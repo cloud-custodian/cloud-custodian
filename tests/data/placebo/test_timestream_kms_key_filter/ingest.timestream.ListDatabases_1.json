@@ -1,0 +1,34 @@
+{
+    "status_code": 200,
+    "data": {
+        "Databases": [
+            {
+                "Arn": "arn:aws:timestream:us-east-1:644160558196:database/test-timestream",
+                "DatabaseName": "test-timestream",
+                "TableCount": 0,
+                "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/a75f7e18-1f8f-44df-8b38-8853ef42555d",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 5,
+                    "day": 1,
+                    "hour": 11,
+                    "minute": 24,
+                    "second": 59,
+                    "microsecond": 174000
+                },
+                "LastUpdatedTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 5,
+                    "day": 6,
+                    "hour": 15,
+                    "minute": 15,
+                    "second": 17,
+                    "microsecond": 229000
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

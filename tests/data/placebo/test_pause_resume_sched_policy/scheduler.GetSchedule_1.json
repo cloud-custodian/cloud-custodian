@@ -1,0 +1,11 @@
+{
+    "status_code": 404,
+    "data": {
+        "Error": {
+            "Message": "Schedule custodian-schedule-ec2-checker-2 does not exist.",
+            "Code": "ResourceNotFoundException"
+        },
+        "ResponseMetadata": {},
+        "Message": "Schedule custodian-schedule-ec2-checker-2 does not exist."
+    }
+}
