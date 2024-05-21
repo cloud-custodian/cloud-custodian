@@ -874,6 +874,18 @@ def get_support_region(manager):
     return support_region
 
 
+def get_resource_tagging_region(resource_type, region):
+    # For global resources, tags don't populate in the get_resources call
+    # unless the call is being made to us-east-1. For govcloud this is us-gov-west-1.
+
+    partition = get_partition(region)
+    if partition == "aws":
+        return getattr(resource_type, 'global_resource', None) and 'us-east-1' or region
+    elif partition == "aws-us-gov":
+        return getattr(resource_type, 'global_resource', None) and 'us-gov-west-1' or region
+    return region
+
+
 def get_eni_resource_type(eni):
     if eni.get('Attachment'):
         instance_id = eni['Attachment'].get('InstanceId')

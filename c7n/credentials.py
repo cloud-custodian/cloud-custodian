@@ -9,6 +9,7 @@ import os
 from botocore.credentials import RefreshableCredentials
 from botocore.session import get_session
 from boto3 import Session
+import json
 
 from c7n.version import version
 from c7n.utils import get_retry
@@ -63,9 +64,11 @@ class CustodianSession(Session):
 
 class SessionFactory:
 
-    def __init__(self, region, profile=None, assume_role=None, external_id=None):
+    def __init__(
+            self, region, profile=None, assume_role=None, external_id=None, session_policy=None):
         self.region = region
         self.profile = profile
+        self.session_policy = session_policy
         self.assume_role = assume_role
         self.external_id = external_id
         self.session_name = "CloudCustodian"
@@ -84,7 +87,7 @@ class SessionFactory:
         if self.assume_role and assume:
             session = Session(profile_name=self.profile)
             session = assumed_session(
-                self.assume_role, self.session_name, session,
+                self.assume_role, self.session_name, self.session_policy, session,
                 region or self.region, self.external_id)
         else:
             session = CustodianSession(
@@ -107,7 +110,8 @@ class SessionFactory:
         self._subscribers = subscribers
 
 
-def assumed_session(role_arn, session_name, session=None, region=None, external_id=None):
+def assumed_session(
+        role_arn, session_name, session_policy=None, session=None, region=None, external_id=None):
     """STS Role assume a boto3.Session
 
     With automatic credential renewal.
@@ -130,6 +134,8 @@ def assumed_session(role_arn, session_name, session=None, region=None, external_
     def refresh():
 
         parameters = {"RoleArn": role_arn, "RoleSessionName": session_name}
+        if session_policy is not None:
+            parameters['Policy'] = json.dumps(session_policy)
 
         if external_id is not None:
             parameters['ExternalId'] = external_id

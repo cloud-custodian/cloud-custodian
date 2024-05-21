@@ -1,0 +1,50 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "FunctionName": "custodian-schedule-ec2-checker",
+        "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-schedule-ec2-checker",
+        "Runtime": "python3.11",
+        "Role": "arn:aws:iam::644160558196:role/custodian-mu",
+        "Handler": "custodian_policy.run",
+        "CodeSize": 625013,
+        "Description": "cloud-custodian lambda policy",
+        "Timeout": 900,
+        "MemorySize": 512,
+        "LastModified": "2024-03-28T12:57:03.000+0000",
+        "CodeSha256": "ALB+gqj5XUDpPFsUmwdyG+uU8uhGtYt94hu4+iJEGoE=",
+        "Version": "$LATEST",
+        "VpcConfig": {
+            "SubnetIds": [],
+            "SecurityGroupIds": [],
+            "VpcId": "",
+            "Ipv6AllowedForDualStack": false
+        },
+        "TracingConfig": {
+            "Mode": "PassThrough"
+        },
+        "RevisionId": "d63ed632-56dd-4a25-96e8-2b7927725de1",
+        "State": "Active",
+        "LastUpdateStatus": "InProgress",
+        "LastUpdateStatusReason": "The function is being created.",
+        "LastUpdateStatusReasonCode": "Creating",
+        "PackageType": "Zip",
+        "Architectures": [
+            "x86_64"
+        ],
+        "EphemeralStorage": {
+            "Size": 512
+        },
+        "SnapStart": {
+            "ApplyOn": "None",
+            "OptimizationStatus": "Off"
+        },
+        "RuntimeVersionConfig": {
+            "RuntimeVersionArn": "arn:aws:lambda:us-east-1::runtime:2d26a57600db1f6cf7cc34a4f11185001f7bae5ca901b445c13723efea1130a6"
+        },
+        "LoggingConfig": {
+            "LogFormat": "Text",
+            "LogGroup": "/aws/lambda/custodian-schedule-ec2-checker"
+        }
+    }
+}

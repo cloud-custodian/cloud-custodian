@@ -48,6 +48,7 @@ class HandleTest(BaseTest):
 
              # defaults
              'external_id': None,
+             'session_policy': None,
              'dryrun': False,
              'profile': None,
              'authorization_file': None,

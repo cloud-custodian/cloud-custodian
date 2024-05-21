@@ -6,6 +6,7 @@ from functools import wraps
 import json
 import itertools
 import logging
+import argparse
 import os
 import sys
 from typing import List
@@ -581,3 +582,21 @@ def version_cmd(options):
     if 'openstack' in found:
         packages.append('c7n_openstack')
     print(generate_requirements(packages))
+
+
+class LoadSessionPolicyJson(argparse.Action):
+
+    @staticmethod
+    def load_session_policy_from_file(session_pol_file_name):
+        # try to read json object
+        try:
+            with open(session_pol_file_name, "r") as sp:
+                s_pol = json.load(sp)
+            return s_pol
+        except Exception as e:
+            raise e
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        file_name = values
+        p = self.load_session_policy_from_file(file_name)
+        setattr(namespace, self.dest, p)

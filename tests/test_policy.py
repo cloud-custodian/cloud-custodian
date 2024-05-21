@@ -1786,9 +1786,12 @@ class LambdaModeTest(BaseTest):
             'name': 'foobar',
             'resource': 'aws.ec2',
             'mode': {
-                'type': 'config-rule',
+                'type': 'schedule',
+                'schedule': 'rate(1 day)',
+                'scheduler-role': 'arn:aws:iam::644160558196:role/custodian-scheduler-mu',
                 'tags': {
-                    'xyz': 'bar'}
+                    'xyz': 'bar'
+                }
             }},
             validate=True)
 
@@ -1803,7 +1806,11 @@ class LambdaModeTest(BaseTest):
         p.provision()
         self.assertEqual(
             policy_lambda[0].tags['custodian-info'],
-            'mode=config-rule:version=%s' % version)
+            'mode=schedule:version=%s' % version)
+        self.assertEqual(
+            policy_lambda[0].tags['custodian-schedule'],
+            'name=custodian-foobar:group=default'
+        )
 
 
 class PullModeTest(BaseTest):

@@ -1,0 +1,7 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "ScheduleArn": "arn:aws:scheduler:us-east-1:644160558196:schedule/default/custodian-schedule-ec2-checker-2"
+    }
+}
