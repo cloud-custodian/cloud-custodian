@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from c7n.actions.core import BaseAction
-from c7n.manager import resources
+from c7n.manager import resources as c7n_resources
 from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, ConfigSource
 from c7n.utils import local_session, type_schema
 from c7n.tags import RemoveTag, Tag
@@ -11,7 +11,6 @@ from c7n.tags import RemoveTag, Tag
 class GetCoreNetwork(DescribeSource):
 
     def augment(self, resources):
-
         resources = super().augment(resources)
         return resources
 
@@ -23,7 +22,7 @@ class DescribeGlobalNetwork(DescribeSource):
         return resources
 
 
-@resources.register('networkmanager-core-network')
+@c7n_resources.register('networkmanager-core-network')
 class CoreNetwork(QueryResourceManager):
 
     class resource_type(TypeInfo):
@@ -33,6 +32,7 @@ class CoreNetwork(QueryResourceManager):
             'get_core_network', 'CoreNetworkId',
             'CoreNetworkId', None)
         arn = 'CoreNetworkArn'
+        name = 'CoreNetworkId'
         id = 'CoreNetworkId'
         date = 'CreatedAt'
         config_type = None
@@ -43,19 +43,18 @@ class CoreNetwork(QueryResourceManager):
     source_mapping = {'describe': GetCoreNetwork, 'config': ConfigSource}
 
 
-@resources.register('networkmanager-global-network')
+@c7n_resources.register('networkmanager-global-network')
 class GlobalNetwork(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'networkmanager'
         enum_spec = ('describe_global_networks', 'GlobalNetworks', None)
-        # batch_detail_spec = (
-        #    'describe_global_networks', 'GlobalNetworkIds',
-        #    'GlobalNetworkId', 'GlobalNetworks', None)
         arn = 'GlobalNetworkArn'
+        name = 'GlobalNetworkId'
         id = 'GlobalNetworkId'
         date = 'CreatedAt'
-        config_type = cfn_type = 'AWS::NetworkManager::GlobalNetwork'
+        config_type = None
+        cfn_type = 'AWS::NetworkManager::GlobalNetwork'
         permissions_augment = ("networkmanager:ListTagsForResource",)
         universal_taggable = object()
 
@@ -69,9 +68,9 @@ class TagNetwork(Tag):
     """
     permissions = ('networkmanager:TagResource',)
 
-    def process_resource_set(self, client, resources, tags):
+    def process_resource_set(self, client, resource_set, tags):
         mid = self.manager.resource_type.id
-        for r in resources:
+        for r in resource_set:
             try:
                 client.tag_resource(ResourceArn=r[mid], Tags=tags)
             except client.exceptions.ResourceNotFoundException:
@@ -85,11 +84,11 @@ class RemoveTagNetwork(RemoveTag):
     """
     permissions = ('networkmanager:UntagResource',)
 
-    def process_resource_set(self, client, resources, keys):
+    def process_resource_set(self, client, resource_set, tag_keys):
         mid = self.manager.resource_type.id
-        for r in resources:
+        for r in resource_set:
             try:
-                client.untag_resource(ResourceArn=r[mid], TagKeys=keys)
+                client.untag_resource(ResourceArn=r[mid], TagKeys=tag_keys)
             except client.exceptions.ResourceNotFoundException:
                 continue
 
