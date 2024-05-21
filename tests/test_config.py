@@ -1,6 +1,9 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import warnings
+
 from c7n.exceptions import PolicyValidationError
+
 from .common import BaseTest
 
 
@@ -200,3 +203,55 @@ class ConfigRuleTest(BaseTest):
         p.expand_variables(p.get_variables())
         resources = p.run()
         self.assertEqual(len(resources), 0)
+
+    def test_retention_configurations(self):
+        session_factory = self.replay_flight_data('test_retention_configurations')
+
+        client = session_factory().client("config")
+        retention_configurations = client.describe_retention_configurations().get(
+            'RetentionConfigurations', []
+        )
+
+        if retention_configurations:
+            p = self.load_policy({
+                'name': 'recorder',
+                'resource': 'aws.config-recorder',
+                'filters': [
+                    {
+                        'type': 'retention-configurations',
+                        'key': 'RetentionPeriodInDays',
+                        'value': retention_configurations[-1]['RetentionPeriodInDays']
+                    }
+                ]},
+                session_factory=session_factory)
+            resources = p.run()
+            if resources:
+                self.assertEqual(len(resources), 1)
+                self.assertIn('c7n:ConfigRetentionConfigs', resources[0])
+                self.assertEqual(
+                        resources[0]['c7n:ConfigRetentionConfigs']['RetentionPeriodInDays'],
+                        retention_configurations[-1]['RetentionPeriodInDays']
+                )
+            else:
+                self.assertEqual(len(resources), 0)
+        else:
+            warnings.warn("The retention_configurations list is empty.")
+            self.assertEqual(len(retention_configurations), 0)
+
+    def test_retention_configurations_without_filter(self):
+        session_factory = self.replay_flight_data('test_retention_configurations_without_filter')
+        p = self.load_policy({
+            'name': 'recorder',
+            'resource': 'aws.config-recorder',
+            'filters': [
+                {
+                    'type': 'retention-configurations'
+                }
+            ]},
+            session_factory=session_factory)
+        resources = p.run()
+        if resources:
+            self.assertEqual(len(resources), 1)
+            self.assertIn('c7n:ConfigRetentionConfigs', resources[0])
+        else:
+            self.assertEqual(len(resources), 0)

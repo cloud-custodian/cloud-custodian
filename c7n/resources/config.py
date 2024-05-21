@@ -76,6 +76,78 @@ class ConfigCrossAccountFilter(CrossAccountAccessFilter):
         return resources
 
 
+@ConfigRecorder.filter_registry.register("retention-configurations")
+class ConfigRetentionConfigurations(ValueFilter):
+    """
+    Filter to look for config retention configurations
+
+    AWS Config supports only one retention configuration per region in a particular account.
+
+    RetentionPeriodInDays value should be an integer ranging from 30 to 2557
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+        - name: config-recorder
+          resource: config-recorder
+          filters:
+            - type: retention-configurations
+              key: RetentionPeriodInDays
+              value: 30
+
+    Also retrieves the retention configuration if no key/value is provided:
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+        - name: config-recorder
+          resource: config-recorder
+          filters:
+            - type: retention-configurations
+    """
+
+    schema = type_schema(
+        "retention-configurations",
+        rinherit=ValueFilter.schema,
+        key={"type": "string"},
+        value={"type": "integer"}
+    )
+    schema_alias = False
+    permissions = ("config:DescribeRetentionConfigurations",)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client("config")
+
+        retention_configs = client.describe_retention_configurations().get(
+            "RetentionConfigurations", []
+        )
+
+        if retention_configs:
+            # Config supports only one retention configuration per region in a particular account.
+            retention_config = retention_configs[0]
+
+            for resource in resources:
+                resource["c7n:ConfigRetentionConfigs"] = retention_config
+
+            if "key" not in self.data or "value" not in self.data:
+                return resources
+            else:
+                key = self.data["key"]
+                value = self.data["value"]
+
+            return [
+                resource
+                for resource in resources
+                if resource["c7n:ConfigRetentionConfigs"].get(key) == value
+            ]
+        else:
+            return []
+
+
 @resources.register('config-rule')
 class ConfigRule(QueryResourceManager):
 
