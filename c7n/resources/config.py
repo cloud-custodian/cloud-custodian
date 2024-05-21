@@ -76,7 +76,7 @@ class ConfigCrossAccountFilter(CrossAccountAccessFilter):
         return resources
 
 
-@ConfigRecorder.filter_registry.register("retention-configurations")
+@ConfigRecorder.filter_registry.register("retention")
 class ConfigRetentionConfigurations(ValueFilter):
     """
     Filter to look for config retention configurations
@@ -93,9 +93,10 @@ class ConfigRetentionConfigurations(ValueFilter):
         - name: config-recorder
           resource: config-recorder
           filters:
-            - type: retention-configurations
+            - type: retention
               key: RetentionPeriodInDays
               value: 30
+              op: gt
 
     Also retrieves the retention configuration if no key/value is provided:
 
@@ -107,17 +108,23 @@ class ConfigRetentionConfigurations(ValueFilter):
         - name: config-recorder
           resource: config-recorder
           filters:
-            - type: retention-configurations
+            - type: retention
     """
 
     schema = type_schema(
-        "retention-configurations",
+        "retention",
+        state={'enum': ["present", "absent"]},
         rinherit=ValueFilter.schema,
-        key={"type": "string"},
-        value={"type": "integer"}
+        op={'type': 'string', 'enum': ['eq', 'ne', 'gt', 'ge', 'lt', 'le'], 'default': 'eq'},
     )
     schema_alias = False
     permissions = ("config:DescribeRetentionConfigurations",)
+    annotation_key = "c7n:ConfigRetentionConfigs"
+
+    def validate(self):
+        if 'state' in self.data and self.data['state'] == 'absent':
+            return self
+        return super().validate()
 
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client("config")
@@ -126,26 +133,49 @@ class ConfigRetentionConfigurations(ValueFilter):
             "RetentionConfigurations", []
         )
 
-        if retention_configs:
-            # Config supports only one retention configuration per region in a particular account.
-            retention_config = retention_configs[0]
-
-            for resource in resources:
-                resource["c7n:ConfigRetentionConfigs"] = retention_config
-
-            if "key" not in self.data or "value" not in self.data:
+        if not retention_configs:
+            if self.data.get('state', 'present') == 'absent':
+                for resource in resources:
+                    resource[self.annotation_key] = None
                 return resources
-            else:
-                key = self.data["key"]
-                value = self.data["value"]
-
-            return [
-                resource
-                for resource in resources
-                if resource["c7n:ConfigRetentionConfigs"].get(key) == value
-            ]
-        else:
             return []
+
+        retention_config = retention_configs[0]
+        for resource in resources:
+            resource[self.annotation_key] = retention_config
+
+        if 'key' not in self.data and 'value' not in self.data:
+            return resources
+
+        return super().process(resources, event)
+
+    def __call__(self, resource):
+        retention_config = resource.get(self.annotation_key)
+        if retention_config is None:
+            return False
+
+        key = self.data.get('key')
+        value = self.data.get('value')
+        op = self.data.get('op', 'eq')
+
+        if key not in retention_config:
+            return False
+
+        resource_value = retention_config[key]
+
+        if op == 'eq' and resource_value == value:
+            return True
+        elif op == 'ne' and resource_value != value:
+            return True
+        elif op == 'gt' and resource_value > value:
+            return True
+        elif op == 'ge' and resource_value >= value:
+            return True
+        elif op == 'lt' and resource_value < value:
+            return True
+        elif op == 'le' and resource_value <= value:
+            return True
+        return False
 
 
 @resources.register('config-rule')

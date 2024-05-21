@@ -1,9 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-import warnings
-
 from c7n.exceptions import PolicyValidationError
-
 from .common import BaseTest
 
 
@@ -218,7 +215,7 @@ class ConfigRuleTest(BaseTest):
                 'resource': 'aws.config-recorder',
                 'filters': [
                     {
-                        'type': 'retention-configurations',
+                        'type': 'retention',
                         'key': 'RetentionPeriodInDays',
                         'value': retention_configurations[-1]['RetentionPeriodInDays']
                     }
@@ -229,13 +226,12 @@ class ConfigRuleTest(BaseTest):
                 self.assertEqual(len(resources), 1)
                 self.assertIn('c7n:ConfigRetentionConfigs', resources[0])
                 self.assertEqual(
-                        resources[0]['c7n:ConfigRetentionConfigs']['RetentionPeriodInDays'],
-                        retention_configurations[-1]['RetentionPeriodInDays']
+                    resources[0]['c7n:ConfigRetentionConfigs']['RetentionPeriodInDays'],
+                    retention_configurations[-1]['RetentionPeriodInDays']
                 )
             else:
                 self.assertEqual(len(resources), 0)
         else:
-            warnings.warn("The retention_configurations list is empty.")
             self.assertEqual(len(retention_configurations), 0)
 
     def test_retention_configurations_without_filter(self):
@@ -245,7 +241,7 @@ class ConfigRuleTest(BaseTest):
             'resource': 'aws.config-recorder',
             'filters': [
                 {
-                    'type': 'retention-configurations'
+                    'type': 'retention'
                 }
             ]},
             session_factory=session_factory)
@@ -253,5 +249,61 @@ class ConfigRuleTest(BaseTest):
         if resources:
             self.assertEqual(len(resources), 1)
             self.assertIn('c7n:ConfigRetentionConfigs', resources[0])
+        else:
+            self.assertEqual(len(resources), 0)
+
+    def test_retention_configurations_with_comparison(self):
+        session_factory = self.replay_flight_data('test_retention_configurations_with_comparison')
+
+        client = session_factory().client("config")
+        retention_configurations = client.describe_retention_configurations().get(
+            'RetentionConfigurations', []
+        )
+
+        if retention_configurations:
+            p = self.load_policy({
+                'name': 'recorder',
+                'resource': 'aws.config-recorder',
+                'filters': [
+                    {
+                        'type': 'retention',
+                        'key': 'RetentionPeriodInDays',
+                        'value': 30,
+                        'op': 'gt'
+                    }
+                ]},
+                session_factory=session_factory)
+            resources = p.run()
+            expected_resources = [
+                r for r in retention_configurations if r['RetentionPeriodInDays'] > 30
+            ]
+            if expected_resources:
+                self.assertEqual(len(resources), len(expected_resources))
+                for resource in resources:
+                    self.assertIn('c7n:ConfigRetentionConfigs', resource)
+                    self.assertGreater(
+                        resource['c7n:ConfigRetentionConfigs']['RetentionPeriodInDays'], 30
+                    )
+            else:
+                self.assertEqual(len(resources), 0)
+        else:
+            self.assertEqual(len(retention_configurations), 0)
+
+    def test_retention_configurations_absent(self):
+        session_factory = self.replay_flight_data('test_retention_configurations_absent')
+        p = self.load_policy({
+            'name': 'recorder',
+            'resource': 'aws.config-recorder',
+            'filters': [
+                {
+                    'type': 'retention',
+                    'state': 'absent'
+                }
+            ]},
+            session_factory=session_factory)
+        resources = p.run()
+        if resources:
+            for resource in resources:
+                self.assertIsNone(resource.get('c7n:ConfigRetentionConfigs'))
         else:
             self.assertEqual(len(resources), 0)
