@@ -1750,7 +1750,7 @@ class AttachLambdaEncrypt(BucketActionBase):
         else:
             source = BucketLambdaNotification(
                 {'account_s3': account_id}, session_factory, bucket)
-        return source.add(func)
+        return source.add(func, None)
 
 
 @actions.register('encryption-policy')

@@ -170,3 +170,22 @@ class TestTimestreamTable(BaseTest):
         client = session_factory().client('timestream-write')
         tables = client.list_tables()['Tables']
         self.assertEqual(len(tables), 0)
+
+    def test_timestream_kms_key_filter(self):
+        session_factory = self.replay_flight_data('test_timestream_kms_key_filter')
+        p = self.load_policy(
+            {
+                'name': 'timestream_kms_key_filter',
+                'resource': 'timestream-database',
+                'filters': [
+                    {
+                        'type': 'kms-key',
+                        'key': 'c7n:AliasName',
+                        'value': 'alias/test/timestream',
+                    },
+                ],
+            }, session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources[0]['c7n:matched-kms-key']), 1)

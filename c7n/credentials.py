@@ -3,11 +3,13 @@
 """
 Authentication utilities
 """
+import threading
 import os
 
 from botocore.credentials import RefreshableCredentials
 from botocore.session import get_session
 from boto3 import Session
+import json
 
 from c7n.version import version
 from c7n.utils import get_retry
@@ -19,11 +21,54 @@ USE_STS_REGIONAL = os.environ.get(
     'C7N_USE_STS_REGIONAL', '').lower() in ('yes', 'true')
 
 
+class CustodianSession(Session):
+
+    # track clients and return extant ones if present
+    _clients = {}
+    lock = threading.Lock()
+
+    def client(self, service_name, region_name=None, *args, **kw):
+        if kw.get('config'):
+            return super().client(service_name, region_name, *args, **kw)
+
+        key = self._cache_key(service_name, region_name)
+        client = self._clients.get(key)
+        if client is not None:
+            return client
+
+        with self.lock:
+            client = self._clients.get(key)
+            if client is not None:
+                return client
+
+            client = super().client(service_name, region_name, *args, **kw)
+            self._clients[key] = client
+            return client
+
+    def _cache_key(self, service_name, region_name):
+        region_name = region_name or self.region_name
+        return (
+            # namedtuple so stable comparison
+            hash(self.get_credentials().get_frozen_credentials()),
+            service_name,
+            region_name
+        )
+
+    @classmethod
+    def close(cls):
+        with cls.lock:
+            for c in cls._clients.values():
+                c.close()
+            cls._clients = {}
+
+
 class SessionFactory:
 
-    def __init__(self, region, profile=None, assume_role=None, external_id=None):
+    def __init__(
+            self, region, profile=None, assume_role=None, external_id=None, session_policy=None):
         self.region = region
         self.profile = profile
+        self.session_policy = session_policy
         self.assume_role = assume_role
         self.external_id = external_id
         self.session_name = "CloudCustodian"
@@ -42,10 +87,10 @@ class SessionFactory:
         if self.assume_role and assume:
             session = Session(profile_name=self.profile)
             session = assumed_session(
-                self.assume_role, self.session_name, session,
+                self.assume_role, self.session_name, self.session_policy, session,
                 region or self.region, self.external_id)
         else:
-            session = Session(
+            session = CustodianSession(
                 region_name=region or self.region, profile_name=self.profile)
 
         return self.update(session)
@@ -65,7 +110,8 @@ class SessionFactory:
         self._subscribers = subscribers
 
 
-def assumed_session(role_arn, session_name, session=None, region=None, external_id=None):
+def assumed_session(
+        role_arn, session_name, session_policy=None, session=None, region=None, external_id=None):
     """STS Role assume a boto3.Session
 
     With automatic credential renewal.
@@ -88,6 +134,8 @@ def assumed_session(role_arn, session_name, session=None, region=None, external_
     def refresh():
 
         parameters = {"RoleArn": role_arn, "RoleSessionName": session_name}
+        if session_policy is not None:
+            parameters['Policy'] = json.dumps(session_policy)
 
         if external_id is not None:
             parameters['ExternalId'] = external_id
@@ -118,7 +166,7 @@ def assumed_session(role_arn, session_name, session=None, region=None, external_
     if region is None:
         region = s.get_config_variable('region') or 'us-east-1'
     s.set_config_variable('region', region)
-    return Session(botocore_session=s)
+    return CustodianSession(botocore_session=s)
 
 
 def get_sts_client(session, region):
