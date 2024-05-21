@@ -297,7 +297,8 @@ class ConfigRuleTest(BaseTest):
             'filters': [
                 {
                     'type': 'retention',
-                    'state': 'absent'
+                    'key': 'ConfigRetentionConfigs',
+                    'value': 'absent'
                 }
             ]},
             session_factory=session_factory)
