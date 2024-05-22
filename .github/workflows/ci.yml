@@ -163,9 +163,11 @@ jobs:
         shell: bash
         env:
           COV_RUN: ${{ contains(matrix.python-version, '3.12') && contains(matrix.os, 'ubuntu') }}
+          COVERAGE_PROCESS_START: .coveragerc  # Ensure this is set to use sys.monitoring
         run: |
           if [[ "$COV_RUN" == "true" ]]
           then
+            poetry run coverage run -m pytest -n auto --cov-config .coveragerc --cov c7n tests tools
             poetry run coverage xml
           else
             make test
