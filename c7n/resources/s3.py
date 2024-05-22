@@ -376,7 +376,8 @@ class S3(query.QueryResourceManager):
             "s3:GetBucketNotification",
             "s3:GetBucketWebsite",
             "s3:GetLifecycleConfiguration",
-            "s3:GetReplicationConfiguration"
+            "s3:GetReplicationConfiguration",
+            "s3:GetBucketObjectLockConfiguration"
         )
         name = id = 'Name'
         date = 'CreationDate'
@@ -427,6 +428,8 @@ S3_AUGMENT_TABLE = (
      'Notification', None, None, 's3:GetBucketNotification'),
     ('get_bucket_lifecycle_configuration',
      'Lifecycle', None, None, 's3:GetLifecycleConfiguration'),
+    ('get_object_lock_configuration', 'ObjectLockConfiguration', {},
+     'ObjectLockConfiguration', 's3:GetBucketObjectLockConfiguration')
     #        ('get_bucket_cors', 'Cors'),
 )
 
