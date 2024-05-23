@@ -66,6 +66,24 @@ class ManagedInstance(QueryResourceManager):
     permissions = ('ssm:DescribeInstanceInformation',)
 
 
+@resources.register('ssm-regional-settings')
+class RegionalSettings(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'ssm'
+        enum_spec = ('get_document', None, {'Name': 'SSM-SessionManagerRunShell'})
+        id = name = 'Name'
+        date = 'CreatedDate'
+        cfn_type = 'AWS::SSM::Document'
+        arn_type = 'document'
+        universal_taggable = object()
+
+    permissions = ('ssm:GetDocument',)
+
+    def augment(self, resources):
+        return [resources]
+
+
 @EC2.action_registry.register('send-command')
 @ManagedInstance.action_registry.register('send-command')
 class SendCommand(Action):
