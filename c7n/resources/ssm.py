@@ -66,7 +66,7 @@ class ManagedInstance(QueryResourceManager):
     permissions = ('ssm:DescribeInstanceInformation',)
 
 
-@resources.register('ssm-regional-settings')
+@resources.register('session-manager-regional-settings')
 class RegionalSettings(QueryResourceManager):
 
     class resource_type(TypeInfo):
