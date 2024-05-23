@@ -617,10 +617,12 @@ class PostItem(Action):
 
 resources.subscribe(PostItem.register_resource)
 
+
 class SSMDocumentDescribe(DescribeSource):
 
     def augment(self, resources):
         return universal_augment(self.manager, super().augment(resources))
+
 
 @resources.register('ssm-document')
 class SSMDocument(QueryResourceManager):
