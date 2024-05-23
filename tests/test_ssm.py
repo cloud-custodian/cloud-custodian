@@ -404,7 +404,7 @@ class TestSSM(BaseTest):
             self.assertTrue(e, client.exceptions.InvalidDocumentOperation)
 
     def test_ssm_document_tag(self):
-        session_factory = self.record_flight_data("test_ssm_document_tag")
+        session_factory = self.replay_flight_data("test_ssm_document_tag")
         client = session_factory().client("ssm")
         p = self.load_policy(
             {

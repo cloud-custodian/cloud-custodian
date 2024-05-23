@@ -75,7 +75,6 @@ class RegionalSettings(QueryResourceManager):
         id = name = 'Name'
         date = 'CreatedDate'
         arn_type = 'document'
-        universal_taggable = object()
 
     permissions = ('ssm:GetDocument',)
 
