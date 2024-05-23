@@ -85,7 +85,7 @@ def _eb_env_tags(envs, session_factory, retry):
                 client.list_tags_for_resource,
                 ResourceArn=eb_env['EnvironmentArn'])['ResourceTags']
         except client.exceptions.ResourceNotFoundException:
-            return
+            eb_env['Tags'] = []
         return eb_env
 
     # Handle API rate-limiting, which is a problem for accounts with many
