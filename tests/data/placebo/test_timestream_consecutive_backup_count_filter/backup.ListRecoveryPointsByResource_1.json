@@ -1,0 +1,28 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "RecoveryPoints": [
+            {
+                "RecoveryPointArn": "arn:aws:backup:us-east-1:644160558196:recovery-point:757807c0-ef88-4055-aa6f-b7f2ac04e8b5",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 5,
+                    "day": 13,
+                    "hour": 22,
+                    "minute": 10,
+                    "second": 12,
+                    "microsecond": 899000
+                },
+                "Status": "COMPLETED",
+                "EncryptionKeyArn": "arn:aws:kms:us-east-1:644160558196:key/5d97ffc0-5842-49ce-9daf-6d0a129bf6c8",
+                "BackupSizeBytes": 0,
+                "BackupVaultName": "Default",
+                "IsParent": false,
+                "ResourceName": "database/test-timestream/table/test-2",
+                "VaultType": "BACKUP_VAULT"
+            }
+        ]
+    }
+}
