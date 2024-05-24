@@ -239,6 +239,8 @@ ResourceMap = {
   "aws.sagemaker-transform-job": "c7n.resources.sagemaker.SagemakerTransformJob",
   "aws.sagemaker-hyperparameter-tuning-job":
     "c7n.resources.sagemaker.SagemakerHyperParameterTuningJob",
+  "aws.sagemaker-model-bias-job-definition":
+    "c7n.resources.sagemaker.SagemakerModelBiasJobDefinition",
   "aws.scaling-policy": "c7n.resources.asg.ScalingPolicy",
   "aws.secrets-manager": "c7n.resources.secretsmanager.SecretsManager",
   "aws.security-group": "c7n.resources.vpc.SecurityGroup",
