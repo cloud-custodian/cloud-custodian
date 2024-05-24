@@ -190,15 +190,18 @@ class ValuesFrom:
         from boto3.dynamodb.types import TypeDeserializer
 
         client = local_session(self.manager.session_factory).client('dynamodb')
-        pager = client.get_paginator('execute_statement')
         deserializer = TypeDeserializer()
-
         results = []
-        for page in pager.paginate(Statement=self.data['query']):
-            rows = page.get('Items')
-            for r in rows:
-                results.append({k: deserializer.deserialize(v) for k, v in r.items()})
-        if self.data.get('expr'):
+
+        record_singleton = False
+        for row in client.execute_statement(Statement=self.data['query']).get('Items', []):
+            record = {k: deserializer.deserialize(v) for k, v in row.items()}
+            if record_singleton or len(record) == 1:
+                record_singleton = True
+                results.append(list(record.values())[0])
+            else:
+                results.append(record)
+        if not record_singleton and self.data.get('expr'):
             return self._get_resource_values(results)
         return results
 

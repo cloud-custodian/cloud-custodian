@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "Items": [
+            {
+                "app_name": {
+                    "S": "cicd"
+                }
+            },
+            {
+                "app_name": {
+                    "S": "app1"
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
