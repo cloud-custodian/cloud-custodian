@@ -65,11 +65,27 @@ def test_dynamodb_resolver(test, dynamodb_resolver):
     resolver = ValuesFrom({
         "url": "dynamodb",
         "query": f'select app_name from "{dynamodb_resolver["aws_dynamodb_table.apps.name"]}"',
-        "format": "txt"
     }, manager)
 
     values = resolver.get_values()
     assert values == ["cicd", "app1"]
+
+
+@terraform('dynamodb_resolver_multi', replay=False)
+def test_dynamodb_resolver_multi(test, dynamodb_resolver_multi):
+    factory = test.record_flight_data("test_dynamodb_resolver_multi")
+    manager = Bag(session_factory=factory, _cache=None,
+                  config=Bag(account_id="123", region="us-east-1"))
+    resolver = ValuesFrom({
+        "url": "dynamodb",
+        "query": (
+            f'select app_name, env from "{dynamodb_resolver_multi["aws_dynamodb_table.apps.name"]}"'
+        ),
+        "expr": "[].env"
+    }, manager)
+
+    values = resolver.get_values()
+    assert set(values) == {"shared", "prod"}
 
 
 class ResolverTest(BaseTest):

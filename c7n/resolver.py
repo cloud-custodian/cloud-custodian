@@ -188,19 +188,28 @@ class ValuesFrom:
             return
 
         from boto3.dynamodb.types import TypeDeserializer
+        from botocore.paginate import Paginator
 
         client = local_session(self.manager.session_factory).client('dynamodb')
+
+        pager = Paginator(
+            client.execute_statement,
+            {"input_token": "NextToken", "output_token": "NextToken", "result_key": "Items"},
+            client.meta.service_model.operation_model('ExecuteStatement')
+        )
         deserializer = TypeDeserializer()
         results = []
 
         record_singleton = False
-        for row in client.execute_statement(Statement=self.data['query']).get('Items', []):
-            record = {k: deserializer.deserialize(v) for k, v in row.items()}
-            if record_singleton or len(record) == 1:
-                record_singleton = True
-                results.append(list(record.values())[0])
-            else:
-                results.append(record)
+        # result = client.execute_statement(Statement=self.data['query'])
+        for page in pager.paginate(Statement=self.data['query']):
+            for row in page.get("Items", []):
+                record = {k: deserializer.deserialize(v) for k, v in row.items()}
+                if record_singleton or len(record) == 1:
+                    record_singleton = True
+                    results.append(list(record.values())[0])
+                else:
+                    results.append(record)
         if not record_singleton and self.data.get('expr'):
             return self._get_resource_values(results)
         return results
