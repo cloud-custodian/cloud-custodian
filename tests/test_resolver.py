@@ -71,9 +71,9 @@ def test_dynamodb_resolver(test, dynamodb_resolver):
     assert values == ["cicd", "app1"]
 
 
-@terraform('dynamodb_resolver_multi', replay=False)
+@terraform('dynamodb_resolver_multi')
 def test_dynamodb_resolver_multi(test, dynamodb_resolver_multi):
-    factory = test.record_flight_data("test_dynamodb_resolver_multi")
+    factory = test.replay_flight_data("test_dynamodb_resolver_multi")
     manager = Bag(session_factory=factory, _cache=None,
                   config=Bag(account_id="123", region="us-east-1"))
     resolver = ValuesFrom({
