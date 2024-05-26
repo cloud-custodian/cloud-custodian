@@ -17,8 +17,7 @@ from c7n.filters.kms import KmsRelatedFilter
 from .aws import shape_validate
 from c7n.exceptions import PolicyValidationError
 from c7n.utils import (
-    local_session, type_schema, get_retry, chunks, snapshot_identifier,
-    merge_dict_list, filter_empty, jmespath_search)
+    local_session, type_schema, get_retry, chunks, snapshot_identifier)
 from botocore.exceptions import ClientError
 
 from c7n.resources.rds import ParameterFilter
@@ -565,7 +564,6 @@ class SetPermissions(rds.SetPermissions):
 class RDSClusterSnapshotRegionCopy(BaseAction):
     """Action to Copy RDS cluster snapshot
     Example::
-
       - name: copy-encrypted-snapshots
         description: |
           copy snapshots under 1 day old to dr region with kms
@@ -593,10 +591,8 @@ class RDSClusterSnapshotRegionCopy(BaseAction):
         tags={'type': 'object'},
         required=('target_region',))
     permissions = ('rds:CopyDBSnapshot',)
-    
     min_delay = 120
     max_attempts = 30
-
     def validate(self):
         if self.data.get('target_region') and self.manager.data.get('mode'):
             raise PolicyValidationError(
@@ -660,9 +656,6 @@ class RDSClusterSnapshotRegionCopy(BaseAction):
                 if tags and self.data.get('copy_tags', True):
                     rtags.extend(r['Tags'])
                 self.process_resource(target_client, target_key, rtags, r)
-
-
-
 @RDSClusterSnapshot.action_registry.register('delete')
 class RDSClusterSnapshotDelete(BaseAction):
     """Action to delete rds cluster snapshots
