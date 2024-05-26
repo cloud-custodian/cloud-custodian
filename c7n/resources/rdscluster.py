@@ -559,7 +559,8 @@ class SetPermissions(rds.SetPermissions):
                 AttributeName='restore',
                 ValuesToRemove=remove_accounts,
                 ValuesToAdd=add_accounts)
-            
+
+
 @RDSClusterSnapshot.action_registry.register('region-copy')
 class RDSClusterSnapshotRegionCopy(BaseAction):
     """Action to Copy RDS cluster snapshot
@@ -593,6 +594,7 @@ class RDSClusterSnapshotRegionCopy(BaseAction):
     permissions = ('rds:CopyDBSnapshot',)
     min_delay = 120
     max_attempts = 30
+
     def validate(self):
         if self.data.get('target_region') and self.manager.data.get('mode'):
             raise PolicyValidationError(
@@ -656,6 +658,8 @@ class RDSClusterSnapshotRegionCopy(BaseAction):
                 if tags and self.data.get('copy_tags', True):
                     rtags.extend(r['Tags'])
                 self.process_resource(target_client, target_key, rtags, r)
+
+               
 @RDSClusterSnapshot.action_registry.register('delete')
 class RDSClusterSnapshotDelete(BaseAction):
     """Action to delete rds cluster snapshots
