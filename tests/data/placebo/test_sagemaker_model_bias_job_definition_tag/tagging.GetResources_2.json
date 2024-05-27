@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:sagemaker:us-east-1:644160558196:model-bias-job-definition/test-c7n-mdl-bias-job-def",
+                "Tags": [
+                    {
+                        "Key": "Owner",
+                        "Value": "c7n"
+                    },
+                    {
+                        "Key": "c7n-test",
+                        "Value": "c7n-test"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
