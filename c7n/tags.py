@@ -72,10 +72,8 @@ def universal_augment(self, resources):
     if not resources:
         return resources
 
-    # For global resources, tags don't populate in the get_resources call
-    # unless the call is being made to us-east-1
-    region = getattr(self.resource_type, 'global_resource', None) and 'us-east-1' or self.region
-
+    region = utils.get_resource_tagging_region(self.resource_type, self.region)
+    self.log.debug("Using region %s for resource tagging" % region)
     client = utils.local_session(
         self.session_factory).client('resourcegroupstaggingapi', region_name=region)
 

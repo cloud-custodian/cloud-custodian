@@ -1,0 +1,48 @@
+{
+    "status_code": 200,
+    "data": {
+        "Tables": [
+            {
+                "Arn": "arn:aws:timestream:us-east-1:644160558196:database/test-timestream/table/test-2",
+                "TableName": "test-2",
+                "DatabaseName": "test-timestream",
+                "TableStatus": "ACTIVE",
+                "RetentionProperties": {
+                    "MemoryStoreRetentionPeriodInHours": 12,
+                    "MagneticStoreRetentionPeriodInDays": 1
+                },
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 5,
+                    "day": 13,
+                    "hour": 22,
+                    "minute": 2,
+                    "second": 21,
+                    "microsecond": 252000
+                },
+                "LastUpdatedTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 5,
+                    "day": 13,
+                    "hour": 22,
+                    "minute": 2,
+                    "second": 21,
+                    "microsecond": 244000
+                },
+                "MagneticStoreWriteProperties": {
+                    "EnableMagneticStoreWrites": false
+                },
+                "Schema": {
+                    "CompositePartitionKey": [
+                        {
+                            "Type": "MEASURE"
+                        }
+                    ]
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
