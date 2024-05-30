@@ -625,7 +625,8 @@ class UpdateTlsConfig(Action):
     """
 
     schema = type_schema('update-tls-config', value={'type': 'string',
-        'enum': ['Policy-Min-TLS-1-0-2019-07', 'Policy-Min-TLS-1-2-2019-07']}, required=['value'])
+        'enum': ['Policy-Min-TLS-1-0-2019-07', 'Policy-Min-TLS-1-2-2019-07',
+                 'Policy-Min-TLS-1-2-PFS-2023-10']}, required=['value'])
     permissions = ('es:UpdateElasticsearchDomainConfig', 'es:ListDomainNames')
 
     def process(self, resources):
