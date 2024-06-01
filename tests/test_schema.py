@@ -82,6 +82,19 @@ class StructureParserTest(BaseTest):
         p = StructureParser()
         p.validate({'policies': [{'name': 'foo', 'resource': 'ec2', 'filters': None}]})
 
+    def test_invalid_mode(self):
+        p = StructureParser()
+        with self.assertRaises(PolicyValidationError) as ecm:
+            p.validate({'policies': [{
+                'name': 'foo', 'resource': 'ec2', 'mode': None}]})
+        self.assertTrue(str(ecm.exception).startswith(
+            'invalid `mode` declaration'))
+        with self.assertRaises(PolicyValidationError) as ecm:
+            p.validate({'policies': [{
+                'name': 'foo', 'resource': 'ec2', 'mode': []}]})
+        self.assertTrue(str(ecm.exception).startswith(
+            'invalid `mode` declaration'))
+
     def test_invalid_filter(self):
         p = StructureParser()
         with self.assertRaises(PolicyValidationError) as ecm:
