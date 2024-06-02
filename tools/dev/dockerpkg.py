@@ -239,12 +239,6 @@ ADD tools/c7n_awscc /src/tools/c7n_awscc
 RUN . /usr/local/bin/activate && cd tools/c7n_awscc && poetry install
 """
 
-TARGET_AWSCC = """\
-LABEL "org.opencontainers.image.title"="awscc"
-LABEL "org.opencontainers.image.description"="Cloud Custodian AWS Control Control"
-LABEL "org.opencontainers.image.documentation"="https://cloudcustodian.io/docs"
-"""
-
 
 class Image:
 
