@@ -71,7 +71,7 @@ runs:
       id: install-custodian
       uses: ./.github/composites/install
       with:
-        python-version: "3.12"
+        python-version: "3.11"
 
     # build a single platform image first in order to actually load the image from buildx
     # manifests are not supported yet
