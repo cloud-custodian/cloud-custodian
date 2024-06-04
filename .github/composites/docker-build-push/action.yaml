@@ -116,7 +116,7 @@ runs:
         push: true
         pull: true
         platforms: ${{ inputs.platforms }}
-        tags: ${{ steps.meta.outputs.tags }}m
+        tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
         file: "docker/${{ inputs.name }}"
         cache-from: type=gha
