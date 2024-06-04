@@ -24,7 +24,7 @@ template_body = json.dumps(
 
 @pytest.fixture(scope="function")
 def org_tree(request):
-    with moto.mock_organizations():
+    with moto.mock_aws():
         client = boto3.client("organizations")
         org = client.create_organization(FeatureSet="ALL")["Organization"]
         root = client.list_roots()["Roots"][0]
@@ -74,17 +74,16 @@ def org_tree(request):
             SourceParentId=root["Id"],
             DestinationParentId=group_c["Id"],
         )
-        with moto.mock_resourcegroupstaggingapi():
-            yield dict(
-                org=org,
-                dept_a=dept_a,
-                dept_b=dept_b,
-                group_c=group_c,
-                account_a=account_a,
-                account_b=account_b,
-                account_c=account_c,
-                root=root,
-            )
+        yield dict(
+            org=org,
+            dept_a=dept_a,
+            dept_b=dept_b,
+            group_c=group_c,
+            account_a=account_a,
+            account_b=account_b,
+            account_c=account_c,
+            root=root,
+        )
 
 
 @pytest.fixture
@@ -372,7 +371,7 @@ def test_org_account_moto(test, org_tree):
     assert len(resources) == 1
 
 
-@moto.mock_cloudformation
+@moto.mock_aws
 def test_org_account_filter_cfn_absent(test):
     p = test.load_policy(
         {
@@ -409,7 +408,7 @@ def test_org_account_filter_cfn_process(account_session, test):
     assert result == [{"Id": "123", "Name": "test-account", "c7n:cfn-stack": {"us-east-1": True}}]
 
 
-@moto.mock_cloudformation
+@moto.mock_aws
 def test_org_account_filter_cfn_present(test):
     p = test.load_policy(
         {
