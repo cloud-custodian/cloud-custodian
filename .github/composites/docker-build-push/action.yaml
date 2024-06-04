@@ -71,7 +71,7 @@ runs:
       id: install-custodian
       uses: ./.github/composites/install
       with:
-        python-version: "3.11"
+        python-version: "3.12"
 
     # build a single platform image first in order to actually load the image from buildx
     # manifests are not supported yet
@@ -84,6 +84,7 @@ runs:
         build-args: |
           POETRY_VERSION=${{ steps.install-custodian.outputs.poetry-version }}
         push: false
+        pull: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
         # load the image back into docker for tests.
@@ -112,8 +113,9 @@ runs:
         build-args: |
           POETRY_VERSION=${{ steps.install-custodian.outputs.poetry-version }}
         push: true
+        pull: true
         platforms: ${{ inputs.platforms }}
-        tags: ${{ steps.meta.outputs.tags }}
+        tags: ${{ steps.meta.outputs.tags }}m
         labels: ${{ steps.meta.outputs.labels }}
         file: "docker/${{ inputs.name }}"
         cache-from: type=gha

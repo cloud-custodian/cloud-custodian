@@ -1,6 +1,6 @@
-FROM chainguard/wolfi-base as builder
+FROM cgr.dev/chainguard/wolfi-base as builder
 
-ARG POETRY_VERSION="1.5.1"
+ARG POETRY_VERSION="1.8.3"
 ARG PY_VERSION=3.12
 WORKDIR /app
 
@@ -10,9 +10,10 @@ RUN apk add python-${PY_VERSION} py${PY_VERSION}-pip && \
 USER nonroot
 
 # Install Poetry in its own virtual environment
-RUN python -m venv "${HOME}/tools" && \
+RUN python3 -m venv "${HOME}/tools" && \
     . "${HOME}/tools/bin/activate" && \
-    pip install "poetry==${POETRY_VERSION}"
+    pip install --verbose "poetry==${POETRY_VERSION}"
+
 
 # Copy enough of the c7n source that poetry can
 # use it when installing c7n-left
@@ -26,7 +27,7 @@ WORKDIR /app/c7n/tools/c7n_left
 COPY tools/c7n_left /app/c7n/tools/c7n_left
 RUN python -m venv "${HOME}/venv" && \
     . "${HOME}/venv/bin/activate" && \
-    ~/tools/bin/poetry install --no-dev
+    ~/tools/bin/poetry install --only main
 
 
 FROM chainguard/wolfi-base
