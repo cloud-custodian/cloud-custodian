@@ -106,6 +106,7 @@ runs:
 
     # actually push the multi arch image
     - name: Push
+      id: "push"
       if: "${{ inputs.push == 'true' }}"
       uses: docker/build-push-action@v5
       with:
@@ -134,8 +135,9 @@ runs:
         COSIGN_EXPERIMENTAL: "true"
         TAGS: ${{ steps.meta.outputs.tags }}
       run: |
+        echo "${{ steps.push.outputs.digest }}"
         tags=(${TAGS//,/ })
         for i in "${tags[@]}"
         do
-          cosign sign $i
+          cosign sign $i:${{ steps.push.outputs.digest }}
         done
