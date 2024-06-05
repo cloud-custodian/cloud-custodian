@@ -139,5 +139,5 @@ runs:
         tags=(${TAGS//,/ })
         for i in "${tags[@]}"
         do
-          cosign sign $i:${{ steps.push.outputs.digest }}
+          cosign sign ${{ inputs.repository }}/${{ inputs.name }}@${{ steps.push.outputs.digest }}
         done
