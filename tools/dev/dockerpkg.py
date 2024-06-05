@@ -43,7 +43,7 @@ RUN if [[ " ${{providers[*]}} " =~ "{pkg}" ]]; then \
 fi
 """
 
-default_providers = ["gcp", "azure", "kube", "openstack", "tencentcloud", "oci"]
+default_providers = ["gcp", "azure", "kube", "openstack", "tencentcloud", "oci", "awscc"]
 
 PHASE_1_PKG_INSTALL_DEP = """\
 # We include `pyproject.toml` and `poetry.lock` first to allow
@@ -112,6 +112,10 @@ ARG providers="{providers}"
 {PHASE_1_PKG_INSTALL_DEP}
 
 {PHASE_2_PKG_INSTALL_ROOT}
+
+# Install c7n_awscc
+ADD tools/c7n_awscc /src/tools/c7n_awscc
+RUN . /usr/local/bin/activate && cd tools/c7n_awscc && poetry install
 
 RUN mkdir /output
 """
@@ -227,6 +231,12 @@ TARGET_POLICYSTREAM = """\
 LABEL "org.opencontainers.image.title"="policystream"
 LABEL "org.opencontainers.image.description"="Custodian policy changes streamed from Git"
 LABEL "org.opencontainers.image.documentation"="https://cloudcustodian.io/docs"
+"""
+
+BUILD_AWSCC = """\
+# Install c7n-awscc
+ADD tools/c7n_awscc /src/tools/c7n_awscc
+RUN . /usr/local/bin/activate && cd tools/c7n_awscc && poetry install
 """
 
 
