@@ -115,3 +115,66 @@ class TestNetworkManager(BaseTest):
         core_network = client.get_core_network(
             CoreNetworkId=resources[0]["CoreNetworkId"])['CoreNetwork']
         self.assertEqual(core_network['State'], "DELETING")
+
+    def test_delete_global_network(self):
+        session_factory = self.replay_flight_data("test_networkmanager_delete_global_network")
+        p = self.load_policy(
+            {
+                "name": "delete-global-network",
+                "resource": "networkmanager-global-network",
+                "filters": [
+                    {"tag:Name": "test-cloudwan-2"}
+                ],
+                "actions": [{"type": "delete"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = session_factory().client("networkmanager")
+        global_network = client.describe_global_networks(
+            GlobalNetworkIds=[resources[0]["GlobalNetworkId"]])['GlobalNetworks']
+        self.assertTrue(len(global_network) == 0)
+
+    def test_mark_for_op_core_network(self):
+        session_factory = self.replay_flight_data("test_networkmanager_mark_for_op_core_network")
+        p = self.load_policy(
+            {
+                "name": "mark-for-op-core-network",
+                "resource": "networkmanager-core-network",
+                "filters": [
+                    {"tag:Name": "test-cloudwan"}
+                ],
+                "actions": [{"type": "mark-for-op", "op": "delete", "days": 1}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = session_factory().client("networkmanager")
+        core_network = client.get_core_network(
+            CoreNetworkId=resources[0]["CoreNetworkId"])['CoreNetwork']
+        self.assertTrue([t for t in core_network['Tags'] if t['Key'] == 'maid_status'])
+
+    def test_mark_for_op_global_network(self):
+        session_factory = self.replay_flight_data("test_networkmanager_mark_for_op_global_network")
+        p = self.load_policy(
+            {
+                "name": "mark-for-op-global-network",
+                "resource": "networkmanager-global-network",
+                "filters": [
+                    {"tag:Name": "test-cloudwan"}
+                ],
+                "actions": [{"type": "mark-for-op", "op": "delete", "days": 1}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = session_factory().client("networkmanager")
+        global_network = client.describe_global_networks(
+            GlobalNetworkIds=[resources[0]["GlobalNetworkId"]])['GlobalNetworks']
+        self.assertTrue([t for t in global_network[0]['Tags'] if t['Key'] == 'maid_status'])

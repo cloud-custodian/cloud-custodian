@@ -5,7 +5,7 @@ from c7n.actions.core import BaseAction
 from c7n.manager import resources as c7n_resources
 from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, ConfigSource
 from c7n.utils import local_session, type_schema
-from c7n.tags import RemoveTag, Tag
+from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 
 
 class GetCoreNetwork(DescribeSource):
@@ -38,9 +38,11 @@ class CoreNetwork(QueryResourceManager):
         config_type = None
         cfn_type = 'AWS::NetworkManager::CoreNetwork'
         permissions_augment = ("networkmanager:ListTagsForResource",)
-        universal_taggable = object()
 
     source_mapping = {'describe': GetCoreNetwork, 'config': ConfigSource}
+
+
+CoreNetwork.filter_registry.register('marked-for-op', TagActionFilter)
 
 
 @c7n_resources.register('networkmanager-global-network')
@@ -55,9 +57,9 @@ class GlobalNetwork(QueryResourceManager):
         date = 'CreatedAt'
         config_type = cfn_type = 'AWS::NetworkManager::GlobalNetwork'
         permissions_augment = ("networkmanager:ListTagsForResource",)
-        universal_taggable = object()
 
-    source_mapping = {'describe': DescribeGlobalNetwork, 'config': ConfigSource}
+
+GlobalNetwork.filter_registry.register('marked-for-op', TagActionFilter)
 
 
 @GlobalNetwork.action_registry.register('tag')
@@ -68,7 +70,7 @@ class TagNetwork(Tag):
     permissions = ('networkmanager:TagResource',)
 
     def process_resource_set(self, client, resource_set, tags):
-        mid = self.manager.resource_type.id
+        mid = self.manager.resource_type.arn
         for r in resource_set:
             try:
                 client.tag_resource(ResourceArn=r[mid], Tags=tags)
@@ -84,12 +86,34 @@ class RemoveTagNetwork(RemoveTag):
     permissions = ('networkmanager:UntagResource',)
 
     def process_resource_set(self, client, resource_set, tag_keys):
-        mid = self.manager.resource_type.id
+        mid = self.manager.resource_type.arn
         for r in resource_set:
             try:
                 client.untag_resource(ResourceArn=r[mid], TagKeys=tag_keys)
             except client.exceptions.ResourceNotFoundException:
                 continue
+
+
+@GlobalNetwork.action_registry.register('mark-for-op')
+@CoreNetwork.action_registry.register('mark-for-op')
+class NetworkMarkForOp(TagDelayedAction):
+    """Mark Network for deferred action
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: core-network-invalid-tag-mark
+            resource: core-network
+            filters:
+              - "tag:InvalidTag": present
+            actions:
+              - type: mark-for-op
+                op: delete
+                days: 1
+    """
+    permissions = ('networkmanager:TagResource',)
 
 
 @CoreNetwork.action_registry.register('delete')
@@ -105,5 +129,22 @@ class DeleteCoreNetwork(BaseAction):
         for r in resources:
             try:
                 client.delete_core_network(CoreNetworkId=r['CoreNetworkId'])
+            except client.exceptions.ResourceNotFound:
+                pass
+
+
+@GlobalNetwork.action_registry.register('delete')
+class DeleteGlobalNetwork(BaseAction):
+    """Action to delete a networkmanager global network
+    """
+    schema = type_schema('delete')
+    permissions = ('networkmanager:DeleteGlobalNetwork',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('networkmanager')
+
+        for r in resources:
+            try:
+                client.delete_global_network(GlobalNetworkId=r['GlobalNetworkId'])
             except client.exceptions.ResourceNotFound:
                 pass
