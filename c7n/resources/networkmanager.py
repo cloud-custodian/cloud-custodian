@@ -105,7 +105,7 @@ class NetworkMarkForOp(TagDelayedAction):
 
         policies:
           - name: core-network-invalid-tag-mark
-            resource: core-network
+            resource: networkmanager-core-network
             filters:
               - "tag:InvalidTag": present
             actions:
