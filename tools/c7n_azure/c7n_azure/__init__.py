@@ -1,8 +1,15 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import logging
+import warnings
 
 import adal
+
+# two azure packages seem to have this issue on invalid escape
+# sequence on their generated code w/ python 3.12
+# (azure.mgmt.resource, azure.mgmt.resourcgraph)
+warnings.filterwarnings("ignore", category=SyntaxWarning)
+
 
 # Quiet logging from dependencies
 adal.set_logging_options({'level': 'WARNING'})

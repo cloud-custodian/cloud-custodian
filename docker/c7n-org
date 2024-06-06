@@ -1,13 +1,14 @@
 # Dockerfiles are generated from tools/dev/dockerpkg.py
-FROM ubuntu:22.04 as build-env
+FROM ubuntu:24.04 as build-env
 
-ARG POETRY_VERSION="1.5.1"
+ARG POETRY_VERSION="1.8.3"
 SHELL ["/bin/bash", "-c"]
 
 # pre-requisite distro deps, and build env setup
-RUN adduser --disabled-login --gecos "" custodian
 RUN apt-get --yes update
-RUN apt-get --yes install --no-install-recommends build-essential curl python3-venv python3-dev
+RUN apt-get --yes install --no-install-recommends build-essential curl python3-venv python3-dev adduser
+# todo: 24.04 is trying to standardize on ubuntu as builtin non root.
+RUN adduser --disabled-login --gecos "" custodian
 RUN python3 -m venv /usr/local
 RUN /usr/local/bin/pip install -U pip setuptools &&     /usr/local/bin/pip install "poetry==${POETRY_VERSION}"
 ARG PATH="/root/.local/bin:$PATH"
@@ -99,7 +100,7 @@ RUN mkdir /output
 ADD tools/c7n_org /src/tools/c7n_org
 RUN . /usr/local/bin/activate && cd tools/c7n_org && poetry install
 
-FROM ubuntu:22.04
+FROM ubuntu:24.04
 
 LABEL name="org" \
       repository="http://github.com/cloud-custodian/cloud-custodian"
@@ -107,7 +108,7 @@ LABEL name="org" \
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get --yes update \
-        && apt-get --yes install python3 python3-venv  --no-install-recommends \
+        && apt-get --yes install python3 python3-venv adduser  --no-install-recommends \
         && rm -Rf /var/cache/apt \
         && rm -Rf /var/lib/apt/lists/* \
         && rm -Rf /var/log/*
