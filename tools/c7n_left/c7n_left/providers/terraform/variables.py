@@ -99,7 +99,18 @@ class VariableResolver:
                 if str(f).endswith(".tfvars.json"):
                     f_vars = json.loads((self.source_dir / f).read_text())
                 elif str(f).endswith(".tfvars"):
-                    f_vars = hcl2.loads((self.source_dir / f).read_text())
+                    contents = (self.source_dir / f).read_text()
+                    # the way the hcl2 library / parse is structured
+                    # in golang/terraform it supports a file contents
+                    # in either format, to preserve compatiblity, we
+                    # check if its json, and if its not then load with
+                    # hcl/terraform. we do json first as its fast to
+                    # check and we can return back any hcl parse
+                    # errors.
+                    try:
+                        json.loads(contents)
+                    except json.JSONDecodeError:
+                        f_vars = hcl2.loads((self.source_dir / f).read_text())
 
                 fpath = type == "user" and self.var_files[idx] or f
                 if isinstance(fpath, Path):
