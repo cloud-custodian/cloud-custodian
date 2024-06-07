@@ -1,5 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+from unittest.mock import MagicMock
 from .common import BaseTest
 
 
@@ -178,3 +179,55 @@ class TestNetworkManager(BaseTest):
         global_network = client.describe_global_networks(
             GlobalNetworkIds=[resources[0]["GlobalNetworkId"]])['GlobalNetworks']
         self.assertTrue([t for t in global_network[0]['Tags'] if t['Key'] == 'maid_status'])
+
+    def test_core_network_delete_error(self):
+        invalid_network_id = 'core-network-7a6b617270696e736b69'
+        factory = self.record_flight_data("test_core_network_delete_error")
+        client = factory().client("networkmanager")
+        mock_factory = MagicMock()
+        mock_factory.region = 'us-east-1'
+        mock_factory().client(
+            'networkmanager').exceptions.ResourceNotFoundException = (
+                client.exceptions.ResourceNotFoundException)
+        mock_factory().client('networkmanager').delete_core_network.side_effect = (
+            client.exceptions.ResourceNotFoundException(
+                {'Error': {'Code': 'xyz'}},
+                operation_name='delete_core_network'))
+        p = self.load_policy({
+            'name': 'delete-core-network-error',
+            'resource': 'networkmanager-core-network',
+            'actions': ['delete']},
+            session_factory=mock_factory)
+
+        try:
+            p.resource_manager.actions[0].process(
+                [{'CoreNetworkId': invalid_network_id}])
+        except client.exceptions.ResourceNotFoundException:
+            self.fail('should not raise')
+        mock_factory().client('networkmanager').delete_core_network.assert_called_once()
+
+    def test_global_network_delete_error(self):
+        invalid_network_id = 'global-network-7a6b617270696e736b69'
+        factory = self.replay_flight_data("test_networkmanager_delete_global_network")
+        client = factory().client("networkmanager")
+        mock_factory = MagicMock()
+        mock_factory.region = 'us-east-1'
+        mock_factory().client(
+            'networkmanager').exceptions.ResourceNotFoundException = (
+                client.exceptions.ResourceNotFoundException)
+        mock_factory().client('networkmanager').delete_global_network.side_effect = (
+            client.exceptions.ResourceNotFoundException(
+                {'Error': {'Code': 'xyz'}},
+                operation_name='delete_global_network'))
+        p = self.load_policy({
+            'name': 'delete-global-network-error',
+            'resource': 'networkmanager-global-network',
+            'actions': ['delete']},
+            session_factory=mock_factory)
+
+        try:
+            p.resource_manager.actions[0].process(
+                [{'GlobalNetworkId': invalid_network_id}])
+        except client.exceptions.ResourceNotFoundException:
+            self.fail('should not raise')
+        mock_factory().client('networkmanager').delete_global_network.assert_called_once()

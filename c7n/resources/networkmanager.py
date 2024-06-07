@@ -3,23 +3,9 @@
 
 from c7n.actions.core import BaseAction
 from c7n.manager import resources as c7n_resources
-from c7n.query import QueryResourceManager, TypeInfo, DescribeSource
+from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
-
-
-class GetCoreNetwork(DescribeSource):
-
-    def augment(self, resources):
-        resources = super().augment(resources)
-        return resources
-
-
-class DescribeGlobalNetwork(DescribeSource):
-
-    def augment(self, resources):
-        resources = super(DescribeGlobalNetwork, self).augment(resources)
-        return resources
 
 
 @c7n_resources.register('networkmanager-core-network')
@@ -127,8 +113,8 @@ class DeleteCoreNetwork(BaseAction):
         for r in resources:
             try:
                 client.delete_core_network(CoreNetworkId=r['CoreNetworkId'])
-            except client.exceptions.ResourceNotFound:
-                pass
+            except client.exceptions.ResourceNotFoundException:
+                continue
 
 
 @GlobalNetwork.action_registry.register('delete')
@@ -144,5 +130,5 @@ class DeleteGlobalNetwork(BaseAction):
         for r in resources:
             try:
                 client.delete_global_network(GlobalNetworkId=r['GlobalNetworkId'])
-            except client.exceptions.ResourceNotFound:
-                pass
+            except client.exceptions.ResourceNotFoundException:
+                continue
