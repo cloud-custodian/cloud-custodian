@@ -152,3 +152,15 @@ class DeleteBQTable(MethodAction):
             'datasetId': r['tableReference']['datasetId'],
             'tableId': r['tableReference']['tableId']
         }
+
+
+@BigQueryTable.action_registry.register('delete')
+class DataSet(MethodAction):
+    schema = type_schema('delete')
+    method_spec = {'op': 'delete'}
+
+    def get_resource_params(self, model, r):
+        return {
+            'projectId': r['datasetReference']['projectId'],
+            'datasetId': r['datasetReference']['datasetId'],
+        }
