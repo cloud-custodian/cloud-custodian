@@ -66,7 +66,7 @@ class ParameterFilter(ValueFilter):
 
     schema = type_schema('db-parameter', rinherit=ValueFilter.schema)
     schema_alias = False
-    permissions = ('rds:DescribeDBParameters')
+    permissions = ('rds:DescribeDBParameters',)
     policy_annotation = 'c7n:MatchedDBParameter'
 
     @staticmethod
