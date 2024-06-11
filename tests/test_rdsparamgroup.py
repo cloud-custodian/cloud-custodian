@@ -274,3 +274,26 @@ class RDSClusterParamGroupTest(BaseTest):
             if count == 2:
                 break
         self.assertEqual(count, 2)
+
+
+class TestRDSParameterGroupValueFilter(BaseTest):
+    def test_param_filter_value(self):
+        session_factory = self.replay_flight_data('test_rds_parameter_group_value_filter')
+        policy = self.load_policy(
+            {
+                "name": "rds-paramter-group-value-filter-test",
+                "resource": "rds-param-group",
+                "filters": [
+                    {
+                        "type": "db-parameter",
+                        "key": "tls_version",
+                        "op": "eq",
+                        "value": "TLSv1.2"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+
+        resources = policy.resource_manager.resources()
+        self.assertEqual(len(resources), 1)
