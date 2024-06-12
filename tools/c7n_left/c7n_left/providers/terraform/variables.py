@@ -110,7 +110,7 @@ class VariableResolver:
                     try:
                         json.loads(contents)
                     except json.JSONDecodeError:
-                        f_vars = hcl2.loads((self.source_dir / f).read_text())
+                        f_vars = hcl2.loads(contents)
 
                 fpath = type == "user" and self.var_files[idx] or f
                 if isinstance(fpath, Path):
