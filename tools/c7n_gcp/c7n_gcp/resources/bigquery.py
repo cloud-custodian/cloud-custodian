@@ -159,7 +159,7 @@ class DeleteBQTable(MethodAction):
 class DeleteDataSet(MethodAction):
     schema = type_schema('delete')
     method_spec = {'op': 'delete'}
-    permissions = ('bigquery.dataset.get', 'bigquery.dataset.delete')
+    permissions = ('bigquery.datasets.get', 'bigquery.datasets.delete')
 
     @staticmethod
     def get_resource_params(model, r):
