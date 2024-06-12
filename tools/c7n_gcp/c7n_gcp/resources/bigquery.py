@@ -154,6 +154,7 @@ class DeleteBQTable(MethodAction):
             'tableId': r['tableReference']['tableId']
         }
 
+
 @DataSet.action_registry.register('delete')
 class DeleteDataSet(MethodAction):
     schema = type_schema('delete')
