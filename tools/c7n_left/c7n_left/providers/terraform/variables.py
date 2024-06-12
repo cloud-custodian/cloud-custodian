@@ -108,7 +108,7 @@ class VariableResolver:
                     # check and we can return back any hcl parse
                     # errors.
                     try:
-                        json.loads(contents)
+                        f_vars = json.loads(contents)
                     except json.JSONDecodeError:
                         f_vars = hcl2.loads(contents)
 
