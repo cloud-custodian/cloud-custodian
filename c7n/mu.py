@@ -424,14 +424,20 @@ class LambdaManager:
             if k == 'Layers' and k in old_config and new_config[k]:
                 if sorted(new_config[k]) != sorted([lyr['Arn'] for lyr in old_config[k]]):
                     changed.append(k)
-            # Vpc needs special handling as a dict with lists
             elif k == 'VpcConfig' and k in old_config and new_config[k]:
-                if set(old_config[k]['SubnetIds']) != set(
-                        new_config[k]['SubnetIds']):
-                    changed.append(k)
-                elif set(old_config[k]['SecurityGroupIds']) != set(
-                        new_config[k]['SecurityGroupIds']):
-                    changed.append(k)
+                # Subnets and security groups are lists without a guaranteed order
+                for sub_k in ('SubnetIds', 'SecurityGroupIds'):
+                    if set(old_config[k][sub_k]) != set(new_config[k][sub_k]):
+                        changed.append(k)
+
+                # Other VpcConfig sub-keys may be missing entirely or have placeholder
+                # default/empty values. Only register a change if there's a change to/from
+                # a non-empty value.
+                for sub_k in ('VpcId', 'Ipv6AllowedForDualStack'):
+                    old = old_config[k].get(sub_k)
+                    new = new_config[k].get(sub_k)
+                    if (old or new) and old != new:
+                        changed.append(k)
             elif k not in old_config:
                 if k in LAMBDA_EMPTY_VALUES and LAMBDA_EMPTY_VALUES[k] == new_config[k]:
                     continue
