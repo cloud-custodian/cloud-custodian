@@ -1,21 +1,21 @@
 {
     "status_code": 200,
     "data": {
-        "Name": "SSM-SessionManagerRunShell",
+        "Name": "Test-Document-1",
         "CreatedDate": {
             "__class__": "datetime",
-            "year": 2024,
-            "month": 5,
-            "day": 23,
-            "hour": 14,
-            "minute": 20,
-            "second": 49,
-            "microsecond": 310000
+            "year": 2021,
+            "month": 3,
+            "day": 31,
+            "hour": 12,
+            "minute": 16,
+            "second": 34,
+            "microsecond": 726000
         },
         "DocumentVersion": "1",
         "Status": "Active",
-        "Content": "{\"schemaVersion\":\"1.0\",\"description\":\"Document to hold regional settings for Session Manager\",\"sessionType\":\"Standard_Stream\",\"inputs\":{\"s3BucketName\":\"\",\"s3KeyPrefix\":\"\",\"s3EncryptionEnabled\":true,\"cloudWatchLogGroupName\":\"\",\"cloudWatchEncryptionEnabled\":true,\"idleSessionTimeout\":\"20\",\"maxSessionDuration\":\"\",\"cloudWatchStreamingEnabled\":false,\"kmsKeyId\":\"\",\"runAsEnabled\":false,\"runAsDefaultUser\":\"\",\"shellProfile\":{\"windows\":\"\",\"linux\":\"\"}}}",
-        "DocumentType": "Session",
+        "Content": "{\n  \"schemaVersion\": \"2.2\",\n  \"description\": \"Command Document Example JSON Template\",\n  \"parameters\": {\n    \"Message\": {\n      \"type\": \"String\",\n      \"description\": \"Example\",\n      \"default\": \"Hello World\"\n    }\n  },\n  \"mainSteps\": [\n    {\n      \"action\": \"aws:runPowerShellScript\",\n      \"name\": \"example\",\n      \"inputs\": {\n        \"runCommand\": [ \"Write-Output {{Message}}\" ]\n      }\n    }\n  ]\n}",
+        "DocumentType": "Command",
         "DocumentFormat": "JSON",
         "ResponseMetadata": {}
     }
