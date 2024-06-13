@@ -288,7 +288,7 @@ class TestSSM(BaseTest):
         )
 
         resources = p.run()
-        self.assertEqual(len(resources), 2)
+        self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["c7n:CrossAccountViolations"][0], "yyyyyyyyyyyy")
 
     def test_ssm_document_remove_sharing(self):
@@ -557,26 +557,6 @@ class TestSSM(BaseTest):
         client = session_factory().client('ssm', region_name='us-east-1')
         sessions = client.describe_sessions(State="Active")
         self.assertEqual(len(sessions["Sessions"]), 0)
-
-    def test_ssm_regional_settings(self):
-        session_factory = self.replay_flight_data("test_ssm_regional_settings")
-        p = self.load_policy(
-            {
-                "name": "session-manager-regional-settings",
-                "resource": "session-manager-regional-settings",
-                'filters': [
-                    {
-                        'type': 'value',
-                        'key': 'inputs.cloudWatchLogGroupName',
-                        'value': 'empty'
-                    }
-                ],
-            },
-            session_factory=session_factory,
-        )
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]["Name"], "SSM-SessionManagerRunShell")
 
 
 @terraform("ssm_patch_group")

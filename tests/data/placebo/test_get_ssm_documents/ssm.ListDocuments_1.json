@@ -4,35 +4,17 @@
         "DocumentIdentifiers": [
             {
                 "Name": "Test-Document-1",
+                "CreatedDate": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 6,
+                    "day": 13,
+                    "hour": 15,
+                    "minute": 2,
+                    "second": 57,
+                    "microsecond": 27000
+                },
                 "Owner": "xxxxxxxxxxxx",
-                "PlatformTypes": [
-                    "Windows",
-                    "Linux",
-                    "MacOS"
-                ],
-                "DocumentVersion": "1",
-                "DocumentType": "Command",
-                "SchemaVersion": "2.2",
-                "DocumentFormat": "JSON",
-                "Tags": []
-            },
-            {
-                "Name": "Test-Document-2",
-                "Owner": "xxxxxxxxxxxx",
-                "PlatformTypes": [
-                    "Windows",
-                    "Linux",
-                    "MacOS"
-                ],
-                "DocumentVersion": "1",
-                "DocumentType": "Command",
-                "SchemaVersion": "2.2",
-                "DocumentFormat": "JSON",
-                "Tags": []
-            },
-            {
-                "Name": "Test-AWS-Document",
-                "Owner": "Amazon",
                 "PlatformTypes": [
                     "Windows",
                     "Linux",

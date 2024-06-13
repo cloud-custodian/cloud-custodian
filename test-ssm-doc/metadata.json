@@ -1,0 +1,84 @@
+{
+  "policy": {
+    "name": "test-ssm-doc",
+    "resource": "ssm-document"
+  },
+  "version": "0.9.37",
+  "execution": {
+    "id": "bc8d90d5-4cd6-4587-94a8-c21f4a154296",
+    "start": 1718309365.336379,
+    "end_time": 1718309365.6383646,
+    "duration": 0.301985502243042
+  },
+  "config": {
+    "region": "us-east-1",
+    "regions": [
+      "us-east-1"
+    ],
+    "cache": "~/.cache/cloud-custodian.cache",
+    "profile": null,
+    "account_id": "644160558196",
+    "assume_role": null,
+    "session_policy": null,
+    "external_id": null,
+    "log_group": null,
+    "tracer": null,
+    "metrics_enabled": null,
+    "metrics": null,
+    "output_dir": ".",
+    "cache_period": 0,
+    "dryrun": false,
+    "authorization_file": null,
+    "subparser": "run",
+    "config": null,
+    "configs": [
+      "policies.yml"
+    ],
+    "policy_filters": [],
+    "resource_types": [],
+    "verbose": null,
+    "quiet": null,
+    "debug": false,
+    "skip_validation": false,
+    "command": "c7n.commands.run",
+    "vars": null
+  },
+  "sys-stats": {
+    "snapshot_time": 0.301990270614624,
+    "num_fds": 2,
+    "cpu_user": 0.08000000000000002,
+    "cpu_system": 0.010000000000000002,
+    "num_ctx_switches_voluntary": 10,
+    "num_ctx_switches_involuntary": 1,
+    "read_count": 172,
+    "write_count": 9,
+    "write_bytes": 8192,
+    "rss": 7028736,
+    "vms": 7757824,
+    "data": 7757824
+  },
+  "api-stats": {
+    "ssm.ListDocuments": 1,
+    "ssm.GetDocument": 2
+  },
+  "metrics": [
+    {
+      "MetricName": "ResourceCount",
+      "Timestamp": "2024-06-13T16:09:25.638132",
+      "Value": 2,
+      "Unit": "Count"
+    },
+    {
+      "MetricName": "ResourceTime",
+      "Timestamp": "2024-06-13T16:09:25.638137",
+      "Value": 0.29598212242126465,
+      "Unit": "Seconds"
+    },
+    {
+      "MetricName": "ActionTime",
+      "Timestamp": "2024-06-13T16:09:25.638358",
+      "Value": 2.1457672119140625e-06,
+      "Unit": "Seconds"
+    }
+  ]
+}

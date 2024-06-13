@@ -3,8 +3,42 @@
     "data": {
         "DocumentIdentifiers": [
             {
+                "Name": "SSM-SessionManagerRunShell",
+                "CreatedDate": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 5,
+                    "day": 23,
+                    "hour": 14,
+                    "minute": 20,
+                    "second": 49,
+                    "microsecond": 310000
+                },
+                "Owner": "644160558196",
+                "PlatformTypes": [
+                    "Windows",
+                    "Linux",
+                    "MacOS"
+                ],
+                "DocumentVersion": "1",
+                "DocumentType": "Session",
+                "SchemaVersion": "1.0",
+                "DocumentFormat": "JSON",
+                "Tags": []
+            },
+            {
                 "Name": "Test-Document-1",
-                "Owner": "xxxxxxxxxxxx",
+                "CreatedDate": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 3,
+                    "day": 31,
+                    "hour": 12,
+                    "minute": 16,
+                    "second": 34,
+                    "microsecond": 726000
+                },
+                "Owner": "644160558196",
                 "PlatformTypes": [
                     "Windows",
                     "Linux",
@@ -18,7 +52,17 @@
             },
             {
                 "Name": "Test-Document-2",
-                "Owner": "xxxxxxxxxxxx",
+                "CreatedDate": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 3,
+                    "day": 23,
+                    "hour": 13,
+                    "minute": 20,
+                    "second": 7,
+                    "microsecond": 984000
+                },
+                "Owner": "644160558196",
                 "PlatformTypes": [
                     "Windows",
                     "Linux",

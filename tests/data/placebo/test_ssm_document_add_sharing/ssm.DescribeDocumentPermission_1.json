@@ -7,11 +7,11 @@
         ],
         "AccountSharingInfoList": [
             {
-                "AccountId": "xxxxxxxxxxxx",
+                "AccountId": "yyyyyyyyyyyy",
                 "SharedDocumentVersion": "$DEFAULT"
             },
             {
-                "AccountId": "yyyyyyyyyyyy",
+                "AccountId": "xxxxxxxxxxxx",
                 "SharedDocumentVersion": "$DEFAULT"
             }
         ],

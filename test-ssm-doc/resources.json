@@ -1,0 +1,78 @@
+[
+  {
+    "Name": "SSM-SessionManagerRunShell",
+    "CreatedDate": "2024-05-23T14:20:49.310000-04:00",
+    "Owner": "644160558196",
+    "PlatformTypes": [
+      "Windows",
+      "Linux",
+      "MacOS"
+    ],
+    "DocumentVersion": "1",
+    "DocumentType": "Session",
+    "SchemaVersion": "1.0",
+    "DocumentFormat": "JSON",
+    "Tags": [],
+    "Status": "Active",
+    "Content": {
+      "schemaVersion": "1.0",
+      "description": "Document to hold regional settings for Session Manager",
+      "sessionType": "Standard_Stream",
+      "inputs": {
+        "s3BucketName": "",
+        "s3KeyPrefix": "",
+        "s3EncryptionEnabled": true,
+        "cloudWatchLogGroupName": "",
+        "cloudWatchEncryptionEnabled": true,
+        "idleSessionTimeout": "20",
+        "maxSessionDuration": "",
+        "cloudWatchStreamingEnabled": false,
+        "kmsKeyId": "",
+        "runAsEnabled": false,
+        "runAsDefaultUser": "",
+        "shellProfile": {
+          "windows": "",
+          "linux": ""
+        }
+      }
+    }
+  },
+  {
+    "Name": "Test-Document-1",
+    "CreatedDate": "2024-06-13T15:02:57.027000-04:00",
+    "Owner": "644160558196",
+    "PlatformTypes": [
+      "Windows",
+      "Linux",
+      "MacOS"
+    ],
+    "DocumentVersion": "1",
+    "DocumentType": "Command",
+    "SchemaVersion": "2.2",
+    "DocumentFormat": "JSON",
+    "Tags": [],
+    "Status": "Active",
+    "Content": {
+      "schemaVersion": "2.2",
+      "description": "Command Document Example JSON Template",
+      "parameters": {
+        "Message": {
+          "type": "String",
+          "description": "Example",
+          "default": "Hello World"
+        }
+      },
+      "mainSteps": [
+        {
+          "action": "aws:runPowerShellScript",
+          "name": "example",
+          "inputs": {
+            "runCommand": [
+              "Write-Output {{Message}}"
+            ]
+          }
+        }
+      ]
+    }
+  }
+]
