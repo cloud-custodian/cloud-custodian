@@ -4,7 +4,7 @@ inputs:
   python-version:
     required: true
   poetry-version:
-    default: "1.5.1"
+    default: "1.8.3"
 outputs:
   poetry-version:
     description: "poetry version"

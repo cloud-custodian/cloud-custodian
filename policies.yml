@@ -1,3 +1,0 @@
-policies:
-- name: test-ssm-doc
-  resource: ssm-document

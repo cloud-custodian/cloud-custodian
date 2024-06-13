@@ -984,6 +984,41 @@ class PolicyLambdaProvision(Publish):
                 },
             )
         )
+        self.assertTrue(
+            delta(
+                {
+                    "VpcConfig": {
+                        "SubnetIds": ["s-1", "s-2"],
+                        "SecurityGroupIds": ["sg-1", "sg-2"],
+                    }
+                },
+                {
+                    "VpcConfig": {
+                        "SubnetIds": ["s-1", "s-2"],
+                        "SecurityGroupIds": ["sg-1", "sg-2"],
+                        "Ipv6AllowedForDualStack": True,
+                    }
+                },
+            )
+        )
+        self.assertTrue(
+            delta(
+                {
+                    "VpcConfig": {
+                        "SubnetIds": ["s-1", "s-2"],
+                        "SecurityGroupIds": ["sg-1", "sg-2"],
+                        "VpcId": "vpc-12345",
+                    }
+                },
+                {
+                    "VpcConfig": {
+                        "SubnetIds": ["s-1", "s-2"],
+                        "SecurityGroupIds": ["sg-1", "sg-2"],
+                        "VpcId": "vpc-23456",
+                    }
+                },
+            )
+        )
         self.assertFalse(delta({}, {"DeadLetterConfig": {}}))
 
         self.assertTrue(delta({}, {"DeadLetterConfig": {"TargetArn": "arn"}}))
@@ -996,6 +1031,20 @@ class PolicyLambdaProvision(Publish):
 
         self.assertFalse(
             delta({}, {"VpcConfig": {"SecurityGroupIds": [], "SubnetIds": []}})
+        )
+        self.assertFalse(
+            delta(
+                {"VpcConfig": {
+                    "SecurityGroupIds": [],
+                    "SubnetIds": [],
+                }},
+                {"VpcConfig": {
+                    "SecurityGroupIds": [],
+                    "SubnetIds": [],
+                    "VpcId": "",
+                    "Ipv6AllowedForDualStack": False,
+                }},
+            )
         )
 
     def test_different_lambda_handler(self):
