@@ -79,6 +79,10 @@ def intersect(x, y):
     return bool(set(x).intersection(y))
 
 
+def mod(x, y):
+    return bool(x % y)
+
+
 OPERATORS = {
     'eq': operator.eq,
     'equal': operator.eq,
@@ -100,7 +104,8 @@ OPERATORS = {
     'not-in': operator_ni,
     'contains': operator.contains,
     'difference': difference,
-    'intersect': intersect}
+    'intersect': intersect,
+    'mod': mod}
 
 
 VALUE_TYPES = [

@@ -84,6 +84,7 @@ runs:
         build-args: |
           POETRY_VERSION=${{ steps.install-custodian.outputs.poetry-version }}
         push: false
+        pull: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
         # load the image back into docker for tests.
@@ -105,6 +106,7 @@ runs:
 
     # actually push the multi arch image
     - name: Push
+      id: "push"
       if: "${{ inputs.push == 'true' }}"
       uses: docker/build-push-action@v5
       with:
@@ -112,6 +114,7 @@ runs:
         build-args: |
           POETRY_VERSION=${{ steps.install-custodian.outputs.poetry-version }}
         push: true
+        pull: true
         platforms: ${{ inputs.platforms }}
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
@@ -132,8 +135,9 @@ runs:
         COSIGN_EXPERIMENTAL: "true"
         TAGS: ${{ steps.meta.outputs.tags }}
       run: |
+        echo "${{ steps.push.outputs.digest }}"
         tags=(${TAGS//,/ })
         for i in "${tags[@]}"
         do
-          cosign sign $i
+          cosign sign ${{ inputs.repository }}/${{ inputs.name }}@${{ steps.push.outputs.digest }}
         done

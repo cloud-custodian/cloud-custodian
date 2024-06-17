@@ -1,13 +1,14 @@
 # Dockerfiles are generated from tools/dev/dockerpkg.py
 FROM debian:10-slim as build-env
 
-ARG POETRY_VERSION="1.5.1"
+ARG POETRY_VERSION="1.8.3"
 SHELL ["/bin/bash", "-c"]
 
 # pre-requisite distro deps, and build env setup
-RUN adduser --disabled-login --gecos "" custodian
 RUN apt-get --yes update
-RUN apt-get --yes install --no-install-recommends build-essential curl python3-venv python3-dev
+RUN apt-get --yes install --no-install-recommends build-essential curl python3-venv python3-dev adduser
+# todo: 24.04 is trying to standardize on ubuntu as builtin non root.
+RUN adduser --disabled-login --gecos "" custodian
 RUN python3 -m venv /usr/local
 RUN /usr/local/bin/pip install -U pip setuptools &&     /usr/local/bin/pip install "poetry==${POETRY_VERSION}"
 ARG PATH="/root/.local/bin:$PATH"
@@ -26,7 +27,7 @@ RUN . /usr/local/bin/activate && poetry install --without dev --no-root
 ADD c7n /src/c7n/
 RUN . /usr/local/bin/activate && poetry install --only-root
 
-ARG providers="gcp azure kube openstack tencentcloud oci"
+ARG providers="gcp azure kube openstack tencentcloud oci awscc"
 # Add provider packages
 # We include `pyproject.toml` and `poetry.lock` first to allow
 # cache of dependency installs.
@@ -55,6 +56,10 @@ ADD tools/c7n_oci/pyproject.toml tools/c7n_oci/poetry.lock /src/tools/c7n_oci/
 RUN if [[ " ${providers[*]} " =~ "oci" ]]; then     . /usr/local/bin/activate &&     cd tools/c7n_oci &&     poetry install --without dev --no-root; fi
 
 
+ADD tools/c7n_awscc/pyproject.toml tools/c7n_awscc/poetry.lock /src/tools/c7n_awscc/
+RUN if [[ " ${providers[*]} " =~ "awscc" ]]; then     . /usr/local/bin/activate &&     cd tools/c7n_awscc &&     poetry install --without dev --no-root; fi
+
+
 # Now install the root of each provider
 
 ADD tools/c7n_gcp /src/tools/c7n_gcp
@@ -80,6 +85,14 @@ RUN if [[ " ${providers[*]} " =~ "tencentcloud" ]]; then     . /usr/local/bin/ac
 ADD tools/c7n_oci /src/tools/c7n_oci
 RUN if [[ " ${providers[*]} " =~ "oci" ]]; then     . /usr/local/bin/activate &&     cd tools/c7n_oci &&     poetry install --only-root; fi
 
+
+ADD tools/c7n_awscc /src/tools/c7n_awscc
+RUN if [[ " ${providers[*]} " =~ "awscc" ]]; then     . /usr/local/bin/activate &&     cd tools/c7n_awscc &&     poetry install --only-root; fi
+
+
+# Install c7n_awscc
+ADD tools/c7n_awscc /src/tools/c7n_awscc
+RUN . /usr/local/bin/activate && cd tools/c7n_awscc && poetry install
 
 RUN mkdir /output
 

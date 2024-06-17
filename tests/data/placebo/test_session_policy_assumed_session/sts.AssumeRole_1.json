@@ -1,0 +1,25 @@
+{
+    "status_code": 200,
+    "data": {
+        "Credentials": {
+            "AccessKeyId": "ASIAZL6XW",
+            "SecretAccessKey": "+iJSlosC4pycF8y4Ra8kBZYS",
+            "SessionToken": "FwoGZXIvYXdzEJD//////////wEaDAqAmhvHeUmOq/fpWCLzAbHZ//QQjeKBJuzNrLscSpKOGodTCmBjpavBwitRah82IkUVX10/Htkk4p+2/w6rHaH73XvnHZ5o9eFpZo6bQ680aEi43HlFotqFdYkIQdTz0lPkLEAN7mpenzLaPV0DNTNfgZ6A1DT7pzOZRO9ORrsvsW3cNG4ZvpUs0kJrud+HuyLUQe1yToC3PWf6WqLjlUZl1rNR1Ds4ST1OpGrpfcpfKh/KLsF+K4t3irPsK/6y3zjMVcf5ql08YbRciB/JP0U9ZIS9Rev3/1FcqsInK8Rc6QGEZAwBjun3so+YKBJ8HUTvfE0S3k0//gwsSOmfKmKe6yi0/+ixBjItRGL8dADZ+Ps8CGfE08sKFeU3H5yRYoj5om73kxoOAeqowGkV+tvKu4Y8OAKn",
+            "Expiration": {
+                "__class__": "datetime",
+                "year": 2024,
+                "month": 5,
+                "day": 15,
+                "hour": 15,
+                "minute": 25,
+                "second": 23,
+                "microsecond": 0
+            }
+        },
+        "AssumedRoleUser": {
+            "Arn": "arn:aws:sts::644160558196:assumed-role/CloudCustodianRole/CloudCustodian"
+        },
+        "PackedPolicySize": 11,
+        "ResponseMetadata": {}
+    }
+}

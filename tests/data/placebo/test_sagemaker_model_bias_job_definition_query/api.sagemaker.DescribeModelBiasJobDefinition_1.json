@@ -1,0 +1,59 @@
+{
+    "status_code": 200,
+    "data": {
+        "JobDefinitionArn": "arn:aws:sagemaker:us-east-1:644160558196:model-bias-job-definition/test-c7n-mdl-bias-job-def",
+        "JobDefinitionName": "test-c7n-mdl-bias-job-def",
+        "CreationTime": {
+            "__class__": "datetime",
+            "year": 2024,
+            "month": 4,
+            "day": 25,
+            "hour": 14,
+            "minute": 42,
+            "second": 41,
+            "microsecond": 396000
+        },
+        "ModelBiasAppSpecification": {
+            "ImageUri": "string",
+            "ConfigUri": "s3://test-sagemaker-model-bias-job/model-bias-app-spec-config.json"
+        },
+        "ModelBiasJobInput": {
+            "EndpointInput": {
+                "EndpointName": "c7n-test-endpoint",
+                "LocalPath": "/opt/ml/processing/endpointdata",
+                "S3InputMode": "File",
+                "S3DataDistributionType": "FullyReplicated"
+            },
+            "GroundTruthS3Input": {
+                "S3Uri": "s3://test-sagemaker-model-bias-job/template-1713927382441.yaml"
+            }
+        },
+        "ModelBiasJobOutputConfig": {
+            "MonitoringOutputs": [
+                {
+                    "S3Output": {
+                        "S3Uri": "s3://test-sagemaker-model-bias-job",
+                        "LocalPath": "/opt/ml/processing/localpath",
+                        "S3UploadMode": "EndOfJob"
+                    }
+                }
+            ]
+        },
+        "JobResources": {
+            "ClusterConfig": {
+                "InstanceCount": 1,
+                "InstanceType": "ml.t3.medium",
+                "VolumeSizeInGB": 1
+            }
+        },
+        "NetworkConfig": {
+            "EnableInterContainerTrafficEncryption": true,
+            "EnableNetworkIsolation": true
+        },
+        "RoleArn": "arn:aws:iam::644160558196:role/sagemaker-bias-job-role",
+        "StoppingCondition": {
+            "MaxRuntimeInSeconds": 120
+        },
+        "ResponseMetadata": {}
+    }
+}

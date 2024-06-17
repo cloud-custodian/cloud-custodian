@@ -35,7 +35,7 @@ install:
 .PHONY: test
 
 test:
-	. $(PWD)/test.env && poetry run pytest -n auto tests tools $(ARGS)
+	. $(PWD)/test.env && poetry run pytest -n auto $(ARGS) tests tools
 
 test-coverage:
 	. $(PWD)/test.env && poetry run pytest -n auto \

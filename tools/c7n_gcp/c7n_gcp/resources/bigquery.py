@@ -146,9 +146,24 @@ class DeleteBQTable(MethodAction):
     method_spec = {'op': 'delete'}
     permissions = ('bigquery.tables.get', 'bigquery.tables.delete')
 
-    def get_resource_params(self, model, r):
+    @staticmethod
+    def get_resource_params(model, r):
         return {
             'projectId': r['tableReference']['projectId'],
             'datasetId': r['tableReference']['datasetId'],
             'tableId': r['tableReference']['tableId']
+        }
+
+
+@DataSet.action_registry.register('delete')
+class DeleteDataSet(MethodAction):
+    schema = type_schema('delete')
+    method_spec = {'op': 'delete'}
+    permissions = ('bigquery.datasets.get', 'bigquery.datasets.delete')
+
+    @staticmethod
+    def get_resource_params(model, r):
+        return {
+            'projectId': r['datasetReference']['projectId'],
+            'datasetId': r['datasetReference']['datasetId']
         }

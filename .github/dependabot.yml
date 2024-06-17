@@ -1,0 +1,24 @@
+version: 2
+updates:
+
+- package-ecosystem: "github-actions"
+  directory: "/"
+  schedule:
+      interval: "monthly"
+  commit-message:
+      prefix: ":seedling:"
+  groups:
+    github-actions:
+      patterns:
+        - "*"
+
+- package-ecosystem: "pip"
+  directory: "/"
+  schedule:
+      interval: "monthly"
+  commit-message:
+      prefix: ":seedling:"
+  groups:
+    python-requirements:
+      patterns:
+        - "*"

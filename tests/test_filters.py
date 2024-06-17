@@ -1081,6 +1081,22 @@ class TestIntersect(unittest.TestCase):
         self.assertEqual(f(instance(Thing=["C", "D", "E"])), True)
 
 
+class TestModValue(unittest.TestCase):
+    def test_mod(self):
+        f = filters.factory({
+            "type": "value",
+            "key": "Number",
+            "value": 3,
+            "op": "mod"
+        })
+        self.assertEqual(f(instance(Number=3)), False)
+        self.assertEqual(f(instance(Number=6)), False)
+        self.assertEqual(f(instance(Number=24)), False)
+        self.assertEqual(f(instance(Number=2)), True)
+        self.assertEqual(f(instance(Number=5)), True)
+        self.assertEqual(f(instance(Number=23)), True)
+
+
 class TestFilterRegistry(unittest.TestCase):
 
     def test_filter_registry(self):
