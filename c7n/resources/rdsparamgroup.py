@@ -164,7 +164,7 @@ class PGParameterFilter(PGMixin, ParameterFilter):
             for p in paginator.paginate(DBParameterGroupName=pg)]))
 
         return param_list
-  
+
 
 @pg_cluster_filters.register('db-parameter')
 class PGClusterParameterFilter(PGClusterMixin, ParameterFilter):
