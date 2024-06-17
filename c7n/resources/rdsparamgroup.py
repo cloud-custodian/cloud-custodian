@@ -116,7 +116,7 @@ class ParameterFilter(ValueFilter):
             ret_val = float(val) if val else 0.0
 
         return ret_val
-    
+
     def get_pg_values(self, param_group):
         pgvalues = {}
         param_list = self.get_param_list(param_group)
@@ -137,7 +137,8 @@ class ParameterFilter(ValueFilter):
                 results.append(resource)
 
         return results
-    
+
+
 @pg_filters.register('db-parameter')
 class PGParameterFilter(PGMixin, ParameterFilter):
     """ Filter by parameters.
@@ -163,7 +164,7 @@ class PGParameterFilter(PGMixin, ParameterFilter):
             for p in paginator.paginate(DBParameterGroupName=pg)]))
 
         return param_list
-    
+  
 
 @pg_cluster_filters.register('db-parameter')
 class PGClusterParameterFilter(PGClusterMixin, ParameterFilter):
@@ -190,6 +191,7 @@ class PGClusterParameterFilter(PGClusterMixin, ParameterFilter):
             for p in paginator.paginate(DBClusterParameterGroupName=pg)]))
 
         return param_list
+
 
 class Copy(BaseAction):
 
