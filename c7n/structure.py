@@ -61,6 +61,10 @@ class StructureParser:
             raise PolicyValidationError(
                 'policy:%s has unknown keys: %s' % (
                     p['name'], ','.join(pkeys.difference(self.allowed_policy_keys))))
+        if "mode" in p:
+            mode = p["mode"]
+            if not isinstance(mode, dict) or "type" not in mode:
+                raise PolicyValidationError("invalid `mode` declaration")
         if not isinstance(p.get('filters', []), (list, type(None))):
             raise PolicyValidationError((
                 'policy:%s must use a list for filters found:%s' % (

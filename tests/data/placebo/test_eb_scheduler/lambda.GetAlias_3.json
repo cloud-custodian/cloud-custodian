@@ -1,0 +1,11 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "AliasArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-schedule-ec2-checker:Dev",
+        "Name": "Dev",
+        "FunctionVersion": "33",
+        "Description": "",
+        "RevisionId": "d6fad82c-b9ad-42b4-a4f4-b5ef5929877b"
+    }
+}
