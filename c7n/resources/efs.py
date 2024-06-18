@@ -309,6 +309,7 @@ class CheckSecureTransport(Filter):
             len(results), len(resources))
         return results
 
+
 @ElasticFileSystem.action_registry.register('secure-transport')
 class EnableSecureTransport(Action, CheckSecureTransport):
     """Modify EFS file system policy that does not enforce secure transport
@@ -325,8 +326,11 @@ class EnableSecureTransport(Action, CheckSecureTransport):
             - type: secure-transport
               state: enable
     """
-    schema = type_schema('secure-transport', **{'state': {'enum': ['enable', 'disable']}})
-    permissions = ('elasticfilesystem:DescribeFileSystemPolicy', 'elasticfilesystem:PutFileSystemPolicy', 'elasticfilesystem:DeleteFileSystemPolicy')
+    schema = type_schema('secure-transport',
+                         **{'state': {'enum': ['enable', 'disable']}})
+    permissions = ('elasticfilesystem:DescribeFileSystemPolicy',
+                   'elasticfilesystem:PutFileSystemPolicy',
+                   'elasticfilesystem:DeleteFileSystemPolicy')
     policy_annotation = 'c7n:Policy'
 
     def get_policy(self, client, resource):
@@ -347,37 +351,39 @@ class EnableSecureTransport(Action, CheckSecureTransport):
 
     def enable_secure_transport(self, client, resource, policy):
         """Enable secure transport for the resource."""
-        updated_policy = { 
+        updated_policy = {
             "Version": "2012-10-17",
             "Statement": [
-                {   
+                {
                     "Sid": "efs-disable-unencrpted-traffic-statement",
                     "Effect": "Deny",
-                    "Principal": { "AWS": "*" },
+                    "Principal": {"AWS": "*"},
                     "Action": "*",
                     "Condition": {
-                        "Bool": { "aws:SecureTransport": "false" }
+                        "Bool": {"aws:SecureTransport": "false"}
                     }
                 }
             ]
         }
         if policy:
-            updated_policy = { 
+            updated_policy = {
                  "Version": "2012-10-17",
                  "Statement": []
             }
             updated_policy['Statement'].extend(self.construct_secure_policy(policy, enable=True))
-        client.put_file_system_policy(FileSystemId=resource['FileSystemId'], Policy=json.dumps(updated_policy))
+        client.put_file_system_policy(FileSystemId=resource['FileSystemId'],
+                                      Policy=json.dumps(updated_policy))
 
-    def disable_secure_transport(self, client, resource, policy): 
+    def disable_secure_transport(self, client, resource, policy):
         """Disable secure transport for the resource."""
-        updated_policy = { 
+        updated_policy = {
              "Version": "2012-10-17",
              "Statement": []
         }
         if policy:
             updated_policy["Statement"].extend(self.construct_secure_policy(policy, enable=False))
-            client.put_file_system_policy(FileSystemId=resource['FileSystemId'], Policy=json.dumps(updated_policy))
+            client.put_file_system_policy(FileSystemId=resource['FileSystemId'],
+                                          Policy=json.dumps(updated_policy))
 
     def construct_secure_policy(self, policy, enable=True):
         """Creates secure policy based on the input flag enable."""
@@ -403,7 +409,7 @@ class EnableSecureTransport(Action, CheckSecureTransport):
     def process(self, resources):
         """Process the resources to either 'enable' or 'disable' secure transport."""
         state_actions = {
-            'enable': self.enable_secure_transport, 
+            'enable': self.enable_secure_transport,
             'disable': self.disable_secure_transport}
         client = local_session(self.manager.session_factory).client('efs')
         for resource in resources:

@@ -356,7 +356,7 @@ class ElasticFileSystem(BaseTest):
         factory = self.replay_flight_data("test_efs_enable_secure_transport")
         client = factory().client("efs")
         try:
-            res = client.describe_file_system_policy(FileSystemId="fs-06f6ce85b4976bd7f")
+            client.describe_file_system_policy(FileSystemId="fs-06f6ce85b4976bd7f")
         except client.exceptions.PolicyNotFound:
             print("Policy not found")
             pass
@@ -377,4 +377,5 @@ class ElasticFileSystem(BaseTest):
         print(resources[0])
         response = client.describe_file_system_policy(FileSystemId="fs-06f6ce85b4976bd7f")
         response = json.loads(response.get('Policy'))
-        self.assertEqual(response.get('Statement')[0]['Condition']['Bool']['aws:SecureTransport'], "false")
+        self.assertEqual(response.get(
+            'Statement')[0]['Condition']['Bool']['aws:SecureTransport'], "false")
