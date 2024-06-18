@@ -90,7 +90,7 @@ class SessionFactory:
                 self.assume_role, self.session_name, self.session_policy, session,
                 region or self.region, self.external_id)
         else:
-            session = CustodianSession(
+            session = Session(
                 region_name=region or self.region, profile_name=self.profile)
 
         return self.update(session)
@@ -166,7 +166,7 @@ def assumed_session(
     if region is None:
         region = s.get_config_variable('region') or 'us-east-1'
     s.set_config_variable('region', region)
-    return CustodianSession(botocore_session=s)
+    return Session(botocore_session=s)
 
 
 def get_sts_client(session, region):
