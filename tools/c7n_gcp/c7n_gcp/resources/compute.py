@@ -1,4 +1,4 @@
-# Copyright The Cloud Custodian Authors.
+    # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
 import re
@@ -361,7 +361,7 @@ class Disk(QueryResourceManager):
         version = 'v1'
         component = 'disks'
         scope = 'zone'
-        enum_spec = ('aggregatedList', 'items.*.disks[]', None)
+        enum_spec = ('list', 'items[]', None)
         name = id = 'name'
         labels = True
         default_report_fields = ["name", "sizeGb", "status", "zone"]
