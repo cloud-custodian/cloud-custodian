@@ -334,7 +334,6 @@ class EnableSecureTransport(Action, CheckSecureTransport):
     policy_annotation = 'c7n:Policy'
 
     def get_policy(self, client, resource):
-        """Return the Filesystem policy for the resource."""
         if self.policy_annotation in resource:
             return resource[self.policy_annotation]
         try:
@@ -350,7 +349,6 @@ class EnableSecureTransport(Action, CheckSecureTransport):
         return resource[self.policy_annotation]
 
     def enable_secure_transport(self, client, resource, policy):
-        """Enable secure transport for the resource."""
         updated_policy = {
             "Version": "2012-10-17",
             "Statement": [
@@ -375,7 +373,6 @@ class EnableSecureTransport(Action, CheckSecureTransport):
                                       Policy=json.dumps(updated_policy))
 
     def disable_secure_transport(self, client, resource, policy):
-        """Disable secure transport for the resource."""
         updated_policy = {
              "Version": "2012-10-17",
              "Statement": []
@@ -386,7 +383,6 @@ class EnableSecureTransport(Action, CheckSecureTransport):
                                           Policy=json.dumps(updated_policy))
 
     def construct_secure_policy(self, policy, enable=True):
-        """Creates secure policy based on the input flag enable."""
         statements = policy.get('Statement', [])
         if isinstance(statements, dict):
             statements = [statements]
@@ -399,7 +395,10 @@ class EnableSecureTransport(Action, CheckSecureTransport):
                 if not enable and effect == 'Deny' and st_value == 'false':
                     statement["Effect"] = 'Allow'
                 if effect == 'Allow' and st_value in ['true', 'false']:
-                    statement["Condition"]["Bool"]["aws:SecureTransport"] = 'true' if enable else 'false'
+                    if enable:
+                        statement["Condition"]["Bool"]["aws:SecureTransport"] = 'true'
+                    else:
+                        statement["Condition"]["Bool"]["aws:SecureTransport"] = 'false'
             except (KeyError, TypeError):
                 pass
             stmts.append(statement)
