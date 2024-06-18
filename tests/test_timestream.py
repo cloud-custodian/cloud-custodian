@@ -1,6 +1,9 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from .common import BaseTest
+from c7n.testing import mock_datetime_now
+import c7n.filters.backup
+from dateutil import parser
 
 
 class TestTimestreamDatabase(BaseTest):
@@ -170,6 +173,28 @@ class TestTimestreamTable(BaseTest):
         client = session_factory().client('timestream-write')
         tables = client.list_tables()['Tables']
         self.assertEqual(len(tables), 0)
+
+    def test_timestream_consecutive_aws_backup_count_filter(self):
+        session_factory = self.replay_flight_data("test_timestream_consecutive_backup_count_filter")
+        p = self.load_policy(
+            {
+                "name": "timestream_consecutive_aws_backup_count_filter",
+                "resource": "aws.timestream-table",
+                "filters": [
+                    {
+                        "type": "consecutive-aws-backups",
+                        "count": 1,
+                        "period": "days",
+                        "status": "COMPLETED"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        with mock_datetime_now(parser.parse("2024-05-14T22:00:00+00:00"), c7n.filters.backup):
+            resources = p.run()
+        self.assertEqual(resources[0]['c7n:AwsBackups'][0]['Status'], "COMPLETED")
+        self.assertEqual(len(resources), 1)
 
     def test_timestream_kms_key_filter(self):
         session_factory = self.replay_flight_data('test_timestream_kms_key_filter')

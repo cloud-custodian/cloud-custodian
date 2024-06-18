@@ -166,6 +166,7 @@ ResourceMap = {
   "aws.lightsail-instance": "c7n.resources.lightsail.Instance",
   "aws.log-group": "c7n.resources.cw.LogGroup",
   "aws.log-metric": "c7n.resources.cw.LogMetric",
+  "aws.memorydb": "c7n.resources.memorydb.MemoryDb",
   "aws.message-broker": "c7n.resources.mq.MessageBroker",
   "aws.message-config": "c7n.resources.mq.MessageConfig",
   "aws.mirror-session": "c7n.resources.vpc.TrafficMirrorSession",
@@ -239,6 +240,8 @@ ResourceMap = {
   "aws.sagemaker-transform-job": "c7n.resources.sagemaker.SagemakerTransformJob",
   "aws.sagemaker-hyperparameter-tuning-job":
     "c7n.resources.sagemaker.SagemakerHyperParameterTuningJob",
+  "aws.sagemaker-model-bias-job-definition":
+    "c7n.resources.sagemaker.SagemakerModelBiasJobDefinition",
   "aws.scaling-policy": "c7n.resources.asg.ScalingPolicy",
   "aws.secrets-manager": "c7n.resources.secretsmanager.SecretsManager",
   "aws.security-group": "c7n.resources.vpc.SecurityGroup",

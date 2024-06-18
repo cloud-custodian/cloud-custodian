@@ -79,6 +79,48 @@ class TestStorageLens(BaseTest):
             {'Key': 'resource', 'Value': 'storagelens'}
             ])
 
+    def test_s3_storage_lens_mark_for_op(self):
+        session_factory = self.replay_flight_data("test_s3_storage_lens_mark_for_op")
+        p = self.load_policy(
+            {
+                "name": "s3-storage-lens-mark",
+                "resource": "aws.s3-storage-lens",
+                "filters": [
+                    {'tag:owner': 'policy'},
+                ],
+                "actions": [
+                    {
+                        "type": "mark-for-op",
+                        "tag": "custodian_cleanup",
+                        "op": "delete",
+                        "days": 1,
+                    }
+                ],
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        p = self.load_policy(
+            {
+                "name": "s3-storage-lens-marked",
+                "resource": "aws.s3-storage-lens",
+                "filters": [
+                    {
+                        "type": "marked-for-op",
+                        "tag": "custodian_cleanup",
+                        "op": "delete",
+                        "skew": 3,
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        assert resources[0]['Id'] == 'test-dashboard'
+
     def test_s3_storage_lens_delete(self):
         session_factory = self.replay_flight_data('test_s3_storage_lens_delete')
         p = self.load_policy(

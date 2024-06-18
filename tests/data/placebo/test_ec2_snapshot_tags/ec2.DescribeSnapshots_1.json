@@ -3,7 +3,7 @@
     "data": {
         "Snapshots": [
             {
-                "Description": "",
+                "Description": "Snapshot Created for i-063c6794763254b51 (Foo)",
                 "Encrypted": false,
                 "OwnerId": "644160558196",
                 "Progress": "99%",
@@ -37,7 +37,7 @@
                 ]
             },
             {
-                "Description": "",
+                "Description": "Snapshot Created for i-063c6794763254b51 (Foo)",
                 "Encrypted": false,
                 "OwnerId": "644160558196",
                 "Progress": "99%",
@@ -71,7 +71,7 @@
                 ]
             },
             {
-                "Description": "",
+                "Description": "Snapshot Created for i-063c6794763254b51 (Foo)",
                 "Encrypted": false,
                 "OwnerId": "644160558196",
                 "Progress": "99%",
