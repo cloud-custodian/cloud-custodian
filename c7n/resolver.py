@@ -201,7 +201,6 @@ class ValuesFrom:
         results = []
 
         record_singleton = False
-        # result = client.execute_statement(Statement=self.data['query'])
         for page in pager.paginate(Statement=self.data['query']):
             for row in page.get("Items", []):
                 record = {k: deserializer.deserialize(v) for k, v in row.items()}
@@ -210,7 +209,7 @@ class ValuesFrom:
                     results.append(list(record.values())[0])
                 else:
                     results.append(record)
-        if not record_singleton and self.data.get('expr'):
+        if not record_singleton or self.data.get('expr'):
             return self._get_resource_values(results)
         return results
 
