@@ -326,11 +326,11 @@ class EnableSecureTransport(Action, CheckSecureTransport):
         - type: secure-transport
           state: enable
     """
+
     schema = type_schema('secure-transport',
                          **{'state': {'enum': ['enable', 'disable']}})
     permissions = ('elasticfilesystem:DescribeFileSystemPolicy',
-                   'elasticfilesystem:PutFileSystemPolicy',
-                   'elasticfilesystem:DeleteFileSystemPolicy')
+                   'elasticfilesystem:PutFileSystemPolicy')
     policy_annotation = 'c7n:Policy'
 
     def get_policy(self, client, resource):
@@ -406,7 +406,6 @@ class EnableSecureTransport(Action, CheckSecureTransport):
         return stmts
 
     def process(self, resources):
-        """Process the resources to either 'enable' or 'disable' secure transport."""
         state_actions = {
             'enable': self.enable_secure_transport,
             'disable': self.disable_secure_transport}
