@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "c7n_kube"
-version = "0.2.36"
+version = "0.2.37"
 description = "Cloud Custodian - Kubernetes Provider"
 readme = "readme.md"
 homepage = "https://cloudcustodian.io"
