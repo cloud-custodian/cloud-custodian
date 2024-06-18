@@ -319,12 +319,12 @@ class EnableSecureTransport(Action, CheckSecureTransport):
     .. code-block:: yaml
 
     - name: efs-securetransport-enable-policy
-        resource: efs
-        filters:
-            - check-secure-transport
-        actions:
-            - type: secure-transport
-              state: enable
+      resource: efs
+      filters:
+        - check-secure-transport
+      actions:
+        - type: secure-transport
+          state: enable
     """
     schema = type_schema('secure-transport',
                          **{'state': {'enum': ['enable', 'disable']}})
