@@ -35,17 +35,17 @@ tests-no-zope = ["attrs[tests-mypy]", "cloudpickle", "hypothesis", "pympler", "p
 
 [[package]]
 name = "boto3"
-version = "1.34.127"
+version = "1.34.128"
 description = "The AWS SDK for Python"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "boto3-1.34.127-py3-none-any.whl", hash = "sha256:d370befe4fb7aea5bc383057d7dad18dda5d0cf3cd3295915bcc8c8c4191905c"},
-    {file = "boto3-1.34.127.tar.gz", hash = "sha256:58ccdeae3a96811ecc9d5d866d8226faadbd0ee1891756e4a04d5186e9a57a64"},
+    {file = "boto3-1.34.128-py3-none-any.whl", hash = "sha256:a048ff980a81cd652724a73bc496c519b336fabe19cc8bfc6c53b2ff6eb22c7b"},
+    {file = "boto3-1.34.128.tar.gz", hash = "sha256:43a6e99f53a8d34b3b4dbe424dbcc6b894350dc41a85b0af7c7bc24a7ec2cead"},
 ]
 
 [package.dependencies]
-botocore = ">=1.34.127,<1.35.0"
+botocore = ">=1.34.128,<1.35.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.10.0,<0.11.0"
 
@@ -54,13 +54,13 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "botocore"
-version = "1.34.127"
+version = "1.34.128"
 description = "Low-level, data-driven core of boto 3."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "botocore-1.34.127-py3-none-any.whl", hash = "sha256:e14fa28c8bb141de965e700f88b196d17c67a703c7f0f5c7e14f7dd1cf636011"},
-    {file = "botocore-1.34.127.tar.gz", hash = "sha256:a377871742c40603d559103f19acb7bc93cfaf285e68f21b81637ec396099877"},
+    {file = "botocore-1.34.128-py3-none-any.whl", hash = "sha256:db67fda136c372ab3fa432580c819c89ba18d28a6152a4d2a7ea40d44082892e"},
+    {file = "botocore-1.34.128.tar.gz", hash = "sha256:8d8e03f7c8c080ecafda72036eb3b482d649f8417c90b5dca33b7c2c47adb0c9"},
 ]
 
 [package.dependencies]
@@ -756,13 +756,13 @@ widechars = ["wcwidth"]
 
 [[package]]
 name = "tencentcloud-sdk-python"
-version = "3.0.1169"
+version = "3.0.1170"
 description = "Tencent Cloud SDK for Python"
 optional = false
 python-versions = "*"
 files = [
-    {file = "tencentcloud-sdk-python-3.0.1169.tar.gz", hash = "sha256:b5718febff525fca67fb4f8f14ea4af46de1ddabe149c02bb3021f025113c488"},
-    {file = "tencentcloud_sdk_python-3.0.1169-py2.py3-none-any.whl", hash = "sha256:461a861caaebd2fba52ef318bfb1c18f36d7d0051304675ab29482a490569c98"},
+    {file = "tencentcloud-sdk-python-3.0.1170.tar.gz", hash = "sha256:844f31582c912a37cab73f70c6bcba21c83fe2ab3f833a418f10615b91a43d3b"},
+    {file = "tencentcloud_sdk_python-3.0.1170-py2.py3-none-any.whl", hash = "sha256:35e7271af8078b0d2678c43b9cf6560a88cf2ad1b13d1f142ef9d0b803b57ded"},
 ]
 
 [package.dependencies]
