@@ -75,11 +75,11 @@ class MetricFilter(Filter):
     .. code-block:: yaml
 
         policies:
-        - name: find-underused-vms
+          - name: find-underused-vms
             description: Find VMs with maximum cpu <= 10% over the last 24 hours
             resource: azure.vm
             filters:
-            - type: metric
+              - type: metric
                 metric: Percentage CPU
                 aggregation: maximum
                 op: lte
