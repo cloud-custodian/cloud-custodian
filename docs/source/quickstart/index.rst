@@ -278,15 +278,17 @@ A hook used to validate Cloud Custodian policies before committing them, to redu
 
 Reference the hook in your `.pre-commit-config.yaml` file:
 
-repos:
-  - repo: https://github.com/cloud-custodian/cloud-custodian.git
-    rev: main # or use a specific release
-    hooks:
-      - id: c7n-validate
-        files: policies/.*\.yml$
-        args:
-          # - --strict
-          - --quiet
+.. code-block:: yaml
+
+  repos:
+    - repo: https://github.com/cloud-custodian/cloud-custodian.git
+      rev: main # or use a specific release
+      hooks:
+        - id: c7n-validate
+          files: policies/.*\.yml$
+          args:
+            # - --strict
+            - --quiet
 
 .. _community:
 
