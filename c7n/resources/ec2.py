@@ -1768,8 +1768,17 @@ class Snapshot(BaseAction):
         if err:
             raise err
 
+    def get_instance_name(self, resource):
+        tags = resource.get('Tags', [])
+        for tag in tags:
+            if tag['Key'] == 'Name':
+                return tag['Value']
+        return "-"
+
     def process_volume_set(self, client, resource):
+        i_name = self.get_instance_name(resource)
         params = dict(
+            Description=f"Snapshot Created for {resource['InstanceId']} ({i_name})",
             InstanceSpecification={
                 'ExcludeBootVolume': self.data.get('exclude-boot', False),
                 'InstanceId': resource['InstanceId']})
