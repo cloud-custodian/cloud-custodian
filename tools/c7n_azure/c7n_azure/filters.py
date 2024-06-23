@@ -69,6 +69,26 @@ class MetricFilter(Filter):
 
     :example:
 
+    Find VMs with a maximum Percentage CPU at or below 10% over the last 24 hours (note the use of
+    ``no_data_action: to_zero`` to treat missing metric values as zeroes)
+
+    .. code-block:: yaml
+
+        policies:
+          - name: find-underused-vms
+            description: Find VMs with maximum cpu <= 10% over the last 24 hours
+            resource: azure.vm
+            filters:
+              - type: metric
+                metric: Percentage CPU
+                aggregation: maximum
+                op: lte
+                threshold: 10
+                timeframe: 24
+                no_data_action: to_zero
+
+    :example:
+
     Find KeyVaults with more than 1000 API hits in the last hour
 
     .. code-block:: yaml
