@@ -134,3 +134,79 @@ class MemoryDbTest(BaseTest):
         except client.exceptions.ClusterNotFoundFault:
             self.fail('should not raise')
         mock_factory().client('memorydb').delete_cluster.assert_called_once()
+
+    def test_memorydb_security_group(self):
+        session_factory = self.replay_flight_data("test_memorydb_security_group")
+        p = self.load_policy(
+            {
+                "name": "memorydb-security-group",
+                "resource": "memorydb",
+                "filters": [
+                    {"type": "security-group", "key": "tag:ASV", "value": "PolicyTest"}
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        assert resources[0]['Name'] == 'test-cluster-custodian'
+
+    def test_memorydb_subnet_filter(self):
+        session_factory = self.replay_flight_data(
+            "test_memorydb_subnet_filter"
+        )
+        p = self.load_policy(
+            {
+                "name": "memorydb-subnet-filter",
+                "resource": "memorydb",
+                "filters": [
+                    {"type": "subnet", "key": "tag:Name", "value": "PublicSubnetA"}
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        assert resources[0]['Name'] == 'test-cluster-custodian'
+
+    def test_memorydb_network_location_filter(self):
+        factory = self.replay_flight_data("test_memorydb_network_location_filter")
+
+        p = self.load_policy(
+            {
+                "name": "test_memorydb_network_location_filter",
+                "resource": "memorydb",
+                "filters": [
+                    {
+                        "type": "network-location",
+                        "compare": ["resource", "subnet"],
+                        "key": "tag:ASV",
+                        "match": "equal"
+                    }
+                ]
+            },
+            session_factory=factory
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        assert resources[0]['Name'] == 'test-cluster-custodian'
+
+    def test_memorydb_kms_encryption(self):
+        session_factory = self.replay_flight_data('test_memorydb_kms_encryption')
+        p = self.load_policy(
+            {
+                'name': 'memorydb-kms-encryption',
+                'resource': 'memorydb',
+                'filters': [
+                    {
+                        'type': 'kms-key',
+                        'key': 'c7n:AliasName',
+                        'value': 'alias/tes/pratyush',
+                    }
+                ],
+            }, session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['Name'], 'test-cluster-2')
