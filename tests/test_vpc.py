@@ -3907,6 +3907,52 @@ class FlowLogsTest(BaseTest):
         ]
         self.assertEqual(logs[0]["ResourceId"], resources[0]["VpcId"])
 
+    def test_vpc_set_flow_logs_legacy_schema_handling(self):
+        session_factory = self.replay_flight_data("test_vpc_set_flow_logs_legacy_schema_handling")
+        p = self.load_policy(
+            {
+                "name": "c7n-vpc-flow-logs-legacy-schema",
+                "resource": "aws.vpc",
+                "filters": [
+                    {"tag:Name": "FlowLogTest"}, {"type": "flow-logs", "enabled": False}
+                ],
+                "actions": [
+                    {
+                        "type": "set-flow-log",
+                        "LogDestinationType": "invalid-value",
+                        "LogDestination": "arn:aws:s3:::nonsense",
+                        "TrafficType": "ALL",
+                        "attrs": {
+                            "LogDestinationType": "s3",
+                            "LogDestination": "arn:aws:s3:::c7n-test/test.log.gz",
+                            "TagSpecifications": [
+                                {
+                                    "ResourceType": "vpc-flow-log",
+                                    "Tags": [
+                                        {
+                                            "Key": "Name",
+                                            "Value": "FlowLogTest"
+                                        },
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["VpcId"], "vpc-05ee7d52fda39ac81")
+        client = session_factory(region="us-east-1").client("ec2")
+        logs = client.describe_flow_logs(
+            Filters=[{"Name": "resource-id", "Values": [resources[0]["VpcId"]]}]
+        )[
+            "FlowLogs"
+        ]
+        self.assertEqual(logs[0]["ResourceId"], resources[0]["VpcId"])
+
     def test_vpc_delete_flow_logs(self):
         session_factory = self.replay_flight_data("test_vpc_delete_flow_logs")
         p = self.load_policy(
