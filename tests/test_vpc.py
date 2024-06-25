@@ -3908,8 +3908,9 @@ class FlowLogsTest(BaseTest):
         self.assertEqual(logs[0]["ResourceId"], resources[0]["VpcId"])
 
     def test_vpc_set_flow_logs_legacy_schema_handling(self):
-        session_factory = self.replay_flight_data("test_vpc_set_flow_logs_legacy_schema_handling")
-        p = self.load_policy(
+        self.assertRaises(
+            PolicyValidationError,
+            self.load_policy,
             {
                 "name": "c7n-vpc-flow-logs-legacy-schema",
                 "resource": "aws.vpc",
@@ -3941,19 +3942,8 @@ class FlowLogsTest(BaseTest):
                     }
                 ],
             },
-            session_factory=session_factory,
+            session_factory=None
         )
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]["VpcId"], "vpc-05ee7d52fda39ac81")
-        client = session_factory(region="us-east-1").client("ec2")
-        logs = client.describe_flow_logs(
-            Filters=[{"Name": "resource-id", "Values": [resources[0]["VpcId"]]}]
-        )[
-            "FlowLogs"
-        ]
-        self.assertEqual(logs[0]["ResourceId"], resources[0]["VpcId"])
-        self.assertEqual(logs[0]["LogDestination"], "arn:aws:s3:::c7n-test/test.log.gz")
 
     def test_vpc_delete_flow_logs(self):
         session_factory = self.replay_flight_data("test_vpc_delete_flow_logs")

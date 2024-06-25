@@ -2958,6 +2958,11 @@ class SetFlowLogs(BaseAction):
         ]
 
     def validate(self):
+        if set(self.legacy_schema).intersection(self.data) and 'attrs' in self.data:
+            raise PolicyValidationError(
+                "set-flow-log: legacy top level keys aren't compatible with `attrs` mapping"
+            )
+
         self.convert()
         attrs = dict(self.data['attrs'])
         model = self.manager.get_model()
