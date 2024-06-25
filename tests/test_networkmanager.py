@@ -11,7 +11,7 @@ class TestNetworkManager(BaseTest):
         p = self.load_policy(
             {
                 "name": "list-core-networks",
-                "resource": "networkmanager-core-network",
+                "resource": "networkmanager-core",
             },
             session_factory=session_factory,
         )
@@ -27,7 +27,7 @@ class TestNetworkManager(BaseTest):
         p = self.load_policy(
             {
                 "name": "describe_global_networks",
-                "resource": "networkmanager-global-network",
+                "resource": "networkmanager-global",
             },
             session_factory=session_factory,
         )
@@ -43,7 +43,7 @@ class TestNetworkManager(BaseTest):
         p = self.load_policy(
             {
                 "name": "describe_global_networks",
-                "resource": "networkmanager-global-network",
+                "resource": "networkmanager-global",
                 "filters": [
                     {"GlobalNetworkId": "global-network-0f952aba212c3fb47"}
                 ]
@@ -62,7 +62,7 @@ class TestNetworkManager(BaseTest):
         p = self.load_policy(
             {
                 "name": "tag-core-network",
-                "resource": "networkmanager-core-network",
+                "resource": "networkmanager-core",
                 "filters": [
                     {"tag:Name": "test-cloudwan"}
                 ],
@@ -82,7 +82,7 @@ class TestNetworkManager(BaseTest):
         p = self.load_policy(
             {
                 "name": "untag-core-network",
-                "resource": "networkmanager-core-network",
+                "resource": "networkmanager-core",
                 "filters": [{"tag:Name": "test-cloudwan"}],
                 "actions": [{"type": "remove-tag", "tags": ["Category"]}],
             },
@@ -101,7 +101,7 @@ class TestNetworkManager(BaseTest):
         p = self.load_policy(
             {
                 "name": "delete-core-network",
-                "resource": "networkmanager-core-network",
+                "resource": "networkmanager-core",
                 "filters": [
                     {"tag:Name": "test-cloudwan"}
                 ],
@@ -122,7 +122,7 @@ class TestNetworkManager(BaseTest):
         p = self.load_policy(
             {
                 "name": "delete-global-network",
-                "resource": "networkmanager-global-network",
+                "resource": "networkmanager-global",
                 "filters": [
                     {"tag:Name": "test-cloudwan-2"}
                 ],
@@ -143,7 +143,7 @@ class TestNetworkManager(BaseTest):
         p = self.load_policy(
             {
                 "name": "mark-for-op-core-network",
-                "resource": "networkmanager-core-network",
+                "resource": "networkmanager-core",
                 "filters": [
                     {"tag:Name": "test-cloudwan"}
                 ],
@@ -164,7 +164,7 @@ class TestNetworkManager(BaseTest):
         p = self.load_policy(
             {
                 "name": "mark-for-op-global-network",
-                "resource": "networkmanager-global-network",
+                "resource": "networkmanager-global",
                 "filters": [
                     {"tag:Name": "test-cloudwan"}
                 ],
@@ -195,7 +195,7 @@ class TestNetworkManager(BaseTest):
                 operation_name='delete_core_network'))
         p = self.load_policy({
             'name': 'delete-core-network-error',
-            'resource': 'networkmanager-core-network',
+            'resource': 'networkmanager-core',
             'actions': ['delete']},
             session_factory=mock_factory)
 
@@ -221,7 +221,7 @@ class TestNetworkManager(BaseTest):
                 operation_name='delete_global_network'))
         p = self.load_policy({
             'name': 'delete-global-network-error',
-            'resource': 'networkmanager-global-network',
+            'resource': 'networkmanager-global',
             'actions': ['delete']},
             session_factory=mock_factory)
 

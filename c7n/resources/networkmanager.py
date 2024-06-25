@@ -8,7 +8,7 @@ from c7n.utils import local_session, type_schema
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 
 
-@c7n_resources.register('networkmanager-core-network')
+@c7n_resources.register('networkmanager-core')
 class CoreNetwork(QueryResourceManager):
 
     class resource_type(TypeInfo):
@@ -29,7 +29,7 @@ class CoreNetwork(QueryResourceManager):
 CoreNetwork.filter_registry.register('marked-for-op', TagActionFilter)
 
 
-@c7n_resources.register('networkmanager-global-network')
+@c7n_resources.register('networkmanager-global')
 class GlobalNetwork(QueryResourceManager):
 
     class resource_type(TypeInfo):
