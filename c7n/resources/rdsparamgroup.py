@@ -11,6 +11,7 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import (type_schema, local_session, chunks)
 from c7n.tags import universal_augment
+from c7n.resources.rds import ParameterFilter
 
 log = logging.getLogger('custodian.rds-param-group')
 
@@ -81,7 +82,7 @@ class PGClusterMixin:
         return pg['DBClusterParameterGroupName']
 
 
-class ParameterFilter(ValueFilter):
+class ParameterGroupFilter(ParameterFilter):
     """
     Applies value type filter on db parameter values.
 
@@ -92,36 +93,11 @@ class ParameterFilter(ValueFilter):
     permissions = ('rds:DescribeDBParameters',)
     policy_annotation = 'c7n:MatchedDBParameter'
 
-    @staticmethod
-    def recast(val, datatype):
-        """ Re-cast the value based upon an AWS supplied datatype
-            and treat nulls sensibly.
-        """
-        ret_val = val
-        if datatype == 'string':
-            ret_val = str(val)
-        elif datatype == 'boolean':
-            # AWS returns 1s and 0s for boolean for most of the cases
-            if val.isdigit():
-                ret_val = bool(int(val))
-            # AWS returns 'TRUE,FALSE' for Oracle engine
-            elif val == 'TRUE':
-                ret_val = True
-            elif val == 'FALSE':
-                ret_val = False
-        elif datatype == 'integer':
-            if val.isdigit():
-                ret_val = int(val)
-        elif datatype == 'float':
-            ret_val = float(val) if val else 0.0
-
-        return ret_val
-
     def get_pg_values(self, param_group):
         pgvalues = {}
         param_list = self.get_param_list(param_group)
         pgvalues = {
-            p['ParameterName']: self.recast(p['ParameterValue'], p['DataType'])
+            p['ParameterName']: ParameterFilter.recast(p['ParameterValue'], p['DataType'])
             for p in param_list if 'ParameterValue' in p}
         return pgvalues
 
@@ -140,7 +116,7 @@ class ParameterFilter(ValueFilter):
 
 
 @pg_filters.register('db-parameter')
-class PGParameterFilter(PGMixin, ParameterFilter):
+class PGParameterFilter(PGMixin, ParameterGroupFilter):
     """ Filter by parameters.
 
     :example:
@@ -167,7 +143,7 @@ class PGParameterFilter(PGMixin, ParameterFilter):
 
 
 @pg_cluster_filters.register('db-parameter')
-class PGClusterParameterFilter(PGClusterMixin, ParameterFilter):
+class PGClusterParameterFilter(PGClusterMixin, ParameterGroupFilter):
     """ Filter by parameters.
 
     :example:

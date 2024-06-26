@@ -317,35 +317,3 @@ class RDSClusterParamGroupTest(BaseTest):
 
         resources = policy.resource_manager.resources()
         self.assertEqual(len(resources), 1)
-
-
-class ParameterFilterTestCase(BaseTest):
-
-    def test_recast_string(self):
-        filter_obj = ParameterFilter({})
-        result = filter_obj.recast("test", "string")
-        self.assertEqual(result, "test")
-
-    def test_recast_boolean(self):
-        filter_obj = ParameterFilter({})
-        result = filter_obj.recast("1", "boolean")
-        self.assertEqual(result, True)
-
-        result = filter_obj.recast("0", "boolean")
-        self.assertEqual(result, False)
-
-        result = filter_obj.recast("TRUE", "boolean")
-        self.assertEqual(result, True)
-
-        result = filter_obj.recast("FALSE", "boolean")
-        self.assertEqual(result, False)
-
-    def test_recast_integer(self):
-        filter_obj = ParameterFilter({})
-        result = filter_obj.recast("123", "integer")
-        self.assertEqual(result, 123)
-
-    def test_recast_float(self):
-        filter_obj = ParameterFilter({})
-        result = filter_obj.recast("3.14", "float")
-        self.assertEqual(result, 3.14)
