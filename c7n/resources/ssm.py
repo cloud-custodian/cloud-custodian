@@ -9,7 +9,7 @@ from c7n.actions import Action
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import Filter, CrossAccountAccessFilter
 from c7n.filters.kms import KmsRelatedFilter
-from c7n.query import QueryResourceManager, TypeInfo
+from c7n.query import DescribeSource, QueryResourceManager, TypeInfo
 from c7n.manager import resources
 from c7n.tags import universal_augment
 from c7n.utils import chunks, get_retry, local_session, type_schema, filter_empty
@@ -601,6 +601,25 @@ class PostItem(Action):
 resources.subscribe(PostItem.register_resource)
 
 
+class SSMDocumentDescribe(DescribeSource):
+
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('ssm')
+
+        def _augment(r):
+            # List tags for the Notebook-Instance & set as attribute
+            document = self.manager.retry(client.get_document,
+                Name=r['Name'])
+            del document['ResponseMetadata']
+            r.update(document)
+            r['Content'] = json.loads(r['Content'])
+            return r
+
+        # Describe notebook-instance & then list tags
+        resources = super().augment(resources)
+        return list(map(_augment, resources))
+
+
 @resources.register('ssm-document')
 class SSMDocument(QueryResourceManager):
 
@@ -614,8 +633,10 @@ class SSMDocument(QueryResourceManager):
         date = 'RegistrationDate'
         arn_type = 'document'
         cfn_type = config_type = "AWS::SSM::Document"
+        universal_taggable = object()
 
-    permissions = ('ssm:ListDocuments',)
+    source_mapping = {'describe': SSMDocumentDescribe}
+    permissions = ('ssm:ListDocuments', 'ssm:GetDocument')
 
 
 @SSMDocument.filter_registry.register('cross-account')

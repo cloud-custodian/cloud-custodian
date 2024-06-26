@@ -24,7 +24,12 @@
                 "DocumentType": "Command",
                 "SchemaVersion": "2.2",
                 "DocumentFormat": "JSON",
-                "Tags": []
+                "Tags": [
+                    {
+                        "Key": "TestTag",
+                        "Value": "c7n"
+                    }
+                ]
             }
         ],
         "ResponseMetadata": {}
