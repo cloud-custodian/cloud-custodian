@@ -1,0 +1,42 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "FileSystems": [
+            {
+                "OwnerId": "644160558196",
+                "CreationToken": "some-token",
+                "FileSystemId": "fs-06f6ce85b4976bd7f",
+                "FileSystemArn": "arn:aws:elasticfilesystem:us-east-1:644160558196:file-system/fs-06f6ce85b4976bd7f",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 12,
+                    "day": 6,
+                    "hour": 15,
+                    "minute": 52,
+                    "second": 15,
+                    "microsecond": 0
+                },
+                "LifeCycleState": "available",
+                "Name": "efs-without-secure-transport",
+                "NumberOfMountTargets": 0,
+                "SizeInBytes": {
+                    "Value": 6144,
+                    "ValueInIA": 0,
+                    "ValueInStandard": 6144
+                },
+                "PerformanceMode": "generalPurpose",
+                "Encrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/f1cbcbea-2ce1-4794-90b1-fe58da4ce954",
+                "ThroughputMode": "bursting",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "efs-without-secure-transport"
+                    }
+                ]
+            }
+        ]
+    }
+}
