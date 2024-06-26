@@ -367,11 +367,6 @@ class ElasticFileSystem(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["Name"], "efs-without-secure-transport")
         self.assertEqual(resources[0]["FileSystemId"], "fs-06f6ce85b4976bd7f")
-        print(resources)
-        # response = client.describe_file_system_policy(FileSystemId="fs-06f6ce85b4976bd7f")
-        # response = json.loads(response.get('Policy'))
-        # self.assertEqual(response.get(
-        #     'Statement')[0]['Condition']['Bool']['aws:SecureTransport'], "false")
 
     def test_disable_secure_transport(self):
         factory = self.replay_flight_data("test_efs_disable_secure_transport")
@@ -388,7 +383,6 @@ class ElasticFileSystem(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["Name"], "efs-with-secure-transport")
         self.assertEqual(resources[0]["FileSystemId"], "fs-06f6ce85b4976bd7f")
-        print(resources)
 
     def test_enable_secure_transport_with_no_policy(self):
         factory = self.replay_flight_data("test_efs_enable_secure_transport_with_no_policy")
@@ -405,4 +399,3 @@ class ElasticFileSystem(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["Name"], "efs-without-secure-transport")
         self.assertEqual(resources[0]["FileSystemId"], "fs-06f6ce85b4976bd7f")
-        print(resources)
