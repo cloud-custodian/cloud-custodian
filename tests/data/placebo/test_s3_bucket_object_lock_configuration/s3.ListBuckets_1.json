@@ -1,0 +1,38 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Buckets": [
+            {
+                "Name": "c7n-test-s3-bucket",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 8,
+                    "day": 22,
+                    "hour": 13,
+                    "minute": 27,
+                    "second": 29,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "c7n-test-s3-bucket-bucket-key-disabled",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 8,
+                    "day": 22,
+                    "hour": 13,
+                    "minute": 29,
+                    "second": 11,
+                    "microsecond": 0
+                }
+            }
+        ],
+        "Owner": {
+            "DisplayName": "mandeep.bal",
+            "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
+        }
+    }
+}

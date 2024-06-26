@@ -1,0 +1,11 @@
+{
+    "status_code": 404,
+    "data": {
+        "Error": {
+            "Code": "ObjectLockConfigurationNotFoundError",
+            "Message": "Object Lock configuration does not exist for this bucket",
+            "BucketName": "c7n-test-s3-bucket-bucket-key-disabled"
+        },
+        "ResponseMetadata": {}
+    }
+}
