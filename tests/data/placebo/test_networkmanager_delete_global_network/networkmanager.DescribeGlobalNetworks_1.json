@@ -1,0 +1,54 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "GlobalNetworks": [
+            {
+                "GlobalNetworkId": "global-network-033fdf071903b5d21",
+                "GlobalNetworkArn": "arn:aws:networkmanager::644160558196:global-network/global-network-033fdf071903b5d21",
+                "CreatedAt": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 5,
+                    "day": 18,
+                    "hour": 22,
+                    "minute": 28,
+                    "second": 57,
+                    "microsecond": 0
+                },
+                "State": "AVAILABLE",
+                "Tags": [
+                    {
+                        "Key": "maid_status",
+                        "Value": "Resource does not meet policy: delete@2024/06/06"
+                    },
+                    {
+                        "Key": "Name",
+                        "Value": "test-cloudwan"
+                    }
+                ]
+            },
+            {
+                "GlobalNetworkId": "global-network-0b80865394c2aa404",
+                "GlobalNetworkArn": "arn:aws:networkmanager::644160558196:global-network/global-network-0b80865394c2aa404",
+                "CreatedAt": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 6,
+                    "day": 4,
+                    "hour": 22,
+                    "minute": 51,
+                    "second": 54,
+                    "microsecond": 0
+                },
+                "State": "AVAILABLE",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "test-cloudwan-2"
+                    }
+                ]
+            }
+        ]
+    }
+}

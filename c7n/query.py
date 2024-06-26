@@ -832,7 +832,7 @@ class TypeInfo(metaclass=TypeMeta):
         https://boto3.amazonaws.com/v1/documentation/reference/services/appmesh/client/list_meshes.html
 
         However, if the enum op doesn't support filtering then the enum op must return all
-        instances of rhe resource and cloud custodian will perform client side filtering.
+        instances of the resource and cloud custodian will perform client side filtering.
 
         Params to the enum_spec:
         - enum_op - the aws api operation

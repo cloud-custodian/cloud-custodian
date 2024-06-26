@@ -1,0 +1,50 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "GlobalNetworks": [
+            {
+                "GlobalNetworkId": "global-network-0f952aba212c3fb47",
+                "GlobalNetworkArn": "arn:aws:networkmanager::644160558196:global-network/global-network-0f952aba212c3fb47",
+                "CreatedAt": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 5,
+                    "day": 16,
+                    "hour": 12,
+                    "minute": 55,
+                    "second": 48,
+                    "microsecond": 0
+                },
+                "State": "AVAILABLE",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "test-2"
+                    }
+                ]
+            },
+            {
+                "GlobalNetworkId": "global-network-0fa387ed8fc5f107c",
+                "GlobalNetworkArn": "arn:aws:networkmanager::644160558196:global-network/global-network-0fa387ed8fc5f107c",
+                "CreatedAt": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 5,
+                    "day": 16,
+                    "hour": 12,
+                    "minute": 47,
+                    "second": 37,
+                    "microsecond": 0
+                },
+                "State": "AVAILABLE",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "test-cloudwan"
+                    }
+                ]
+            }
+        ]
+    }
+}

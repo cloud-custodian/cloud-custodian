@@ -1,0 +1,21 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "CoreNetworks": [
+            {
+                "CoreNetworkId": "core-network-049cea4c0e5525b80",
+                "CoreNetworkArn": "arn:aws:networkmanager::644160558196:core-network/core-network-049cea4c0e5525b80",
+                "GlobalNetworkId": "global-network-033fdf071903b5d21",
+                "OwnerAccountId": "644160558196",
+                "State": "AVAILABLE",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "test-cloudwan"
+                    }
+                ]
+            }
+        ]
+    }
+}

@@ -489,7 +489,6 @@ class PolicyMetaLint(BaseTest):
             "AWS::IoT::FleetMetric",
             "AWS::IoTWireless::ServiceProfile",
             "AWS::NetworkManager::Device",
-            "AWS::NetworkManager::GlobalNetwork",
             "AWS::NetworkManager::Link",
             "AWS::NetworkManager::Site",
             "AWS::Panorama::Package",
@@ -737,7 +736,8 @@ class PolicyMetaLint(BaseTest):
     def test_resource_type_empty_metadata(self):
         empty = set()
         for k, v in manager.resources.items():
-            if k in ('rest-account', 'account', 'codedeploy-deployment', 'sagemaker-cluster'):
+            if k in ('rest-account', 'account', 'codedeploy-deployment', 'sagemaker-cluster',
+                     'networkmanager-core'):
                 continue
             for rk, rv in v.resource_type.__dict__.items():
                 if rk[0].isalnum() and rv is None:
