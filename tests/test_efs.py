@@ -6,7 +6,6 @@ from .common import BaseTest, functional, event_data
 
 import uuid
 import time
-import json
 from operator import itemgetter
 from c7n.testing import mock_datetime_now
 from dateutil import parser
