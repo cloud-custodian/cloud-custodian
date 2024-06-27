@@ -1,0 +1,8 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "FileSystemId": "fs-06f6ce85b4976bd7f",
+        "Policy": "{\n  \"Version\" : \"2012-10-17\",\n  \"Id\" : \"EnforceSecureTransport\",\n  \"Statement\" : [ {\n    \"Sid\" : \"ExampleSatement01\",\n    \"Effect\" : \"Allow\",\n    \"Principal\" : {\n      \"AWS\" : \"*\"\n    },\n    \"Action\" : \"*\",\n    \"Resource\" : \"arn:aws:elasticfilesystem:us-east-1:644160558196:file-system/fs-06f6ce85b4976bd7f\",\n    \"Condition\" : {\n      \"Bool\" : {\n        \"aws:SecureTransport\" : \"true\"\n      }\n    }\n  } ]\n}"
+    }
+}
