@@ -8,6 +8,7 @@ import time
 from unittest import mock
 
 from botocore.exceptions import ClientError
+from azure.core.exceptions import HttpResponseError
 from dateutil.parser import parse as parse_date
 
 from c7n import query
@@ -51,6 +52,49 @@ class Backoff(BaseTest):
             self.assertEqual(self.count, 5)
         else:
             self.fail("should have raised")
+
+    def test_retry_errors_azure(self):
+        self.patch(time, "sleep", lambda x: x)
+        self.count = 0
+
+        def func():
+            self.count += 1
+            raise HttpResponseError(response=self.get_azure_mocked_response())
+
+        retry = utils.get_retry((429,), 5)
+
+        try:
+            retry(func)
+        except HttpResponseError:
+            self.assertEqual(self.count, 5)
+        else:
+            self.fail("should have raised")
+
+    def test_retry_unauthorized_error_azure(self):
+        self.patch(time, "sleep", lambda x: x)
+        self.count = 0
+
+        def func():
+            self.count += 1
+            raise HttpResponseError(response=self.get_azure_mocked_response(401, "Unauthorized"))
+
+        retry = utils.get_retry((429,), 5)
+
+        try:
+            retry(func)
+        except HttpResponseError:
+            self.assertEqual(self.count, 1)
+        else:
+            self.fail("should have raised")
+
+    def get_azure_mocked_response(self, status_code=429, reason = "Too Many Requests"):
+        class AzureMockResponse:
+            def __init__(self, status_code, reason):
+                self.status_code = status_code
+                self.reason = reason
+
+        response = AzureMockResponse(status_code, reason)
+        return response
 
     def test_delays(self):
         self.assertEqual(
