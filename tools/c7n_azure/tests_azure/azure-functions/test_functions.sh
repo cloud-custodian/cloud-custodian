@@ -17,7 +17,7 @@ function cleanup {
 }
 trap cleanup EXIT
 
-echo "Logging to Azure"
+echo "Logging in to Azure"
 az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET -t $AZURE_TENANT_ID -o none
 az account set -s $AZURE_SUBSCRIPTION_ID -o none
 
