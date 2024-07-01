@@ -28,7 +28,7 @@ class TestTrustedAdvisor(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(len(resources[0]['flaggedResources']), 1 )
+        self.assertEqual(len(resources[0]['flaggedResources']), 1)
         self.assertJmes('[0].flaggedResources[*].status', resources, ["error"])
 
     def test_trusted_advisor_status_filter_all(self):
@@ -49,6 +49,5 @@ class TestTrustedAdvisor(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(len(resources[0]['flaggedResources']), 2 )
-        self.assertJmes('[0].flaggedResources[*].status', resources, ["error","ok"])
-
+        self.assertEqual(len(resources[0]['flaggedResources']), 2)
+        self.assertJmes('[0].flaggedResources[*].status', resources, ["error", "ok"])

@@ -3,7 +3,7 @@
 from c7n.filters import Filter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo, DescribeSource
-from c7n.utils import local_session, get_support_region, type_schema 
+from c7n.utils import local_session, get_support_region, type_schema
 
 
 @resources.register('support-case')
@@ -87,5 +87,7 @@ class StatusErrorFilter(Filter):
         return filtered_resources
 
     def has_status(self, r):
-        flaggedResources = [ fr for fr in r['flaggedResources'] if fr["status"] in self.data['statuses'] ]
+        flaggedResources = [
+            fr for fr in r['flaggedResources'] if fr["status"] in self.data['statuses']
+        ]
         return flaggedResources
