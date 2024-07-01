@@ -1,0 +1,38 @@
+{
+    "status_code": 200,
+    "data": {
+        "Clusters": [
+            {
+                "Name": "test-cluster-custodian",
+                "Description": "Easy created demo cluster on 2024-06-19T02:18:43.782Z",
+                "Status": "available",
+                "NumberOfShards": 1,
+                "ClusterEndpoint": {
+                    "Address": "clustercfg.test-cluster-custodian.qgcgte.memorydb.us-east-1.amazonaws.com",
+                    "Port": 6379
+                },
+                "NodeType": "db.t4g.small",
+                "EngineVersion": "7.1",
+                "EnginePatchVersion": "7.1.0",
+                "ParameterGroupName": "default.memorydb-redis7",
+                "ParameterGroupStatus": "in-sync",
+                "SecurityGroups": [
+                    {
+                        "SecurityGroupId": "sg-03c0b84cdad91744f",
+                        "Status": "active"
+                    }
+                ],
+                "SubnetGroupName": "test-subnet",
+                "TLSEnabled": true,
+                "ARN": "arn:aws:memorydb:us-east-1:644160558196:cluster/test-cluster-custodian",
+                "SnapshotRetentionLimit": 1,
+                "MaintenanceWindow": "sat:03:30-sat:04:30",
+                "SnapshotWindow": "04:30-05:30",
+                "ACLName": "open-access",
+                "AutoMinorVersionUpgrade": true,
+                "DataTiering": "false"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

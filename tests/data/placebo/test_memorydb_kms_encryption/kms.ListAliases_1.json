@@ -1,0 +1,35 @@
+{
+    "status_code": 200,
+    "data": {
+        "Aliases": [
+            {
+                "AliasName": "alias/tes/pratyush",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/tes/pratyush",
+                "TargetKeyId": "082cd05f-96d1-49f6-a5ac-32093d2cfe38",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 5,
+                    "day": 13,
+                    "hour": 13,
+                    "minute": 2,
+                    "second": 58,
+                    "microsecond": 537000
+                },
+                "LastUpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 5,
+                    "day": 13,
+                    "hour": 13,
+                    "minute": 2,
+                    "second": 58,
+                    "microsecond": 537000
+                }
+            }
+        ],
+        "NextMarker": "eyJhIjoiYWxpYXMvdGVzL3ByYXR5dXNoIiwiYiI6ImFsaWFzL3Rlcy9wcmF0eXVzaCJ9",
+        "Truncated": true,
+        "ResponseMetadata": {}
+    }
+}

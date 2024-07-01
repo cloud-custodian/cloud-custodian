@@ -1,0 +1,27 @@
+{
+    "status_code": 200,
+    "data": {
+        "SubnetGroups": [
+            {
+                "Name": "test-subnet",
+                "VpcId": "vpc-0d4f819d13b730139",
+                "Subnets": [
+                    {
+                        "Identifier": "subnet-0707ce1b2a6305995",
+                        "AvailabilityZone": {
+                            "Name": "us-east-1a"
+                        }
+                    },
+                    {
+                        "Identifier": "subnet-0bd18cd4df2d0d3b9",
+                        "AvailabilityZone": {
+                            "Name": "us-east-1a"
+                        }
+                    }
+                ],
+                "ARN": "arn:aws:memorydb:us-east-1:644160558196:subnetgroup/test-subnet"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

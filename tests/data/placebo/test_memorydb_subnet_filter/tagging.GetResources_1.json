@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:memorydb:us-east-1:644160558196:subnetgroup/test-subnet",
+                "Tags": [
+                    {
+                        "Key": "name",
+                        "Value": "test"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

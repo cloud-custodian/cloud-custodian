@@ -167,6 +167,8 @@ ResourceMap = {
   "aws.lightsail-instance": "c7n.resources.lightsail.Instance",
   "aws.log-group": "c7n.resources.cw.LogGroup",
   "aws.log-metric": "c7n.resources.cw.LogMetric",
+  "aws.memorydb": "c7n.resources.memorydb.MemoryDb",
+  "aws.memorydb-subnet-group": "c7n.resources.memorydb.MemoryDbSubnetGroup",
   "aws.message-broker": "c7n.resources.mq.MessageBroker",
   "aws.message-config": "c7n.resources.mq.MessageConfig",
   "aws.mirror-session": "c7n.resources.vpc.TrafficMirrorSession",

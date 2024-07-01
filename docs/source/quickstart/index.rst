@@ -10,6 +10,7 @@ Also see the README in the `GitHub repository <https://github.com/cloud-custodia
 * :ref:`cloud-providers`
 * :ref:`monitor-cc`
 * :ref:`tab-completion`
+* :ref:`pre-commit`
 * :ref:`community`
 
 .. _install-cc:
@@ -65,7 +66,7 @@ Windows (CMD/PowerShell)
 To install Cloud Custodian, run::
 
   python3 -m venv custodian
-  .\custodian\Scripts\Activate.ps1   # For Powershell users  
+  .\custodian\Scripts\Activate.ps1   # For Powershell users
   # .\custodian\Scripts\activate.bat # Or use this for CMD users
   pip install c7n    # This includes AWS support
 
@@ -268,6 +269,27 @@ Run:
 Now launch a new shell (or refresh your bash environment by sourcing the appropriate
 file).
 
+.. _pre-commit:
+
+Pre-commit Integration
+----------------------
+
+A hook used to validate Cloud Custodian policies before committing them, to reduce issues when developing.
+
+Reference the hook in your `.pre-commit-config.yaml` file:
+
+.. code-block:: yaml
+
+  repos:
+    - repo: https://github.com/cloud-custodian/cloud-custodian.git
+      rev: main # or use a specific release
+      hooks:
+        - id: c7n-validate
+          files: policies/.*\.yml$
+          args:
+            # - --strict
+            - --quiet
+
 .. _community:
 
 Community Resources
@@ -277,7 +299,7 @@ We have a regular community meeting that is open to all users and developers of
 every skill level. Joining the `mailing list
 <https://groups.google.com/forum/#!forum/cloud-custodian>`_ will automatically send
 you a meeting invite. See the notes below for more technical information on
-joining the meeting. 
+joining the meeting.
 
  * `Community Meeting Videos <https://www.youtube.com/watch?v=qy250y0UT-4&list=PLJ2Un8H_N5uBeAAWK95SnWvm_AuNJ8q2x>`_
  * `Community Meeting Notes Archive <https://github.com/cloud-custodian/community/discussions>`_
