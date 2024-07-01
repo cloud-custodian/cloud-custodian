@@ -480,6 +480,34 @@ class TestSsm(BaseTest):
             [r['InstanceId'] for r in resources],
             ['i-0dea82d960d56dc1d', 'i-0ba3874e85bb97244'])
 
+    def test_ssm_inventory(self):
+        session_factory = self.replay_flight_data("test_ec2_ssm_inventory_filter")
+        p = self.load_policy(
+            {
+                "name": "ec2-find-specific-package",
+                "resource": "ec2",
+                "filters": [
+                    {
+                        "type": "ssm-inventory",
+                        "query": [
+                            {
+                                "Key": "Name",
+                                "Values": [
+                                    "docker"
+                                ],
+                                "Type": "Equal"
+                            }
+                        ]
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue('c7n:SSM-Inventory' in resources[0])
+        self.assertEqual(resources[0]['InstanceId'], 'i-069d5df3524c95b06')
+
 
 class TestHealthEventsFilter(BaseTest):
 

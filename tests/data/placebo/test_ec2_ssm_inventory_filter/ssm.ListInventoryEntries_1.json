@@ -1,0 +1,24 @@
+{
+    "status_code": 200,
+    "data": {
+        "TypeName": "AWS:Application",
+        "InstanceId": "i-069d5df3524c95b06",
+        "SchemaVersion": "1.1",
+        "CaptureTime": "2024-07-01T16:59:14Z",
+        "Entries": [
+            {
+                "ApplicationType": "Unspecified",
+                "Architecture": "x86_64",
+                "InstalledTime": "2024-07-01T16:47:09Z",
+                "Name": "docker",
+                "PackageId": "docker-25.0.3-1.amzn2023.0.1.src.rpm",
+                "Publisher": "Amazon Linux",
+                "Release": "1.amzn2023.0.1",
+                "Summary": "Automates deployment of containerized applications",
+                "URL": "http://www.docker.com",
+                "Version": "25.0.3"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
