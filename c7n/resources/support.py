@@ -76,6 +76,10 @@ class StatusErrorFilter(Filter):
         statuses={'type': 'array', 'items': {'enum':
             ['ok', 'warning', 'error', 'not_available']}})
 
+    def get_permissions(self):
+        perms = self.manager.get_resource_manager('advisor-check').get_permissions()
+        return perms
+
     def process(self, resources, event=None):
         filtered_resources = []
         for resource in resources:
