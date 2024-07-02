@@ -1,0 +1,49 @@
+{
+    "status_code": 200,
+    "data": {
+        "result": {
+            "checkId": "Hs4Ma3G118",
+            "timestamp": "2024-07-01T19:54:44Z",
+            "status": "error",
+            "resourcesSummary": {
+                "resourcesProcessed": 2,
+                "resourcesFlagged": 1,
+                "resourcesIgnored": 0,
+                "resourcesSuppressed": 0
+            },
+            "categorySpecificSummary": {
+                "costOptimizing": {
+                    "estimatedMonthlySavings": 0.0,
+                    "estimatedPercentMonthlySavings": 0.0
+                }
+            },
+            "flaggedResources": [
+                {
+                    "status": "error",
+                    "region": "us-west-2",
+                    "resourceId": "HxDVnPsL00axVCcE0rop3Zv7Pi3CqbTWEia_jNDHO_g",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "Red",
+                        "us-west-2",
+                        "arn:aws:ec2:us-west-2:644160558196:security-group/sg-081472f89b5c65bf1",
+                        "2024-07-01T09:31:51.267Z"
+                    ]
+                },
+                {
+                    "status": "ok",
+                    "region": "us-east-1",
+                    "resourceId": "ryeJv_6zQW7YOI9R3wdxVwDXybNR5BT8OTWeButWndQ",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "Green",
+                        "us-east-1",
+                        "arn:aws:ec2:us-east-1:644160558196:security-group/sg-08d3f62092b3ec2dd",
+                        "2024-07-01T15:19:27.682Z"
+                    ]
+                }
+            ]
+        },
+        "ResponseMetadata": {}
+    }
+}
