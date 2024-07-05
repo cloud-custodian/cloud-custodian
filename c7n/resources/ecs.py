@@ -96,7 +96,9 @@ class ECSCluster(query.QueryResourceManager):
         service = 'ecs'
         enum_spec = ('list_clusters', 'clusterArns', None)
         batch_detail_spec = (
-            'describe_clusters', 'clusters', None, 'clusters', {'include': ['TAGS', 'SETTINGS']})
+            'describe_clusters', 'clusters', None, 'clusters', {
+                'include': ['TAGS', 'SETTINGS', 'CONFIGURATIONS']
+            })
         name = "clusterName"
         arn = id = "clusterArn"
         arn_type = 'cluster'
