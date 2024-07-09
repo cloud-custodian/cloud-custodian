@@ -1485,6 +1485,7 @@ class TestSnapshot(BaseTest):
         rtags['test-tag'] = 'custodian'
         for s in snaps:
             self.assertEqual(rtags, {t['Key']: t['Value'] for t in s['Tags']})
+            self.assertEqual(s['Description'], "Snapshot Created for i-063c6794763254b51 (Foo)")
 
 
 class TestSetInstanceProfile(BaseTest):
