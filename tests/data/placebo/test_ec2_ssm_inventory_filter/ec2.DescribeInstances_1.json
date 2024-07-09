@@ -1,0 +1,185 @@
+{
+    "status_code": 200,
+    "data": {
+        "Reservations": [
+            {
+                "Groups": [],
+                "Instances": [
+                    {
+                        "AmiLaunchIndex": 0,
+                        "ImageId": "ami-01b799c439fd5516a",
+                        "InstanceId": "i-069d5df3524c95b06",
+                        "InstanceType": "t2.medium",
+                        "KeyName": "sas-ssh-key",
+                        "LaunchTime": {
+                            "__class__": "datetime",
+                            "year": 2024,
+                            "month": 7,
+                            "day": 1,
+                            "hour": 16,
+                            "minute": 40,
+                            "second": 19,
+                            "microsecond": 0
+                        },
+                        "Monitoring": {
+                            "State": "disabled"
+                        },
+                        "Placement": {
+                            "AvailabilityZone": "us-east-1a",
+                            "GroupName": "",
+                            "Tenancy": "default"
+                        },
+                        "PrivateDnsName": "ip-10-146-96-43.ec2.internal",
+                        "PrivateIpAddress": "10.146.96.43",
+                        "ProductCodes": [],
+                        "PublicDnsName": "",
+                        "State": {
+                            "Code": 16,
+                            "Name": "running"
+                        },
+                        "StateTransitionReason": "",
+                        "SubnetId": "subnet-0897a33a30b9945ed",
+                        "VpcId": "vpc-08bbc74c36b8a08dd",
+                        "Architecture": "x86_64",
+                        "BlockDeviceMappings": [
+                            {
+                                "DeviceName": "/dev/xvda",
+                                "Ebs": {
+                                    "AttachTime": {
+                                        "__class__": "datetime",
+                                        "year": 2024,
+                                        "month": 7,
+                                        "day": 1,
+                                        "hour": 16,
+                                        "minute": 40,
+                                        "second": 20,
+                                        "microsecond": 0
+                                    },
+                                    "DeleteOnTermination": true,
+                                    "Status": "attached",
+                                    "VolumeId": "vol-0a476d462fe10a377"
+                                }
+                            }
+                        ],
+                        "ClientToken": "0886da63-25ce-4573-8cd5-6be0b2f9abad",
+                        "EbsOptimized": false,
+                        "EnaSupport": true,
+                        "Hypervisor": "xen",
+                        "IamInstanceProfile": {
+                            "Arn": "arn:aws:iam::644160558196:instance-profile/CSO-InstanceProfile-For-EC2-SSM-Mgmt",
+                            "Id": "AIPASWNLKEPHQ7VCFKPD4"
+                        },
+                        "NetworkInterfaces": [
+                            {
+                                "Attachment": {
+                                    "AttachTime": {
+                                        "__class__": "datetime",
+                                        "year": 2024,
+                                        "month": 7,
+                                        "day": 1,
+                                        "hour": 16,
+                                        "minute": 40,
+                                        "second": 19,
+                                        "microsecond": 0
+                                    },
+                                    "AttachmentId": "eni-attach-01830304b729ee6f2",
+                                    "DeleteOnTermination": true,
+                                    "DeviceIndex": 0,
+                                    "Status": "attached",
+                                    "NetworkCardIndex": 0
+                                },
+                                "Description": "",
+                                "Groups": [
+                                    {
+                                        "GroupName": "devsecops-sandbox-vpc-1-SecurityGroup-VI9XDNA82UWN",
+                                        "GroupId": "sg-0738e8b46f1c2c79d"
+                                    }
+                                ],
+                                "Ipv6Addresses": [],
+                                "MacAddress": "12:e9:e5:09:36:e5",
+                                "NetworkInterfaceId": "eni-065036808124b42f6",
+                                "OwnerId": "644160558196",
+                                "PrivateDnsName": "ip-10-146-96-43.ec2.internal",
+                                "PrivateIpAddress": "10.146.96.43",
+                                "PrivateIpAddresses": [
+                                    {
+                                        "Primary": true,
+                                        "PrivateDnsName": "ip-10-146-96-43.ec2.internal",
+                                        "PrivateIpAddress": "10.146.96.43"
+                                    }
+                                ],
+                                "SourceDestCheck": true,
+                                "Status": "in-use",
+                                "SubnetId": "subnet-0897a33a30b9945ed",
+                                "VpcId": "vpc-08bbc74c36b8a08dd",
+                                "InterfaceType": "interface"
+                            }
+                        ],
+                        "RootDeviceName": "/dev/xvda",
+                        "RootDeviceType": "ebs",
+                        "SecurityGroups": [
+                            {
+                                "GroupName": "devsecops-sandbox-vpc-1-SecurityGroup-VI9XDNA82UWN",
+                                "GroupId": "sg-0738e8b46f1c2c79d"
+                            }
+                        ],
+                        "SourceDestCheck": true,
+                        "Tags": [
+                            {
+                                "Key": "Name",
+                                "Value": "ssm-inventory-test"
+                            }
+                        ],
+                        "VirtualizationType": "hvm",
+                        "CpuOptions": {
+                            "CoreCount": 2,
+                            "ThreadsPerCore": 1
+                        },
+                        "CapacityReservationSpecification": {
+                            "CapacityReservationPreference": "open"
+                        },
+                        "HibernationOptions": {
+                            "Configured": false
+                        },
+                        "MetadataOptions": {
+                            "State": "applied",
+                            "HttpTokens": "required",
+                            "HttpPutResponseHopLimit": 2,
+                            "HttpEndpoint": "enabled",
+                            "HttpProtocolIpv6": "disabled",
+                            "InstanceMetadataTags": "disabled"
+                        },
+                        "EnclaveOptions": {
+                            "Enabled": false
+                        },
+                        "BootMode": "uefi-preferred",
+                        "PlatformDetails": "Linux/UNIX",
+                        "UsageOperation": "RunInstances",
+                        "UsageOperationUpdateTime": {
+                            "__class__": "datetime",
+                            "year": 2024,
+                            "month": 7,
+                            "day": 1,
+                            "hour": 16,
+                            "minute": 40,
+                            "second": 19,
+                            "microsecond": 0
+                        },
+                        "PrivateDnsNameOptions": {
+                            "HostnameType": "ip-name",
+                            "EnableResourceNameDnsARecord": false,
+                            "EnableResourceNameDnsAAAARecord": false
+                        },
+                        "MaintenanceOptions": {
+                            "AutoRecovery": "default"
+                        },
+                        "CurrentInstanceBootMode": "legacy-bios"
+                    }
+                ],
+                "OwnerId": "644160558196",
+                "ReservationId": "r-00cb063f1b6fec608"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
