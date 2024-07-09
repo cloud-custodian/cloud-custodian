@@ -73,6 +73,32 @@ class TestEcs(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_ecs_cluster_exec_cw_logging(self):
+        session_factory = self.replay_flight_data("test_ecs_cluster_exec_cw_logging")
+        p = self.load_policy(
+        {
+            "name": "ecs-cluster-exec-cw-logging",
+            "resource": "ecs",
+            "filters": [
+                {
+                    "type": "value",
+                    "key": "configuration.executeCommandConfiguration."
+                           "logConfiguration.cloudWatchLogGroupName",
+                    "value": "present"
+                },
+                {
+                    "type": "value",
+                    "key": "configuration.executeCommandConfiguration."
+                           "logConfiguration.cloudWatchEncryptionEnabled",
+                    "value": False
+                }
+            ],
+        },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
 
 class TestEcsService(BaseTest):
 
