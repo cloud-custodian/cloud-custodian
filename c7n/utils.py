@@ -927,9 +927,9 @@ def get_eni_resource_type(eni):
         rtype = 'hsm'
     elif description.startswith('CloudHsm ENI'):
         rtype = 'hsmv2'
-    elif description.startswith('AWS Lambda VPC'):
-        rtype = 'lambda'
     elif description.startswith('AWS Lambda VPC ENI'):
+        rtype = 'lambda'
+    elif description.startswith('AWS Lambda VPC'):
         rtype = 'lambda'
     elif description.startswith('Interface for NAT Gateway'):
         rtype = 'nat'
