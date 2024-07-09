@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 from .common import BaseTest, functional
 from botocore.exceptions import ClientError
-from c7n.resources.rdsparamgroup import ParameterFilter
 
 
 class RDSParamGroupTest(BaseTest):
