@@ -1,6 +1,5 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-import textwrap
 from unittest import mock
 from jsonschema.exceptions import best_match, ValidationError
 
