@@ -139,7 +139,8 @@ init_env_globals()
 
 def dispatch_event(event, context):
     # default event.detail for EB Scheduler is '{}', not {}
-    if event.get('detail') == '{}': event['detail'] = {}
+    if event.get('detail') == '{}':
+        event['detail'] = {}
     error = event.get('detail', {}).get('errorCode')
     if error and C7N_SKIP_EVTERR:
         log.debug("Skipping failed operation: %s" % error)
