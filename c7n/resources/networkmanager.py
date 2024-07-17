@@ -97,6 +97,8 @@ class Site(ChildResourceManager):
 @GlobalNetwork.action_registry.register('tag')
 @CoreNetwork.action_registry.register('tag')
 @Link.action_registry.register('tag')
+@Device.action_registry.register('tag')
+@Site.action_registry.register('tag')
 class TagNetwork(Tag):
     """Action to tag a networkmanager resource
     """
@@ -114,6 +116,8 @@ class TagNetwork(Tag):
 @GlobalNetwork.action_registry.register('remove-tag')
 @CoreNetwork.action_registry.register('remove-tag')
 @Link.action_registry.register('remove-tag')
+@Device.action_registry.register('remove-tag')
+@Site.action_registry.register('remove-tag')
 class RemoveTagNetwork(RemoveTag):
     """Action to remove a tag from networkmanager resource
     """
@@ -131,6 +135,8 @@ class RemoveTagNetwork(RemoveTag):
 @GlobalNetwork.action_registry.register('mark-for-op')
 @CoreNetwork.action_registry.register('mark-for-op')
 @Link.action_registry.register('mark-for-op')
+@Device.action_registry.register('mark-for-op')
+@Site.action_registry.register('mark-for-op')
 class NetworkMarkForOp(TagDelayedAction):
     """Mark Network for deferred action
 
