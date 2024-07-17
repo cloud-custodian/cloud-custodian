@@ -1,0 +1,29 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "GlobalNetworks": [
+            {
+                "GlobalNetworkId": "global-network-0907a5c1e93ace9ea",
+                "GlobalNetworkArn": "arn:aws:networkmanager::644160558196:global-network/global-network-0907a5c1e93ace9ea",
+                "CreatedAt": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 6,
+                    "day": 4,
+                    "hour": 23,
+                    "minute": 2,
+                    "second": 19,
+                    "microsecond": 0
+                },
+                "State": "AVAILABLE",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "test-cloudwan"
+                    }
+                ]
+            }
+        ]
+    }
+}

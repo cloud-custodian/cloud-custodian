@@ -249,3 +249,38 @@ class TestNetworkManagerChildern(BaseTest):
         for r in resources:
             self.assertEqual(r["State"], "AVAILABLE")
             self.assertTrue(r["LinkId"])
+
+    def test_list_sites(self):
+        session_factory = self.replay_flight_data("test_networkmanager_list_sites")
+        p = self.load_policy(
+            {
+                "name": "list-sites",
+                "resource": "networkmanager-site",
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        for r in resources:
+            self.assertEqual(r["State"], "AVAILABLE")
+            self.assertTrue(r["SiteId"])
+
+    def test_list_devices(self):
+        session_factory = self.replay_flight_data("test_networkmanager_list_devices")
+        p = self.load_policy(
+            {
+                "name": "list-devices",
+                "resource": "networkmanager-device",
+                "filters": [{
+                    "State": "AVAILABLE"
+                }]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        for r in resources:
+            self.assertEqual(r["State"], "AVAILABLE")
+            self.assertTrue(r["DeviceId"])

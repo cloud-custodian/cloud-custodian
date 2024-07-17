@@ -62,6 +62,38 @@ class Link(ChildResourceManager):
         permissions_augment = ("networkmanager:ListTagsForResource",)
 
 
+@c7n_resources.register('networkmanager-device')
+class Device(ChildResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'networkmanager'
+        enum_spec = ('get_devices', 'Devices', None)
+        parent_spec = ('networkmanager-global', 'GlobalNetworkId', None)
+        arn = 'DeviceArn'
+        name = 'DeviceId'
+        id = 'DeviceId'
+        date = 'CreatedAt'
+        config_type = 'AWS::NetworkManager::Device'
+        cfn_type = 'AWS::NetworkManager::Device'
+        permissions_augment = ("networkmanager:ListTagsForResource",)
+
+
+@c7n_resources.register('networkmanager-site')
+class Site(ChildResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'networkmanager'
+        enum_spec = ('get_sites', 'Sites', None)
+        parent_spec = ('networkmanager-global', 'GlobalNetworkId', None)
+        arn = 'SiteArn'
+        name = 'SiteId'
+        id = 'SiteId'
+        date = 'CreatedAt'
+        config_type = 'AWS::NetworkManager::Site'
+        cfn_type = 'AWS::NetworkManager::Site'
+        permissions_augment = ("networkmanager:ListTagsForResource",)
+
+
 @GlobalNetwork.action_registry.register('tag')
 @CoreNetwork.action_registry.register('tag')
 @Link.action_registry.register('tag')
