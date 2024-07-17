@@ -179,6 +179,7 @@ ResourceMap = {
   "aws.network-addr": "c7n.resources.vpc.NetworkAddress",
   "aws.networkmanager-core": "c7n.resources.networkmanager.CoreNetwork",
   "aws.networkmanager-global": "c7n.resources.networkmanager.GlobalNetwork",
+  "aws.networkmanager-link": "c7n.resources.networkmanager.Link",
   "aws.opensearch-serverless": "c7n.resources.opensearch.OpensearchServerless",
   "aws.ops-item": "c7n.resources.ssm.OpsItem",
   "aws.opswork-cm": "c7n.resources.opsworks.OpsworksCM",

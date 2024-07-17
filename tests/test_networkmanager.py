@@ -231,3 +231,21 @@ class TestNetworkManager(BaseTest):
         except client.exceptions.ResourceNotFoundException:
             self.fail('should not raise')
         mock_factory().client('networkmanager').delete_global_network.assert_called_once()
+
+
+class TestNetworkManagerChildern(BaseTest):
+    def test_list_links(self):
+        session_factory = self.replay_flight_data("test_networkmanager_list_links")
+        p = self.load_policy(
+            {
+                "name": "list-links",
+                "resource": "networkmanager-link",
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        for r in resources:
+            self.assertEqual(r["State"], "AVAILABLE")
+            self.assertTrue(r["LinkId"])

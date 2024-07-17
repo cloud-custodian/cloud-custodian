@@ -3,7 +3,7 @@
 
 from c7n.actions.core import BaseAction
 from c7n.manager import resources as c7n_resources
-from c7n.query import QueryResourceManager, TypeInfo
+from c7n.query import ChildResourceManager, QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 
@@ -46,8 +46,25 @@ class GlobalNetwork(QueryResourceManager):
 GlobalNetwork.filter_registry.register('marked-for-op', TagActionFilter)
 
 
+@c7n_resources.register('networkmanager-link')
+class Link(ChildResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'networkmanager'
+        enum_spec = ('get_links', 'Links', None)
+        parent_spec = ('networkmanager-global', 'GlobalNetworkId', None)
+        arn = 'LinkArn'
+        name = 'LinkId'
+        id = 'LinkId'
+        date = 'CreatedAt'
+        config_type = 'AWS::NetworkManager::Link'
+        cfn_type = 'AWS::NetworkManager::Link'
+        permissions_augment = ("networkmanager:ListTagsForResource",)
+
+
 @GlobalNetwork.action_registry.register('tag')
 @CoreNetwork.action_registry.register('tag')
+@Link.action_registry.register('tag')
 class TagNetwork(Tag):
     """Action to tag a networkmanager resource
     """
@@ -64,6 +81,7 @@ class TagNetwork(Tag):
 
 @GlobalNetwork.action_registry.register('remove-tag')
 @CoreNetwork.action_registry.register('remove-tag')
+@Link.action_registry.register('remove-tag')
 class RemoveTagNetwork(RemoveTag):
     """Action to remove a tag from networkmanager resource
     """
@@ -80,6 +98,7 @@ class RemoveTagNetwork(RemoveTag):
 
 @GlobalNetwork.action_registry.register('mark-for-op')
 @CoreNetwork.action_registry.register('mark-for-op')
+@Link.action_registry.register('mark-for-op')
 class NetworkMarkForOp(TagDelayedAction):
     """Mark Network for deferred action
 
