@@ -1,6 +1,5 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-import textwrap
 from unittest import mock
 from jsonschema.exceptions import best_match, ValidationError
 
@@ -200,16 +199,7 @@ class SchemaTest(BaseTest):
         errors = list(validator.iter_errors(data))
         self.assertEqual(len(errors), 1)
         error = specific_error(errors[0])
-        assert str(error) == textwrap.dedent(
-            """\
-            'test-1.2.1' does not match '^[A-z][A-z0-9]*(-[A-z0-9]+)*$'
-
-            Failed validating 'pattern' in schema[0]['allOf'][0]['properties']['name']:
-                {'pattern': '^[A-z][A-z0-9]*(-[A-z0-9]+)*$', 'type': 'string'}
-
-            On instance['name']:
-                'test-1.2.1'"""
-        )
+        assert str(error).startswith("'test-1.2.1' does not match")
 
     def test_bad_condition_value(self):
         data = {

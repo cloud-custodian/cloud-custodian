@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "c7n"
-version = "0.9.38"
+version = "0.9.39"
 description = "Cloud Custodian - Policy Rules Engine"
 authors = ["Cloud Custodian Project"]
 readme = "README.md"
