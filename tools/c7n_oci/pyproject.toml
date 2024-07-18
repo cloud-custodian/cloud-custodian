@@ -19,7 +19,7 @@ python = "^3.8"
 oci = "^2.106"
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^7.1.2"
+pytest = "^8.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
