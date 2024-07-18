@@ -59,7 +59,6 @@ class Link(ChildResourceManager):
         date = 'CreatedAt'
         config_type = 'AWS::NetworkManager::Link'
         cfn_type = 'AWS::NetworkManager::Link'
-        permissions_augment = ("networkmanager:ListTagsForResource",)
 
 
 @c7n_resources.register('networkmanager-device')
@@ -75,7 +74,6 @@ class Device(ChildResourceManager):
         date = 'CreatedAt'
         config_type = 'AWS::NetworkManager::Device'
         cfn_type = 'AWS::NetworkManager::Device'
-        permissions_augment = ("networkmanager:ListTagsForResource",)
 
 
 @c7n_resources.register('networkmanager-site')
@@ -91,7 +89,6 @@ class Site(ChildResourceManager):
         date = 'CreatedAt'
         config_type = 'AWS::NetworkManager::Site'
         cfn_type = 'AWS::NetworkManager::Site'
-        permissions_augment = ("networkmanager:ListTagsForResource",)
 
 
 @GlobalNetwork.action_registry.register('tag')
