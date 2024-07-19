@@ -813,26 +813,26 @@ widechars = ["wcwidth"]
 
 [[package]]
 name = "tfparse"
-version = "0.6.9"
+version = "0.6.10"
 description = "Python HCL/Terraform parser via extension for AquaSecurity defsec"
 optional = false
 python-versions = "*"
 files = [
-    {file = "tfparse-0.6.9-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:bd131e17ff0e21e637f1a5eaccc1bcc60f3fabdbaee4c8e0151632bd94fe0292"},
-    {file = "tfparse-0.6.9-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:0b514df7fe5e1f15f1721b3e117eac09234d953adffa43967d5a908135fa88bc"},
-    {file = "tfparse-0.6.9-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:45cd8b68ad7d82178e3e4964eedc2b71b6bab327c7e0c7ac4d13f42e79d4f9ab"},
-    {file = "tfparse-0.6.9-cp310-cp310-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:84a2c2e74dffaeac43ef56ee08b59e50dc12bfc8aed125ae77360257d8161ee6"},
-    {file = "tfparse-0.6.9-cp310-cp310-win_amd64.whl", hash = "sha256:6b2e7036fd3a12746d2b7674cfb232c5d9f2b8d387f3c12abc3c78077777c0ea"},
-    {file = "tfparse-0.6.9-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:fda8de849638eae7fb4cc86685522a03a9721415a6f0c009588794b384eb57b8"},
-    {file = "tfparse-0.6.9-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:ab7d5da78ed9db3b7729954d2e550cee7191c2710a3a8ec51c1941ee0dd361ab"},
-    {file = "tfparse-0.6.9-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:c85922f0c20771a7619d2d58498b432ba5ab12c682829e2d1011e29040f0c7dc"},
-    {file = "tfparse-0.6.9-cp311-cp311-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:d07989394ebd6b7dd532b7424f45eb33d0622007405bccc04e50612a4096d175"},
-    {file = "tfparse-0.6.9-cp311-cp311-win_amd64.whl", hash = "sha256:01840577f660c9d955e98d114b2b7a0501513310614471e6597a2394a8f022d0"},
-    {file = "tfparse-0.6.9-cp312-cp312-macosx_10_9_x86_64.whl", hash = "sha256:471868bf3117fb32045909a93f4e618400912b2d9daf998e5037fb0aa7a4d1ff"},
-    {file = "tfparse-0.6.9-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:76261806eb2b9a2d34126cbbf10913aa171520698ca9edc6f5c0b85f17bf4ad0"},
-    {file = "tfparse-0.6.9-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:7d571f1d49b57455d27657d76b44c03422d9c48127864cf7785e5bf16e3700e9"},
-    {file = "tfparse-0.6.9-cp312-cp312-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:e5eade4c8218b9d112d4f42338b9a4ffbe280ea2041bc3affbc275b9380311c8"},
-    {file = "tfparse-0.6.9-cp312-cp312-win_amd64.whl", hash = "sha256:30b4c79359405171be50e484f163725bdd7599acb0c6bf1763056fe0947deb44"},
+    {file = "tfparse-0.6.10-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:b00e24f4908ec36453cc42a36e014a19d239b6ec22faf768fce703150451ee08"},
+    {file = "tfparse-0.6.10-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:53ab6c6771e72cccb35923063311ed25708ef812c0af35ca35da84670631b893"},
+    {file = "tfparse-0.6.10-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:5637e0d69b52009e498c22723b2c550943b042093113bb99e2cd3c81d9d61978"},
+    {file = "tfparse-0.6.10-cp310-cp310-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:0d834a93d25a27c1e9c442d9a139d8f72bb1284acc33c5a3ec6644c0eb8b3e1b"},
+    {file = "tfparse-0.6.10-cp310-cp310-win_amd64.whl", hash = "sha256:49c68e6229514a7a9780fc41a6133d57ca6d92a86b5ae2f0ef860a724b2a7cd3"},
+    {file = "tfparse-0.6.10-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:27b218da0bd2ca5b841f5c87200292bc7aac9f0d991a99c03a5f989b63e31914"},
+    {file = "tfparse-0.6.10-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:50b10474e23494fdcb65c93632e74802117fc06ee40d74c18867b8cc75be9253"},
+    {file = "tfparse-0.6.10-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:0f9c70722640b11921c05e590d8cc4ddf73cf71127908434fa7adc75f90b26ac"},
+    {file = "tfparse-0.6.10-cp311-cp311-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:84c5e4aac0127ed807af8993e355823de6f4cd51804ba325e1fa6659a7de31de"},
+    {file = "tfparse-0.6.10-cp311-cp311-win_amd64.whl", hash = "sha256:93d15eb0206e1a67fc0cb0c78f0226dfebe739e983208ba34a344a218c2ab895"},
+    {file = "tfparse-0.6.10-cp312-cp312-macosx_10_9_x86_64.whl", hash = "sha256:804525c48fa77efff70046bd8caf398c10a45054e97618e72b00798841ff44a3"},
+    {file = "tfparse-0.6.10-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:283aaa3e222b829191a358424368f70564035f609e0dba8970fc23d48d3158c2"},
+    {file = "tfparse-0.6.10-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:9251a2d00a0bb1e36ec13acc37d70555f9b047c1826085c9db7c6ab0f591f3c9"},
+    {file = "tfparse-0.6.10-cp312-cp312-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:4a21ecebe777d52e814b8da842f7b7c975dcd2ae6475008c8ad20f12f009247e"},
+    {file = "tfparse-0.6.10-cp312-cp312-win_amd64.whl", hash = "sha256:32ff2a6a250ae5cb701b16af4bdd579ced53cc72a10c3a36578e4d4aa381b3b6"},
 ]
 
 [package.dependencies]
