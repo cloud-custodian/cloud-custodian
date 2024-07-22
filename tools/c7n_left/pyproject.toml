@@ -27,7 +27,7 @@ tfparse = "^0.6"
 python-hcl2 = "^4.3.2"
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^8.0"
+pytest = "<8.0"
 pytest-terraform = "^0.7.0"
 
 [build-system]

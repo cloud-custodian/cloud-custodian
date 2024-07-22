@@ -28,7 +28,7 @@ pyrate-limiter = "^2.8.4"
 
 [tool.poetry.group.dev.dependencies]
 freezegun = "^1.2.2"
-pytest = "^8.0"
+pytest = "<8.0"
 pytest-terraform = "^0.7.0"
 
 [build-system]

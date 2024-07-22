@@ -21,7 +21,7 @@ c7n = {path = "../..", develop = true}
 openstacksdk = "^0.52.0"
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^8.0"
+pytest = "<8.0"
 vcrpy = ">=4.0.2"
 
 [build-system]

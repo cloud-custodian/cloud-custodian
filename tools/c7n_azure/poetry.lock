@@ -1217,13 +1217,13 @@ files = [
 
 [[package]]
 name = "azure-storage-blob"
-version = "12.20.0"
+version = "12.21.0"
 description = "Microsoft Azure Blob Storage Client Library for Python"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "azure-storage-blob-12.20.0.tar.gz", hash = "sha256:eeb91256e41d4b5b9bad6a87fd0a8ade07dd58aa52344e2c8d2746e27a017d3b"},
-    {file = "azure_storage_blob-12.20.0-py3-none-any.whl", hash = "sha256:de6b3bf3a90e9341a6bcb96a2ebe981dffff993e9045818f6549afea827a52a9"},
+    {file = "azure-storage-blob-12.21.0.tar.gz", hash = "sha256:b9722725072f5b7373c0f4dd6d78fbae2bb37bffc5c3e01731ab8c750ee8dd7e"},
+    {file = "azure_storage_blob-12.21.0-py3-none-any.whl", hash = "sha256:f9ede187dd5a0ef296b583a7c1861c6938ddd6708d6e70f4203a163c2ab42d43"},
 ]
 
 [package.dependencies]
@@ -1269,13 +1269,13 @@ azure-storage-common = ">=2.1,<3.0"
 
 [[package]]
 name = "azure-storage-file-share"
-version = "12.16.0"
+version = "12.17.0"
 description = "Microsoft Azure Azure File Share Storage Client Library for Python"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "azure-storage-file-share-12.16.0.tar.gz", hash = "sha256:412fb7e6c3c28f6f722af98195aa59407aaa32323afa13a4a01f62d0b8774eb3"},
-    {file = "azure_storage_file_share-12.16.0-py3-none-any.whl", hash = "sha256:de7bbe7281dafb7b591166ee4bd81887d8553ac5396d80926503a5fa1c08ddf1"},
+    {file = "azure-storage-file-share-12.17.0.tar.gz", hash = "sha256:f7b2c6cfc1b7cb80097a53b1ed2efa9e545b49a291430d369cdb49fafbc841d6"},
+    {file = "azure_storage_file_share-12.17.0-py3-none-any.whl", hash = "sha256:c4652759a9d529bf08881bb53275bf38774bb643746b849d27c47118f9cf923d"},
 ]
 
 [package.dependencies]
@@ -1289,13 +1289,13 @@ aio = ["azure-core[aio] (>=1.28.0)"]
 
 [[package]]
 name = "azure-storage-queue"
-version = "12.10.0"
+version = "12.11.0"
 description = "Microsoft Azure Azure Queue Storage Client Library for Python"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "azure-storage-queue-12.10.0.tar.gz", hash = "sha256:767ba3d5cccdb4f70974e5ce61d164c7ab74732cfb2b441dd8737669a2116da8"},
-    {file = "azure_storage_queue-12.10.0-py3-none-any.whl", hash = "sha256:aaa1d82c1414d9b771196599134cf5031d61fc169222913c3fdcf6bcfdb8252a"},
+    {file = "azure-storage-queue-12.11.0.tar.gz", hash = "sha256:0a8c777839dba5c50824cac48afa3cc56be044faa45ca61b7269eb319ebf0171"},
+    {file = "azure_storage_queue-12.11.0-py3-none-any.whl", hash = "sha256:b9bdff3da5f0fb6ec4daa48ef4b465c780e0a3df5e065d875e105229acec0798"},
 ]
 
 [package.dependencies]
@@ -1337,17 +1337,17 @@ tzdata = ["tzdata"]
 
 [[package]]
 name = "boto3"
-version = "1.34.144"
+version = "1.34.145"
 description = "The AWS SDK for Python"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "boto3-1.34.144-py3-none-any.whl", hash = "sha256:b8433d481d50b68a0162c0379c0dd4aabfc3d1ad901800beb5b87815997511c1"},
-    {file = "boto3-1.34.144.tar.gz", hash = "sha256:2f3e88b10b8fcc5f6100a9d74cd28230edc9d4fa226d99dd40a3ab38ac213673"},
+    {file = "boto3-1.34.145-py3-none-any.whl", hash = "sha256:69d5afb7a017d07dd6bdfb680d2912d5d369b3fafa0a45161207d9f393b14d7e"},
+    {file = "boto3-1.34.145.tar.gz", hash = "sha256:ac770fb53dde1743aec56bd8e56b7ee2e2f5ad42a37825968ec4ff8428822640"},
 ]
 
 [package.dependencies]
-botocore = ">=1.34.144,<1.35.0"
+botocore = ">=1.34.145,<1.35.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.10.0,<0.11.0"
 
@@ -1356,13 +1356,13 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "botocore"
-version = "1.34.144"
+version = "1.34.145"
 description = "Low-level, data-driven core of boto 3."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "botocore-1.34.144-py3-none-any.whl", hash = "sha256:a2cf26e1bf10d5917a2285e50257bc44e94a1d16574f282f3274f7a5d8d1f08b"},
-    {file = "botocore-1.34.144.tar.gz", hash = "sha256:4215db28d25309d59c99507f1f77df9089e5bebbad35f6e19c7c44ec5383a3e8"},
+    {file = "botocore-1.34.145-py3-none-any.whl", hash = "sha256:2e72e262de02adcb0264ac2bac159a28f55dbba8d9e52aa0308773a42950dff5"},
+    {file = "botocore-1.34.145.tar.gz", hash = "sha256:edf0fb4c02186ae29b76263ac5fda18b0a085d334a310551c9984407cf1079e6"},
 ]
 
 [package.dependencies]
@@ -1388,6 +1388,7 @@ develop = true
 [package.dependencies]
 argcomplete = ">=1.12.3"
 boto3 = "^1.12.31"
+cryptography = "<43"
 docutils = ">=0.18, <0.19"
 importlib-metadata = ">=6,<9"
 jsonschema = ">=4.18"

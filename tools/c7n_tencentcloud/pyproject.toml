@@ -21,7 +21,7 @@ tencentcloud-sdk-python = "^3.0.783"
 cos-python-sdk-v5 = "^1.9.21"
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^8.0"
+pytest = "<8.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
