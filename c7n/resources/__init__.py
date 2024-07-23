@@ -51,7 +51,6 @@ def load_available(resources=True):
         try:
             load_providers((provider,))
         except ImportError: # pragma: no cover
-            raise
             continue
         else:
             found.append(provider)
