@@ -89,7 +89,7 @@ def load_providers(provider_types):
         from c7n_openstack.entry import initialize_openstack
         initialize_openstack()
 
-    if should_load_provider('terraform', provider_types):
+    if should_load_provider('terraform', provider_types, no_wild=True):
         from c7n_left.entry import initialize_iac
         initialize_iac()
 
