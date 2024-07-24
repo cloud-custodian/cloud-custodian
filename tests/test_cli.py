@@ -106,6 +106,17 @@ class ValidateTest(CliTest):
         yaml_file = self.write_policy_file(invalid_policies)
         self.run_and_expect_failure(["custodian", "validate", yaml_file], 1)
 
+    def test_validate_terraform(self):
+        policies = {
+            "policies": [
+                {"name": "tfx",
+                 "resource": "terraform.*",
+                 "filters": ["taggable"]}
+            ]
+        }
+        yaml_file = self.write_policy_file(policies)
+        self.run_and_expect_success(["custodian", "validate", yaml_file])
+
     def test_validate(self):
         invalid_policies = {
             "policies": [
