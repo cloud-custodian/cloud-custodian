@@ -102,7 +102,7 @@ class VersionTest(CliTest):
 
 def check_left():
     try:
-        import c7n_left
+        import c7n_left  # noqa: F401
     except ImportError:
         return {"condition": True, "reason": "c7n_left not installed"}
     return {"condition": False, "reason": "c7n_left installed"}
