@@ -105,7 +105,7 @@ class OriginAccessControl(QueryResourceManager):
         signing_protocol = "SigningProtocol"
         signing_behavior = "SigningBehavior"
         origin_type = "OriginAccessControlOriginType"
-        cfn_type = config_type = "AWS::CloudFront::OriginAccessControl"
+        cfn_type = "AWS::CloudFront::OriginAccessControl"
 
 
 Distribution.filter_registry.register('shield-metrics', ShieldMetrics)
