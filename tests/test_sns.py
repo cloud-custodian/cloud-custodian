@@ -893,7 +893,6 @@ class TestSNS(BaseTest):
         client = session_factory().client("sns")
         name = "test_sns_has_statement_multi_action"
         topic_arn = client.create_topic(Name=name)["TopicArn"]
-        self.addCleanup(client.delete_topic, TopicArn=topic_arn)
 
         client.set_topic_attributes(
             TopicArn=topic_arn,
