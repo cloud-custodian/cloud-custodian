@@ -890,9 +890,6 @@ class TestSNS(BaseTest):
         session_factory = self.replay_flight_data(
             "test_sns_has_statement"
         )
-        client = session_factory().client("sns")
-        name = "test_sns_has_statement_multi_action"
-        topic_arn = client.create_topic(Name=name)["TopicArn"]
 
         p = self.load_policy(
             {

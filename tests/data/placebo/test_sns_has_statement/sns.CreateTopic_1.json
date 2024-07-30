@@ -1,7 +1,0 @@
-{
-    "status_code": 200,
-    "data": {
-        "TopicArn": "arn:aws:sns:ap-northeast-2:644160558196:sns-test-has-statement",
-        "ResponseMetadata": {}
-    }
-}
