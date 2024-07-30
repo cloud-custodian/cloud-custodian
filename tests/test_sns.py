@@ -902,6 +902,8 @@ class TestSNS(BaseTest):
                             {
                                 "Effect": "Deny",
                                 "Action": [
+                                    # The order deliberately does not match that of the actual policy statement.
+                                    # This test ensures that the filter is agnostic to the order of the actions.
                                     "SNS:SetTopicAttributes",
                                     "SNS:Publish",
                                     "SNS:Subscribe"
