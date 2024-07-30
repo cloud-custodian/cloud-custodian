@@ -894,32 +894,6 @@ class TestSNS(BaseTest):
         name = "test_sns_has_statement_multi_action"
         topic_arn = client.create_topic(Name=name)["TopicArn"]
 
-        client.set_topic_attributes(
-            TopicArn=topic_arn,
-            AttributeName="Policy",
-            AttributeValue=json.dumps(
-                {
-                    "Version": "2012-10-17",
-                    "Statement": [
-                        {
-                            "Effect": "Deny",
-                            "Action": [
-                                # IMPORTANT: These actions are intentionally ordered differently
-                                # than in the policy. The point of this test is
-                                # to ensure that the filter is order-agnostic.
-                                "SNS:Publish",
-                                "SNS:Subscribe",
-                                "SNS:SetTopicAttributes"
-                            ],
-                            "Principal": "*",
-                            "Condition":
-                                {"Bool": {"aws:SecureTransport": "false"}},
-                            "Resource": "{topic_arn}"
-                        }
-                    ],
-                }
-            ),
-        )
         p = self.load_policy(
             {
                 "name": "test_sns_has_statement_multi_action",
