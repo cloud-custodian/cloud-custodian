@@ -908,7 +908,7 @@ class TestSNS(BaseTest):
                                 # IMPORTANT: These actions are intentionally ordered differently
                                 # than in the policy. The point of this test is
                                 # to ensure that the filter is order-agnostic.
-                                "SNS:Publish", 
+                                "SNS:Publish",
                                 "SNS:Subscribe",
                                 "SNS:SetTopicAttributes"
                             ],
