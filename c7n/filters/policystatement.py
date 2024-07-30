@@ -101,8 +101,9 @@ class HasStatementFilter(Filter):
                 found = 0
                 for key, value in required_statement.items():
                     if key in ['Action', 'NotAction']:
-                        if key in statement and self.action_resource_case_insensitive(value) \
-                           == self.action_resource_case_insensitive(statement[key]):
+                        if key in statement and \
+                            set(self.action_resource_case_insensitive(value)) \
+                            == set(self.action_resource_case_insensitive(statement[key])):
                             found += 1
                     else:
                         if key in statement and value == statement[key]:
