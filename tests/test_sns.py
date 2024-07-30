@@ -888,7 +888,7 @@ class TestSNS(BaseTest):
 
     def test_sns_has_statement_multi_action(self):
         session_factory = self.replay_flight_data(
-            "test_sns_has_statement_multi_action"
+            "test_sns_has_statement"
         )
         client = session_factory().client("sns")
         name = "test_sns_has_statement_multi_action"
