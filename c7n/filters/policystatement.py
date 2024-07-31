@@ -76,7 +76,7 @@ class HasStatementFilter(Filter):
             for action in actions:
                 actionsFormatted.append('{}:{}'.format(action.split(':')[0].lower(),
                 action.split(':')[1]))
-        return actionsFormatted
+        return set(actionsFormatted)
 
     def process_resource(self, resource):
         policy_attribute = getattr(self, 'policy_attribute', 'Policy')
@@ -102,8 +102,8 @@ class HasStatementFilter(Filter):
                 for key, value in required_statement.items():
                     if key in ['Action', 'NotAction']:
                         if key in statement and \
-                            set(self.action_resource_case_insensitive(value)) \
-                            == set(self.action_resource_case_insensitive(statement[key])):
+                            self.action_resource_case_insensitive(value) \
+                            == self.action_resource_case_insensitive(statement[key]):
                             found += 1
                     else:
                         if key in statement and value == statement[key]:
