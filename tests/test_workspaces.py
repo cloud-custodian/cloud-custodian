@@ -395,26 +395,26 @@ class TestWorkspacesWeb(BaseTest):
                 'resource': 'workspaces-web',
                 'filters': [
                     {
-                       'networkSettings.securityGroupIds': ["sg-0d30141b566cfa039"]
+                       'networkSettings.securityGroupIds': 'present'
                     },
                     {
-                        "type": "subnet", "key": "tag:Name", "value": "Private subnet1"
+                        'type': 'subnet', 'key': 'tag:Name', 'value': 'Private subnet1'
                     },
                     {
-                       'userSettings.copyAllowed': "Disabled"
+                       'userSettings.copyAllowed': 'Disabled'
                     },
                     {
-                       'userSettings.downloadAllowed': "Disabled"
+                       'userSettings.downloadAllowed': 'Disabled'
                     },
                     {
-                       'userSettings.pasteAllowed': "Disabled"
+                       'userSettings.pasteAllowed': 'Disabled'
                     },
                     {
-                       'userSettings.printAllowed': "Disabled"
+                       'userSettings.printAllowed': 'Disabled'
                     },
                     {
                        'userAccessLoggingSettings.kinesisStreamArn':
-                       "arn:aws:kinesis:us-east-1:644160558196:stream/amazon-workspaces-web-test"
+                       'arn:aws:kinesis:us-east-1:644160558196:stream/amazon-workspaces-web-test'
                     },
                 ]
             }, session_factory=session_factory
