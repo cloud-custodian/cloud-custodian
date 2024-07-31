@@ -387,6 +387,41 @@ class WorkspacesTest(BaseTest):
 
 class TestWorkspacesWeb(BaseTest):
 
+    def test_workspaces_web_augment(self):
+        session_factory = self.replay_flight_data('test_workspaces_web_augment')
+        p = self.load_policy(
+            {
+                'name': 'test-workspaces-web-augment',
+                'resource': 'workspaces-web',
+                'filters': [
+                    {
+                       'networkSettings.securityGroupIds': ["sg-0d30141b566cfa039"]
+                    },
+                    {
+                        "type": "subnet", "key": "tag:Name", "value": "Private subnet1"
+                    },
+                    {
+                       'userSettings.copyAllowed': "Disabled"
+                    },
+                    {
+                       'userSettings.downloadAllowed': "Disabled"
+                    },
+                    {
+                       'userSettings.pasteAllowed': "Disabled"
+                    },
+                    {
+                       'userSettings.printAllowed': "Disabled"
+                    },
+                    {
+                       'userAccessLoggingSettings.kinesisStreamArn':
+                       "arn:aws:kinesis:us-east-1:644160558196:stream/amazon-workspaces-web-test"
+                    },
+                ]
+            }, session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_workspaces_web_tag(self):
         session_factory = self.replay_flight_data('test_workspaces_web_tag')
         p = self.load_policy(

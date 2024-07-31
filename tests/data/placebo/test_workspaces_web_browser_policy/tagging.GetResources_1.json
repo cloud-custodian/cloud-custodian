@@ -4,17 +4,8 @@
         "PaginationToken": "",
         "ResourceTagMappingList": [
             {
-                "ResourceARN": "arn:aws:workspaces-web:us-east-1:644160558196:portal/ccef0dcf-2073-4fa9-98e2-60160a7d7976",
-                "Tags": [
-                    {
-                        "Key": "Owner",
-                        "Value": "Barbara"
-                    },
-                    {
-                        "Key": "foo",
-                        "Value": "bar"
-                    }
-                ]
+                "ResourceARN": "arn:aws:workspaces-web:us-east-1:644160558196:portal/7b4be505-d2f2-4c88-a5b3-5653f14e480e",
+                "Tags": []
             }
         ],
         "ResponseMetadata": {}

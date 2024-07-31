@@ -3,11 +3,14 @@
     "data": {
         "ResponseMetadata": {},
         "browserSettings": {
+            "additionalEncryptionContext": {
+                "aws:workspaces-web:portal:id": "7b4be505-d2f2-4c88-a5b3-5653f14e480e"
+            },
             "associatedPortalArns": [
-                "arn:aws:workspaces-web:us-east-1:644160558196:portal/ccef0dcf-2073-4fa9-98e2-60160a7d7976"
+                "arn:aws:workspaces-web:us-east-1:644160558196:portal/7b4be505-d2f2-4c88-a5b3-5653f14e480e"
             ],
-            "browserPolicy": "{\"chromePolicies\":{\"ManagedBookmarks\":{\"value\":[]},\"BookmarkBarEnabled\":{\"value\":false},\"RestoreOnStartup\":{\"value\":5},\"RestoreOnStartupURLs\":{\"value\":[]},\"URLBlocklist\":{\"value\":[]},\"URLAllowlist\":{\"value\":[]},\"AllowDeletingBrowserHistory\":{\"value\":false},\"IncognitoModeAvailability\":{\"value\":1}}}",
-            "browserSettingsArn": "arn:aws:workspaces-web:us-east-1:644160558196:browserSettings/43c78162-dfe7-4724-ba86-7bf0fda450d5"
+            "browserPolicy": "{\n  \"chromePolicies\": {\n    \"ManagedBookmarks\": {\n      \"value\": []\n    },\n    \"BookmarkBarEnabled\": {\n      \"value\": false\n    },\n    \"RestoreOnStartup\": {\n      \"value\": 5\n    },\n    \"RestoreOnStartupURLs\": {\n      \"value\": []\n    },\n    \"URLBlocklist\": {\n      \"value\": []\n    },\n    \"URLAllowlist\": {\n      \"value\": []\n    },\n    \"AllowDeletingBrowserHistory\": {\n      \"value\": false\n    },\n    \"IncognitoModeAvailability\": {\n      \"value\": 0\n    }\n  }\n}",
+            "browserSettingsArn": "arn:aws:workspaces-web:us-east-1:644160558196:browserSettings/ee2a5576-0f0b-46bc-a437-e6a25ca319ac"
         }
     }
 }

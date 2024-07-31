@@ -4,7 +4,7 @@
         "PaginationToken": "",
         "ResourceTagMappingList": [
             {
-                "ResourceARN": "arn:aws:workspaces-web:us-east-1:644160558196:portal/86048a7f-ee77-4dff-99bb-145ba3d1ad45",
+                "ResourceARN": "arn:aws:workspaces-web:us-east-1:644160558196:portal/7b4be505-d2f2-4c88-a5b3-5653f14e480e",
                 "Tags": [
                     {
                         "Key": "foo",
