@@ -142,6 +142,16 @@ class CodeBuildProject(QueryResourceManager):
     }
 
 
+@resources.register('codebuild-credential')
+class CodeBuildSourceCredentials(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = 'codebuild'
+        enum_spec = ('list_source_credentials', 'sourceCredentialsInfos', None)
+        name = id = 'arn'
+        arn = 'arn'
+        cfn_type = 'AWS::CodeBuild::SourceCredential'
+
+
 @CodeBuildProject.filter_registry.register('subnet')
 class BuildSubnetFilter(SubnetFilter):
 

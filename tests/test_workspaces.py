@@ -492,6 +492,33 @@ class TestWorkspacesWeb(BaseTest):
         portals = client.list_portals()['portals']
         self.assertEqual(len(portals), 0)
 
+    def test_workspaces_web_browser_policy(self):
+        session_factory = self.replay_flight_data("test_workspaces_web_browser_policy")
+        p = self.load_policy(
+            {
+                "name": "test-browser-policy",
+                "resource": "workspaces-web",
+                "filters": [
+                    {
+                        "type": "browser-policy",
+                        "key": "chromePolicies.AllowDeletingBrowserHistory.value",
+                        "op": "eq",
+                        "value": False
+                    },
+                    {
+                        "type": "browser-policy",
+                        "key": "chromePolicies.BookmarkBarEnabled.value",
+                        "op": "eq",
+                        "value": False
+                    },
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+
 
 class TestWorkspacesBundleDelete(BaseTest):
 

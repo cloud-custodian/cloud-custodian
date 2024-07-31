@@ -3,7 +3,7 @@
 
 from c7n.actions.core import BaseAction
 from c7n.manager import resources as c7n_resources
-from c7n.query import QueryResourceManager, TypeInfo
+from c7n.query import ChildResourceManager, QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 
@@ -46,8 +46,56 @@ class GlobalNetwork(QueryResourceManager):
 GlobalNetwork.filter_registry.register('marked-for-op', TagActionFilter)
 
 
+@c7n_resources.register('networkmanager-link')
+class Link(ChildResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'networkmanager'
+        enum_spec = ('get_links', 'Links', None)
+        parent_spec = ('networkmanager-global', 'GlobalNetworkId', None)
+        arn = 'LinkArn'
+        name = 'LinkId'
+        id = 'LinkId'
+        date = 'CreatedAt'
+        config_type = 'AWS::NetworkManager::Link'
+        cfn_type = 'AWS::NetworkManager::Link'
+
+
+@c7n_resources.register('networkmanager-device')
+class Device(ChildResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'networkmanager'
+        enum_spec = ('get_devices', 'Devices', None)
+        parent_spec = ('networkmanager-global', 'GlobalNetworkId', None)
+        arn = 'DeviceArn'
+        name = 'DeviceId'
+        id = 'DeviceId'
+        date = 'CreatedAt'
+        config_type = 'AWS::NetworkManager::Device'
+        cfn_type = 'AWS::NetworkManager::Device'
+
+
+@c7n_resources.register('networkmanager-site')
+class Site(ChildResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'networkmanager'
+        enum_spec = ('get_sites', 'Sites', None)
+        parent_spec = ('networkmanager-global', 'GlobalNetworkId', None)
+        arn = 'SiteArn'
+        name = 'SiteId'
+        id = 'SiteId'
+        date = 'CreatedAt'
+        config_type = 'AWS::NetworkManager::Site'
+        cfn_type = 'AWS::NetworkManager::Site'
+
+
 @GlobalNetwork.action_registry.register('tag')
 @CoreNetwork.action_registry.register('tag')
+@Link.action_registry.register('tag')
+@Device.action_registry.register('tag')
+@Site.action_registry.register('tag')
 class TagNetwork(Tag):
     """Action to tag a networkmanager resource
     """
@@ -64,6 +112,9 @@ class TagNetwork(Tag):
 
 @GlobalNetwork.action_registry.register('remove-tag')
 @CoreNetwork.action_registry.register('remove-tag')
+@Link.action_registry.register('remove-tag')
+@Device.action_registry.register('remove-tag')
+@Site.action_registry.register('remove-tag')
 class RemoveTagNetwork(RemoveTag):
     """Action to remove a tag from networkmanager resource
     """
@@ -80,6 +131,9 @@ class RemoveTagNetwork(RemoveTag):
 
 @GlobalNetwork.action_registry.register('mark-for-op')
 @CoreNetwork.action_registry.register('mark-for-op')
+@Link.action_registry.register('mark-for-op')
+@Device.action_registry.register('mark-for-op')
+@Site.action_registry.register('mark-for-op')
 class NetworkMarkForOp(TagDelayedAction):
     """Mark Network for deferred action
 

@@ -12,7 +12,10 @@ from c7n.query import (
 )
 from c7n.resources.aws import Arn
 from c7n.tags import universal_augment
-from c7n.utils import local_session
+from c7n.filters import ListItemFilter
+from c7n.utils import (
+    local_session, type_schema
+)
 
 
 class DescribeMesh(DescribeSource):
@@ -324,3 +327,210 @@ class AppmeshVirtualNode(ChildResourceManager):
             'virtualNodes',
             None,
         )
+
+
+@AppmeshMesh.filter_registry.register('service')
+class VirtualService(ListItemFilter):
+
+    """Filter on appmesh virtual services as List-Item Filters.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: appmesh-virtual-service-policy
+            resource: aws.appmesh-mesh
+            filters:
+              - type: service
+                attrs:
+                  - or :
+                      - type: value
+                        key: meshOwner
+                        op: ne
+                        value: resourceOwner
+                        value_type: expr
+                      - not :
+                          - type: value
+                            key: virtualServiceName
+                            op : regex
+                            value: '^.*.local$'
+    """
+
+    schema = type_schema(
+        'service',
+        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'},
+        count={'type': 'number'},
+        count_op={'$ref': '#/definitions/filters_common/comparison_operators'}
+    )
+
+    annotation_key = "virtualServices"
+    permissions = ('appmesh:DescribeVirtualService',)
+
+    def __init__(self, data, manager=None):
+        super().__init__(data, manager)
+        self.data['key'] = self.annotation_key
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('appmesh')
+        for mesh in resources:
+            response = self.manager.retry(client.list_virtual_services,
+                                          meshName=mesh["meshName"])
+
+            mesh[self.annotation_key] = response.get(
+                'virtualServices', [])
+
+        return super().process(resources, event)
+
+
+@AppmeshMesh.filter_registry.register('router')
+class VirtualRouter(ListItemFilter):
+
+    """Filter on appmesh virtual routers as List-Item Filters.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: appmesh-router-policy
+            resource: aws.appmesh-mesh
+            filters:
+              - type: router
+                attrs:
+                  - type: value
+                    key: meshOwner
+                    op: ne
+                    value: resourceOwner
+                    value_type: expr
+
+    """
+
+    schema = type_schema(
+        'router',
+        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'},
+        count={'type': 'number'},
+        count_op={'$ref': '#/definitions/filters_common/comparison_operators'}
+    )
+
+    annotation_key = "virtualRouters"
+    permissions = ('appmesh:DescribeVirtualRouter',)
+
+    def __init__(self, data, manager=None):
+        super().__init__(data, manager)
+        self.data['key'] = self.annotation_key
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('appmesh')
+        for mesh in resources:
+            response = self.manager.retry(client.list_virtual_routers,
+                                          meshName=mesh["meshName"])
+
+            mesh[self.annotation_key] = response.get(
+                'virtualRouters', [])
+
+        return super().process(resources, event)
+
+
+@AppmeshMesh.filter_registry.register('route')
+class AppmeshRoute(ListItemFilter):
+
+    """Filter on appmesh routes from virtual routers as List-Item Filters.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: appmesh-route-policy
+            resource: aws.appmesh-mesh
+            filters:
+              - type: route
+                key: virtualRouters[].routes[]
+                attrs:
+                  - type: value
+                    key: meshOwner
+                    op: ne
+                    value: resourceOwner
+                    value_type: "expr"
+
+    """
+
+    schema = type_schema(
+        'route',
+        key={'type': 'string'},
+        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'},
+        count={'type': 'number'},
+        count_op={'$ref': '#/definitions/filters_common/comparison_operators'}
+    )
+    permissions = ('appmesh:DescribeVirtualRouter',)
+
+    def __init__(self, data, manager=None):
+        super().__init__(data, manager)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('appmesh')
+
+        for mesh in resources:
+            virtual_routers = self.manager.retry(client.list_virtual_routers,
+                                                meshName=mesh["meshName"])
+
+            mesh["virtualRouters"] = virtual_routers.get("virtualRouters", [])
+
+            for virtual_router in virtual_routers['virtualRouters']:
+                response = self.manager.retry(client.list_routes,
+                                              meshName=virtual_router["meshName"],
+                                              virtualRouterName=virtual_router["virtualRouterName"])
+
+                virtual_router["routes"] = response.get("routes", [])
+
+        return super().process(resources, event)
+
+
+@AppmeshVirtualGateway.filter_registry.register('gateway-route')
+class AppmeshGatewayRoute(ListItemFilter):
+    """Filter on appmesh gateway routes as List-Item Filters.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: appmesh-gateway-route-policy
+            resource: aws.appmesh-virtualgateway
+            filters:
+              - type: gateway-route
+                attrs:
+                  - type: value
+                    key: meshOwner
+                    op: ne
+                    value: resourceOwner
+                    value_type: expr
+
+    """
+
+    schema = type_schema(
+        'gateway-route',
+        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'},
+        count={'type': 'number'},
+        count_op={'$ref': '#/definitions/filters_common/comparison_operators'}
+    )
+
+    annotation_key = "gatewayRoutes"
+    permissions = ('appmesh:DescribeRoute',)
+
+    def __init__(self, data, manager=None):
+        super().__init__(data, manager)
+        self.data['key'] = self.annotation_key
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('appmesh')
+
+        for virtual_gateway in resources:
+            response = self.manager.retry(client.list_gateway_routes,
+                                          meshName=virtual_gateway["meshName"],
+                                          virtualGatewayName=virtual_gateway["virtualGatewayName"])
+
+            virtual_gateway[self.annotation_key] = response.get("gatewayRoutes", [])
+
+        return super().process(resources, event)

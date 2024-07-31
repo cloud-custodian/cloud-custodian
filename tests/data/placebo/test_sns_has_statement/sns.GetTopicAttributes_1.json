@@ -2,7 +2,7 @@
     "status_code": 200,
     "data": {
         "Attributes": {
-            "Policy": "{\"Version\": \"2008-10-17\", \"Id\": \"__default_policy_ID\", \"Statement\": [{\"Sid\": \"BlockNonSSL\", \"Effect\": \"Deny\", \"Principal\": \"*\", \"Action\": \"SNS:Publish\", \"Resource\": \"arn:aws:sns:ap-northeast-2:644160558196:sns-test-has-statement\", \"Condition\": {\"Bool\": {\"aws:SecureTransport\": \"false\"}}}, {\"Sid\": \"__default_statement_ID\", \"Effect\": \"Deny\", \"Principal\": \"*\", \"Action\": \"*\", \"Resource\": \"arn:aws:sns:ap-northeast-2:644160558196:sns-test-has-statement\", \"Condition\": {\"Bool\": {\"aws:SecureTransport\": \"false\"}}}]}",
+            "Policy": "{\"Version\": \"2008-10-17\", \"Id\": \"__default_policy_ID\", \"Statement\": [{\"Sid\": \"BlockNonSSL\", \"Effect\": \"Deny\", \"Principal\": \"*\", \"Action\": \"SNS:Publish\", \"Resource\": \"arn:aws:sns:ap-northeast-2:644160558196:sns-test-has-statement\", \"Condition\": {\"Bool\": {\"aws:SecureTransport\": \"false\"}}}, {\"Sid\": \"__default_statement_ID\", \"Effect\": \"Deny\", \"Principal\": \"*\", \"Action\": \"*\", \"Resource\": \"arn:aws:sns:ap-northeast-2:644160558196:sns-test-has-statement\", \"Condition\": {\"Bool\": {\"aws:SecureTransport\": \"false\"}}}, {\"Sid\": \"DenyNotEncryptedInTransit\", \"Effect\": \"Deny\", \"Principal\": \"*\", \"Action\": [\"SNS:Publish\", \"SNS:Subscribe\", \"SNS:SetTopicAttributes\"], \"Resource\": \"arn:aws:sns:ap-northeast-2:644160558196:sns-test-has-statement\", \"Condition\": {\"Bool\": {\"aws:SecureTransport\": \"false\"}}}]}",
             "LambdaSuccessFeedbackSampleRate": "0",
             "Owner": "644160558196",
             "SubscriptionsPending": "0",

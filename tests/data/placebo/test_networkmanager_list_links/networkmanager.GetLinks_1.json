@@ -1,0 +1,38 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Links": [
+            {
+                "LinkId": "link-022d277eaabe49275",
+                "LinkArn": "arn:aws:networkmanager::644160558196:link/global-network-0907a5c1e93ace9ea/link-022d277eaabe49275",
+                "GlobalNetworkId": "global-network-0907a5c1e93ace9ea",
+                "SiteId": "site-0e84e8234f124f657",
+                "Description": "test link",
+                "Type": "LTE",
+                "Bandwidth": {
+                    "UploadSpeed": 100,
+                    "DownloadSpeed": 100
+                },
+                "Provider": "CellOne",
+                "CreatedAt": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 7,
+                    "day": 17,
+                    "hour": 10,
+                    "minute": 54,
+                    "second": 17,
+                    "microsecond": 0
+                },
+                "State": "AVAILABLE",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "test-linke"
+                    }
+                ]
+            }
+        ]
+    }
+}
