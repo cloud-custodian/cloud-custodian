@@ -1,0 +1,13 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "userAccessLoggingSettings": {
+            "associatedPortalArns": [
+                "arn:aws:workspaces-web:us-east-1:644160558196:portal/7b4be505-d2f2-4c88-a5b3-5653f14e480e"
+            ],
+            "kinesisStreamArn": "arn:aws:kinesis:us-east-1:644160558196:stream/amazon-workspaces-web-test",
+            "userAccessLoggingSettingsArn": "arn:aws:workspaces-web:us-east-1:644160558196:userAccessLoggingSettings/374e381b-6625-49e7-bedf-600d3b852063"
+        }
+    }
+}
