@@ -1,7 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
-from c7n_azure.actions.bae import AzureBaseAction
+from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.resources.arm import ArmResourceManager
 from c7n_azure.provider import resources
 from c7n.utils import type_schema
@@ -47,11 +47,14 @@ class Snapshot(ArmResourceManager):
 class DeleteSnapshot(AzureBaseAction):
     schema = type_schema("delete")
 
+    def process(self, resources):
+        return super().process(resources)
+
     def _prepare_processing(self):
         self.client = self.manager.get_client()
 
     def _process_resource(self, resource):
-        self.client.snapshots.delete(
+        return self.client.snapshots.delete(
             resource["resourceGroup"],
             resource["name"],
         )

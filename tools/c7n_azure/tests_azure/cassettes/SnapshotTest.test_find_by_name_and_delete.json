@@ -1,0 +1,686 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/snapshots?api-version=2020-09-30",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Wed, 31 Jul 2024 18:45:23 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/HighCostGet3Min;238,Microsoft.Compute/HighCostGet30Min;1915"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 1AE164C13DF64CDEB5673A4BEBC334C7 Ref B: BL2AA2010205039 Ref C: 2024-07-31T18:45:23Z"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "1479"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "name": "Testsnapshot",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/JAMISON-POLICY-TESTING/providers/Microsoft.Compute/snapshots/Testsnapshot",
+                                "type": "Microsoft.Compute/snapshots",
+                                "location": "eastus",
+                                "tags": {},
+                                "sku": {
+                                    "name": "Standard_ZRS",
+                                    "tier": "Standard"
+                                },
+                                "properties": {
+                                    "osType": "Linux",
+                                    "hyperVGeneration": "V2",
+                                    "creationData": {
+                                        "createOption": "Copy",
+                                        "sourceResourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/JAMISON-POLICY-TESTING/providers/Microsoft.Compute/disks/JamisonTestVM_OsDisk_1_0217b3db61cb4bf6bbfbe1bbddadf4d4",
+                                        "sourceUniqueId": "0217b3db-61cb-4bf6-bbfb-e1bbddadf4d4"
+                                    },
+                                    "diskSizeGB": 30,
+                                    "encryption": {
+                                        "type": "EncryptionAtRestWithCustomerKey",
+                                        "diskEncryptionSetId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/JAMISON-POLICY-TESTING/providers/Microsoft.Compute/diskEncryptionSets/CMKEncryptionSet"
+                                    },
+                                    "incremental": false,
+                                    "networkAccessPolicy": "AllowAll",
+                                    "timeCreated": "2023-05-18T17:41:22.5261631+00:00",
+                                    "provisioningState": "Succeeded",
+                                    "diskState": "Unattached",
+                                    "diskSizeBytes": 32213303296,
+                                    "uniqueId": "667d1d45-5740-4727-97bc-d42a55e76ee8"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute?api-version=2020-10-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Wed, 31 Jul 2024 18:45:23 GMT"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 7B94874F9B1347F2B80155F45BDC7CA6 Ref B: BL2AA2010204033 Ref C: 2024-07-31T18:45:23Z"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "89918"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute",
+                        "namespace": "Microsoft.Compute",
+                        "authorizations": [],
+                        "resourceTypes": [
+                            {
+                                "resourceType": "availabilitySets",
+                                "apiVersions": [
+                                    "2024-07-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualMachines",
+                                "apiVersions": [
+                                    "2024-07-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualMachines/extensions",
+                                "apiVersions": [
+                                    "2024-07-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualMachineScaleSets",
+                                "apiVersions": [
+                                    "2024-07-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualMachineScaleSets/extensions",
+                                "apiVersions": [
+                                    "2024-07-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualMachineScaleSets/virtualMachines",
+                                "apiVersions": [
+                                    "2024-07-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualMachineScaleSets/virtualMachines/extensions",
+                                "apiVersions": [
+                                    "2024-07-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualMachineScaleSets/networkInterfaces",
+                                "apiVersions": [
+                                    "2024-07-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualMachineScaleSets/virtualMachines/networkInterfaces",
+                                "apiVersions": [
+                                    "2024-07-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualMachineScaleSets/publicIPAddresses",
+                                "apiVersions": [
+                                    "2024-07-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations",
+                                "apiVersions": [
+                                    "2024-07-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/operations",
+                                "apiVersions": [
+                                    "2024-07-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/vmSizes",
+                                "apiVersions": [
+                                    "2024-07-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/runCommands",
+                                "apiVersions": [
+                                    "2024-07-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/virtualMachines",
+                                "apiVersions": [
+                                    "2024-07-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/virtualMachineScaleSets",
+                                "apiVersions": [
+                                    "2024-07-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/publishers",
+                                "apiVersions": [
+                                    "2024-07-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "operations",
+                                "apiVersions": [
+                                    "2024-07-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualMachines/runCommands",
+                                "apiVersions": [
+                                    "2024-07-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualMachineScaleSets/applications",
+                                "apiVersions": [
+                                    "2024-07-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualMachines/VMApplications",
+                                "apiVersions": [
+                                    "2024-07-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/edgeZones",
+                                "apiVersions": [
+                                    "2024-07-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/edgeZones/vmimages",
+                                "apiVersions": [
+                                    "2024-07-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/edgeZones/publishers",
+                                "apiVersions": [
+                                    "2024-07-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "restorePointCollections",
+                                "apiVersions": [
+                                    "2024-07-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "restorePointCollections/restorePoints",
+                                "apiVersions": [
+                                    "2024-07-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "proximityPlacementGroups",
+                                "apiVersions": [
+                                    "2024-07-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "sshPublicKeys",
+                                "apiVersions": [
+                                    "2024-07-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "capacityReservationGroups",
+                                "apiVersions": [
+                                    "2024-07-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "capacityReservationGroups/capacityReservations",
+                                "apiVersions": [
+                                    "2024-07-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualMachines/metricDefinitions",
+                                "apiVersions": [
+                                    "2014-04-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/spotEvictionRates",
+                                "apiVersions": [
+                                    "2024-07-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/spotPriceHistory",
+                                "apiVersions": [
+                                    "2024-07-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/recommendations",
+                                "apiVersions": [
+                                    "2024-07-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/sharedGalleries",
+                                "apiVersions": [
+                                    "2024-07-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/communityGalleries",
+                                "apiVersions": [
+                                    "2024-07-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "sharedVMImages",
+                                "apiVersions": [
+                                    "2017-10-15-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "sharedVMImages/versions",
+                                "apiVersions": [
+                                    "2017-10-15-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/artifactPublishers",
+                                "apiVersions": [
+                                    "2017-10-15-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/capsoperations",
+                                "apiVersions": [
+                                    "2023-07-03"
+                                ]
+                            },
+                            {
+                                "resourceType": "galleries",
+                                "apiVersions": [
+                                    "2023-07-03"
+                                ]
+                            },
+                            {
+                                "resourceType": "galleries/images",
+                                "apiVersions": [
+                                    "2023-07-03"
+                                ]
+                            },
+                            {
+                                "resourceType": "galleries/images/versions",
+                                "apiVersions": [
+                                    "2023-07-03"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/galleries",
+                                "apiVersions": [
+                                    "2023-07-03"
+                                ]
+                            },
+                            {
+                                "resourceType": "payloadGroups",
+                                "apiVersions": [
+                                    "2023-07-03"
+                                ]
+                            },
+                            {
+                                "resourceType": "galleries/applications",
+                                "apiVersions": [
+                                    "2023-07-03"
+                                ]
+                            },
+                            {
+                                "resourceType": "galleries/applications/versions",
+                                "apiVersions": [
+                                    "2023-07-03"
+                                ]
+                            },
+                            {
+                                "resourceType": "disks",
+                                "apiVersions": [
+                                    "2024-03-02"
+                                ]
+                            },
+                            {
+                                "resourceType": "snapshots",
+                                "apiVersions": [
+                                    "2024-03-02"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/diskoperations",
+                                "apiVersions": [
+                                    "2024-03-02"
+                                ]
+                            },
+                            {
+                                "resourceType": "diskEncryptionSets",
+                                "apiVersions": [
+                                    "2024-03-02"
+                                ]
+                            },
+                            {
+                                "resourceType": "diskAccesses",
+                                "apiVersions": [
+                                    "2024-03-02"
+                                ]
+                            },
+                            {
+                                "resourceType": "restorePointCollections/restorePoints/diskRestorePoints",
+                                "apiVersions": [
+                                    "2024-03-02"
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualMachineScaleSets/disks",
+                                "apiVersions": [
+                                    "2024-03-02"
+                                ]
+                            },
+                            {
+                                "resourceType": "cloudServices",
+                                "apiVersions": [
+                                    "2022-09-04"
+                                ]
+                            },
+                            {
+                                "resourceType": "cloudServices/roles",
+                                "apiVersions": [
+                                    "2022-09-04"
+                                ]
+                            },
+                            {
+                                "resourceType": "cloudServices/roleInstances",
+                                "apiVersions": [
+                                    "2022-09-04"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/csoperations",
+                                "apiVersions": [
+                                    "2022-09-04"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/cloudServiceOsVersions",
+                                "apiVersions": [
+                                    "2022-09-04"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/cloudServiceOsFamilies",
+                                "apiVersions": [
+                                    "2022-09-04"
+                                ]
+                            },
+                            {
+                                "resourceType": "cloudServices/networkInterfaces",
+                                "apiVersions": [
+                                    "2021-03-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "cloudServices/roleInstances/networkInterfaces",
+                                "apiVersions": [
+                                    "2021-03-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "cloudServices/publicIPAddresses",
+                                "apiVersions": [
+                                    "2021-03-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/usages",
+                                "apiVersions": [
+                                    "2024-07-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "images",
+                                "apiVersions": [
+                                    "2024-07-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/diagnostics",
+                                "apiVersions": [
+                                    "2024-06-01-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/diagnosticOperations",
+                                "apiVersions": [
+                                    "2024-06-01-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/placementScores",
+                                "apiVersions": [
+                                    "2024-06-01-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/placementRecommendations",
+                                "apiVersions": [
+                                    "2024-06-01-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/logAnalytics",
+                                "apiVersions": [
+                                    "2024-07-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "hostGroups",
+                                "apiVersions": [
+                                    "2024-07-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "hostGroups/hosts",
+                                "apiVersions": [
+                                    "2024-07-01"
+                                ]
+                            }
+                        ],
+                        "registrationState": "Registered",
+                        "registrationPolicy": "RegistrationRequired"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "DELETE",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/JAMISON-POLICY-TESTING/providers/Microsoft.Compute/snapshots/Testsnapshot?api-version=2024-03-02",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 202,
+                    "message": "Accepted"
+                },
+                "headers": {
+                    "date": [
+                        "Wed, 31 Jul 2024 18:45:24 GMT"
+                    ],
+                    "azure-asyncoperation": [
+                        "https://management.azure.com/subscriptions/632790a5-a1aa-4e0c-8cc1-fafbee1d5b39/providers/Microsoft.Compute/locations/eastus/DiskOperations/cf689950-8ca7-44c2-8e41-11010c5f0fd4?p=a4640899-8268-4eae-ad74-fa0d8e276755&api-version=2024-03-02&t=638580483246198111&c=MIIHhzCCBm-gAwIBAgITfAULQ3rFY4Objzxl3AAABQtDejANBgkqhkiG9w0BAQsFADBEMRMwEQYKCZImiZPyLGQBGRYDR0JMMRMwEQYKCZImiZPyLGQBGRYDQU1FMRgwFgYDVQQDEw9BTUUgSW5mcmEgQ0EgMDUwHhcNMjQwNjIyMjE1NzIzWhcNMjUwNjE3MjE1NzIzWjBAMT4wPAYDVQQDEzVhc3luY29wZXJhdGlvbnNpZ25pbmdjZXJ0aWZpY2F0ZS5tYW5hZ2VtZW50LmF6dXJlLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALhRxgv00I_kIXwCJCxn0QIbiBxztKV5N7VUsmJclkirZBo6v69H49qwFEyTyf6TsDRZiDyUNhhfYpqgthcgDoGvOa0_uYNIt0GINfkDoySgM3HurzdD12Zyaj2woPrEkxHdoetI4nepp_ytiAmF81Z7YZyv05HKxV_WspPeyLBxorHcJ_drtY13Ez5tLDFiX_NnqLjf1oZojfYarEmVhETopjp53RxjVOKKRI4K2YWjs44wk0T2jaYGo5macYriIx3aHAxhN0aCURkqI1nWMC6SkdMrP1wdgAcHD5niTqQC5ql2zaSMLmcGFm50nyqRNylI1LJdmgPwGhN_dGd0E6ECAwEAAaOCBHQwggRwMCcGCSsGAQQBgjcVCgQaMBgwCgYIKwYBBQUHAwEwCgYIKwYBBQUHAwIwPQYJKwYBBAGCNxUHBDAwLgYmKwYBBAGCNxUIhpDjDYTVtHiE8Ys-hZvdFs6dEoFggvX2K4Py0SACAWQCAQowggHLBggrBgEFBQcBAQSCAb0wggG5MGMGCCsGAQUFBzAChldodHRwOi8vY3JsLm1pY3Jvc29mdC5jb20vcGtpaW5mcmEvQ2VydHMvQ08xUEtJSU5UQ0EwMS5BTUUuR0JMX0FNRSUyMEluZnJhJTIwQ0ElMjAwNS5jcnQwUwYIKwYBBQUHMAKGR2h0dHA6Ly9jcmwxLmFtZS5nYmwvYWlhL0NPMVBLSUlOVENBMDEuQU1FLkdCTF9BTUUlMjBJbmZyYSUyMENBJTIwMDUuY3J0MFMGCCsGAQUFBzAChkdodHRwOi8vY3JsMi5hbWUuZ2JsL2FpYS9DTzFQS0lJTlRDQTAxLkFNRS5HQkxfQU1FJTIwSW5mcmElMjBDQSUyMDA1LmNydDBTBggrBgEFBQcwAoZHaHR0cDovL2NybDMuYW1lLmdibC9haWEvQ08xUEtJSU5UQ0EwMS5BTUUuR0JMX0FNRSUyMEluZnJhJTIwQ0ElMjAwNS5jcnQwUwYIKwYBBQUHMAKGR2h0dHA6Ly9jcmw0LmFtZS5nYmwvYWlhL0NPMVBLSUlOVENBMDEuQU1FLkdCTF9BTUUlMjBJbmZyYSUyMENBJTIwMDUuY3J0MB0GA1UdDgQWBBTDuxsvkrD8RyTijDaIWm29RaQAYTAOBgNVHQ8BAf8EBAMCBaAwggEmBgNVHR8EggEdMIIBGTCCARWgggERoIIBDYY_aHR0cDovL2NybC5taWNyb3NvZnQuY29tL3BraWluZnJhL0NSTC9BTUUlMjBJbmZyYSUyMENBJTIwMDUuY3JshjFodHRwOi8vY3JsMS5hbWUuZ2JsL2NybC9BTUUlMjBJbmZyYSUyMENBJTIwMDUuY3JshjFodHRwOi8vY3JsMi5hbWUuZ2JsL2NybC9BTUUlMjBJbmZyYSUyMENBJTIwMDUuY3JshjFodHRwOi8vY3JsMy5hbWUuZ2JsL2NybC9BTUUlMjBJbmZyYSUyMENBJTIwMDUuY3JshjFodHRwOi8vY3JsNC5hbWUuZ2JsL2NybC9BTUUlMjBJbmZyYSUyMENBJTIwMDUuY3JsMIGdBgNVHSAEgZUwgZIwDAYKKwYBBAGCN3sBATBmBgorBgEEAYI3ewICMFgwVgYIKwYBBQUHAgIwSh5IADMAMwBlADAAMQA5ADIAMQAtADQAZAA2ADQALQA0AGYAOABjAC0AYQAwADUANQAtADUAYgBkAGEAZgBmAGQANQBlADMAMwBkMAwGCisGAQQBgjd7AwEwDAYKKwYBBAGCN3sEATAfBgNVHSMEGDAWgBR61hmFKHlscXYeYPjzS--iBUIWHTAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwDQYJKoZIhvcNAQELBQADggEBADe3mHC76LsKVL9fkhYlwBSfOx_cb-6YFuiqGA60VGCoc_qwfcn9leu0FbnJEquloNzG8tG_ZwhaFVsQ-_we0Vgl03BjC-BOem7ZES6XywaYv4X1vEBc0SNaQ8EQVToFyCD9wf1ZGu5uv4jk-oILXl_CzdRsvuGKmprgkbrMIS6t5V8ds7REAX8SiE37hqdZU5hNT74RwV32cg3gLtbUsPK22Kv1gf5KsCUZe9tEsEkyq_bSxaNCWnh3lfmsstE0Jo_zL1O6cPKMMtvD21xFYchjWKjYGr1p5mGiM-OLLi8_ETKkYQTS0_gB7wZOGtsc0pIsvgAnqA-sMNn8Oy953Q4&s=b7gjL8OLVEk9zWV6gmvq0J3UrmD2ENZJ2ol9MYCj-aYdF93vYXlx8y2o7I3gRBQdXP0uhZ50_vefBKpOIDBHnnrGpXeyD_PKb_7I5R5pJv4-QyJCCtMertq-DzCPJ2RsXd1QFIs-y_ZuQGQBkVjqXYnDqIaaH9-vKSUWFLYEKJFzyhWop90-DrI2O_SJt-GOPYsIiR0R4_3mro5uM6BuhEmpwsmO-Wy7oNDun0Y1AnarenCvJ1aslQANHxMaUaSdUtLQlosZfuM_A51NryfFc-jVX6Xl7FdrEDMWb3H-8S0kuY2j_8I-e1F6LBx2Q5dApNKQEGJj3B5ZdMJ_Ktetcw&h=JwT1FcpLgE6VmnwjM4dxcrJYkDhzv9saD_rWuSWrh8U"
+                    ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/DeleteDisks3Min;2999,Microsoft.Compute/DeleteDisks30Min;23999"
+                    ],
+                    "location": [
+                        "https://management.azure.com/subscriptions/632790a5-a1aa-4e0c-8cc1-fafbee1d5b39/providers/Microsoft.Compute/locations/eastus/DiskOperations/cf689950-8ca7-44c2-8e41-11010c5f0fd4?p=a4640899-8268-4eae-ad74-fa0d8e276755&monitor=true&api-version=2024-03-02&t=638580483246198111&c=MIIHhzCCBm-gAwIBAgITfAULQ3rFY4Objzxl3AAABQtDejANBgkqhkiG9w0BAQsFADBEMRMwEQYKCZImiZPyLGQBGRYDR0JMMRMwEQYKCZImiZPyLGQBGRYDQU1FMRgwFgYDVQQDEw9BTUUgSW5mcmEgQ0EgMDUwHhcNMjQwNjIyMjE1NzIzWhcNMjUwNjE3MjE1NzIzWjBAMT4wPAYDVQQDEzVhc3luY29wZXJhdGlvbnNpZ25pbmdjZXJ0aWZpY2F0ZS5tYW5hZ2VtZW50LmF6dXJlLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALhRxgv00I_kIXwCJCxn0QIbiBxztKV5N7VUsmJclkirZBo6v69H49qwFEyTyf6TsDRZiDyUNhhfYpqgthcgDoGvOa0_uYNIt0GINfkDoySgM3HurzdD12Zyaj2woPrEkxHdoetI4nepp_ytiAmF81Z7YZyv05HKxV_WspPeyLBxorHcJ_drtY13Ez5tLDFiX_NnqLjf1oZojfYarEmVhETopjp53RxjVOKKRI4K2YWjs44wk0T2jaYGo5macYriIx3aHAxhN0aCURkqI1nWMC6SkdMrP1wdgAcHD5niTqQC5ql2zaSMLmcGFm50nyqRNylI1LJdmgPwGhN_dGd0E6ECAwEAAaOCBHQwggRwMCcGCSsGAQQBgjcVCgQaMBgwCgYIKwYBBQUHAwEwCgYIKwYBBQUHAwIwPQYJKwYBBAGCNxUHBDAwLgYmKwYBBAGCNxUIhpDjDYTVtHiE8Ys-hZvdFs6dEoFggvX2K4Py0SACAWQCAQowggHLBggrBgEFBQcBAQSCAb0wggG5MGMGCCsGAQUFBzAChldodHRwOi8vY3JsLm1pY3Jvc29mdC5jb20vcGtpaW5mcmEvQ2VydHMvQ08xUEtJSU5UQ0EwMS5BTUUuR0JMX0FNRSUyMEluZnJhJTIwQ0ElMjAwNS5jcnQwUwYIKwYBBQUHMAKGR2h0dHA6Ly9jcmwxLmFtZS5nYmwvYWlhL0NPMVBLSUlOVENBMDEuQU1FLkdCTF9BTUUlMjBJbmZyYSUyMENBJTIwMDUuY3J0MFMGCCsGAQUFBzAChkdodHRwOi8vY3JsMi5hbWUuZ2JsL2FpYS9DTzFQS0lJTlRDQTAxLkFNRS5HQkxfQU1FJTIwSW5mcmElMjBDQSUyMDA1LmNydDBTBggrBgEFBQcwAoZHaHR0cDovL2NybDMuYW1lLmdibC9haWEvQ08xUEtJSU5UQ0EwMS5BTUUuR0JMX0FNRSUyMEluZnJhJTIwQ0ElMjAwNS5jcnQwUwYIKwYBBQUHMAKGR2h0dHA6Ly9jcmw0LmFtZS5nYmwvYWlhL0NPMVBLSUlOVENBMDEuQU1FLkdCTF9BTUUlMjBJbmZyYSUyMENBJTIwMDUuY3J0MB0GA1UdDgQWBBTDuxsvkrD8RyTijDaIWm29RaQAYTAOBgNVHQ8BAf8EBAMCBaAwggEmBgNVHR8EggEdMIIBGTCCARWgggERoIIBDYY_aHR0cDovL2NybC5taWNyb3NvZnQuY29tL3BraWluZnJhL0NSTC9BTUUlMjBJbmZyYSUyMENBJTIwMDUuY3JshjFodHRwOi8vY3JsMS5hbWUuZ2JsL2NybC9BTUUlMjBJbmZyYSUyMENBJTIwMDUuY3JshjFodHRwOi8vY3JsMi5hbWUuZ2JsL2NybC9BTUUlMjBJbmZyYSUyMENBJTIwMDUuY3JshjFodHRwOi8vY3JsMy5hbWUuZ2JsL2NybC9BTUUlMjBJbmZyYSUyMENBJTIwMDUuY3JshjFodHRwOi8vY3JsNC5hbWUuZ2JsL2NybC9BTUUlMjBJbmZyYSUyMENBJTIwMDUuY3JsMIGdBgNVHSAEgZUwgZIwDAYKKwYBBAGCN3sBATBmBgorBgEEAYI3ewICMFgwVgYIKwYBBQUHAgIwSh5IADMAMwBlADAAMQA5ADIAMQAtADQAZAA2ADQALQA0AGYAOABjAC0AYQAwADUANQAtADUAYgBkAGEAZgBmAGQANQBlADMAMwBkMAwGCisGAQQBgjd7AwEwDAYKKwYBBAGCN3sEATAfBgNVHSMEGDAWgBR61hmFKHlscXYeYPjzS--iBUIWHTAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwDQYJKoZIhvcNAQELBQADggEBADe3mHC76LsKVL9fkhYlwBSfOx_cb-6YFuiqGA60VGCoc_qwfcn9leu0FbnJEquloNzG8tG_ZwhaFVsQ-_we0Vgl03BjC-BOem7ZES6XywaYv4X1vEBc0SNaQ8EQVToFyCD9wf1ZGu5uv4jk-oILXl_CzdRsvuGKmprgkbrMIS6t5V8ds7REAX8SiE37hqdZU5hNT74RwV32cg3gLtbUsPK22Kv1gf5KsCUZe9tEsEkyq_bSxaNCWnh3lfmsstE0Jo_zL1O6cPKMMtvD21xFYchjWKjYGr1p5mGiM-OLLi8_ETKkYQTS0_gB7wZOGtsc0pIsvgAnqA-sMNn8Oy953Q4&s=b7gjL8OLVEk9zWV6gmvq0J3UrmD2ENZJ2ol9MYCj-aYdF93vYXlx8y2o7I3gRBQdXP0uhZ50_vefBKpOIDBHnnrGpXeyD_PKb_7I5R5pJv4-QyJCCtMertq-DzCPJ2RsXd1QFIs-y_ZuQGQBkVjqXYnDqIaaH9-vKSUWFLYEKJFzyhWop90-DrI2O_SJt-GOPYsIiR0R4_3mro5uM6BuhEmpwsmO-Wy7oNDun0Y1AnarenCvJ1aslQANHxMaUaSdUtLQlosZfuM_A51NryfFc-jVX6Xl7FdrEDMWb3H-8S0kuY2j_8I-e1F6LBx2Q5dApNKQEGJj3B5ZdMJ_Ktetcw&h=JwT1FcpLgE6VmnwjM4dxcrJYkDhzv9saD_rWuSWrh8U"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-deletes": [
+                        "199"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: B8C3985074D343CEB7302653403D1CE8 Ref B: BL2AA2010203051 Ref C: 2024-07-31T18:45:24Z"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "0"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-deletes": [
+                        "2999"
+                    ]
+                },
+                "body": {
+                    "string": ""
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/JAMISON-POLICY-TESTING/providers/Microsoft.Compute/snapshots/Testsnapshot?api-version=2020-09-30",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Wed, 31 Jul 2024 18:45:24 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/LowCostGet3Min;14998,Microsoft.Compute/LowCostGet30Min;119998"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 6C1BBEED8FBC4FBF99683EBE06CE3237 Ref B: BL2AA2010205039 Ref C: 2024-07-31T18:45:24Z"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "1325"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "name": "Testsnapshot",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/JAMISON-POLICY-TESTING/providers/Microsoft.Compute/snapshots/Testsnapshot",
+                        "type": "Microsoft.Compute/snapshots",
+                        "location": "eastus",
+                        "tags": {},
+                        "sku": {
+                            "name": "Standard_ZRS",
+                            "tier": "Standard"
+                        },
+                        "properties": {
+                            "osType": "Linux",
+                            "hyperVGeneration": "V2",
+                            "creationData": {
+                                "createOption": "Copy",
+                                "sourceResourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/JAMISON-POLICY-TESTING/providers/Microsoft.Compute/disks/JamisonTestVM_OsDisk_1_0217b3db61cb4bf6bbfbe1bbddadf4d4",
+                                "sourceUniqueId": "0217b3db-61cb-4bf6-bbfb-e1bbddadf4d4"
+                            },
+                            "diskSizeGB": 30,
+                            "encryption": {
+                                "type": "EncryptionAtRestWithCustomerKey",
+                                "diskEncryptionSetId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/JAMISON-POLICY-TESTING/providers/Microsoft.Compute/diskEncryptionSets/CMKEncryptionSet"
+                            },
+                            "incremental": false,
+                            "networkAccessPolicy": "AllowAll",
+                            "timeCreated": "2023-05-18T17:41:22.5261631+00:00",
+                            "provisioningState": "Deleting",
+                            "diskState": "Unattached",
+                            "diskSizeBytes": 32213303296,
+                            "uniqueId": "667d1d45-5740-4727-97bc-d42a55e76ee8"
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}
