@@ -462,6 +462,41 @@ class DeregisterWorkspaceDirectory(BaseAction):
             )
 
 
+class DescribeWorkspacesWeb(DescribeSource):
+
+    def augment(self, resources):
+        resources = universal_augment(self.manager, resources)
+
+        client = local_session(self.manager.session_factory).client('workspaces-web')
+        results = []
+
+        for r in resources:
+            try:
+                r['networkSettings'] = client.get_network_settings(
+                    networkSettingsArn=r['networkSettingsArn']).get('networkSettings', {})
+            except client.exceptions.ResourceNotFoundException:
+                pass
+            except KeyError:
+                pass
+            try:
+                r['userSettings'] = client.get_user_settings(
+                    userSettingsArn=r['userSettingsArn']).get('userSettings', {})
+            except client.exceptions.ResourceNotFoundException:
+                pass
+            except KeyError:
+                pass
+            try:
+                r['userAccessLoggingSettings'] = client.get_user_access_logging_settings(
+                    userAccessLoggingSettingsArn=r['userAccessLoggingSettingsArn']).get(
+                        'userAccessLoggingSettings', {})
+            except KeyError:
+                pass
+            except client.exceptions.ResourceNotFoundException:
+                pass
+            results.append(r)
+        return results
+
+
 @resources.register('workspaces-web')
 class WorkspacesWeb(QueryResourceManager):
 
@@ -471,8 +506,22 @@ class WorkspacesWeb(QueryResourceManager):
         arn_type = 'portal'
         name = 'displayName'
         arn = id = "portalArn"
+        permissions_augment = (
+            "workspaces-web:GetNetworkSettings",
+            "workspaces-web:GetUserSettings",
+            "workspaces-web:GetUserAccessLoggingSettings",
+            "workspaces-web:ListTagsForResource"
+        )
 
-    augment = universal_augment
+    source_mapping = {
+        'describe': DescribeWorkspacesWeb
+    }
+
+
+@WorkspacesWeb.filter_registry.register('subnet')
+class SubnetFilter(net_filters.SubnetFilter):
+
+    RelatedIdsExpression = "networkSettings.subnetIds[]"
 
 
 @WorkspacesWeb.action_registry.register('tag')
@@ -537,9 +586,14 @@ class DeleteWorkspacesWeb(BaseAction):
     schema = type_schema('delete')
     permissions = (
         'workspaces-web:DeletePortal',
+        'workspaces-web:DeleteNetworkSettings',
+        'workspaces-web:DeleteBrowserSettings',
+        'workspaces-web:DeleteUserSettings',
+        'workspaces-web:DeleteUserAccessLoggingSettings',
         'workspaces-web:DisassociateNetworkSettings',
         'workspaces-web:DisassociateBrowserSettings',
-        'workspaces-web:DisassociateUserSettings'
+        'workspaces-web:DisassociateUserSettings',
+        'workspaces-web:DisassociateUserAccessLoggingSettings',
     )
 
     def process(self, resources):
@@ -547,15 +601,51 @@ class DeleteWorkspacesWeb(BaseAction):
         for r in resources:
             self.disassociate_settings(client, r, 'networkSettingsArn',
                                        'disassociate_network_settings')
+            try:
+                client.delete_network_settings(
+                    networkSettingsArn=r['networkSettingsArn']
+                )
+            except client.exceptions.ResourceNotFoundException:
+                pass
+            except KeyError:
+                pass
             self.disassociate_settings(client, r, 'browserSettingsArn',
                                        'disassociate_browser_settings')
+            try:
+                client.delete_browser_settings(
+                    browserSettingsArn=r['browserSettingsArn']
+                )
+            except client.exceptions.ResourceNotFoundException:
+                pass
+            except KeyError:
+                pass
             self.disassociate_settings(client, r, 'userSettingsArn',
                                        'disassociate_user_settings')
+            try:
+                client.delete_user_settings(
+                    userSettingsArn=r['userSettingsArn']
+                )
+            except client.exceptions.ResourceNotFoundException:
+                pass
+            except KeyError:
+                pass
+            self.disassociate_settings(client, r, 'userAccessLoggingSettingsArn',
+                                       'disassociate_user_access_logging_settings')
+            try:
+                client.delete_user_access_logging_settings(
+                    userAccessLoggingSettingsArn=r['userAccessLoggingSettingsArn']
+                )
+            except client.exceptions.ResourceNotFoundException:
+                pass
+            except KeyError:
+                pass
             self.delete_portal(client, r)
 
-    def disassociate_settings(self, client, resource, setting_arn_key, disassociate_method_name):
+    def disassociate_settings(self, client, resource, setting_arn_key,
+                              disassociate_method_name):
         setting_arn = resource.get(setting_arn_key)
         if setting_arn:
+
             disassociate_method = getattr(client, disassociate_method_name)
             try:
                 disassociate_method(portalArn=resource["portalArn"])
