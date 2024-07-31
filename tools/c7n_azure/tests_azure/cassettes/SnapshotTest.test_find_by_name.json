@@ -1,0 +1,380 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/disks?api-version=2020-09-30",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-msedge-ref": [
+                        "Ref A: 83D1DFD3F34B4320A9C8A40131603FAF Ref B: MNZ221060619023 Ref C: 2024-07-31T14:50:30Z"
+                    ],
+                    "content-length": [
+                        "9123"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "d1499505-bc6c-40fa-b4b3-744a3c164a86",
+                        "37cd586c-5e20-4b86-9e15-d4c19e928677"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Wed, 31 Jul 2024 14:50:29 GMT"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "name": "JamisonsCMKDisk",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/JAMISON-POLICY-TESTING/providers/Microsoft.Compute/disks/JamisonsCMKDisk",
+                                "type": "Microsoft.Compute/disks",
+                                "location": "eastus",
+                                "tags": {},
+                                "sku": {
+                                    "name": "Premium_LRS",
+                                    "tier": "Premium"
+                                },
+                                "properties": {
+                                    "creationData": {
+                                        "createOption": "Empty"
+                                    },
+                                    "diskSizeGB": 4,
+                                    "diskIOPSReadWrite": 120,
+                                    "diskMBpsReadWrite": 25,
+                                    "encryption": {
+                                        "type": "EncryptionAtRestWithCustomerKey",
+                                        "diskEncryptionSetId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/JAMISON-POLICY-TESTING/providers/Microsoft.Compute/diskEncryptionSets/CMKEncryptionSet"
+                                    },
+                                    "networkAccessPolicy": "AllowAll",
+                                    "timeCreated": "2022-01-25T20:51:04.4474023+00:00",
+                                    "provisioningState": "Succeeded",
+                                    "diskState": "Unattached",
+                                    "diskSizeBytes": 4294967296,
+                                    "uniqueId": "9efaecd0-15ee-41b9-a8da-843b68655038",
+                                    "tier": "P1"
+                                }
+                            },
+                            {
+                                "name": "JamisonTestVM_OsDisk_1_0217b3db61cb4bf6bbfbe1bbddadf4d4",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/JAMISON-POLICY-TESTING/providers/Microsoft.Compute/disks/JamisonTestVM_OsDisk_1_0217b3db61cb4bf6bbfbe1bbddadf4d4",
+                                "type": "Microsoft.Compute/disks",
+                                "location": "eastus",
+                                "managedBy": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/jamison-policy-testing/providers/Microsoft.Compute/virtualMachines/JamisonTestVM",
+                                "sku": {
+                                    "name": "Premium_LRS",
+                                    "tier": "Premium"
+                                },
+                                "properties": {
+                                    "osType": "Linux",
+                                    "hyperVGeneration": "V2",
+                                    "creationData": {
+                                        "createOption": "FromImage",
+                                        "imageReference": {
+                                            "id": "/Subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/Providers/Microsoft.Compute/Locations/eastus/Publishers/canonical/ArtifactTypes/VMImage/Offers/0001-com-ubuntu-server-focal/Skus/20_04-lts-gen2/Versions/20.04.202201310"
+                                        }
+                                    },
+                                    "diskSizeGB": 30,
+                                    "diskIOPSReadWrite": 120,
+                                    "diskMBpsReadWrite": 25,
+                                    "encryption": {
+                                        "type": "EncryptionAtRestWithCustomerKey",
+                                        "diskEncryptionSetId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/JAMISON-POLICY-TESTING/providers/Microsoft.Compute/diskEncryptionSets/CMKEncryptionSet"
+                                    },
+                                    "networkAccessPolicy": "AllowAll",
+                                    "timeCreated": "2022-02-09T17:29:51.2032775+00:00",
+                                    "provisioningState": "Succeeded",
+                                    "diskState": "Reserved",
+                                    "diskSizeBytes": 32213303296,
+                                    "uniqueId": "0217b3db-61cb-4bf6-bbfb-e1bbddadf4d4",
+                                    "tier": "P4"
+                                }
+                            },
+                            {
+                                "name": "UnattachedDiskExample",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/JAMISON-POLICY-TESTING/providers/Microsoft.Compute/disks/UnattachedDiskExample",
+                                "type": "Microsoft.Compute/disks",
+                                "location": "eastus",
+                                "tags": {
+                                    "Name": "UnattachedDiskExample"
+                                },
+                                "zones": [
+                                    "1"
+                                ],
+                                "sku": {
+                                    "name": "Premium_LRS",
+                                    "tier": "Premium"
+                                },
+                                "properties": {
+                                    "creationData": {
+                                        "createOption": "Empty"
+                                    },
+                                    "diskSizeGB": 1024,
+                                    "diskIOPSReadWrite": 5000,
+                                    "diskMBpsReadWrite": 200,
+                                    "encryption": {
+                                        "type": "EncryptionAtRestWithPlatformKey"
+                                    },
+                                    "networkAccessPolicy": "AllowAll",
+                                    "timeCreated": "2024-05-02T21:00:37.7102727+00:00",
+                                    "provisioningState": "Succeeded",
+                                    "diskState": "Unattached",
+                                    "diskSizeBytes": 1099511627776,
+                                    "uniqueId": "77bde55e-31b8-416d-89d7-a81523ea11f6",
+                                    "tier": "P30"
+                                }
+                            },
+                            {
+                                "name": "UnattachedDiskExample2",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/JAMISON-POLICY-TESTING/providers/Microsoft.Compute/disks/UnattachedDiskExample2",
+                                "type": "Microsoft.Compute/disks",
+                                "location": "eastus",
+                                "tags": {
+                                    "Name": "UnattachedDiskExample2"
+                                },
+                                "zones": [
+                                    "1"
+                                ],
+                                "sku": {
+                                    "name": "Premium_LRS",
+                                    "tier": "Premium"
+                                },
+                                "properties": {
+                                    "creationData": {
+                                        "createOption": "Empty"
+                                    },
+                                    "diskSizeGB": 512,
+                                    "diskIOPSReadWrite": 2300,
+                                    "diskMBpsReadWrite": 150,
+                                    "encryption": {
+                                        "type": "EncryptionAtRestWithPlatformKey"
+                                    },
+                                    "networkAccessPolicy": "AllowAll",
+                                    "timeCreated": "2024-05-02T21:03:12.1488788+00:00",
+                                    "provisioningState": "Succeeded",
+                                    "diskState": "Unattached",
+                                    "diskSizeBytes": 549755813888,
+                                    "uniqueId": "d2dc8685-d6c8-4636-adb7-ee3c9ccb0c74",
+                                    "tier": "P20"
+                                }
+                            },
+                            {
+                                "name": "UnattachedDiskExample3",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/JAMISON-POLICY-TESTING/providers/Microsoft.Compute/disks/UnattachedDiskExample3",
+                                "type": "Microsoft.Compute/disks",
+                                "location": "eastus",
+                                "tags": {
+                                    "Name": "UnattachedDiskExample3"
+                                },
+                                "zones": [
+                                    "1"
+                                ],
+                                "sku": {
+                                    "name": "Premium_LRS",
+                                    "tier": "Premium"
+                                },
+                                "properties": {
+                                    "creationData": {
+                                        "createOption": "Empty"
+                                    },
+                                    "diskSizeGB": 1024,
+                                    "diskIOPSReadWrite": 5000,
+                                    "diskMBpsReadWrite": 200,
+                                    "encryption": {
+                                        "type": "EncryptionAtRestWithPlatformKey"
+                                    },
+                                    "networkAccessPolicy": "AllowAll",
+                                    "timeCreated": "2024-05-02T22:24:14.464649+00:00",
+                                    "provisioningState": "Succeeded",
+                                    "diskState": "Unattached",
+                                    "diskSizeBytes": 1099511627776,
+                                    "uniqueId": "da762cfc-4e40-43e5-b48a-aa57a95e7c75",
+                                    "tier": "P30"
+                                }
+                            },
+                            {
+                                "name": "myosdisk1",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/KUBECON-VM/providers/Microsoft.Compute/disks/myosdisk1",
+                                "type": "Microsoft.Compute/disks",
+                                "location": "eastus",
+                                "tags": {
+                                    "environment": "staging"
+                                },
+                                "managedBy": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/kubecon-vm/providers/Microsoft.Compute/virtualMachines/kubecon-vm",
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "properties": {
+                                    "osType": "Linux",
+                                    "hyperVGeneration": "V1",
+                                    "creationData": {
+                                        "createOption": "FromImage",
+                                        "imageReference": {
+                                            "id": "/Subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/Providers/Microsoft.Compute/Locations/eastus/Publishers/Canonical/ArtifactTypes/VMImage/Offers/UbuntuServer/Skus/16.04-LTS/Versions/16.04.202109280"
+                                        }
+                                    },
+                                    "diskSizeGB": 30,
+                                    "diskIOPSReadWrite": 500,
+                                    "diskMBpsReadWrite": 60,
+                                    "encryption": {
+                                        "type": "EncryptionAtRestWithPlatformKey"
+                                    },
+                                    "networkAccessPolicy": "AllowAll",
+                                    "timeCreated": "2021-10-06T13:24:08.8859146+00:00",
+                                    "provisioningState": "Succeeded",
+                                    "diskState": "Reserved",
+                                    "diskSizeBytes": 32213303296,
+                                    "uniqueId": "a4a3b751-0167-4797-bb2e-b8fd120e1f24"
+                                }
+                            },
+                            {
+                                "name": "kirill-ubuntu_OsDisk_1_4ae3b459e62c43d18a2051a92ab91c41",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/RG-IWK8FE/providers/Microsoft.Compute/disks/kirill-ubuntu_OsDisk_1_4ae3b459e62c43d18a2051a92ab91c41",
+                                "type": "Microsoft.Compute/disks",
+                                "location": "eastus",
+                                "sku": {
+                                    "name": "Premium_LRS",
+                                    "tier": "Premium"
+                                },
+                                "properties": {
+                                    "osType": "Linux",
+                                    "hyperVGeneration": "V1",
+                                    "creationData": {
+                                        "createOption": "FromImage",
+                                        "imageReference": {
+                                            "id": "/Subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/Providers/Microsoft.Compute/Locations/eastus/Publishers/canonical/ArtifactTypes/VMImage/Offers/0001-com-ubuntu-server-focal/Skus/20_04-lts/Versions/20.04.202201100"
+                                        }
+                                    },
+                                    "diskSizeGB": 30,
+                                    "diskIOPSReadWrite": 120,
+                                    "diskMBpsReadWrite": 25,
+                                    "encryption": {
+                                        "type": "EncryptionAtRestWithPlatformKey"
+                                    },
+                                    "networkAccessPolicy": "AllowAll",
+                                    "timeCreated": "2022-01-12T00:52:40.5686527+00:00",
+                                    "provisioningState": "Succeeded",
+                                    "diskState": "Unattached",
+                                    "diskSizeBytes": 32213303296,
+                                    "uniqueId": "4ae3b459-e62c-43d1-8a20-51a92ab91c41",
+                                    "tier": "P4"
+                                }
+                            },
+                            {
+                                "name": "test_OsDisk_1_9f48ded798a24de29b051f1c02ecadab",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/STACKLET-SONNY4/providers/Microsoft.Compute/disks/test_OsDisk_1_9f48ded798a24de29b051f1c02ecadab",
+                                "type": "Microsoft.Compute/disks",
+                                "location": "eastus",
+                                "managedBy": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/stacklet-sonny4/providers/Microsoft.Compute/virtualMachines/test",
+                                "sku": {
+                                    "name": "Premium_LRS",
+                                    "tier": "Premium"
+                                },
+                                "properties": {
+                                    "osType": "Linux",
+                                    "hyperVGeneration": "V2",
+                                    "creationData": {
+                                        "createOption": "FromImage",
+                                        "imageReference": {
+                                            "id": "/Subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/Providers/Microsoft.Compute/Locations/eastus/Publishers/canonical/ArtifactTypes/VMImage/Offers/0001-com-ubuntu-server-focal/Skus/20_04-lts-gen2/Versions/20.04.202305150"
+                                        }
+                                    },
+                                    "diskSizeGB": 30,
+                                    "diskIOPSReadWrite": 120,
+                                    "diskMBpsReadWrite": 25,
+                                    "encryption": {
+                                        "type": "EncryptionAtRestWithPlatformKey"
+                                    },
+                                    "networkAccessPolicy": "AllowAll",
+                                    "timeCreated": "2023-05-19T06:08:17.3155069+00:00",
+                                    "provisioningState": "Succeeded",
+                                    "diskState": "Reserved",
+                                    "diskSizeBytes": 32213303296,
+                                    "uniqueId": "9f48ded7-98a2-4de2-9b05-1f1c02ecadab",
+                                    "tier": "P4"
+                                }
+                            },
+                            {
+                                "name": "demo_tagged",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/AJ/providers/Microsoft.Compute/disks/demo_tagged",
+                                "type": "Microsoft.Compute/disks",
+                                "location": "westus2",
+                                "tags": {
+                                    "environment": "dev"
+                                },
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "properties": {
+                                    "creationData": {
+                                        "createOption": "Empty"
+                                    },
+                                    "diskSizeGB": 1,
+                                    "diskIOPSReadWrite": 500,
+                                    "diskMBpsReadWrite": 60,
+                                    "encryption": {
+                                        "type": "EncryptionAtRestWithPlatformKey"
+                                    },
+                                    "networkAccessPolicy": "AllowAll",
+                                    "timeCreated": "2021-08-17T05:57:59.973162+00:00",
+                                    "provisioningState": "Succeeded",
+                                    "diskState": "Unattached",
+                                    "diskSizeBytes": 1073741824,
+                                    "uniqueId": "a83a787b-05c1-42b8-a94b-0080682d7ab9"
+                                }
+                            },
+                            {
+                                "name": "demo_untagged",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/AJ/providers/Microsoft.Compute/disks/demo_untagged",
+                                "type": "Microsoft.Compute/disks",
+                                "location": "westus2",
+                                "tags": {},
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "properties": {
+                                    "creationData": {
+                                        "createOption": "Empty"
+                                    },
+                                    "diskSizeGB": 1,
+                                    "diskIOPSReadWrite": 500,
+                                    "diskMBpsReadWrite": 60,
+                                    "encryption": {
+                                        "type": "EncryptionAtRestWithPlatformKey"
+                                    },
+                                    "networkAccessPolicy": "AllowAll",
+                                    "timeCreated": "2021-08-17T05:57:59.7700743+00:00",
+                                    "provisioningState": "Succeeded",
+                                    "diskState": "Unattached",
+                                    "diskSizeBytes": 1073741824,
+                                    "uniqueId": "b02f88d9-a887-4af7-bf63-a01a261c441f"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}
