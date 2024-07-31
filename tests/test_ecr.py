@@ -410,3 +410,24 @@ class TestECR(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_ecr_cross_account_filter_config(self):
+        session_factory = self.replay_flight_data("test_ecr_cross_account_filter_config")
+        p = self.load_policy(
+            {
+                "name": "ecr-cross-account-config",
+                "resource": "aws.ecr",
+                "source": "config",
+                "filters": [
+                    {
+                        "type": "cross-account",
+                        "whitelist": ["644160558196"],
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 4)
+        self.assertEqual({"testrepo", "testing", "test-ecr-modify-policy", "demodev"}, {r.get(
+            "repositoryName") for r in resources})

@@ -886,6 +886,48 @@ class TestSNS(BaseTest):
         self.assertEqual(resources[0]["TopicArn"],
         "arn:aws:sns:ap-northeast-2:644160558196:sns-test-has-statement")
 
+    def test_sns_has_statement_multi_action(self):
+        session_factory = self.replay_flight_data(
+            "test_sns_has_statement"
+        )
+
+        p = self.load_policy(
+            {
+                "name": "test_sns_has_statement_multi_action",
+                "resource": "sns",
+                "filters": [
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Deny",
+                                "Action": [
+                                    # The order deliberately does not match that of the actual
+                                    # policy statement. This test ensures that the filter is
+                                    # agnostic to the order of the actions.
+                                    "SNS:SetTopicAttributes",
+                                    "SNS:Publish",
+                                    "SNS:Subscribe"
+                                ],
+                                "Principal": "*",
+                                "Condition":
+                                    {"Bool": {"aws:SecureTransport": "false"}},
+                                "Resource": "{topic_arn}"
+                            }
+                        ]
+                    }
+                ],
+            },
+            session_factory=session_factory,
+            config={'region': 'ap-northeast-2'}
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]["TopicArn"],
+            "arn:aws:sns:ap-northeast-2:644160558196:sns-test-has-statement"
+        )
+
     def test_sns_metrics(self):
         session_factory = self.replay_flight_data(
             "test_sns_metrics"
