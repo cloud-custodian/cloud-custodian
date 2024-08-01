@@ -112,7 +112,6 @@ class ConfigRetentionConfigurations(ValueFilter):
 
     schema = type_schema(
         "retention",
-        state={'enum': ["present", "absent"]},
         rinherit=ValueFilter.schema,
 
     )
@@ -126,21 +125,9 @@ class ConfigRetentionConfigurations(ValueFilter):
         retention_configs = client.describe_retention_configurations().get(
             "RetentionConfigurations", []
         )
-
-        if not retention_configs:
-            if self.data.get('state', 'present') == 'absent':
-                for resource in resources:
-                    resource[self.annotation_key] = None
-                return resources
-            return []
-
-        retention_config = retention_configs[0]
+        retention_config = retention_configs and retention_configs[0] or {}
         for resource in resources:
             resource[self.annotation_key] = retention_config
-
-        if 'key' not in self.data and 'value' not in self.data:
-            return resources
-
         return super().process(resources, event)
 
     def __call__(self, resource):
