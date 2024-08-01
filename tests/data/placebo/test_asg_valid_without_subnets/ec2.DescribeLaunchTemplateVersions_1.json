@@ -1,0 +1,30 @@
+{
+    "status_code": 200,
+    "data": {
+        "LaunchTemplateVersions": [
+            {
+                "LaunchTemplateId": "lt-0acf34391337bfcee",
+                "LaunchTemplateName": "autotest_asg_launch_template_green20240801180252087500000001",
+                "VersionNumber": 2,
+                "CreateTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 8,
+                    "day": 1,
+                    "hour": 18,
+                    "minute": 7,
+                    "second": 44,
+                    "microsecond": 0
+                },
+                "CreatedBy": "arn:aws:iam::111111111111:user/test",
+                "DefaultVersion": false,
+                "LaunchTemplateData": {
+                    "ImageId": "ami-0aab30c354cf88d7b",
+                    "InstanceType": "t4g.nano",
+                    "KeyName": "autotest_asg_key_green"
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,143 @@
+{
+    "status_code": 200,
+    "data": {
+        "AutoScalingGroups": [
+            {
+                "AutoScalingGroupName": "autotest-asg-ec2-green-asg-1",
+                "AutoScalingGroupARN": "arn:aws:autoscaling:us-east-1:111111111111:autoScalingGroup:f104c942-aeae-4629-ba95-32a94076c390:autoScalingGroupName/autotest-asg-ec2-green-asg-1",
+                "MixedInstancesPolicy": {
+                    "LaunchTemplate": {
+                        "LaunchTemplateSpecification": {
+                            "LaunchTemplateId": "lt-0acf34391337bfcee",
+                            "LaunchTemplateName": "autotest_asg_launch_template_green20240801180252087500000001",
+                            "Version": "$Latest"
+                        },
+                        "Overrides": [
+                            {
+                                "InstanceType": "t4g.micro",
+                                "WeightedCapacity": "3"
+                            },
+                            {
+                                "InstanceType": "t4g.nano",
+                                "WeightedCapacity": "2"
+                            }
+                        ]
+                    },
+                    "InstancesDistribution": {
+                        "OnDemandAllocationStrategy": "prioritized",
+                        "OnDemandBaseCapacity": 0,
+                        "OnDemandPercentageAboveBaseCapacity": 25,
+                        "SpotAllocationStrategy": "lowest-price",
+                        "SpotInstancePools": 2
+                    }
+                },
+                "MinSize": 0,
+                "MaxSize": 1,
+                "DesiredCapacity": 0,
+                "DefaultCooldown": 300,
+                "AvailabilityZones": [
+                    "us-east-1c"
+                ],
+                "LoadBalancerNames": [
+                    "autotest-asg-lb-green-1"
+                ],
+                "TargetGroupARNs": [],
+                "HealthCheckType": "ELB",
+                "HealthCheckGracePeriod": 300,
+                "Instances": [],
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 8,
+                    "day": 1,
+                    "hour": 18,
+                    "minute": 3,
+                    "second": 4,
+                    "microsecond": 143000
+                },
+                "SuspendedProcesses": [],
+                "VPCZoneIdentifier": "subnet-0ca5ca7dc5dd8a6bd",
+                "EnabledMetrics": [],
+                "Tags": [
+                    {
+                        "ResourceId": "autotest-asg-ec2-green-asg-1",
+                        "ResourceType": "auto-scaling-group",
+                        "Key": "ComplianceStatus",
+                        "Value": "green",
+                        "PropagateAtLaunch": true
+                    }
+                ],
+                "TerminationPolicies": [
+                    "Default"
+                ],
+                "NewInstancesProtectedFromScaleIn": false,
+                "ServiceLinkedRoleARN": "arn:aws:iam::111111111111:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling",
+                "CapacityRebalance": true,
+                "TrafficSources": [
+                    {
+                        "Identifier": "autotest-asg-lb-green-1",
+                        "Type": "elb"
+                    }
+                ]
+            },
+            {
+                "AutoScalingGroupName": "autotest-asg-ec2-green-asg-2",
+                "AutoScalingGroupARN": "arn:aws:autoscaling:us-east-1:111111111111:autoScalingGroup:4951b533-5d46-4de1-ae9b-91220329c560:autoScalingGroupName/autotest-asg-ec2-green-asg-2",
+                "LaunchTemplate": {
+                    "LaunchTemplateId": "lt-0acf34391337bfcee",
+                    "LaunchTemplateName": "autotest_asg_launch_template_green20240801180252087500000001",
+                    "Version": "$Latest"
+                },
+                "MinSize": 0,
+                "MaxSize": 1,
+                "DesiredCapacity": 0,
+                "DefaultCooldown": 300,
+                "AvailabilityZones": [
+                    "us-east-1a",
+                    "us-east-1c"
+                ],
+                "LoadBalancerNames": [],
+                "TargetGroupARNs": [
+                    "arn:aws:elasticloadbalancing:us-east-1:111111111111:targetgroup/autotest-asg-lb-green-2/af65bb312aa90c5e"
+                ],
+                "HealthCheckType": "EC2",
+                "HealthCheckGracePeriod": 300,
+                "Instances": [],
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 8,
+                    "day": 1,
+                    "hour": 18,
+                    "minute": 2,
+                    "second": 55,
+                    "microsecond": 636000
+                },
+                "SuspendedProcesses": [],
+                "VPCZoneIdentifier": "",
+                "EnabledMetrics": [],
+                "Tags": [
+                    {
+                        "ResourceId": "autotest-asg-ec2-green-asg-2",
+                        "ResourceType": "auto-scaling-group",
+                        "Key": "ComplianceStatus",
+                        "Value": "green",
+                        "PropagateAtLaunch": true
+                    }
+                ],
+                "TerminationPolicies": [
+                    "Default"
+                ],
+                "NewInstancesProtectedFromScaleIn": false,
+                "ServiceLinkedRoleARN": "arn:aws:iam::111111111111:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling",
+                "TrafficSources": [
+                    {
+                        "Identifier": "arn:aws:elasticloadbalancing:us-east-1:111111111111:targetgroup/autotest-asg-lb-green-2/af65bb312aa90c5e",
+                        "Type": "elbv2"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

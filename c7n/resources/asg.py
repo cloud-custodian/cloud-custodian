@@ -318,7 +318,7 @@ class ConfigValidFilter(Filter):
 
         for subnet in subnets:
             subnet = subnet.strip()
-            if subnet not in self.subnets:
+            if subnet and subnet not in self.subnets:
                 errors.append(('invalid-subnet', subnet))
 
         for elb in asg['LoadBalancerNames']:

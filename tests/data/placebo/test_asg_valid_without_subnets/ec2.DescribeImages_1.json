@@ -1,0 +1,46 @@
+{
+    "status_code": 200,
+    "data": {
+        "Images": [
+            {
+                "Architecture": "arm64",
+                "CreationDate": "2024-07-25T21:42:47.000Z",
+                "ImageId": "ami-0aab30c354cf88d7b",
+                "ImageLocation": "amazon/al2023-ami-ecs-hvm-2023.0.20240725-kernel-6.1-arm64",
+                "ImageType": "machine",
+                "Public": true,
+                "OwnerId": "111111111111",
+                "PlatformDetails": "Linux/UNIX",
+                "UsageOperation": "RunInstances",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "Iops": 3000,
+                            "SnapshotId": "snap-0d0269e7a99c02faa",
+                            "VolumeSize": 30,
+                            "VolumeType": "gp3",
+                            "Throughput": 125,
+                            "Encrypted": false
+                        }
+                    }
+                ],
+                "Description": "Amazon Linux AMI 2023.0.20240725 arm64 ECS HVM EBS",
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "ImageOwnerAlias": "amazon",
+                "Name": "al2023-ami-ecs-hvm-2023.0.20240725-kernel-6.1-arm64",
+                "RootDeviceName": "/dev/xvda",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "VirtualizationType": "hvm",
+                "BootMode": "uefi",
+                "DeprecationTime": "2026-07-25T21:42:47.000Z",
+                "ImdsSupport": "v2.0"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

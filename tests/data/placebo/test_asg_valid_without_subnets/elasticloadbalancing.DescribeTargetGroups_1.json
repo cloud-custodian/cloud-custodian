@@ -1,0 +1,30 @@
+{
+    "status_code": 200,
+    "data": {
+        "TargetGroups": [
+            {
+                "TargetGroupArn": "arn:aws:elasticloadbalancing:us-east-1:111111111111:targetgroup/autotest-asg-lb-green-2/af65bb312aa90c5e",
+                "TargetGroupName": "autotest-asg-lb-green-2",
+                "Protocol": "HTTP",
+                "Port": 80,
+                "VpcId": "vpc-0924b852a9515e163",
+                "HealthCheckProtocol": "HTTP",
+                "HealthCheckPort": "traffic-port",
+                "HealthCheckEnabled": true,
+                "HealthCheckIntervalSeconds": 30,
+                "HealthCheckTimeoutSeconds": 5,
+                "HealthyThresholdCount": 5,
+                "UnhealthyThresholdCount": 2,
+                "HealthCheckPath": "/",
+                "Matcher": {
+                    "HttpCode": "200"
+                },
+                "LoadBalancerArns": [],
+                "TargetType": "instance",
+                "ProtocolVersion": "HTTP1",
+                "IpAddressType": "ipv4"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,30 @@
+{
+    "status_code": 200,
+    "data": {
+        "KeyPairs": [
+            {
+                "KeyPairId": "key-041b3462110ae5be1",
+                "KeyFingerprint": "65:38:eb:ee::80:4f",
+                "KeyName": "autotest_asg_key_green",
+                "KeyType": "rsa",
+                "Tags": [
+                    {
+                        "Key": "ComplianceStatus",
+                        "Value": "Green"
+                    }
+                ],
+                "CreateTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 8,
+                    "day": 1,
+                    "hour": 18,
+                    "minute": 7,
+                    "second": 43,
+                    "microsecond": 578000
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
