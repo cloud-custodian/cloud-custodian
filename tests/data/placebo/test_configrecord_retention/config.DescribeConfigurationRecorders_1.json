@@ -12,7 +12,7 @@
                         "AWS::WAF::RateBasedRule",
                         "AWS::WAF::Rule",
                         "AWS::WAF::RuleGroup",
-                        "AWS::WAF::WebACL",
+                        "AWS::WAF::WebACL"
                     ],
                     "exclusionByResourceTypes": {
                         "resourceTypes": []
