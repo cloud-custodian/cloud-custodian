@@ -20,6 +20,9 @@ from c7n.utils import local_session, chunks, type_schema
 
 from c7n.resources.shield import IsShieldProtected, SetShieldProtection
 
+from c7n.resources.elb_shared import AdvancedIpPermissionsFilter
+from c7n.resources.vpc import SGPermissionSchema
+
 
 filters = FilterRegistry('elb.filters')
 actions = ActionRegistry('elb.actions')
@@ -434,6 +437,30 @@ class VpcFilter(net_filters.VpcFilter):
 
 
 filters.register('network-location', net_filters.NetworkLocation)
+
+
+@filters.register('ingress')
+class AdvancedIngressFilter(AdvancedIpPermissionsFilter):
+    schema = {
+        'type': 'object',
+        'additionalProperties': False,
+        'properties': {'type': {'enum': ['ingress']}}, 'required': ['type']
+    }
+    schema['properties'].update(SGPermissionSchema)
+
+    permissions_key = 'IpPermissions'
+
+
+@filters.register('egress')
+class AdvancedEgressFilter(AdvancedIpPermissionsFilter):
+    schema = {
+        'type': 'object',
+        'additionalProperties': False,
+        'properties': {'type': {'enum': ['egress']}}, 'required': ['type']
+    }
+    schema['properties'].update(SGPermissionSchema)
+
+    permissions_key = 'IpPermissionsEgress'
 
 
 @filters.register('instance')
