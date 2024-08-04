@@ -3,13 +3,13 @@
     "data": {
         "Images": [
             {
-                "Architecture": "arm64",
-                "CreationDate": "2024-07-25T21:42:47.000Z",
-                "ImageId": "ami-0aab30c354cf88d7b",
-                "ImageLocation": "amazon/al2023-ami-ecs-hvm-2023.0.20240725-kernel-6.1-arm64",
+                "Architecture": "x86_64",
+                "CreationDate": "2024-07-30T22:57:30.000Z",
+                "ImageId": "ami-025fe52e1f2dc5044",
+                "ImageLocation": "amazon/al2023-ami-2023.5.20240730.0-kernel-6.1-x86_64",
                 "ImageType": "machine",
                 "Public": true,
-                "OwnerId": "111111111111",
+                "OwnerId": "644160558196",
                 "PlatformDetails": "Linux/UNIX",
                 "UsageOperation": "RunInstances",
                 "State": "available",
@@ -19,25 +19,25 @@
                         "Ebs": {
                             "DeleteOnTermination": true,
                             "Iops": 3000,
-                            "SnapshotId": "snap-0d0269e7a99c02faa",
-                            "VolumeSize": 30,
+                            "SnapshotId": "snap-0bd006545a26999ad",
+                            "VolumeSize": 8,
                             "VolumeType": "gp3",
                             "Throughput": 125,
                             "Encrypted": false
                         }
                     }
                 ],
-                "Description": "Amazon Linux AMI 2023.0.20240725 arm64 ECS HVM EBS",
+                "Description": "Amazon Linux 2023 AMI 2023.5.20240730.0 x86_64 HVM kernel-6.1",
                 "EnaSupport": true,
                 "Hypervisor": "xen",
                 "ImageOwnerAlias": "amazon",
-                "Name": "al2023-ami-ecs-hvm-2023.0.20240725-kernel-6.1-arm64",
+                "Name": "al2023-ami-2023.5.20240730.0-kernel-6.1-x86_64",
                 "RootDeviceName": "/dev/xvda",
                 "RootDeviceType": "ebs",
                 "SriovNetSupport": "simple",
                 "VirtualizationType": "hvm",
-                "BootMode": "uefi",
-                "DeprecationTime": "2026-07-25T21:42:47.000Z",
+                "BootMode": "uefi-preferred",
+                "DeprecationTime": "2024-10-28T22:58:00.000Z",
                 "ImdsSupport": "v2.0"
             }
         ],

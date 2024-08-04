@@ -884,20 +884,22 @@ class AutoScalingTest(BaseTest):
         self.assertTrue("invalid-subnet" in s)
         self.assertTrue("invalid-security-group" in s)
 
-    def test_asg_valid_without_subnets(self):
-        factory = self.replay_flight_data("test_asg_valid_without_subnets")
+    def test_asg_invalid_az(self):
+        factory = self.replay_flight_data("test_asg_invalid_az")
         p = self.load_policy(
             {
-                "name": "asg-valid-without-subnets",
+                "name": "asg-invalid-az",
                 "resource": "asg",
                 "filters": [
-                    {"type": "valid"}
+                    {"type": "invalid"}
                 ],
             },
-            session_factory=factory,
+            session_factory=factory
         )
         resources = p.run()
         self.assertEqual(len(resources), 2)
+        for resource in resources:
+            self.assertIn("invalid-availability-zone", resource["Invalid"][0])
 
     def test_asg_subnet(self):
         factory = self.replay_flight_data("test_asg_subnet")
