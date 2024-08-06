@@ -649,8 +649,6 @@ class DeleteWorkspacesWeb(BaseAction):
                 client.delete_network_settings(
                     networkSettingsArn=r['networkSettingsArn']
                 )
-            except client.exceptions.ResourceNotFoundException:
-                pass
             except KeyError:
                 pass
             self.disassociate_settings(client, r, 'browserSettingsArn',
@@ -659,8 +657,6 @@ class DeleteWorkspacesWeb(BaseAction):
                 client.delete_browser_settings(
                     browserSettingsArn=r['browserSettingsArn']
                 )
-            except client.exceptions.ResourceNotFoundException:
-                pass
             except KeyError:
                 pass
             self.disassociate_settings(client, r, 'userSettingsArn',
@@ -669,8 +665,6 @@ class DeleteWorkspacesWeb(BaseAction):
                 client.delete_user_settings(
                     userSettingsArn=r['userSettingsArn']
                 )
-            except client.exceptions.ResourceNotFoundException:
-                pass
             except KeyError:
                 pass
             self.disassociate_settings(client, r, 'userAccessLoggingSettingsArn',
@@ -679,8 +673,6 @@ class DeleteWorkspacesWeb(BaseAction):
                 client.delete_user_access_logging_settings(
                     userAccessLoggingSettingsArn=r['userAccessLoggingSettingsArn']
                 )
-            except client.exceptions.ResourceNotFoundException:
-                pass
             except KeyError:
                 pass
             self.delete_portal(client, r)
