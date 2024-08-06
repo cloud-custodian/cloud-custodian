@@ -1,0 +1,20 @@
+{
+    "status_code": 200,
+    "data": {
+        "checks": [
+            {
+                "id": "Hs4Ma3G118",
+                "name": "The VPC default security group should not allow inbound and outbound traffic",
+                "description": "Checks that the default security group of a VPC does not allow inbound or outbound traffic.<br><br><h4 class='headerBodyStyle'>Source</h4><br><a href=\"https://console.aws.amazon.com/securityhub/home\" target=\"_blank\">AWS Security Hub</a><br>Security Hub control ID: EC2.2<br><br><h4 class='headerBodyStyle'>Alert Criteria</h4><br>Red: Critical or High. Security Hub control failed.<br><br><h4 class='headerBodyStyle'>Recommended Action</h4><br>Follow the <a href=\"https://docs.aws.amazon.com/console/securityhub/EC2.2/remediation\" target=\"_blank\">Security Hub documentation</a> to fix the issue.",
+                "category": "security",
+                "metadata": [
+                    "Status",
+                    "Region",
+                    "Resource",
+                    "Last Updated Time"
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
