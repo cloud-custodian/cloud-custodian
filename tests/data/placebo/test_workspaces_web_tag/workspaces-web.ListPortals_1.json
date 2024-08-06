@@ -5,25 +5,28 @@
         "portals": [
             {
                 "authenticationType": "IAM_Identity_Center",
-                "browserSettingsArn": "arn:aws:workspaces-web:us-east-1:644160558196:browserSettings/9db842bb-2e53-4707-9b22-c95596aaa2ee",
+                "browserSettingsArn": "arn:aws:workspaces-web:us-east-1:644160558196:browserSettings/ee2a5576-0f0b-46bc-a437-e6a25ca319ac",
                 "browserType": "Chrome",
                 "creationDate": {
                     "__class__": "datetime",
-                    "year": 2023,
-                    "month": 10,
-                    "day": 29,
-                    "hour": 12,
-                    "minute": 32,
-                    "second": 43,
-                    "microsecond": 993000
+                    "year": 2024,
+                    "month": 7,
+                    "day": 31,
+                    "hour": 16,
+                    "minute": 23,
+                    "second": 8,
+                    "microsecond": 940000
                 },
                 "displayName": "test",
-                "networkSettingsArn": "arn:aws:workspaces-web:us-east-1:644160558196:networkSettings/41e1c85e-249a-4235-9d6e-68bd807d5523",
-                "portalArn": "arn:aws:workspaces-web:us-east-1:644160558196:portal/86048a7f-ee77-4dff-99bb-145ba3d1ad45",
-                "portalEndpoint": "86048a7f-ee77-4dff-99bb-145ba3d1ad45.workspaces-web.com",
+                "instanceType": "standard.regular",
+                "maxConcurrentSessions": 5,
+                "networkSettingsArn": "arn:aws:workspaces-web:us-east-1:644160558196:networkSettings/dba0b0ac-f0a4-4ed5-bf6b-2d07dde71a27",
+                "portalArn": "arn:aws:workspaces-web:us-east-1:644160558196:portal/7b4be505-d2f2-4c88-a5b3-5653f14e480e",
+                "portalEndpoint": "7b4be505-d2f2-4c88-a5b3-5653f14e480e.workspaces-web.com",
                 "portalStatus": "Active",
                 "rendererType": "AppStream",
-                "userSettingsArn": "arn:aws:workspaces-web:us-east-1:644160558196:userSettings/25f40942-7e45-4eaf-9b21-77d89e5559b5"
+                "userAccessLoggingSettingsArn": "arn:aws:workspaces-web:us-east-1:644160558196:userAccessLoggingSettings/374e381b-6625-49e7-bedf-600d3b852063",
+                "userSettingsArn": "arn:aws:workspaces-web:us-east-1:644160558196:userSettings/c8f7463f-26fb-4c8d-8273-0b0a47c1d6be"
             }
         ]
     }

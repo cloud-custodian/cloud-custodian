@@ -1,0 +1,20 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "networkSettings": {
+            "associatedPortalArns": [
+                "arn:aws:workspaces-web:us-east-1:644160558196:portal/7b4be505-d2f2-4c88-a5b3-5653f14e480e"
+            ],
+            "networkSettingsArn": "arn:aws:workspaces-web:us-east-1:644160558196:networkSettings/dba0b0ac-f0a4-4ed5-bf6b-2d07dde71a27",
+            "securityGroupIds": [
+                "sg-0d30141b566cfa039"
+            ],
+            "subnetIds": [
+                "subnet-068dfbf3f275a6ae8",
+                "subnet-03ec1a55eadb55221"
+            ],
+            "vpcId": "vpc-072f438c953672ace"
+        }
+    }
+}

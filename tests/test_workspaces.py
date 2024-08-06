@@ -387,6 +387,41 @@ class WorkspacesTest(BaseTest):
 
 class TestWorkspacesWeb(BaseTest):
 
+    def test_workspaces_web_augment(self):
+        session_factory = self.replay_flight_data('test_workspaces_web_augment')
+        p = self.load_policy(
+            {
+                'name': 'test-workspaces-web-augment',
+                'resource': 'workspaces-web',
+                'filters': [
+                    {
+                       'networkSettings.securityGroupIds': 'present'
+                    },
+                    {
+                        'type': 'subnet', 'key': 'tag:Name', 'value': 'Private subnet1'
+                    },
+                    {
+                       'userSettings.copyAllowed': 'Disabled'
+                    },
+                    {
+                       'userSettings.downloadAllowed': 'Disabled'
+                    },
+                    {
+                       'userSettings.pasteAllowed': 'Disabled'
+                    },
+                    {
+                       'userSettings.printAllowed': 'Disabled'
+                    },
+                    {
+                       'userAccessLoggingSettings.kinesisStreamArn':
+                       'arn:aws:kinesis:us-east-1:644160558196:stream/amazon-workspaces-web-test'
+                    },
+                ]
+            }, session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_workspaces_web_tag(self):
         session_factory = self.replay_flight_data('test_workspaces_web_tag')
         p = self.load_policy(
@@ -437,6 +472,27 @@ class TestWorkspacesWeb(BaseTest):
         client = session_factory().client('workspaces-web')
         tags = client.list_tags_for_resource(resourceArn=resources[0]['portalArn'])['tags']
         self.assertEqual(len(tags), 0)
+
+    def test_workspaces_web_delete_unconfigured_portal(self):
+        # Test deleting a resource without networkSettingsArn, userSettingsArn,
+        # and userAccessLoggingSettingsArn
+        session_factory = self.replay_flight_data('test_workspaces_web_delete_unconfigured_portal')
+        p = self.load_policy(
+            {
+                'name': 'test_workspaces_web_disassociate',
+                'resource': 'workspaces-web',
+                'filters': [{'displayName': 'test'}],
+                'actions': [{'type': 'delete'}]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client('workspaces-web')
+        if self.recording:
+            time.sleep(5)
+        portals = client.list_portals()['portals']
+        self.assertEqual(len(portals), 0)
 
     def test_workspaces_web_delete(self):
         session_factory = self.replay_flight_data('test_workspaces_web_delete')
