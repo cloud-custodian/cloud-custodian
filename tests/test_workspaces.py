@@ -12,7 +12,6 @@ from c7n.resources.workspaces import Workspace
 from c7n.exceptions import PolicyExecutionError
 from c7n.testing import mock_datetime_now
 from c7n.utils import annotation
-from botocore.exceptions import ClientError
 
 
 class WorkspacesTest(BaseTest):
@@ -477,7 +476,6 @@ class TestWorkspacesWeb(BaseTest):
     def test_workspaces_web_delete_unconfigured_portal(self):
         # Test deleting a resource without networkSettingsArn, userSettingsArn,
         # and userAccessLoggingSettingsArn
-        # session_factory = self.record_flight_data('test_workspaces_web_delete_unconfigured_portal')
         session_factory = self.replay_flight_data('test_workspaces_web_delete_unconfigured_portal')
         p = self.load_policy(
             {
@@ -495,7 +493,6 @@ class TestWorkspacesWeb(BaseTest):
             time.sleep(5)
         portals = client.list_portals()['portals']
         self.assertEqual(len(portals), 0)
-
 
     def test_workspaces_web_delete(self):
         session_factory = self.replay_flight_data('test_workspaces_web_delete')
