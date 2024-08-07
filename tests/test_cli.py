@@ -15,6 +15,7 @@ from c7n.schema import ElementSchema, generate
 from c7n.utils import yaml_dump, yaml_load
 from c7n.commands import LoadSessionPolicyJson
 
+import pytest
 from .common import BaseTest, TextTestIO
 
 
@@ -99,12 +100,32 @@ class VersionTest(CliTest):
         self.assertIn('python-dateutil==', output)
 
 
+def check_left():
+    try:
+        import c7n_left  # noqa: F401
+    except ImportError:
+        return {"condition": True, "reason": "c7n_left not installed"}
+    return {"condition": False, "reason": "c7n_left installed"}
+
+
 class ValidateTest(CliTest):
 
     def test_invalidate_structure_exit(self):
         invalid_policies = {"policies": [{"name": "foo"}]}
         yaml_file = self.write_policy_file(invalid_policies)
         self.run_and_expect_failure(["custodian", "validate", yaml_file], 1)
+
+    @pytest.mark.skipif(**check_left())
+    def test_validate_terraform(self):
+        policies = {
+            "policies": [
+                {"name": "tfx",
+                 "resource": "terraform.*",
+                 "filters": ["taggable"]}
+            ]
+        }
+        yaml_file = self.write_policy_file(policies)
+        self.run_and_expect_success(["custodian", "validate", yaml_file])
 
     def test_validate(self):
         invalid_policies = {
