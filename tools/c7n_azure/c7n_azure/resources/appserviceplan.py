@@ -34,7 +34,7 @@ class AppServicePlan(ArmResourceManager):
 
         service = 'azure.mgmt.web'
         client = 'WebSiteManagementClient'
-        enum_spec = ('app_service_plans', 'list', None)
+        enum_spec = ('app_service_plans', 'list', {'detailed': True})
         default_report_fields = (
             'name',
             'location',
