@@ -133,8 +133,7 @@ class ECSClusterResourceDescribeSource(query.ChildDescribeSource):
     def __init__(self, manager):
         self.manager = manager
         self.query = query.ChildResourceQuery(
-            self.manager.session_factory, self.manager)
-        self.query.capture_parent_id = True
+            self.manager.session_factory, self.manager, capture_parent_id=True)
 
     def get_resources(self, ids, cache=True):
         """Retrieve ecs resources for serverless policies or related resources
@@ -947,7 +946,7 @@ class ECSContainerInstanceDescribeSource(ECSClusterResourceDescribeSource):
             r = client.describe_container_instances(
                 cluster=cluster_id,
                 include=['TAGS'],
-                containerInstances=container_instances).get('containerInstances', [])
+                containerInstances=service_set).get('containerInstances', [])
             # Many Container Instance API calls require the cluster_id, adding as a
             # custodian specific key in the resource
             for i in r:
