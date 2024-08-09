@@ -85,9 +85,7 @@ class RepositoryImageDescribeSource(ChildDescribeSource):
     resource_query_factory = ECRImageQuery
 
     def get_query(self):
-        query = super(RepositoryImageDescribeSource, self).get_query()
-        query.capture_parent_id = True
-        return query
+        return super().get_query(capture_parent_id=True)
 
     def augment(self, resources):
         results = []
