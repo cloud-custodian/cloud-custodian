@@ -2,12 +2,67 @@
 # SPDX-License-Identifier: Apache-2.0
 import time
 
+from c7n.exceptions import PolicyValidationError
 from c7n.resources.cw import LogMetricAlarmFilter
 from .common import BaseTest, functional
 from unittest.mock import MagicMock
 
 import pytest
 from pytest_terraform import terraform
+
+
+def test_log_group_rename_validation(test):
+    with pytest.raises(PolicyValidationError) as ecm:
+        test.load_policy({
+            'name': 'log-rename',
+            'resource': 'aws.log-group',
+            'filters': [{
+                'or': [
+                    {"tag:Application": "present"}, {"tag:Bap": "present"}
+                ],
+            }],
+            'actions': [{
+                'type': 'rename-tag',
+                'new_key': 'App'}],
+        }, validate=True)
+    assert "log-rename:rename-tag 'old_keys' or 'old_key' required" == str(ecm.value)
+
+
+@terraform('log_group_rename_tag')
+def test_log_group_rename_tag(test, log_group_rename_tag):
+    factory = test.replay_flight_data('test_log_group_rename_tag', region='us-west-2')
+    client = factory().client('logs')
+
+    p = test.load_policy({
+        'name': 'log-rename',
+        'resource': 'aws.log-group',
+        'filters': [{
+            'or': [
+                {"tag:Application": "present"}, {"tag:Bap": "present"}
+            ],
+        }],
+        'actions': [{
+            'type': 'rename-tag',
+            'old_keys': ['Application', 'Bap'],
+            'new_key': 'App'}],
+        },
+        session_factory=factory, config={'region': 'us-west-2'})
+    resources = p.run()
+    assert len(resources) == 4
+
+    def get_tags(resource):
+        return client.list_tags_for_resource(resourceArn=resource['arn'][:-2]).get('tags')
+
+    extant_tags = list(map(get_tags, resources))
+    extant_keys = set()
+    extant_values = set()
+    for t in extant_tags:
+        extant_keys.update(t)
+    for t in extant_tags:
+        extant_values.update(t.values())
+
+    assert extant_keys == {'App'}
+    assert extant_values == {'greeter', 'login', 'greep'}
 
 
 @pytest.mark.audited

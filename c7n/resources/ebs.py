@@ -14,7 +14,7 @@ from c7n.actions import BaseAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
     CrossAccountAccessFilter, Filter, AgeFilter, ValueFilter,
-    ANNOTATION_KEY)
+    ANNOTATION_KEY, ListItemFilter)
 from c7n.filters.health import HealthEventFilter
 from c7n.filters.related import RelatedResourceFilter
 
@@ -32,7 +32,8 @@ from c7n.utils import (
     set_annotation,
     type_schema,
     QueryParser,
-    get_support_region
+    get_support_region,
+    group_by
 )
 from c7n.resources.ami import AMI
 
@@ -679,6 +680,72 @@ class EBS(QueryResourceManager):
         return []
 
 
+@EBS.filter_registry.register('snapshots')
+class EBSSnapshotsFilter(ListItemFilter):
+    """
+    Filter volumes by all their snapshots.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: ebs-volumes
+            resource: aws.ebs
+            filters:
+              - not:
+                - type: snapshots
+                  attrs:
+                    - type: value
+                      key: StartTime
+                      value_type: age
+                      value: 2
+                      op: less-than
+    """
+    schema = type_schema(
+        'snapshots',
+        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'},
+        count={'type': 'number'},
+        count_op={'$ref': '#/definitions/filters_common/comparison_operators'}
+    )
+    permissions = ('ec2:DescribeSnapshots', )
+    item_annotation_key = 'c7n:Snapshots'
+    annotate_items = True
+
+    def _process_resources_set(self, client, resources):
+        snapshots = client.describe_snapshots(
+            Filters=[{
+                'Name': 'volume-id',
+                'Values': [r['VolumeId'] for r in resources]
+            }]
+        ).get('Snapshots') or []
+        grouped = group_by(snapshots, 'VolumeId')
+        for res in resources:
+            res[self.item_annotation_key] = grouped.get(res['VolumeId']) or []
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('ec2')
+        with self.manager.executor_factory(max_workers=3) as w:
+            futures = []
+            # 200 max value for a single call
+            for resources_set in chunks(resources, 30):
+                futures.append(w.submit(self._process_resources_set, client,
+                                        resources_set))
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Exception getting snapshots by volume ids \n %s" % (
+                            f.exception())
+                    )
+                    continue
+        return super().process(resources, event)
+
+    def get_item_values(self, resource):
+        if self.annotate_items:
+            return resource[self.item_annotation_key]
+        return resource.pop(self.item_annotation_key)
+
+
 @EBS.action_registry.register('post-finding')
 class EBSPostFinding(PostFinding):
 
@@ -1204,7 +1271,7 @@ class EncryptInstanceVolumes(BaseAction):
         return False
 
     def create_encrypted_volume(self, ec2, v, key_id, instance_id):
-        unencrypted_volume_tags = v['Tags']
+        unencrypted_volume_tags = v.get('Tags', [])
         # Create a current snapshot
         results = ec2.create_snapshot(
             VolumeId=v['VolumeId'],
@@ -1582,9 +1649,9 @@ class ModifyVolume(BaseAction):
                  volume-type: gp2
 
     `iops-percent` and `size-percent` can be used to modify
-    respectively iops on io1 volumes and volume size.
+    respectively iops on io1/io2 volumes and volume size.
 
-    When converting to io1, `iops-percent` is used to set the iops
+    When converting to io1/io2, `iops-percent` is used to set the iops
     allocation for the new volume against the extant value for the old
     volume.
 
@@ -1614,7 +1681,7 @@ class ModifyVolume(BaseAction):
 
     schema = type_schema(
         'modify',
-        **{'volume-type': {'enum': ['io1', 'gp2', 'gp3', 'st1', 'sc1']},
+        **{'volume-type': {'enum': ['io1', 'io2', 'gp2', 'gp3', 'st1', 'sc1']},
            'shrink': False,
            'size-percent': {'type': 'number'},
            'iops-percent': {'type': 'number'}})
@@ -1644,7 +1711,8 @@ class ModifyVolume(BaseAction):
 
         for r in resource_set:
             params = {'VolumeId': r['VolumeId']}
-            if piops and ('io1' in (vtype, r['VolumeType'])):
+            if piops and ('io1' in (vtype, r['VolumeType']) or
+                          'io2' in (vtype, r['VolumeType'])):
                 # default here if we're changing to io1
                 params['Iops'] = max(int(r.get('Iops', 10) * piops / 100.0), 100)
             if psize:

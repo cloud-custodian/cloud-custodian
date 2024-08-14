@@ -5,6 +5,7 @@ from c7n.query import QueryResourceManager, TypeInfo
 from c7n.filters import ValueFilter
 from c7n.utils import local_session, type_schema
 from c7n.actions import Action
+from c7n.filters.kms import KmsRelatedFilter
 
 
 @resources.register('connect-instance')
@@ -108,3 +109,31 @@ class ConnectInstanceAttributeFilter(ValueFilter):
             for r in resources:
                 client.update_instance_attribute(InstanceId=r["Id"],
                     AttributeType=self.data.get("attribute_type"), Value=self.data.get("value"))
+
+
+@resources.register('connect-campaign')
+class ConnectCampaign(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'connectcampaigns'
+        enum_spec = ('list_campaigns', 'campaignSummaryList', None)
+        detail_spec = (
+            'get_connect_instance_config',
+            'connectInstanceId',
+            'connectInstanceId',
+            None
+        )
+        arn_type = 'campaign'
+        name = "name"
+        id = "id"
+        permission_prefix = "connect-campaigns"
+
+    permissions = (
+        'connect-campaigns:ListCampaigns',
+        'connect-campaigns:GetConnectInstanceConfig',
+    )
+
+
+@ConnectCampaign.filter_registry.register('kms-key')
+class ConnectCampaignKmsFilter(KmsRelatedFilter):
+    RelatedIdsExpression = 'connectInstanceConfig.encryptionConfig.keyArn'

@@ -166,7 +166,12 @@ In AWS, you will need ReadOnly access as well as the following permissions:
                     "lambda:CreateAlias",
                     "logs:CreateLogStream",
                     "logs:PutLogEvents",
-                    "logs:CreateLogGroup"
+                    "logs:CreateLogGroup",
+                    "scheduler:CreateSchedule",
+                    "scheduler:DeleteSchedule",
+                    "scheduler:GetSchedule",
+                    "scheduler:ListScheduleGroups",
+                    "scheduler:UpdateSchedule"
                 ],
                 "Resource": "*"
             }
@@ -258,7 +263,7 @@ or Azure Storage accounts::
 Mailer and Notifications Deployment
 -----------------------------------
 
-For instructions on how to deploy the mailer for notifications, see :doc:`/tools/c7n-mailer`
+For instructions on how to deploy the mailer for notifications, see :doc:`/tools/c7n-mailer`.
 
 .. _multi_account_execution:
 

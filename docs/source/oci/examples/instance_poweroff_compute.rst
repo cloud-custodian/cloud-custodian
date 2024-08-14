@@ -17,6 +17,4 @@ The following example policy will shut down a running instance
              key: display_name
              value: Instance_1
          actions:
-           - type: instance-action
-             params:
-               'action' : 'STOP'
+           - stop

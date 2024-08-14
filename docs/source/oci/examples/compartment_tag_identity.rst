@@ -18,8 +18,6 @@ The following example policy will tag all the child compartments under the speci
         description: Filter and add tag on the child compartments
         resource: oci.compartment
         actions:
-          - type: update-compartment
-            params:
-              update_compartment_details:
-                freeform_tags:
-                  "custodian_development": 'true'
+          - type: update
+            freeform_tags:
+               "custodian_development": 'true'

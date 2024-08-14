@@ -1,0 +1,36 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "analyzers": [
+            {
+                "arn": "arn:aws:access-analyzer:us-east-1:644160558196:analyzer/ConsoleAnalyzer-iamaa-2b9ec1f2-xxxx-4e7d-8c0c-12340954e789",
+                "name": "ConsoleAnalyzer-iamaa-2b9ec1f2-xxxx-4e7d-8c0c-12340954e789",
+                "type": "ACCOUNT",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 3,
+                    "day": 29,
+                    "hour": 13,
+                    "minute": 53,
+                    "second": 8,
+                    "microsecond": 0
+                },
+                "lastResourceAnalyzed": "arn:aws:ecr:us-east-1:644160558196:repository/container-assets-644160558196-us-east-1",
+                "lastResourceAnalyzedAt": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 9,
+                    "day": 2,
+                    "hour": 11,
+                    "minute": 15,
+                    "second": 5,
+                    "microsecond": 964000
+                },
+                "tags": {},
+                "status": "ACTIVE"
+            }
+        ]
+    }
+}

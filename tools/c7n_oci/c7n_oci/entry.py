@@ -13,3 +13,6 @@ def initialize_oci():
 
     # load the shared actions for all the OCI resources
     import c7n_oci.actions  # noqa
+
+    # load the option to send output to OCI Object Storage
+    import c7n_oci.output  # noqa

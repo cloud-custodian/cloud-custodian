@@ -19,8 +19,6 @@ The following example policy will filter and tag the users whose API keys age is
          value_type: age
          value: 365
       actions:
-       - type: update-user
-         params:
-          update_user_details:
-            freeform_tags:
-                TagName : TagValue
+       - type: update
+         freeform_tags:
+            TagName : TagValue

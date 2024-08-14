@@ -14,7 +14,7 @@ import re
 
 from dateutil.tz import tzutc
 from dateutil.parser import parse
-from distutils import version
+from c7n.vendored.distutils import version
 from random import sample
 
 from c7n.element import Element
@@ -79,6 +79,10 @@ def intersect(x, y):
     return bool(set(x).intersection(y))
 
 
+def mod(x, y):
+    return bool(x % y)
+
+
 OPERATORS = {
     'eq': operator.eq,
     'equal': operator.eq,
@@ -100,16 +104,19 @@ OPERATORS = {
     'not-in': operator_ni,
     'contains': operator.contains,
     'difference': difference,
-    'intersect': intersect}
+    'intersect': intersect,
+    'mod': mod}
 
 
 VALUE_TYPES = [
     'age', 'integer', 'expiration', 'normalize', 'size',
     'cidr', 'cidr_size', 'swap', 'resource_count', 'expr',
-    'unique_size', 'date', 'version']
+    'unique_size', 'date', 'version', 'float']
 
 
 class FilterRegistry(PluginRegistry):
+
+    value_filter_class = None
 
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
@@ -143,7 +150,7 @@ class FilterRegistry(PluginRegistry):
                 return self['and'](data, self, manager)
             elif op == 'not':
                 return self['not'](data, self, manager)
-            return ValueFilter(data, manager)
+            return self.value_filter_class(data, manager)
         if isinstance(data, str):
             filter_type = data
             data = {'type': data}
@@ -251,7 +258,7 @@ class BaseValueFilter(Filter):
             # as labels without values.
             # Azure schema: 'tags': {'key': 'value'}
             elif 'tags' in i:
-                r = i.get('tags', {}).get(tk, None)
+                r = (i.get('tags', {}) or {}).get(tk, None)
         elif k in i:
             r = i.get(k)
         elif k not in self.expr:
@@ -500,7 +507,7 @@ class ValueFilter(BaseValueFilter):
             'value_from': {'$ref': '#/definitions/filters_common/value_from'},
             'value': {'$ref': '#/definitions/filters_common/value'},
             'op': {'$ref': '#/definitions/filters_common/comparison_operators'},
-            'value_path': {'type':'string'}
+            'value_path': {'type': 'string'}
         }
     }
     schema_alias = True
@@ -595,7 +602,7 @@ class ValueFilter(BaseValueFilter):
     def get_resource_value(self, k, i):
         return super(ValueFilter, self).get_resource_value(k, i, self.data.get('value_regex'))
 
-    def get_path_value(self,i):
+    def get_path_value(self, i):
         """Retrieve values using JMESPath.
 
         When using a Value Filter, a ``value_path`` can be specified.
@@ -619,7 +626,7 @@ class ValueFilter(BaseValueFilter):
         This implementation allows for the comparison of two separate lists of values
         within the same resource.
         """
-        return jmespath_search(self.data.get('value_path'),i)
+        return jmespath_search(self.data.get('value_path'), i)
 
     def match(self, i):
         if self.v is None and len(self.data) == 1:
@@ -684,6 +691,11 @@ class ValueFilter(BaseValueFilter):
                 value = int(str(value).strip())
             except ValueError:
                 value = 0
+        elif self.vtype == 'float':
+            try:
+                value = float(str(value).strip())
+            except ValueError:
+                value = 0.0
         elif self.vtype == 'size':
             try:
                 return sentinel, len(value)
@@ -738,6 +750,9 @@ class ValueFilter(BaseValueFilter):
             return s, v
 
         return sentinel, value
+
+
+FilterRegistry.value_filter_class = ValueFilter
 
 
 class AgeFilter(Filter):
@@ -1134,7 +1149,7 @@ class ListItemFilter(Filter):
 
     schema_alias = True
     annotate_items = False
-
+    item_annotation_key = "c7n:ListItemMatches"
     _expr = None
 
     @property
@@ -1144,6 +1159,14 @@ class ListItemFilter(Filter):
         self._expr = jmespath_compile(self.data['key'])
         return self._expr
 
+    def check_count(self, rcount):
+        if 'count' not in self.data:
+            return False
+        count = self.data['count']
+        op = OPERATORS[self.data.get('count_op', 'eq')]
+        if op(rcount, count):
+            return True
+
     def process(self, resources, event=None):
         result = []
         frm = ListItemResourceManager(
@@ -1151,6 +1174,8 @@ class ListItemFilter(Filter):
         for r in resources:
             list_values = self.get_item_values(r)
             if not list_values:
+                if self.check_count(0):
+                    result.append(r)
                 continue
             if not isinstance(list_values, list):
                 item_type = type(list_values)
@@ -1163,10 +1188,8 @@ class ListItemFilter(Filter):
             matched_indicies = [r['c7n:_id'] for r in list_resources]
             for idx, list_value in enumerate(list_values):
                 list_value.pop('c7n:_id')
-            if self.data.get('count'):
-                count = self.data['count']
-                op = OPERATORS[self.data.get('count_op', 'eq')]
-                if op(len(list_resources), count):
+            if 'count' in self.data:
+                if self.check_count(len(list_resources)):
                     result.append(r)
             elif list_resources:
                 if not self.annotate_items:
@@ -1176,8 +1199,8 @@ class ListItemFilter(Filter):
                     ]
                 else:
                     annotations = list_resources
-                r.setdefault('c7n:ListItemMatches', [])
-                r['c7n:ListItemMatches'].extend(annotations)
+                r.setdefault(self.item_annotation_key, [])
+                r[self.item_annotation_key].extend(annotations)
                 result.append(r)
         return result
 

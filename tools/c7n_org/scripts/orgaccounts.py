@@ -44,7 +44,7 @@ def main(role, name, ou, assume, profile, output, regions, active, ignore):
     """
     logging.basicConfig(level=logging.INFO)
 
-    stats, session = get_session(assume, 'c7n-org', profile)
+    _, session = get_session(assume, 'c7n-org', profile)
     client = session.client('organizations')
     accounts = []
     for path in ou:

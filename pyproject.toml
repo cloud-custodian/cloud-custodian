@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "c7n"
-version = "0.9.28"
+version = "0.9.40"
 description = "Cloud Custodian - Policy Rules Engine"
 authors = ["Cloud Custodian Project"]
 readme = "README.md"
@@ -22,52 +22,60 @@ classifiers=[
 custodian = 'c7n.cli:main'
 
 [tool.poetry.dependencies]
-python = "^3.7"
+cryptography = "<43"
+python = "^3.8"
 boto3 = "^1.12.31"
-# set an upper bound on urllib3 to avoid long dependency resolution times
-# botocore accepts a narrow range of urllib3 versions, while packages
-# like docker/requests/twine are happy with 2.0.
-urllib3 = "<2.0"
-jsonschema = ">=3.0.0"
+jsonschema = ">=4.18"
 argcomplete = ">=1.12.3"
 python-dateutil = "^2.8.2"
 pyyaml = ">=5.4.0"
 tabulate = "^0.9.0"
-importlib-metadata = "^5.1"
+importlib-metadata = ">=6,<9"
 docutils = ">=0.18, <0.19"
+# temporary work around for 
+# https://github.com/cloud-custodian/poetry-plugin-freeze/issues/18
+urllib3 = "<2"
+# temporary work around for
+# https://github.com/p1c2u/jsonschema-path/issues/98
+# which gets pulled in via moto
+referencing = "==0.35.1"
 
 [tool.poetry.group.dev.dependencies]
-ruff = "~0.0.246"
-docker = "^6.0.1"
-black = "^23.1.0"
-pytest = "^7.1.2"
+ruff = ">=0.3,<0.6"
+docker = {extras = ["websockets"], version = "^7.1.0"}
+black = ">=23.1,<25.0"
+pytest = "<8"
 coverage = "^7"
-placebo = "^0.9.0"
+placebo = "^0"
 pytest-xdist = "^3.0"
-pytest-cov = "^3.0.0"
-pytest-terraform = "^0.6.0"
-mock = "^4.0.1"
-vcrpy = "^4.0.2"
+pytest-cov = ">=3,<6"
+pytest-terraform = ">=0.6,<0.8"
+vcrpy = ">=4.0.2"
 aws-xray-sdk = "^2.5.0"
 jsonpatch = "^1.25"
-psutil = "^5.7.0"
-twine = "^3.1.1"
-pytest-sugar = "^0.9.2"
+psutil = ">=5.7,<7.0"
+twine = ">=3.1.1,<6.0.0"
+pytest-sugar = ">=0.9.2,<1.1.0"
 click = "^8.0"
 freezegun = "^1.2.2"
-pytest-recording = "^0.12.1"
+pytest-recording = ">=0.12.1,<0.14.0"
+moto = "^5.0"
+openapi-spec-validator = "^0.7.1"
 
 [tool.black]
 skip-string-normalization = true
 line-length = 100
 
 [tool.ruff]
-select = ["E", "F", "W"]
 line-length = 100
+exclude = ["__init__.py"]
+
+[tool.ruff.lint]
+preview = true
+select = ["E", "F", "W"]
 # E741 - single char variables
 # E401 - multiple imports in a single line
 ignore = ["E741", "E401"]
-exclude = ["__init__.py"]
 
 [tool.pytest.ini_options]
 junit_family = "xunit2"
@@ -75,6 +83,10 @@ addopts = "--tb=native"
 markers = ["functional", "skiplive", "audited"]
 python_files = "test_*.py"
 norecursedirs = ["data", "cassettes", "templates", "terraform"]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning"
+]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

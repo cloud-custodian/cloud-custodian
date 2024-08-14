@@ -22,8 +22,9 @@ from c7n.resolver import ValuesFrom
 from c7n.resources import load_resources
 from c7n.resources.aws import ArnResolver
 from c7n.tags import universal_augment
-from c7n.utils import type_schema, local_session, chunks, get_retry
+from c7n.utils import type_schema, local_session, chunks, get_retry, jmespath_search
 from botocore.config import Config
+import re
 
 
 class DescribeAlarm(DescribeSource):
@@ -45,6 +46,7 @@ class Alarm(QueryResourceManager):
         date = 'AlarmConfigurationUpdatedTimestamp'
         cfn_type = config_type = 'AWS::CloudWatch::Alarm'
         universal_taggable = object()
+        permissions_augment = ("cloudwatch:ListTagsForResource",)
 
     source_mapping = {
         'describe': DescribeAlarm,
@@ -87,6 +89,36 @@ class AlarmDelete(BaseAction):
             self.manager.retry(
                 client.delete_alarms,
                 AlarmNames=[r['AlarmName'] for r in resource_set])
+
+
+@Alarm.filter_registry.register('is-composite-child')
+class IsCompositeChild(Filter):
+    schema = type_schema('is-composite-child', state={"type": "boolean"})
+    permissions = ('cloudwatch:DescribeAlarms',)
+
+    def process(self, resources, event=None):
+        state = self.data.get("state", True)
+        # Get the composite alarms since filtered out in enum_spec
+        composite_alarms = self.manager.get_resource_manager("composite-alarm").resources()
+        composite_alarm_rules = jmespath_search('[].AlarmRule', composite_alarms)
+
+        child_alarm_names = set()
+        # Loop through, find child alarm names
+        for rule in composite_alarm_rules:
+            names = self.extract_alarm_names_from_rule(rule)
+            child_alarm_names.update(names)
+
+        if state:
+            # If we want to filter out alarms that are a child of a composite alarm
+            return [r for r in resources if r['AlarmName'] in child_alarm_names]
+
+        return [r for r in resources if r['AlarmName'] not in child_alarm_names]
+
+    def extract_alarm_names_from_rule(self, rule):
+        # Check alarm references (OK/ALARM/INSUFFICIENT_DATA)
+        pattern = r"\b(?:ALARM|OK|INSUFFICIENT_DATA)\s*\(\s*([^\)]+)\s*\)"
+        matches = re.findall(pattern, rule)
+        return set(matches)
 
 
 @resources.register('composite-alarm')
@@ -152,6 +184,7 @@ class EventBus(QueryResourceManager):
         config_type = cfn_type = 'AWS::Events::EventBus'
         id = name = 'Name'
         universal_taggable = object()
+        permissions_augment = ("events:ListTagsForResource",)
 
     source_mapping = {'describe': DescribeWithResourceTags,
                       'config': ConfigSource}
@@ -194,8 +227,15 @@ class EventBusDelete(BaseAction):
                     Name=r['Name'])
 
 
+class RuleDescribe(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(self.manager, resources)
+
+
 @resources.register('event-rule')
 class EventRule(QueryResourceManager):
+
     class resource_type(TypeInfo):
         service = 'events'
         arn_type = 'rule'
@@ -204,10 +244,14 @@ class EventRule(QueryResourceManager):
         id = "Name"
         filter_name = "NamePrefix"
         filter_type = "scalar"
-        cfn_type = 'AWS::Events::Rule'
+        config_type = cfn_type = 'AWS::Events::Rule'
         universal_taggable = object()
+        permissions_augment = ("events:ListTagsForResource",)
 
-    augment = universal_augment
+    source_mapping = {
+        'config': ConfigSource,
+        'describe': RuleDescribe
+    }
 
 
 @EventRule.filter_registry.register('metrics')
@@ -506,6 +550,7 @@ class LogGroup(QueryResourceManager):
         date = 'creationTime'
         universal_taggable = True
         cfn_type = 'AWS::Logs::LogGroup'
+        permissions_augment = ("logs:ListTagsForResource",)
 
     augment = universal_augment
 
@@ -1009,3 +1054,20 @@ class SubscriptionFilter(BaseAction):
         for r in resources:
             client.put_subscription_filter(
                 logGroupName=r['logGroupName'], **params)
+
+
+@resources.register("cloudwatch-dashboard")
+class CloudWatchDashboard(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = "cloudwatch"
+        enum_spec = ('list_dashboards', 'DashboardEntries', None)
+        arn_type = "dashboard"
+        arn = "DashboardArn"
+        id = "DashboardName"
+        name = "DashboardName"
+        cfn_type = "AWS::CloudWatch::Dashboard"
+        universal_taggable = object()
+
+    source_mapping = {
+       "describe": DescribeWithResourceTags,
+    }

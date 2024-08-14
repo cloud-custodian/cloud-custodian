@@ -16,7 +16,7 @@ from unittest import mock
 import pytest
 import yaml
 
-from distutils.util import strtobool
+from c7n.vendored.distutils.util import strtobool
 
 from c7n import deprecated, policy
 from c7n.exceptions import DeprecationError

@@ -44,8 +44,8 @@ class Compartment(QueryResourceManager):
         search_resource_type = "compartment"
 
 
-@Compartment.action_registry.register("update-compartment")
-class UpdateCompartment(OCIBaseAction):
+@Compartment.action_registry.register("update")
+class UpdateCompartmentAction(OCIBaseAction):
     """
     Update compartment Action
 
@@ -62,30 +62,25 @@ class UpdateCompartment(OCIBaseAction):
             - name: perform-update-compartment-action
               resource: oci.compartment
               actions:
-                - type: update-compartment
+                - type: update
+                  defined_tags:
+                     Cloud_Custodian: True
+                  freeform_tags:
+                     Environment: development
 
     """  # noqa
 
     schema = type_schema(
-        "update-compartment", params={"type": "object"}, rinherit=OCIBaseAction.schema
+        "update", **{"freeform_tags": {"type": "object"}, "defined_tags": {"type": "object"}}
     )
 
     def perform_action(self, resource):
         client = self.manager.get_client()
-        params_dict = {}
-        params_model = {}
-        params_dict["compartment_id"] = resource.get("id")
-        if self.data.get("params").get("update_compartment_details"):
-            update_compartment_details_user = self.data.get("params").get(
-                "update_compartment_details"
-            )
-            params_model = self.update_params(resource, update_compartment_details_user)
-            params_dict[
-                "update_compartment_details"
-            ] = oci.identity.models.UpdateCompartmentDetails(**params_model)
+        update_compartment_details_user = self.extract_params(self.data)
+        params_model = self.update_params(resource, update_compartment_details_user)
+        update_compartment_details = oci.identity.models.UpdateCompartmentDetails(**params_model)
         response = client.update_compartment(
-            compartment_id=params_dict["compartment_id"],
-            update_compartment_details=params_dict["update_compartment_details"],
+            compartment_id=resource.get("id"), update_compartment_details=update_compartment_details
         )
         log.info(
             f"Received status {response.status} for PUT:update_compartment {response.request_id}"
@@ -170,8 +165,8 @@ class Group(QueryResourceManager):
         search_resource_type = "group"
 
 
-@Group.action_registry.register("update-group")
-class UpdateGroup(OCIBaseAction):
+@Group.action_registry.register("update")
+class UpdateGroupAction(OCIBaseAction):
     """
     Update group Action
 
@@ -188,26 +183,25 @@ class UpdateGroup(OCIBaseAction):
             - name: perform-update-group-action
               resource: oci.group
               actions:
-                - type: update-group
+                - type: update
+                  defined_tags:
+                     Cloud_Custodian: True
+                  freeform_tags:
+                     Environment: development
 
     """  # noqa
 
-    schema = type_schema("update-group", params={"type": "object"}, rinherit=OCIBaseAction.schema)
+    schema = type_schema(
+        "update", **{"freeform_tags": {"type": "object"}, "defined_tags": {"type": "object"}}
+    )
 
     def perform_action(self, resource):
         client = self.manager.get_client()
-        params_dict = {}
-        params_model = {}
-        params_dict["group_id"] = resource.get("id")
-        if self.data.get("params").get("update_group_details"):
-            update_group_details_user = self.data.get("params").get("update_group_details")
-            params_model = self.update_params(resource, update_group_details_user)
-            params_dict["update_group_details"] = oci.identity.models.UpdateGroupDetails(
-                **params_model
-            )
+        update_group_details_user = self.extract_params(self.data)
+        params_model = self.update_params(resource, update_group_details_user)
+        update_group_details = oci.identity.models.UpdateGroupDetails(**params_model)
         response = client.update_group(
-            group_id=params_dict["group_id"],
-            update_group_details=params_dict["update_group_details"],
+            group_id=resource.get("id"), update_group_details=update_group_details
         )
         log.info(f"Received status {response.status} for PUT:update_group {response.request_id}")
         return response
@@ -288,8 +282,8 @@ class User(QueryResourceManager):
         search_resource_type = "user"
 
 
-@User.action_registry.register("update-user")
-class UpdateUser(OCIBaseAction):
+@User.action_registry.register("update")
+class UpdateUserAction(OCIBaseAction):
     """
     Update user Action
 
@@ -306,26 +300,26 @@ class UpdateUser(OCIBaseAction):
             - name: perform-update-user-action
               resource: oci.user
               actions:
-                - type: update-user
+                - type: update
+                  defined_tags:
+                     Cloud_Custodian: True
+                  freeform_tags:
+                     Environment: development
+
 
     """  # noqa
 
-    schema = type_schema("update-user", params={"type": "object"}, rinherit=OCIBaseAction.schema)
+    schema = type_schema(
+        "update", **{"freeform_tags": {"type": "object"}, "defined_tags": {"type": "object"}}
+    )
 
     def perform_action(self, resource):
         client = self.manager.get_client()
-        params_dict = {}
-        params_model = {}
-        params_dict["user_id"] = resource.get("id")
-        if self.data.get("params").get("update_user_details"):
-            update_user_details_user = self.data.get("params").get("update_user_details")
-            params_model = self.update_params(resource, update_user_details_user)
-            params_dict["update_user_details"] = oci.identity.models.UpdateUserDetails(
-                **params_model
-            )
+        update_user_details_user = self.extract_params(self.data)
+        params_model = self.update_params(resource, update_user_details_user)
+        update_user_details = oci.identity.models.UpdateUserDetails(**params_model)
         response = client.update_user(
-            user_id=params_dict["user_id"],
-            update_user_details=params_dict["update_user_details"],
+            user_id=resource.get("id"), update_user_details=update_user_details
         )
         log.info(f"Received status {response.status} for PUT:update_user {response.request_id}")
         return response

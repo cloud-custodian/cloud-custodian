@@ -923,6 +923,57 @@ class RDSTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["DBInstanceIdentifier"], "database-2")
 
+    def test_rds_pending_maintenance(self):
+        session_factory = self.replay_flight_data("test_rds_pending_maintenance")
+        p = self.load_policy(
+            {
+                "name": "rds-pending-maintenance",
+                "resource": "rds",
+                "query": [
+                    {
+                        "DBInstanceIdentifier": "asset-sync-instance-1"
+                    }
+                ],
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "DBInstanceIdentifier",
+                        "value": "asset-sync-instance-1"
+                    },
+                    {
+                        "type": "pending-maintenance"
+                    },
+                    {
+                        "type": "value",
+                        "key": '"c7n:PendingMaintenance"[].PendingMaintenanceActionDetails['
+                               '].Action',
+                        "op": "intersect",
+                        "value": ["system-update"]
+                    }
+                ],
+            },
+            config={"region": "us-west-2"},
+            session_factory=session_factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+
+def test_rds_snapshot_instance(test):
+    factory = test.replay_flight_data('test_rds_snapshot_instance')
+    p = test.load_policy(
+        {'name': 'check-instance',
+         'resource': 'aws.rds-snapshot',
+         'filters': [
+             {'type': 'instance',
+              'key': 'DeletionProtection',
+              'value': False}]},
+        session_factory=factory)
+    resources = p.run()
+    assert len(resources) == 1
+    resources[0]['DBSnapshotIdentifier'] == 'manual-testx'
+
 
 class RDSSnapshotTest(BaseTest):
 
@@ -1725,6 +1776,31 @@ class TestModifyVpcSecurityGroupsAction(BaseTest):
         self.assertEqual(len(resources), 4)
         self.assertEqual("vpc-09b75e60", resources[0]["DBSubnetGroup"]["VpcId"])
 
+    def test_rds_sg_add_by_tag(self):
+        session_factory = self.replay_flight_data("test_rds_sg_add_by_tag")
+        client = session_factory().client('rds')
+        policy = self.load_policy({
+            "name": "add-sg-via-tags",
+            "resource": "rds",
+                "filters": [
+                    {"type": "security-group", "key": "tag:c7n", "value": "add", "op": "ne"}],
+            "actions": [
+                {"type": "modify-security-groups",
+                 "add-by-tag": {
+                      "key": "c7n",
+                      "values": ["add"]}}]},
+            session_factory=session_factory,
+        )
+        resources = policy.run()
+        if self.recording:
+            time.sleep(60)
+        self.assertEqual(len(resources), 1)
+        self.assertAlmostEqual(
+            len(resources[0]['VpcSecurityGroups']), 1)
+        db = client.describe_db_instances(DBInstanceIdentifier="database-1")
+        mod_sgs = db.get('DBInstances')[0].get('VpcSecurityGroups')
+        self.assertTrue(len(mod_sgs), 2)
+
 
 class TestHealthEventsFilter(BaseTest):
 
@@ -2046,3 +2122,93 @@ class RDSProxy(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['DBProxyName'], 'test-us-east-1-db-proxy')
         self.assertEqual(resources[0]['RequireTLS'], False)
+
+    def test_rds_proxy_delete(self):
+        session_factory = self.replay_flight_data('test_rds_proxy_delete')
+        p = self.load_policy(
+            {
+                'name': 'delete-rds-proxy',
+                'resource': 'aws.rds-proxy',
+                'filters': [
+                    {
+                        'type': 'value',
+                        'key': 'DBProxyName',
+                        'value': 'proxy-test-1'
+                    }
+                ],
+                'actions': [
+                    {
+                        'type': 'delete'
+                    }
+                ],
+            },
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client('rds')
+        resources = client.describe_db_proxies()
+        self.assertEqual(resources['DBProxies'][0]['DBProxyName'], 'proxy-test-1')
+        self.assertEqual(resources['DBProxies'][0]['Status'], 'deleting')
+
+    def test_rds_proxy_subnet_filter(self):
+        session_factory = self.replay_flight_data("test_rds_proxy_subnet_filter")
+        p = self.load_policy(
+            {
+                "name": "rds-proxy-subnet-filter",
+                "resource": "rds-proxy",
+                "filters": [
+                    {
+                        "type": "subnet",
+                        "key": "DefaultForAz",
+                        "op": "eq",
+                        "value": False,
+                    }
+                ],
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["DBProxyName"], "proxy-test-1")
+
+    def test_rds_proxy_security_group_filter(self):
+        session_factory = self.replay_flight_data("test_rds_proxy_security_group_filter")
+        p = self.load_policy(
+            {
+                "name": "rds-proxy-security-group-filter",
+                "resource": "rds-proxy",
+                "filters": [
+                    {
+                        "type": "security-group",
+                        "key": "tag:ASV",
+                        "op": "eq",
+                        "value": "PolicyTest",
+                    }
+                ],
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["DBProxyName"], "proxy-test-1")
+
+    def test_rds_proxy_vpc_filter(self):
+        session_factory = self.replay_flight_data("test_rds_proxy_vpc_filter")
+        p = self.load_policy(
+            {
+                "name": "rds-proxy-vpc-filter",
+                "resource": "rds-proxy",
+                "filters": [
+                    {
+                        "type": "vpc",
+                        "key": "tag:Name",
+                        "op": "eq",
+                        "value": "DemoVPC",
+                    }
+                ],
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["DBProxyName"], "proxy-test-1")

@@ -1,13 +1,12 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import itertools
-import operator
 import zlib
 import re
 from c7n.actions import BaseAction, ModifyVpcSecurityGroupsAction
+from c7n.deprecated import DeprecatedField
 from c7n.exceptions import PolicyValidationError, ClientError
-from c7n.filters import (
-    DefaultVpcBase, Filter, ValueFilter, MetricsFilter)
+from c7n.filters import Filter, ValueFilter, MetricsFilter, ListItemFilter
 import c7n.filters.vpc as net_filters
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.filters.related import RelatedResourceFilter, RelatedResourceByIdFilter
@@ -17,13 +16,14 @@ from c7n.manager import resources
 from c7n.resources.securityhub import OtherResourcePostFinding, PostFinding
 from c7n.utils import (
     chunks,
-    local_session,
-    type_schema,
-    get_retry,
-    parse_cidr,
     get_eni_resource_type,
+    get_retry,
+    jmespath_compile,
     jmespath_search,
-    jmespath_compile
+    local_session,
+    merge_dict,
+    parse_cidr,
+    type_schema,
 )
 from c7n.resources.aws import shape_validate
 from c7n.resources.shield import IsEIPShieldProtected, SetEIPShieldProtection
@@ -44,9 +44,112 @@ class Vpc(query.QueryResourceManager):
         id_prefix = "vpc-"
 
 
+@Vpc.filter_registry.register('metrics')
+class VpcMetrics(MetricsFilter):
+
+    def get_dimensions(self, resource):
+        return [{"Name": "Per-VPC Metrics",
+                 "Value": resource["VpcId"]}]
+
+
+@Vpc.action_registry.register('modify')
+class ModifyVpc(BaseAction):
+    """Modify vpc settings
+    """
+
+    schema = type_schema(
+        'modify',
+        **{'dnshostnames': {'type': 'boolean'},
+           'dnssupport': {'type': 'boolean'},
+           'addressusage': {'type': 'boolean'}}
+    )
+
+    key_params = (
+        ('dnshostnames', 'EnableDnsHostnames'),
+        ('dnssupport', 'EnableDnsSupport'),
+        ('addressusage', 'EnableNetworkAddressUsageMetrics')
+    )
+
+    permissions = ('ec2:ModifyVpcAttribute',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ec2')
+
+        for policy_key, param_name in self.key_params:
+            if policy_key not in self.data:
+                continue
+            params = {param_name: {'Value': self.data[policy_key]}}
+            # can only modify one attribute per request
+            for r in resources:
+                params['VpcId'] = r['VpcId']
+                client.modify_vpc_attribute(**params)
+
+
+@Vpc.action_registry.register('delete-empty')
+class DeleteVpc(BaseAction):
+    """Delete an empty VPC
+
+    For example, if you want to delete an empty VPC
+
+    :example:
+
+      .. code-block:: yaml
+
+        - name: aws-ec2-vpc-delete
+          resource: vpc
+          actions:
+            - type: delete-empty
+
+    """
+    schema = type_schema('delete-empty',)
+    permissions = ('ec2:DeleteVpc',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ec2')
+
+        for vpc in resources:
+            self.manager.retry(
+                client.delete_vpc,
+                VpcId=vpc['VpcId'],
+                ignore_err_codes=(
+                    'NoSuchEntityException',
+                    'DeleteConflictException',
+                ),
+            )
+
+
+class DescribeFlow(query.DescribeSource):
+
+    def get_resources(self, ids, cache=True):
+        params = {'Filters': [{'Name': 'flow-log-id', 'Values': ids}]}
+        return self.query.filter(self.resource_manager, **params)
+
+
+@resources.register('flow-log')
+class FlowLog(query.QueryResourceManager):
+
+    class resource_type(query.TypeInfo):
+
+        service = 'ec2'
+        arn_type = 'vpc-flow-log'
+        enum_spec = ('describe_flow_logs', 'FlowLogs', None)
+        name = id = 'FlowLogId'
+        cfn_type = config_type = 'AWS::EC2::FlowLog'
+        id_prefix = 'fl-'
+
+    source_mapping = {
+        'describe': DescribeFlow,
+        'config': query.ConfigSource
+    }
+
+
 @Vpc.filter_registry.register('flow-logs')
-class FlowLogFilter(Filter):
+class FlowLogv2Filter(ListItemFilter):
     """Are flow logs enabled on the resource.
+
+    This filter reuses `list-item` filter for arbitrary filtering
+    on the flow log attibutes, it also  maintains compatiblity
+    with the legacy flow-log filter.
 
     ie to find all vpcs with flows logs disabled we can do this
 
@@ -73,101 +176,132 @@ class FlowLogFilter(Filter):
                 filters:
                   - not:
                     - type: flow-logs
-                      enabled: true
-                      set-op: or
-                      op: equal
-                      # equality operator applies to following keys
-                      traffic-type: all
-                      status: active
-                      log-group: vpc-logs
-
+                      attrs:
+                        - TrafficType: ALL
+                        - FlowLogStatus: ACTIVE
+                        - LogGroupName: vpc-logs
     """
+
+    legacy_schema = {
+        'enabled': {'type': 'boolean', 'default': False},
+        'op': {'enum': ['equal', 'not-equal'], 'default': 'equal'},
+        'set-op': {'enum': ['or', 'and'], 'default': 'or'},
+        'status': {'enum': ['active']},
+        'deliver-status': {'enum': ['success', 'failure']},
+        'destination': {'type': 'string'},
+        'destination-type': {'enum': ['s3', 'cloud-watch-logs']},
+        'traffic-type': {'enum': ['accept', 'reject', 'all']},
+        'log-format': {'type': 'string'},
+        'log-group': {'type': 'string'}
+    }
 
     schema = type_schema(
         'flow-logs',
-        **{'enabled': {'type': 'boolean', 'default': False},
-           'op': {'enum': ['equal', 'not-equal'], 'default': 'equal'},
-           'set-op': {'enum': ['or', 'and'], 'default': 'or'},
-           'status': {'enum': ['active']},
-           'deliver-status': {'enum': ['success', 'failure']},
-           'destination': {'type': 'string'},
-           'destination-type': {'enum': ['s3', 'cloud-watch-logs']},
-           'traffic-type': {'enum': ['accept', 'reject', 'all']},
-           'log-format': {'type': 'string'},
-           'log-group': {'type': 'string'}})
-
+        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'},
+        count={'type': 'number'},
+        count_op={'$ref': '#/definitions/filters_common/comparison_operators'},
+        **legacy_schema
+    )
+    schema_alias = True
+    annotate_items = True
     permissions = ('ec2:DescribeFlowLogs',)
 
-    def process(self, resources, event=None):
-        client = local_session(self.manager.session_factory).client('ec2')
+    compat_conversion = {
+        'status': {
+            'key': 'FlowLogStatus',
+            'values': {'active': 'ACTIVE'},
+        },
+        'deliver-status': {
+            'key': 'DeliverLogsStatus',
+            'values': {'success': 'SUCCESS',
+                       'failure': 'FAILED'}
+        },
+        'destination': {
+            'key': 'LogDestination',
+        },
+        'destination-type': {
+            'key': 'LogDestinationType',
+            # values ?
+        },
+        'traffic-type': {
+            'key': 'TrafficType',
+            'values': {'all': 'ALL',
+                       'reject': 'REJECT',
+                       'accept': 'ACCEPT'},
+        },
+        'log-format': {
+            'key': 'LogFormat',
+        },
+        'log-group': {
+            'key': 'LogGroupName'
+        }
+    }
 
-        # TODO given subnet/nic level logs, we should paginate, but we'll
-        # need to add/update botocore pagination support.
-        logs = client.describe_flow_logs().get('FlowLogs', ())
+    flow_log_map = None
 
-        m = self.manager.get_model()
-        resource_map = {}
+    def get_deprecations(self):
+        filter_name = self.data["type"]
+        return [
+            DeprecatedField(f"{filter_name}.{k}", "use list-item style attrs and set operators")
+            for k in set(self.legacy_schema).intersection(self.data)
+        ]
 
-        for fl in logs:
-            resource_map.setdefault(fl['ResourceId'], []).append(fl)
+    def validate(self):
+        keys = set(self.data)
+        if 'attrs' in keys and keys.intersection(self.compat_conversion):
+            raise PolicyValidationError(
+                "flow-log filter doesn't allow combining legacy keys with list-item attrs")
+        return super().validate()
 
-        enabled = self.data.get('enabled', False)
-        log_group = self.data.get('log-group')
-        log_format = self.data.get('log-format')
-        traffic_type = self.data.get('traffic-type')
-        destination_type = self.data.get('destination-type')
-        destination = self.data.get('destination')
-        status = self.data.get('status')
-        delivery_status = self.data.get('deliver-status')
-        op = self.data.get('op', 'equal') == 'equal' and operator.eq or operator.ne
-        set_op = self.data.get('set-op', 'or')
-
-        results = []
-        # looping over vpc resources
-        for r in resources:
-            if r[m.id] not in resource_map:
-                # we didn't find a flow log for this vpc
-                if enabled:
-                    # vpc flow logs not enabled so exclude this vpc from results
-                    continue
-                results.append(r)
+    def convert(self):
+        self.source_data = {}
+        # no mixing of legacy and list-item style
+        if 'attrs' in self.data:
+            return
+        data = {}
+        if self.data.get('enabled', False):
+            data['count_op'] = 'gte'
+            data['count'] = 1
+        else:
+            data['count'] = 0
+        attrs = []
+        for k in self.compat_conversion:
+            if k not in self.data:
                 continue
-            flogs = resource_map[r[m.id]]
-            r['c7n:flow-logs'] = flogs
+            afilter = {}
+            cinfo = self.compat_conversion[k]
+            ak = cinfo['key']
+            av = self.data[k]
+            if 'values' in cinfo:
+                av = cinfo['values'][av]
+            if 'op' in self.data and self.data['op'] == 'not-equal':
+                av = {'value': av, 'op': 'not-equal'}
+            afilter[ak] = av
+            attrs.append(afilter)
+        if attrs:
+            data['attrs'] = attrs
+        data['type'] = self.type
+        self.source_data = self.data
+        self.data = data
 
-            # config comparisons are pointless if we only want vpcs with no flow logs
-            if enabled:
-                fl_matches = []
-                for fl in flogs:
-                    dest_type_match = (destination_type is None) or op(
-                        fl['LogDestinationType'], destination_type)
-                    if 'LogDestination' not in fl:
-                        fl['LogDestination'] = ''
-                    dest_match = (destination is None) or op(
-                        fl['LogDestination'], destination)
-                    status_match = (status is None) or op(fl['FlowLogStatus'], status.upper())
-                    delivery_status_match = (delivery_status is None) or op(
-                        fl['DeliverLogsStatus'], delivery_status.upper())
-                    traffic_type_match = (
-                        traffic_type is None) or op(
-                        fl['TrafficType'],
-                        traffic_type.upper())
-                    log_group_match = (log_group is None) or op(fl.get('LogGroupName'), log_group)
-                    log_format_match = (log_format is None) or op(fl.get('LogFormat'), log_format)
-                    # combine all conditions to check if flow log matches the spec
-                    fl_match = (status_match and traffic_type_match and dest_match and
-                                log_format_match and log_group_match and
-                                dest_type_match and delivery_status_match)
-                    fl_matches.append(fl_match)
+    def get_item_values(self, resource):
+        flogs = self.flow_log_map.get(resource[self.manager.resource_type.id], ())
+        # compatibility with v1 filter, we also add list-item annotation
+        # for matched flow logs
+        resource['c7n:flow-logs'] = flogs
 
-                if set_op == 'or':
-                    if any(fl_matches):
-                        results.append(r)
-                elif set_op == 'and':
-                    if all(fl_matches):
-                        results.append(r)
+        # set operators are a little odd, but for list-item do require
+        # some runtime modification to ensure compatiblity.
+        if self.source_data.get('set-op', 'or') == 'and':
+            self.data['count'] = len(flogs)
+        return flogs
 
-        return results
+    def process(self, resources, event=None):
+        self.convert()
+        self.flow_log_map = {}
+        for r in self.manager.get_resource_manager('flow-log').resources():
+            self.flow_log_map.setdefault(r['ResourceId'], []).append(r)
+        return super().process(resources, event)
 
 
 @Vpc.filter_registry.register('security-group')
@@ -324,35 +458,40 @@ class AttributesFilter(Filter):
     schema = type_schema(
         'vpc-attributes',
         dnshostnames={'type': 'boolean'},
+        addressusage={'type': 'boolean'},
         dnssupport={'type': 'boolean'})
+
     permissions = ('ec2:DescribeVpcAttribute',)
+
+    key_params = (
+        ('dnshostnames', 'enableDnsHostnames'),
+        ('dnssupport', 'enableDnsSupport'),
+        ('addressusage', 'enableNetworkAddressUsageMetrics')
+    )
+    annotation_key = 'c7n:attributes'
 
     def process(self, resources, event=None):
         results = []
         client = local_session(self.manager.session_factory).client('ec2')
-        dns_hostname = self.data.get('dnshostnames', None)
-        dns_support = self.data.get('dnssupport', None)
 
         for r in resources:
-            if dns_hostname is not None:
-                hostname = client.describe_vpc_attribute(
+            found = True
+            for policy_key, vpc_attr in self.key_params:
+                if policy_key not in self.data:
+                    continue
+                policy_value = self.data[policy_key]
+                response_attr = "%s%s" % (vpc_attr[0].upper(), vpc_attr[1:])
+                value = client.describe_vpc_attribute(
                     VpcId=r['VpcId'],
-                    Attribute='enableDnsHostnames'
-                )['EnableDnsHostnames']['Value']
-            if dns_support is not None:
-                support = client.describe_vpc_attribute(
-                    VpcId=r['VpcId'],
-                    Attribute='enableDnsSupport'
-                )['EnableDnsSupport']['Value']
-            if dns_hostname is not None and dns_support is not None:
-                if dns_hostname == hostname and dns_support == support:
-                    results.append(r)
-            elif dns_hostname is not None and dns_support is None:
-                if dns_hostname == hostname:
-                    results.append(r)
-            elif dns_support is not None and dns_hostname is None:
-                if dns_support == support:
-                    results.append(r)
+                    Attribute=vpc_attr
+                )
+                value = value[response_attr]['Value']
+                r.setdefault(self.annotation_key, {})[policy_key] = value
+                if policy_value != value:
+                    found = False
+                    break
+            if found:
+                results.append(r)
         return results
 
 
@@ -502,13 +641,14 @@ class Subnet(query.QueryResourceManager):
         'config': query.ConfigSource}
 
 
-Subnet.filter_registry.register('flow-logs', FlowLogFilter)
+Subnet.filter_registry.register('flow-logs', FlowLogv2Filter)
 
 
 @Subnet.filter_registry.register('vpc')
 class SubnetVpcFilter(net_filters.VpcFilter):
 
     RelatedIdsExpression = "VpcId"
+
 
 @Subnet.filter_registry.register('ip-address-usage')
 class SubnetIpAddressUsageFilter(ValueFilter):
@@ -580,6 +720,7 @@ class SubnetIpAddressUsageFilter(ValueFilter):
             if self.match(r[self.annotation_key]):
                 results.append(r)
         return results
+
 
 class ConfigSG(query.ConfigSource):
 
@@ -785,7 +926,7 @@ class SecurityGroupPatch:
                 client.create_tags, Resources=[group['GroupId']], Tags=tags)
 
     def process_rules(self, client, rule_type, group, delta):
-        key, revoke_op, auth_op = self.RULE_TYPE_MAP[rule_type]
+        _, revoke_op, auth_op = self.RULE_TYPE_MAP[rule_type]
         revoke, authorize = getattr(
             client, revoke_op), getattr(client, auth_op)
 
@@ -801,6 +942,8 @@ class SecurityGroupPatch:
 
 
 class SGUsage(Filter):
+
+    nics = ()
 
     def get_permissions(self):
         return list(itertools.chain(
@@ -887,7 +1030,9 @@ class SGUsage(Filter):
             for perm_type in ('IpPermissions', 'IpPermissionsEgress'):
                 for p in sg.get(perm_type, []):
                     for g in p.get('UserIdGroupPairs', ()):
-                        sg_ids.add(g['GroupId'])
+                        # self references aren't usage.
+                        if g['GroupId'] != sg['GroupId']:
+                            sg_ids.add(g['GroupId'])
         return sg_ids
 
     def get_ecs_cwe_sgs(self):
@@ -1083,7 +1228,7 @@ class Stale(Filter):
 
 
 @SecurityGroup.filter_registry.register('default-vpc')
-class SGDefaultVpc(DefaultVpcBase):
+class SGDefaultVpc(net_filters.DefaultVpcBase):
     """Filter that returns any security group that exists within the default vpc
 
     :example:
@@ -1748,7 +1893,7 @@ class NetworkInterface(query.QueryResourceManager):
     }
 
 
-NetworkInterface.filter_registry.register('flow-logs', FlowLogFilter)
+NetworkInterface.filter_registry.register('flow-logs', FlowLogv2Filter)
 NetworkInterface.filter_registry.register(
     'network-location', net_filters.NetworkLocation)
 
@@ -1893,6 +2038,47 @@ class DeleteNetworkInterface(BaseAction):
                     raise
 
 
+@NetworkInterface.action_registry.register('detach')
+class DetachNetworkInterface(BaseAction):
+    """Detach a network interface from an EC2 instance.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: detach-enis
+            comment: Detach ENIs attached to EC2 with public IP addresses
+            resource: eni
+            filters:
+              - type: value
+                key: Attachment.InstanceId
+                value: present
+              - type: value
+                key: Association.PublicIp
+                value: present
+            actions:
+              - type: detach
+    """
+    permissions = ('ec2:DetachNetworkInterface',)
+    schema = type_schema('detach')
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ec2')
+        att_resources = [ar for ar in resources if ('Attachment' in ar
+            and ar['Attachment'].get('InstanceId')
+            and ar['Attachment'].get('DeviceIndex') != 0)]
+        if att_resources and (len(att_resources) < len(resources)):
+            self.log.warning(
+                "Filtered {} of {} non-primary network interfaces attatched to EC2".format(
+                len(att_resources), len(resources))
+            )
+        elif not att_resources:
+            self.log.warning("No non-primary EC2 interfaces indentified - revise c7n filters")
+        for r in att_resources:
+            client.detach_network_interface(AttachmentId=r['Attachment']['AttachmentId'])
+
+
 @resources.register('route-table')
 class RouteTable(query.QueryResourceManager):
 
@@ -1983,6 +2169,9 @@ class TransitGateway(query.QueryResourceManager):
         filter_name = 'TransitGatewayIds'
         filter_type = 'list'
         config_type = cfn_type = 'AWS::EC2::TransitGateway'
+
+
+TransitGateway.filter_registry.register('flow-logs', FlowLogv2Filter)
 
 
 class TransitGatewayAttachmentQuery(query.ChildResourceQuery):
@@ -2286,8 +2475,50 @@ class AddressRelease(BaseAction):
                 client.release_address(AllocationId=r['AllocationId'])
             except ClientError as e:
                 # If its already been released, ignore, else raise.
+                if e.response['Error']['Code'] == 'InvalidAddress.PtrSet':
+                    self.log.warning(
+                        "EIP %s cannot be released because it has a PTR record set.",
+                        r['AllocationId'])
+                if e.response['Error']['Code'] == 'InvalidAddress.Locked':
+                    self.log.warning(
+                        "EIP %s cannot be released because it is locked to your account.",
+                        r['AllocationId'])
                 if e.response['Error']['Code'] != 'InvalidAllocationID.NotFound':
                     raise
+
+
+@NetworkAddress.action_registry.register('disassociate')
+class DisassociateAddress(BaseAction):
+    """Disassociate elastic IP addresses from resources without releasing them.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: disassociate-network-addr
+                resource: network-addr
+                filters:
+                  - AllocationId: ...
+                actions:
+                  - type: disassociate
+    """
+
+    schema = type_schema('disassociate')
+    permissions = ('ec2:DisassociateAddress',)
+
+    def process(self, network_addrs):
+        client = local_session(self.manager.session_factory).client('ec2')
+        assoc_addrs = [addr for addr in network_addrs if 'AssociationId' in addr]
+
+        for aa in assoc_addrs:
+            try:
+                client.disassociate_address(AssociationId=aa['AssociationId'])
+            except ClientError as e:
+                # If its already been diassociated ignore, else raise.
+                if not (e.response['Error']['Code'] == 'InvalidAssocationID.NotFound' and
+                       aa['AssocationId'] in e.response['Error']['Message']):
+                    raise e
 
 
 @resources.register('customer-gateway')
@@ -2345,7 +2576,15 @@ class DeleteInternetGateway(BaseAction):
             try:
                 client.delete_internet_gateway(InternetGatewayId=r['InternetGatewayId'])
             except ClientError as err:
-                if not err.response['Error']['Code'] == 'InvalidInternetGatewayId.NotFound':
+                if err.response['Error']['Code'] == 'DependencyViolation':
+                    self.log.warning(
+                        "%s error hit deleting internetgateway: %s",
+                        err.response['Error']['Code'],
+                        err.response['Error']['Message'],
+                    )
+                elif err.response['Error']['Code'] == 'InvalidInternetGatewayId.NotFound':
+                    pass
+                else:
                     raise
 
 
@@ -2464,7 +2703,6 @@ class EndpointPolicyStatementFilter(HasStatementFilter):
         }
 
 
-
 @VpcEndpoint.filter_registry.register('cross-account')
 class EndpointCrossAccountFilter(CrossAccountAccessFilter):
 
@@ -2577,18 +2815,40 @@ class UnusedKeyPairs(Filter):
             - type: unused
               state: false
     """
-    annotation_key = 'c7n:unused_keys'
-    permissions = ('ec2:DescribeKeyPairs',)
     schema = type_schema('unused',
         state={'type': 'boolean'})
 
+    def get_permissions(self):
+        return list(itertools.chain(*[
+            self.manager.get_resource_manager(m).get_permissions()
+            for m in ('asg', 'launch-config', 'ec2')]))
+
+    def _pull_asg_keynames(self):
+        asgs = self.manager.get_resource_manager('asg').resources()
+        key_names = set()
+        lcfgs = set(a['LaunchConfigurationName'] for a in asgs if 'LaunchConfigurationName' in a)
+        lcfg_mgr = self.manager.get_resource_manager('launch-config')
+
+        if lcfgs:
+            key_names.update([
+                lcfg['KeyName'] for lcfg in lcfg_mgr.resources()
+                if lcfg['LaunchConfigurationName'] in lcfgs])
+
+        tmpl_mgr = self.manager.get_resource_manager('launch-template-version')
+        for tversion in tmpl_mgr.get_resources(
+                list(tmpl_mgr.get_asg_templates(asgs).keys())):
+            key_names.add(tversion['LaunchTemplateData'].get('KeyName'))
+        return key_names
+
+    def _pull_ec2_keynames(self):
+        ec2_manager = self.manager.get_resource_manager('ec2')
+        return {i.get('KeyName', None) for i in ec2_manager.resources()}
+
     def process(self, resources, event=None):
-        instances = self.manager.get_resource_manager('ec2').resources()
-        used = set(jmespath_search('[].KeyName', instances))
+        keynames = self._pull_ec2_keynames().union(self._pull_asg_keynames())
         if self.data.get('state', True):
-            return [r for r in resources if r['KeyName'] not in used]
-        else:
-            return [r for r in resources if r['KeyName'] in used]
+            return [r for r in resources if r['KeyName'] not in keynames]
+        return [r for r in resources if r['KeyName'] in keynames]
 
 
 @KeyPair.action_registry.register('delete')
@@ -2633,8 +2893,10 @@ class DeleteUnusedKeyPairs(BaseAction):
 @Vpc.action_registry.register('set-flow-log')
 @Subnet.action_registry.register('set-flow-log')
 @NetworkInterface.action_registry.register('set-flow-log')
-class CreateFlowLogs(BaseAction):
-    """Create flow logs for a network resource
+@TransitGateway.action_registry.register('set-flow-log')
+@TransitGatewayAttachment.action_registry.register('set-flow-log')
+class SetFlowLogs(BaseAction):
+    """Set flow logs for a network resource
 
     :example:
 
@@ -2648,129 +2910,123 @@ class CreateFlowLogs(BaseAction):
                 enabled: false
             actions:
               - type: set-flow-log
-                DeliverLogsPermissionArn: arn:iam:role
-                LogGroupName: /custodian/vpc/flowlogs/
-    """
-    permissions = ('ec2:CreateFlowLogs', 'logs:CreateLogGroup',)
-    schema = {
-        'type': 'object',
-        'additionalProperties': False,
-        'properties': {
-            'type': {'enum': ['set-flow-log']},
-            'state': {'type': 'boolean'},
-            'DeliverLogsPermissionArn': {'type': 'string'},
-            'LogGroupName': {'type': 'string'},
-            'LogDestination': {'type': 'string'},
-            'LogFormat': {'type': 'string'},
-            'MaxAggregationInterval': {'type': 'integer'},
-            'LogDestinationType': {'enum': ['s3', 'cloud-watch-logs']},
-            'TrafficType': {
-                'type': 'string',
-                'enum': ['ACCEPT', 'REJECT', 'ALL']
-            }
+                attrs:
+                  DeliverLogsPermissionArn: arn:iam:role
+                  LogGroupName: /custodian/vpc/flowlogs/
+
+    `attrs` are passed through to create_flow_log and are per the api
+    documentation
+
+    https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2/client/create_flow_logs.html
+    """  # noqa
+
+    legacy_schema = {
+        'DeliverLogsPermissionArn': {'type': 'string'},
+        'LogGroupName': {'type': 'string'},
+        'LogDestination': {'type': 'string'},
+        'LogFormat': {'type': 'string'},
+        'MaxAggregationInterval': {'type': 'integer'},
+        'LogDestinationType': {'enum': ['s3', 'cloud-watch-logs']},
+        'TrafficType': {
+            'type': 'string',
+            'enum': ['ACCEPT', 'REJECT', 'ALL']
         }
     }
+
+    schema = type_schema(
+        'set-flow-log',
+        state={'type': 'boolean'},
+        attrs={'type': 'object'},
+        **legacy_schema
+    )
+    shape = 'CreateFlowLogsRequest'
+    permissions = ('ec2:CreateFlowLogs', 'logs:CreateLogGroup',)
 
     RESOURCE_ALIAS = {
         'vpc': 'VPC',
         'subnet': 'Subnet',
-        'eni': 'NetworkInterface'
+        'eni': 'NetworkInterface',
+        'transit-gateway': 'TransitGateway',
+        'transit-attachment': 'TransitGatewayAttachment'
     }
 
-    SchemaValidation = {
-        's3': {
-            'required': ['LogDestination'],
-            'absent': ['LogGroupName', 'DeliverLogsPermissionArn']
-        },
-        'cloud-watch-logs': {
-            'required': ['DeliverLogsPermissionArn'],
-            'one-of': ['LogGroupName', 'LogDestination'],
-        }
-    }
+    def get_deprecations(self):
+        filter_name = self.data["type"]
+        return [
+            DeprecatedField(f"{filter_name}.{k}", f"set {k} under attrs: block")
+            for k in set(self.legacy_schema).intersection(self.data)
+        ]
 
     def validate(self):
-        self.state = self.data.get('state', True)
-        if not self.state:
-            return
-        destination_type = self.data.get(
-            'LogDestinationType', 'cloud-watch-logs')
-        dvalidation = self.SchemaValidation[destination_type]
-        for r in dvalidation.get('required', ()):
-            if not self.data.get(r):
-                raise PolicyValidationError(
-                    'Required %s missing for destination-type:%s' % (
-                        r, destination_type))
-        for r in dvalidation.get('absent', ()):
-            if r in self.data:
-                raise PolicyValidationError(
-                    '%s is prohibited for destination-type:%s' % (
-                        r, destination_type))
-        if ('one-of' in dvalidation and
-                sum([1 for k in dvalidation['one-of'] if k in self.data]) != 1):
+        if set(self.legacy_schema).intersection(self.data) and 'attrs' in self.data:
             raise PolicyValidationError(
-                "Destination:%s Exactly one of %s required" % (
-                    destination_type, ", ".join(dvalidation['one-of'])))
-        return self
+                "set-flow-log: legacy top level keys aren't compatible with `attrs` mapping"
+            )
 
-    def delete_flow_logs(self, client, rids):
-        flow_logs = client.describe_flow_logs(
-            Filters=[{'Name': 'resource-id', 'Values': rids}])['FlowLogs']
-        try:
-            results = client.delete_flow_logs(
-                FlowLogIds=[f['FlowLogId'] for f in flow_logs])
-
-            for r in results['Unsuccessful']:
-                self.log.exception(
-                    'Exception: delete flow-log for %s: %s on %s',
-                    r['ResourceId'], r['Error']['Message'])
-        except ClientError as e:
-            if e.response['Error']['Code'] == 'InvalidParameterValue':
-                self.log.exception(
-                    'delete flow-log: %s', e.response['Error']['Message'])
-            else:
-                raise
-
-    def process(self, resources):
-        client = local_session(self.manager.session_factory).client('ec2')
-        params = dict(self.data)
-        params.pop('type')
-
-        if self.data.get('state'):
-            params.pop('state')
-
+        self.convert()
+        attrs = dict(self.data['attrs'])
         model = self.manager.get_model()
-        params['ResourceIds'] = [r[model.id] for r in resources]
+        attrs['ResourceType'] = self.RESOURCE_ALIAS[model.arn_type]
+        attrs['ResourceIds'] = [model.id_prefix + '123']
+        return shape_validate(attrs, self.shape, 'ec2')
 
-        if not self.state:
-            self.delete_flow_logs(client, params['ResourceIds'])
-            return
+    def convert(self):
+        data = dict(self.data)
+        attrs = {}
+        for k in set(self.legacy_schema).intersection(data):
+            attrs[k] = data.pop(k)
+        self.source_data = self.data
+        self.data['attrs'] = merge_dict(attrs, self.data.get('attrs', {}))
 
-        params['ResourceType'] = self.RESOURCE_ALIAS[model.arn_type]
-        params['TrafficType'] = self.data.get('TrafficType', 'ALL').upper()
-        params['MaxAggregationInterval'] = self.data.get('MaxAggregationInterval', 600)
-        if self.data.get('LogDestinationType', 'cloud-watch-logs') == 'cloud-watch-logs':
-            self.process_log_group(self.data.get('LogGroupName'))
+    def run_client_op(self, op, params, log_err_codes=()):
         try:
-            results = client.create_flow_logs(**params)
-
+            results = op(**params)
             for r in results['Unsuccessful']:
                 self.log.exception(
-                    'Exception: create flow-log for %s: %s',
-                    r['ResourceId'], r['Error']['Message'])
+                    'Exception: %s for %s: %s',
+                    op.__name__, r['ResourceId'], r['Error']['Message'])
         except ClientError as e:
-            if e.response['Error']['Code'] == 'FlowLogAlreadyExists':
+            if e.response['Error']['Code'] in log_err_codes:
                 self.log.exception(
-                    'Exception: create flow-log: %s',
-                    e.response['Error']['Message'])
+                    'Exception: %s: %s',
+                    op.response['Error']['Message'])
             else:
                 raise
 
-    def process_log_group(self, logroup):
+    def ensure_log_group(self, logroup):
         client = local_session(self.manager.session_factory).client('logs')
         try:
             client.create_log_group(logGroupName=logroup)
         except client.exceptions.ResourceAlreadyExistsException:
             pass
+
+    def delete_flow_logs(self, client, rids):
+        flow_logs = [
+            r for r in self.manager.get_resource_manager('flow-log').resources()
+            if r['ResourceId'] in rids]
+        self.run_client_op(
+            client.delete_flow_logs,
+            {'FlowLogIds': [f['FlowLogId'] for f in flow_logs]},
+            ('InvalidParameterValue', 'InvalidFlowLogId.NotFound',)
+        )
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ec2')
+        enabled = self.data.get('state', True)
+
+        if not enabled:
+            model_id = self.manager.get_model().id
+            rids = [r[model_id] for r in resources]
+            return self.delete_flow_logs(client, rids)
+
+        model = self.manager.get_model()
+        params = {'ResourceIds': [r[model.id] for r in resources]}
+        params['ResourceType'] = self.RESOURCE_ALIAS[model.arn_type]
+        params.update(self.data['attrs'])
+        if params.get('LogDestinationType', 'cloud-watch-logs') == 'cloud-watch-logs':
+            self.ensure_log_group(params['LogGroupName'])
+        self.run_client_op(
+            client.create_flow_logs, params, ('FlowLogAlreadyExists',))
 
 
 class PrefixListDescribe(query.DescribeSource):

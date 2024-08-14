@@ -62,6 +62,7 @@ def register_universal_tags(filters, actions, compatibility=True):
         actions.register('untag', UniversalUntag)
 
     actions.register('remove-tag', UniversalUntag)
+    actions.register('rename-tag', UniversalTagRename)
 
 
 def universal_augment(self, resources):
@@ -71,10 +72,8 @@ def universal_augment(self, resources):
     if not resources:
         return resources
 
-    # For global resources, tags don't populate in the get_resources call
-    # unless the call is being made to us-east-1
-    region = getattr(self.resource_type, 'global_resource', None) and 'us-east-1' or self.region
-
+    region = utils.get_resource_tagging_region(self.resource_type, self.region)
+    self.log.debug("Using region %s for resource tagging" % region)
     client = utils.local_session(
         self.session_factory).client('resourcegroupstaggingapi', region_name=region)
 
@@ -301,7 +300,7 @@ class TagActionFilter(Filter):
         if ':' not in v or '@' not in v:
             return False
 
-        msg, tgt = v.rsplit(':', 1)
+        _, tgt = v.rsplit(':', 1)
         action, action_date_str = tgt.strip().split('@', 1)
 
         if action != op:
@@ -911,6 +910,78 @@ class UniversalUntag(RemoveTag):
         arns = self.manager.get_arns(resource_set)
         return universal_retry(
             client.untag_resources, ResourceARNList=arns, TagKeys=tag_keys)
+
+
+class UniversalTagRename(Action):
+    """Rename an existing tag key to a new value.
+
+    :example:
+
+    rename Application, and Bap to App, if a resource has both of the old keys
+    then we'll use the value specified by Application, which is based on the
+    order of values of old_keys.
+
+        .. code-block :: yaml
+
+            policies:
+            - name: rename-tags-example
+              resource: aws.log-group
+              filters:
+                - or:
+                  - "tag:Bap": present
+                  - "tag:Application": present
+              actions:
+                - type: rename-tag
+                  old_keys: [Application, Bap]
+                  new_key: App
+    """
+    schema = utils.type_schema(
+        'rename-tag',
+        old_keys={'type': 'array', 'items': {'type': 'string'}},
+        old_key={'type': 'string'},
+        new_key={'type': 'string'},
+    )
+
+    permissions = UniversalTag.permissions + UniversalUntag.permissions
+
+    def validate(self):
+        if 'old_keys' not in self.data and 'old_key' not in self.data:
+            raise PolicyValidationError(
+                f"{self.manager.ctx.policy.name}:{self.type} 'old_keys' or 'old_key' required")
+
+    def process(self, resources):
+        old_keys = set(self.data.get('old_keys', ()))
+        if 'old_key' in self.data:
+            old_keys.add(self.data['old_key'])
+
+        # Collect by distinct tag value, and old_key value to minimize api calls
+        # via bulk api usage on add and remove.
+        old_key_resources = {}
+        values_resources = {}
+
+        # sort tags using ordering of old_keys
+        def key_func(a):
+            if a['Key'] in old_keys:
+                return self.data['old_keys'].index(a['Key'])
+            return 50
+
+        for r in resources:
+            found = False
+            for t in sorted(r.get('Tags', ()), key=key_func):
+                if t['Key'] in old_keys:
+                    old_key_resources.setdefault(t['Key'], []).append(r)
+                    if not found:
+                        values_resources.setdefault(t['Value'], []).append(r)
+                        found = True
+
+        new_key = self.data['new_key']
+
+        for value, rpopulation in values_resources.items():
+            tagger = UniversalTag({'key': new_key, 'value': value}, self.manager)
+            tagger.process(rpopulation)
+        for old_key, rpopulation in old_key_resources.items():
+            cleaner = UniversalUntag({'tags': [old_key]}, self.manager)
+            cleaner.process(rpopulation)
 
 
 class UniversalTagDelayedAction(TagDelayedAction):

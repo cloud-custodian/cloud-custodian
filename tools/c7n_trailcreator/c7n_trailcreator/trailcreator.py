@@ -692,7 +692,7 @@ def tag_org(config, db, region, creator_tag, user_suffix, dryrun,
             accounts, tags, debug, verbose, type):
     """Tag an orgs resources
     """
-    accounts_config, custodian_config, executor = org_init(
+    accounts_config, _, executor = org_init(
         config, use=None, debug=debug, verbose=verbose,
         accounts=accounts or None, tags=tags, policies=None,
         resource=None, policy_tags=None)

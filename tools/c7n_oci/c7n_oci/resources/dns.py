@@ -44,8 +44,8 @@ class Zone(QueryResourceManager):
         search_resource_type = "customerdnszone"
 
 
-@Zone.action_registry.register("update-zone")
-class UpdateZone(OCIBaseAction):
+@Zone.action_registry.register("update")
+class UpdateZoneAction(OCIBaseAction):
     """
         Update zone Action
 
@@ -68,30 +68,26 @@ class UpdateZone(OCIBaseAction):
                 - name: perform-update-zone-action
                   resource: oci.zone
                   actions:
-                    - type: update-zone
+                    - type: update
+                      defined_tags:
+                        Cloud_Custodian: True
+                      freeform_tags:
+                        Environment: development
 
     """  # noqa
 
-    schema = type_schema("update-zone", params={"type": "object"}, rinherit=OCIBaseAction.schema)
+    schema = type_schema(
+        "update", **{"freeform_tags": {"type": "object"}, "defined_tags": {"type": "object"}}
+    )
 
     def perform_action(self, resource):
         client = self.manager.get_client()
-        params_dict = {}
-        params_model = {}
-        params_dict["zone_name_or_id"] = resource.get("id")
-        if self.data.get("params").get("update_zone_details"):
-            update_zone_details_user = self.data.get("params").get("update_zone_details")
-            params_model = self.update_params(resource, update_zone_details_user)
-            params_dict["update_zone_details"] = oci.dns.models.UpdateZoneDetails(**params_model)
-        if self.data.get("params") and self.data.get("params").get("scope"):
-            params_dict["scope"] = self.data.get("params").get("scope")
-        if self.data.get("params") and self.data.get("params").get("view_id"):
-            params_dict["view_id"] = self.data.get("params").get("view_id")
-        if self.data.get("params") and self.data.get("params").get("compartment_id"):
-            params_dict["compartment_id"] = self.data.get("params").get("compartment_id")
+        update_zone_details_user = self.extract_params(self.data)
+        params_model = self.update_params(resource, update_zone_details_user)
+        update_zone_details = oci.dns.models.UpdateZoneDetails(**params_model)
         response = client.update_zone(
-            zone_name_or_id=params_dict["zone_name_or_id"],
-            update_zone_details=params_dict["update_zone_details"],
+            zone_name_or_id=resource.get("id"),
+            update_zone_details=update_zone_details,
         )
         log.info(f"Received status {response.status} for PUT:update_zone {response.request_id}")
         return response

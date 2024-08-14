@@ -13,7 +13,7 @@ And resize those instances to Flex shape.
         description: Perform resize on the VM's only if the VM is tagged and it's maximum CPU utilization is less than 50%
         resource: oci.instance
         filters:
-          - type: monitoring
+          - type: metrics
             query: 'CpuUtilization[1d].max() < 50'
           - type: value
             key: freeform_tags.eligible_for_resize
@@ -21,9 +21,7 @@ And resize those instances to Flex shape.
         actions:
           - type: remove-tag
             freeform_tags: ['eligible_for_resize']
-          - type: update-instance
-            params:
-              update_instance_details:
-                shape: VM.Standard.E3.Flex
-                shape_config:
-                  ocpus: 1
+          - type: update
+            shape: VM.Standard.E3.Flex
+            shape_config:
+               ocpus: 1

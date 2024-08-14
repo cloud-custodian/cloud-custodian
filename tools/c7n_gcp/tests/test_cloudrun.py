@@ -16,7 +16,6 @@ class RunServiceTest(BaseTest):
         assert len(resources) == 1
         assert resources[0]["metadata"]["name"] == "hello"
 
-
     def test_filter(self):
 
         factory = self.replay_flight_data("gcp-cloud-run-service")
@@ -34,6 +33,27 @@ class RunServiceTest(BaseTest):
         resources = p.run()
         assert len(resources) == 1
 
+    def test_cloudrun_filter_iam_query(self):
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data('gcp-cloud-run-service-filter-iam', project_id=project_id)
+        p = self.load_policy({
+            'name': 'gcp-cloud-run-service-filter-iam',
+            'resource': 'gcp.cloud-run-service',
+            'filters': [{
+                'type': 'iam-policy',
+                'doc': {
+                    'key': "bindings[?(role=='roles\\editor' || role=='roles\\owner')]",
+                    'op': 'ne',
+                    'value': []
+                }
+            }]
+        }, session_factory=factory)
+        resources = p.run()
+
+        self.assertEqual(1, len(resources))
+        self.assertEqual('run-1',
+                         resources[0]["metadata"]['name'])
+
 
 class JobServiceTest(BaseTest):
     def test_query(self):
@@ -45,3 +65,15 @@ class JobServiceTest(BaseTest):
         resources = p.run()
         assert len(resources) == 1
         assert resources[0]["metadata"]["name"] == "job"
+
+
+class RevisionServiceTest(BaseTest):
+    def test_query(self):
+        factory = self.replay_flight_data('gcp-cloud-run-revision')
+        p = self.load_policy({
+            'name': 'cloud-run-job',
+            'resource': 'gcp.cloud-run-revision'
+        }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['metadata']['name'], 'hello-00001-nvq')

@@ -1,0 +1,58 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_budgets_budget": {
+            "ec2": {
+                "account_id": "644160558196",
+                "arn": "arn:aws:budgets::644160558196:budget/budget-ec2-monthly",
+                "auto_adjust_data": [],
+                "budget_type": "COST",
+                "cost_filter": [
+                    {
+                        "name": "Service",
+                        "values": [
+                            "Amazon Elastic Compute Cloud - Compute"
+                        ]
+                    }
+                ],
+                "cost_types": [
+                    {
+                        "include_credit": true,
+                        "include_discount": true,
+                        "include_other_subscription": true,
+                        "include_recurring": true,
+                        "include_refund": true,
+                        "include_subscription": true,
+                        "include_support": true,
+                        "include_tax": true,
+                        "include_upfront": true,
+                        "use_amortized": false,
+                        "use_blended": false
+                    }
+                ],
+                "id": "644160558196:budget-ec2-monthly",
+                "limit_amount": "1200.0",
+                "limit_unit": "USD",
+                "name": "budget-ec2-monthly",
+                "name_prefix": "",
+                "notification": [
+                    {
+                        "comparison_operator": "GREATER_THAN",
+                        "notification_type": "FORECASTED",
+                        "subscriber_email_addresses": [
+                            "test@example.com"
+                        ],
+                        "subscriber_sns_topic_arns": [],
+                        "threshold": 100,
+                        "threshold_type": "PERCENTAGE"
+                    }
+                ],
+                "planned_limit": [],
+                "time_period_end": "2087-06-15_00:00",
+                "time_period_start": "2017-07-01_00:00",
+                "time_unit": "MONTHLY"
+            }
+        }
+    }
+}

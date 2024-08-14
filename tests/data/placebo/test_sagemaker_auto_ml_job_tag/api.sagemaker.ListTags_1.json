@@ -1,0 +1,20 @@
+{
+    "status_code": 200,
+    "data": {
+        "Tags": [
+            {
+                "Key": "JobTag",
+                "Value": "JobTagValue"
+            },
+            {
+                "Key": "CanvasModelName",
+                "Value": "c7n-test"
+            },
+            {
+                "Key": "Source",
+                "Value": "SageMakerCanvas"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

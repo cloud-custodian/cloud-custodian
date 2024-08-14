@@ -17,7 +17,5 @@ The following example policy will filter all the buckets based on a tag and sets
          value: 'true'
          op: eq
       actions:
-       - type: update-bucket
-         params:
-           update_bucket_details:
-             public_access_type: 'NoPublicAccess'
+       - type: update
+         public_access_type: 'NoPublicAccess'

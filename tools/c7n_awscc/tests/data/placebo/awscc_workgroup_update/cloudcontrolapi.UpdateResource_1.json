@@ -1,0 +1,24 @@
+{
+    "status_code": 200,
+    "data": {
+        "ProgressEvent": {
+            "TypeName": "AWS::Athena::WorkGroup",
+            "Identifier": "tf-test-loving-llama",
+            "RequestToken": "f76d664b-9097-4c9e-b2fb-68cecf8faa50",
+            "Operation": "UPDATE",
+            "OperationStatus": "IN_PROGRESS",
+            "EventTime": {
+                "__class__": "datetime",
+                "year": 2024,
+                "month": 2,
+                "day": 21,
+                "hour": 13,
+                "minute": 14,
+                "second": 16,
+                "microsecond": 337000
+            },
+            "ResourceModel": "{\"WorkGroupConfiguration\":{\"EnforceWorkGroupConfiguration\":false,\"EngineVersion\":{\"SelectedEngineVersion\":\"AUTO\"},\"PublishCloudWatchMetricsEnabled\":true,\"ResultConfiguration\":{\"EncryptionConfiguration\":{\"EncryptionOption\":\"SSE_S3\"}},\"RequesterPaysEnabled\":false},\"State\":\"ENABLED\",\"Tags\":[],\"Name\":\"tf-test-loving-llama\"}"
+        },
+        "ResponseMetadata": {}
+    }
+}

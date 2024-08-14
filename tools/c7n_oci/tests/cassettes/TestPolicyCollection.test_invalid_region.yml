@@ -1,0 +1,100 @@
+interactions:
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>
+  response:
+    body:
+      data:
+        capabilities:
+          canUseApiKeys: true
+          canUseAuthTokens: true
+          canUseConsolePassword: false
+          canUseCustomerSecretKeys: true
+          canUseDbCredentials: true
+          canUseOAuth2ClientCredentials: true
+          canUseSmtpCredentials: true
+        compartmentId: ocid1.tenancy.oc1..<unique_ID>
+        dbUserName: user@example.com
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: Some
+          OracleInternalReserved:
+            Phonebook: '9800'
+        description: user@example.com
+        emailVerified: true
+        externalIdentifier: c5571b54909a443685e610af14bcf73b
+        freeformTags:
+          Contractor: 'True'
+          TagName: TagValue
+          key_old: 'true'
+          mfa_activated: 'false'
+        id: ocid1.user.oc1..<unique_ID>
+        identityProviderId: ocid1.saml2idp.oc1..<unique_ID>
+        isMfaActivated: false
+        lifecycleState: ACTIVE
+        name: user@example.com
+        timeCreated: '2022-07-15T08:25:13.055Z'
+        timeModified: '2023-06-21T09:20:37.521Z'
+    headers:
+      cache-control:
+      - no-cache, no-store, must-revalidate
+      content-length:
+      - '1090'
+      content-type:
+      - application/json
+      date:
+      - Tue, 11 Jul 2023 06:36:02 GMT
+      etag:
+      - 31ff068d7314192e8d5de6e0397f28186f61005e
+      pragma:
+      - no-cache
+      x-content-type-options:
+      - nosniff
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://www-proxy.us.oracle.com:80/20160918/tenancies/ocid1.tenancy.oc1..<unique_ID>/regionSubscriptions
+  response:
+    body:
+      data:
+      - isHomeRegion: true
+        regionKey: IAD
+        regionName: us-ashburn-1
+        status: READY
+      - isHomeRegion: false
+        regionKey: PHX
+        regionName: us-phoenix-1
+        status: READY
+      - isHomeRegion: false
+        regionKey: YUL
+        regionName: ca-montreal-1
+        status: READY
+      - isHomeRegion: false
+        regionKey: YYZ
+        regionName: ca-toronto-1
+        status: READY
+    headers:
+      cache-control:
+      - no-cache, no-store, must-revalidate
+      content-encoding:
+      - gzip
+      content-length:
+      - '149'
+      content-type:
+      - application/json
+      date:
+      - Tue, 11 Jul 2023 06:36:03 GMT
+      pragma:
+      - no-cache
+      x-content-type-options:
+      - nosniff
+    status:
+      code: 200
+      message: OK
+version: 1

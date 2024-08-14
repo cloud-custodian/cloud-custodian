@@ -274,12 +274,22 @@ class MetricsFilter(Filter):
                 rvalue = r[self.data.get('percent-attr')]
                 if self.data.get('attr-multiplier'):
                     rvalue = rvalue * self.data['attr-multiplier']
-                percent = (collected_metrics[key][0][self.statistics] /
-                           rvalue * 100)
-                if self.op(percent, self.value):
+                all_meet_condition = True
+                for data_point in collected_metrics[key]:
+                    percent = (data_point[self.statistics] / rvalue * 100)
+                    if not self.op(percent, self.value):
+                        all_meet_condition = False
+                        break
+                if all_meet_condition:
                     matched.append(r)
-            elif self.op(collected_metrics[key][0][self.statistics], self.value):
-                matched.append(r)
+            else:
+                all_meet_condition = True
+                for data_point in collected_metrics[key]:
+                    if not self.op(data_point[self.statistics], self.value):
+                        all_meet_condition = False
+                        break
+                if all_meet_condition:
+                    matched.append(r)
         return matched
 
 

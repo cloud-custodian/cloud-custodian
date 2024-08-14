@@ -7,7 +7,7 @@ a provider for cloud custodian for usage with Tencent Cloud.
 
 ```shell
 
-pip install c7n_tencentcloud
+pip install c7n-tencentcloud
 ```
 
 

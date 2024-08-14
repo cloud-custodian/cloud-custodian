@@ -1,0 +1,44 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "CoreNetwork": {
+            "GlobalNetworkId": "global-network-033fdf071903b5d21",
+            "CoreNetworkId": "core-network-049cea4c0e5525b80",
+            "CoreNetworkArn": "arn:aws:networkmanager::644160558196:core-network/core-network-049cea4c0e5525b80",
+            "CreatedAt": {
+                "__class__": "datetime",
+                "year": 2024,
+                "month": 6,
+                "day": 4,
+                "hour": 21,
+                "minute": 30,
+                "second": 50,
+                "microsecond": 0
+            },
+            "State": "AVAILABLE",
+            "Segments": [
+                {
+                    "Name": "testcloudwan",
+                    "EdgeLocations": [
+                        "us-east-1"
+                    ],
+                    "SharedSegments": []
+                }
+            ],
+            "Edges": [
+                {
+                    "EdgeLocation": "us-east-1",
+                    "Asn": 64512,
+                    "InsideCidrBlocks": []
+                }
+            ],
+            "Tags": [
+                {
+                    "Key": "Name",
+                    "Value": "test-cloudwan"
+                }
+            ]
+        }
+    }
+}

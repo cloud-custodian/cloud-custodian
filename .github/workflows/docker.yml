@@ -20,9 +20,9 @@ jobs:
           - mailer
           - policystream
           - c7n-left
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-8-cores
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: ${{ matrix.image }} build and push
         uses: ./.github/composites/docker-build-push
         env:

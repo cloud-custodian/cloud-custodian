@@ -1,0 +1,57 @@
+{
+    "status_code": 200,
+    "data": {
+        "clusters": [
+            {
+                "clusterArn": "arn:aws:ecs:us-east-1:123456789012:cluster/c7n-fail",
+                "clusterName": "c7n-fail",
+                "status": "ACTIVE",
+                "registeredContainerInstancesCount": 1,
+                "runningTasksCount": 0,
+                "pendingTasksCount": 0,
+                "activeServicesCount": 1,
+                "statistics": [],
+                "tags": [
+                    {
+                        "key": "c7n_fail",
+                        "value": "true"
+                    }
+                ],
+                "settings": [
+                    {
+                        "name": "containerInsights",
+                        "value": "disabled"
+                    }
+                ],
+                "capacityProviders": [],
+                "defaultCapacityProviderStrategy": []
+            },
+            {
+                "clusterArn": "arn:aws:ecs:us-east-1:123456789012:cluster/c7n-success",
+                "clusterName": "c7n-success",
+                "status": "ACTIVE",
+                "registeredContainerInstancesCount": 1,
+                "runningTasksCount": 0,
+                "pendingTasksCount": 0,
+                "activeServicesCount": 0,
+                "statistics": [],
+                "tags": [
+                    {
+                        "key": "c7n_success",
+                        "value": "true"
+                    }
+                ],
+                "settings": [
+                    {
+                        "name": "containerInsights",
+                        "value": "disabled"
+                    }
+                ],
+                "capacityProviders": [],
+                "defaultCapacityProviderStrategy": []
+            }
+        ],
+        "failures": [],
+        "ResponseMetadata": {}
+    }
+}

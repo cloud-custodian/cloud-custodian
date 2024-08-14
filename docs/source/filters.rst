@@ -106,6 +106,8 @@ Comparison Operators
     - ``gte`` or ``ge``
     - ``less-than`` or ``lt``
     - ``lte`` or ``le``
+    - ``in``
+    - ``not-in`` or ``ni``
     - ``contains``
 
   .. code-block:: yaml
@@ -145,8 +147,11 @@ List Operators
 
     - ``in``
     - ``not-in`` or ``ni``
-    - ``intersect`` - Provides comparison between 2 lists
+    - ``contains``
+    - ``intersect`` - Match if two lists share any elements
+    - ``difference`` - Match if the first list has any values not in the second list
 
+  This filter only matches resources whose ``ImageId`` property appears in a predefined list:
 
   .. code-block:: yaml
 
@@ -156,16 +161,56 @@ List Operators
            op: in                         ─▶ List operator
            value: [ID-123, ID-321]        ─▶ List of Values to be compared against
 
+  Some resource properties are lists themselves. For example, EC2 instances can have
+  multiple security groups. For the next few examples, assume the filters are evaluating
+  three instances:
+
+  =========  ===============================================
+  Instance   Security Group Names
+  =========  ===============================================
+  instance1  default, common, custom
+  instance2  common, custom, extra
+  instance3  common
+  =========  ===============================================
+
+  This filter matches ``instance1``, whose security group list contains the ``default`` group:
+
   .. code-block:: yaml
 
       filters:
          - type: value
-           key: ImageId.List              ─▶ The value from the describe call
-           op: in                         ─▶ List operator
-           value: ID-321                  ─▶ Values to be compared against
-           value_type: swap               ─▶ Switches list comparison order
+           key: SecurityGroups[].GroupName
+           op: contains
+           value: default
 
+  The ``difference`` operator can find instances with security groups that don't appear in
+  a predefined list. This filter matches ``instance1`` and ``instance2``, because ``default``
+  and ``extra`` aren't in the list of expected security groups:
 
+  .. code-block:: yaml
+
+      filters:
+         - type: value
+           key: SecurityGroups[].GroupName
+           op: difference
+           value:
+             - common
+             - custom
+
+  ``value_type: swap`` can invert that logic, checking to see if the predefined list has
+  any values that don't appear on an instance. This filter matches ``instance3``, because
+  it is missing the ``custom`` security group:
+
+  .. code-block:: yaml
+
+      filters:
+         - type: value
+           key: SecurityGroups[].GroupName
+           op: difference
+           value:
+             - common
+             - custom
+           value_type: swap
 
 Pattern Matching Operators
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -325,6 +370,9 @@ Cloud Custodian supports additional custom JMESPath functions, including:
             key: "split(`/`, logGroupName)[-1]"
             tags: "*"
 
+- ``from_json(json_encoded_string) -> obj``: takes 1 argument, a json encoded string.
+  Returns an json decoded value.
+
 
 Value Regex
 ~~~~~~~~~~~
@@ -392,6 +440,59 @@ Value Path
   This implementation allows for the comparison of two separate lists of values
   within the same resource.
 
+List Item Filter
+----------------
+
+The ``list-item`` filter makes it easier to evaluate resource properties that contain
+a list of values.
+
+Example 1: AWS ECS Task Definitions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+AWS ECS task definitions include a list of container definitions. This policy matches
+a task definition if any of its container images reference an image from outside a given
+account and region:
+
+  .. code-block:: yaml
+
+    - name: find-task-def-not-using-registry
+      resource: aws.ecs-task-definition
+      filters:
+        - not:
+          - type: list-item
+            key: containerDefinitions
+            attrs:
+              - not:
+                - type: value
+                  key: image
+                  value: "${account_id}.dkr.ecr.us-east-2.amazonaws.com.*"
+                  op: regex
+
+That check is not possible with the ``value`` filter alone, because the ``regex``
+operator cannot operate directly against a list.
+
+Example 2: S3 Lifecycle Rules
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+S3 buckets can have lifecycle policies that include multiple rules.
+This policy matches buckets that are missing a rule for cleaning up
+incomplete multipart uploads.
+
+  .. code-block:: yaml
+
+    - name: s3-mpu-cleanup-not-configured
+      resource: aws.s3
+      filters:
+        - not:
+          - type: list-item
+            key: Lifecycle.Rules[]
+            attrs:
+              - Status: Enabled
+              - AbortIncompleteMultipartUpload.DaysAfterInitiation: not-null
+
+Here the ``list-item`` filter ensures that we check a combination of multiple
+properties for each individual lifecycle rule.
+
 Event Filter
 -------------
 
@@ -408,9 +509,13 @@ describe resource call as is the case in the ValueFilter
          events:
              - RunInstances
        filters:
-         - type: event                                                                           ─┐ The key is a JMESPath Query of
-           key: "detail.requestParameters.networkInterfaceSet.items[].associatePublicIpAddress"   ├▶the event JSON from CloudWatch
-           value: true                                                                           ─┘
+         - type: event
+           # The key is a JMESPath Query of the event JSON from CloudWatch.
+           key: "detail.requestParameters.networkInterfaceSet.items[].associatePublicIpAddress"
+           # The key expression returns a list. Combining "op: contains" with "value: true"
+           # allows this filter to match if any network interface has a public IP address.
+           op: contains
+           value: true
        actions:
          - type: terminate
            force: true

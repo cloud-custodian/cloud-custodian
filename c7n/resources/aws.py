@@ -299,6 +299,8 @@ class Arn(namedtuple('_Arn', (
         if isinstance(arn, Arn):
             return arn
         parts = arn.split(':', 5)
+        if len(parts) < 3:
+            raise ValueError("Invalid Arn")
         # a few resources use qualifiers without specifying type
         if parts[2] in ('s3', 'apigateway', 'execute-api', 'emr-serverless'):
             parts.append(None)
@@ -381,6 +383,9 @@ class MetricsOutput(Metrics):
         super(MetricsOutput, self).__init__(ctx, config)
         self.namespace = self.config.get('namespace', DEFAULT_NAMESPACE)
         self.region = self.config.get('region')
+        self.ignore_zero = self.config.get('ignore_zero')
+        am = self.config.get('active_metrics')
+        self.active_metrics = am and am.split(',')
         self.destination = (
             self.config.scheme == 'aws' and
             self.config.get('netloc') == 'master') and 'master' or None
@@ -414,6 +419,15 @@ class MetricsOutput(Metrics):
         else:
             watch = utils.local_session(
                 self.ctx.session_factory).client('cloudwatch', region_name=self.region)
+
+        # NOTE filter out value is 0 metrics data
+        if self.ignore_zero in ['1', 'true', 'True']:
+            metrics = [m for m in metrics if m.get("Value") != 0]
+        # NOTE filter metrics data by the metric name configured
+        if self.active_metrics:
+            metrics = [m for m in metrics if m["MetricName"] in self.active_metrics]
+        if not metrics:
+            return
         return self.retry(
             watch.put_metric_data, Namespace=ns, MetricData=metrics)
 
@@ -734,7 +748,8 @@ class AWS(Provider):
             options.region,
             options.profile,
             options.assume_role,
-            options.external_id)
+            options.external_id,
+            options.session_policy)
 
     def initialize_policies(self, policy_collection, options):
         """Return a set of policies targetted to the given regions.
@@ -815,7 +830,7 @@ def join_output(output_dir, suffix):
     # query string. make sure we add a suffix to
     # the path component.
     output_url_parts = output_url_parts._replace(
-        path = output_url_parts.path.rstrip('/') + '/%s' % suffix
+        path=output_url_parts.path.rstrip('/') + '/%s' % suffix
     )
     return urlparse.urlunparse(output_url_parts)
 
@@ -841,10 +856,10 @@ def get_service_region_map(regions, resource_types, provider='aws'):
     resource_service_map = {
         r: clouds[provider].resources.get(r).resource_type.service
         for r in normalized_types if r != 'account'}
-    # support for govcloud and china, we only utilize these regions if they
+    # support for govcloud, china, and iso. We only utilize these regions if they
     # are explicitly passed in on the cli.
     partition_regions = {}
-    for p in ('aws-cn', 'aws-us-gov'):
+    for p in ('aws-cn', 'aws-us-gov', 'aws-iso'):
         for r in session.get_available_regions('s3', partition_name=p):
             partition_regions[r] = p
 

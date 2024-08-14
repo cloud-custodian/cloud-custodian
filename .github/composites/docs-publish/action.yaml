@@ -13,7 +13,7 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - uses: aws-actions/configure-aws-credentials@v1-node16
+    - uses: aws-actions/configure-aws-credentials@v4
       with:
         role-to-assume: ${{ inputs.aws-role }}
         aws-region: ${{ inputs.aws-region }}
@@ -21,7 +21,7 @@ runs:
     - name: Install Deps
       shell: bash
       run: |
-        pip install -U awscli
+        pip install -U awscli --index-url https://pypi.org/simple
 
     - name: Publish
       shell: bash

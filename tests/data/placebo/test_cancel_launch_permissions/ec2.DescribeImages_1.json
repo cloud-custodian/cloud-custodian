@@ -1,0 +1,56 @@
+{
+    "status_code": 200,
+    "data": {
+        "Images": [
+            {
+                "Architecture": "x86_64",
+                "CreationDate": "2018-11-04T06:24:45.000Z",
+                "ImageId": "ami-0515ff4f8f9dbeb31",
+                "ImageLocation": "644160558196/Ubuntu1404",
+                "ImageType": "machine",
+                "Public": false,
+                "OwnerId": "644160558196",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/sda1",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-0d16416527e67c663",
+                            "VolumeSize": 8,
+                            "VolumeType": "standard",
+                            "Encrypted": true
+                        }
+                    },
+                    {
+                        "DeviceName": "/dev/sdb",
+                        "VirtualName": "ephemeral0"
+                    },
+                    {
+                        "DeviceName": "/dev/sdc",
+                        "VirtualName": "ephemeral1"
+                    }
+                ],
+                "Description": "[Copied ami-3073884d from us-east-1] ubuntu/images/hvm/ubuntu-trusty-14.04-amd64-server-20180308",
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "Ubuntu1404",
+                "RootDeviceName": "/dev/sda1",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "VirtualizationType": "hvm"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "f03372b5-48b8-4a14-a03a-e91e8c33ddf0",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "text/xml;charset=UTF-8",
+                "content-length": "1998",
+                "date": "Fri, 01 Mar 2019 16:00:20 GMT",
+                "server": "AmazonEC2"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

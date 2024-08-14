@@ -1,13 +1,19 @@
-FROM cgr.dev/chainguard/python:3.11-dev as builder
+FROM cgr.dev/chainguard/wolfi-base as builder
 
-ARG POETRY_VERSION="1.4.0"
-
+ARG POETRY_VERSION="1.8.3"
+ARG PY_VERSION=3.12
 WORKDIR /app
 
+RUN apk add python-${PY_VERSION} py${PY_VERSION}-pip && \
+    chown -R nonroot.nonroot /app/
+
+USER nonroot
+
 # Install Poetry in its own virtual environment
-RUN python -m venv "${HOME}/tools" && \
+RUN python3 -m venv "${HOME}/tools" && \
     . "${HOME}/tools/bin/activate" && \
-    pip3 install "poetry==${POETRY_VERSION}"
+    pip install --verbose "poetry==${POETRY_VERSION}"
+
 
 # Copy enough of the c7n source that poetry can
 # use it when installing c7n-left
@@ -21,9 +27,10 @@ WORKDIR /app/c7n/tools/c7n_left
 COPY tools/c7n_left /app/c7n/tools/c7n_left
 RUN python -m venv "${HOME}/venv" && \
     . "${HOME}/venv/bin/activate" && \
-    ~/tools/bin/poetry install --no-dev
+    ~/tools/bin/poetry install --only main
 
-FROM cgr.dev/chainguard/python:3.11
+
+FROM chainguard/wolfi-base
 
 LABEL name="c7n-left" \
       repository="http://github.com/cloud-custodian/cloud-custodian"
@@ -31,14 +38,18 @@ LABEL "org.opencontainers.image.title"="c7n-left"
 LABEL "org.opencontainers.image.description"="IaC Policy Engine"
 LABEL "org.opencontainers.image.documentation"="https://cloudcustodian.io/docs"
 
+ARG PY_VERSION=3.12
+
 WORKDIR /app
+RUN apk add git python-${PY_VERSION} && \
+    chown -R nonroot.nonroot /app/
 
-COPY --from=builder /home/nonroot/venv/lib/python3.11/site-packages /home/nonroot/.local/lib/python3.11/site-packages
-
+COPY --from=builder /home/nonroot/venv/lib/python${PY_VERSION}/site-packages /home/nonroot/.local/lib/python${PY_VERSION}/site-packages
+RUN rm -Rf /home/nonroot/.local/lib/python${PY_VERSION}/site-packages/pip*
 COPY --from=builder /app/c7n/c7n /app/c7n
 COPY --from=builder /app/c7n/tools/c7n_left /app/c7n/tools/c7n_left
 
 ENV LC_ALL="C.UTF-8" LANG="C.UTF-8"
-ENV PYTHONPATH=/app:$PYTHONPATH
+ENV PYTHONPATH=/app:/app/c7n/tools/c7n_left:/home/nonroot/.local/lib/python${PY_VERSION}/site-packages:$PYTHONPATH
 
 ENTRYPOINT [ "python", "-m", "c7n_left.cli"]

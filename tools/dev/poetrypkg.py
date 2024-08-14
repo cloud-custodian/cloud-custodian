@@ -12,6 +12,7 @@ def cli():
     some simple tooling to sync poetry files to setup/pip
     """
 
+
 def project_roots(root):
     for config_path in Path(root).rglob("pyproject.toml"):
         yield config_path.parent

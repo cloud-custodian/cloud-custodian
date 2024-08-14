@@ -36,7 +36,8 @@ extensions = [
     'sphinx.ext.viewcode',
     'c7n_sphinxext.docgen',
     'myst_parser',
-    'sphinx_markdown_tables'
+    'sphinx_markdown_tables',
+    'sphinxcontrib.jquery',
 ]
 
 # Extract only a classes docstrings
@@ -63,6 +64,9 @@ source_suffix = ['.rst', '.md']
 
 # The master toctree document.
 master_doc = 'index'
+
+# Generate Markdown header links anchors
+myst_heading_anchors = 3
 
 # General information about the project.
 project = u'Cloud Custodian'

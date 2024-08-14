@@ -1,0 +1,60 @@
+{
+    "status_code": 200,
+    "data": {
+        "logGroups": [
+            {
+                "logGroupName": "/aws/lambda/aws-controltower-NotificationForwarder",
+                "creationTime": 1628616564122,
+                "retentionInDays": 14,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-west-2:644160558196:log-group:/aws/lambda/aws-controltower-NotificationForwarder:*",
+                "storedBytes": 0
+            },
+            {
+                "logGroupName": "/aws/lambda/hello_world",
+                "creationTime": 1690463681871,
+                "retentionInDays": 14,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-west-2:644160558196:log-group:/aws/lambda/hello_world:*",
+                "storedBytes": 0
+            },
+            {
+                "logGroupName": "StackSet-AWSControlTowerBP-VPC-ACCOUNT-FACTORY-V1-e334ba13-ec6a-409f-a1ad-e29294b761fe-VPCFlowLogsLogGroup-ubdVPrVFarGe",
+                "creationTime": 1628617183274,
+                "retentionInDays": 90,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-west-2:644160558196:log-group:StackSet-AWSControlTowerBP-VPC-ACCOUNT-FACTORY-V1-e334ba13-ec6a-409f-a1ad-e29294b761fe-VPCFlowLogsLogGroup-ubdVPrVFarGe:*",
+                "storedBytes": 0
+            },
+            {
+                "logGroupName": "expert-cougar-1",
+                "creationTime": 1693153186887,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-west-2:644160558196:log-group:expert-cougar-1:*",
+                "storedBytes": 0
+            },
+            {
+                "logGroupName": "expert-cougar-2",
+                "creationTime": 1693153186887,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-west-2:644160558196:log-group:expert-cougar-2:*",
+                "storedBytes": 0
+            },
+            {
+                "logGroupName": "expert-cougar-3",
+                "creationTime": 1693153186886,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-west-2:644160558196:log-group:expert-cougar-3:*",
+                "storedBytes": 0
+            },
+            {
+                "logGroupName": "expert-cougar-4",
+                "creationTime": 1693153186866,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-west-2:644160558196:log-group:expert-cougar-4:*",
+                "storedBytes": 0
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

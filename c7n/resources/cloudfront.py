@@ -8,7 +8,7 @@ from c7n.manager import resources
 from c7n.query import ConfigSource, QueryResourceManager, DescribeSource, TypeInfo
 from c7n.tags import universal_augment
 from c7n.utils import local_session, merge_dict, type_schema, get_retry
-from c7n.filters import ValueFilter
+from c7n.filters import ValueFilter, WafV2FilterBase
 from .aws import shape_validate
 from c7n.exceptions import PolicyValidationError
 
@@ -52,6 +52,7 @@ class Distribution(QueryResourceManager):
         cfn_type = config_type = "AWS::CloudFront::Distribution"
         # Denotes this resource type exists across regions
         global_resource = True
+        permission_augment = ("cloudfront:ListTagsForResource",)
 
     source_mapping = {
         'describe': DescribeDistribution,
@@ -86,6 +87,25 @@ class StreamingDistribution(QueryResourceManager):
         'describe': DescribeStreamingDistribution,
         'config': ConfigSource
     }
+
+
+@resources.register("origin-access-control")
+class OriginAccessControl(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = "cloudfront"
+        arn_type = "origin-access-control"
+        enum_spec = (
+            "list_origin_access_controls",
+            "OriginAccessControlList.Items",
+            None,
+        )
+        id = "Id"
+        description = "Description"
+        name = "Name"
+        signing_protocol = "SigningProtocol"
+        signing_behavior = "SigningBehavior"
+        origin_type = "OriginAccessControlOriginType"
+        cfn_type = "AWS::CloudFront::OriginAccessControl"
 
 
 Distribution.filter_registry.register('shield-metrics', ShieldMetrics)
@@ -167,7 +187,7 @@ class IsWafEnabled(Filter):
 
 
 @Distribution.filter_registry.register('wafv2-enabled')
-class IsWafV2Enabled(Filter):
+class IsWafV2Enabled(WafV2FilterBase):
     """Filter CloudFront distribution by wafv2 web-acl
 
     :example:
@@ -203,32 +223,9 @@ class IsWafV2Enabled(Filter):
                     web-acl: .*FMManagedWebACLV2-?FMS-.*
     """
 
-    schema = type_schema(
-        'wafv2-enabled', **{
-            'web-acl': {'type': 'string'},
-            'state': {'type': 'boolean'}})
-
-    permissions = ('wafv2:ListWebACLs',)
-
-    def process(self, resources, event=None):
-        query = {'Scope': 'CLOUDFRONT'}
-        wafs = self.manager.get_resource_manager('wafv2').resources(query, augment=False)
-        waf_name_id_map = {w['Name']: w['ARN'] for w in wafs}
-
-        target_acl = self.data.get('web-acl', '')
-        state = self.data.get('state', False)
-        target_acl_ids = [v for k, v in waf_name_id_map.items() if
-                          re.match(target_acl, k)]
-        results = []
-        for r in resources:
-            r_web_acl_id = r.get('WebACLId')
-            if state:
-                if r_web_acl_id and r_web_acl_id in target_acl_ids:
-                    results.append(r)
-            else:
-                if not r_web_acl_id or r_web_acl_id not in target_acl_ids:
-                    results.append(r)
-        return results
+    def get_associated_web_acl(self, resource):
+        # for WAFv2 Cloudfront stores the ARN of the WebACL even though the attribute is 'WebACLId'
+        return self.get_web_acl_by_arn(resource.get('WebACLId'), scope='CLOUDFRONT')
 
 
 class BaseDistributionConfig(ValueFilter):

@@ -1,0 +1,27 @@
+{
+  "status_code": 200,
+  "data": {
+    "mesh": {
+      "meshName": "m1",
+      "metadata": {
+        "arn": "arn:aws:appmesh:eu-west-2:123456789012:mesh/m1",
+        "createdAt": "2023-11-03T02:36:27.877000+00:00",
+        "lastUpdatedAt": "2023-11-03T02:36:27.877000+00:00",
+        "meshOwner": "123456789012",
+        "resourceOwner": "123456789012",
+        "uid": "1013368a-8d58-4b30-b08e-57347af88525",
+        "version": 1
+      },
+      "spec": {
+        "egressFilter" : {
+          "type" : "ALLOW_ALL"
+        }
+      },
+      "status": {
+        "status": "ACTIVE"
+      }
+    },
+    "failures": [],
+    "ResponseMetadata": {}
+  }
+}

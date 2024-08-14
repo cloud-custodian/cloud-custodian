@@ -3,6 +3,7 @@
 from c7n.utils import type_schema
 
 from c7n_gcp.actions import MethodAction
+from c7n_gcp.filters import IamPolicyFilter
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
 
@@ -35,6 +36,14 @@ class PubSubTopic(QueryResourceManager):
         def get(client, resource_info):
             return client.execute_command(
                 'get', {'topic': resource_info['topic_id']})
+
+
+@PubSubTopic.filter_registry.register('iam-policy')
+class PubSubTopicIamPolicyFilter(IamPolicyFilter):
+    """
+    Overrides the base implementation to process pubsub topic resources correctly.
+    """
+    permissions = ('pubsub.topics.getIamPolicy',)
 
 
 @PubSubTopic.action_registry.register('delete')

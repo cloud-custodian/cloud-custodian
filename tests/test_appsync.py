@@ -3,6 +3,7 @@
 
 from .common import BaseTest
 
+
 class AppSyncWafV2(BaseTest):
 
     def test_graphql_api_filter_wafv2(self):
@@ -52,6 +53,38 @@ class AppSyncWafV2(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 2)
+
+    def test_graphql_api_filter_wafv2_value(self):
+        factory = self.replay_flight_data("test_graphql_api_filter_wafv2_value")
+
+        p = self.load_policy(
+            {
+                "name": "filter-graphql-api-wafv2",
+                "resource": "graphql-api",
+                "filters": [{"type": "wafv2-enabled", "key": "Rules", "value": "empty"}]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        # mock WAF has 1 rule
+        self.assertEqual(len(resources), 0)
+
+        p = self.load_policy(
+            {
+                "name": "filter-graphql-api-wafv2",
+                "resource": "graphql-api",
+                "filters": [{
+                    "type": "wafv2-enabled",
+                    "key": "length(Rules[?contains(keys(Statement), 'RateBasedStatement')])",
+                    "op": "gte",
+                    "value": 1
+                }]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        # mock WAF rule has single RateBasedStatement
+        self.assertEqual(len(resources), 1)
 
     def test_graphql_api_action_wafv2(self):
         factory = self.replay_flight_data("test_graphql_api_action_wafv2")

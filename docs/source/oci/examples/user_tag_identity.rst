@@ -13,8 +13,6 @@ The following example policy will tag all the users in the tenancy
         Tag all the users in the tenancy
       resource: oci.user
       actions:
-       - type: update-user
-         params:
-          update_user_details:
-            freeform_tags:
-                TagName : TagValue
+       - type: update
+         freeform_tags:
+           TagName : TagValue

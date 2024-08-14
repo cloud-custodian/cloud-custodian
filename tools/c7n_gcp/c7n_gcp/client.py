@@ -180,9 +180,11 @@ class Session:
         if not credentials:
             # Only share the http object when using the default credentials.
             self._use_cached_http = True
-            default_credentials, _ = google.auth.default(
-                quota_project_id=project_id or get_default_project()
-            )
+            # This causes error: https://github.com/cloud-custodian/cloud-custodian/issues/7155
+            # default_credentials, _ = google.auth.default(
+            #    quota_project_id=project_id or get_default_project()
+            # )
+            default_credentials, _ = google.auth.default()
         impersonated_credentials = None
         if impersonate_service or GOOGLE_IMPERSONATE_SERVICE_ACCOUNT:
             impersonate_target = impersonate_service or GOOGLE_IMPERSONATE_SERVICE_ACCOUNT

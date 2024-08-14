@@ -12,7 +12,7 @@ import zlib
 from contextlib import closing
 
 from c7n.cache import NullCache
-from c7n.utils import format_string_values, jmespath_search
+from c7n.utils import format_string_values, local_session, jmespath_search
 
 log = logging.getLogger('custodian.resolver')
 
@@ -51,6 +51,7 @@ class URIResolver:
 
     def get_s3_uri(self, uri):
         parsed = urlparse(uri)
+        client = local_session(self.session_factory).client('s3')
         params = dict(
             Bucket=parsed.netloc,
             Key=parsed.path[1:])
@@ -60,7 +61,9 @@ class URIResolver:
         client = self.session_factory().client('s3', region_name=region)
         result = client.get_object(**params)
         body = result['Body'].read()
-        if isinstance(body, str):
+        if params['Key'].lower().endswith(('.gz', '.zip', '.gzip')):
+            return zlib.decompress(body, ZIP_OR_GZIP_HEADER_DETECT).decode('utf-8')
+        elif isinstance(body, str):
             return body
         else:
             return body.decode('utf-8')
@@ -98,6 +101,13 @@ class ValuesFrom:
          format: csv2dict
          expr: key[1]
 
+      # using cql against dynamodb
+      value_from:
+         url: dynamodb
+         query: |
+           select resource_id from exceptions
+           where account_id = '{account_id} and policy = '{policy.name}'
+         expr: [].resource_id
        # inferred from extension
        format: [json, csv, csv2dict, txt]
     """
@@ -110,6 +120,7 @@ class ValuesFrom:
         'required': ['url'],
         'properties': {
             'url': {'type': 'string'},
+            'query': {'type': 'string'},
             'format': {'enum': ['csv', 'json', 'txt', 'csv2dict']},
             'expr': {'oneOf': [
                 {'type': 'integer'},
@@ -155,17 +166,52 @@ class ValuesFrom:
         return contents, format
 
     def get_values(self):
-        key = [self.data.get(i) for i in ('url', 'format', 'expr', 'headers')]
+        cache_key = [self.data.get(i) for i in ('url', 'format', 'expr', 'headers', 'query')]
         with self.cache:
             # use these values as a key to cache the result so if we have
             # the same filter happening across many resources, we can reuse
             # the results.
-            contents = self.cache.get(("value-from", key))
+            contents = self.cache.get(("value-from", cache_key))
             if contents is not None:
                 return contents
-            contents = self._get_values()
-            self.cache.save(("value-from", key), contents)
+            if self.data['url'] == 'dynamodb':
+                contents = self._get_ddb_values()
+            else:
+                contents = self._get_values()
+            self.cache.save(("value-from", cache_key), contents)
             return contents
+
+    def _get_ddb_values(self):
+        if not self.data['query']:
+            return
+        if not self.data['query'].lower().startswith('select'):
+            return
+
+        from boto3.dynamodb.types import TypeDeserializer
+        from botocore.paginate import Paginator
+
+        client = local_session(self.manager.session_factory).client('dynamodb')
+
+        pager = Paginator(
+            client.execute_statement,
+            {"input_token": "NextToken", "output_token": "NextToken", "result_key": "Items"},
+            client.meta.service_model.operation_model('ExecuteStatement')
+        )
+        deserializer = TypeDeserializer()
+        results = []
+
+        record_singleton = False
+        for page in pager.paginate(Statement=self.data['query']):
+            for row in page.get("Items", []):
+                record = {k: deserializer.deserialize(v) for k, v in row.items()}
+                if record_singleton or len(record) == 1:
+                    record_singleton = True
+                    results.append(list(record.values())[0])
+                else:
+                    results.append(record)
+        if not record_singleton or self.data.get('expr'):
+            return self._get_resource_values(results)
+        return results
 
     def _get_values(self):
         contents, format = self.get_contents()

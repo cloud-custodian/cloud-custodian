@@ -1,0 +1,374 @@
+interactions:
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>
+  response:
+    body:
+      data:
+    headers:
+      cache-control:
+      - no-cache, no-store, must-revalidate
+      content-length:
+      - '990'
+      content-type:
+      - application/json
+      date:
+      - Thu, 15 Jun 2023 12:36:00 GMT
+      etag:
+      - e3d2cb864e2b0f74308b4ead60ac0e65f2b1d7e8
+      pragma:
+      - no-cache
+      x-content-type-options:
+      - nosniff
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://iaas.us-ashburn-1.oraclecloud.com/20160918/instances?compartmentId=ocid1.compartment.oc1..<unique_ID>
+  response:
+    body:
+      data:
+      - agentConfig:
+          areAllPluginsDisabled: false
+          isManagementDisabled: false
+          isMonitoringDisabled: false
+          pluginsConfig:
+          - desiredState: DISABLED
+            name: Vulnerability Scanning
+          - desiredState: DISABLED
+            name: Oracle Java Management Service
+          - desiredState: ENABLED
+            name: OS Management Service Agent
+          - desiredState: ENABLED
+            name: Custom Logs Monitoring
+          - desiredState: ENABLED
+            name: Compute Instance Run Command
+          - desiredState: ENABLED
+            name: Compute Instance Monitoring
+          - desiredState: DISABLED
+            name: Block Volume Management
+          - desiredState: DISABLED
+            name: Bastion
+          - desiredState: ENABLED
+            name: Management Agent
+        availabilityConfig:
+          isLiveMigrationPreferred: null
+          recoveryAction: RESTORE_INSTANCE
+        availabilityDomain: NQNU:US-ASHBURN-AD-1
+        capacityReservationId: null
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        dedicatedVmHostId: null
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-06-15T06:41:33.444Z'
+        displayName: cc_ag
+        extendedMetadata: {}
+        faultDomain: FAULT-DOMAIN-3
+        freeformTags: {}
+        id: ocid1.instance.oc1..<unique_ID>
+        imageId: ocid1.image.oc1..<unique_ID>
+        instanceConfigurationId: null
+        instanceOptions:
+          areLegacyImdsEndpointsDisabled: false
+        ipxeScript: null
+        isCrossNumaNode: false
+        launchMode: PARAVIRTUALIZED
+        launchOptions:
+          bootVolumeType: PARAVIRTUALIZED
+          firmware: UEFI_64
+          isConsistentVolumeNamingEnabled: true
+          isPvEncryptionInTransitEnabled: true
+          networkType: PARAVIRTUALIZED
+          remoteDataVolumeType: PARAVIRTUALIZED
+        lifecycleState: TERMINATED
+        platformConfig: null
+        preemptibleInstanceConfig: null
+        preferredMaintenanceAction: null
+        region: iad
+        shape: VM.Standard.E4.Flex
+        shapeConfig:
+          baselineOcpuUtilization: null
+          gpuDescription: null
+          gpus: 0
+          localDiskDescription: null
+          localDisks: 0
+          localDisksTotalSizeInGBs: null
+          maxVnicAttachments: 2
+          memoryInGBs: 16.0
+          networkingBandwidthInGbps: 1.0
+          ocpus: 1.0
+          processorDescription: "2.55 GHz AMD EPYC\u2122 7J13 (Milan)"
+          vcpus: 2
+        sourceDetails:
+          bootVolumeSizeInGBs: null
+          bootVolumeVpusPerGB: null
+          imageId: ocid1.image.oc1..<unique_ID>
+          instanceSourceImageFilterDetails: null
+          kmsKeyId: null
+          sourceType: image
+        systemTags: {}
+        timeCreated: '2023-06-15T06:41:34.131Z'
+        timeMaintenanceRebootDue: null
+        timeStopScheduled: null
+    headers:
+      content-encoding:
+      - gzip
+      content-length:
+      - '2904'
+      content-type:
+      - application/json
+      date:
+      - Thu, 15 Jun 2023 12:36:02 GMT
+      x-content-type-options:
+      - nosniff
+    status:
+      code: 200
+      message: OK
+- request:
+    body: mock_body
+    headers: {}
+    method: POST
+    uri: https://telemetry.us-ashburn-1.oraclecloud.com/20180401/metrics/actions/summarizeMetricsData?compartmentId=ocid1.compartment.oc1..<unique_ID>
+  response:
+    body:
+      data:
+      - aggregatedDatapoints:
+        - timestamp: '2023-06-15T10:15:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T10:16:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T10:17:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T10:18:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T10:19:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T10:20:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T10:21:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T10:22:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T10:23:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T10:24:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T10:25:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T10:26:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T10:27:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T10:28:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T10:29:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T10:30:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T10:31:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T10:32:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T10:33:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T10:34:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T10:35:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T10:36:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T10:37:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T10:38:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T10:39:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T10:40:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T10:41:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T10:42:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T10:43:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T10:44:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T10:45:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T10:46:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T10:47:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T10:48:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T10:49:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T10:50:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T10:51:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T10:52:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T10:53:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T10:54:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T10:55:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T10:56:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T10:57:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T10:58:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T10:59:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T11:00:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T11:01:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T11:02:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T11:03:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T11:04:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T11:05:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T11:06:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T11:07:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T11:08:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T11:09:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T11:10:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T11:11:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T11:12:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T11:13:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T11:14:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T11:15:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T11:16:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T11:17:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T11:18:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T11:19:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T11:20:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T11:21:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T11:22:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T11:23:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T11:24:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T11:25:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T11:26:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T11:27:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T11:28:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T11:29:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T11:30:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T11:31:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T11:32:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T11:33:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T11:34:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T11:35:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T11:36:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T11:37:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T11:38:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T11:39:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T11:40:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T11:41:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T11:42:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T11:43:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T11:44:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T11:45:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T11:46:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T11:47:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T11:48:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T11:49:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T11:50:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T11:51:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T11:52:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T11:53:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T11:54:00.000Z'
+          value: 1.0
+        - timestamp: '2023-06-15T11:55:00.000Z'
+          value: 1.0
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        dimensions:
+          availabilityDomain: NQNU:US-ASHBURN-AD-1
+          faultDomain: FAULT-DOMAIN-1
+          imageId: ocid1.image.oc1..<unique_ID>
+          instancePoolId: Default
+          region: us-ashburn-1
+          resourceDisplayName: instance20230615101159
+          resourceId: ocid1.instance.oc1..<unique_ID>
+          shape: VM.Standard.E3.Flex
+        name: CpuUtilization
+        namespace: <namespace>
+        resolution: null
+        resourceGroup: null
+    headers:
+      content-encoding:
+      - gzip
+      content-type:
+      - application/json
+      date:
+      - Thu, 15 Jun 2023 12:36:04 GMT
+      transfer-encoding:
+      - chunked
+      vary:
+      - Accept-Encoding
+      x-content-type-options:
+      - nosniff
+    status:
+      code: 200
+      message: OK
+version: 1

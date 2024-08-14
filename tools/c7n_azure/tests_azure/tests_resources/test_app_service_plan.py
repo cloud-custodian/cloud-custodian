@@ -76,7 +76,7 @@ class AppServicePlanTest(BaseTest):
             resources = p.run()
             self.assertEqual(1, len(resources))
 
-            name, args, kwargs = update_mock.mock_calls[0]
+            _, args, _ = update_mock.mock_calls[0]
             self.assertEqual('cctest-appserviceplan-win', args[1])
             self.assertEqual('B1', args[2].sku.name)
             self.assertEqual('BASIC', args[2].sku.tier)
@@ -108,7 +108,7 @@ class AppServicePlanTest(BaseTest):
             resources = p.run()
             self.assertEqual(1, len(resources))
 
-            name, args, kwargs = update_mock.mock_calls[0]
+            _, args, _ = update_mock.mock_calls[0]
             self.assertEqual('cctest-appserviceplan-linux', args[1])
             self.assertEqual('B1', args[2].sku.name)
             self.assertEqual('BASIC', args[2].sku.tier)
@@ -137,7 +137,7 @@ class AppServicePlanTest(BaseTest):
             resources = p.run()
             self.assertEqual(1, len(resources))
 
-            name, args, kwargs = update_mock.mock_calls[0]
+            _, args, _ = update_mock.mock_calls[0]
             self.assertEqual('cctest-appserviceplan-win', args[1])
             self.assertEqual('B1', args[2].sku.name)
             self.assertEqual('BASIC', args[2].sku.tier)
@@ -219,7 +219,7 @@ class AppServicePlanTest(BaseTest):
             resources = p.run()
             self.assertEqual(1, len(resources))
 
-            name, args, kwargs = update_mock.mock_calls[0]
+            _, args, _ = update_mock.mock_calls[0]
             self.assertEqual('cctest-appserviceplan-win', args[1])
             self.assertEqual('S1', args[2].sku.name)
             self.assertEqual('Standard', args[2].sku.tier)

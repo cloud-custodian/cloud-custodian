@@ -5,7 +5,8 @@ from concurrent.futures import as_completed
 
 from c7n.actions import BaseAction
 from c7n.manager import resources
-from c7n.query import ConfigSource, QueryResourceManager, DescribeSource, TypeInfo
+from c7n.query import (
+    ConfigSource, QueryResourceManager, DescribeSource, TypeInfo, DescribeWithResourceTags)
 from c7n.utils import local_session, chunks, type_schema, get_retry
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter
 from c7n.filters.kms import KmsRelatedFilter
@@ -58,7 +59,8 @@ class ReplicationInstance(QueryResourceManager):
         name = id = 'ReplicationInstanceIdentifier'
         arn = 'ReplicationInstanceArn'
         date = 'InstanceCreateTime'
-        cfn_type = 'AWS::DMS::ReplicationInstance'
+        config_type = cfn_type = 'AWS::DMS::ReplicationInstance'
+        permissions_augment = ("dms:ListTagsForResource",)
 
     filters = FilterRegistry('dms-instance.filters')
     filters.register('marked-for-op', TagActionFilter)
@@ -71,6 +73,12 @@ class ReplicationInstance(QueryResourceManager):
     }
 
 
+class EndpointDescribe(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(self.manager, resources)
+
+
 @resources.register('dms-endpoint')
 class DmsEndpoints(QueryResourceManager):
 
@@ -81,9 +89,13 @@ class DmsEndpoints(QueryResourceManager):
         name = 'EndpointIdentifier'
         arn_type = 'endpoint'
         universal_taggable = object()
-        cfn_type = 'AWS::DMS::Endpoint'
+        config_type = cfn_type = 'AWS::DMS::Endpoint'
+        permissions_augment = ("dms:ListTagsForResource",)
 
-    augment = universal_augment
+    source_mapping = {
+        'describe': EndpointDescribe,
+        'config': ConfigSource
+    }
 
 
 @ReplicationInstance.filter_registry.register('kms-key')
@@ -399,3 +411,22 @@ class DeleteDmsEndpoint(BaseAction):
                 client.delete_endpoint(EndpointArn=EndpointArn)
             except client.exceptions.ResourceNotFoundFault:
                 continue
+
+
+@resources.register("dms-replication-task")
+class DMSReplicationTask(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = "dms"
+        enum_spec = ('describe_replication_tasks', 'ReplicationTasks', None)
+        arn_type = "task"
+        arn = "ReplicationTaskArn"
+        id = "ReplicationTaskArn"
+        name = "ReplicationTaskIdentifier"
+        cfn_type = config_type = "AWS::DMS::ReplicationTask"
+        universal_taggable = object()
+        permissions_augment = ("dms:ListTagsForResource",)
+
+    source_mapping = {
+       "describe": DescribeWithResourceTags,
+       "config": ConfigSource
+    }

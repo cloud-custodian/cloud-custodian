@@ -1,0 +1,151 @@
+{
+    "status_code": 200,
+    "data": {
+        "tasks": [
+            {
+                "attachments": [
+                    {
+                        "id": "c8773f8d-1317-457a-ba3c-b57775ac6a04",
+                        "type": "ElasticNetworkInterface",
+                        "status": "ATTACHED",
+                        "details": [
+                            {
+                                "name": "subnetId",
+                                "value": "subnet-0797208b821c08196"
+                            },
+                            {
+                                "name": "networkInterfaceId",
+                                "value": "eni-0a303493893652ca1"
+                            },
+                            {
+                                "name": "macAddress",
+                                "value": "0e:46:2e:26:86:81"
+                            },
+                            {
+                                "name": "privateDnsName",
+                                "value": "ip-10-0-1-232.ec2.internal"
+                            },
+                            {
+                                "name": "privateIPv4Address",
+                                "value": "10.0.1.232"
+                            }
+                        ]
+                    }
+                ],
+                "attributes": [
+                    {
+                        "name": "ecs.cpu-architecture",
+                        "value": "x86_64"
+                    }
+                ],
+                "availabilityZone": "us-east-1b",
+                "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/c7n-test-cluster",
+                "connectivity": "CONNECTED",
+                "connectivityAt": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 8,
+                    "day": 31,
+                    "hour": 14,
+                    "minute": 27,
+                    "second": 1,
+                    "microsecond": 246000
+                },
+                "containers": [
+                    {
+                        "containerArn": "arn:aws:ecs:us-east-1:644160558196:container/c7n-test-cluster/2e04f4f94d1149b3b4a0515e4a71d933/062656e3-e767-4a60-be90-c345374a3d60",
+                        "taskArn": "arn:aws:ecs:us-east-1:644160558196:task/c7n-test-cluster/2e04f4f94d1149b3b4a0515e4a71d933",
+                        "name": "sample-app",
+                        "image": "httpd:2.4",
+                        "imageDigest": "sha256:333f7bca9fb72248f301fd2ae4892b86d36cc2fdf4c6aa49a6700f27c8e06daf",
+                        "runtimeId": "2e04f4f94d1149b3b4a0515e4a71d933-1053176469",
+                        "lastStatus": "RUNNING",
+                        "networkBindings": [],
+                        "networkInterfaces": [
+                            {
+                                "attachmentId": "c8773f8d-1317-457a-ba3c-b57775ac6a04",
+                                "privateIpv4Address": "10.0.1.232"
+                            }
+                        ],
+                        "healthStatus": "UNKNOWN",
+                        "cpu": "256",
+                        "memoryReservation": "512"
+                    }
+                ],
+                "cpu": "256",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 8,
+                    "day": 31,
+                    "hour": 14,
+                    "minute": 26,
+                    "second": 57,
+                    "microsecond": 835000
+                },
+                "desiredStatus": "RUNNING",
+                "enableExecuteCommand": false,
+                "group": "service:c7n-test-service",
+                "healthStatus": "UNKNOWN",
+                "lastStatus": "RUNNING",
+                "launchType": "FARGATE",
+                "memory": "512",
+                "overrides": {
+                    "containerOverrides": [
+                        {
+                            "name": "sample-app"
+                        }
+                    ],
+                    "inferenceAcceleratorOverrides": []
+                },
+                "platformVersion": "1.4.0",
+                "platformFamily": "Linux",
+                "pullStartedAt": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 8,
+                    "day": 31,
+                    "hour": 14,
+                    "minute": 27,
+                    "second": 11,
+                    "microsecond": 327000
+                },
+                "pullStoppedAt": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 8,
+                    "day": 31,
+                    "hour": 14,
+                    "minute": 27,
+                    "second": 15,
+                    "microsecond": 969000
+                },
+                "startedAt": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 8,
+                    "day": 31,
+                    "hour": 14,
+                    "minute": 27,
+                    "second": 17,
+                    "microsecond": 157000
+                },
+                "startedBy": "ecs-svc/1718156036370285947",
+                "tags": [
+                    {
+                        "key": "NetworkLocation",
+                        "value": "Customer"
+                    }
+                ],
+                "taskArn": "arn:aws:ecs:us-east-1:644160558196:task/c7n-test-cluster/2e04f4f94d1149b3b4a0515e4a71d933",
+                "taskDefinitionArn": "arn:aws:ecs:us-east-1:644160558196:task-definition/c7n-test-task-def:2",
+                "version": 3,
+                "ephemeralStorage": {
+                    "sizeInGiB": 20
+                }
+            }
+        ],
+        "failures": [],
+        "ResponseMetadata": {}
+    }
+}

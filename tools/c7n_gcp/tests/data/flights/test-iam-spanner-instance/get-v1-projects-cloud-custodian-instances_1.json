@@ -1,0 +1,36 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 27 Jan 2022 15:39:07 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "server-timing": "gfet4t7; dur=216",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "518",
+    "-content-encoding": "gzip",
+    "content-location": "https://spanner.googleapis.com/v1/projects/cloud-custodian/instances?alt=json"
+  },
+  "body": {
+    "instances": [
+      {
+        "name": "projects/cloud-custodian/instances/test-green",
+        "config": "projects/cloud-custodian/instanceConfigs/regional-us-central1",
+        "displayName": "test-green",
+        "state": "READY",
+        "processingUnits": 100
+      },
+      {
+        "name": "projects/cloud-custodian/instances/test-red",
+        "config": "projects/cloud-custodian/instanceConfigs/regional-us-central1",
+        "displayName": "test-red",
+        "state": "READY",
+        "processingUnits": 100
+      }
+    ]
+  }
+}

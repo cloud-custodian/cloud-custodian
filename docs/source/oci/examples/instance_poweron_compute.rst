@@ -17,6 +17,4 @@ The following example policy will start a stopped instance
                key: display_name
                value: Instance_1
           actions:
-             - type: instance-action
-               params:
-                  'action' : 'START'
+             - start

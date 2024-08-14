@@ -1,0 +1,56 @@
+{
+    "status_code": 200,
+    "data": {
+        "UpdateToken": "051d4f2e-0761-4d75-a00f-c33f50270f04",
+        "Firewall": {
+            "FirewallName": "test-firewall",
+            "FirewallArn": "arn:aws:network-firewall:us-east-1:644160558196:firewall/test-firewall",
+            "FirewallPolicyArn": "arn:aws:network-firewall:us-east-1:644160558196:firewall-policy/test-firewall-policy",
+            "VpcId": "vpc-0d4f819d13b730139",
+            "SubnetMappings": [
+                {
+                    "SubnetId": "subnet-0707ce1b2a6305995",
+                    "IPAddressType": "IPV4"
+                }
+            ],
+            "DeleteProtection": true,
+            "SubnetChangeProtection": true,
+            "FirewallPolicyChangeProtection": false,
+            "FirewallId": "f4df2ae5-6107-49e7-92d0-0213c7876ea8",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "policy"
+                },
+                {
+                    "Key": "custodian_cleanup",
+                    "Value": "Resource does not meet policy: delete@2024/03/08"
+                }
+            ],
+            "EncryptionConfiguration": {
+                "KeyId": "AWS_OWNED_KMS_KEY",
+                "Type": "AWS_OWNED_KMS_KEY"
+            }
+        },
+        "FirewallStatus": {
+            "Status": "READY",
+            "ConfigurationSyncStateSummary": "IN_SYNC",
+            "SyncStates": {
+                "us-east-1a": {
+                    "Attachment": {
+                        "SubnetId": "subnet-0707ce1b2a6305995",
+                        "EndpointId": "vpce-0e1f834bd86c6c64d",
+                        "Status": "READY"
+                    },
+                    "Config": {
+                        "arn:aws:network-firewall:us-east-1:644160558196:firewall-policy/test-firewall-policy": {
+                            "SyncStatus": "IN_SYNC",
+                            "UpdateToken": "63dbfbb3-295f-4429-82c5-d4a1ff900162"
+                        }
+                    }
+                }
+            }
+        },
+        "ResponseMetadata": {}
+    }
+}

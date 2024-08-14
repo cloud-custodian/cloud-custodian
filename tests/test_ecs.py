@@ -7,6 +7,8 @@ import os
 import time
 
 from c7n.exceptions import PolicyExecutionError
+from c7n.resources.aws import Arn
+
 
 class TestEcs(BaseTest):
     def test_ecs_container_insights_enabled(self):
@@ -46,6 +48,52 @@ class TestEcs(BaseTest):
                     }
                 ],
             },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_ecs_cluster_storage(self):
+        session_factory = self.replay_flight_data("test_ecs_cluster_storage")
+        p = self.load_policy(
+            {
+                "name": "ecs-cluster-storage",
+                "resource": "ecs",
+                "filters": [
+                    {
+                        "type": "ebs-storage",
+                        "key": "Encrypted",
+                        "op": "eq",
+                        "value": True
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_ecs_cluster_exec_cw_logging(self):
+        session_factory = self.replay_flight_data("test_ecs_cluster_exec_cw_logging")
+        p = self.load_policy(
+        {
+            "name": "ecs-cluster-exec-cw-logging",
+            "resource": "ecs",
+            "filters": [
+                {
+                    "type": "value",
+                    "key": "configuration.executeCommandConfiguration."
+                           "logConfiguration.cloudWatchLogGroupName",
+                    "value": "present"
+                },
+                {
+                    "type": "value",
+                    "key": "configuration.executeCommandConfiguration."
+                           "logConfiguration.cloudWatchEncryptionEnabled",
+                    "value": False
+                }
+            ],
+        },
             session_factory=session_factory,
         )
         resources = p.run()
@@ -140,6 +188,37 @@ class TestEcsService(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertTrue("c7n.metrics" in resources[0])
+
+    def test_ecs_service_modify_definition(self):
+        factory = self.replay_flight_data("test_ecs_service_update_definition", region="us-east-2")
+        p = self.load_policy(
+            {"name": "update-definition",
+             "resource": "aws.ecs-service",
+             "filters": [
+                 {'serviceName': 'redash-server'},
+                 "cost-optimization"],
+             "actions": ["modify-definition"]},
+            config={"region": "us-east-2"},
+            session_factory=factory,
+        )
+        resources = p.run()
+        assert len(resources) == 1
+        rservice = resources.pop()
+        client = factory().client('ecs')
+        cluster, service_name = Arn.parse(rservice['serviceArn']).resource.split('/')
+        cservice = client.describe_services(
+            cluster=cluster,
+            services=[service_name]
+        )["services"][0]
+
+        rtask = client.describe_task_definition(
+            taskDefinition=rservice['taskDefinition'])['taskDefinition']
+        ctask = client.describe_task_definition(
+            taskDefinition=cservice['taskDefinition'])['taskDefinition']
+
+        assert cservice['taskDefinition'] != rservice['taskDefinition']
+        assert rtask['cpu'] != ctask['cpu']
+        assert rtask['memory'] != ctask['memory']
 
     def test_ecs_service_update(self):
         session_factory = self.replay_flight_data("test_ecs_service_update")
@@ -329,6 +408,37 @@ class TestEcsService(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["serviceName"], "c7n-test")
+
+    def test_ecs_service_taskset_delete(self):
+        session_factory = self.replay_flight_data("test_ecs_service_taskset_delete")
+        p = self.load_policy(
+            {
+                "name": "test-ecs-service-taskset-delete",
+                "resource": "ecs-service",
+                "filters": [{"serviceName": "test-task-set-delete"}],
+                "actions": ["delete"],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+
+        # Remove duplicate response
+        unique_services = {svc['serviceArn']: svc for svc in resources}.values()
+        self.assertEqual(len(unique_services), 1)
+        svc = resources.pop()
+        self.assertEqual(svc["serviceName"], "test-task-set-delete")
+        if self.recording:
+            time.sleep(1)
+        client = session_factory().client("ecs")
+        svc_current = client.describe_services(
+            cluster=svc["clusterArn"], services=[svc["serviceName"]]
+        )[
+            "services"
+        ][
+            0
+        ]
+        self.assertEqual(svc_current["serviceArn"], svc["serviceArn"])
+        self.assertNotEqual(svc_current["status"], svc["status"])
 
 
 class TestEcsTaskDefinition(BaseTest):
@@ -645,3 +755,169 @@ class TestEcsContainerInstance(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0].get('c7n:matched-subnets')[0], 'subnet-914763e7')
+
+    def test_ecs_service_sg_filter(self):
+        session_factory = self.replay_flight_data("test_ecs_service_sg_filter")
+        p = self.load_policy(
+            {
+                "name": "test-ecs-service-sg-filter",
+                "resource": "ecs-service",
+                "filters": [
+                    {
+                        "type": "security-group",
+                        "key": "tag:NetworkLocation",
+                        "value": "Customer"
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["serviceName"], "c7n-test-service")
+
+    def test_ecs_service_network_location_filter_subnet(self):
+        session_factory = self.replay_flight_data("test_ecs_service_network_location_filter_subnet")
+        p = self.load_policy(
+            {
+                "name": "test-ecs-service-network-location-filter-subnet",
+                "resource": "ecs-service",
+                "filters": [
+                    {
+                        "type": "network-location",
+                        "compare": ["resource", "subnet"],
+                        "key": "tag:NetworkLocation",
+                        "match": "equal"
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["serviceName"], "c7n-test-service")
+        matched = resources.pop()
+        self.assertEqual(
+            matched["Tags"],
+            [
+                {
+                    "Key": "NetworkLocation",
+                    "Value": "Customer"
+                }
+            ]
+        )
+
+    def test_ecs_service_network_location_filter_sg(self):
+        session_factory = self.replay_flight_data("test_ecs_service_network_location_filter_sg")
+        p = self.load_policy(
+            {
+                "name": "test-ecs-service-network-location-filter-sg",
+                "resource": "ecs-service",
+                "filters": [
+                    {
+                        "type": "network-location",
+                        "compare": ["resource", "security-group"],
+                        "key": "tag:NetworkLocation",
+                        "match": "equal"
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["serviceName"], "c7n-test-service")
+        matched = resources.pop()
+        self.assertEqual(
+            matched["Tags"],
+            [
+                {
+                    "Key": "NetworkLocation",
+                    "Value": "Customer"
+                }
+            ]
+        )
+
+    def test_ecs_task_sg_filter(self):
+        session_factory = self.replay_flight_data("test_ecs_task_sg_filter")
+        p = self.load_policy(
+            {
+                "name": "test-ecs-task-sg-filter",
+                "resource": "ecs-task",
+                "filters": [
+                    {
+                        "type": "security-group",
+                        "key": "tag:NetworkLocation",
+                        "value": "Customer"
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["group"], "service:c7n-test-service")
+
+    def test_ecs_task_network_location_filter_subnet(self):
+        session_factory = self.replay_flight_data("test_ecs_task_network_location_filter_subnet")
+        p = self.load_policy(
+            {
+                "name": "test-ecs-task-network-location-filter-subnet",
+                "resource": "ecs-task",
+                "filters": [
+                    {
+                        "type": "network-location",
+                        "compare": ["resource", "subnet"],
+                        "key": "tag:NetworkLocation",
+                        "match": "equal"
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        matched = resources.pop()
+        self.assertEqual(
+            matched["Tags"],
+            [
+                {
+                    "Key": "NetworkLocation",
+                    "Value": "Customer"
+                }
+            ]
+        )
+
+    def test_ecs_task_network_location_filter_sg(self):
+        session_factory = self.replay_flight_data("test_ecs_task_network_location_filter_sg")
+        p = self.load_policy(
+            {
+                "name": "test-ecs-task-network-location-filter-sg",
+                "resource": "ecs-task",
+                "filters": [
+                    {
+                        "type": "network-location",
+                        "compare": ["resource", "security-group"],
+                        "key": "tag:NetworkLocation",
+                        "match": "equal"
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        matched = resources.pop()
+        self.assertEqual(
+            matched["Tags"],
+            [
+                {
+                    "Key": "NetworkLocation",
+                    "Value": "Customer"
+                }
+            ]
+        )

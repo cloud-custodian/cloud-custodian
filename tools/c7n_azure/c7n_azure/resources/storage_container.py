@@ -104,10 +104,14 @@ class StorageContainerSetPublicAccessAction(AzureBaseAction):
     def _process_resource(self, resource):
         resource_group = ResourceIdParser.get_resource_group(resource['id'])
         account_name = ResourceIdParser.get_resource_name(resource['c7n:parent-id'])
-
+        blob_container = self.client.blob_containers.get(resource_group,
+            account_name,
+            resource['name'],
+        )
+        blob_container.public_access = self.data['value']
         self.client.blob_containers.update(
             resource_group,
             account_name,
             resource['name'],
-            public_access=self.data['value']
+            blob_container
         )

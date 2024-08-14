@@ -130,7 +130,7 @@ class TestSlackDelivery(unittest.TestCase):
         result = slack.get_to_addrs_slack_messages_map(self.message)
         slack.send_slack_msg(webhook, result[webhook])
 
-        args, kwargs = mock_post.call_args
+        _, kwargs = mock_post.call_args
         assert webhook == kwargs["url"]
         assert kwargs["data"] == result[webhook]
 
@@ -143,7 +143,7 @@ class TestSlackDelivery(unittest.TestCase):
         result = slack.get_to_addrs_slack_messages_map(self.message)
         slack.send_slack_msg(self.target_channel, result[self.target_channel])
 
-        args, kwargs = mock_post.call_args
+        _, kwargs = mock_post.call_args
         assert self.target_channel == json.loads(kwargs["data"])["channel"]
         assert SLACK_POST_MESSAGE_API == kwargs["url"]
         assert kwargs["data"] == result[self.target_channel]
@@ -158,7 +158,6 @@ class TestSlackDelivery(unittest.TestCase):
         result = slack.get_to_addrs_slack_messages_map(self.message)
         slack.send_slack_msg(self.target_channel, result[self.target_channel])
 
-        args, kwargs = mock_post.call_args
         self.logger.info.assert_called_with(
             "Slack API rate limiting. Waiting %d seconds", retry_after_delay
         )

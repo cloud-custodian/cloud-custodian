@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:cloudfront::644160558196:distribution/E3Q5UC7SQLL7MN",
+                "Tags": [
+                    {
+                        "Key": "test",
+                        "Value": "c7n"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

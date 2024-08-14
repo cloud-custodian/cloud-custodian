@@ -3,9 +3,9 @@
     "data": {
         "LoggingConfigurations": [
             {
-                "ResourceArn": "arn:aws:wafv2:us-east-1:644160558196:regional/webacl/WVvF5qejaoARvhMU/ebf41215-9625-436d-938c-c2172c665718",
+                "ResourceArn": "arn:aws:wafv2:us-east-1:123456789012:regional/webacl/WVvF5qejaoARvhMU/ebf41215-9625-436d-938c-c2172c665718",
                 "LogDestinationConfigs": [
-                    "arn:aws:logs:us-east-1:644160558196:log-group:aws-waf-logs-c7n-functional20221209221532919100000001"
+                    "arn:aws:logs:us-east-1:123456789012:log-group:aws-waf-logs-c7n-functional20221209221532919100000001"
                 ],
                 "RedactedFields": [
                     {

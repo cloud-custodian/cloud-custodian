@@ -4,10 +4,10 @@ from copy import deepcopy
 from datetime import datetime, timedelta
 import json
 import logging
-import mock
 import os
 import shutil
 import tempfile
+from unittest import mock
 
 from c7n import policy, manager
 from c7n.config import Config
@@ -77,6 +77,8 @@ class PolicyMetaLint(BaseTest):
                 "kinesis:DescribeStream",
                 "kinesis:ListStreams",
                 "kinesis:DeleteStream",
+                "kinesis:ListTagsForStream",
+                "tag:GetResources"
             },
         )
 
@@ -203,7 +205,8 @@ class PolicyMetaLint(BaseTest):
         overrides = overrides.difference(
             {'account', 's3', 'hostedzone', 'log-group', 'rest-api', 'redshift-snapshot',
              'rest-stage', 'codedeploy-app', 'codedeploy-group', 'fis-template', 'dlm-policy',
-             'apigwv2', 'apigw-domain-name', 'fis-experiment'})
+             'apigwv2', 'apigwv2-stage', 'apigw-domain-name', 'fis-experiment',
+             'launch-template-version'})
         if overrides:
             raise ValueError("unknown arn overrides in %s" % (", ".join(overrides)))
 
@@ -262,7 +265,18 @@ class PolicyMetaLint(BaseTest):
 
         whitelist = set(('AwsS3Object', 'Container'))
         todo = set((
+            # q4 2023,
+            'AwsEc2ClientVpnEndpoint',
+            'AwsS3AccessPoint',
+            'AwsMskCluster',
+            'AwsEventsEventbus',
+            'AwsEventsEndpoint',
+            'AwsDmsReplicationTask',
+            'AwsRoute53HostedZone',
+            'AwsDmsEndpoint',
+            'AwsDmsReplicationInstance',
             # q2 2023
+            'AwsAthenaWorkGroup',
             'AwsStepFunctionStateMachine',
             'AwsGuardDutyDetector',
             'AwsAmazonMqBroker',
@@ -363,9 +377,92 @@ class PolicyMetaLint(BaseTest):
         # of a resource.
 
         whitelist = {
+            # q1 2024
+            "AWS::Cognito::UserPoolClient",
+            "AWS::Cognito::UserPoolGroup",
+            "AWS::EC2::NetworkInsightsAccessScope",
+            "AWS::EC2::NetworkInsightsAnalysis",
+            "AWS::Grafana::Workspace",
+            "AWS::GroundStation::DataflowEndpointGroup",
+            "AWS::ImageBuilder::ImageRecipe",
+            "AWS::M2::Environment",
+            "AWS::QuickSight::DataSource",
+            "AWS::QuickSight::Template",
+            "AWS::QuickSight::Theme",
+            "AWS::RDS::OptionGroup",
+            "AWS::Redshift::EndpointAccess",
+            "AWS::Route53Resolver::FirewallRuleGroup",
+            # q4 2023 wave 2 (aka reinvent)
+            "AWS::ACMPCA::CertificateAuthorityActivation",
+            "AWS::AppMesh::GatewayRoute",
+            "AWS::Connect::Instance",
+            "AWS::Connect::QuickConnect",
+            "AWS::EC2::CarrierGateway",
+            "AWS::EC2::IPAMPool",
+            "AWS::EC2::TransitGatewayConnect",
+            "AWS::EC2::TransitGatewayMulticastDomain",
+            "AWS::ECS::CapacityProvider",
+            "AWS::IAM::InstanceProfile",
+            "AWS::IoT::CACertificate",
+            "AWS::IoTTwinMaker::SyncJob",
+            "AWS::KafkaConnect::Connector",
+            "AWS::Lambda::CodeSigningConfig",
+            "AWS::NetworkManager::ConnectPeer",
+            "AWS::ResourceExplorer2::Index",
+            # q4 2023
+            "AWS::APS::RuleGroupsNamespace",
+            "AWS::Batch::SchedulingPolicy",
+            "AWS::CodeBuild::ReportGroup",
+            "AWS::CodeGuruProfiler::ProfilingGroup",
+            "AWS::InspectorV2::Filter",
+            "AWS::IoT::JobTemplate",
+            "AWS::IoT::ProvisioningTemplate",
+            "AWS::IoTTwinMaker::ComponentType",
+            "AWS::IoTWireless::FuotaTask",
+            "AWS::IoTWireless::MulticastGroup",
+            "AWS::MSK::BatchScramSecret",
+            "AWS::MediaConnect::FlowSource",
+            "AWS::Personalize::DatasetGroup",
+            "AWS::Route53Resolver::ResolverQueryLoggingConfig",
+            "AWS::Route53Resolver::ResolverQueryLoggingConfigAssociation",
+            "AWS::SageMaker::FeatureGroup",
+            "AWS::ServiceDiscovery::Instance",
+            "AWS::Transfer::Certificate",
+            # q3 2023
+            "AWS::ACMPCA::CertificateAuthority",
+            "AWS::Amplify::Branch",
+            "AWS::AppConfig::HostedConfigurationVersion",
+            "AWS::AppIntegrations::EventIntegration",
+            "AWS::AppMesh::Route",
+            "AWS::AppMesh::VirtualRouter",
+            "AWS::AppRunner::Service",
+            "AWS::Athena::PreparedStatement",
+            "AWS::CustomerProfiles::ObjectType",
+            "AWS::EC2::CapacityReservation",
+            "AWS::EC2::ClientVpnEndpoint",
+            "AWS::EC2::IPAMScope",
+            "AWS::Evidently::Launch",
+            "AWS::Forecast::DatasetGroup",
+            "AWS::GreengrassV2::ComponentVersion",
+            "AWS::GroundStation::MissionProfile",
+            "AWS::Kendra::Index",
+            "AWS::KinesisVideo::Stream",
+            "AWS::Logs::Destination",
+            "AWS::MSK::Configuration",
+            "AWS::MediaConnect::FlowEntitlement",
+            "AWS::MediaConnect::FlowVpcInterface",
+            "AWS::MediaTailor::PlaybackConfiguration",
+            "AWS::NetworkManager::CustomerGatewayAssociation",
+            "AWS::NetworkManager::LinkAssociation",
+            "AWS::Personalize::Dataset",
+            "AWS::Personalize::Schema",
+            "AWS::Personalize::Solution",
+            "AWS::Pinpoint::EmailChannel",
+            "AWS::Pinpoint::EmailTemplate",
+            "AWS::Pinpoint::EventStream",
+            "AWS::ResilienceHub::App",
             # q2 2023 wave 3
             "AWS::Amplify::App",
-            "AWS::AppMesh::VirtualNode",
             "AWS::AppMesh::VirtualService",
             "AWS::AppRunner::VpcConnector",
             "AWS::AppStream::Application",
@@ -381,11 +478,9 @@ class PolicyMetaLint(BaseTest):
             "AWS::Transfer::Connector",
             # q2 2023 wave 2
             "AWS::AppConfig::DeploymentStrategy",
-            "AWS::AppFlow::Flow",
             "AWS::AuditManager::Assessment",
             "AWS::CloudWatch::MetricStream",
             "AWS::DeviceFarm::InstanceProfile",
-            "AWS::DeviceFarm::Project",
             "AWS::EC2::EC2Fleet",
             "AWS::EC2::SubnetRouteTableAssociation",
             "AWS::ECR::PullThroughCacheRule",
@@ -393,10 +488,6 @@ class PolicyMetaLint(BaseTest):
             "AWS::ImageBuilder::ImagePipeline",
             "AWS::IoT::FleetMetric",
             "AWS::IoTWireless::ServiceProfile",
-            "AWS::NetworkManager::Device",
-            "AWS::NetworkManager::GlobalNetwork",
-            "AWS::NetworkManager::Link",
-            "AWS::NetworkManager::Site",
             "AWS::Panorama::Package",
             "AWS::Pinpoint::App",
             "AWS::Redshift::ScheduledAction",
@@ -412,7 +503,6 @@ class PolicyMetaLint(BaseTest):
             "AWS::EC2::IPAM",
             "AWS::EC2::NetworkInsightsPath",
             "AWS::EC2::TrafficMirrorFilter",
-            "AWS::Events::Rule",
             "AWS::HealthLake::FHIRDatastore",
             "AWS::IoTTwinMaker::Scene",
             "AWS::KinesisVideo::SignalingChannel",
@@ -481,7 +571,6 @@ class PolicyMetaLint(BaseTest):
             'AWS::IoTSiteWise::Project',
             'AWS::IoTTwinMaker::Entity',
             'AWS::IoTTwinMaker::Workspace',
-            'AWS::Lex::Bot',
             'AWS::Lex::BotAlias',
             'AWS::Lightsail::Bucket',
             'AWS::Lightsail::Certificate',
@@ -497,7 +586,6 @@ class PolicyMetaLint(BaseTest):
             'AWS::Route53RecoveryReadiness::Cell',
             'AWS::Route53RecoveryReadiness::RecoveryGroup',
             'AWS::Route53Resolver::FirewallDomainList',
-            'AWS::S3::MultiRegionAccessPoint',
             'AWS::S3::StorageLens',
             'AWS::SES::ReceiptFilter',
             'AWS::SES::ReceiptRuleSet',
@@ -505,10 +593,9 @@ class PolicyMetaLint(BaseTest):
             'AWS::ServiceDiscovery::HttpNamespace',
             'AWS::Transfer::Workflow',
             #
-            'AWS::ApiGatewayV2::Stage',
+            # 'AWS::ApiGatewayV2::Stage',
             'AWS::Athena::DataCatalog',
             'AWS::Athena::WorkGroup',
-            'AWS::AutoScaling::ScalingPolicy',
             'AWS::AutoScaling::ScheduledAction',
             'AWS::Backup::BackupSelection',
             'AWS::Backup::RecoveryPoint',
@@ -518,7 +605,6 @@ class PolicyMetaLint(BaseTest):
             'AWS::Detective::Graph',
             'AWS::DMS::Certificate',
             'AWS::EC2::EgressOnlyInternetGateway',
-            'AWS::EC2::FlowLog',
             'AWS::EC2::LaunchTemplate',
             'AWS::EC2::RegisteredHAInstance',
             'AWS::EC2::TransitGatewayAttachment',
@@ -547,7 +633,6 @@ class PolicyMetaLint(BaseTest):
             'AWS::SSM::ManagedInstanceInventory',
             'AWS::SSM::PatchCompliance',
             'AWS::SageMaker::CodeRepository',
-            'AWS::ServiceCatalog::CloudFormationProduct',
             'AWS::ServiceCatalog::CloudFormationProvisionedProduct',
             'AWS::ShieldRegional::Protection',
             'AWS::WAF::RateBasedRule',
@@ -560,7 +645,7 @@ class PolicyMetaLint(BaseTest):
             'AWS::WAFv2::ManagedRuleSet',
             'AWS::WAFv2::RegexPatternSet',
             'AWS::WAFv2::RuleGroup',
-            'AWS::WAFv2::WebACL',
+            # 'AWS::WAFv2::WebACL',
             'AWS::XRay::EncryptionConfig',
             'AWS::ElasticLoadBalancingV2::Listener',
             'AWS::AccessAnalyzer::Analyzer',
@@ -580,8 +665,6 @@ class PolicyMetaLint(BaseTest):
             'AWS::DMS::Certificate',
             'AWS::Detective::Graph',
             'AWS::EC2::TransitGatewayRouteTable',
-            'AWS::AppSync::GraphQLApi',
-            'AWS::DataSync::Task',
             'AWS::Glue::Job',
             'AWS::SageMaker::NotebookInstanceLifecycleConfig',
             'AWS::SES::ContactList',
@@ -594,7 +677,6 @@ class PolicyMetaLint(BaseTest):
             'AWS::EC2::NetworkInsightsAccessScopeAnalysis',
             'AWS::Route53::HostedZone',
             'AWS::GuardDuty::IPSet',
-            'AWS::SES::ConfigurationSet',
             'AWS::GuardDuty::ThreatIntelSet',
             'AWS::DataSync::LocationNFS',
             'AWS::DataSync::LocationEFS',
@@ -613,6 +695,11 @@ class PolicyMetaLint(BaseTest):
         model = session.get_service_model('config')
         shape = model.shape_for('ResourceType')
 
+        present = resource_config_types.intersection(whitelist)
+        if present:
+            raise AssertionError(
+                "Supported config types \n %s" % ('\n'.join(sorted(present))))
+
         config_types = set(shape.enum).difference(whitelist)
         missing = config_types.difference(resource_config_types)
         if missing:
@@ -621,10 +708,11 @@ class PolicyMetaLint(BaseTest):
 
         # config service can't be bothered to update their sdk correctly
         invalid_ignore = {
-            'AWS::ECS::Service',
-            'AWS::ECS::TaskDefinition',
-            'AWS::NetworkFirewall::Firewall',
-            'AWS::WAFv2::WebACL'
+            'AWS::Config::ConfigurationRecorder',
+            'AWS::SageMaker::NotebookInstance',
+            'AWS::SageMaker::EndpointConfig',
+            'AWS::DMS::ReplicationInstance',
+            'AWS::DMS::ReplicationTask',
         }
         bad_types = resource_config_types.difference(config_types)
         bad_types = bad_types.difference(invalid_ignore)
@@ -645,7 +733,8 @@ class PolicyMetaLint(BaseTest):
     def test_resource_type_empty_metadata(self):
         empty = set()
         for k, v in manager.resources.items():
-            if k in ('rest-account', 'account', 'codedeploy-deployment'):
+            if k in ('rest-account', 'account', 'codedeploy-deployment', 'sagemaker-cluster',
+                     'networkmanager-core'):
                 continue
             for rk, rv in v.resource_type.__dict__.items():
                 if rk[0].isalnum() and rv is None:
@@ -671,6 +760,8 @@ class PolicyMetaLint(BaseTest):
             'rest-api',
             'rest-stage',
             'apigw-domain-name',
+            # our check doesn't handle nested resource types in the arn
+            'guardduty-finding',
             # synthetics ~ ie. c7n introduced since non exist.
             # or in some cases where it exists but not usable in iam.
             'scaling-policy',
@@ -713,6 +804,11 @@ class PolicyMetaLint(BaseTest):
                 invalid[k] = {'valid': sorted(svc_arn_types),
                               'service': svc,
                               'resource': v.resource_type.arn_type}
+
+        # s3 directory has bucket in the arn, but its not in the iam ref docs
+        # we source arn types from.
+        for ignore in ('s3-directory',):
+            invalid.pop(ignore)
 
         if invalid:
             raise ValueError("%d %s have invalid arn types in metadata" % (
@@ -770,6 +866,8 @@ class PolicyMetaLint(BaseTest):
             'rest-stage', 'rest-resource', 'rest-vpclink', 'rest-client-certificate'}
         explicit = []
         whitelist_explicit = {
+            'securityhub-finding', 'ssm-patch-group',
+            'appdiscovery-agent', 'athena-named-query',
             'rest-account', 'shield-protection', 'shield-attack',
             'dlm-policy', 'efs', 'efs-mount-target', 'gamelift-build',
             'glue-connection', 'glue-dev-endpoint', 'cloudhsm-cluster',
@@ -936,6 +1034,8 @@ class PolicyMeta(BaseTest):
                 "kinesis:DescribeStream",
                 "kinesis:ListStreams",
                 "kinesis:DeleteStream",
+                "kinesis:ListTagsForStream",
+                "tag:GetResources"
             },
         )
 
@@ -1548,14 +1648,14 @@ class PolicyConditionsTest(BaseTest):
 
         p = self.load_policy(p_json)
         p.conditions.env_vars['account'] = {'name': 'deputy'}
-        p.expand_variables({"var1":"value1"})
+        p.expand_variables({"var1": "value1"})
         p.validate()
         self.assertEqual("Test var extension value1", p.data["description"])
         self.assertTrue(p.is_runnable())
 
         p = self.load_policy(p_json)
         p.conditions.env_vars['account'] = {'name': 'mickey'}
-        p.expand_variables({"var1":"value2"})
+        p.expand_variables({"var1": "value2"})
         p.validate()
         self.assertEqual("Test var extension value2", p.data["description"])
         self.assertFalse(p.is_runnable())
@@ -1683,9 +1783,12 @@ class LambdaModeTest(BaseTest):
             'name': 'foobar',
             'resource': 'aws.ec2',
             'mode': {
-                'type': 'config-rule',
+                'type': 'schedule',
+                'schedule': 'rate(1 day)',
+                'scheduler-role': 'arn:aws:iam::644160558196:role/custodian-scheduler-mu',
                 'tags': {
-                    'xyz': 'bar'}
+                    'xyz': 'bar'
+                }
             }},
             validate=True)
 
@@ -1700,7 +1803,11 @@ class LambdaModeTest(BaseTest):
         p.provision()
         self.assertEqual(
             policy_lambda[0].tags['custodian-info'],
-            'mode=config-rule:version=%s' % version)
+            'mode=schedule:version=%s' % version)
+        self.assertEqual(
+            policy_lambda[0].tags['custodian-schedule'],
+            'name=custodian-foobar:group=default'
+        )
 
 
 class PullModeTest(BaseTest):

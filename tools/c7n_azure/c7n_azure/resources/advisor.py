@@ -24,6 +24,12 @@ class AdvisorRecommendation(ArmResourceManager):
               op: equal
               value_type: normalize
               value: security
+
+        - name: azure-advisor-recommendations-with-query
+          description: Query recommendations by category
+          query:
+            - filter: "Category eq 'Cost'"
+          resource: azure.advisor-recommendation
     """
 
     class resource_type(ArmResourceManager.resource_type):

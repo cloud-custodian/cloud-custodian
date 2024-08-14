@@ -391,6 +391,30 @@ class TestAMI(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 0)
 
+    def test_cancel_launch_permissions_true(self):
+        factory = self.replay_flight_data("test_cancel_launch_permissions")
+        p = self.load_policy(
+            {
+                "name": "test-cancel-launch-permissions",
+                "resource": "ami",
+                "actions": [{"type": "cancel-launch-permission", }]},
+                session_factory=factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_cancel_launch_permissions_false(self):
+        factory = self.replay_flight_data("test_cancel_launch_permissions")
+        p = self.load_policy(
+            {
+                "name": "test-cancel-launch-permission",
+                "resource": "ami",
+                "actions": [{"type": "cancel-launch-permission", "dryrun": False}]},
+                session_factory=factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_unused_ami_true(self):
         factory = self.replay_flight_data("test_unused_ami_true")
         p = self.load_policy(

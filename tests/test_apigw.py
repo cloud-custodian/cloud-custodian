@@ -5,6 +5,30 @@ from botocore.exceptions import ClientError
 from .common import BaseTest, event_data
 from c7n.exceptions import PolicyValidationError
 
+from pytest_terraform import terraform
+
+
+@terraform("apigatewayv2_stage")
+def test_apigwv2_stage_query(test, apigatewayv2_stage):
+    factory = test.replay_flight_data("test_apigwv2_stage_query")
+
+    policy = test.load_policy({
+      "name": "test-aws-apigwv2-stage",
+      "resource": "aws.apigwv2-stage"
+    }, session_factory=factory)
+
+    resources = policy.run()
+
+    assert len(resources) > 0
+    assert resources[1]['StageName'] == apigatewayv2_stage[
+        'aws_apigatewayv2_stage.example.name']
+    assert resources[1]['Tags'] == [{'Key': 'Env', 'Value': 'Dev'}]
+
+    assert policy.resource_manager.get_arns(resources) == [
+        'arn:aws:apigateway:us-east-1::/apis/0mt9yx690a/stages/production',
+        'arn:aws:apigateway:us-east-1::/apis/zzc87ypck1/stages/example-api-allowed-sheepdog'
+    ]
+
 
 class TestRestAccount(BaseTest):
 
@@ -573,6 +597,37 @@ class TestRestStage(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_wafregional_value_no_rules(self):
+        factory = self.replay_flight_data("test_rest_stage_waf_value")
+        p = self.load_policy(
+            {
+                "name": "waf-apigw",
+                "resource": "rest-stage",
+                "filters": [{"type": "waf-enabled", "key": "Rules", "value": "empty"}]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    def test_wafregional_value_at_least_1_rule(self):
+        factory = self.replay_flight_data("test_rest_stage_waf_value")
+        p = self.load_policy(
+            {
+                "name": "waf-apigw",
+                "resource": "rest-stage",
+                "filters": [{
+                    "type": "waf-enabled",
+                    "key": "length(Rules)",
+                    "op": "gte",
+                    "value": 1
+                }]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_wafv2_to_wafregional(self):
         factory = self.replay_flight_data("test_rest_stage_wafv2")
         p = self.load_policy(
@@ -586,6 +641,37 @@ class TestRestStage(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 2)
+
+    def test_wafv2_value_no_rules(self):
+        factory = self.replay_flight_data("test_rest_stage_wafv2_value")
+        p = self.load_policy(
+            {
+                "name": "waf-apigw",
+                "resource": "rest-stage",
+                "filters": [{"type": "wafv2-enabled", "key": "Rules", "value": "empty"}]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_wafv2_value_at_least_1_rule(self):
+        factory = self.replay_flight_data("test_rest_stage_wafv2_value")
+        p = self.load_policy(
+            {
+                "name": "waf-apigw",
+                "resource": "rest-stage",
+                "filters": [{
+                    "type": "wafv2-enabled",
+                    "key": "length(Rules)",
+                    "op": "gte",
+                    "value": 1
+                }]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
 
     def test_reststage_action_wafv2_not_found(self):
         self.assertRaises(

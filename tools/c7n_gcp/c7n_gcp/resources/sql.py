@@ -80,10 +80,21 @@ class SqlInstanceAction(MethodAction):
 @SqlInstance.action_registry.register('delete')
 class SqlInstanceDelete(SqlInstanceAction):
 
-    schema = type_schema('delete')
+    schema = type_schema('delete', force={'type': 'boolean'})
     method_spec = {'op': 'delete'}
     path_param_re = re.compile(
         '.*?/projects/(.*?)/instances/(.*)')
+
+    def process(self, resources):
+        if self.data.get('force'):
+            self.disable_protection(resources)
+        super().process(resources)
+
+    def disable_protection(self, resources):
+        deletion_protected = [
+            r for r in resources if r['settings'].get('deletionProtectionEnabled')]
+        disable_protection = SqlInstanceEnableDeletion({}, self.manager)
+        disable_protection.process(deletion_protected)
 
 
 @SqlInstance.action_registry.register('stop')
@@ -116,6 +127,59 @@ class SqlInstanceStart(MethodAction):
         return {'project': project,
                 'instance': instance,
                 'body': {'settings': {'activationPolicy': 'ALWAYS'}}}
+
+
+@SqlInstance.action_registry.register('set-deletion-protection')
+class SqlInstanceEnableDeletion(MethodAction):
+
+    schema = type_schema(
+        'set-deletion-protection',
+        value={'type': 'boolean'})
+    method_spec = {'op': 'patch'}
+    path_param_re = re.compile('.*?/projects/(.*?)/instances/(.*)')
+    method_perm = 'update'
+
+    def get_resource_params(self, model, resource):
+        project, instance = self.path_param_re.match(
+            resource['selfLink']).groups()
+        return {
+            'project': project,
+            'instance': instance,
+            'body': {
+                'settings': {
+                    'deletionProtectionEnabled': str(self.data.get('value', True)).lower()
+                }
+            }
+        }
+
+
+@SqlInstance.action_registry.register('set-high-availability')
+class SqlInstanceHighAvailability(MethodAction):
+
+    schema = type_schema(
+        'set-high-availability',
+        value={'type': 'boolean', 'required': True})
+    method_spec = {'op': 'patch'}
+    path_param_re = re.compile('.*?/projects/(.*?)/instances/(.*)')
+    method_perm = 'update'
+
+    def get_resource_params(self, model, resource):
+        if self.data['value'] is False:
+            availabilityType = 'ZONAL'
+        else:
+            availabilityType = 'REGIONAL'
+
+        project, instance = self.path_param_re.match(
+            resource['selfLink']).groups()
+        return {
+            'project': project,
+            'instance': instance,
+            'body': {
+                'settings': {
+                    'availabilityType': availabilityType
+                }
+            }
+        }
 
 
 class SQLInstanceChildTypeInfo(ChildTypeInfo):

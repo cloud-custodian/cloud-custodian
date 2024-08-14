@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "c7n_gcp"
-version = "0.4.27"
+version = "0.4.39"
 description = "Cloud Custodian - Google Cloud Provider"
 readme = "readme.md"
 homepage = "https://cloudcustodian.io"
@@ -15,7 +15,7 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.8"
 c7n = {path = "../..", develop = true}
 
 retrying = "^1.3.3"
@@ -26,10 +26,10 @@ google-cloud-monitoring = "^2.5.0"
 google-cloud-storage = "^2.7"
 pyrate-limiter = "^2.8.4"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 freezegun = "^1.2.2"
-pytest = "^7.1.2"
-pytest-terraform = "^0.6.0"
+pytest = "<8.0"
+pytest-terraform = "^0.7.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

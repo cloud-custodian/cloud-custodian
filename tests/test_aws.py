@@ -7,7 +7,7 @@ import threading
 import socket
 import sys
 from urllib.error import URLError, HTTPError
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 from c7n.config import Bag, Config
 from c7n.exceptions import PolicyValidationError, InvalidOutputConfig
@@ -208,6 +208,12 @@ class ArnTest(BaseTest):
             'arn:aws:s3:::my_corporate_bucket/exampleobject.png')
         self.assertEqual(arn.resource, 'my_corporate_bucket/exampleobject.png')
 
+    def test_invalid_arn(self):
+        try:
+            aws.Arn.parse('arn:aws')
+        except ValueError:
+            pass
+
 
 class UtilTest(BaseTest):
 
@@ -325,6 +331,29 @@ class OutputMetricsTest(BaseTest):
         self.assertTrue(isinstance(sink, aws.MetricsOutput))
         sink.put_metric('ResourceCount', 101, 'Count')
         sink.flush()
+
+    def test_metrics_query_params(self):
+        # Test metrics filter when 'metrics' and 'ignore_zero' is present in query parameters
+        conf = Bag(
+            {'active_metrics': 'ResourceCount,ApiCalls', 'scheme': 'aws', 'ignore_zero': 'true'})
+        ctx = Bag(session_factory=self.replay_flight_data('output-aws-metrics'),
+                  options=Bag(account_id='123456789012', region='us-east-1'),
+                  policy=Bag(name='test', resource_type='ec2'))
+        moutput = aws.MetricsOutput(ctx, conf)
+
+        with patch("botocore.client.BaseClient._make_api_call") as aws_api:
+            moutput.put_metric('ResourceCount', 0, 'Count', Scope='Policy', Food='Pizza')
+            moutput.flush()
+            assert aws_api.call_count == 0
+
+            moutput.put_metric('Calories', 400, 'Count', Scope='Policy', Food='Pizza')
+            moutput.flush()
+            assert aws_api.call_count == 0
+
+            moutput._put_metrics("ns", [{'MetricName': 'Calls'}, {'MetricName': 'ResourceCount'}])
+            assert aws_api.call_args[0][0] == "PutMetricData"
+            assert aws_api.call_args[0][1]["MetricData"] == [{'MetricName': 'ResourceCount'}]
+            assert aws_api.call_count == 1
 
 
 class OutputLogsTest(BaseTest):

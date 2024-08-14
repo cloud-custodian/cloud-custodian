@@ -1,18 +1,20 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import copy
 from botocore.exceptions import ClientError
 
-from c7n.actions import BaseAction
-from c7n.exceptions import PolicyExecutionError
+from c7n.actions import AutoTagUser, AutoscalingBase, BaseAction
+from c7n.exceptions import PolicyExecutionError, PolicyValidationError
 from c7n.filters import MetricsFilter, ValueFilter, Filter
+from c7n.filters.costhub import CostHubRecommendation
 from c7n.filters.offhours import OffHour, OnHour
+import c7n.filters.vpc as net_filters
 from c7n.manager import resources
 from c7n.utils import local_session, chunks, get_retry, type_schema, group_by, jmespath_compile
-from c7n import query
+from c7n import query, utils
 from c7n.query import DescribeSource, ConfigSource
+from c7n.resources.aws import Arn
 from c7n.tags import Tag, TagDelayedAction, RemoveTag, TagActionFilter
-from c7n.actions import AutoTagUser, AutoscalingBase
-import c7n.filters.vpc as net_filters
 
 
 def ecs_tag_normalize(resources):
@@ -94,7 +96,9 @@ class ECSCluster(query.QueryResourceManager):
         service = 'ecs'
         enum_spec = ('list_clusters', 'clusterArns', None)
         batch_detail_spec = (
-            'describe_clusters', 'clusters', None, 'clusters', {'include': ['TAGS', 'SETTINGS']})
+            'describe_clusters', 'clusters', None, 'clusters', {
+                'include': ['TAGS', 'SETTINGS', 'CONFIGURATIONS']
+            })
         name = "clusterName"
         arn = id = "clusterArn"
         arn_type = 'cluster'
@@ -244,6 +248,10 @@ class RelatedTaskDefinitionFilter(ValueFilter):
     related_key = 'taskDefinition'
 
     def process(self, resources, event=None):
+        self.task_defs = {t['taskDefinitionArn']: t for t in self.get_task_defs(resources)}
+        return super(RelatedTaskDefinitionFilter, self).process(resources)
+
+    def get_task_defs(self, resources):
         task_def_ids = list({s[self.related_key] for s in resources})
         task_def_manager = self.manager.get_resource_manager(
             'ecs-task-definition')
@@ -260,8 +268,7 @@ class RelatedTaskDefinitionFilter(ValueFilter):
         # else just augment the ids
         else:
             task_defs = task_def_manager.augment(task_def_ids)
-        self.task_defs = {t['taskDefinitionArn']: t for t in task_defs}
-        return super(RelatedTaskDefinitionFilter, self).process(resources)
+        return task_defs
 
     def __call__(self, i):
         task = self.task_defs[i[self.related_key]]
@@ -294,6 +301,88 @@ class ServiceTaskDefinitionFilter(RelatedTaskDefinitionFilter):
     """
 
 
+@ECSCluster.filter_registry.register('ebs-storage')
+class Storage(ValueFilter):
+    """Filter clusters by configured EBS storage parameters.
+
+    :Example:
+
+    Find any ECS clusters that have instances that are using unencrypted EBS volumes.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: encrypted-ebs-volumes
+            resource: ecs
+            filters:
+              - type: ebs-storage
+                key: Encrypted
+                value: true
+    """
+
+    schema = type_schema(
+        'ebs-storage', rinherit=ValueFilter.schema,
+        operator={'type': 'string', 'enum': ['or', 'and']},
+    )
+    schema_alias = False
+
+    def get_permissions(self):
+        return (self.manager.get_resource_manager('ebs').get_permissions() +
+                self.manager.get_resource_manager('ec2').get_permissions() +
+                self.manager.get_resource_manager('ecs').get_permissions()
+                )
+
+    def process(self, resources, event=None):
+        self.storage = self.get_storage(resources)
+        self.skip = []
+        self.operator = self.data.get(
+            'operator', 'or') == 'or' and any or all
+        return list(filter(self, resources))
+
+    def get_storage(self, resources):
+        manager = self.manager.get_resource_manager('ecs-container-instance')
+
+        storage = {}
+        for cluster_set in utils.chunks(resources, 200):
+            for cluster in cluster_set:
+                cluster["clusterArn"]
+                instances = manager.resources({
+                    "cluster": cluster['clusterArn'],
+                }, augment=False)
+                instances = manager.get_resources(instances, augment=False)
+                storage[cluster["clusterArn"]] = []
+
+                for instance in instances:
+                    storage[cluster["clusterArn"]].extend(self.get_ebs_volumes([instance["ec2InstanceId"]]))
+
+        return storage
+
+    def get_ebs_volumes(self, resources):
+        volumes = []
+        ec2_manager = self.manager.get_resource_manager('ec2')
+        ebs_manager = self.manager.get_resource_manager('ebs')
+        for instance_set in utils.chunks(resources, 200):
+            instance_set = ec2_manager.get_resources(instance_set)
+            volume_ids = []
+            for i in instance_set:
+                for bd in i.get('BlockDeviceMappings', ()):
+                    if 'Ebs' not in bd:
+                        continue
+                    volume_ids.append(bd['Ebs']['VolumeId'])
+            for v in ebs_manager.get_resources(volume_ids):
+                if not v['Attachments']:
+                    continue
+                volumes.append(v)
+        return volumes
+
+    def __call__(self, i):
+        storage = self.storage.get(i["clusterArn"])
+
+        if not storage:
+            return False
+        return self.operator(map(self.match, storage))
+
+
 @Service.filter_registry.register('subnet')
 class SubnetFilter(net_filters.SubnetFilter):
 
@@ -311,6 +400,134 @@ class SubnetFilter(net_filters.SubnetFilter):
                 if ids:
                     subnet_ids.update(ids)
         return list(subnet_ids)
+
+
+@Service.filter_registry.register('security-group')
+class SGFilter(net_filters.SecurityGroupFilter):
+
+    RelatedIdsExpression = ""
+    expressions = ('taskSets[].networkConfiguration.awsvpcConfiguration.securityGroups[]',
+                'deployments[].networkConfiguration.awsvpcConfiguration.securityGroups[]',
+                'networkConfiguration.awsvpcConfiguration.securityGroups[]')
+
+    def get_related_ids(self, resources):
+        sg_ids = set()
+        for exp in self.expressions:
+            cexp = jmespath_compile(exp)
+            for r in resources:
+                ids = cexp.search(r)
+                if ids:
+                    sg_ids.update(ids)
+        return list(sg_ids)
+
+
+@Service.filter_registry.register('network-location', net_filters.NetworkLocation)
+@Service.action_registry.register('modify-definition')
+class UpdateTemplate(BaseAction):
+
+    schema = type_schema(
+        'modify-definition',
+        properties={'type': 'object'},
+    )
+
+    permissions = ("ecs:RegisterTaskDefinition", "ecs:UpdateService")
+
+    def validate(self):
+        if self.data.get('properties'):
+            return
+        found = False
+        for f in self.manager.iter_filters():
+            if isinstance(f, CostHubRecommendation):
+                found = True
+        if not found:
+            raise PolicyValidationError(
+                "modify-definition: either properties specified or am optimization filter used"
+            )
+
+    def process(self, resources):
+        task_def_filter = ServiceTaskDefinitionFilter({}, self.manager)
+        task_defs = {t['taskDefinitionArn']: t for t in task_def_filter.get_task_defs(resources)}
+        client = local_session(self.manager.session_factory).client('ecs')
+
+        # we can only modify task definition when ecs is controlling the deployment.
+        resources = self.filter_resources(resources, "deploymentController.type", ("ECS",))
+
+        nack = 0
+        for r in resources:
+            r_task_def = task_defs[r[task_def_filter.related_key]]
+            m_task_def = self.get_target_task_def(r, r_task_def)
+            if m_task_def is None:
+                nack += 1
+                continue
+            response = client.register_task_definition(**m_task_def)
+            task_arn = response['taskDefinition']['taskDefinitionArn']
+            cluster, _ = Arn.parse(r['serviceArn']).resource.split('/', 1)
+            client.update_service(
+                cluster=cluster,
+                service=r['serviceName'],
+                taskDefinition=task_arn
+            )
+        if nack:
+            self.log.warning("modify-definition %d services not modified", nack)
+
+    task_def_normalized = [
+        "taskDefinitionArn", "revision", "status",
+        "registeredAt", "registeredBy", "requiresAttributes",
+    ]
+
+    task_def_remap = {
+        "compatibilities": "requiresCompatibilities",
+    }
+
+    def get_target_task_def(self, resource, current_task_def):
+        target_task_def = copy.deepcopy(current_task_def)
+        target_task_def.update(self.data.get('properties', {}))
+        cost_optimization = resource.get(CostHubRecommendation.annotation_key)
+
+        if cost_optimization and cost_optimization['actionType'] == 'Rightsize':
+            cpu, mem = cost_optimization["recommendedResourceSummary"].split("/")
+            cpu = int(float(cpu.split(" ")[0]))
+            mem = int(mem.split(" ")[0])
+            target_task_def["cpu"] = str(cpu)
+            target_task_def["memory"] = str(mem)
+            target_task_def = self.update_target_containers_size(current_task_def, target_task_def)
+
+        if target_task_def == current_task_def or target_task_def is None:
+            return
+
+        # normalize from describe to register formats
+        for k in self.task_def_normalized:
+            target_task_def.pop(k, None)
+        for ck, dk in self.task_def_remap.items():
+            if ck in target_task_def:
+                target_task_def[dk] = target_task_def.pop(ck)
+        tags = []
+        for t in target_task_def.pop('Tags', []):
+            tags.append({'key': t['Key'], 'value': t['Value']})
+        if tags:
+            target_task_def['tags'] = tags
+        return target_task_def
+
+    def update_target_containers_size(self, current_task_def, target_task_def):
+        """Update container memory/size targets.
+
+        We need to update memory/cpu requirements of the containers within
+        the task, so the total of the containers in the task def
+        matches the definition.
+
+        for a task w/ a single container this is simple, make the container match
+        the definition.
+
+        for a multi container task, we need select a heuristic
+        (proportional, largest) with some notion of a floor / min for
+        proportional. for now we punt on multi-container tasks.
+        """
+        if len(target_task_def['containerDefinitions']) > 1:
+            return
+        container_def = target_task_def['containerDefinitions'][0]
+        container_def['memory'] = int(target_task_def['memory'])
+        container_def['cpu'] = int(target_task_def['cpu'])
+        return target_task_def
 
 
 @Service.action_registry.register('modify')
@@ -420,13 +637,22 @@ class DeleteService(BaseAction):
         retry = get_retry(('Throttling',))
         for r in resources:
             try:
-                primary = [d for d in r['deployments']
-                           if d['status'] == 'PRIMARY'].pop()
-                if primary['desiredCount'] > 0:
+                desiredCount = 0
+
+                # Two different types of responses:
+                # Deployments would appear for normal services
+                # TaskSets would show for Blue/Green deployment
+                if 'deployments' in r:
+                    primary = [d for d in r['deployments'] if d['status'] == 'PRIMARY'].pop()
+                    desiredCount = primary.get('desiredCount', 0)
+                elif 'taskSets' in r:
+                    primary = [t for t in r['taskSets'] if t['status'] == 'PRIMARY'].pop()
+                    desiredCount = primary.get('computedDesiredCount', 0)
+
+                if desiredCount > 0:
                     retry(client.update_service,
-                          cluster=r['clusterArn'],
-                          service=r['serviceName'],
-                          desiredCount=0)
+                          cluster=r['clusterArn'], service=r['serviceName'], desiredCount=0)
+
                 retry(client.delete_service,
                       cluster=r['clusterArn'], service=r['serviceName'])
             except ClientError as e:
@@ -481,6 +707,54 @@ class TaskSubnetFilter(net_filters.SubnetFilter):
     RelatedIdsExpression = "attachments[].details[?name == 'subnetId'].value[]"
 
 
+@Task.filter_registry.register('security-group')
+class TaskSGFilter(net_filters.SecurityGroupFilter):
+
+    ecs_group_cache = None
+
+    RelatedIdsExpression = ""
+    eni_expression = "attachments[].details[?name == 'networkInterfaceId'].value[]"
+    sg_expression = "Groups[].GroupId[]"
+
+    def _get_related_ids(self, resources):
+        groups = dict()
+        eni_ids = set()
+
+        cexp = jmespath_compile(self.eni_expression)
+        for r in resources:
+            ids = cexp.search(r)
+            if ids:
+                eni_ids.update(ids)
+
+        if eni_ids:
+            client = local_session(self.manager.session_factory).client('ec2')
+            response = client.describe_network_interfaces(
+                NetworkInterfaceIds=list(eni_ids)
+            )
+            if response["NetworkInterfaces"]:
+                cexp = jmespath_compile(self.sg_expression)
+                for r in response["NetworkInterfaces"]:
+                    ids = cexp.search(r)
+                    if ids:
+                        groups[r["NetworkInterfaceId"]] = ids
+                        self.ecs_group_cache = groups
+
+        return groups
+
+    def get_related_ids(self, resources):
+        if not self.ecs_group_cache:
+            self.ecs_group_cache = self._get_related_ids(resources)
+
+        group_ids = set()
+        cexp = jmespath_compile(self.eni_expression)
+        for r in resources:
+            ids = cexp.search(r)
+            for group_id in ids:
+                group_ids.update(self.ecs_group_cache.get(group_id, ()))
+        return list(group_ids)
+
+
+@Task.filter_registry.register('network-location', net_filters.NetworkLocation)
 @Task.filter_registry.register('task-definition')
 class TaskTaskDefinitionFilter(RelatedTaskDefinitionFilter):
     """Filter tasks by their task definition.
@@ -617,7 +891,7 @@ class DeleteTaskDefinition(BaseAction):
     """
 
     schema = type_schema('delete', force={'type': 'boolean'})
-    permissions = ('ecs:DeregisterTaskDefinition','ecs:DeleteTaskDefinitions',)
+    permissions = ('ecs:DeregisterTaskDefinition', 'ecs:DeleteTaskDefinitions',)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('ecs')

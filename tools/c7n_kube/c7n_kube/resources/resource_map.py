@@ -11,7 +11,8 @@ ResourceMap = {
     "k8s.pod": "c7n_kube.resources.core.pod.Pod",
     "k8s.replica-set": "c7n_kube.resources.apps.replicaset.ReplicaSet",
     "k8s.replication-controller": (
-        "c7n_kube.resources.core.replicationcontroller.ReplicationController"),
+        "c7n_kube.resources.core.replicationcontroller.ReplicationController"
+    ),
     "k8s.secret": "c7n_kube.resources.core.secret.Secret",
     "k8s.service": "c7n_kube.resources.core.service.Service",
     "k8s.service-account": "c7n_kube.resources.core.serviceaccount.ServiceAccount",

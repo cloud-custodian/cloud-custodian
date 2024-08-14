@@ -4,7 +4,7 @@ inputs:
   python-version:
     required: true
   poetry-version:
-    default: "1.4.0"
+    default: "1.8.3"
 outputs:
   poetry-version:
     description: "poetry version"
@@ -18,12 +18,12 @@ runs:
       run: pipx install poetry==${{ inputs.poetry-version }}
 
     - name: Set up Python ${{ inputs.python-version }}
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ inputs.python-version }}
 
     - name: Set up cache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       id: cache
       with:
         path: .venv
@@ -74,3 +74,8 @@ runs:
       shell: bash
       id: echo-poetry-version
       run: echo "poetry-version=${{ inputs.poetry-version }}" >> $GITHUB_OUTPUT
+
+    - name: Build awscc data files
+      shell: bash
+      run: cd tools/c7n_awscc && python build.py
+

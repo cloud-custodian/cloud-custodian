@@ -6,7 +6,9 @@ from c7n_gcp.actions import MethodAction
 from c7n_gcp.query import QueryResourceManager, TypeInfo
 
 from c7n_gcp.provider import resources
-from c7n.utils import type_schema
+from c7n.filters.core import ListItemFilter
+from c7n.utils import type_schema, local_session
+from c7n_gcp.utils import get_firewall_port_ranges
 
 
 @resources.register('vpc')
@@ -33,6 +35,25 @@ class Network(QueryResourceManager):
                 resource_info["resourceName"]).groups()
             return client.execute_query(
                 'get', {'project': project, 'network': network})
+
+
+@Network.filter_registry.register('firewall')
+class VPCFirewallFilter(ListItemFilter):
+    schema = type_schema(
+        'firewall',
+        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'}
+    )
+    annotate_items = True
+    permissions = ("vpcaccess.locations.list",)
+
+    def get_item_values(self, resource):
+        session = local_session(self.manager.session_factory)
+        client = session.client(service_name='compute', version='v1',
+                                component='networks')
+        project = session.get_default_project()
+        firewalls = client.execute_query('getEffectiveFirewalls', {
+            'project': project, 'network': resource['name']}).get('firewalls')
+        return firewalls
 
 
 @resources.register('subnet')
@@ -149,6 +170,11 @@ class Firewall(QueryResourceManager):
             return client.execute_query(
                 'get', {'project': resource_info['project_id'],
                         'firewall': resource_info['resourceName'].rsplit('/', 1)[-1]})
+
+    def augment(self, resources):
+        if not resources:
+            return []
+        return get_firewall_port_ranges(resources)
 
 
 @Firewall.action_registry.register('delete')

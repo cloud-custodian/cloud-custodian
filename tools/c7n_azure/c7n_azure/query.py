@@ -31,7 +31,7 @@ class ResourceQuery:
     def __init__(self, session_factory):
         self.session_factory = session_factory
 
-    def filter(self, resource_manager, **params):
+    def filter(self, resource_manager, query=None, **params):
         m = resource_manager.resource_type
         enum_op, list_op, extra_args = m.enum_spec
 
@@ -42,6 +42,9 @@ class ResourceQuery:
 
         try:
             op = getattr(getattr(resource_manager.get_client(), enum_op), list_op)
+            if query:
+                params.update(**query[0])
+
             result = op(**params)
 
             if isinstance(result, Iterable):
@@ -78,7 +81,7 @@ class DescribeSource:
         pass
 
     def get_resources(self, query):
-        return self.query.filter(self.manager)
+        return self.query.filter(self.manager, query)
 
     def get_permissions(self):
         return ()
@@ -130,7 +133,7 @@ class ChildResourceQuery(ResourceQuery):
     parents identifiers. ie. SQL and Cosmos databases
     """
 
-    def filter(self, resource_manager, **params):
+    def filter(self, resource_manager, query=None, **params):
         """Query a set of resources."""
         m = self.resolve(resource_manager.resource_type)  # type: ChildTypeInfo
 
@@ -262,6 +265,9 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
         return self.data.get('source', 'describe-azure')
 
     def resources(self, query=None, augment=True):
+        if self.data.get("query"):
+            query = self.data["query"]
+
         cache_key = self.get_cache_key(query)
 
         resources = None

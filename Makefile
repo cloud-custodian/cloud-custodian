@@ -1,11 +1,13 @@
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 SHELL := /bin/bash
 SELF_MAKE := $(lastword $(MAKEFILE_LIST))
 
 PKG_REPO = testpypi
 PKG_INCREMENT := patch
-PKG_SET := tools/c7n_gcp tools/c7n_kube tools/c7n_openstack tools/c7n_mailer tools/c7n_logexporter tools/c7n_policystream tools/c7n_trailcreator tools/c7n_org tools/c7n_sphinxext tools/c7n_terraform tools/c7n_awscc tools/c7n_tencentcloud tools/c7n_azure tools/c7n_oci
+PKG_SET := tools/c7n_gcp tools/c7n_kube tools/c7n_openstack tools/c7n_mailer tools/c7n_logexporter tools/c7n_policystream tools/c7n_trailcreator tools/c7n_org tools/c7n_sphinxext tools/c7n_awscc tools/c7n_tencentcloud tools/c7n_azure tools/c7n_oci tools/c7n_terraform
 
-FMT_SET := tools/c7n_left tools/c7n_mailer tools/c7n_oci
+FMT_SET := tools/c7n_left tools/c7n_mailer tools/c7n_oci tools/c7n_kube tools/c7n_awscc
 
 PLATFORM_ARCH := $(shell python3 -c "import platform; print(platform.machine())")
 PLATFORM_OS := $(shell python3 -c "import platform; print(platform.system())")
@@ -16,13 +18,9 @@ ARGS :=
 IMAGE := c7n
 IMAGE_TAG := latest
 
-ifneq "$(findstring $(PLATFORM_OS), Linux Darwin)" ""
-  ifneq "$(findstring $(PY_VERSION), 3.10)" ""
+# we distribute tfparse binary wheels for 3.10+
+ifneq "$(findstring 3.1, $(PY_VERSION))" ""
     PKG_SET := tools/c7n_left $(PKG_SET)
-  endif
-  ifneq "$(findstring $(PY_VERSION), 3.11)" ""
-    PKG_SET := tools/c7n_left $(PKG_SET)
-  endif
 endif
 
 
@@ -37,17 +35,17 @@ install:
 .PHONY: test
 
 test:
-	. $(PWD)/test.env && poetry run pytest -n auto tests tools $(ARGS)
+	. $(PWD)/test.env && poetry run pytest -n auto $(ARGS) tests tools
 
 test-coverage:
 	. $(PWD)/test.env && poetry run pytest -n auto \
+            --cov-config .coveragerc \
             --cov-report $(COVERAGE_TYPE) \
             --cov c7n \
             --cov tools/c7n_azure/c7n_azure \
             --cov tools/c7n_gcp/c7n_gcp \
             --cov tools/c7n_kube/c7n_kube \
             --cov tools/c7n_left/c7n_left \
-            --cov tools/c7n_terraform/c7n_terraform \
             --cov tools/c7n_mailer/c7n_mailer \
             --cov tools/c7n_policystream/c7n_policystream \
             --cov tools/c7n_tencentcloud/c7n_tencentcloud \
@@ -62,13 +60,13 @@ sphinx:
 	make -f docs/Makefile.sphinx html
 
 lint:
-	ruff c7n tests tools
+	ruff check c7n tests tools
 	black --check $(FMT_SET)
 	type -P terraform && terraform fmt -check -recursive .
 
 format:
 	black $(FMT_SET)
-	ruff --fix c7n tests tools
+	ruff check --fix c7n tests tools
 	type -P terraform && terraform fmt -recursive .
 
 clean:
@@ -93,6 +91,8 @@ pkg-rebase:
 	for pkg in $(PKG_SET); do cd $$pkg && echo $$pkg && git add poetry.lock && cd ../..; done
 
 pkg-clean:
+	rm -f release.md
+	rm -f wheels-manifest.txt
 	rm -f dist/*
 	for pkg in $(PKG_SET); do cd $$pkg && rm -f dist/* && cd ../..; done
 
@@ -127,13 +127,20 @@ pkg-build-wheel:
 
 pkg-publish-wheel:
 # upload to test pypi
+	set -e
 	twine upload -r $(PKG_REPO) dist/*
 	for pkg in $(PKG_SET); do cd $$pkg && twine upload -r $(PKG_REPO) dist/* && cd ../..; done
 
+release-get-artifacts:
+	@$(MAKE) -f $(SELF_MAKE) pkg-clean
+	python tools/dev/get_release_artifacts.py
+
 data-update:
+# terraform data sets
+	cd tools/c7n_left/scripts && terraform init && python get_taggable.py --output ../c7n_left/data/taggable.json
 # aws data sets
 	python tools/dev/cfntypedb.py -f tests/data/cfn-types.json
-	python tools/dev/arnref.py -f tests/data/arn-types.json
+	python tools/dev/updatearnref.py > tests/data/arn-types.json
 	python tools/dev/iamdb.py -f tests/data/iam-actions.json
 # gcp data sets
 	python tools/dev/gcpiamdb.py -f tools/c7n_gcp/tests/data/iam-permissions.json
@@ -146,7 +153,8 @@ analyzer-bandit:
 	bandit -i -s B101,B311 \
 	-r tools/c7n_azure/c7n_azure \
 	 tools/c7n_gcp/c7n_gcp \
-	 tools/c7n_terraform/c7n_terraform \
+	 tools/c7n_oci/c7n_oci \
+	 tools/c7n_left/c7n_left \
 	 tools/c7n_guardian/c7n_guardian \
 	 tools/c7n_org/c7n_org \
 	 tools/c7n_mailer/c7n_mailer \
@@ -159,7 +167,8 @@ analyzer-semgrep:
 	semgrep --error --verbose --config p/security-audit \
 	 tools/c7n_azure/c7n_azure \
 	 tools/c7n_gcp/c7n_gcp \
-	 tools/c7n_terraform/c7n_terraform \
+	 tools/c7n_oci/c7n_oci \
+	 tools/c7n_left/c7n_left \
 	 tools/c7n_guardian/c7n_guardian \
 	 tools/c7n_org/c7n_org \
 	 tools/c7n_mailer/c7n_mailer \

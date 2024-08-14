@@ -61,6 +61,19 @@ class ElasticBeanstalkEnvironment(BaseTest):
             resources = p.run()
         self.assertEqual(len(resources), 2)
 
+    def test_eb_env_resource_exception(self):
+        factory = self.replay_flight_data("test_elasticbeanstalk_describe_envs_exception")
+        p = self.load_policy(
+            {
+                "name": "eb-find-inactive",
+                "resource": "elasticbeanstalk-environment",
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertTrue(resources[0]['Tags'])
+        self.assertEqual(resources[1]['Tags'], [])
+
 
 class EbEnvBaseTest(BaseTest):
 

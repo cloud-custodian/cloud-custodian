@@ -8,7 +8,7 @@ The following example policy will filter and tag the users with the expired cust
 .. code-block:: yaml
 
     policies:
-    - name: filter-tag-user-with-expired-secret-keys
+    - name: filter-tag-users-with-expired-customer-secret-keys
       description: |
         Filter and tag users with expired customer secret keys
       resource: oci.user
@@ -19,8 +19,6 @@ The following example policy will filter and tag the users with the expired cust
          op: greater-than
          value: 0
       actions:
-       - type: update-user
-         params:
-          update_user_details:
-            freeform_tags:
-                TagName : TagValue
+       - type: update
+         freeform_tags:
+            TagName : TagValue

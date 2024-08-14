@@ -1,0 +1,10 @@
+{
+    "status_code": 400,
+    "data": {
+        "Error": {
+            "Code": "InvalidSubnetID.NotFound",
+            "Message": "The subnet ID 'subnet-0cc56341f33e72de0' does not exist"
+        },
+        "ResponseMetadata": {}
+    }
+}

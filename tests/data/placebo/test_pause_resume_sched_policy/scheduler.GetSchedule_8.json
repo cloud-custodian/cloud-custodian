@@ -1,0 +1,45 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "ActionAfterCompletion": "NONE",
+        "Arn": "arn:aws:scheduler:us-east-1:644160558196:schedule/default/custodian-schedule-ec2-checker-2",
+        "CreationDate": {
+            "__class__": "datetime",
+            "year": 2024,
+            "month": 3,
+            "day": 28,
+            "hour": 8,
+            "minute": 57,
+            "second": 23,
+            "microsecond": 825000
+        },
+        "Description": "cloud-custodian lambda policy",
+        "FlexibleTimeWindow": {
+            "Mode": "OFF"
+        },
+        "GroupName": "default",
+        "LastModificationDate": {
+            "__class__": "datetime",
+            "year": 2024,
+            "month": 3,
+            "day": 28,
+            "hour": 8,
+            "minute": 57,
+            "second": 24,
+            "microsecond": 375000
+        },
+        "Name": "custodian-schedule-ec2-checker-2",
+        "ScheduleExpression": "rate(1 day)",
+        "ScheduleExpressionTimezone": "Etc/UTC",
+        "State": "ENABLED",
+        "Target": {
+            "Arn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-schedule-ec2-checker-2",
+            "RetryPolicy": {
+                "MaximumEventAgeInSeconds": 86400,
+                "MaximumRetryAttempts": 185
+            },
+            "RoleArn": "arn:aws:iam::644160558196:role/custodian-scheduler-mu"
+        }
+    }
+}

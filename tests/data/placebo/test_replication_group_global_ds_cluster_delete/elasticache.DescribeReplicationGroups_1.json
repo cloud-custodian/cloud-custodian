@@ -1,0 +1,74 @@
+{
+    "status_code": 200,
+    "data": {
+        "ReplicationGroups": [
+            {
+                "ReplicationGroupId": "c7n-test-global",
+                "Description": " ",
+                "GlobalReplicationGroupInfo": {
+                    "GlobalReplicationGroupId": "ldgnf-c7n-test-global",
+                    "GlobalReplicationGroupMemberRole": "PRIMARY"
+                },
+                "Status": "available",
+                "PendingModifiedValues": {},
+                "MemberClusters": [
+                    "c7n-test-global-001"
+                ],
+                "NodeGroups": [
+                    {
+                        "NodeGroupId": "0001",
+                        "Status": "available",
+                        "PrimaryEndpoint": {
+                            "Address": "master.c7n-test-global.tgeny2.use1.cache.amazonaws.com",
+                            "Port": 6379
+                        },
+                        "ReaderEndpoint": {
+                            "Address": "replica.c7n-test-global.tgeny2.use1.cache.amazonaws.com",
+                            "Port": 6379
+                        },
+                        "NodeGroupMembers": [
+                            {
+                                "CacheClusterId": "c7n-test-global-001",
+                                "CacheNodeId": "0001",
+                                "ReadEndpoint": {
+                                    "Address": "c7n-test-global-001.c7n-test-global.tgeny2.use1.cache.amazonaws.com",
+                                    "Port": 6379
+                                },
+                                "PreferredAvailabilityZone": "us-east-1b",
+                                "CurrentRole": "primary"
+                            }
+                        ]
+                    }
+                ],
+                "AutomaticFailover": "disabled",
+                "MultiAZ": "disabled",
+                "SnapshotRetentionLimit": 0,
+                "SnapshotWindow": "09:30-10:30",
+                "ClusterEnabled": false,
+                "CacheNodeType": "cache.m5.large",
+                "AuthTokenEnabled": false,
+                "TransitEncryptionEnabled": true,
+                "AtRestEncryptionEnabled": true,
+                "ARN": "arn:aws:elasticache:us-east-1:644160558196:replicationgroup:c7n-test-global",
+                "LogDeliveryConfigurations": [],
+                "ReplicationGroupCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 8,
+                    "day": 25,
+                    "hour": 21,
+                    "minute": 59,
+                    "second": 9,
+                    "microsecond": 247000
+                },
+                "DataTiering": "disabled",
+                "AutoMinorVersionUpgrade": false,
+                "NetworkType": "ipv4",
+                "IpDiscovery": "ipv4",
+                "TransitEncryptionMode": "required",
+                "ClusterMode": "disabled"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

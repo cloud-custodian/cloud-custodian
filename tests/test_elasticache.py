@@ -247,6 +247,27 @@ class TestElastiCacheCluster(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 3)
 
+    def test_elasticache_global_ds_cluster_delete(self):
+        session_factory = self.replay_flight_data("test_elasticache_global_ds_cluster_delete")
+        log_output = self.capture_logging('custodian.actions')
+        p = self.load_policy(
+            {
+                "name": "elasticache-cluster-delete",
+                "resource": "cache-cluster",
+                "filters": [{
+                    "type": "value",
+                    "key": "CacheParameterGroup.CacheParameterGroupName",
+                    "value": "global-datastore",
+                    "op": "contains"}],
+                "actions": [{"type": "delete"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['CacheClusterId'], 'c7n-test-global-001')
+        assert "Skipping c7n-test-global-001" in log_output.getvalue()
+
 
 class TestElastiCacheSubnetGroup(BaseTest):
 
@@ -518,3 +539,24 @@ class TestElastiCacheReplicationGroup(BaseTest):
         arn = p.resource_manager.get_arns(resources)[0]
         tags = client.list_tags_for_resource(ResourceName=arn)["TagList"]
         self.assertEqual(tags[0]["Value"], "added")
+
+    def test_replication_group_global_ds_cluster_delete(self):
+        session_factory = self.replay_flight_data("test_replication_group_global_ds_cluster_delete")
+        log_output = self.capture_logging('custodian.actions')
+        p = self.load_policy(
+            {
+                "name": "elasticache-cluster-delete",
+                "resource": "aws.elasticache-group",
+                "filters": [{
+                    "type": "value",
+                    "key": "GlobalReplicationGroupInfo.GlobalReplicationGroupId",
+                    "value": "ldgnf-c7n-test-global",
+                    "op": "eq"}],
+                "actions": [{"type": "delete"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['ReplicationGroupId'], 'c7n-test-global')
+        assert "Skipping c7n-test-global" in log_output.getvalue()

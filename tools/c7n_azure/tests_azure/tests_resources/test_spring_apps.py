@@ -5,11 +5,11 @@ from ..azure_common import BaseTest
 
 class SpringAppsTest(BaseTest):
     def test_azure_springapps_schema_validate(self):
-            p = self.load_policy({
-                'name': 'test-azure-springapps-schema-validate',
-                'resource': 'azure.spring-app'
-            }, validate=True)
-            self.assertTrue(p)
+        p = self.load_policy({
+            'name': 'test-azure-springapps-schema-validate',
+            'resource': 'azure.spring-app'
+        }, validate=True)
+        self.assertTrue(p)
 
     def test_find_by_name(self):
         p = self.load_policy({

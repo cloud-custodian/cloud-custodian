@@ -1,0 +1,219 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.DBForPostgreSQL/servers?api-version=2017-12-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Thu, 16 Jun 2022 13:15:08 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "2035"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "sku": {
+                                    "name": "GP_Gen5_2",
+                                    "tier": "GeneralPurpose",
+                                    "family": "Gen5",
+                                    "capacity": 2
+                                },
+                                "properties": {
+                                    "administratorLogin": "kgtxTSvC",
+                                    "storageProfile": {
+                                        "storageMB": 5120,
+                                        "backupRetentionDays": 7,
+                                        "geoRedundantBackup": "Disabled",
+                                        "storageAutogrow": "Enabled"
+                                    },
+                                    "version": "9.6",
+                                    "sslEnforcement": "Enabled",
+                                    "minimalTlsVersion": "TLS1_2",
+                                    "userVisibleState": "Ready",
+                                    "fullyQualifiedDomainName": "postgresqlserver343-red.postgres.database.azure.com",
+                                    "earliestRestoreDate": "2022-06-16T08:39:39.903+00:00",
+                                    "replicationRole": "",
+                                    "masterServerId": "",
+                                    "byokEnforcement": "Disabled",
+                                    "privateEndpointConnections": [],
+                                    "infrastructureEncryption": "Disabled",
+                                    "publicNetworkAccess": "Disabled"
+                                },
+                                "location": "eastus",
+                                "tags": {
+                                    "ComplianceStatus": "Red",
+                                    "CustodianRule": "epam-azure-343-postgresql_threat_detection_policy"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/343-rg-red/providers/Microsoft.DBforPostgreSQL/servers/postgresqlserver343-red",
+                                "name": "postgresqlserver343-red",
+                                "type": "Microsoft.DBforPostgreSQL/servers"
+                            },
+                            {
+                                "sku": {
+                                    "name": "GP_Gen5_2",
+                                    "tier": "GeneralPurpose",
+                                    "family": "Gen5",
+                                    "capacity": 2
+                                },
+                                "properties": {
+                                    "administratorLogin": "fjxxavJL",
+                                    "storageProfile": {
+                                        "storageMB": 5120,
+                                        "backupRetentionDays": 7,
+                                        "geoRedundantBackup": "Disabled",
+                                        "storageAutogrow": "Enabled"
+                                    },
+                                    "version": "9.6",
+                                    "sslEnforcement": "Enabled",
+                                    "minimalTlsVersion": "TLS1_2",
+                                    "userVisibleState": "Ready",
+                                    "fullyQualifiedDomainName": "postgresqlserver343-green.postgres.database.azure.com",
+                                    "earliestRestoreDate": "2022-06-16T08:39:40.347+00:00",
+                                    "replicationRole": "",
+                                    "masterServerId": "",
+                                    "byokEnforcement": "Disabled",
+                                    "privateEndpointConnections": [],
+                                    "infrastructureEncryption": "Disabled",
+                                    "publicNetworkAccess": "Disabled"
+                                },
+                                "location": "eastus",
+                                "tags": {
+                                    "ComplianceStatus": "Green",
+                                    "CustodianRule": "epam-azure-343-postgresql_threat_detection_policy"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/343-rg-green/providers/Microsoft.DBforPostgreSQL/servers/postgresqlserver343-green",
+                                "name": "postgresqlserver343-green",
+                                "type": "Microsoft.DBforPostgreSQL/servers"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/343-rg-red/providers/Microsoft.DBforPostgreSQL/servers/postgresqlserver343-red/securityAlertPolicies?api-version=2017-12-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Thu, 16 Jun 2022 13:15:08 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "489"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "properties": {
+                                    "state": "Disabled",
+                                    "disabledAlerts": [
+                                        ""
+                                    ],
+                                    "emailAddresses": [
+                                        ""
+                                    ],
+                                    "emailAccountAdmins": false,
+                                    "storageEndpoint": "",
+                                    "storageAccountAccessKey": "",
+                                    "retentionDays": 0,
+                                    "creationTime": "0001-01-01T00:00:00Z"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/343-rg-red/providers/Microsoft.DBforPostgreSQL/servers/postgresqlserver343-red/securityAlertPolicies/Default",
+                                "name": "Default",
+                                "type": "Microsoft.DBforPostgreSQL/servers/securityAlertPolicies"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/343-rg-green/providers/Microsoft.DBforPostgreSQL/servers/postgresqlserver343-green/securityAlertPolicies?api-version=2017-12-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Thu, 16 Jun 2022 13:15:09 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "495"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "properties": {
+                                    "state": "Enabled",
+                                    "disabledAlerts": [
+                                        ""
+                                    ],
+                                    "emailAddresses": [
+                                        ""
+                                    ],
+                                    "emailAccountAdmins": false,
+                                    "storageEndpoint": "",
+                                    "storageAccountAccessKey": "",
+                                    "retentionDays": 0,
+                                    "creationTime": "2022-06-16T08:31:43.51Z"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/343-rg-green/providers/Microsoft.DBforPostgreSQL/servers/postgresqlserver343-green/securityAlertPolicies/Default",
+                                "name": "Default",
+                                "type": "Microsoft.DBforPostgreSQL/servers/securityAlertPolicies"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

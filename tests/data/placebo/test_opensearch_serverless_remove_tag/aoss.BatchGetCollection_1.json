@@ -1,0 +1,23 @@
+{
+    "status_code": 200,
+    "data": {
+        "collectionDetails": [
+            {
+                "arn": "arn:aws:aoss:us-east-1:644160558196:collection/z2nmacgaa5v8pekwi1h1",
+                "collectionEndpoint": "https://z2nmacgaa5v8pekwi1h1.us-east-1.aoss.amazonaws.com",
+                "createdDate": 1707789152880,
+                "dashboardEndpoint": "https://z2nmacgaa5v8pekwi1h1.us-east-1.aoss.amazonaws.com/_dashboards",
+                "description": "Default collection created by Amazon Bedrock Knowledge base.",
+                "id": "z2nmacgaa5v8pekwi1h1",
+                "kmsKeyArn": "auto",
+                "lastModifiedDate": 1707789493243,
+                "name": "bedrock-knowledge-base-141zzj",
+                "standbyReplicas": "DISABLED",
+                "status": "ACTIVE",
+                "type": "VECTORSEARCH"
+            }
+        ],
+        "collectionErrorDetails": [],
+        "ResponseMetadata": {}
+    }
+}

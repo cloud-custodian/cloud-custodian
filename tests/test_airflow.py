@@ -3,6 +3,7 @@
 from .common import BaseTest
 from c7n.utils import jmespath_search
 
+
 class TestApacheAirflow(BaseTest):
     def test_airflow_environment_value_filter(self):
         session_factory = self.replay_flight_data('test_airflow_environment_value_filter')
@@ -95,3 +96,62 @@ class TestApacheAirflow(BaseTest):
         airflow = session_factory().client('mwaa')
         call = airflow.get_environment(Name=name)
         self.assertEqual({}, call['Environment'].get('Tags'))
+
+    def test_airflow_update_environment(self):
+        session_factory = self.replay_flight_data('test_airflow_update_environment')
+        p = self.load_policy(
+            {
+                "name": "airflow-update-webserver-access-mode",
+                "resource": "airflow",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "WebserverAccessMode",
+                        "op": "eq",
+                        "value": "PUBLIC_ONLY",
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "update-environment",
+                        "access_mode": "PRIVATE_ONLY",
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+        name = resources[0].get('Name')
+        airflow = session_factory().client('mwaa')
+        call = airflow.get_environment(Name=name)
+        self.assertEqual("PRIVATE_ONLY", call['Environment'].get('WebserverAccessMode'))
+
+    def test_airflow_delete_environment(self):
+        session_factory = self.replay_flight_data('test_airflow_delete_environment')
+        p = self.load_policy(
+            {
+                "name": "airflow-update-webserver-access-mode",
+                "resource": "airflow",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "Name",
+                        "op": "eq",
+                        "value": "TestStack-MwaaEnvironment",
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "delete-environment"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        name = resources[0].get('Name')
+        airflow = session_factory().client('mwaa')
+        call = airflow.get_environment(Name=name)
+        self.assertEqual("DELETING", call['Environment'].get('Status'))

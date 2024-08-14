@@ -1,0 +1,17 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "meshes": [
+            {
+                "arn": "arn:aws:appmesh:us-east-1:644160558196:mesh/m1",
+                "createdAt": "2024-03-22T23:14:07.869000+00:00",
+                "lastUpdatedAt": "2024-03-22T23:14:07.869000+00:00",
+                "meshName": "m1",
+                "meshOwner": "644160558196",
+                "resourceOwner": "644160558196",
+                "version": 1
+            }
+        ]
+    }
+}

@@ -1,0 +1,927 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "findings": [
+            {
+                "awsAccountId": "644160558196",
+                "description": "\n Daniel Moghimi discovered that some Intel(R) Processors did not properly\n clear microarchitectural state after speculative execution of various\n instructions. A local unprivileged user could use this to obtain to\n sensitive information.",
+                "epss": {
+                    "score": 0.00105
+                },
+                "exploitAvailable": "NO",
+                "findingArn": "arn:aws:inspector2:eu-central-1:644160558196:finding/bae2fba169a149bf0778f477b6f0d303",
+                "firstObservedAt": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 9,
+                    "day": 8,
+                    "hour": 20,
+                    "minute": 7,
+                    "second": 30,
+                    "microsecond": 366000
+                },
+                "fixAvailable": "YES",
+                "inspectorScore": 6.5,
+                "inspectorScoreDetails": {
+                    "adjustedCvss": {
+                        "adjustments": [],
+                        "cvssSource": "UBUNTU_CVE",
+                        "score": 6.5,
+                        "scoreSource": "UBUNTU_CVE",
+                        "scoringVector": "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:C/C:H/I:N/A:N",
+                        "version": "3.1"
+                    }
+                },
+                "lastObservedAt": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 9,
+                    "day": 8,
+                    "hour": 20,
+                    "minute": 7,
+                    "second": 30,
+                    "microsecond": 366000
+                },
+                "packageVulnerabilityDetails": {
+                    "cvss": [
+                        {
+                            "baseScore": 6.5,
+                            "scoringVector": "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:C/C:H/I:N/A:N",
+                            "source": "UBUNTU_CVE",
+                            "version": "3.1"
+                        },
+                        {
+                            "baseScore": 6.5,
+                            "scoringVector": "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:C/C:H/I:N/A:N",
+                            "source": "NVD",
+                            "version": "3.1"
+                        }
+                    ],
+                    "referenceUrls": [
+                        "https://ubuntu.com/security/notices/USN-6318-1",
+                        "https://ubuntu.com/security/notices/USN-6329-1",
+                        "https://ubuntu.com/security/notices/USN-6316-1",
+                        "https://ubuntu.com/security/notices/USN-6328-1",
+                        "https://ubuntu.com/security/notices/USN-6317-1",
+                        "https://www.intel.com/content/www/us/en/security-center/advisory/intel-sa-00828.html",
+                        "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2022-40982",
+                        "https://ubuntu.com/security/notices/USN-6286-1",
+                        "https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/best-practices/threat-analysis-gds.html",
+                        "https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/technical-documentation/gather-data-sampling.html",
+                        "https://ubuntu.com/security/notices/USN-6321-1",
+                        "https://ubuntu.com/security/notices/USN-6332-1",
+                        "https://ubuntu.com/security/notices/USN-6331-1",
+                        "https://ubuntu.com/security/notices/USN-6330-1",
+                        "https://ubuntu.com/security/notices/USN-6325-1",
+                        "https://ubuntu.com/security/notices/USN-6348-1",
+                        "https://ubuntu.com/security/notices/USN-6315-1",
+                        "https://ubuntu.com/security/notices/USN-6346-1",
+                        "https://ubuntu.com/security/notices/USN-6324-1"
+                    ],
+                    "relatedVulnerabilities": [],
+                    "source": "UBUNTU_CVE",
+                    "sourceUrl": "https://people.canonical.com/~ubuntu-security/cve/2022/CVE-2022-40982.html",
+                    "vendorCreatedAt": {
+                        "__class__": "datetime",
+                        "year": 2023,
+                        "month": 8,
+                        "day": 11,
+                        "hour": 4,
+                        "minute": 15,
+                        "second": 0,
+                        "microsecond": 0
+                    },
+                    "vendorSeverity": "medium",
+                    "vulnerabilityId": "CVE-2022-40982",
+                    "vulnerablePackages": [
+                        {
+                            "arch": "X86_64",
+                            "epoch": 0,
+                            "fixedInVersion": "0:3.20230808.0ubuntu0.20.04.1",
+                            "name": "intel-microcode",
+                            "packageManager": "OS",
+                            "remediation": "apt update && apt install --only-upgrade intel-microcode",
+                            "version": "3.20230214.0ubuntu0.20.04.1"
+                        },
+                        {
+                            "arch": "X86_64",
+                            "epoch": 0,
+                            "fixedInVersion": "0:5.15.0.1043.48~20.04.31",
+                            "name": "linux-image-aws",
+                            "packageManager": "OS",
+                            "remediation": "apt update && apt install --only-upgrade linux-image-aws",
+                            "version": "5.15.0.1036.40~20.04.25"
+                        }
+                    ]
+                },
+                "remediation": {
+                    "recommendation": {
+                        "text": "None Provided"
+                    }
+                },
+                "resources": [
+                    {
+                        "details": {
+                            "awsEc2Instance": {
+                                "iamInstanceProfileArn": "arn:aws:iam::644160558196:instance-profile/SSMInstanceProfile",
+                                "imageId": "ami-0ab1a82de7ca5889c",
+                                "ipV4Addresses": [
+                                    "172.31.28.155",
+                                    "3.70.160.43"
+                                ],
+                                "ipV6Addresses": [],
+                                "launchedAt": {
+                                    "__class__": "datetime",
+                                    "year": 2023,
+                                    "month": 9,
+                                    "day": 8,
+                                    "hour": 20,
+                                    "minute": 5,
+                                    "second": 55,
+                                    "microsecond": 0
+                                },
+                                "platform": "UBUNTU_20_04",
+                                "subnetId": "subnet-0fa0116f3c7f29ed2",
+                                "type": "t2.micro",
+                                "vpcId": "vpc-01330a3528d96e6d9"
+                            }
+                        },
+                        "id": "i-07b035550fa86717d",
+                        "partition": "aws",
+                        "region": "eu-central-1",
+                        "tags": {
+                            "Name": "inspector-test"
+                        },
+                        "type": "AWS_EC2_INSTANCE"
+                    }
+                ],
+                "severity": "MEDIUM",
+                "status": "ACTIVE",
+                "title": "CVE-2022-40982 - intel-microcode, linux-image-aws",
+                "type": "PACKAGE_VULNERABILITY",
+                "updatedAt": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 9,
+                    "day": 8,
+                    "hour": 20,
+                    "minute": 7,
+                    "second": 30,
+                    "microsecond": 366000
+                }
+            },
+            {
+                "awsAccountId": "644160558196",
+                "description": " A fully compromised ESXi host can force VMware Tools to fail to authenticate host-to-guest operations, impacting the confidentiality and integrity of the guest virtual machine.",
+                "epss": {
+                    "score": 0.00224
+                },
+                "exploitAvailable": "NO",
+                "findingArn": "arn:aws:inspector2:eu-central-1:644160558196:finding/bbe983a13ee0b169ce9e9d0e5e9853be",
+                "firstObservedAt": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 9,
+                    "day": 8,
+                    "hour": 20,
+                    "minute": 7,
+                    "second": 30,
+                    "microsecond": 243000
+                },
+                "fixAvailable": "YES",
+                "inspectorScore": 3.9,
+                "inspectorScoreDetails": {
+                    "adjustedCvss": {
+                        "adjustments": [],
+                        "cvssSource": "UBUNTU_CVE",
+                        "score": 3.9,
+                        "scoreSource": "UBUNTU_CVE",
+                        "scoringVector": "CVSS:3.1/AV:L/AC:H/PR:H/UI:N/S:C/C:L/I:L/A:N",
+                        "version": "3.1"
+                    }
+                },
+                "lastObservedAt": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 9,
+                    "day": 8,
+                    "hour": 20,
+                    "minute": 7,
+                    "second": 30,
+                    "microsecond": 243000
+                },
+                "packageVulnerabilityDetails": {
+                    "cvss": [
+                        {
+                            "baseScore": 3.9,
+                            "scoringVector": "CVSS:3.1/AV:L/AC:H/PR:H/UI:N/S:C/C:L/I:L/A:N",
+                            "source": "UBUNTU_CVE",
+                            "version": "3.1"
+                        },
+                        {
+                            "baseScore": 3.9,
+                            "scoringVector": "CVSS:3.1/AV:L/AC:H/PR:H/UI:N/S:C/C:L/I:L/A:N",
+                            "source": "NVD",
+                            "version": "3.1"
+                        }
+                    ],
+                    "referenceUrls": [
+                        "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-20867",
+                        "https://ubuntu.com/security/notices/USN-6257-1"
+                    ],
+                    "relatedVulnerabilities": [],
+                    "source": "UBUNTU_CVE",
+                    "sourceUrl": "https://people.canonical.com/~ubuntu-security/cve/2023/CVE-2023-20867.html",
+                    "vendorCreatedAt": {
+                        "__class__": "datetime",
+                        "year": 2023,
+                        "month": 6,
+                        "day": 13,
+                        "hour": 18,
+                        "minute": 15,
+                        "second": 0,
+                        "microsecond": 0
+                    },
+                    "vendorSeverity": "low",
+                    "vulnerabilityId": "CVE-2023-20867",
+                    "vulnerablePackages": [
+                        {
+                            "arch": "X86_64",
+                            "epoch": 2,
+                            "fixedInVersion": "2:11.3.0-2ubuntu0~ubuntu20.04.5",
+                            "name": "open-vm-tools",
+                            "packageManager": "OS",
+                            "release": "2ubuntu0~ubuntu20.04.4",
+                            "remediation": "apt update && apt install --only-upgrade open-vm-tools",
+                            "version": "11.3.0"
+                        }
+                    ]
+                },
+                "remediation": {
+                    "recommendation": {
+                        "text": "None Provided"
+                    }
+                },
+                "resources": [
+                    {
+                        "details": {
+                            "awsEc2Instance": {
+                                "iamInstanceProfileArn": "arn:aws:iam::644160558196:instance-profile/SSMInstanceProfile",
+                                "imageId": "ami-0ab1a82de7ca5889c",
+                                "ipV4Addresses": [
+                                    "172.31.28.155",
+                                    "3.70.160.43"
+                                ],
+                                "ipV6Addresses": [],
+                                "launchedAt": {
+                                    "__class__": "datetime",
+                                    "year": 2023,
+                                    "month": 9,
+                                    "day": 8,
+                                    "hour": 20,
+                                    "minute": 5,
+                                    "second": 55,
+                                    "microsecond": 0
+                                },
+                                "platform": "UBUNTU_20_04",
+                                "subnetId": "subnet-0fa0116f3c7f29ed2",
+                                "type": "t2.micro",
+                                "vpcId": "vpc-01330a3528d96e6d9"
+                            }
+                        },
+                        "id": "i-07b035550fa86717d",
+                        "partition": "aws",
+                        "region": "eu-central-1",
+                        "tags": {
+                            "Name": "inspector-test"
+                        },
+                        "type": "AWS_EC2_INSTANCE"
+                    }
+                ],
+                "severity": "LOW",
+                "status": "ACTIVE",
+                "title": "CVE-2023-20867 - open-vm-tools",
+                "type": "PACKAGE_VULNERABILITY",
+                "updatedAt": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 9,
+                    "day": 8,
+                    "hour": 20,
+                    "minute": 7,
+                    "second": 30,
+                    "microsecond": 243000
+                }
+            },
+            {
+                "awsAccountId": "644160558196",
+                "description": " We issued this CVE pre-maturely, as we have subsequently realized that this issue points out a problem that there really is no safe measures around or protections for.",
+                "exploitAvailable": "NO",
+                "findingArn": "arn:aws:inspector2:eu-central-1:644160558196:finding/bc609341db4bc532ab810ad593a7e1c1",
+                "firstObservedAt": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 9,
+                    "day": 8,
+                    "hour": 20,
+                    "minute": 7,
+                    "second": 30,
+                    "microsecond": 366000
+                },
+                "fixAvailable": "YES",
+                "inspectorScore": 5.0,
+                "inspectorScoreDetails": {
+                    "adjustedCvss": {
+                        "adjustments": [],
+                        "cvssSource": "UBUNTU_CVE",
+                        "score": 5.0,
+                        "scoreSource": "UBUNTU_CVE",
+                        "scoringVector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:L/A:L",
+                        "version": "3.1"
+                    }
+                },
+                "lastObservedAt": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 9,
+                    "day": 8,
+                    "hour": 20,
+                    "minute": 7,
+                    "second": 30,
+                    "microsecond": 366000
+                },
+                "packageVulnerabilityDetails": {
+                    "cvss": [
+                        {
+                            "baseScore": 5.0,
+                            "scoringVector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:L/A:L",
+                            "source": "UBUNTU_CVE",
+                            "version": "3.1"
+                        }
+                    ],
+                    "referenceUrls": [
+                        "https://ubuntu.com/security/notices/USN-6237-1",
+                        "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-32001"
+                    ],
+                    "relatedVulnerabilities": [],
+                    "source": "UBUNTU_CVE",
+                    "sourceUrl": "https://people.canonical.com/~ubuntu-security/cve/2023/CVE-2023-32001.html",
+                    "vendorCreatedAt": {
+                        "__class__": "datetime",
+                        "year": 2023,
+                        "month": 7,
+                        "day": 26,
+                        "hour": 22,
+                        "minute": 15,
+                        "second": 0,
+                        "microsecond": 0
+                    },
+                    "vendorSeverity": "medium",
+                    "vulnerabilityId": "CVE-2023-32001",
+                    "vulnerablePackages": [
+                        {
+                            "arch": "X86_64",
+                            "epoch": 0,
+                            "fixedInVersion": "0:7.68.0-1ubuntu2.19",
+                            "name": "curl",
+                            "packageManager": "OS",
+                            "release": "1ubuntu2.18",
+                            "remediation": "apt update && apt install --only-upgrade curl",
+                            "version": "7.68.0"
+                        },
+                        {
+                            "arch": "X86_64",
+                            "epoch": 0,
+                            "fixedInVersion": "0:7.68.0-1ubuntu2.19",
+                            "name": "libcurl4",
+                            "packageManager": "OS",
+                            "release": "1ubuntu2.18",
+                            "remediation": "apt update && apt install --only-upgrade libcurl4",
+                            "version": "7.68.0"
+                        },
+                        {
+                            "arch": "X86_64",
+                            "epoch": 0,
+                            "fixedInVersion": "0:7.68.0-1ubuntu2.19",
+                            "name": "libcurl3-gnutls",
+                            "packageManager": "OS",
+                            "release": "1ubuntu2.18",
+                            "remediation": "apt update && apt install --only-upgrade libcurl3-gnutls",
+                            "version": "7.68.0"
+                        }
+                    ]
+                },
+                "remediation": {
+                    "recommendation": {
+                        "text": "None Provided"
+                    }
+                },
+                "resources": [
+                    {
+                        "details": {
+                            "awsEc2Instance": {
+                                "iamInstanceProfileArn": "arn:aws:iam::644160558196:instance-profile/SSMInstanceProfile",
+                                "imageId": "ami-0ab1a82de7ca5889c",
+                                "ipV4Addresses": [
+                                    "172.31.28.155",
+                                    "3.70.160.43"
+                                ],
+                                "ipV6Addresses": [],
+                                "launchedAt": {
+                                    "__class__": "datetime",
+                                    "year": 2023,
+                                    "month": 9,
+                                    "day": 8,
+                                    "hour": 20,
+                                    "minute": 5,
+                                    "second": 55,
+                                    "microsecond": 0
+                                },
+                                "platform": "UBUNTU_20_04",
+                                "subnetId": "subnet-0fa0116f3c7f29ed2",
+                                "type": "t2.micro",
+                                "vpcId": "vpc-01330a3528d96e6d9"
+                            }
+                        },
+                        "id": "i-07b035550fa86717d",
+                        "partition": "aws",
+                        "region": "eu-central-1",
+                        "tags": {
+                            "Name": "inspector-test"
+                        },
+                        "type": "AWS_EC2_INSTANCE"
+                    }
+                ],
+                "severity": "MEDIUM",
+                "status": "ACTIVE",
+                "title": "CVE-2023-32001 - curl, libcurl4 and 1 more",
+                "type": "PACKAGE_VULNERABILITY",
+                "updatedAt": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 9,
+                    "day": 8,
+                    "hour": 20,
+                    "minute": 7,
+                    "second": 30,
+                    "microsecond": 366000
+                }
+            },
+            {
+                "awsAccountId": "644160558196",
+                "description": "\n It was discovered that the kernel->user space relay implementation in the\n Linux kernel did not properly perform certain buffer calculations, leading\n to an out-of-bounds read vulnerability. A local attacker could use this to\n cause a denial of service (system crash) or expose sensitive information\n (kernel memory).",
+                "epss": {
+                    "score": 0.00042
+                },
+                "exploitAvailable": "NO",
+                "findingArn": "arn:aws:inspector2:eu-central-1:644160558196:finding/bcb125dca60d2f38e68b332bb66ea601",
+                "firstObservedAt": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 9,
+                    "day": 8,
+                    "hour": 20,
+                    "minute": 7,
+                    "second": 30,
+                    "microsecond": 366000
+                },
+                "fixAvailable": "YES",
+                "inspectorScore": 7.1,
+                "inspectorScoreDetails": {
+                    "adjustedCvss": {
+                        "adjustments": [],
+                        "cvssSource": "UBUNTU_CVE",
+                        "score": 7.1,
+                        "scoreSource": "UBUNTU_CVE",
+                        "scoringVector": "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:H",
+                        "version": "3.1"
+                    }
+                },
+                "lastObservedAt": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 9,
+                    "day": 8,
+                    "hour": 20,
+                    "minute": 7,
+                    "second": 30,
+                    "microsecond": 366000
+                },
+                "packageVulnerabilityDetails": {
+                    "cvss": [
+                        {
+                            "baseScore": 7.1,
+                            "scoringVector": "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:H",
+                            "source": "UBUNTU_CVE",
+                            "version": "3.1"
+                        },
+                        {
+                            "baseScore": 7.1,
+                            "scoringVector": "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:H",
+                            "source": "NVD",
+                            "version": "3.1"
+                        }
+                    ],
+                    "referenceUrls": [
+                        "https://ubuntu.com/security/notices/USN-6252-1",
+                        "https://ubuntu.com/security/notices/USN-6283-1",
+                        "https://ubuntu.com/security/notices/USN-6349-1",
+                        "https://lore.kernel.org/lkml/1682238502-1892-1-git-send-email-yangpc@wangsu.com/T/",
+                        "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-3268",
+                        "https://ubuntu.com/security/notices/USN-6254-1",
+                        "https://ubuntu.com/security/notices/USN-6340-1",
+                        "https://ubuntu.com/security/notices/USN-6300-1",
+                        "https://ubuntu.com/security/notices/USN-6311-1",
+                        "https://ubuntu.com/security/notices/USN-6332-1",
+                        "https://git.kernel.org/linus/43ec16f1450f4936025a9bdf1a273affdb9732c1(6.4-rc1)",
+                        "https://ubuntu.com/security/notices/USN-6347-1"
+                    ],
+                    "relatedVulnerabilities": [],
+                    "source": "UBUNTU_CVE",
+                    "sourceUrl": "https://people.canonical.com/~ubuntu-security/cve/2023/CVE-2023-3268.html",
+                    "vendorCreatedAt": {
+                        "__class__": "datetime",
+                        "year": 2023,
+                        "month": 6,
+                        "day": 16,
+                        "hour": 20,
+                        "minute": 15,
+                        "second": 0,
+                        "microsecond": 0
+                    },
+                    "vendorSeverity": "medium",
+                    "vulnerabilityId": "CVE-2023-3268",
+                    "vulnerablePackages": [
+                        {
+                            "arch": "X86_64",
+                            "epoch": 0,
+                            "fixedInVersion": "0:5.15.0.1041.46~20.04.30",
+                            "name": "linux-image-aws",
+                            "packageManager": "OS",
+                            "remediation": "apt update && apt install --only-upgrade linux-image-aws",
+                            "version": "5.15.0.1036.40~20.04.25"
+                        }
+                    ]
+                },
+                "remediation": {
+                    "recommendation": {
+                        "text": "None Provided"
+                    }
+                },
+                "resources": [
+                    {
+                        "details": {
+                            "awsEc2Instance": {
+                                "iamInstanceProfileArn": "arn:aws:iam::644160558196:instance-profile/SSMInstanceProfile",
+                                "imageId": "ami-0ab1a82de7ca5889c",
+                                "ipV4Addresses": [
+                                    "172.31.28.155",
+                                    "3.70.160.43"
+                                ],
+                                "ipV6Addresses": [],
+                                "launchedAt": {
+                                    "__class__": "datetime",
+                                    "year": 2023,
+                                    "month": 9,
+                                    "day": 8,
+                                    "hour": 20,
+                                    "minute": 5,
+                                    "second": 55,
+                                    "microsecond": 0
+                                },
+                                "platform": "UBUNTU_20_04",
+                                "subnetId": "subnet-0fa0116f3c7f29ed2",
+                                "type": "t2.micro",
+                                "vpcId": "vpc-01330a3528d96e6d9"
+                            }
+                        },
+                        "id": "i-07b035550fa86717d",
+                        "partition": "aws",
+                        "region": "eu-central-1",
+                        "tags": {
+                            "Name": "inspector-test"
+                        },
+                        "type": "AWS_EC2_INSTANCE"
+                    }
+                ],
+                "severity": "HIGH",
+                "status": "ACTIVE",
+                "title": "CVE-2023-3268 - linux-image-aws",
+                "type": "PACKAGE_VULNERABILITY",
+                "updatedAt": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 9,
+                    "day": 8,
+                    "hour": 20,
+                    "minute": 7,
+                    "second": 30,
+                    "microsecond": 366000
+                }
+            },
+            {
+                "awsAccountId": "644160558196",
+                "description": " An issue was discovered in Contiki through 3.0. An Integer Overflow exists in the uIP TCP/IP Stack component when parsing TCP MSS options of IPv4 network packets in uip_process in net/ipv4/uip.c.",
+                "epss": {
+                    "score": 0.00131
+                },
+                "exploitAvailable": "NO",
+                "findingArn": "arn:aws:inspector2:eu-central-1:644160558196:finding/bfb33634cadfb4eb500aa9db13dcdbfc",
+                "firstObservedAt": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 9,
+                    "day": 8,
+                    "hour": 20,
+                    "minute": 7,
+                    "second": 30,
+                    "microsecond": 366000
+                },
+                "fixAvailable": "YES",
+                "inspectorScore": 7.5,
+                "inspectorScoreDetails": {
+                    "adjustedCvss": {
+                        "adjustments": [],
+                        "cvssSource": "UBUNTU_CVE",
+                        "score": 7.5,
+                        "scoreSource": "UBUNTU_CVE",
+                        "scoringVector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+                        "version": "3.1"
+                    }
+                },
+                "lastObservedAt": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 9,
+                    "day": 8,
+                    "hour": 20,
+                    "minute": 7,
+                    "second": 30,
+                    "microsecond": 366000
+                },
+                "packageVulnerabilityDetails": {
+                    "cvss": [
+                        {
+                            "baseScore": 7.5,
+                            "scoringVector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+                            "source": "UBUNTU_CVE",
+                            "version": "3.1"
+                        },
+                        {
+                            "baseScore": 5.0,
+                            "scoringVector": "AV:N/AC:L/Au:N/C:N/I:N/A:P",
+                            "source": "NVD",
+                            "version": "2.0"
+                        },
+                        {
+                            "baseScore": 7.5,
+                            "scoringVector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+                            "source": "NVD",
+                            "version": "3.1"
+                        }
+                    ],
+                    "referenceUrls": [
+                        "https://ubuntu.com/security/notices/USN-6259-1",
+                        "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-13988"
+                    ],
+                    "relatedVulnerabilities": [],
+                    "source": "UBUNTU_CVE",
+                    "sourceUrl": "https://people.canonical.com/~ubuntu-security/cve/2020/CVE-2020-13988.html",
+                    "vendorCreatedAt": {
+                        "__class__": "datetime",
+                        "year": 2020,
+                        "month": 12,
+                        "day": 11,
+                        "hour": 22,
+                        "minute": 15,
+                        "second": 0,
+                        "microsecond": 0
+                    },
+                    "vendorSeverity": "low",
+                    "vulnerabilityId": "CVE-2020-13988",
+                    "vulnerablePackages": [
+                        {
+                            "arch": "X86_64",
+                            "epoch": 0,
+                            "fixedInVersion": "0:2.0.874-7.1ubuntu6.4",
+                            "name": "open-iscsi",
+                            "packageManager": "OS",
+                            "release": "7.1ubuntu6.3",
+                            "remediation": "apt update && apt install --only-upgrade open-iscsi",
+                            "version": "2.0.874"
+                        }
+                    ]
+                },
+                "remediation": {
+                    "recommendation": {
+                        "text": "None Provided"
+                    }
+                },
+                "resources": [
+                    {
+                        "details": {
+                            "awsEc2Instance": {
+                                "iamInstanceProfileArn": "arn:aws:iam::644160558196:instance-profile/SSMInstanceProfile",
+                                "imageId": "ami-0ab1a82de7ca5889c",
+                                "ipV4Addresses": [
+                                    "172.31.28.155",
+                                    "3.70.160.43"
+                                ],
+                                "ipV6Addresses": [],
+                                "launchedAt": {
+                                    "__class__": "datetime",
+                                    "year": 2023,
+                                    "month": 9,
+                                    "day": 8,
+                                    "hour": 20,
+                                    "minute": 5,
+                                    "second": 55,
+                                    "microsecond": 0
+                                },
+                                "platform": "UBUNTU_20_04",
+                                "subnetId": "subnet-0fa0116f3c7f29ed2",
+                                "type": "t2.micro",
+                                "vpcId": "vpc-01330a3528d96e6d9"
+                            }
+                        },
+                        "id": "i-07b035550fa86717d",
+                        "partition": "aws",
+                        "region": "eu-central-1",
+                        "tags": {
+                            "Name": "inspector-test"
+                        },
+                        "type": "AWS_EC2_INSTANCE"
+                    }
+                ],
+                "severity": "HIGH",
+                "status": "ACTIVE",
+                "title": "CVE-2020-13988 - open-iscsi",
+                "type": "PACKAGE_VULNERABILITY",
+                "updatedAt": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 9,
+                    "day": 8,
+                    "hour": 20,
+                    "minute": 7,
+                    "second": 30,
+                    "microsecond": 366000
+                }
+            },
+            {
+                "awsAccountId": "644160558196",
+                "description": "\n Zheng Zhang discovered that the device-mapper implementation in the Linux\n kernel did not properly handle locking during table_clear() operations. A\n local attacker could use this to cause a denial of service (kernel\n deadlock).",
+                "epss": {
+                    "score": 0.00042
+                },
+                "exploitAvailable": "NO",
+                "findingArn": "arn:aws:inspector2:eu-central-1:644160558196:finding/c15913c4049c07030a5118907ecc36a1",
+                "firstObservedAt": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 9,
+                    "day": 8,
+                    "hour": 20,
+                    "minute": 7,
+                    "second": 30,
+                    "microsecond": 243000
+                },
+                "fixAvailable": "YES",
+                "inspectorScore": 4.4,
+                "inspectorScoreDetails": {
+                    "adjustedCvss": {
+                        "adjustments": [],
+                        "cvssSource": "UBUNTU_CVE",
+                        "score": 4.4,
+                        "scoreSource": "UBUNTU_CVE",
+                        "scoringVector": "CVSS:3.1/AV:L/AC:L/PR:H/UI:N/S:U/C:N/I:N/A:H",
+                        "version": "3.1"
+                    }
+                },
+                "lastObservedAt": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 9,
+                    "day": 8,
+                    "hour": 20,
+                    "minute": 7,
+                    "second": 30,
+                    "microsecond": 243000
+                },
+                "packageVulnerabilityDetails": {
+                    "cvss": [
+                        {
+                            "baseScore": 4.4,
+                            "scoringVector": "CVSS:3.1/AV:L/AC:L/PR:H/UI:N/S:U/C:N/I:N/A:H",
+                            "source": "UBUNTU_CVE",
+                            "version": "3.1"
+                        },
+                        {
+                            "baseScore": 4.4,
+                            "scoringVector": "CVSS:3.1/AV:L/AC:L/PR:H/UI:N/S:U/C:N/I:N/A:H",
+                            "source": "NVD",
+                            "version": "3.1"
+                        }
+                    ],
+                    "referenceUrls": [
+                        "https://ubuntu.com/security/notices/USN-6283-1",
+                        "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-2269",
+                        "https://ubuntu.com/security/notices/USN-6327-1",
+                        "https://ubuntu.com/security/notices/USN-6349-1",
+                        "https://ubuntu.com/security/notices/USN-6309-1",
+                        "https://ubuntu.com/security/notices/USN-6340-1",
+                        "https://lore.kernel.org/lkml/ZD1xyZxb3rHot8PV@redhat.com/t/",
+                        "https://ubuntu.com/security/notices/USN-6300-1",
+                        "https://ubuntu.com/security/notices/USN-6311-1",
+                        "https://ubuntu.com/security/notices/USN-6332-1",
+                        "https://ubuntu.com/security/notices/USN-6342-1",
+                        "https://ubuntu.com/security/notices/USN-6173-1",
+                        "https://ubuntu.com/security/notices/USN-6347-1"
+                    ],
+                    "relatedVulnerabilities": [],
+                    "source": "UBUNTU_CVE",
+                    "sourceUrl": "https://people.canonical.com/~ubuntu-security/cve/2023/CVE-2023-2269.html",
+                    "vendorCreatedAt": {
+                        "__class__": "datetime",
+                        "year": 2023,
+                        "month": 4,
+                        "day": 25,
+                        "hour": 22,
+                        "minute": 15,
+                        "second": 0,
+                        "microsecond": 0
+                    },
+                    "vendorSeverity": "medium",
+                    "vulnerabilityId": "CVE-2023-2269",
+                    "vulnerablePackages": [
+                        {
+                            "arch": "X86_64",
+                            "epoch": 0,
+                            "fixedInVersion": "0:5.15.0.1041.46~20.04.30",
+                            "name": "linux-image-aws",
+                            "packageManager": "OS",
+                            "remediation": "apt update && apt install --only-upgrade linux-image-aws",
+                            "version": "5.15.0.1036.40~20.04.25"
+                        }
+                    ]
+                },
+                "remediation": {
+                    "recommendation": {
+                        "text": "None Provided"
+                    }
+                },
+                "resources": [
+                    {
+                        "details": {
+                            "awsEc2Instance": {
+                                "iamInstanceProfileArn": "arn:aws:iam::644160558196:instance-profile/SSMInstanceProfile",
+                                "imageId": "ami-0ab1a82de7ca5889c",
+                                "ipV4Addresses": [
+                                    "172.31.28.155",
+                                    "3.70.160.43"
+                                ],
+                                "ipV6Addresses": [],
+                                "launchedAt": {
+                                    "__class__": "datetime",
+                                    "year": 2023,
+                                    "month": 9,
+                                    "day": 8,
+                                    "hour": 20,
+                                    "minute": 5,
+                                    "second": 55,
+                                    "microsecond": 0
+                                },
+                                "platform": "UBUNTU_20_04",
+                                "subnetId": "subnet-0fa0116f3c7f29ed2",
+                                "type": "t2.micro",
+                                "vpcId": "vpc-01330a3528d96e6d9"
+                            }
+                        },
+                        "id": "i-07b035550fa86717d",
+                        "partition": "aws",
+                        "region": "eu-central-1",
+                        "tags": {
+                            "Name": "inspector-test"
+                        },
+                        "type": "AWS_EC2_INSTANCE"
+                    }
+                ],
+                "severity": "MEDIUM",
+                "status": "ACTIVE",
+                "title": "CVE-2023-2269 - linux-image-aws",
+                "type": "PACKAGE_VULNERABILITY",
+                "updatedAt": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 9,
+                    "day": 8,
+                    "hour": 20,
+                    "minute": 7,
+                    "second": 30,
+                    "microsecond": 243000
+                }
+            }
+        ]
+    }
+}

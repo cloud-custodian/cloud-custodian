@@ -1,4 +1,5 @@
 [
+  "africa-south1",
   "asia-east1",
   "asia-east2",
   "asia-northeast1",
@@ -14,6 +15,7 @@
   "europe-north1",
   "europe-southwest1",
   "europe-west1",
+  "europe-west10",
   "europe-west12",
   "europe-west2",
   "europe-west3",
@@ -22,6 +24,7 @@
   "europe-west8",
   "europe-west9",
   "me-central1",
+  "me-central2",
   "me-west1",
   "northamerica-northeast1",
   "northamerica-northeast2",
@@ -37,5 +40,6 @@
   "us-west1",
   "us-west2",
   "us-west3",
-  "us-west4"
+  "us-west4",
+  "us-west8"
 ]

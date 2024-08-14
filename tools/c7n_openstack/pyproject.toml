@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "c7n_openstack"
-version = "0.1.18"
+version = "0.1.30"
 description = "Cloud Custodian - OpenStack Provider"
 readme = "readme.md"
 authors = ["Cloud Custodian Project"]
@@ -15,14 +15,14 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.8"
 c7n = {path = "../..", develop = true}
 
 openstacksdk = "^0.52.0"
 
-[tool.poetry.dev-dependencies]
-pytest = "^7.1.2"
-vcrpy = "^4.0.2"
+[tool.poetry.group.dev.dependencies]
+pytest = "<8.0"
+vcrpy = ">=4.0.2"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

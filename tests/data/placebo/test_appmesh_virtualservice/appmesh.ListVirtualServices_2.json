@@ -1,0 +1,36 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "virtualServices": [
+            {
+                "arn": "arn:aws:appmesh:us-east-1:644160558196:mesh/m2/virtualService/vs1.m2.us-east-1",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 5,
+                    "day": 24,
+                    "hour": 13,
+                    "minute": 3,
+                    "second": 10,
+                    "microsecond": 983000
+                },
+                "lastUpdatedAt": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 5,
+                    "day": 24,
+                    "hour": 13,
+                    "minute": 3,
+                    "second": 10,
+                    "microsecond": 983000
+                },
+                "meshName": "m2",
+                "meshOwner": "644160558196",
+                "resourceOwner": "644160558196",
+                "version": 1,
+                "virtualServiceName": "vs1.m2.us-east-1.local.m2.us-east-1"
+            }
+        ]
+    }
+}

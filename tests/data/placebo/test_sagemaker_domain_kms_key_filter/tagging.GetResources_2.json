@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:kms:us-east-1:644160558196:key/75d1e7ba-f9c5-46b9-97bc-28e6c834aa49",
+                "Tags": [
+                    {
+                        "Key": "c7n",
+                        "Value": "test"
+                    },
+                    {
+                        "Key": "Name",
+                        "Value": "c7n/sagemaker"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

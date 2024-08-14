@@ -1,0 +1,39 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 09 Aug 2023 22:01:58 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "4777",
+    "-content-encoding": "gzip",
+    "content-location": "https://cloudkms.googleapis.com/v1/projects/cloud-custodian/locations/global/keyRings?alt=json"
+  },
+  "body": {
+    "keyRings": [
+      {
+        "name": "projects/cloud-custodian/locations/global/keyRings/gcs-key",
+        "createTime": "2021-02-12T10:34:11.227374188Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/global/keyRings/kms-key123",
+        "createTime": "2021-07-12T11:54:13.681532538Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/global/keyRings/new_key",
+        "createTime": "2021-04-29T16:34:59.432581824Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/global/keyRings/testkey1",
+        "createTime": "2019-10-16T14:17:02.529052792Z"
+      }
+    ],
+    "totalSize": 30
+  }
+}

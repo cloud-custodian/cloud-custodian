@@ -11,7 +11,13 @@ from collections import defaultdict
 from c7n.actions import ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
-    Filter, FilterRegistry, DefaultVpcBase, MetricsFilter, ValueFilter)
+    Filter,
+    FilterRegistry,
+    MetricsFilter,
+    ValueFilter,
+    WafV2FilterBase,
+    WafClassicRegionalFilterBase
+)
 import c7n.filters.vpc as net_filters
 from c7n import tags
 from c7n.manager import resources
@@ -81,6 +87,7 @@ class AppELB(QueryResourceManager):
         arn = "LoadBalancerArn"
         # The suffix varies by type of loadbalancer (app vs net)
         arn_type = 'loadbalancer/app'
+        permissions_augment = ("elasticloadbalancing:DescribeTags",)
 
     retry = staticmethod(get_retry(('Throttling',)))
     source_mapping = {
@@ -180,7 +187,7 @@ class VpcFilter(net_filters.VpcFilter):
 
 
 @AppELB.filter_registry.register('waf-enabled')
-class WafEnabled(Filter):
+class WafEnabled(WafClassicRegionalFilterBase):
     """Filter Application LoadBalancer by waf-regional web-acl
 
     :example:
@@ -195,65 +202,18 @@ class WafEnabled(Filter):
                     state: false
                     web-acl: test
     """
-    schema = type_schema(
-        'waf-enabled', **{
-            'web-acl': {'type': 'string'},
-            'state': {'type': 'boolean'}})
 
-    permissions = ('waf-regional:ListResourcesForWebACL', 'waf-regional:ListWebACLs')
-
-    # TODO verify name uniqueness within region/account
-    # TODO consider associated resource fetch in augment
-    def process(self, resources, event=None):
-        client = local_session(self.manager.session_factory).client(
-            'waf-regional')
-
-        target_acl = self.data.get('web-acl')
-        state = self.data.get('state', False)
-
-        name_id_map = {}
-        resource_map = {}
-
-        wafs = self.manager.get_resource_manager('waf-regional').resources(augment=False)
-
-        for w in wafs:
-            if 'c7n:AssociatedResources' not in w:
-                arns = client.list_resources_for_web_acl(
-                    WebACLId=w['WebACLId']).get('ResourceArns', [])
-                w['c7n:AssociatedResources'] = arns
-            name_id_map[w['Name']] = w['WebACLId']
-            for r in w['c7n:AssociatedResources']:
-                resource_map[r] = w['WebACLId']
-
-        target_acl_id = name_id_map.get(target_acl, target_acl)
-
-        # generally frown on runtime validation errors, but also frown on
-        # api calls during validation.
-        if target_acl and target_acl_id not in name_id_map.values():
-            raise ValueError("Invalid target acl:%s, acl not found" % target_acl)
-
-        arn_key = self.manager.resource_type.id
-
-        state_map = {}
-        for r in resources:
-            arn = r[arn_key]
-            if arn in resource_map:
-                r['c7n_webacl'] = resource_map[arn]
-                if not target_acl:
-                    state_map[arn] = True
-                    continue
-                r_acl = resource_map[arn]
-                if r_acl == target_acl_id:
-                    state_map[arn] = True
-                    continue
-                state_map[arn] = False
-            else:
-                state_map[arn] = False
-        return [r for r in resources if state_map[r[arn_key]] == state]
+    # application load balancers don't hold a reference to the associated web acl
+    # so we have to look them up via the associations on the web acl directly
+    def get_associated_web_acl(self, resource):
+        return self.get_web_acl_from_associations(
+            'APPLICATION_LOAD_BALANCER',
+            resource['LoadBalancerArn']
+        )
 
 
 @AppELB.filter_registry.register('wafv2-enabled')
-class WafV2Enabled(Filter):
+class WafV2Enabled(WafV2FilterBase):
     """Filter Application LoadBalancer by wafv2 web-acl
 
     Supports regex expression for web-acl.
@@ -280,65 +240,13 @@ class WafV2Enabled(Filter):
                     web-acl: .*FMManagedWebACLV2-?FMS-.*
     """
 
-    schema = type_schema(
-        'wafv2-enabled', **{
-            'web-acl': {'type': 'string'},
-            'state': {'type': 'boolean'}})
-    permissions = ('wafv2:ListResourcesForWebACL', 'wafv2:ListWebACLs')
-
-    retry = staticmethod(get_retry((
-        'ThrottlingException',
-        'RequestLimitExceeded',
-        'Throttled',
-        'ThrottledException',
-        'Throttling',
-        'Client.RequestLimitExceeded')))
-
-    # TODO verify name uniqueness within region/account
-    # TODO consider associated resource fetch in augment
-    def process(self, resources, event=None):
-        client = local_session(self.manager.session_factory).client('wafv2')
-
-        target_acl = self.data.get('web-acl', '')
-        state = self.data.get('state', False)
-
-        name_arn_map = {}
-        resource_map = {}
-
-        wafs = self.manager.get_resource_manager('wafv2').resources(augment=False)
-
-        for w in wafs:
-            if 'c7n:AssociatedResources' not in w:
-                arns = self.retry(
-                    client.list_resources_for_web_acl,
-                    WebACLArn=w.get('ARN', ''),
-                    ResourceType='APPLICATION_LOAD_BALANCER').get('ResourceArns', [])
-                w['c7n:AssociatedResources'] = arns
-            name_arn_map[w['Name']] = w['ARN']
-            for r in w['c7n:AssociatedResources']:
-                resource_map[r] = w['ARN']
-
-        target_acl_ids = [v for k, v in name_arn_map.items() if
-                          re.match(target_acl, k)]
-
-        arn_key = self.manager.resource_type.id
-        state_map = {}
-        for r in resources:
-            arn = r[arn_key]
-            # NLB & GLB doesn't support WAF. So, skip such resources
-            if r['Type'] != 'application':
-                continue
-            if arn not in resource_map:
-                state_map[arn] = False
-                continue
-            if not target_acl:
-                state_map[arn] = True
-                continue
-            if resource_map[arn] in target_acl_ids:
-                state_map[arn] = True
-                continue
-            state_map[arn] = False
-        return [r for r in resources if r[arn_key] in state_map and state_map[r[arn_key]] == state]
+    # application load balancers don't hold a reference to the associated web acl
+    # so we have to look them up via the associations on the web acl directly
+    def get_associated_web_acl(self, resource):
+        return self.get_web_acl_from_associations(
+            'APPLICATION_LOAD_BALANCER',
+            resource['LoadBalancerArn']
+        )
 
 
 @AppELB.action_registry.register('set-waf')
@@ -713,9 +621,12 @@ class AppELBDeleteAction(BaseAction):
                 client.delete_load_balancer, LoadBalancerArn=alb['LoadBalancerArn'])
         except client.exceptions.LoadBalancerNotFoundException:
             pass
-        except client.exceptions.OperationNotPermittedException as e:
+        except (
+            client.exceptions.OperationNotPermittedException,
+            client.exceptions.ResourceInUseException
+        ) as e:
             self.log.warning(
-                "Exception trying to delete ALB: %s error: %s",
+                "Exception trying to delete load balancer: %s error: %s",
                 alb['LoadBalancerArn'], e)
 
 
@@ -1169,7 +1080,7 @@ class AppELBTargetGroupFilter(ValueFilter, AppELBTargetGroupFilterBase):
 
 
 @AppELB.filter_registry.register('default-vpc')
-class AppELBDefaultVpcFilter(DefaultVpcBase):
+class AppELBDefaultVpcFilter(net_filters.DefaultVpcBase):
     """Filter all ELB that exist within the default vpc
 
     :example:
@@ -1319,7 +1230,7 @@ class AppELBTargetGroupRemoveTagAction(tags.RemoveTag):
 
 
 @AppELBTargetGroup.filter_registry.register('default-vpc')
-class AppELBTargetGroupDefaultVpcFilter(DefaultVpcBase):
+class AppELBTargetGroupDefaultVpcFilter(net_filters.DefaultVpcBase):
     """Filter all application elb target groups within the default vpc
 
     :example:
@@ -1384,8 +1295,9 @@ class TargetGroupAttributeFilterBase:
         def _process_attributes(tg):
             if 'c7n:TargetGroupAttributes' not in tg:
                 tg['c7n:TargetGroupAttributes'] = {}
-                results = client.describe_target_group_attributes(
-                    TargetGroupArn=tg['TargetGroupArn'])
+                results = self.manager.retry(client.describe_target_group_attributes,
+                    TargetGroupArn=tg['TargetGroupArn'],
+                    ignore_err_codes=('TargetGroupNotFoundException',))
                 # flatten out the list of dicts and cast
                 for pair in results['Attributes']:
                     k = pair['Key']

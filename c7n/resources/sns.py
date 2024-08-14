@@ -3,7 +3,7 @@
 import json
 
 from c7n.actions import RemovePolicyBase, ModifyPolicyBase, BaseAction
-from c7n.filters import CrossAccountAccessFilter, PolicyChecker, ValueFilter
+from c7n.filters import CrossAccountAccessFilter, PolicyChecker, ValueFilter, MetricsFilter
 from c7n.filters.kms import KmsRelatedFilter
 import c7n.filters.policystatement as polstmt_filter
 from c7n.manager import resources
@@ -45,6 +45,7 @@ class SNS(QueryResourceManager):
             'SubscriptionsDeleted'
         )
         universal_taggable = True
+        permissions_augment = ("sns:ListTagsForResource",)
 
     permissions = ('sns:ListTagsForResource',)
     source_mapping = {
@@ -299,7 +300,7 @@ class RemovePolicyStatement(RemovePolicyBase):
             return
 
         p = json.loads(resource['Policy'])
-        statements, found = self.process_policy(
+        _, found = self.process_policy(
             p, resource, CrossAccountAccessFilter.annotation_key)
 
         if not found:
@@ -446,6 +447,14 @@ class DeleteTopic(BaseAction):
                 client.delete_topic(TopicArn=r['TopicArn'])
             except client.exceptions.NotFoundException:
                 continue
+
+
+@SNS.filter_registry.register('metrics')
+class Metrics(MetricsFilter):
+
+    def get_dimensions(self, resource):
+        return [{'Name': self.model.dimension,
+                 'Value': resource['TopicArn'].rsplit(':', 1)[-1]}]
 
 
 @resources.register('sns-subscription')

@@ -1,0 +1,132 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/frontDoorWebApplicationFirewallPolicies?api-version=2022-05-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Tue, 08 Aug 2023 21:36:57 GMT"
+                    ],
+                    "content-length": [
+                        "4022"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cfb-vdilrzfv/providers/Microsoft.Network/frontdoorwebapplicationfirewallpolicies/cbfailwafpolicy",
+                                "type": "Microsoft.Network/frontdoorwebapplicationfirewallpolicies",
+                                "name": "cbfailwafpolicy",
+                                "location": "Global",
+                                "tags": {
+                                    "product_id": "13742"
+                                },
+                                "sku": {
+                                    "name": "Premium_AzureFrontDoor"
+                                },
+                                "properties": {
+                                    "policySettings": {
+                                        "enabledState": "Enabled",
+                                        "mode": "Detection",
+                                        "redirectUrl": null,
+                                        "customBlockResponseStatusCode": null,
+                                        "customBlockResponseBody": null,
+                                        "requestBodyCheck": "Enabled"
+                                    },
+                                    "customRules": {
+                                        "rules": []
+                                    },
+                                    "managedRules": {
+                                        "managedRuleSets": [
+                                            {
+                                                "ruleSetType": "Microsoft_DefaultRuleSet",
+                                                "ruleSetVersion": "2.1",
+                                                "ruleSetAction": "Block",
+                                                "ruleGroupOverrides": [],
+                                                "exclusions": []
+                                            }
+                                        ]
+                                    },
+                                    "frontendEndpointLinks": [],
+                                    "securityPolicyLinks": [],
+                                    "resourceState": "Enabled",
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cb-test-access/providers/Microsoft.Network/frontdoorwebapplicationfirewallpolicies/cbcreatemanualwafpolicy",
+                                "type": "Microsoft.Network/frontdoorwebapplicationfirewallpolicies",
+                                "name": "cbcreatemanualwafpolicy",
+                                "location": "Global",
+                                "tags": {
+                                    "product_id": "13742"
+                                },
+                                "sku": {
+                                    "name": "Premium_AzureFrontDoor"
+                                },
+                                "properties": {
+                                    "policySettings": {
+                                        "enabledState": "Enabled",
+                                        "mode": "Prevention",
+                                        "redirectUrl": null,
+                                        "customBlockResponseStatusCode": 403,
+                                        "customBlockResponseBody": null,
+                                        "requestBodyCheck": "Disabled"
+                                    },
+                                    "customRules": {
+                                        "rules": []
+                                    },
+                                    "managedRules": {
+                                        "managedRuleSets": [
+                                            {
+                                                "ruleSetType": "DefaultRuleSet",
+                                                "ruleSetVersion": "1.0",
+                                                "ruleSetAction": null,
+                                                "ruleGroupOverrides": [
+                                                    {
+                                                        "ruleGroupName": "JAVA",
+                                                        "rules": [
+                                                            {
+                                                                "ruleId": "944120",
+                                                                "enabledState": "Disabled",
+                                                                "action": "Block",
+                                                                "exclusions": []
+                                                            }
+                                                        ],
+                                                        "exclusions": []
+                                                    }
+                                                ],
+                                                "exclusions": []
+                                            }
+                                        ]
+                                    },
+                                    "frontendEndpointLinks": [],
+                                    "securityPolicyLinks": [],
+                                    "resourceState": "Enabled",
+                                    "provisioningState": "Succeeded"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

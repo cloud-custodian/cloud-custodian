@@ -3,6 +3,7 @@
 import json
 import os
 import sys
+import argparse
 
 from argparse import ArgumentTypeError
 from datetime import datetime, timedelta
@@ -12,6 +13,7 @@ from c7n.resolver import ValuesFrom
 from c7n.resources import aws
 from c7n.schema import ElementSchema, generate
 from c7n.utils import yaml_dump, yaml_load
+from c7n.commands import LoadSessionPolicyJson
 
 from .common import BaseTest, TextTestIO
 
@@ -28,7 +30,7 @@ class CliTest(BaseTest):
 
     def get_output(self, argv):
         """ Run cli.main with the supplied argv and return the output. """
-        out, err = self.run_and_expect_success(argv)
+        out, _ = self.run_and_expect_success(argv)
         return out
 
     def capture_output(self):
@@ -177,7 +179,7 @@ class ValidateTest(CliTest):
 class SchemaTest(CliTest):
 
     def test_schema_outline(self):
-        stdout, stderr = self.run_and_expect_success([
+        stdout, _ = self.run_and_expect_success([
             "custodian", "schema", "--outline", "--json", "aws"])
         data = json.loads(stdout)
         self.assertEqual(list(data.keys()), ["aws"])
@@ -187,19 +189,19 @@ class SchemaTest(CliTest):
         self.assertTrue(len(data['aws']['aws.ec2']['actions']) > 10)
 
     def test_schema_alias(self):
-        stdout, stderr = self.run_and_expect_success([
+        stdout, _ = self.run_and_expect_success([
             "custodian", "schema", "aws.network-addr"])
         self.assertIn("aws.elastic-ip:", stdout)
 
     def test_schema_alias_unqualified(self):
-        stdout, stderr = self.run_and_expect_success([
+        stdout, _ = self.run_and_expect_success([
             "custodian", "schema", "network-addr"])
         self.assertIn("aws.elastic-ip:", stdout)
 
     def test_schema(self):
 
         # no options
-        stdout, stderr = self.run_and_expect_success(["custodian", "schema"])
+        stdout, _ = self.run_and_expect_success(["custodian", "schema"])
         data = yaml_load(stdout)
         assert data['resources']
 
@@ -298,6 +300,7 @@ class SchemaTest(CliTest):
                 'required': ['url'],
                 'properties': {
                     'url': {'type': 'string'},
+                    'query': {'type': 'string'},
                     'format': {'enum': ['csv', 'json', 'txt', 'csv2dict']},
                     'expr': {'oneOf': [
                         {'type': 'integer'},
@@ -316,6 +319,7 @@ class SchemaTest(CliTest):
                 'required': ['url'],
                 'properties': {
                     'url': {'type': 'string'},
+                    'query': {'type': 'string'},
                     'format': {'enum': ['csv', 'json', 'txt', 'csv2dict']},
                     'expr': {'oneOf': [
                         {'type': 'integer'},
@@ -566,6 +570,29 @@ class RunTest(CliTest):
             ["custodian", "run", "-s", temp_dir, "--debug", yaml_file], CustomError
         )
 
+    def test_session_policy(self):
+        parser = argparse.ArgumentParser()
+        parser.add_argument('--session-policy', action=LoadSessionPolicyJson)
+        bad_session_policy = "bad_policy"
+        sample_policy = {
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Sid": "Statement1",
+                "Effect": "Allow",
+                "Action": ["lambda:ListFunctions", "tag:*", "ebs:Delete*"],
+                "Resource": "*"
+                }]
+            }
+        session_policy = self.write_policy_file(sample_policy, format="json")
+        arguments = parser.parse_args(["--session-policy", session_policy])
+        self.assertEqual(vars(arguments).get('session_policy'), sample_policy)
+        self.assertEqual(LoadSessionPolicyJson(dest=session_policy,
+            option_strings=None).load_session_policy_from_file(session_policy), sample_policy)
+        with self.assertRaises(FileNotFoundError) as e:
+            LoadSessionPolicyJson(dest=session_policy,
+                option_strings=None).load_session_policy_from_file(bad_session_policy)
+        self.assertIn("No such file or directory", str(e.exception))
+
 
 class MetricsTest(CliTest):
 
@@ -654,7 +681,7 @@ class MetricsTest(CliTest):
 class MiscTest(CliTest):
 
     def test_no_args(self):
-        stdout, stderr = self.run_and_expect_failure(["custodian"], 2)
+        _, stderr = self.run_and_expect_failure(["custodian"], 2)
         self.assertIn("metrics", stderr)
         self.assertIn("logs", stderr)
 

@@ -1,0 +1,10 @@
+{
+    "status_code": 404,
+    "data": {
+        "Error": {
+            "Code": "NoSuchConfiguration",
+            "Message": "The specified configuration does not exist."
+        },
+        "ResponseMetadata": {}
+    }
+}

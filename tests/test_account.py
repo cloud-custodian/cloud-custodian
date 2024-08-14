@@ -13,8 +13,9 @@ from pytest_terraform import terraform
 import datetime
 from dateutil import parser, tz
 import json
-import mock
+import logging
 import time
+from unittest import mock
 
 from .common import functional
 
@@ -398,6 +399,99 @@ class AccountTests(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 0)
 
+    def test_cloudtrail_success_regex_log_metric_filter(self):
+        session_factory = self.replay_flight_data("test_cloudtrail_success_regex_log_metric_filter")
+        pdata = {
+            'name': 'success-regex-log-metric-filter',
+            'resource': 'account',
+            'filters': [
+                {
+                    'type': 'check-cloudtrail',
+                    'log-metric-filter-pattern':
+                        {
+                            'type': 'value',
+                            'op': 'regex',
+                            'value': '\\{ ?(\\()? ?\\$\\.eventName ?= ?(")?ConsoleLogin(")? '
+                                     '?(\\))? ?&& ?(\\()? ?\\$\\.errorMessage ?= '
+                                     '?(")?Failed authentication(")? ?(\\))? ?\\}'
+                        }
+                },
+            ],
+            }
+        p = self.load_policy(
+            pdata,
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+        logs_client = local_session(session_factory).client("logs")
+        logs_metrics = logs_client.describe_metric_filters(logGroupName='test_log_group')
+        self.assertRegex(logs_metrics['metricFilters'][0]['filterPattern'],
+                         pdata['filters'][0]['log-metric-filter-pattern']['value'])
+
+    def test_cloudtrail_fail_regex_log_metric_filter(self):
+        session_factory = self.replay_flight_data("test_cloudtrail_fail_regex_log_metric_filter")
+        pdata = {
+            'name': 'success-regex-log-metric-filter',
+            'resource': 'account',
+            'filters': [
+                {
+                    'type': 'check-cloudtrail',
+                    'log-metric-filter-pattern':
+                        '\\{ ?(\\()? ?\\$\\.eventName ?= ?(")?ConsoleLogin(")? ?(\\))? ?&& ?'
+                        '(\\()? ?\\$\\.errorMessage ?= ?(")?Failed authentication(")? ?(\\))? ?\\}'
+                },
+            ],
+            }
+        p = self.load_policy(
+            pdata,
+            session_factory=session_factory
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        logs_client = local_session(session_factory).client("logs")
+        logs_metrics = logs_client.describe_metric_filters(logGroupName='test_log_group')
+        self.assertNotRegex(logs_metrics['metricFilters'][0]['filterPattern'],
+                            pdata['filters'][0]['log-metric-filter-pattern'])
+
+    def test_cloudtrail_success_management_advanced_events_included(self):
+        session_factory = self.replay_flight_data(
+            "test_cloudtrail_success_management_advanced_events_included")
+        p = self.load_policy(
+            {
+                "name": "trail-management-advanced-events-included",
+                "resource": "account",
+                "filters": [{
+                    "type": "check-cloudtrail",
+                    'include-management-events': True
+                }],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    def test_cloudtrail_fail_management_advanced_events_included(self):
+        session_factory = self.replay_flight_data(
+            "test_cloudtrail_fail_management_advanced_events_included"
+        )
+        p = self.load_policy(
+            {
+                "name": "trail-management-advanced-events-included",
+                "resource": "account",
+                "filters": [{
+                    "type": "check-cloudtrail",
+                    'include-management-events': True
+                }],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_config_enabled(self):
         session_factory = self.replay_flight_data("test_account_config")
         p = self.load_policy(
@@ -490,6 +584,53 @@ class AccountTests(BaseTest):
             {"DB instances"},
         )
         self.assertEqual(len(resources[0]["c7n:ServiceLimitsExceeded"]), 1)
+
+    def test_service_limit_specific_check_handles_exception(self):
+        session_factory = self.replay_flight_data("test_account_service_limit_exception")
+        p = self.load_policy(
+            {
+                "name": "service-limit",
+                "resource": "account",
+                "filters": [
+                    {
+                        "type": "service-limit",
+                        "names": ["RDS DB Instances"],
+                        "threshold": 1.0,
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        # use this to prevent attempts at refreshing check
+        with mock_datetime_now(parser.parse("2017-02-23T00:40:00+00:00"), datetime) and \
+         self.capture_logging(level=logging.WARNING) as log_output:
+            resources = p.run()
+            self.assertEqual(0, len(resources))
+            self.assertRegex(log_output.getvalue(), r"InvalidParameterValueException")
+
+    def test_service_limit_specific_check_handles_exception_on_date_refresh(self):
+        session_factory = self.replay_flight_data(
+            "test_account_service_limit_date_refresh_exception")
+        p = self.load_policy(
+            {
+                "name": "service-limit",
+                "resource": "account",
+                "filters": [
+                    {
+                        "type": "service-limit",
+                        "names": ["RDS DB Instances"],
+                        "threshold": 1.0,
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        # use this to prevent attempts at refreshing check
+        with mock_datetime_now(parser.parse("2017-02-23T00:40:00+00:00"), datetime) and \
+         self.capture_logging(level=logging.WARNING) as log_output:
+            resources = p.run()
+            self.assertEqual(0, len(resources))
+            self.assertRegex(log_output.getvalue(), r"InvalidParameterValueException")
 
     def test_service_limit_specific_service(self):
         session_factory = self.replay_flight_data("test_account_service_limit_specific_service")
@@ -1154,6 +1295,108 @@ class AccountTests(BaseTest):
         ]
         self.assertEqual(resources[0]['c7n:ses-send-stats'], expected_send_stats)
         self.assertEqual(resources[0]['c7n:ses-max-bounce-rate'], 6)
+
+    def test_bedrock_model_invocation_logging_disabled(self):
+        factory = self.replay_flight_data('test_bedrock_model_invocation_logging_disabled')
+        p = self.load_policy({
+            'name': 'bedrock-model-invocation-logging-disabled',
+            'resource': 'account',
+            'filters': [
+                            {
+                                "type": "bedrock-model-invocation-logging",
+                                "count": 0,
+                                "count_op": "eq"
+                            }
+                        ]
+                        },
+            config={'region': 'us-east-1'},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_get_bedrock_model_invocation_logging(self):
+        factory = self.replay_flight_data('test_get_bedrock_model_invocation_logging')
+        p = self.load_policy({
+            'name': 'get-bedrock-model-invocation-logging',
+            'resource': 'account',
+            'filters': [
+                            {
+                                "type": "bedrock-model-invocation-logging",
+                                "attrs": [
+                                    {"s3Config": "not-null"},
+                                    {"imageDataDeliveryEnabled": True}
+                                ]
+                            }
+                        ]
+                        },
+            config={'region': 'us-east-1'},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_delete_bedrock_model_invocation_logging(self):
+        factory = self.replay_flight_data('test_delete_bedrock_model_invocation_logging')
+        p = self.load_policy({
+            'name': 'delete-bedrock-model-invocation-logging',
+            'resource': 'account',
+            'actions': [
+                            {
+                                "type": "set-bedrock-model-invocation-logging",
+                                "enabled": False
+                            }
+                        ]
+                        },
+            config={'region': 'us-east-1'},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_update_bedrock_model_invocation_logging(self):
+        factory = self.replay_flight_data("test_update_bedrock_model_invocation_logging")
+        p = self.load_policy(
+            {
+                "name": "set-bedrock-model-invocation-logging",
+                "resource": "account",
+                "actions": [
+                    {
+                        "type": "set-bedrock-model-invocation-logging",
+                        "enabled": True,
+                        "loggingConfig": {
+                            "textDataDeliveryEnabled": True,
+                            "imageDataDeliveryEnabled": True,
+                            "embeddingDataDeliveryEnabled": False,
+                            "s3Config":
+                                {
+                                    "bucketName": "test-bedrock-1",
+                                    "keyPrefix": "logging/"
+                                }
+                        }
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = local_session(factory).client('bedrock')
+        configuration = client.get_model_invocation_logging_configuration()
+        self.assertEqual(
+            [
+                configuration['loggingConfig']['textDataDeliveryEnabled'],
+                configuration['loggingConfig']['imageDataDeliveryEnabled'],
+                configuration['loggingConfig']['embeddingDataDeliveryEnabled'],
+                configuration['loggingConfig']['s3Config']['bucketName'],
+                configuration['loggingConfig']['s3Config']['keyPrefix']
+            ],
+            [
+                True,
+                True,
+                False,
+                "test-bedrock-1",
+                "logging/"
+            ]
+        )
 
 
 class AccountDataEvents(BaseTest):

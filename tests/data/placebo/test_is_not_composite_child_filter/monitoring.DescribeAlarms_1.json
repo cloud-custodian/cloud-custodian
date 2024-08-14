@@ -1,0 +1,58 @@
+{
+    "status_code": 200,
+    "data": {
+        "CompositeAlarms": [],
+        "MetricAlarms": [
+            {
+                "AlarmName": "c7n-test-alarm-tags-filter",
+                "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-tags-filter",
+                "AlarmConfigurationUpdatedTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 3,
+                    "day": 24,
+                    "hour": 18,
+                    "minute": 1,
+                    "second": 32,
+                    "microsecond": 583000
+                },
+                "ActionsEnabled": true,
+                "OKActions": [],
+                "AlarmActions": [],
+                "InsufficientDataActions": [],
+                "StateValue": "INSUFFICIENT_DATA",
+                "StateReason": "Insufficient Data: 5 datapoints were unknown.",
+                "StateReasonData": "{\"version\":\"1.0\",\"queryDate\":\"2022-09-27T10:05:12.193+0000\",\"statistic\":\"Average\",\"period\":3600,\"recentDatapoints\":[],\"threshold\":10.0,\"evaluatedDatapoints\":[{\"timestamp\":\"2022-09-27T09:05:00.000+0000\"},{\"timestamp\":\"2022-09-27T08:05:00.000+0000\"},{\"timestamp\":\"2022-09-27T07:05:00.000+0000\"},{\"timestamp\":\"2022-09-27T06:05:00.000+0000\"},{\"timestamp\":\"2022-09-27T05:05:00.000+0000\"}]}",
+                "StateUpdatedTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 9,
+                    "day": 27,
+                    "hour": 10,
+                    "minute": 5,
+                    "second": 12,
+                    "microsecond": 198000
+                },
+                "MetricName": "CPUUtilization",
+                "Namespace": "AWS/EC2",
+                "Statistic": "Average",
+                "Dimensions": [],
+                "Period": 3600,
+                "EvaluationPeriods": 5,
+                "Threshold": 10.0,
+                "ComparisonOperator": "GreaterThanThreshold",
+                "StateTransitionedTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 9,
+                    "day": 27,
+                    "hour": 10,
+                    "minute": 5,
+                    "second": 12,
+                    "microsecond": 198000
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -3,6 +3,7 @@
 from itertools import chain
 
 from c7n_mailer.azure_mailer.sendgrid_delivery import SendGridDelivery
+from c7n_mailer.graph_delivery import GraphDelivery
 from c7n_mailer.smtp_delivery import SmtpDelivery
 
 from .ldap_lookup import LdapLookup
@@ -26,7 +27,6 @@ class EmailDelivery:
         if self.provider == Providers.AWS:
             self.aws_ses = self.get_ses_session()
         self.ldap_lookup = self.get_ldap_connection()
-        self.provider = get_provider(self.config)
 
     def get_ses_session(self):
         if self.config.get("ses_role", False):
@@ -239,7 +239,10 @@ class EmailDelivery:
             elif "sendgrid_api_key" in self.config:
                 delivery = SendGridDelivery(self.config, self.session, self.logger)
                 delivery.sendgrid_handler(sqs_message, emails_to_mimetext_map)
-            # if smtp_server or sendgrid_api_key isn't set in mailer.yml, use aws ses normally.
+            elif "graph_sendmail_endpoint" in self.config:
+                delivery = GraphDelivery(self.config, self.session, self.logger)
+                delivery.send_message(emails_to_mimetext_map)
+            # use aws ses normally.
             else:
                 for emails, mimetext_msg in emails_to_mimetext_map.items():
                     self.aws_ses.send_raw_email(RawMessage={"Data": mimetext_msg.as_string()})

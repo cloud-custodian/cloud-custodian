@@ -7,50 +7,11 @@ interactions:
   response:
     body:
       data:
-        capabilities:
-          canUseApiKeys: true
-          canUseAuthTokens: true
-          canUseConsolePassword: false
-          canUseCustomerSecretKeys: true
-          canUseDbCredentials: true
-          canUseOAuth2ClientCredentials: true
-          canUseSmtpCredentials: true
-        compartmentId: ocid1.tenancy.oc1..<unique_ID>
-        definedTags:
-          Oracle-Tags:
-            CreatedBy: scim-service
-            CreatedOn: '2023-02-14T16:54:52.134Z'
-        description: user@example.com
-        emailVerified: true
-        externalIdentifier: 3fcb0b0c6a3844ca8dad3bd6a92e3537
-        freeformTags:
-          TagName: TagValue
-          api-keys: test
-          key_old: 'true'
-          max_api_keys_limit_reached: 'true'
-          mfa_activated: 'false'
         id: ocid1.user.oc1..<unique_ID>
-        identityProviderId: ocid1.saml2idp.oc1..<unique_ID>
-        isMfaActivated: false
-        lifecycleState: ACTIVE
         name: user@example.com
-        timeCreated: '2023-02-14T16:54:52.216Z'
-        timeModified: '2023-06-08T07:59:26.410Z'
     headers:
-      cache-control:
-      - no-cache, no-store, must-revalidate
-      content-length:
-      - '1046'
       content-type:
       - application/json
-      date:
-      - Fri, 09 Jun 2023 20:21:09 GMT
-      etag:
-      - e4384ad3ce46f76cf4cfc837226fe90c7a81112a
-      pragma:
-      - no-cache
-      x-content-type-options:
-      - nosniff
     status:
       code: 200
       message: OK
@@ -61,24 +22,10 @@ interactions:
     uri: https://objectstorage.us-ashburn-1.oraclecloud.com/n
   response:
     body:
-      data: idimd1fghobk
+      data: namespace
     headers:
-      access-control-allow-credentials:
-      - 'true'
-      access-control-allow-methods:
-      - POST,PUT,GET,HEAD,DELETE,OPTIONS
-      access-control-allow-origin:
-      - '*'
-      access-control-expose-headers:
-      - access-control-allow-credentials,access-control-allow-methods,access-control-allow-origin,content-length,content-type,date,opc-client-info,opc-request-id,x-api-id
-      content-length:
-      - '14'
       content-type:
       - application/json
-      date:
-      - Fri, 09 Jun 2023 20:21:10 GMT
-      x-api-id:
-      - native
     status:
       code: 200
       message: OK
@@ -91,63 +38,19 @@ interactions:
     body:
       data:
       - compartmentId: ocid1.compartment.oc1..<unique_ID>
-        createdBy: ocid1.saml2idp.oc1..<unique_ID>
-        definedTags:
-          Oracle-Tags:
-            CreatedBy: user@example.com
-            CreatedOn: '2023-06-06T04:47:26.556Z'
-        etag: e436ad3c-c252-4630-9dcd-a5542f4042fb
-        freeformTags:
-          max_limit: unlimited
-        name: Test1
-        namespace: <namespace>
-        timeCreated: '2023-06-06T04:47:26.574Z'
-      - compartmentId: ocid1.compartment.oc1..<unique_ID>
-        createdBy: ocid1.saml2idp.oc1..<unique_ID>
-        definedTags:
-          Oracle-Tags:
-            CreatedBy: user@example.com
-            CreatedOn: '2023-06-06T04:47:34.922Z'
-          cloud_custodian:
-            environment: dev
-        etag: 4328d03d-7ef2-4f56-9946-d585d7b3f0da
-        freeformTags:
-          max_limit: unlimited
-          public_access: 'true'
-        name: Test2
-        namespace: <namespace>
-        timeCreated: '2023-06-06T04:47:34.936Z'
-      - compartmentId: ocid1.compartment.oc1..<unique_ID>
-        createdBy: ocid1.user.oc1..<unique_ID>
         definedTags:
           Oracle-Tags:
             CreatedBy: user@example.com
             CreatedOn: '2023-06-09T20:20:45.932Z'
           cloud-custodian-test:
             mark-for-resize: 'false'
-        etag: 92ac32fb-d0da-437d-bc1a-c6866019a11c
         freeformTags:
           Environment: Production
         name: test_bucket
         namespace: <namespace>
-        timeCreated: '2023-06-09T20:20:45.946Z'
     headers:
-      access-control-allow-credentials:
-      - 'true'
-      access-control-allow-methods:
-      - POST,PUT,GET,HEAD,DELETE,OPTIONS
-      access-control-allow-origin:
-      - '*'
-      access-control-expose-headers:
-      - access-control-allow-credentials,access-control-allow-methods,access-control-allow-origin,content-length,content-type,date,opc-client-info,opc-request-id,x-api-id
-      content-length:
-      - '1704'
       content-type:
       - application/json
-      date:
-      - Fri, 09 Jun 2023 20:21:10 GMT
-      x-api-id:
-      - native
     status:
       code: 200
       message: OK
@@ -159,53 +62,18 @@ interactions:
   response:
     body:
       data:
-        approximateCount: null
-        approximateSize: null
-        approximateSizeMultipartUploads: null
-        autoTiering: Disabled
-        compartmentId: ocid1.compartment.oc1..<unique_ID>
-        createdBy: ocid1.user.oc1..<unique_ID>
         definedTags:
           Oracle-Tags:
             CreatedBy: user@example.com
             CreatedOn: '2023-06-09T20:20:45.932Z'
-        etag: 52552655-4eda-4e62-a427-06e21be508dd
         freeformTags:
           Environment: Production
         id: ocid1.bucket.oc1..<unique_ID>
-        isReadOnly: false
-        kmsKeyId: null
-        metadata: {}
-        meterFlagSet:
-          empty: true
         name: test_bucket
         namespace: <namespace>
-        objectEventsEnabled: false
-        objectLevelAuditMode: Disabled
-        publicAccessType: NoPublicAccess
-        replicationEnabled: false
-        storageTier: Standard
-        timeCreated: '2023-06-09T20:20:45.946Z'
-        versioning: Disabled
     headers:
-      access-control-allow-credentials:
-      - 'true'
-      access-control-allow-methods:
-      - POST,PUT,GET,HEAD,DELETE,OPTIONS
-      access-control-allow-origin:
-      - '*'
-      access-control-expose-headers:
-      - access-control-allow-credentials,access-control-allow-methods,access-control-allow-origin,content-length,content-type,date,etag,opc-client-info,opc-request-id,x-api-id
-      content-length:
-      - '963'
       content-type:
       - application/json
-      date:
-      - Fri, 09 Jun 2023 20:21:12 GMT
-      etag:
-      - 52552655-4eda-4e62-a427-06e21be508dd
-      x-api-id:
-      - native
     status:
       code: 200
       message: OK
@@ -217,55 +85,18 @@ interactions:
   response:
     body:
       data:
-        approximateCount: null
-        approximateSize: null
-        approximateSizeMultipartUploads: null
-        autoTiering: null
-        compartmentId: ocid1.compartment.oc1..<unique_ID>
-        createdBy: ocid1.user.oc1..<unique_ID>
         definedTags:
           Oracle-Tags:
             CreatedBy: user@example.com
             CreatedOn: '2023-06-09T20:20:45.932Z'
-        etag: 52552655-4eda-4e62-a427-06e21be508dd
         freeformTags:
           Environment: Production
         id: ocid1.bucket.oc1..<unique_ID>
-        isReadOnly: false
-        kmsKeyId: null
-        metadata: {}
-        meterFlagSet:
-          empty: true
         name: test_bucket
         namespace: <namespace>
-        objectEventsEnabled: false
-        objectLevelAuditMode: Disabled
-        publicAccessType: NoPublicAccess
-        replicationEnabled: false
-        storageTier: Standard
-        timeCreated: '2023-06-09T20:20:45.946Z'
-        versioning: Disabled
     headers:
-      access-control-allow-credentials:
-      - 'true'
-      access-control-allow-methods:
-      - POST,PUT,GET,HEAD,DELETE,OPTIONS
-      access-control-allow-origin:
-      - '*'
-      access-control-expose-headers:
-      - access-control-allow-credentials,access-control-allow-methods,access-control-allow-origin,cache-control,content-length,content-type,date,etag,opc-client-info,opc-request-id,x-api-id
-      cache-control:
-      - no-store
-      content-length:
-      - '957'
       content-type:
       - application/json
-      date:
-      - Fri, 09 Jun 2023 20:21:13 GMT
-      etag:
-      - 52552655-4eda-4e62-a427-06e21be508dd
-      x-api-id:
-      - native
     status:
       code: 200
       message: OK

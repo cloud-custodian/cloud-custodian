@@ -1,0 +1,48 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "IsTruncated": false,
+        "IntelligentTieringConfigurationList": [
+            {
+                "Id": "c7n-default",
+                "Filter": {
+                    "And": {
+                        "Prefix": "test",
+                        "Tags": [
+                            {
+                                "Key": "Owner",
+                                "Value": "c7n"
+                            },
+                            {
+                                "Key": "AnotherOnwer",
+                                "Value": "Enterprise"
+                            }
+                        ]
+                    }
+                },
+                "Status": "Enabled",
+                "Tierings": [
+                    {
+                        "Days": 150,
+                        "AccessTier": "ARCHIVE_ACCESS"
+                    },
+                    {
+                        "Days": 200,
+                        "AccessTier": "DEEP_ARCHIVE_ACCESS"
+                    }
+                ]
+            },
+            {
+                "Id": "hello-1",
+                "Status": "Enabled",
+                "Tierings": [
+                    {
+                        "Days": 105,
+                        "AccessTier": "ARCHIVE_ACCESS"
+                    }
+                ]
+            }
+        ]
+    }
+}

@@ -433,6 +433,7 @@ class AppELBTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
         p = self.load_policy(
             {
                 "name": "appelb-waf",
@@ -447,6 +448,37 @@ class AppELBTest(BaseTest):
         self.assertEqual(
             resources[0]["LoadBalancerArn"], post_resources[0]["LoadBalancerArn"]
         )
+
+    def test_appelb_waf_value(self):
+        factory = self.replay_flight_data("test_appelb_waf_value")
+
+        p = self.load_policy(
+            {
+                "name": "appelb-waf",
+                "resource": "app-elb",
+                "filters": [
+                    {"type": "waf-enabled", "key": "Rules", "value": "empty"}
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        # mock data contains one rule and will not match
+        self.assertEqual(len(resources), 0)
+
+        p = self.load_policy(
+            {
+                "name": "appelb-waf",
+                "resource": "app-elb",
+                "filters": [
+                    {"type": "waf-enabled", "key": "length(Rules[?Type == 'REGULAR'])", "value": 1}
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        # mock data contains one "REGULAR" rule
+        self.assertEqual(len(resources), 1)
 
     def test_appelb_wafv2_any(self):
         factory = self.replay_flight_data("test_appelb_wafv2")
@@ -507,6 +539,38 @@ class AppELBTest(BaseTest):
             session_factory=factory,
         )
         resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_appelb_wafv2_value(self):
+        factory = self.replay_flight_data("test_appelb_wafv2_value")
+
+        p = self.load_policy(
+            {
+                "name": "appelb-waf",
+                "resource": "app-elb",
+                "filters": [{"type": "wafv2-enabled", "key": "Rules", "value": "empty"}]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        # mock data contains one rule and will not match
+        self.assertEqual(len(resources), 0)
+
+        p = self.load_policy(
+            {
+                "name": "appelb-waf",
+                "resource": "app-elb",
+                "filters": [{
+                    "type": "wafv2-enabled",
+                    "key": "length(Rules[?contains(keys(Statement), 'RateBasedStatement')])",
+                    "op": "gte",
+                    "value": 1
+                }]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        # mock WAF rule has single RateBasedStatement
         self.assertEqual(len(resources), 1)
 
     def test_appelb_waf_to_wafv2(self):

@@ -2,7 +2,6 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-
     },
     "variables": {
         "suffix":"[substring(subscription().subscriptionId, 24, 12)]",
@@ -36,33 +35,55 @@
             },
             "resources": [
                 {
-                    "type": "firewallrules",
+                    "name": "[variables('name')]",
+                    "type":"Microsoft.DBforMySQL/servers/configurations",
                     "apiVersion": "2017-12-01",
+                    "properties": {},
                     "dependsOn": [
-                        "[resourceId('Microsoft.DBforMySQL/servers/databases', variables('name'), variables('databaseName'))]",
-                        "[resourceId('Microsoft.DBforMySQL/servers/', variables('name'))]"
-                    ],
-                    "location": "EastUs",
-                    "name": "AllowAzureIPs",
-                    "properties": {
-                        "startIpAddress": "0.0.0.0",
-                        "endIpAddress": "0.0.0.0"
-                    }
+                        "[concat('Microsoft.DBforMySQL/servers/', variables('suffix'))]"
+                    ]
                 },
                 {
-                    "name": "[variables('databaseName')]",
-                    "type": "databases",
+                    "name": "log_audit_enabled",
+                    "type": "configurations",
                     "apiVersion": "2017-12-01",
                     "properties": {
-                        "charset": "utf8",
-                        "collation": "utf8_general_ci"
+                        "value": "OFF"
                     },
                     "dependsOn": [
-                        "[resourceId('Microsoft.DBforMySQL/servers/', variables('name'))]"
+                        "[concat('Microsoft.DBforMySQL/servers/, variables('suffix'))]"
                     ]
+                 }
+            ],
+        "resources": [
+            {
+                "type": "firewallRules",
+                "apiVersion": "2017-12-01",
+                "dependsOn": [
+                    "[resourceId('Microsoft.DBforMySQL/servers/databases', variables('name'), variables('databaseName'))]",
+                    "[resourceId('Microsoft.DBforMySQL/servers/', variables('name'))]"
+                ],
+                "location": "EastUs",
+                "name": "AllowAzureIPs",
+                "properties": {
+                    "startIpAddress": "0.0.0.0",
+                    "endIpAddress": "0.0.0.0"
                 }
-            ]
-        }
-          ],
-    "outputs": {}
+            },
+            {
+                "name": "[variables('databaseName')]",
+                "type": "databases",
+                "apiVersion": "2017-12-01",
+                "properties": {
+                    "charset": "utf8",
+                    "collation": "utf8_general_ci"
+                },
+                "dependsOn": [
+                    "[resourceId('Microsoft.DBforMySQL/servers/', variables('name'))]"
+                ]
+            }
+        ]
+    }
+        ],
+"outputs": {}
 }

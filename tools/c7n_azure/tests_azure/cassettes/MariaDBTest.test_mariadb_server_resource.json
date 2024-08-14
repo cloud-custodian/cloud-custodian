@@ -1,0 +1,76 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.DBforMariaDB/servers?api-version=2018-06-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Tue, 10 Aug 2021 11:44:13 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "1020"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "sku": {
+                                    "name": "B_Gen5_2",
+                                    "tier": "Basic",
+                                    "family": "Gen5",
+                                    "capacity": 2
+                                },
+                                "properties": {
+                                    "administratorLogin": "rfP256G7",
+                                    "storageProfile": {
+                                        "storageMB": 5120,
+                                        "backupRetentionDays": 7,
+                                        "geoRedundantBackup": "Disabled",
+                                        "storageAutogrow": "Enabled"
+                                    },
+                                    "version": "10.2",
+                                    "sslEnforcement": "Enabled",
+                                    "minimalTlsVersion": "TLSEnforcementDisabled",
+                                    "userVisibleState": "Ready",
+                                    "fullyQualifiedDomainName": "mariadbserver156-red.mariadb.database.azure.com",
+                                    "earliestRestoreDate": "2021-08-10T11:35:12.963+00:00",
+                                    "replicationRole": "",
+                                    "masterServerId": "",
+                                    "byokEnforcement": "Disabled",
+                                    "infrastructureEncryption": "Disabled",
+                                    "privateEndpointConnections": [],
+                                    "publicNetworkAccess": "Enabled"
+                                },
+                                "location": "eastus",
+                                "tags": {
+                                    "ComplianceStatus": "Red",
+                                    "CustodianRule": "epam-azure-156-asb_mariadb_public_access_disabled"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/156_resource_group_red/providers/Microsoft.DBforMariaDB/servers/mariadbserver156-red",
+                                "name": "mariadbserver156-red",
+                                "type": "Microsoft.DBforMariaDB/servers"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

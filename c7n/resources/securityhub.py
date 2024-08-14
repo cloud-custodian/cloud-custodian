@@ -9,14 +9,17 @@ import hashlib
 import logging
 import sys
 
-from c7n import deprecated
+from c7n import deprecated, query
 from c7n.actions import Action
 from c7n.filters import Filter
+from c7n.manager import resources
+from c7n.query import DescribeSource
 from c7n.exceptions import PolicyValidationError, PolicyExecutionError
 from c7n.policy import LambdaMode, execution
 from c7n.utils import (
     local_session, type_schema, get_retry,
-    chunks, dumps, filter_empty, get_partition, jmespath_search
+    chunks, dumps, filter_empty, get_partition, jmespath_search,
+    merge_dict_list
 )
 from c7n.version import version
 
@@ -519,10 +522,10 @@ class PostFinding(Action):
                 self.manager.config.region,
                 self.manager.config.account_id,
                 # we use md5 for id, equiv to using crc32
-                hashlib.md5( # nosec nosemgrep
+                hashlib.md5(  # nosec nosemgrep
                     json.dumps(policy.data).encode('utf8'),
                     **params).hexdigest(),
-                hashlib.md5( # nosec nosemgrep
+                hashlib.md5(  # nosec nosemgrep
                     json.dumps(list(sorted([r[model.id] for r in resources]))).encode('utf8'),
                     **params).hexdigest()
             )
@@ -673,3 +676,93 @@ class OtherResourcePostFinding(PostFinding):
 
 AWS.resources.subscribe(OtherResourcePostFinding.register_resource)
 AWS.resources.subscribe(SecurityHubFindingFilter.register_resources)
+
+
+class DescribeSecurityhubFinding(DescribeSource):
+    def resources(self, query):
+        """Only show active compliance failures by default
+
+        Unless overridden by policy, use these default filters:
+
+        - Workflow status: anything but RESOLVED
+        - Record state: ACTIVE
+        - Compliance status: FAILED
+        """
+
+        query = merge_dict_list(
+            [
+                {
+                    "Filters": {
+                        "WorkflowStatus": [
+                            {
+                                "Comparison": "NOT_EQUALS",
+                                "Value": "RESOLVED",
+                            },
+                        ],
+                        "RecordState": [
+                            {
+                                "Comparison": "EQUALS",
+                                "Value": "ACTIVE",
+                            },
+                        ],
+                        "ComplianceStatus": [
+                            {
+                                "Comparison": "EQUALS",
+                                "Value": "FAILED",
+                            }
+                        ],
+                    }
+                },
+                *self.manager.data.get("query", []),
+                query,
+            ]
+        )
+
+        return super().resources(query=query)
+
+
+@resources.register("securityhub-finding")
+class SecurityhubFinding(query.QueryResourceManager):
+    """AWS SecurityHub Findings
+
+    :example:
+
+    Use the default filter set, which includes active unresolved findings
+    that have failed compliance checks
+
+    .. code-block:: yaml
+
+        policies:
+          - name: aws-security-hub-findings
+            resource: aws.securityhub-finding
+
+    :example:
+
+    Show findings for a specific control ID, overriding default filters
+
+    .. code-block:: yaml
+
+        policies:
+          - name: aws-security-hub-findings
+            resource: aws.securityhub-finding
+            query:
+              - Filters:
+                  ComplianceSecurityControlId:
+                    - Comparison: EQUALS
+                      Value: RDS.23
+
+    Reference for available filters:
+
+    https://docs.aws.amazon.com/securityhub/1.0/APIReference/API_GetFindings.html#API_GetFindings_RequestSyntax
+    """  # noqa: E501
+
+    class resource_type(query.TypeInfo):
+        service = "securityhub"
+        enum_spec = ('get_findings', 'Findings', None)
+        arn = False
+        id = "Id"
+        name = "ProductName"
+
+    source_mapping = {
+        "describe": DescribeSecurityhubFinding,
+    }

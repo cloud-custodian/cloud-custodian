@@ -1,0 +1,74 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.EventGrid/domains?api-version=2020-06-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Wed, 01 Sep 2021 09:42:31 GMT"
+                    ],
+                    "content-length": [
+                        "1149"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "properties": {
+                                    "privateEndpointConnections": [
+                                        {
+                                            "properties": {
+                                                "privateEndpoint": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/VV/providers/Microsoft.Network/privateEndpoints/testegendp"
+                                                },
+                                                "groupIds": [
+                                                    "domain"
+                                                ],
+                                                "privateLinkServiceConnectionState": {
+                                                    "status": "Approved",
+                                                    "description": "Auto-approved",
+                                                    "actionsRequired": "None"
+                                                },
+                                                "provisioningState": "Succeeded"
+                                            },
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/VV/providers/Microsoft.EventGrid/domains/testegvv/privateEndpointConnections/testegendp.b4364cac-af59-4ba1-a716-f579cfd2b92c",
+                                            "name": "testegendp.b4364cac-af59-4ba1-a716-f579cfd2b92c",
+                                            "type": "Microsoft.EventGrid/domains/privateEndpointConnections"
+                                        }
+                                    ],
+                                    "provisioningState": "Succeeded",
+                                    "endpoint": "https://testegvv.eastus-1.eventgrid.azure.net/api/events",
+                                    "inputSchema": "EventGridSchema",
+                                    "metricResourceId": "193a20c8-e7db-48f6-8dd3-fbbc8689bcd3",
+                                    "publicNetworkAccess": "Enabled"
+                                },
+                                "location": "eastus",
+                                "tags": {},
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/VV/providers/Microsoft.EventGrid/domains/testegvv",
+                                "name": "testegvv",
+                                "type": "Microsoft.EventGrid/domains"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

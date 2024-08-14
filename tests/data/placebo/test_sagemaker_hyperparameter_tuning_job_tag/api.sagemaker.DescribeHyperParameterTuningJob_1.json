@@ -1,0 +1,297 @@
+{
+    "status_code": 200,
+    "data": {
+        "HyperParameterTuningJobName": "c7n-test",
+        "HyperParameterTuningJobArn": "arn:aws:sagemaker:us-east-1:644160558196:hyper-parameter-tuning-job/c7n-test",
+        "HyperParameterTuningJobConfig": {
+            "Strategy": "Bayesian",
+            "ResourceLimits": {
+                "MaxNumberOfTrainingJobs": 20,
+                "MaxParallelTrainingJobs": 3
+            }
+        },
+        "TrainingJobDefinitions": [
+            {
+                "DefinitionName": "c7n-test-def",
+                "TuningObjective": {
+                    "Type": "Maximize",
+                    "MetricName": "validation:auc"
+                },
+                "HyperParameterRanges": {
+                    "IntegerParameterRanges": [
+                        {
+                            "Name": "num_round",
+                            "MinValue": "0",
+                            "MaxValue": "100",
+                            "ScalingType": "Linear"
+                        },
+                        {
+                            "Name": "max_depth",
+                            "MinValue": "1",
+                            "MaxValue": "10",
+                            "ScalingType": "Linear"
+                        }
+                    ],
+                    "ContinuousParameterRanges": [
+                        {
+                            "Name": "eta",
+                            "MinValue": "0",
+                            "MaxValue": "1",
+                            "ScalingType": "Linear"
+                        },
+                        {
+                            "Name": "min_child_weight",
+                            "MinValue": "1",
+                            "MaxValue": "10",
+                            "ScalingType": "Linear"
+                        },
+                        {
+                            "Name": "alpha",
+                            "MinValue": "0",
+                            "MaxValue": "2",
+                            "ScalingType": "Linear"
+                        }
+                    ],
+                    "CategoricalParameterRanges": []
+                },
+                "StaticHyperParameters": {
+                    "_tuning_objective_metric": "validation:auc",
+                    "base_score": "0.5",
+                    "booster": "gbtree",
+                    "csv_weights": "0",
+                    "dsplit": "row",
+                    "eval_metric": "auc",
+                    "grow_policy": "depthwise",
+                    "lambda_bias": "0.0",
+                    "max_bin": "256",
+                    "max_leaves": "0",
+                    "normalize_type": "tree",
+                    "num_parallel_tree": "1",
+                    "objective": "binary:logistic",
+                    "one_drop": "0",
+                    "process_type": "default",
+                    "rate_drop": "0.3",
+                    "refresh_leaf": "1",
+                    "sample_type": "uniform",
+                    "sampling_method": "uniform",
+                    "scale_pos_weight": "1.0",
+                    "sketch_eps": "0.03",
+                    "skip_drop": "0.0",
+                    "tree_method": "auto",
+                    "tweedie_variance_power": "1.4",
+                    "updater": "grow_colmaker,prune",
+                    "verbosity": "1"
+                },
+                "AlgorithmSpecification": {
+                    "TrainingImage": "644160558196.dkr.ecr.us-east-1.amazonaws.com/sagemaker-xgboost:1.3-1",
+                    "TrainingInputMode": "File",
+                    "MetricDefinitions": [
+                        {
+                            "Name": "train:mae",
+                            "Regex": ".*\\[[0-9]+\\].*#011train-mae:([-+]?[0-9]*\\.?[0-9]+(?:[eE][-+]?[0-9]+)?).*"
+                        },
+                        {
+                            "Name": "validation:aucpr",
+                            "Regex": ".*\\[[0-9]+\\].*#011validation-aucpr:([-+]?[0-9]*\\.?[0-9]+(?:[eE][-+]?[0-9]+)?).*"
+                        },
+                        {
+                            "Name": "validation:f1_binary",
+                            "Regex": ".*\\[[0-9]+\\].*#011validation-f1_binary:([-+]?[0-9]*\\.?[0-9]+(?:[eE][-+]?[0-9]+)?).*"
+                        },
+                        {
+                            "Name": "validation:mae",
+                            "Regex": ".*\\[[0-9]+\\].*#011validation-mae:([-+]?[0-9]*\\.?[0-9]+(?:[eE][-+]?[0-9]+)?).*"
+                        },
+                        {
+                            "Name": "validation:logloss",
+                            "Regex": ".*\\[[0-9]+\\].*#011validation-logloss:([-+]?[0-9]*\\.?[0-9]+(?:[eE][-+]?[0-9]+)?).*"
+                        },
+                        {
+                            "Name": "validation:f1",
+                            "Regex": ".*\\[[0-9]+\\].*#011validation-f1:([-+]?[0-9]*\\.?[0-9]+(?:[eE][-+]?[0-9]+)?).*"
+                        },
+                        {
+                            "Name": "train:accuracy",
+                            "Regex": ".*\\[[0-9]+\\].*#011train-accuracy:([-+]?[0-9]*\\.?[0-9]+(?:[eE][-+]?[0-9]+)?).*"
+                        },
+                        {
+                            "Name": "train:mse",
+                            "Regex": ".*\\[[0-9]+\\].*#011train-mse:([-+]?[0-9]*\\.?[0-9]+(?:[eE][-+]?[0-9]+)?).*"
+                        },
+                        {
+                            "Name": "validation:recall",
+                            "Regex": ".*\\[[0-9]+\\].*#011validation-recall:([-+]?[0-9]*\\.?[0-9]+(?:[eE][-+]?[0-9]+)?).*"
+                        },
+                        {
+                            "Name": "validation:poisson-nloglik",
+                            "Regex": ".*\\[[0-9]+\\].*#011validation-poisson-nloglik:([-+]?[0-9]*\\.?[0-9]+(?:[eE][-+]?[0-9]+)?).*"
+                        },
+                        {
+                            "Name": "validation:precision",
+                            "Regex": ".*\\[[0-9]+\\].*#011validation-precision:([-+]?[0-9]*\\.?[0-9]+(?:[eE][-+]?[0-9]+)?).*"
+                        },
+                        {
+                            "Name": "train:error",
+                            "Regex": ".*\\[[0-9]+\\].*#011train-error:([-+]?[0-9]*\\.?[0-9]+(?:[eE][-+]?[0-9]+)?).*"
+                        },
+                        {
+                            "Name": "train:ndcg",
+                            "Regex": ".*\\[[0-9]+\\].*#011train-ndcg:([-+]?[0-9]*\\.?[0-9]+(?:[eE][-+]?[0-9]+)?).*"
+                        },
+                        {
+                            "Name": "validation:map",
+                            "Regex": ".*\\[[0-9]+\\].*#011validation-map:([-+]?[0-9]*\\.?[0-9]+(?:[eE][-+]?[0-9]+)?).*"
+                        },
+                        {
+                            "Name": "train:f1_binary",
+                            "Regex": ".*\\[[0-9]+\\].*#011train-f1_binary:([-+]?[0-9]*\\.?[0-9]+(?:[eE][-+]?[0-9]+)?).*"
+                        },
+                        {
+                            "Name": "validation:auc",
+                            "Regex": ".*\\[[0-9]+\\].*#011validation-auc:([-+]?[0-9]*\\.?[0-9]+(?:[eE][-+]?[0-9]+)?).*"
+                        },
+                        {
+                            "Name": "train:auc",
+                            "Regex": ".*\\[[0-9]+\\].*#011train-auc:([-+]?[0-9]*\\.?[0-9]+(?:[eE][-+]?[0-9]+)?).*"
+                        },
+                        {
+                            "Name": "validation:error",
+                            "Regex": ".*\\[[0-9]+\\].*#011validation-error:([-+]?[0-9]*\\.?[0-9]+(?:[eE][-+]?[0-9]+)?).*"
+                        },
+                        {
+                            "Name": "train:poisson-nloglik",
+                            "Regex": ".*\\[[0-9]+\\].*#011train-poisson-nloglik:([-+]?[0-9]*\\.?[0-9]+(?:[eE][-+]?[0-9]+)?).*"
+                        },
+                        {
+                            "Name": "train:rmse",
+                            "Regex": ".*\\[[0-9]+\\].*#011train-rmse:([-+]?[0-9]*\\.?[0-9]+(?:[eE][-+]?[0-9]+)?).*"
+                        },
+                        {
+                            "Name": "train:logloss",
+                            "Regex": ".*\\[[0-9]+\\].*#011train-logloss:([-+]?[0-9]*\\.?[0-9]+(?:[eE][-+]?[0-9]+)?).*"
+                        },
+                        {
+                            "Name": "validation:accuracy",
+                            "Regex": ".*\\[[0-9]+\\].*#011validation-accuracy:([-+]?[0-9]*\\.?[0-9]+(?:[eE][-+]?[0-9]+)?).*"
+                        },
+                        {
+                            "Name": "train:aucpr",
+                            "Regex": ".*\\[[0-9]+\\].*#011train-aucpr:([-+]?[0-9]*\\.?[0-9]+(?:[eE][-+]?[0-9]+)?).*"
+                        },
+                        {
+                            "Name": "validation:balanced_accuracy",
+                            "Regex": ".*\\[[0-9]+\\].*#011validation-balanced_accuracy:([-+]?[0-9]*\\.?[0-9]+(?:[eE][-+]?[0-9]+)?).*"
+                        },
+                        {
+                            "Name": "validation:rmse",
+                            "Regex": ".*\\[[0-9]+\\].*#011validation-rmse:([-+]?[0-9]*\\.?[0-9]+(?:[eE][-+]?[0-9]+)?).*"
+                        },
+                        {
+                            "Name": "validation:mse",
+                            "Regex": ".*\\[[0-9]+\\].*#011validation-mse:([-+]?[0-9]*\\.?[0-9]+(?:[eE][-+]?[0-9]+)?).*"
+                        },
+                        {
+                            "Name": "validation:ndcg",
+                            "Regex": ".*\\[[0-9]+\\].*#011validation-ndcg:([-+]?[0-9]*\\.?[0-9]+(?:[eE][-+]?[0-9]+)?).*"
+                        },
+                        {
+                            "Name": "train:f1",
+                            "Regex": ".*\\[[0-9]+\\].*#011train-f1:([-+]?[0-9]*\\.?[0-9]+(?:[eE][-+]?[0-9]+)?).*"
+                        },
+                        {
+                            "Name": "train:map",
+                            "Regex": ".*\\[[0-9]+\\].*#011train-map:([-+]?[0-9]*\\.?[0-9]+(?:[eE][-+]?[0-9]+)?).*"
+                        },
+                        {
+                            "Name": "ObjectiveMetric",
+                            "Regex": ".*\\[[0-9]+\\].*#011validation-auc:([-+]?[0-9]*\\.?[0-9]+(?:[eE][-+]?[0-9]+)?).*"
+                        }
+                    ]
+                },
+                "RoleArn": "arn:aws:iam::644160558196:role/service-role/AmazonSageMakerServiceCatalogProductsUseRole",
+                "InputDataConfig": [
+                    {
+                        "ChannelName": "train",
+                        "DataSource": {
+                            "S3DataSource": {
+                                "S3DataType": "S3Prefix",
+                                "S3Uri": "s3://c7n-test-s3-bucket/DEMO-automatic-model-tuning-xgboost-dm/train",
+                                "S3DataDistributionType": "FullyReplicated"
+                            }
+                        },
+                        "ContentType": "csv",
+                        "CompressionType": "None",
+                        "RecordWrapperType": "None"
+                    },
+                    {
+                        "ChannelName": "validation",
+                        "DataSource": {
+                            "S3DataSource": {
+                                "S3DataType": "S3Prefix",
+                                "S3Uri": "s3://c7n-test-s3-bucket/DEMO-automatic-model-tuning-xgboost-dm/validation/",
+                                "S3DataDistributionType": "FullyReplicated"
+                            }
+                        },
+                        "ContentType": "csv",
+                        "CompressionType": "None",
+                        "RecordWrapperType": "None"
+                    }
+                ],
+                "OutputDataConfig": {
+                    "S3OutputPath": "s3://c7n-test-s3-bucket/DEMO-automatic-model-tuning-xgboost-dm/output"
+                },
+                "ResourceConfig": {
+                    "InstanceType": "ml.m4.xlarge",
+                    "InstanceCount": 2,
+                    "VolumeSizeInGB": 10
+                },
+                "StoppingCondition": {
+                    "MaxRuntimeInSeconds": 42300
+                },
+                "EnableNetworkIsolation": false,
+                "EnableInterContainerTrafficEncryption": false,
+                "EnableManagedSpotTraining": false
+            }
+        ],
+        "HyperParameterTuningJobStatus": "InProgress",
+        "CreationTime": {
+            "__class__": "datetime",
+            "year": 2024,
+            "month": 4,
+            "day": 11,
+            "hour": 11,
+            "minute": 50,
+            "second": 39,
+            "microsecond": 929000
+        },
+        "LastModifiedTime": {
+            "__class__": "datetime",
+            "year": 2024,
+            "month": 4,
+            "day": 11,
+            "hour": 11,
+            "minute": 50,
+            "second": 43,
+            "microsecond": 281000
+        },
+        "TrainingJobStatusCounters": {
+            "Completed": 0,
+            "InProgress": 0,
+            "RetryableError": 0,
+            "NonRetryableError": 0,
+            "Stopped": 0
+        },
+        "ObjectiveStatusCounters": {
+            "Succeeded": 0,
+            "Pending": 0,
+            "Failed": 0
+        },
+        "TuningJobCompletionDetails": {
+            "NumberOfTrainingJobsObjectiveNotImproving": 0
+        },
+        "ConsumedResources": {
+            "RuntimeInSeconds": 0
+        },
+        "ResponseMetadata": {}
+    }
+}

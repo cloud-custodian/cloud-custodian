@@ -119,3 +119,29 @@ class DnsPolicyTest(BaseTest):
                 'gcp:dns::cloud-custodian:policy/custodian'
             ],
         )
+
+
+class TestDnsResourceRecordsFilter(BaseTest):
+
+    def test_query(self):
+        project_id = 'cloud-custodian'
+        session_factory = self.replay_flight_data(
+            'test-dns-resource-records-filter-query', project_id=project_id)
+
+        policy = self.load_policy(
+            {'name': 'dns-resource-record',
+             'resource': 'gcp.dns-managed-zone',
+             'filters': [{'type': 'records-sets',
+                          'attrs': [{
+                              'type': 'value',
+                              'key': 'type',
+                              'op': 'eq',
+                              'value': 'TXT'
+                          }]
+            }]},
+            session_factory=session_factory)
+
+        policy_resources = policy.run()
+
+        self.assertEqual(len(policy_resources), 1)
+        self.assertEqual(policy_resources[0]['name'], 'zone-277-red')

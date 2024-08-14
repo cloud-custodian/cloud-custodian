@@ -10,9 +10,7 @@ from botocore.exceptions import ClientError
 
 from c7n.actions import ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction
 from c7n.exceptions import PolicyValidationError
-from c7n.filters import (
-    Filter, FilterRegistry, DefaultVpcBase, ValueFilter,
-    ShieldMetrics)
+from c7n.filters import Filter, FilterRegistry, ValueFilter, ShieldMetrics
 import c7n.filters.vpc as net_filters
 from datetime import datetime
 from c7n import tags
@@ -54,6 +52,7 @@ class ELB(QueryResourceManager):
         date = 'CreatedTime'
         dimension = 'LoadBalancerName'
         cfn_type = config_type = "AWS::ElasticLoadBalancing::LoadBalancer"
+        permissions_augment = ("elasticloadbalancing:DescribeTags",)
         default_report_fields = (
             'LoadBalancerName',
             'DNSName',
@@ -275,7 +274,7 @@ class SetSslListenerPolicy(BaseAction):
         lb_name = elb['LoadBalancerName']
         attrs = self.data.get('attributes')
 
-        if type(attrs) is dict:
+        if isinstance(attrs, dict):
             policy_attributes = [{'AttributeName': name, 'AttributeValue': value}
                 for name, value in attrs.items()]
         else:
@@ -738,7 +737,7 @@ class HealthCheckProtocolMismatch(Filter):
 
 
 @filters.register('default-vpc')
-class DefaultVpc(DefaultVpcBase):
+class DefaultVpc(net_filters.DefaultVpcBase):
     """ Matches if an elb database is in the default vpc
 
     :example:

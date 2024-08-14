@@ -13,8 +13,6 @@ The following example policy will tag all the VCN in the tenancy
         Tag all the VCN in the tenancy
       resource: oci.vcn
       actions:
-       - type: update-vcn
-         params:
-           update_vcn_details:
-             freeform_tags:
-               TagName: TagValue
+       - type: update
+         freeform_tags:
+            TagName: TagValue

@@ -1,0 +1,789 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 06 Sep 2023 16:13:33 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "24559",
+    "-content-encoding": "gzip",
+    "content-location": "https://cloudkms.googleapis.com/v1/projects/cloud-custodian/locations?alt=json"
+  },
+  "body": {
+    "locations": [
+      {
+        "name": "projects/cloud-custodian/locations/asia",
+        "labels": {
+          "cloud.googleapis.com/country": "SG",
+          "cloud.googleapis.com/location": "asia"
+        },
+        "metadata": {
+          "@type": "type.googleapis.com/google.cloud.kms.v1.LocationMetadata",
+          "hsmAvailable": true,
+          "ekmAvailable": true
+        },
+        "locationId": "asia"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/asia-east1",
+        "labels": {
+          "cloud.googleapis.com/location": "asia-east1",
+          "cloud.googleapis.com/country": "TW",
+          "cloud.googleapis.com/region": "asia-east1"
+        },
+        "metadata": {
+          "@type": "type.googleapis.com/google.cloud.kms.v1.LocationMetadata",
+          "hsmAvailable": true,
+          "ekmAvailable": true
+        },
+        "locationId": "asia-east1",
+        "displayName": "Taiwan"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/asia-east2",
+        "labels": {
+          "cloud.googleapis.com/location": "asia-east2",
+          "cloud.googleapis.com/country": "HK",
+          "cloud.googleapis.com/region": "asia-east2"
+        },
+        "metadata": {
+          "@type": "type.googleapis.com/google.cloud.kms.v1.LocationMetadata",
+          "hsmAvailable": true,
+          "ekmAvailable": true
+        },
+        "locationId": "asia-east2",
+        "displayName": "Hong Kong"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/asia-northeast1",
+        "labels": {
+          "cloud.googleapis.com/country": "JP",
+          "cloud.googleapis.com/location": "asia-northeast1",
+          "cloud.googleapis.com/region": "asia-northeast1"
+        },
+        "metadata": {
+          "@type": "type.googleapis.com/google.cloud.kms.v1.LocationMetadata",
+          "hsmAvailable": true,
+          "ekmAvailable": true
+        },
+        "locationId": "asia-northeast1",
+        "displayName": "Tokyo"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/asia-northeast2",
+        "labels": {
+          "cloud.googleapis.com/region": "asia-northeast2",
+          "cloud.googleapis.com/country": "JP",
+          "cloud.googleapis.com/location": "asia-northeast2"
+        },
+        "metadata": {
+          "@type": "type.googleapis.com/google.cloud.kms.v1.LocationMetadata",
+          "hsmAvailable": true,
+          "ekmAvailable": true
+        },
+        "locationId": "asia-northeast2",
+        "displayName": "Osaka"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/asia-northeast3",
+        "labels": {
+          "cloud.googleapis.com/location": "asia-northeast3",
+          "cloud.googleapis.com/region": "asia-northeast3",
+          "cloud.googleapis.com/country": "KR"
+        },
+        "metadata": {
+          "@type": "type.googleapis.com/google.cloud.kms.v1.LocationMetadata",
+          "hsmAvailable": true,
+          "ekmAvailable": true
+        },
+        "locationId": "asia-northeast3",
+        "displayName": "Seoul"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/asia-south1",
+        "labels": {
+          "cloud.googleapis.com/region": "asia-south1",
+          "cloud.googleapis.com/location": "asia-south1",
+          "cloud.googleapis.com/country": "IN"
+        },
+        "metadata": {
+          "@type": "type.googleapis.com/google.cloud.kms.v1.LocationMetadata",
+          "hsmAvailable": true,
+          "ekmAvailable": true
+        },
+        "locationId": "asia-south1",
+        "displayName": "Mumbai"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/asia-south2",
+        "labels": {
+          "cloud.googleapis.com/location": "asia-south2",
+          "cloud.googleapis.com/country": "IN",
+          "cloud.googleapis.com/region": "asia-south2"
+        },
+        "metadata": {
+          "@type": "type.googleapis.com/google.cloud.kms.v1.LocationMetadata",
+          "hsmAvailable": true,
+          "ekmAvailable": true
+        },
+        "locationId": "asia-south2",
+        "displayName": "Delhi"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/asia-southeast1",
+        "labels": {
+          "cloud.googleapis.com/region": "asia-southeast1",
+          "cloud.googleapis.com/location": "asia-southeast1",
+          "cloud.googleapis.com/country": "SG"
+        },
+        "metadata": {
+          "@type": "type.googleapis.com/google.cloud.kms.v1.LocationMetadata",
+          "hsmAvailable": true,
+          "ekmAvailable": true
+        },
+        "locationId": "asia-southeast1",
+        "displayName": "Singapore"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/asia-southeast2",
+        "labels": {
+          "cloud.googleapis.com/country": "ID",
+          "cloud.googleapis.com/region": "asia-southeast2",
+          "cloud.googleapis.com/location": "asia-southeast2"
+        },
+        "metadata": {
+          "@type": "type.googleapis.com/google.cloud.kms.v1.LocationMetadata",
+          "hsmAvailable": true,
+          "ekmAvailable": true
+        },
+        "locationId": "asia-southeast2",
+        "displayName": "Jakarta"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/asia1",
+        "labels": {
+          "cloud.googleapis.com/country": "JP",
+          "cloud.googleapis.com/location": "asia1"
+        },
+        "metadata": {
+          "@type": "type.googleapis.com/google.cloud.kms.v1.LocationMetadata",
+          "hsmAvailable": true,
+          "ekmAvailable": true
+        },
+        "locationId": "asia1"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/australia-southeast1",
+        "labels": {
+          "cloud.googleapis.com/country": "AU",
+          "cloud.googleapis.com/region": "australia-southeast1",
+          "cloud.googleapis.com/location": "australia-southeast1"
+        },
+        "metadata": {
+          "@type": "type.googleapis.com/google.cloud.kms.v1.LocationMetadata",
+          "hsmAvailable": true,
+          "ekmAvailable": true
+        },
+        "locationId": "australia-southeast1",
+        "displayName": "Sydney"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/australia-southeast2",
+        "labels": {
+          "cloud.googleapis.com/region": "australia-southeast2",
+          "cloud.googleapis.com/country": "AU",
+          "cloud.googleapis.com/location": "australia-southeast2"
+        },
+        "metadata": {
+          "@type": "type.googleapis.com/google.cloud.kms.v1.LocationMetadata",
+          "hsmAvailable": true,
+          "ekmAvailable": true
+        },
+        "locationId": "australia-southeast2",
+        "displayName": "Melbourne"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/eur3",
+        "labels": {
+          "cloud.googleapis.com/location": "eur3"
+        },
+        "metadata": {
+          "@type": "type.googleapis.com/google.cloud.kms.v1.LocationMetadata",
+          "hsmAvailable": true,
+          "ekmAvailable": true
+        },
+        "locationId": "eur3"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/eur4",
+        "labels": {
+          "cloud.googleapis.com/location": "eur4",
+          "cloud.googleapis.com/country": "IE"
+        },
+        "metadata": {
+          "@type": "type.googleapis.com/google.cloud.kms.v1.LocationMetadata",
+          "hsmAvailable": true,
+          "ekmAvailable": true
+        },
+        "locationId": "eur4"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/eur5",
+        "labels": {
+          "cloud.googleapis.com/country": "GB",
+          "cloud.googleapis.com/location": "eur5"
+        },
+        "metadata": {
+          "@type": "type.googleapis.com/google.cloud.kms.v1.LocationMetadata",
+          "hsmAvailable": true,
+          "ekmAvailable": true
+        },
+        "locationId": "eur5"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/eur6",
+        "labels": {
+          "cloud.googleapis.com/location": "eur6"
+        },
+        "metadata": {
+          "@type": "type.googleapis.com/google.cloud.kms.v1.LocationMetadata",
+          "hsmAvailable": true,
+          "ekmAvailable": true
+        },
+        "locationId": "eur6"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/europe",
+        "labels": {
+          "cloud.googleapis.com/location": "europe",
+          "cloud.googleapis.com/country": "IE"
+        },
+        "metadata": {
+          "@type": "type.googleapis.com/google.cloud.kms.v1.LocationMetadata",
+          "hsmAvailable": true,
+          "ekmAvailable": true
+        },
+        "locationId": "europe"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/europe-central2",
+        "labels": {
+          "cloud.googleapis.com/region": "europe-central2",
+          "cloud.googleapis.com/country": "PL",
+          "cloud.googleapis.com/location": "europe-central2"
+        },
+        "metadata": {
+          "@type": "type.googleapis.com/google.cloud.kms.v1.LocationMetadata",
+          "hsmAvailable": true,
+          "ekmAvailable": true
+        },
+        "locationId": "europe-central2",
+        "displayName": "Warsaw"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/europe-north1",
+        "labels": {
+          "cloud.googleapis.com/region": "europe-north1",
+          "cloud.googleapis.com/country": "FI",
+          "cloud.googleapis.com/location": "europe-north1"
+        },
+        "metadata": {
+          "@type": "type.googleapis.com/google.cloud.kms.v1.LocationMetadata",
+          "hsmAvailable": true,
+          "ekmAvailable": true
+        },
+        "locationId": "europe-north1",
+        "displayName": "Finland"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/europe-southwest1",
+        "labels": {
+          "cloud.googleapis.com/country": "ES",
+          "cloud.googleapis.com/location": "europe-southwest1",
+          "cloud.googleapis.com/region": "europe-southwest1"
+        },
+        "metadata": {
+          "@type": "type.googleapis.com/google.cloud.kms.v1.LocationMetadata",
+          "hsmAvailable": true,
+          "ekmAvailable": true
+        },
+        "locationId": "europe-southwest1",
+        "displayName": "Madrid"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/europe-west1",
+        "labels": {
+          "cloud.googleapis.com/region": "europe-west1",
+          "cloud.googleapis.com/country": "BE",
+          "cloud.googleapis.com/location": "europe-west1"
+        },
+        "metadata": {
+          "@type": "type.googleapis.com/google.cloud.kms.v1.LocationMetadata",
+          "hsmAvailable": true,
+          "ekmAvailable": true
+        },
+        "locationId": "europe-west1",
+        "displayName": "Belgium"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/europe-west2",
+        "labels": {
+          "cloud.googleapis.com/location": "europe-west2",
+          "cloud.googleapis.com/country": "GB",
+          "cloud.googleapis.com/region": "europe-west2"
+        },
+        "metadata": {
+          "@type": "type.googleapis.com/google.cloud.kms.v1.LocationMetadata",
+          "hsmAvailable": true,
+          "ekmAvailable": true
+        },
+        "locationId": "europe-west2",
+        "displayName": "London"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/europe-west3",
+        "labels": {
+          "cloud.googleapis.com/country": "DE",
+          "cloud.googleapis.com/location": "europe-west3",
+          "cloud.googleapis.com/region": "europe-west3"
+        },
+        "metadata": {
+          "@type": "type.googleapis.com/google.cloud.kms.v1.LocationMetadata",
+          "hsmAvailable": true,
+          "ekmAvailable": true
+        },
+        "locationId": "europe-west3",
+        "displayName": "Frankfurt"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/europe-west4",
+        "labels": {
+          "cloud.googleapis.com/country": "NL",
+          "cloud.googleapis.com/region": "europe-west4",
+          "cloud.googleapis.com/location": "europe-west4"
+        },
+        "metadata": {
+          "@type": "type.googleapis.com/google.cloud.kms.v1.LocationMetadata",
+          "hsmAvailable": true,
+          "ekmAvailable": true
+        },
+        "locationId": "europe-west4",
+        "displayName": "Netherlands"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/europe-west6",
+        "labels": {
+          "cloud.googleapis.com/country": "CH",
+          "cloud.googleapis.com/region": "europe-west6",
+          "cloud.googleapis.com/location": "europe-west6"
+        },
+        "metadata": {
+          "@type": "type.googleapis.com/google.cloud.kms.v1.LocationMetadata",
+          "hsmAvailable": true,
+          "ekmAvailable": true
+        },
+        "locationId": "europe-west6",
+        "displayName": "Zurich"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/europe-west8",
+        "labels": {
+          "cloud.googleapis.com/region": "europe-west8",
+          "cloud.googleapis.com/location": "europe-west8",
+          "cloud.googleapis.com/country": "IT"
+        },
+        "metadata": {
+          "@type": "type.googleapis.com/google.cloud.kms.v1.LocationMetadata",
+          "hsmAvailable": true,
+          "ekmAvailable": true
+        },
+        "locationId": "europe-west8",
+        "displayName": "Milan"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/europe-west9",
+        "labels": {
+          "cloud.googleapis.com/region": "europe-west9",
+          "cloud.googleapis.com/country": "FR",
+          "cloud.googleapis.com/location": "europe-west9"
+        },
+        "metadata": {
+          "@type": "type.googleapis.com/google.cloud.kms.v1.LocationMetadata",
+          "hsmAvailable": true,
+          "ekmAvailable": true
+        },
+        "locationId": "europe-west9",
+        "displayName": "Paris"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/global",
+        "labels": {
+          "cloud.googleapis.com/location": "global"
+        },
+        "metadata": {
+          "@type": "type.googleapis.com/google.cloud.kms.v1.LocationMetadata",
+          "hsmAvailable": true
+        },
+        "locationId": "global"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/in",
+        "labels": {
+          "cloud.googleapis.com/location": "in"
+        },
+        "metadata": {
+          "@type": "type.googleapis.com/google.cloud.kms.v1.LocationMetadata",
+          "ekmAvailable": true
+        },
+        "locationId": "in"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/me-west1",
+        "labels": {
+          "cloud.googleapis.com/region": "me-west1",
+          "cloud.googleapis.com/country": "IL",
+          "cloud.googleapis.com/location": "me-west1"
+        },
+        "metadata": {
+          "@type": "type.googleapis.com/google.cloud.kms.v1.LocationMetadata",
+          "hsmAvailable": true,
+          "ekmAvailable": true
+        },
+        "locationId": "me-west1",
+        "displayName": "Tel Aviv"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/nam-eur-asia1",
+        "labels": {
+          "cloud.googleapis.com/location": "nam-eur-asia1"
+        },
+        "metadata": {
+          "@type": "type.googleapis.com/google.cloud.kms.v1.LocationMetadata"
+        },
+        "locationId": "nam-eur-asia1"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/nam10",
+        "labels": {
+          "cloud.googleapis.com/location": "nam10"
+        },
+        "metadata": {
+          "@type": "type.googleapis.com/google.cloud.kms.v1.LocationMetadata",
+          "hsmAvailable": true,
+          "ekmAvailable": true
+        },
+        "locationId": "nam10"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/nam11",
+        "labels": {
+          "cloud.googleapis.com/location": "nam11"
+        },
+        "metadata": {
+          "@type": "type.googleapis.com/google.cloud.kms.v1.LocationMetadata",
+          "hsmAvailable": true,
+          "ekmAvailable": true
+        },
+        "locationId": "nam11"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/nam12",
+        "labels": {
+          "cloud.googleapis.com/location": "nam12"
+        },
+        "metadata": {
+          "@type": "type.googleapis.com/google.cloud.kms.v1.LocationMetadata",
+          "hsmAvailable": true,
+          "ekmAvailable": true
+        },
+        "locationId": "nam12"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/nam3",
+        "labels": {
+          "cloud.googleapis.com/location": "nam3"
+        },
+        "metadata": {
+          "@type": "type.googleapis.com/google.cloud.kms.v1.LocationMetadata",
+          "hsmAvailable": true,
+          "ekmAvailable": true
+        },
+        "locationId": "nam3"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/nam4",
+        "labels": {
+          "cloud.googleapis.com/location": "nam4",
+          "cloud.googleapis.com/country": "US"
+        },
+        "metadata": {
+          "@type": "type.googleapis.com/google.cloud.kms.v1.LocationMetadata",
+          "hsmAvailable": true,
+          "ekmAvailable": true
+        },
+        "locationId": "nam4"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/nam6",
+        "labels": {
+          "cloud.googleapis.com/location": "nam6"
+        },
+        "metadata": {
+          "@type": "type.googleapis.com/google.cloud.kms.v1.LocationMetadata",
+          "hsmAvailable": true,
+          "ekmAvailable": true
+        },
+        "locationId": "nam6"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/nam7",
+        "labels": {
+          "cloud.googleapis.com/location": "nam7"
+        },
+        "metadata": {
+          "@type": "type.googleapis.com/google.cloud.kms.v1.LocationMetadata",
+          "hsmAvailable": true,
+          "ekmAvailable": true
+        },
+        "locationId": "nam7"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/nam8",
+        "labels": {
+          "cloud.googleapis.com/location": "nam8"
+        },
+        "metadata": {
+          "@type": "type.googleapis.com/google.cloud.kms.v1.LocationMetadata",
+          "hsmAvailable": true,
+          "ekmAvailable": true
+        },
+        "locationId": "nam8"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/nam9",
+        "labels": {
+          "cloud.googleapis.com/location": "nam9"
+        },
+        "metadata": {
+          "@type": "type.googleapis.com/google.cloud.kms.v1.LocationMetadata",
+          "hsmAvailable": true,
+          "ekmAvailable": true
+        },
+        "locationId": "nam9"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/northamerica-northeast1",
+        "labels": {
+          "cloud.googleapis.com/region": "northamerica-northeast1",
+          "cloud.googleapis.com/location": "northamerica-northeast1",
+          "cloud.googleapis.com/country": "CA"
+        },
+        "metadata": {
+          "@type": "type.googleapis.com/google.cloud.kms.v1.LocationMetadata",
+          "hsmAvailable": true,
+          "ekmAvailable": true
+        },
+        "locationId": "northamerica-northeast1",
+        "displayName": "Montr\u00e9al"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/northamerica-northeast2",
+        "labels": {
+          "cloud.googleapis.com/region": "northamerica-northeast2",
+          "cloud.googleapis.com/country": "CA",
+          "cloud.googleapis.com/location": "northamerica-northeast2"
+        },
+        "metadata": {
+          "@type": "type.googleapis.com/google.cloud.kms.v1.LocationMetadata",
+          "hsmAvailable": true,
+          "ekmAvailable": true
+        },
+        "locationId": "northamerica-northeast2",
+        "displayName": "Toronto"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/southamerica-east1",
+        "labels": {
+          "cloud.googleapis.com/location": "southamerica-east1",
+          "cloud.googleapis.com/country": "BR",
+          "cloud.googleapis.com/region": "southamerica-east1"
+        },
+        "metadata": {
+          "@type": "type.googleapis.com/google.cloud.kms.v1.LocationMetadata",
+          "hsmAvailable": true,
+          "ekmAvailable": true
+        },
+        "locationId": "southamerica-east1",
+        "displayName": "S\u00e3o Paulo"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/southamerica-west1",
+        "labels": {
+          "cloud.googleapis.com/country": "CL",
+          "cloud.googleapis.com/location": "southamerica-west1",
+          "cloud.googleapis.com/region": "southamerica-west1"
+        },
+        "metadata": {
+          "@type": "type.googleapis.com/google.cloud.kms.v1.LocationMetadata",
+          "hsmAvailable": true,
+          "ekmAvailable": true
+        },
+        "locationId": "southamerica-west1",
+        "displayName": "Santiago"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us",
+        "labels": {
+          "cloud.googleapis.com/location": "us",
+          "cloud.googleapis.com/country": "US"
+        },
+        "metadata": {
+          "@type": "type.googleapis.com/google.cloud.kms.v1.LocationMetadata",
+          "hsmAvailable": true,
+          "ekmAvailable": true
+        },
+        "locationId": "us"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1",
+        "labels": {
+          "cloud.googleapis.com/country": "US",
+          "cloud.googleapis.com/location": "us-central1",
+          "cloud.googleapis.com/region": "us-central1"
+        },
+        "metadata": {
+          "@type": "type.googleapis.com/google.cloud.kms.v1.LocationMetadata",
+          "hsmAvailable": true,
+          "ekmAvailable": true
+        },
+        "locationId": "us-central1",
+        "displayName": "Iowa"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-east1",
+        "labels": {
+          "cloud.googleapis.com/location": "us-east1",
+          "cloud.googleapis.com/region": "us-east1",
+          "cloud.googleapis.com/country": "US"
+        },
+        "metadata": {
+          "@type": "type.googleapis.com/google.cloud.kms.v1.LocationMetadata",
+          "hsmAvailable": true,
+          "ekmAvailable": true
+        },
+        "locationId": "us-east1",
+        "displayName": "South Carolina"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-east4",
+        "labels": {
+          "cloud.googleapis.com/location": "us-east4",
+          "cloud.googleapis.com/region": "us-east4",
+          "cloud.googleapis.com/country": "US"
+        },
+        "metadata": {
+          "@type": "type.googleapis.com/google.cloud.kms.v1.LocationMetadata",
+          "hsmAvailable": true,
+          "ekmAvailable": true
+        },
+        "locationId": "us-east4",
+        "displayName": "Northern Virginia"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-east5",
+        "labels": {
+          "cloud.googleapis.com/region": "us-east5",
+          "cloud.googleapis.com/location": "us-east5",
+          "cloud.googleapis.com/country": "US"
+        },
+        "metadata": {
+          "@type": "type.googleapis.com/google.cloud.kms.v1.LocationMetadata",
+          "hsmAvailable": true,
+          "ekmAvailable": true
+        },
+        "locationId": "us-east5",
+        "displayName": "Columbus"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-south1",
+        "labels": {
+          "cloud.googleapis.com/region": "us-south1",
+          "cloud.googleapis.com/country": "US",
+          "cloud.googleapis.com/location": "us-south1"
+        },
+        "metadata": {
+          "@type": "type.googleapis.com/google.cloud.kms.v1.LocationMetadata",
+          "hsmAvailable": true,
+          "ekmAvailable": true
+        },
+        "locationId": "us-south1",
+        "displayName": "Dallas"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-west1",
+        "labels": {
+          "cloud.googleapis.com/location": "us-west1",
+          "cloud.googleapis.com/region": "us-west1",
+          "cloud.googleapis.com/country": "US"
+        },
+        "metadata": {
+          "@type": "type.googleapis.com/google.cloud.kms.v1.LocationMetadata",
+          "hsmAvailable": true,
+          "ekmAvailable": true
+        },
+        "locationId": "us-west1",
+        "displayName": "Oregon"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-west2",
+        "labels": {
+          "cloud.googleapis.com/location": "us-west2",
+          "cloud.googleapis.com/country": "US",
+          "cloud.googleapis.com/region": "us-west2"
+        },
+        "metadata": {
+          "@type": "type.googleapis.com/google.cloud.kms.v1.LocationMetadata",
+          "hsmAvailable": true,
+          "ekmAvailable": true
+        },
+        "locationId": "us-west2",
+        "displayName": "Los Angeles"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-west3",
+        "labels": {
+          "cloud.googleapis.com/country": "US",
+          "cloud.googleapis.com/region": "us-west3",
+          "cloud.googleapis.com/location": "us-west3"
+        },
+        "metadata": {
+          "@type": "type.googleapis.com/google.cloud.kms.v1.LocationMetadata",
+          "hsmAvailable": true,
+          "ekmAvailable": true
+        },
+        "locationId": "us-west3",
+        "displayName": "Salt Lake City"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-west4",
+        "labels": {
+          "cloud.googleapis.com/region": "us-west4",
+          "cloud.googleapis.com/location": "us-west4",
+          "cloud.googleapis.com/country": "US"
+        },
+        "metadata": {
+          "@type": "type.googleapis.com/google.cloud.kms.v1.LocationMetadata",
+          "hsmAvailable": true,
+          "ekmAvailable": true
+        },
+        "locationId": "us-west4",
+        "displayName": "Las Vegas"
+      }
+    ]
+  }
+}

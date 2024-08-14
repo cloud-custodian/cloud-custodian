@@ -1,13 +1,11 @@
 .. _oci_gettingstarted:
 
-Getting Started (Alpha)
+Getting Started (Beta)
 =======================
 
-The Oracle Cloud Infrastructure (OCI) provider (Alpha) is an optional package. which can be installed to enable
+The Oracle Cloud Infrastructure (OCI) provider (Beta) is an optional package. which can be installed to enable
 writing policies which interact with OCI related resources.
 
-
-Alpha providers will potentially have non backwards compatible syntax changes to exposed policy language.
 
 
 .. _oci_install-custodian:
@@ -29,7 +27,7 @@ Option 1: Install released packages to local Python Environment
 .. code-block:: bash
 
     pip install c7n
-    pip install c7n_oci
+    pip install c7n-oci
 
 
 Option 2: Install latest from the repository
@@ -65,6 +63,21 @@ Then run the following command:
 
 After the configuration is complete, Cloud Custodian will implicitly pick up your credentials when it runs.
 
+
+Instance Principal Authentication
+"""""""""""""""""""""""""""""""""
+
+Cloud custodian can also be run on an OCI instance to make use of instance principal auth.
+To enable authentication using instance principal, set the environment variable ``OCI_CLI_AUTH`` to ``instance_principal``.
+For e.g.
+
+.. code-block:: bash
+
+    export OCI_CLI_AUTH=instance_principal
+
+
+For more details on how to use instance principal auth please click `here <https://docs.oracle.com/en-us/iaas/Content/Identity/Tasks/callingservicesfrominstances.htm>`_.
+
 .. _oci_run-policy:
 
 Run your first policies
@@ -80,19 +93,17 @@ Create a file named ``custodian.yml`` with the following content. Update ``displ
 .. code-block:: yaml
 
     policies:
-          - name: filter-for-compute-name
-            description: Filter for compute which matches the  name
-            resource: oci.instance
-            filters:
-              - type: value
-                key: display_name
-                value: test
-            actions:
-              - type: update-instance
-                params:
-                  update_instance_details:
-                    freeform_tags:
-                      mark-for-deletion: 'true'
+      - name: filter-for-compute-name
+        description: Filter for compute which matches the  name
+        resource: oci.instance
+        filters:
+          - type: value
+            key: display_name
+            value: test
+        actions:
+          - type: update
+            freeform_tags:
+              mark-for-deletion: 'true'
 
 
 Run the following from the command line:
@@ -137,20 +148,16 @@ Update ``compute_shape`` and set  ``OCI_COMPARTMENTS`` environment variable to m
         description: Scan for all the VM's with standard shape
         resource: oci.instance
         query: [
-          'lifecycle_state': [
-             'RUNNING'
-             ]
+          'lifecycle_state': 'RUNNING'
         ]
         filters:
           - type: value
             key: shape
             value: VM.Standard2.4
         actions:
-          - type: update-instance
-            params:
-              update_instance_details:
-                freeform_tags:
-                  eligible_for_resize: 'true'
+          - type: update
+            freeform_tags:
+              eligible_for_resize: 'true'
 
 Run the following from the command line:
 

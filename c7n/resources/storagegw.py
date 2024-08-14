@@ -15,5 +15,6 @@ class StorageGateway(QueryResourceManager):
         arn_type = 'gateway'
         name = 'GatewayName'
         universal_taggble = object()
+        permissions_augment = ("storagegateway:ListTagsForResource",)
 
     augment = universal_augment

@@ -10,14 +10,14 @@ config file of the events and resources of interest is required.
 ## Install
 
 ```shell
-$ pip install c7n_trailcreator
+$ pip install c7n-trailcreator
 
 $ c7n-trailcreator --help
 ```
 
 ## Config File
 
-The config file format here is similiar to what custodian requires
+The config file format here is similar to what custodian requires
 for lambda policies on cloudtrail api events as an event selector.
 
 First for each resource, the custodian resource-type is required
@@ -25,7 +25,7 @@ to be specified, and then for each event, we need to know the
 name of the service, the event name, and a jmespath expression
 to get the resource ids.
 
-Here's a a few examples, covering iam-user, iam-role, and and an s3 bucket.
+Here's a few examples, covering iam-user, iam-role, and an s3 bucket.
 
 
 ```json
@@ -68,8 +68,8 @@ Here's a a few examples, covering iam-user, iam-role, and and an s3 bucket.
 
 Trail creators supports loading data from s3 using s3 select or from cloudtrail s3 using athena.
 
-Note you'll have to pre-created the athena table for cloudtrail previously per
-https://docs.aws.amazon.com/athena/latest/ug/cloudtrail-logs.html
+Note you'll have to pre-create the athena table for cloudtrail per
+[https://docs.aws.amazon.com/athena/latest/ug/cloudtrail-logs.html](https://docs.aws.amazon.com/athena/latest/ug/cloudtrail-logs.html)
 
 Let's use the example config file to load up data for all the roles, buckets, and users created in 2019
 
@@ -130,7 +130,7 @@ INFO:c7n_trailowner:account:644160558196 region:us-east-1 tag 13 iam-role resour
 
 - records: the count of database create events we have for this resource type.
 - users: the number of unique users for whom we have create events.
-- not-found: the number of resources for whom we do not have create events, ie created before or after our trail analysis period.
+- not-found: the number of resources for which we do not have create events, i.e. created before or after our trail analysis period.
 - population: the total number of resources in the account region.
 
 ## Multi Account / Multi Region

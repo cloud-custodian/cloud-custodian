@@ -43,7 +43,7 @@ RUN if [[ " ${{providers[*]}} " =~ "{pkg}" ]]; then \
 fi
 """
 
-default_providers = ["gcp", "azure", "kube", "openstack", "tencentcloud"]
+default_providers = ["gcp", "azure", "kube", "openstack", "tencentcloud", "oci", "awscc"]
 
 PHASE_1_PKG_INSTALL_DEP = """\
 # We include `pyproject.toml` and `poetry.lock` first to allow
@@ -60,23 +60,42 @@ PHASE_2_PKG_INSTALL_ROOT += "\n".join(
     [PHASE_2_INSTALL_TMPL.format(pkg=pkg) for pkg in default_providers]
 )
 
-BUILD_STAGE = """\
-# Dockerfiles are generated from tools/dev/dockerpkg.py
 
+BOOTSTRAP_STAGE = """\
+# Dockerfiles are generated from tools/dev/dockerpkg.py
 FROM {base_build_image} as build-env
 
-ARG POETRY_VERSION="1.4.0"
+ARG POETRY_VERSION="1.8.3"
 SHELL ["/bin/bash", "-c"]
 
 # pre-requisite distro deps, and build env setup
-RUN adduser --disabled-login --gecos "" custodian
 RUN apt-get --yes update
-RUN apt-get --yes install --no-install-recommends build-essential curl python3-venv python3-dev
+RUN apt-get --yes install --no-install-recommends build-essential \
+    curl python3-venv python3-dev adduser
+# todo: 24.04 is trying to standardize on ubuntu as builtin non root.
+RUN adduser --disabled-login --gecos "" custodian
 RUN python3 -m venv /usr/local
-RUN curl -sSL https://install.python-poetry.org | python3 - -y --version {poetry_version}
+RUN /usr/local/bin/pip install -U pip setuptools && \
+    /usr/local/bin/pip install "poetry=={poetry_version}"
 ARG PATH="/root/.local/bin:$PATH"
-WORKDIR /src
 
+WORKDIR /src
+"""
+
+LEFT_BUILD_STAGE = BOOTSTRAP_STAGE + """\
+ADD pyproject.toml poetry.lock README.md /src
+RUN . /usr/local/bin/activate && poetry install --only main --no-root
+
+ADD c7n /src/c7n/
+RUN . /usr/local/bin/activate && poetry install --only-root
+
+ADD tools/c7n_left /src/tools/c7n_left
+RUN . /usr/local/bin/activate && cd tools/c7n_left && poetry install --only main
+
+RUN mkdir /output
+"""
+
+BUILD_STAGE = BOOTSTRAP_STAGE + """\
 # Add core & aws packages
 ADD pyproject.toml poetry.lock README.md /src/
 RUN . /usr/local/bin/activate && pip install -qU pip wheel aws-xray-sdk psutil jsonpatch
@@ -96,6 +115,10 @@ ARG providers="{providers}"
 
 {PHASE_2_PKG_INSTALL_ROOT}
 
+# Install c7n_awscc
+ADD tools/c7n_awscc /src/tools/c7n_awscc
+RUN . /usr/local/bin/activate && cd tools/c7n_awscc && poetry install
+
 RUN mkdir /output
 """
 
@@ -108,7 +131,7 @@ LABEL name="{name}" \\
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get --yes update \\
-        && apt-get --yes install python3 python3-venv --no-install-recommends \\
+        && apt-get --yes install python3 python3-venv adduser {packages} --no-install-recommends \\
         && rm -Rf /var/cache/apt \\
         && rm -Rf /var/lib/apt/lists/* \\
         && rm -Rf /var/log/*
@@ -155,6 +178,12 @@ TARGET_CLI = """\
 LABEL "org.opencontainers.image.title"="cli"
 LABEL "org.opencontainers.image.description"="Cloud Management Rules Engine"
 LABEL "org.opencontainers.image.documentation"="https://cloudcustodian.io/docs"
+"""
+
+TARGET_LEFT = """
+LABEL "org.opencontainers.image.title"="left"
+LABEL "org.opencontainers.image.description"="Cloud Custodian IaC Engine"
+LABEL "org.opencontainers.image.documentation"="https://cloudcustodian.io/docs/tools/c7n-left.html"
 """
 
 BUILD_KUBE = """\
@@ -206,13 +235,20 @@ LABEL "org.opencontainers.image.description"="Custodian policy changes streamed 
 LABEL "org.opencontainers.image.documentation"="https://cloudcustodian.io/docs"
 """
 
+BUILD_AWSCC = """\
+# Install c7n-awscc
+ADD tools/c7n_awscc /src/tools/c7n_awscc
+RUN . /usr/local/bin/activate && cd tools/c7n_awscc && poetry install
+"""
+
 
 class Image:
 
     defaults = dict(
-        base_build_image="ubuntu:22.04",
-        base_target_image="ubuntu:22.04",
+        base_build_image="ubuntu:24.04",
+        base_target_image="ubuntu:24.04",
         poetry_version="${POETRY_VERSION}",
+        packages="",
         providers=" ".join(default_providers),
         PHASE_1_PKG_INSTALL_DEP=PHASE_1_PKG_INSTALL_DEP,
         PHASE_2_PKG_INSTALL_ROOT=PHASE_2_PKG_INSTALL_ROOT,
@@ -609,6 +645,7 @@ def build_image(client, image_name, image_def, dfile_path, build_args):
 def generate():
     """Generate dockerfiles"""
     for df_path, image in ImageMap.items():
+        print(df_path)
         p = Path(df_path)
         p.write_text(image.render())
 

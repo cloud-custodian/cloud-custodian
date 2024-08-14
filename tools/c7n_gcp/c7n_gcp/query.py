@@ -331,7 +331,7 @@ class ChildResourceManager(QueryResourceManager):
             # Without this support you could only map parent-child elements with the raw data
             # they hold, but with regex you could regex that data as well while you map.
             if 'regex' in mapping:
-                result[mapping[1]] = re.search(mapping[3],result[mapping[1]]).group(1)
+                result[mapping[1]] = re.search(mapping[3], result[mapping[1]]).group(1)
 
         return result
 
@@ -407,6 +407,9 @@ class TypeInfo(metaclass=TypeMeta):
     urn_has_project = True
     # The location element is a zone, not a region.
     urn_zonal = False
+
+    # If the type supports refreshing an individual resource
+    refresh = None
 
     @classmethod
     def get_metric_resource_name(cls, resource):

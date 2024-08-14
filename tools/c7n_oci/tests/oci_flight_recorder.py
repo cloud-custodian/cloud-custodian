@@ -1,5 +1,7 @@
-import functools
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import gzip
+import inspect
 import json
 import os
 import re
@@ -11,7 +13,7 @@ from vcr import config
 import requests_stubs
 from c7n.testing import C7N_FUNCTIONAL, CustodianTestCore
 from c7n.utils import reset_session_cache
-from c7n_oci.session import Session
+from c7n_oci.session import SessionFactory
 from oci_common import (
     replace_ocid,
     replace_email,
@@ -34,6 +36,16 @@ FILTERED_HEADERS = [
     "connection",
     "expires",
     "content-location",
+    "access-control-allow-credentials",
+    "access-control-allow-methods",
+    "access-control-allow-origin",
+    "access-control-expose-headers",
+    "content-length",
+    "date",
+    "x-api-id",
+    "etag",
+    "pragma",
+    "x-content-type-options",
 ]
 
 
@@ -44,6 +56,7 @@ class OCIFlightRecorder(CustodianTestCore):
     multi_requests_map = {}
     multi_requests_history = {}
     running_req_count = {}
+    recording = False
 
     def cleanUp(self):
         threading.local().http = None
@@ -69,7 +82,7 @@ class OCIFlightRecorder(CustodianTestCore):
         cm = self.myvcr.use_cassette(cassette)
         cm.__enter__()
         self.addCleanup(cm.__exit__, None, None, None)
-        return functools.partial(Session)
+        return SessionFactory()
 
     def replay_flight_data(self, test_class, test_case):
         self.myvcr = config.VCR(
@@ -87,9 +100,15 @@ class OCIFlightRecorder(CustodianTestCore):
         self.cassette_name = self._get_cassette_name(test_class, test_case)
         cm.__enter__()
         self.addCleanup(cm.__exit__, None, None, None)
-        return functools.partial(Session)
+        return SessionFactory()
 
-    def oci_session_factory(self, test_class, test_case):
+    def _extract_caller(self):
+        caller = inspect.currentframe().f_back.f_back
+        return (caller.f_locals["self"].__class__.__name__, caller.f_code.co_name)
+
+    def oci_session_factory(self, test_class=None, test_case=None):
+        if not test_class or not test_case:
+            test_class, test_case = self._extract_caller()
         if not C7N_FUNCTIONAL and self._cassette_file_exists(test_class, test_case):
             return self.replay_flight_data(test_class, test_case)
         else:
@@ -106,6 +125,7 @@ class OCIFlightRecorder(CustodianTestCore):
 
     def _get_mock_triples(self):
         import oci.base_client as ocibase
+        import oci._vendor.urllib3.connectionpool as conn
 
         mock_triples = (
             (ocibase, "OCIConnectionPool", requests_stubs.VCROCIConnectionPool),
@@ -114,6 +134,8 @@ class OCIFlightRecorder(CustodianTestCore):
                 "ConnectionCls",
                 requests_stubs.VCROCIConnection,
             ),
+            (conn.HTTPConnectionPool, "ConnectionCls", requests_stubs.VCRHTTPConnection),
+            (conn.HTTPSConnectionPool, "ConnectionCls", requests_stubs.VCRHTTPSConnection),
         )
         return mock_triples
 
@@ -182,7 +204,7 @@ class OCIFlightRecorder(CustodianTestCore):
         multi_requests_map = {}
         tmp_requests_map = {}
         for t in self.cassette.data:
-            (r, b) = t
+            (r, _) = t
             k = f"{r.method}_{r.uri}"
             tmp_requests_map[k] = tmp_requests_map.get(k, 0) + 1
         for k, v in tmp_requests_map.items():

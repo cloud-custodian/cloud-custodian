@@ -4,20 +4,15 @@
         "PaginationToken": "",
         "ResourceTagMappingList": [
             {
-                "ResourceARN": "arn:aws:glue:us-east-1:644160558196:devEndpoint/test",
-                "Tags": []
+                "ResourceARN": "arn:aws:glue:us-east-1:644160558196:connection/test",
+                "Tags": [
+                    {
+                        "Key": "owner",
+                        "Value": "pratyush"
+                    }
+                ]
             }
         ],
-        "ResponseMetadata": {
-            "RequestId": "1fb11b1e-8247-11e9-a0de-99cb9b419859",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "1fb11b1e-8247-11e9-a0de-99cb9b419859",
-                "content-type": "application/x-amz-json-1.1",
-                "content-length": "130",
-                "date": "Wed, 29 May 2019 19:22:39 GMT"
-            },
-            "RetryAttempts": 0
-        }
+        "ResponseMetadata": {}
     }
 }

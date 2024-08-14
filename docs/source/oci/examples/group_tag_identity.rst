@@ -13,8 +13,6 @@ The following example policy will tag all the groups in the tenancy
         Tag all the groups in the tenancy
       resource: oci.group
       actions:
-       - type: update-group
-         params:
-          update_group_details:
-            freeform_tags:
-                TagName : TagValue
+       - type: update
+         freeform_tags:
+            TagName : TagValue

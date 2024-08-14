@@ -4,13 +4,15 @@
 from datetime import datetime, timedelta
 from dateutil import tz as tzutil
 
+from googleapiclient.errors import HttpError
+
 from c7n.utils import type_schema
 from c7n.filters import FilterValidationError
 from c7n.filters.offhours import Time
 from c7n.lookup import Lookup
+
 from c7n_gcp.actions import MethodAction
 from c7n_gcp.filters.labels import LabelActionFilter
-
 from c7n_gcp.provider import resources as gcp_resources
 
 
@@ -46,6 +48,18 @@ class BaseLabelAction(MethodAction):
 
     def _get_current_labels(self, resource):
         return resource.get('labels', {})
+
+    def handle_resource_error(self, client, model, resource, op_name, params, error):
+        if 'fingerprint' not in error.reason or not model.refresh:
+            return
+        try:
+            resource = model.refresh(client, resource)
+            params['body']['labelFingerprint'] = resource['labelFingerprint']
+            return self.invoke_api(client, op_name, params)
+        except HttpError as e:
+            if e.resp.status in self.ignore_error_codes:
+                return e
+            raise
 
     @classmethod
     def register_resources(cls, registry, resource_class):

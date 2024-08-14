@@ -1,0 +1,10 @@
+{
+    "status_code": 200,
+    "data": {
+        "VpcId": "vpc-6d20940b",
+        "EnableNetworkAddressUsageMetrics": {
+            "Value": true
+        },
+        "ResponseMetadata": {}
+    }
+}
