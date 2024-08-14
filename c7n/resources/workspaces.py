@@ -519,6 +519,45 @@ class BrowerPolicyFilter(ValueFilter):
         return results
 
 
+@WorkspacesWeb.filter_registry.register('user-access-logging-settings')
+class UserAccessLoggingSettingsFilter(ValueFilter):
+    """
+    Filters workspaces secured browsers based on their user access loggging settings.
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: user-access-logging-settings-match
+                resource: workspaces-web
+                filters:
+                  - type: user-access-logging-settings
+                    key: kinesisStreamArn
+                    value: present
+    """
+
+    schema = type_schema('user-access-logging-settings', rinherit=ValueFilter.schema)
+    schema_alias = False
+    permissions = ('workspaces-web:GetUserAccessLoggingSettings',)
+    policy_annotation = "c7n:UserAccessLoggingSettings"
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('workspaces-web')
+        results = []
+        for r in resources:
+            if (self.policy_annotation not in r) and (
+                'userAccessLoggingSettingsArn' in r):
+                r[self.policy_annotation] = self.manager.retry(
+                    client.get_user_access_logging_settings,
+                    userAccessLoggingSettingsArn=r['userAccessLoggingSettingsArn']).get(
+                        'userAccessLoggingSettings', {})
+            results.append(r)
+        return super().process(results, event)
+
+    def __call__(self, r):
+        return super().__call__(r.get(self.policy_annotation, {}))
+
+
 @WorkspacesWeb.action_registry.register('tag')
 class TagWorkspacesWebResource(Tag):
     """Create tags on a Workspaces Web portal
