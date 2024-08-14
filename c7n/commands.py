@@ -581,6 +581,10 @@ def version_cmd(options):
         packages.append('c7n_kube')
     if 'openstack' in found:
         packages.append('c7n_openstack')
+    if 'aliyun' in found:
+        packages.append('c7n_aliyun')
+    if 'vsphere' in found:
+        packages.append('c7n_vsphere')
     print(generate_requirements(packages))
 
 

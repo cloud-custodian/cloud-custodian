@@ -27,7 +27,7 @@ RUN . /usr/local/bin/activate && poetry install --without dev --no-root
 ADD c7n /src/c7n/
 RUN . /usr/local/bin/activate && poetry install --only-root
 
-ARG providers="gcp azure kube openstack tencentcloud oci awscc"
+ARG providers="gcp azure kube openstack tencentcloud oci awscc aliyun"
 # Add provider packages
 # We include `pyproject.toml` and `poetry.lock` first to allow
 # cache of dependency installs.
