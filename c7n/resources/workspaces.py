@@ -538,7 +538,7 @@ class UserSettingsFilter(ValueFilter):
 
     schema = type_schema('user-settings', rinherit=ValueFilter.schema)
     schema_alias = False
-    permissions = ('workspaces-web:GetUserSettings')
+    permissions = ('workspaces-web:GetUserSettings',)
     policy_annotation = "c7n:UserSettings"
 
     def process(self, resources, event=None):
