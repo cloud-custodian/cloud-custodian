@@ -519,6 +519,44 @@ class BrowerPolicyFilter(ValueFilter):
         return results
 
 
+@WorkspacesWeb.filter_registry.register('user-settings')
+class UserSettingsFilter(ValueFilter):
+    """
+    Filters workspaces secured browsers based on their user settings.
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: user-settings-match
+                resource: workspaces-web
+                filters:
+                  - type: user-settings
+                    key: copyAllowed
+                    value: Disabled
+    """
+
+    schema = type_schema('user-settings', rinherit=ValueFilter.schema)
+    schema_alias = False
+    permissions = ('workspaces-web:GetUserSettings')
+    policy_annotation = "c7n:UserSettings"
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('workspaces-web')
+        results = []
+        for r in resources:
+            if (self.policy_annotation not in r) and ('userSettingsArn' in r):
+                r[self.policy_annotation] = self.manager.retry(
+                    client.get_user_settings,
+                    userSettingsArn=r['userSettingsArn']).get(
+                        'userSettings', {})
+            results.append(r)
+        return super().process(results, event)
+
+    def __call__(self, r):
+        return super().__call__(r.get(self.policy_annotation, {}))
+
+
 @WorkspacesWeb.action_registry.register('tag')
 class TagWorkspacesWebResource(Tag):
     """Create tags on a Workspaces Web portal
