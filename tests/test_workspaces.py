@@ -516,11 +516,8 @@ class TestWorkspacesWeb(BaseTest):
             session_factory=session_factory
         )
         resources = p.run()
-
         self.assertEqual(len(resources), 1)
 
-    def test_workspaces_web_user_settings_fail(self):
-        session_factory = self.replay_flight_data('test_workspaces_web_user_settings')
         p = self.load_policy(
             {
                 'name': 'test-workspaces-web-user-settings',
@@ -536,7 +533,6 @@ class TestWorkspacesWeb(BaseTest):
             session_factory=session_factory
         )
         resources = p.run()
-
         self.assertEqual(len(resources), 0)
 
 
