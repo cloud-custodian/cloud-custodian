@@ -14,7 +14,7 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.8"
 crcmod = "^1.7"
 oss2 = "^2.12.1"
 aliyun-python-sdk-core="^2.13.30"

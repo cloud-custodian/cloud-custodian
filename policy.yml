@@ -1,0 +1,20 @@
+policies:
+  - name: resource_policy-op-tag
+    resource: aliyun.ecs
+    description: |
+      Schedule a resource that does not meet tag compliance policies
+      to be stopped in four days.
+    filters:
+      - State.Name: running
+      - "tag:Environment": absent
+      - "tag:AppId": absent
+      - or:
+        - "tag:OwnerContact": absent
+        - "tag:DeptID": absent
+    actions:
+      - type: webhook
+        url: https://open.feishu.cn/open-apis/bot/v2/hook/1b6226de-cfe5-475e-98ef-c34d4d672d91
+        method: POST
+#        query-params:
+#          resource_name: resource.name
+#          policy_name: policy.name
