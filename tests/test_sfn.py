@@ -118,3 +118,23 @@ class TestStepFunction(BaseTest):
         client = session_factory().client('stepfunctions')
         tags = client.list_tags_for_resource(resourceArn=resources[0]['stateMachineArn'])
         self.assertTrue([t for t in tags['tags'] if t['key'] != 'test'])
+
+    def test_sfn_get_activity(self):
+        session_factory = self.record_flight_data('test_sfn_resource')
+        p = self.load_policy(
+            {
+                'name': 'test-sfn-get-acitivity',
+                'resource': 'activity',
+                'filters': [
+                    {
+                        'type': 'value',
+                        'key': 'name',
+                        'value': 'test'
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue(resources[0]['name'], 'test')

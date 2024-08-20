@@ -40,6 +40,23 @@ class StepFunction(QueryResourceManager):
     }
 
 
+@resources.register('activity')
+class Activity(QueryResourceManager):
+    """AWS Step Functions Activity"""
+
+    class resource_type(TypeInfo):
+        service = 'stepfunctions'
+        enum_spec = ('list_activities', 'activities', None)
+        arn = id = 'activityArn'
+        arn_type = 'activity'
+        cfn_type = config_type = 'AWS::StepFunctions::Activity'
+        name = 'name'
+        date = 'creationDate'
+        detail_spec = (
+            "describe_activity", "activityArn",
+            'activityArn', None)
+
+
 class InvokeStepFunction(Action):
     """Invoke step function on resources.
 
@@ -130,6 +147,7 @@ resources.subscribe(InvokeStepFunction.register_resources)
 
 
 @StepFunction.action_registry.register('tag')
+@Activity.action_registry.register('tag')
 class TagStepFunction(Tag):
     """Action to create tag(s) on a step function
 
@@ -149,14 +167,14 @@ class TagStepFunction(Tag):
     permissions = ('states:TagResource',)
 
     def process_resource_set(self, client, resources, tags):
-
+        mid = self.manager.resource_type.arn
         tags_lower = []
 
         for tag in tags:
             tags_lower.append({k.lower(): v for k, v in tag.items()})
 
         for r in resources:
-            client.tag_resource(resourceArn=r['stateMachineArn'], tags=tags_lower)
+            client.tag_resource(resourceArn=r[mid], tags=tags_lower)
 
 
 @StepFunction.action_registry.register('remove-tag')
@@ -178,6 +196,6 @@ class UnTagStepFunction(RemoveTag):
     permissions = ('states:UntagResource',)
 
     def process_resource_set(self, client, resources, tag_keys):
-
+        mid = self.manager.resource_type.arn
         for r in resources:
-            client.untag_resource(resourceArn=r['stateMachineArn'], tagKeys=tag_keys)
+            client.untag_resource(resourceArn=r[mid], tagKeys=tag_keys)
