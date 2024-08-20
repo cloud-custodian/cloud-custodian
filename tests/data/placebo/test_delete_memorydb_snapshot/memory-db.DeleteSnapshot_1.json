@@ -1,0 +1,27 @@
+{
+    "status_code": 200,
+    "data": {
+        "Snapshot": {
+            "Name": "test-snapshot-2",
+            "Status": "deleting",
+            "Source": "manual",
+            "ARN": "arn:aws:memorydb:us-east-1:644160558196:snapshot/test-snapshot-2",
+            "ClusterConfiguration": {
+                "Name": "test-cluster",
+                "Description": "Easy created demo cluster on 2024-08-07T19:27:52.717Z",
+                "NodeType": "db.t4g.small",
+                "EngineVersion": "7.1",
+                "MaintenanceWindow": "sun:03:00-sun:04:00",
+                "Port": 6379,
+                "ParameterGroupName": "default.memorydb-redis7",
+                "SubnetGroupName": "test-subnet",
+                "VpcId": "vpc-0d4f819d13b730139",
+                "SnapshotRetentionLimit": 1,
+                "SnapshotWindow": "05:30-06:30",
+                "NumShards": 1
+            },
+            "DataTiering": "false"
+        },
+        "ResponseMetadata": {}
+    }
+}
