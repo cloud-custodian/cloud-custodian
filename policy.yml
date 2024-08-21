@@ -13,7 +13,7 @@ policies:
         op: less-than
     actions:
       - type: webhook
-        url: https://open.feishu.cn/open-apis/bot/v2/hook/1b6226de-cfe5-475e-98ef-c34d4d672d91
+        url: ""
         method: POST
         batch: true
         body: |

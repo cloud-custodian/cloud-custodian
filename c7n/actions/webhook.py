@@ -112,7 +112,7 @@ class Webhook(EventAction):
                 headers=prepared_headers)
 
             self.log.info("%s header %s body %s got response %s with URL %s getresponse %s" %
-                          (self.method, prepared_headers, prepared_body, res.status, prepared_url,res.data))
+                          (self.method, prepared_headers, prepared_body, res.status, prepared_url, res.data))
         except urllib3.exceptions.HTTPError as e:
             self.log.error("Error calling %s. Code: %s" % (prepared_url, e.reason))
 
@@ -157,13 +157,13 @@ class Webhook(EventAction):
         """Create a JSON body and dump it to encoded bytes."""
         if not self.body:
             return None
-        elif self.headers.get("channel",None) =='`feishu`':
+        elif self.headers.get("channel", None) == '`feishu`':
             content = {
-                    "msg_type": "text",
-                    "content": {
-                        "text": json.dumps(utils.jmespath_search(self.body, resource))
-                    }
+                "msg_type": "text",
+                "content": {
+                    "text": json.dumps(utils.jmespath_search(self.body, resource))
                 }
+            }
         else:
-            content =utils.jmespath_search(self.body, resource)
+            content = utils.jmespath_search(self.body, resource)
         return utils.dumps(content).encode('utf-8')
