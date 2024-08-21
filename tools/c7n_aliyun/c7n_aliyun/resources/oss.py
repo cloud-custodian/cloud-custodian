@@ -31,9 +31,9 @@ accessKeyId = os.getenv('ALIYUN_ACCESSKEYID')
 accessSecret = os.getenv('ALIYUN_ACCESSSECRET')
 regionId = os.getenv('ALIYUN_DEFAULT_REGION')
 
+
 @resources.register('oss')
 class Oss(QueryResourceManager):
-
     class resource_type(TypeInfo):
         service = 'oss'
         enum_spec = (None, 'buckets', None)
@@ -41,6 +41,7 @@ class Oss(QueryResourceManager):
 
     def get_request(self):
         return regionId
+
 
 @Oss.filter_registry.register('global-grants')
 class GlobalGrantsFilter(Filter):
@@ -91,6 +92,7 @@ class GlobalGrantsFilter(Filter):
             set_annotation(b, 'GlobalPermissions', results)
             return b
 
+
 @Oss.filter_registry.register('encryption')
 class GlobalGrantsFilter(Filter):
     """Filters :example:
@@ -120,9 +122,10 @@ class GlobalGrantsFilter(Filter):
             if jmespath.search('ServerSideEncryptionRule.SSEAlgorithm', result) is False:
                 return i
         except Exception as err:
-            i['ServerSideEncryptionRule'] = {"SSEAlgorithm" : "None"}
+            i['ServerSideEncryptionRule'] = {"SSEAlgorithm": "None"}
             return i
         return False
+
 
 @Oss.filter_registry.register('data-redundancy-type')
 class DataRedundancyTypeOssFilter(AliyunOssFilter):
@@ -157,6 +160,7 @@ class DataRedundancyTypeOssFilter(AliyunOssFilter):
             i['DataRedundancyType'] = "None"
             return i
         return i
+
 
 @Oss.filter_registry.register('bucket-referer')
 class BucketRefererOssFilter(AliyunOssFilter):

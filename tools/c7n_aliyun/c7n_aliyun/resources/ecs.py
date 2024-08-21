@@ -28,7 +28,6 @@ from c7n_aliyun.query import QueryResourceManager, TypeInfo
 
 @resources.register('ecs')
 class Ecs(QueryResourceManager):
-
     class resource_type(TypeInfo):
         service = 'ecs'
         enum_spec = (None, 'Instances.Instance', None)
@@ -39,9 +38,9 @@ class Ecs(QueryResourceManager):
         request = DescribeInstancesRequest()
         return request
 
+
 @Ecs.filter_registry.register('public-ip-address')
 class PublicIpAddress(AliyunEcsFilter):
-
     """Filters
        :Example:
        .. code-block:: yaml
@@ -61,6 +60,7 @@ class PublicIpAddress(AliyunEcsFilter):
         if len(data) == 0:
             return False
         return i
+
 
 @Ecs.filter_registry.register('instance-age')
 class EcsAgeFilter(AliyunAgeFilter):
@@ -91,6 +91,7 @@ class EcsAgeFilter(AliyunAgeFilter):
 
     def get_resource_date(self, i):
         return i['CreationTime']
+
 
 @Ecs.filter_registry.register('metrics')
 class EcsMetricsFilter(MetricsFilter):
@@ -134,6 +135,7 @@ class InstanceNetworkTypeEcsFilter(AliyunEcsFilter):
             return False
         return i
 
+
 @Ecs.filter_registry.register('vpc-type')
 class VpcTypeEcsFilter(AliyunEcsFilter):
     """Filters
@@ -157,6 +159,7 @@ class VpcTypeEcsFilter(AliyunEcsFilter):
         if vpcId in self.data['vpcIds']:
             return False
         return i
+
 
 @Ecs.filter_registry.register('stopped')
 class AliyunEcsFilter(AliyunEcsFilter):
@@ -186,6 +189,7 @@ class AliyunEcsFilter(AliyunEcsFilter):
         if 'Stopped' != status:
             return False
         return i
+
 
 @Ecs.filter_registry.register('instance-age')
 class EcsAgeFilter(AliyunAgeFilter):

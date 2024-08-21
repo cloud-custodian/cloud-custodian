@@ -23,14 +23,15 @@ from c7n_aliyun.provider import resources
 from c7n_aliyun.query import QueryResourceManager, TypeInfo
 from c7n_aliyun.client import Session
 
-logging.basicConfig(level=logging.ERROR, format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s', datefmt='%a, %d %b %Y %H:%M:%S')
+logging.basicConfig(level=logging.ERROR, format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
+                    datefmt='%a, %d %b %Y %H:%M:%S')
 
 service = 'mongodb'
 regionId = os.getenv('ALIYUN_DEFAULT_REGION')
 
+
 @resources.register('mongodb')
 class MongoDB(QueryResourceManager):
-
     class resource_type(TypeInfo):
         service = 'mongodb'
         enum_spec = (None, 'DBInstances.DBInstance', None)
@@ -38,6 +39,7 @@ class MongoDB(QueryResourceManager):
 
     def get_request(self):
         return DescribeDBInstancesRequest()
+
 
 @MongoDB.filter_registry.register('network-type')
 class NetworkTypeMongoDBFilter(AliyunRdsFilter):
@@ -65,6 +67,7 @@ class NetworkTypeMongoDBFilter(AliyunRdsFilter):
         if self.data['value'] == i['NetworkType']:
             return False
         return i
+
 
 @MongoDB.filter_registry.register('internet-access')
 class InternetAccessMongoDBFilter(AliyunRdsFilter):

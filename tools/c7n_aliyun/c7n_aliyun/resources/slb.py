@@ -31,9 +31,10 @@ from c7n_aliyun.provider import resources
 from c7n_aliyun.query import QueryResourceManager, TypeInfo
 
 service = 'slb'
+
+
 @resources.register('slb')
 class Slb(QueryResourceManager):
-
     class resource_type(TypeInfo):
         service = 'slb'
         enum_spec = (None, 'LoadBalancers.LoadBalancer', None)
@@ -42,6 +43,7 @@ class Slb(QueryResourceManager):
     def get_request(self):
         request = DescribeLoadBalancersRequest()
         return request
+
 
 @Slb.filter_registry.register('listener')
 class AliyunSlbListener(AliyunSlbFilter):
@@ -76,6 +78,7 @@ class AliyunSlbListener(AliyunSlbFilter):
             return False
         return i
 
+
 @Slb.filter_registry.register('unused')
 class AliyunSlbUnused(AliyunSlbFilter):
     """Filters
@@ -108,6 +111,7 @@ class AliyunSlbUnused(AliyunSlbFilter):
             return None
         return i
 
+
 @Slb.filter_registry.register('no-listener')
 class AliyunSlbNoListener(AliyunSlbListenerFilter):
     """Filters
@@ -135,9 +139,11 @@ class AliyunSlbNoListener(AliyunSlbListenerFilter):
         ListenerPortsAndProtocal = response.get('ListenerPortsAndProtocal').get('ListenerPortAndProtocal')
         ListenerPortsAndProtocol = response.get('ListenerPortsAndProtocol').get('ListenerPortAndProtocol')
         BackendServers = response.get('BackendServers').get('BackendServer')
-        if len(ListenerPort) == 0 and len(ListenerPortsAndProtocal) == 0 and len(ListenerPortsAndProtocol) == 0 and len(BackendServers) == 0:
+        if len(ListenerPort) == 0 and len(ListenerPortsAndProtocal) == 0 and len(ListenerPortsAndProtocol) == 0 and len(
+                BackendServers) == 0:
             return i
         return False
+
 
 @Slb.filter_registry.register('listener-type')
 class AliyunSlbListener(AliyunSlbListenerFilter):
@@ -174,9 +180,9 @@ class AliyunSlbListener(AliyunSlbListenerFilter):
                 return False
         return False
 
+
 @Slb.filter_registry.register('metrics')
 class SlbMetricsFilter(MetricsFilter):
-
     """
       1              policies:
       2                - name: aliyun-slb
@@ -190,6 +196,7 @@ class SlbMetricsFilter(MetricsFilter):
      11                      value: 30000
      12                      op: less-than
     """
+
     def get_request(self, r):
         request = DescribeMetricListRequest()
         request.set_accept_format('json')
@@ -200,6 +207,7 @@ class SlbMetricsFilter(MetricsFilter):
         request.set_Namespace(self.namespace)
         request.set_MetricName(self.metric)
         return request
+
 
 @Slb.filter_registry.register('address-type')
 class AddressTypeSlbFilter(AliyunSlbFilter):
@@ -225,6 +233,7 @@ class AddressTypeSlbFilter(AliyunSlbFilter):
             return False
         return i
 
+
 @Slb.filter_registry.register('network-type')
 class NetworkTypeSlbFilter(AliyunSlbFilter):
     """Filters
@@ -247,6 +256,7 @@ class NetworkTypeSlbFilter(AliyunSlbFilter):
         if self.data['value'] == i['NetworkType']:
             return False
         return i
+
 
 @Slb.filter_registry.register('vpc-type')
 class VpcSlbFilter(AliyunSlbFilter):
@@ -271,6 +281,7 @@ class VpcSlbFilter(AliyunSlbFilter):
         if vpcId in self.data['vpcIds']:
             return False
         return i
+
 
 @Slb.filter_registry.register('bandwidth')
 class BandwidthSlbFilter(AliyunSlbFilter):
@@ -301,6 +312,7 @@ class BandwidthSlbFilter(AliyunSlbFilter):
             return False
         data['F2CId'] = data['LoadBalancerId']
         return data
+
 
 @Slb.filter_registry.register('acls')
 class AclsSlbFilter(AliyunSlbFilter):
@@ -333,4 +345,3 @@ class AclsSlbFilter(AliyunSlbFilter):
             else:
                 return None
         return i
-

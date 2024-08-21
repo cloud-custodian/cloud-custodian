@@ -23,9 +23,10 @@ from c7n_aliyun.filters.filter import AliyunRamFilter
 from c7n_aliyun.client import Session
 
 service = 'ram'
+
+
 @resources.register('ram')
 class Ram(QueryResourceManager):
-
     class resource_type(TypeInfo):
         service = 'ram'
         enum_spec = (None, 'Users.User', None)
@@ -35,9 +36,9 @@ class Ram(QueryResourceManager):
         request = ListUsersRequest()
         return request
 
+
 @Ram.filter_registry.register('mfa')
 class MFA(AliyunRamFilter):
-
     """Filters
        :Example:
        .. code-block:: yaml

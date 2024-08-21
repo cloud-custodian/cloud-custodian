@@ -17,8 +17,8 @@ import os
 import jmespath
 from aliyunsdkr_kvstore.request.v20150101.DescribeInstancesRequest import DescribeInstancesRequest
 from aliyunsdkr_kvstore.request.v20150101.DescribeSecurityIpsRequest import DescribeSecurityIpsRequest
-from aliyunsdkr_kvstore.request.v20150101.DescribeSecurityGroupConfigurationRequest import DescribeSecurityGroupConfigurationRequest
-
+from aliyunsdkr_kvstore.request.v20150101.DescribeSecurityGroupConfigurationRequest import \
+    DescribeSecurityGroupConfigurationRequest
 
 from c7n.utils import type_schema
 from c7n_aliyun.client import Session
@@ -26,14 +26,15 @@ from c7n_aliyun.filters.filter import AliyunRedisFilter
 from c7n_aliyun.provider import resources
 from c7n_aliyun.query import QueryResourceManager, TypeInfo
 
-logging.basicConfig(level=logging.ERROR, format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s', datefmt='%a, %d %b %Y %H:%M:%S')
+logging.basicConfig(level=logging.ERROR, format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
+                    datefmt='%a, %d %b %Y %H:%M:%S')
 
 service = 'redis'
 regionId = os.getenv('ALIYUN_DEFAULT_REGION')
 
+
 @resources.register('redis')
 class Redis(QueryResourceManager):
-
     class resource_type(TypeInfo):
         service = 'redis'
         enum_spec = (None, 'Instances.KVStoreInstance', None)
@@ -41,6 +42,7 @@ class Redis(QueryResourceManager):
 
     def get_request(self):
         return DescribeInstancesRequest()
+
 
 @Redis.filter_registry.register('network-type')
 class NetworkTypeRedisFilter(AliyunRedisFilter):
@@ -68,6 +70,7 @@ class NetworkTypeRedisFilter(AliyunRedisFilter):
         if self.data['value'] == i['NetworkType']:
             return False
         return i
+
 
 @Redis.filter_registry.register('internet-access')
 class InternetAccessMongoDBFilter(AliyunRedisFilter):

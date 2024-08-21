@@ -24,6 +24,7 @@ class AliyunEipFilter(Filter):
     def __call__(self, i):
         return self.get_request(i)
 
+
 class AliyunEcsFilter(Filter):
     schema = None
 
@@ -33,6 +34,7 @@ class AliyunEcsFilter(Filter):
     def __call__(self, i):
         return self.get_request(i)
 
+
 class AliyunDiskFilter(Filter):
     schema = None
 
@@ -41,6 +43,7 @@ class AliyunDiskFilter(Filter):
 
     def __call__(self, i):
         return self.get_request(i)
+
 
 class AliyunRdsFilter(Filter):
     schema = None
@@ -52,6 +55,7 @@ class AliyunRdsFilter(Filter):
     def __call__(self, i):
         return self.get_request(i)
 
+
 class AliyunRedisFilter(Filter):
     schema = None
     filter = None
@@ -62,6 +66,7 @@ class AliyunRedisFilter(Filter):
     def __call__(self, i):
         return self.get_request(i)
 
+
 class AliyunSlbFilter(Filter):
 
     def validate(self):
@@ -69,6 +74,7 @@ class AliyunSlbFilter(Filter):
 
     def __call__(self, i):
         return self.get_request(i)
+
 
 class AliyunCdnFilter(Filter):
 
@@ -78,6 +84,7 @@ class AliyunCdnFilter(Filter):
     def __call__(self, i):
         return self.get_request(i)
 
+
 class AliyunOssFilter(Filter):
 
     def validate(self):
@@ -85,6 +92,7 @@ class AliyunOssFilter(Filter):
 
     def __call__(self, i):
         return self.get_request(i)
+
 
 class AliyunSlbListenerFilter(Filter):
     schema = None
@@ -96,6 +104,7 @@ class AliyunSlbListenerFilter(Filter):
     def __call__(self, i):
         return self.get_request(i)
 
+
 class AliyunRamFilter(Filter):
     schema = None
 
@@ -104,6 +113,7 @@ class AliyunRamFilter(Filter):
 
     def __call__(self, i):
         return self.get_request(i)
+
 
 class AliyunAgeFilter(Filter):
     """Automatically filter resources older than a given date.
@@ -136,7 +146,6 @@ class AliyunAgeFilter(Filter):
         op = OPERATORS[self.data.get('op', 'greater-than')]
 
         if not self.threshold_date:
-
             days = self.data.get('days', 0)
             hours = self.data.get('hours', 0)
             minutes = self.data.get('minutes', 0)
@@ -146,6 +155,7 @@ class AliyunAgeFilter(Filter):
 
         return op(self.threshold_date, v)
 
+
 class AliyunVpcFilter(Filter):
 
     def validate(self):
@@ -154,6 +164,7 @@ class AliyunVpcFilter(Filter):
     def __call__(self, i):
         return self.get_request(i)
 
+
 class AliyunSgFilter(Filter):
 
     def validate(self):
@@ -161,6 +172,7 @@ class AliyunSgFilter(Filter):
 
     def __call__(self, i):
         return self.get_request(i)
+
 
 class SGPermission(Filter):
     """Filter for verifying security group ingress and egress permissions
@@ -347,7 +359,6 @@ class SGPermission(Filter):
                 found = False
         return found
 
-
     def _process_cidr(self, cidr_key, cidr_type, SourceCidrIp, perm):
         found = None
         SourceCidrIp = perm.get(SourceCidrIp, "")
@@ -457,6 +468,7 @@ class SGPermission(Filter):
             resource['Matched%s' % self.ip_permissions_key] = matched
             return True
 
+
 class MetricsFilter(Filter):
     """Supports   metrics filters on resources.
     .. code-block:: yaml
@@ -549,6 +561,7 @@ class MetricsFilter(Filter):
         'acs_vpc_eip': 'Datapoints',
         'MonitorData': 'DiskMonitorData',
     }
+
     def process(self, resources, event=None):
         days = self.data.get('days', 1)
         duration = timedelta(days)
@@ -580,7 +593,7 @@ class MetricsFilter(Filter):
         start = self.model.dimension[:1]
         end = self.model.dimension[1:]
         key = start.lower() + end
-        if key!='instanceId':
+        if key != 'instanceId':
             key = 'instanceId'
         return [{key: resource[self.model.dimension]}]
 
@@ -629,7 +642,8 @@ class MetricsFilter(Filter):
             # for m in collected_metrics[key]:
             if len(collected_metrics[key]) == 0:
                 if 'missing-value' in self.data:
-                    collected_metrics[key].append({'timestamp': self.start, self.statistics: self.data['missing-value'], 'c7n_aliyun:detail': 'Fill value for missing data'})
+                    collected_metrics[key].append({'timestamp': self.start, self.statistics: self.data['missing-value'],
+                                                   'c7n_aliyun:detail': 'Fill value for missing data'})
                 else:
                     collected_metrics[key].append({'startTime': self.start, 'endTime': self.end, self.statistics: 0,
                                                    'detail': 'The read and write monitoring value within the specified time range is 0 (or no data)'})
@@ -651,6 +665,7 @@ class MetricsFilter(Filter):
                     matched.append(r)
 
         return matched
+
 
 SGPermissionSchema = {
     'match-operator': {'type': 'string', 'enum': ['or', 'and']},
@@ -674,4 +689,3 @@ SGPermissionSchema = {
     'CidrV6': {},
     'SGReferences': {}
 }
-

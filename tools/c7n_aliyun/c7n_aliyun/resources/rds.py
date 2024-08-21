@@ -19,9 +19,9 @@ from aliyunsdkcms.request.v20190101.DescribeMetricListRequest import DescribeMet
 from aliyunsdkrds.request.v20140815.DescribeAvailableZonesRequest import DescribeAvailableZonesRequest
 from aliyunsdkrds.request.v20140815.DescribeDBInstanceAttributeRequest import DescribeDBInstanceAttributeRequest
 from aliyunsdkrds.request.v20140815.DescribeDBInstancesRequest import DescribeDBInstancesRequest
-from aliyunsdkrds.request.v20140815.DescribeSecurityGroupConfigurationRequest import DescribeSecurityGroupConfigurationRequest
+from aliyunsdkrds.request.v20140815.DescribeSecurityGroupConfigurationRequest import \
+    DescribeSecurityGroupConfigurationRequest
 from aliyunsdkrds.request.v20140815.DescribeDBInstanceIPArrayListRequest import DescribeDBInstanceIPArrayListRequest
-
 
 from c7n.utils import type_schema
 from c7n_aliyun.client import Session
@@ -29,14 +29,15 @@ from c7n_aliyun.filters.filter import AliyunRdsFilter, MetricsFilter
 from c7n_aliyun.provider import resources
 from c7n_aliyun.query import QueryResourceManager, TypeInfo
 
-logging.basicConfig(level=logging.ERROR, format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s', datefmt='%a, %d %b %Y %H:%M:%S')
+logging.basicConfig(level=logging.ERROR, format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
+                    datefmt='%a, %d %b %Y %H:%M:%S')
 
 service = 'rds'
 regionId = os.getenv('ALIYUN_DEFAULT_REGION')
 
+
 @resources.register('rds')
 class Rds(QueryResourceManager):
-
     class resource_type(TypeInfo):
         service = 'rds'
         enum_spec = (None, 'Items.DBInstance', None)
@@ -45,6 +46,7 @@ class Rds(QueryResourceManager):
     def get_request(self):
         request = DescribeDBInstancesRequest()
         return request
+
 
 @Rds.filter_registry.register('available-zones')
 class AvailableZonesRdsFilter(AliyunRdsFilter):
@@ -80,13 +82,14 @@ class AvailableZonesRdsFilter(AliyunRdsFilter):
 
         string = str(response, encoding="utf-8").replace("false", "False").replace("true", "True")
         data = eval(string)
-        if self.data['value']==True:
+        if self.data['value'] == True:
             flag = len(data['AvailableZones']) > 0
         else:
             flag = len(data['AvailableZones']) < 0
         if flag != self.data['value']:
             return False
         return i
+
 
 @Rds.filter_registry.register('security-ip-mode')
 class AliyunRdsFilter(AliyunRdsFilter):
@@ -125,6 +128,7 @@ class AliyunRdsFilter(AliyunRdsFilter):
         i['DBInstanceAttributes'] = DBInstanceAttributes
         return i
 
+
 @Rds.filter_registry.register('high-availability')
 class HighAvailabilityRdsFilter(AliyunRdsFilter):
     """Filters
@@ -162,9 +166,9 @@ class HighAvailabilityRdsFilter(AliyunRdsFilter):
         i['DBInstanceAttributes'] = DBInstanceAttributes
         return i
 
+
 @Rds.filter_registry.register('metrics')
 class RdsMetricsFilter(MetricsFilter):
-
     """
           1 policies:
           2   - name: aliyun-rds-metrics
@@ -194,6 +198,7 @@ class RdsMetricsFilter(MetricsFilter):
         request.set_MetricName(self.metric)
         return request
 
+
 @Rds.filter_registry.register('connection-mode')
 class ConnectionModeRds2Filter(AliyunRdsFilter):
     """Filters
@@ -222,6 +227,7 @@ class ConnectionModeRds2Filter(AliyunRdsFilter):
             return False
         return i
 
+
 @Rds.filter_registry.register('vpc-type')
 class VpcTypeRdsFilter(AliyunRdsFilter):
     """Filters
@@ -245,6 +251,7 @@ class VpcTypeRdsFilter(AliyunRdsFilter):
         if vpcId in self.data['vpcIds']:
             return False
         return i
+
 
 @Rds.filter_registry.register('instance-network-type')
 class InstanceNetworkTypeRdsFilter(AliyunRdsFilter):
@@ -272,6 +279,7 @@ class InstanceNetworkTypeRdsFilter(AliyunRdsFilter):
         if self.data['value'] == i['InstanceNetworkType']:
             return False
         return i
+
 
 @Rds.filter_registry.register('internet-access')
 class InternetAccessRdsFilter(AliyunRdsFilter):
@@ -310,9 +318,9 @@ class InternetAccessRdsFilter(AliyunRdsFilter):
         net_a = self.ip_into_int('10.255.255.255') >> 24
         net_b = self.ip_into_int('172.31.255.255') >> 20
         net_c = self.ip_into_int('192.168.255.255') >> 16
-        return ip >> 24 == net_a or ip >>20 == net_b or ip >> 16 == net_c
+        return ip >> 24 == net_a or ip >> 20 == net_b or ip >> 16 == net_c
 
     def ip_into_int(self, ip):
         # 先把 192.168.31.46 用map分割'.'成数组，然后用reduuce+lambda转成10进制的 3232243502
         # (((((192 * 256) + 168) * 256) + 31) * 256) + 46
-        return self.reduce(lambda x,y:(x<<8)+y,map(int,ip.split('.')))
+        return self.reduce(lambda x, y: (x << 8) + y, map(int, ip.split('.')))

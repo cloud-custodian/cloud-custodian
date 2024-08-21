@@ -26,7 +26,6 @@ from c7n.utils import type_schema
 
 @resources.register('disk')
 class Disk(QueryResourceManager):
-
     class resource_type(TypeInfo):
         service = 'disk'
         enum_spec = (None, 'Disks.Disk', None)
@@ -35,6 +34,7 @@ class Disk(QueryResourceManager):
     def get_request(self):
         request = DescribeDisksRequest()
         return request
+
 
 @Disk.filter_registry.register('encrypted')
 class AliyunDiskFilter(AliyunDiskFilter):
@@ -63,6 +63,7 @@ class AliyunDiskFilter(AliyunDiskFilter):
             return False
         return i
 
+
 @Disk.filter_registry.register('unused')
 class AliyunDiskFilter(AliyunDiskFilter):
     """Filters
@@ -88,9 +89,9 @@ class AliyunDiskFilter(AliyunDiskFilter):
             return False
         return i
 
+
 @Disk.filter_registry.register('metrics')
 class MetricsDiskFilter(MetricsFilter):
-
     """
           policies:
             - name: aliyun-disk
@@ -106,12 +107,15 @@ class MetricsDiskFilter(MetricsFilter):
                   value: 0
                   op: eq
     """
+
     # 系统盘I/O读写总操作，单位：次/s。IOPSTotal
     # 系统盘读写总带宽，单位：Byte/s。BPSTotal
     def get_request(self, disk):
         request = DescribeDiskMonitorDataRequest()
-        request.set_StartTime(datetime.datetime.strptime(str(self.start), '%Y-%m-%d %H:%M:%S.%f').strftime('%Y-%m-%dT%H:%M:%SZ'))
-        request.set_EndTime(datetime.datetime.strptime(str(self.end), '%Y-%m-%d %H:%M:%S.%f').strftime('%Y-%m-%dT%H:%M:%SZ'))
+        request.set_StartTime(
+            datetime.datetime.strptime(str(self.start), '%Y-%m-%d %H:%M:%S.%f').strftime('%Y-%m-%dT%H:%M:%SZ'))
+        request.set_EndTime(
+            datetime.datetime.strptime(str(self.end), '%Y-%m-%d %H:%M:%S.%f').strftime('%Y-%m-%dT%H:%M:%SZ'))
         request.set_DiskId(disk["DiskId"])
         request.set_Period(self.period)
         request.set_accept_format('json')

@@ -32,7 +32,6 @@ from c7n_aliyun.resources.rds import Rds
 
 @resources.register('vpc')
 class Vpc(QueryResourceManager):
-
     class resource_type(TypeInfo):
         service = 'vpc'
         enum_spec = (None, 'Vpcs.Vpc', None)
@@ -41,6 +40,7 @@ class Vpc(QueryResourceManager):
     def get_request(self):
         request = DescribeVpcsRequest()
         return request
+
 
 @Vpc.filter_registry.register('unused')
 class AliyunVpcFilter(AliyunVpcFilter):
@@ -62,7 +62,7 @@ class AliyunVpcFilter(AliyunVpcFilter):
 
     def get_request(self, i):
         VpcId = i['VpcId']
-        #vpc 查询vpc下是否有ECS资源
+        # vpc 查询vpc下是否有ECS资源
         ecs_request = Ecs.get_request(self)
         ecs_request.set_accept_format('json')
         ecs_response_str = Session.client(self, service='ecs').do_action(ecs_request)
@@ -84,6 +84,7 @@ class AliyunVpcFilter(AliyunVpcFilter):
                     return None
         return i
 
+
 # 删除vpc 需要先删除底下所有资源（子网等）
 # @Vpc.action_registry.register('delete')
 # class Delete(MethodAction):
@@ -100,7 +101,6 @@ class AliyunVpcFilter(AliyunVpcFilter):
 
 @resources.register('security-group')
 class SecurityGroup(QueryResourceManager):
-
     class resource_type(TypeInfo):
         service = 'security-group'
         enum_spec = (None, 'SecurityGroups.SecurityGroup', None)
@@ -110,9 +110,9 @@ class SecurityGroup(QueryResourceManager):
         request = DescribeSecurityGroupsRequest()
         return request
 
+
 @SecurityGroup.filter_registry.register('source-cidr-ip')
 class IPPermission(AliyunSgFilter):
-
     """Filters
        :Example:
        .. code-block:: yaml
@@ -146,9 +146,9 @@ class IPPermission(AliyunSgFilter):
                 return sg
         return False
 
+
 @SecurityGroup.filter_registry.register('source-ports')
 class IPPermission(AliyunSgFilter):
-
     """Filters
        :Example:
        .. code-block:: yaml
@@ -167,7 +167,7 @@ class IPPermission(AliyunSgFilter):
     schema = type_schema(
         'source-ports',
         **{'SourceCidrIp': {'type': 'string'},
-        'PortRange': {'type': 'string'}}
+           'PortRange': {'type': 'string'}}
     )
 
     def get_request(self, sg):
@@ -199,9 +199,9 @@ class IPPermission(AliyunSgFilter):
                         return sg
         return False
 
+
 @SecurityGroup.filter_registry.register('ingress')
 class IPPermission(SGPermission):
-
     ip_permissions_key = "Permissions.Permission"
     schema = {
         'type': 'object',

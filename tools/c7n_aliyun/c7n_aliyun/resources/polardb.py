@@ -16,7 +16,8 @@ import os
 
 import jmespath
 from aliyunsdkpolardb.request.v20170801.DescribeDBClustersRequest import DescribeDBClustersRequest
-from aliyunsdkpolardb.request.v20170801.DescribeDBClusterAccessWhitelistRequest import DescribeDBClusterAccessWhitelistRequest
+from aliyunsdkpolardb.request.v20170801.DescribeDBClusterAccessWhitelistRequest import \
+    DescribeDBClusterAccessWhitelistRequest
 
 from c7n.utils import type_schema
 from c7n_aliyun.filters.filter import AliyunRdsFilter
@@ -24,14 +25,15 @@ from c7n_aliyun.provider import resources
 from c7n_aliyun.query import QueryResourceManager, TypeInfo
 from c7n_aliyun.client import Session
 
-logging.basicConfig(level=logging.ERROR, format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s', datefmt='%a, %d %b %Y %H:%M:%S')
+logging.basicConfig(level=logging.ERROR, format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
+                    datefmt='%a, %d %b %Y %H:%M:%S')
 
 service = 'polardb'
 regionId = os.getenv('ALIYUN_DEFAULT_REGION')
 
+
 @resources.register('polardb')
 class PolarDB(QueryResourceManager):
-
     class resource_type(TypeInfo):
         service = 'polardb'
         enum_spec = (None, 'Items.DBCluster', None)
@@ -39,6 +41,7 @@ class PolarDB(QueryResourceManager):
 
     def get_request(self):
         return DescribeDBClustersRequest()
+
 
 @PolarDB.filter_registry.register('vpc-type')
 class VpcTypePolarDBFilter(AliyunRdsFilter):
@@ -63,6 +66,7 @@ class VpcTypePolarDBFilter(AliyunRdsFilter):
         if vpcId in self.data['vpcIds']:
             return False
         return i
+
 
 @PolarDB.filter_registry.register('dbcluster-network-type')
 class DBClusterNetworkTypePolarDBFilter(AliyunRdsFilter):
@@ -90,6 +94,7 @@ class DBClusterNetworkTypePolarDBFilter(AliyunRdsFilter):
         if self.data['value'] == i['DBClusterNetworkType']:
             return False
         return i
+
 
 @PolarDB.filter_registry.register('internet-access')
 class InternetAccessPolarDBFilter(AliyunRdsFilter):

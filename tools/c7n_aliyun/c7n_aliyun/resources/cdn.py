@@ -20,9 +20,10 @@ from c7n_aliyun.filters.filter import AliyunCdnFilter
 from c7n.utils import type_schema
 
 service = 'cdn'
+
+
 @resources.register('cdn')
 class Cdn(QueryResourceManager):
-
     class resource_type(TypeInfo):
         service = 'cdn'
         enum_spec = (None, 'Domains.PageData', None)
@@ -31,6 +32,7 @@ class Cdn(QueryResourceManager):
     def get_request(self):
         request = DescribeUserDomainsRequest()
         return request
+
 
 @Cdn.filter_registry.register('ssl-protocol')
 class SslProtocolCdnFilter(AliyunCdnFilter):

@@ -22,7 +22,6 @@ from c7n_aliyun.query import QueryResourceManager, TypeInfo
 
 @resources.register('eip')
 class Eip(QueryResourceManager):
-
     class resource_type(TypeInfo):
         service = 'eip'
         enum_spec = (None, 'EipAddresses.EipAddress', None)
@@ -31,6 +30,7 @@ class Eip(QueryResourceManager):
     def get_request(self):
         request = DescribeEipAddressesRequest()
         return request
+
 
 @Eip.filter_registry.register('unused')
 class AliyunEipFilter(AliyunEipFilter):
@@ -58,9 +58,9 @@ class AliyunEipFilter(AliyunEipFilter):
             return False
         return i
 
+
 @Eip.filter_registry.register('metrics')
 class EipMetricsFilter(MetricsFilter):
-
     """
           1 policies:
           2   - name: aliyun-eip
@@ -76,6 +76,7 @@ class EipMetricsFilter(MetricsFilter):
          12         value: 0
          13         op: eq
     """
+
     # 网络流入带宽利用率	: net_in.rate_percentage
     # 网络流出带宽利用率	: net_out.rate_percentage
     def get_request(self, eip):
@@ -86,6 +87,7 @@ class EipMetricsFilter(MetricsFilter):
         request.set_Namespace(self.namespace)
         request.set_MetricName(self.metric)
         return request
+
 
 @Eip.filter_registry.register('bandwidth')
 class BandwidthEipFilter(AliyunEipFilter):
