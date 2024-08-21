@@ -238,7 +238,6 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
         q = query or self.get_resource_query()
         key = self.get_cache_key(q)
         resources = self._fetch_resources(q)
-        print(key, resources)
         self._cache.save(key, resources)
 
         resource_count = len(resources)
