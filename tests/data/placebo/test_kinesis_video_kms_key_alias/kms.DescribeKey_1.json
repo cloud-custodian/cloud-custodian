@@ -1,0 +1,11 @@
+{
+    "status_code": 200,
+    "data": {
+        "KeyMetadata": {
+            "AWSAccountId": "123456789012",
+            "KeyId": "0d543df5-915c-42a1-afa1-c9c5f1f97955",
+            "Arn": "arn:aws:kms:us-east-1:123456789012:alias/aws/lambda"
+        },
+        "ResponseMetadata": {}
+    }
+}

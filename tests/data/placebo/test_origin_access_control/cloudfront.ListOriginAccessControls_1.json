@@ -1,0 +1,40 @@
+{
+  "status_code": 200,
+  "data": {
+    "OriginAccessControlList": {
+      "Marker": "",
+      "MaxItems": 200,
+      "IsTruncated": false,
+      "Quantity": 2,
+      "Items": [
+        {
+          "Id": "E65YXOJ2CCHLX2",
+          "Name": "c7n-signing-behavior-always-oac",
+          "SigningProtocol": "sigv4",
+          "SigningBehavior": "always",
+          "OriginAccessControlOriginType": "s3"
+        },
+        {
+          "Id": "E67KI9SC1UA4K7",
+          "Name": "c7n-signing-behavior-never-oac",
+          "SigningProtocol": "sigv4",
+          "SigningBehavior": "never",
+          "OriginAccessControlOriginType": "s3"
+        }
+      ]
+    },
+    "ResponseMetadata": {
+      "RequestId": "073c49bd-c96a-11e8-985e-9d171bfe00d0",
+      "HTTPStatusCode": 200,
+      "HTTPHeaders": {
+        "server": "Server",
+        "date": "Fri, 07 Jul 2024 16:28:18 GMT",
+        "content-type": "application/x-amz-json-1.1",
+        "content-length": "123",
+        "connection": "keep-alive",
+        "x-amzn-requestid": "073c49bd-c96a-11e8-985e-9d171bfe00d0"
+      },
+      "RetryAttempts": 0
+    }
+  }
+}

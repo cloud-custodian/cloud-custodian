@@ -18,6 +18,7 @@ import time
 import tempfile
 import zipfile
 import platform
+import re
 
 
 # We use this for freezing dependencies for serverless environments
@@ -43,6 +44,8 @@ LambdaRetry = get_retry(('InsufficientPermissionsException',
                          'InvalidParameterValueException',), max_attempts=5)
 LambdaConflictRetry = get_retry(('ResourceConflictException',), max_attempts=3)
 RuleRetry = get_retry(('ResourceNotFoundException',), max_attempts=2)
+
+schedule_tag_pattern = None  # store compiled regex pattern after first use
 
 
 class PythonPackageArchive:
@@ -385,7 +388,7 @@ class LambdaManager:
                     yield f
 
     def publish(self, func, alias=None, role=None, s3_uri=None):
-        result, changed = self._create_or_update(
+        result, changed, existing = self._create_or_update(
             func, role, s3_uri, qualifier=alias)
         func.arn = result['FunctionArn']
         if alias and changed:
@@ -396,7 +399,7 @@ class LambdaManager:
             func.alias = func.arn
 
         for e in func.get_events(self.session_factory):
-            if e.add(func):
+            if e.add(func, existing):
                 log.debug(
                     "Added event source: %s to function: %s",
                     e, func.alias)
@@ -421,14 +424,20 @@ class LambdaManager:
             if k == 'Layers' and k in old_config and new_config[k]:
                 if sorted(new_config[k]) != sorted([lyr['Arn'] for lyr in old_config[k]]):
                     changed.append(k)
-            # Vpc needs special handling as a dict with lists
             elif k == 'VpcConfig' and k in old_config and new_config[k]:
-                if set(old_config[k]['SubnetIds']) != set(
-                        new_config[k]['SubnetIds']):
-                    changed.append(k)
-                elif set(old_config[k]['SecurityGroupIds']) != set(
-                        new_config[k]['SecurityGroupIds']):
-                    changed.append(k)
+                # Subnets and security groups are lists without a guaranteed order
+                for sub_k in ('SubnetIds', 'SecurityGroupIds'):
+                    if set(old_config[k][sub_k]) != set(new_config[k][sub_k]):
+                        changed.append(k)
+
+                # Other VpcConfig sub-keys may be missing entirely or have placeholder
+                # default/empty values. Only register a change if there's a change to/from
+                # a non-empty value.
+                for sub_k in ('VpcId', 'Ipv6AllowedForDualStack'):
+                    old = old_config[k].get(sub_k)
+                    new = new_config[k].get(sub_k)
+                    if (old or new) and old != new:
+                        changed.append(k)
             elif k not in old_config:
                 if k in LAMBDA_EMPTY_VALUES and LAMBDA_EMPTY_VALUES[k] == new_config[k]:
                     continue
@@ -510,7 +519,7 @@ class LambdaManager:
             waiter.wait(FunctionName=func.name)
             changed = True
 
-        return result, changed
+        return result, changed, existing
 
     def _update_concurrency(self, existing, func):
         e_concurrency = None
@@ -951,6 +960,11 @@ class PolicyLambda(AbstractLambdaFunction):
         elif self.policy.data['mode']['type'] == 'hub-action':
             events.append(
                 SecurityHubAction(self.policy, session_factory))
+        elif self.policy.data['mode']['type'] == 'schedule':
+            events.append(
+                EventBridgeScheduleSource(
+                    self.policy.data['mode'], session_factory)
+            )
         else:
             events.append(
                 CloudWatchEventSource(
@@ -1028,8 +1042,9 @@ class AWSEventBase:
                 StatementId=func.event_name,
             )
             return True
-        except client.ResourceNotFoundException:
-            pass
+        except ClientError as e:  # pragma: no cover
+            if e.response['Error']['Code'] != 'ResourceNotFoundException':
+                raise
 
 
 class CloudWatchEventSource(AWSEventBase):
@@ -1169,7 +1184,7 @@ class CloudWatchEventSource(AWSEventBase):
             payload = merge_dict(payload, self.data['pattern'])
         return json.dumps(payload)
 
-    def add(self, func):
+    def add(self, func, existing):
         params = dict(
             Name=func.event_name, Description=func.description, State='ENABLED')
 
@@ -1260,6 +1275,123 @@ class CloudWatchEventSource(AWSEventBase):
             return True
 
 
+class EventBridgeScheduleSource(AWSEventBase):
+    """
+    Invoke Lambda functions via EventBridge Scheduler.
+    """
+
+    client_service = 'scheduler'
+    schedule_tag_pattern = re.compile(r'^name=[a-zA-Z0-9-_]{1,64}:group=([0-9a-zA-Z-_.]{1,64})$')
+
+    def get(self, schedule_name, group_name='default'):
+        return resource_exists(self.client.get_schedule,
+                               Name=schedule_name,
+                               GroupName=group_name)
+
+    @staticmethod
+    def delta(src, tgt):
+        """Given two schedules determine if the configuration is the same.
+
+        Name is already implied.
+        """
+        for k in ['State', 'StartDate', 'EndDate', 'ScheduleExpression',
+                  'ScheduleExpressionTimezone', 'Description', 'GroupName']:
+            if src.get(k) != tgt.get(k):
+                return True
+
+        for k in ['Arn', 'RoleArn']:
+            if src.get('Target', {}).get(k) != tgt.get('Target', {}).get(k):
+                return True
+
+        return False  # pragma: no cover
+
+    def __repr__(self):
+        return (f'<CWEvent Type:{self.data.get("type")} Events:'
+                f'{", ".join(map(str, self.data.get("events", [])))}>')
+
+    def add(self, func, existing):
+        params = dict(
+            Name=func.event_name,
+            Description=func.description,
+            State='ENABLED',
+            FlexibleTimeWindow={'Mode': 'OFF'},
+            ScheduleExpression=self.data.get('schedule'),
+            ScheduleExpressionTimezone=self.data.get('timezone', 'Etc/UTC'),
+            GroupName=self.data.get('group-name', 'default'),
+            Target={
+                'Arn': func.arn,
+                'RoleArn': self.data.get('scheduler-role')
+            }
+        )
+
+        schedule = self.get(func.event_name, params['GroupName'])
+
+        if schedule and self.delta(schedule, params):
+            log.debug(f'Updating schedule for {func.event_name} in group {params["GroupName"]}')
+            self.client.update_schedule(**params)
+        elif not schedule:
+            log.debug(f'Creating schedule for {self} in group {params["GroupName"]}')
+            self.client.create_schedule(**params)
+
+        previous_name = self._get_previous_group(existing)
+
+        # check if old_group_name is set, and if so, is it different to the current group name
+        # if true, remove the old schedule from the old group
+        if previous_name is not None and previous_name != params['GroupName']:
+            log.debug(f'Removing schedule {func.event_name} in group {previous_name}')
+            self.client.delete_schedule(Name=func.event_name, GroupName=previous_name)
+
+        return True
+
+    def _get_previous_group(self, existing):
+        if not existing:
+            return None
+        old_schedule_tag = existing.get('Tags', {}).get('custodian-schedule', None)
+        old_group_name = None
+        if old_schedule_tag is not None:
+            matches = self.schedule_tag_pattern.match(old_schedule_tag)
+            old_group_name = matches.group(1) if matches else None
+        return old_group_name
+
+    def update(self, func):
+        self.add(func)
+
+    def pause(self, func):
+        try:
+            schedule = self.get(func.event_name, self.data.get('group-name', 'default'))
+            schedule['State'] = 'DISABLED'
+            self.update_schedule(schedule)
+        except ClientError:  # pragma: no cover
+            pass
+
+    def resume(self, func):
+        try:
+            schedule = self.get(func.event_name, self.data.get('group-name', 'default'))
+            schedule['State'] = 'ENABLED'
+            self.update_schedule(schedule)
+        except ClientError:  # pragma: no cover
+            pass
+
+    def update_schedule(self, schedule):
+        keys_to_delete = []
+        for key in schedule.keys():
+            if key not in ['ActionAfterCompletion', 'ClientToken', 'Description', 'EndDate',
+                           'FlexibleTimeWindow', 'GroupName', 'KmsKeyArn', 'Name',
+                           'ScheduleExpression', 'ScheduleExpressionTimezone', 'StartDate',
+                           'State', 'Target']:
+                keys_to_delete.append(key)
+        for key in keys_to_delete:
+            del schedule[key]
+        self.client.update_schedule(**schedule)
+
+    def remove(self, func, func_deleted=True):
+        if self.get(func.event_name):
+            group_name = self.data.get('group-name', 'default')
+            log.info(f'Removing schedule {func.event_name} in group {group_name}')
+            self.client.delete_schedule(Name=func.event_name, GroupName=group_name)
+            return True
+
+
 class SecurityHubAction:
 
     def __init__(self, policy, session_factory):
@@ -1297,7 +1429,7 @@ class SecurityHubAction:
         action = actions and actions.pop() or None
         return {'event': subscriber, 'action': action}
 
-    def add(self, func):
+    def add(self, func, existing):
         self.cwe.add(func)
         client = local_session(self.session_factory).client('securityhub')
         action = self.get(func.event_name).get('action')
@@ -1324,7 +1456,7 @@ class SecurityHubAction:
 
     def update(self, func):
         self.cwe.update(func)
-        self.add(func)
+        self.add(func, None)
 
     def remove(self, func, func_deleted=True):
         self.cwe.remove(func, func_deleted)
@@ -1357,7 +1489,7 @@ class BucketLambdaNotification:
             found = f
         return notifies, found
 
-    def add(self, func):
+    def add(self, func, existing):
         s3 = self.session.client('s3')
         notifies, found = self._get_notifies(s3, func)
         notifies.pop('ResponseMetadata', None)
@@ -1438,7 +1570,7 @@ class CloudWatchLogSubscription:
         self.session = session_factory()
         self.client = self.session.client('logs')
 
-    def add(self, func):
+    def add(self, func, existing):
         lambda_client = self.session.client('lambda')
         for group in self.log_groups:
             log.info(
@@ -1498,7 +1630,7 @@ class SQSSubscription:
         self.session_factory = session_factory
         self.batch_size = batch_size
 
-    def add(self, func):
+    def add(self, func, existing):
         client = local_session(self.session_factory).client('lambda')
         event_mappings = {
             m['EventSourceArn']: m for m in client.list_event_source_mappings(
@@ -1567,7 +1699,7 @@ class SNSSubscription:
         statement_id = 'sns-topic-' + topic_name
         return region, topic_name, statement_id
 
-    def add(self, func):
+    def add(self, func, existing):
         session = local_session(self.session_factory)
         lambda_client = session.client('lambda')
         for arn in self.topic_arns:
@@ -1755,7 +1887,7 @@ class ConfigRule(AWSEventBase):
             return True
         return False
 
-    def add(self, func):
+    def add(self, func, existing):
         rule = self.get(func.name)
         params = self.get_rule_params(func)
 

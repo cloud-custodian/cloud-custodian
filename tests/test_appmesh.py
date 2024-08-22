@@ -711,3 +711,166 @@ class TestAppmeshVirtualNode(BaseTest):
                            "2024-03-22T23:14:07.869000+00:00",
                            "m1"]
                           ], report, "data")
+
+
+class VirtualService(BaseTest):
+
+    def test_virtual_service(self):
+        # session_factory = self.record_flight_data('test_appmesh_virtualservice')
+        session_factory = self.replay_flight_data('test_appmesh_virtualservice')
+
+        # test data has 2 VGW but only 1 has a port of 123
+        p = self.load_policy(
+            {
+                "name": "appmesh-virtual-service-policy",
+                "resource": "aws.appmesh-mesh",
+                "filters": [
+                    {
+                        "type": "service",
+                        "attrs": [
+                            {
+                                "or": [
+                                    {
+                                        "type": "value",
+                                        "key": "meshOwner",
+                                        "op": "ne",
+                                        "value": "resourceOwner",
+                                        "value_type": "expr"
+                                    },
+                                    {
+                                        "not": [
+                                            {
+                                                "type": "value",
+                                                "key": "virtualServiceName",
+                                                "op": "regex",
+                                                "value": "^.*\\.local$"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+
+        # RUN THE SUT
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['meshName'], 'm2')
+        self.assertEqual(resources[0]['virtualServices'][0]['virtualServiceName'],
+                         'vs1.m2.us-east-1.local.m2.us-east-1')
+
+
+class VirtualRouter(BaseTest):
+
+    def test_virtual_router(self):
+        # session_factory = self.record_flight_data('test_appmesh_virtualrouter')
+        session_factory = self.replay_flight_data('test_appmesh_virtualrouter')
+
+        # test data has 2 VGW but only 1 has a port of 123
+        p = self.load_policy(
+            {
+                "name": "appmesh-virtual-router-policy",
+                "resource": "aws.appmesh-mesh",
+                "filters": [
+                    {
+                        "type": "router",
+                        "attrs": [
+                            {
+                                "type": "value",
+                                "key": "meshOwner",
+                                "op": "ne",
+                                "value": "resourceOwner",
+                                "value_type": "expr"
+                            }
+                        ]
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+
+        # RUN THE SUT
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['meshName'], 'm2')
+        self.assertEqual(resources[0]['virtualRouters'][0]['virtualRouterName'], 'vr1')
+
+
+class AppmeshRoute(BaseTest):
+
+    def test_appmesh_route(self):
+        # session_factory = self.record_flight_data('test_appmesh_route')
+        session_factory = self.replay_flight_data('test_appmesh_route')
+
+        # test data has 2 VGW but only 1 has a port of 123
+        p = self.load_policy(
+            {
+                "name": "appmesh-route-policy",
+                "resource": "aws.appmesh-mesh",
+                "filters": [
+                    {
+                        "type": "route",
+                        "key": "virtualRouters[].routes[]",
+                        "attrs": [
+                            {
+                                "type": "value",
+                                "key": "meshOwner",
+                                "op": "ne",
+                                "value": "resourceOwner",
+                                "value_type": "expr"
+                            }
+                        ]
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+
+        # RUN THE SUT
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['meshName'], 'm2')
+        self.assertEqual(resources[0]['virtualRouters'][0]['virtualRouterName'], 'vr1')
+        self.assertEqual(resources[0]['virtualRouters'][0]['routes'][0]['routeName'],
+                         'vr1-default-8000-http')
+
+
+class AppmeshGatewayRoute(BaseTest):
+
+    def test_appmesh_gateway_route(self):
+        # session_factory = self.record_flight_data('test_appmesh_gateway_route')
+        session_factory = self.replay_flight_data('test_appmesh_gateway_route')
+
+        # test data has 2 VGW but only 1 has a port of 123
+        p = self.load_policy(
+            {
+                "name": "appmesh-gateway-route-policy",
+                "resource": "aws.appmesh-virtualgateway",
+                "filters": [
+                    {
+                        "type": "gateway-route",
+                        "attrs": [
+                            {
+                                "type": "value",
+                                "key": "meshOwner",
+                                "op": "ne",
+                                "value": "resourceOwner",
+                                "value_type": "expr"
+                            }
+                        ]
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+
+        # RUN THE SUT
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['meshName'], 'm2')
+        self.assertEqual(resources[0]['gatewayRoutes'][0]['virtualGatewayName'], 'g1')
+        self.assertEqual(resources[0]['gatewayRoutes'][0]['gatewayRouteName'], 'gr1')

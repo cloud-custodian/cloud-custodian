@@ -1,0 +1,20 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "StorageLensConfigurationList": [
+            {
+                "Id": "default-account-dashboard",
+                "StorageLensArn": "arn:aws:s3:us-east-1:644160558196:storage-lens/default-account-dashboard",
+                "HomeRegion": "us-east-1",
+                "IsEnabled": true
+            },
+            {
+                "Id": "test-dashboard",
+                "StorageLensArn": "arn:aws:s3:us-east-1:644160558196:storage-lens/test-dashboard",
+                "HomeRegion": "us-east-1",
+                "IsEnabled": true
+            }
+        ]
+    }
+}

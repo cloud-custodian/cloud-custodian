@@ -651,7 +651,7 @@ class PolicyLambdaProvision(Publish):
             "arn:aws:securityhub:us-east-1:644160558196:action/custom/sechub")
         self.assertEqual(
             hub_action.get(mu_policy.name), {'event': False, 'action': None})
-        hub_action.add(mu_policy)
+        hub_action.add(mu_policy, None)
         self.assertEqual(
             {'event': False,
              'action': {
@@ -726,6 +726,103 @@ class PolicyLambdaProvision(Publish):
 
         self.addCleanup(cleanup)
         return mgr, mgr.publish(pl)
+
+    def test_eb_schedule(self):
+        session_factory = self.replay_flight_data("test_eb_scheduler")
+        scheduler_role = "arn:aws:iam::644160558196:role/custodian-scheduler-mu"
+        policy = {
+            "resource": "ec2",
+            "name": "schedule-ec2-checker",
+            "mode": {"type": "schedule", "schedule": "rate(1 day)",
+                     "scheduler-role": scheduler_role},
+        }
+        p = self.load_policy(policy, session_factory=session_factory)
+
+        pl = PolicyLambda(p)
+        mgr = LambdaManager(session_factory)
+        self.addCleanup(mgr.remove, pl)
+        result = mgr.publish(pl, "Dev", role=ROLE)
+        self.assert_items(
+            result,
+            {
+                "FunctionName": "custodian-schedule-ec2-checker",
+                "Handler": "custodian_policy.run",
+                "MemorySize": 512,
+                "Runtime": "python3.11",
+                "Timeout": 900,
+            },
+        )
+
+        scheduler = session_factory().client("scheduler")
+        result = scheduler.get_schedule(Name="custodian-schedule-ec2-checker")
+        self.assert_items(
+            result,
+            {
+                "State": "ENABLED",
+                "ScheduleExpression": "rate(1 day)",
+                "Name": "custodian-schedule-ec2-checker"
+            }
+        )
+        self.assert_items(result['Target'], {"RoleArn": scheduler_role})
+
+        # modify policy and re-publish
+        policy['mode']['timezone'] = 'America/New_York'
+        p = self.load_policy(policy, session_factory=session_factory)
+        pl = PolicyLambda(p)
+        self.addCleanup(mgr.remove, pl)
+        result = mgr.publish(pl, "Dev", role=ROLE)
+        result = scheduler.get_schedule(Name="custodian-schedule-ec2-checker")
+        self.assert_items(
+            result,
+            {
+                "State": "ENABLED",
+                "ScheduleExpression": "rate(1 day)",
+                "Name": "custodian-schedule-ec2-checker",
+                "ScheduleExpressionTimezone": 'America/New_York'
+            }
+        )
+
+        # modify scheduler role
+        policy['mode']['scheduler-role'] = f'{scheduler_role}2'
+        p = self.load_policy(policy, session_factory=session_factory)
+        pl = PolicyLambda(p)
+        self.addCleanup(mgr.remove, pl)
+        result = mgr.publish(pl, "Dev", role=ROLE)
+        result = scheduler.get_schedule(Name="custodian-schedule-ec2-checker")
+        self.assert_items(result['Target'], {"RoleArn": f'{scheduler_role}2'})
+
+    def test_pause_resume_sched_policy(self):
+        session_factory = self.replay_flight_data("test_pause_resume_sched_policy")
+        scheduler_role = "arn:aws:iam::644160558196:role/custodian-scheduler-mu"
+        p = self.load_policy(
+            {
+                "resource": "ec2",
+                "name": "schedule-ec2-checker-2",
+                "mode": {"type": "schedule", "schedule": "rate(1 day)",
+                         "scheduler-role": scheduler_role},
+            },
+            session_factory=session_factory)
+        pl = PolicyLambda(p)
+        mgr = LambdaManager(session_factory)
+        self.addCleanup(mgr.remove, pl, True)
+        mgr.publish(pl, "Dev", role=ROLE)
+        events = pl.get_events(session_factory)
+        self.assertEqual(len(events), 1)
+
+        scheduler = session_factory().client('scheduler')
+        events[0].pause(pl)
+        schedule = scheduler.get_schedule(Name=pl.event_name)
+        self.assertEqual(schedule["State"], "DISABLED")
+
+        # subsequent calls to pause an already paused rule should be a no-op
+        events[0].pause(pl)
+
+        events[0].resume(pl)
+        schedule = scheduler.get_schedule(Name=pl.event_name)
+        self.assertEqual(schedule["State"], "ENABLED")
+
+        # subsequent calls to resume an already enabled rule should be a no-op
+        events[0].resume(pl)
 
     def create_a_lambda_with_lots_of_config(self, flight):
         extra = {
@@ -887,6 +984,41 @@ class PolicyLambdaProvision(Publish):
                 },
             )
         )
+        self.assertTrue(
+            delta(
+                {
+                    "VpcConfig": {
+                        "SubnetIds": ["s-1", "s-2"],
+                        "SecurityGroupIds": ["sg-1", "sg-2"],
+                    }
+                },
+                {
+                    "VpcConfig": {
+                        "SubnetIds": ["s-1", "s-2"],
+                        "SecurityGroupIds": ["sg-1", "sg-2"],
+                        "Ipv6AllowedForDualStack": True,
+                    }
+                },
+            )
+        )
+        self.assertTrue(
+            delta(
+                {
+                    "VpcConfig": {
+                        "SubnetIds": ["s-1", "s-2"],
+                        "SecurityGroupIds": ["sg-1", "sg-2"],
+                        "VpcId": "vpc-12345",
+                    }
+                },
+                {
+                    "VpcConfig": {
+                        "SubnetIds": ["s-1", "s-2"],
+                        "SecurityGroupIds": ["sg-1", "sg-2"],
+                        "VpcId": "vpc-23456",
+                    }
+                },
+            )
+        )
         self.assertFalse(delta({}, {"DeadLetterConfig": {}}))
 
         self.assertTrue(delta({}, {"DeadLetterConfig": {"TargetArn": "arn"}}))
@@ -899,6 +1031,20 @@ class PolicyLambdaProvision(Publish):
 
         self.assertFalse(
             delta({}, {"VpcConfig": {"SecurityGroupIds": [], "SubnetIds": []}})
+        )
+        self.assertFalse(
+            delta(
+                {"VpcConfig": {
+                    "SecurityGroupIds": [],
+                    "SubnetIds": [],
+                }},
+                {"VpcConfig": {
+                    "SecurityGroupIds": [],
+                    "SubnetIds": [],
+                    "VpcId": "",
+                    "Ipv6AllowedForDualStack": False,
+                }},
+            )
         )
 
     def test_different_lambda_handler(self):
@@ -1053,7 +1199,7 @@ class PolicyLambdaProvision(Publish):
             ],
             "foo"
         )
-        cwls.add(func)
+        cwls.add(func, None)
         lambda_client = session_factory().client("lambda")
         policy = lambda_client.get_policy(FunctionName="test-foo-bar")
         self.assertTrue(policy)
@@ -1101,7 +1247,7 @@ class PolicyLambdaProvision(Publish):
             bucket={"Name": "c7n-ci20210930214353595400000001"}
         )
 
-        bln.add(func)
+        bln.add(func, None)
         bln.remove(func, func_deleted=False)
 
         # we should be able to do idempotent removal

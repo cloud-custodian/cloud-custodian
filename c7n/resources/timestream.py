@@ -9,6 +9,7 @@ from c7n.tags import (
     Tag as TagAction,
     RemoveTag as RemoveTagAction
 )
+from c7n.filters.backup import ConsecutiveAwsBackupsFilter
 
 
 class DescribeTimestream(DescribeSource):
@@ -136,6 +137,9 @@ class TimestreamDatabaseDelete(Action):
                 client.delete_database(
                     DatabaseName=r['DatabaseName'],
                 )
+
+
+TimestreamTable.filter_registry.register('consecutive-aws-backups', ConsecutiveAwsBackupsFilter)
 
 
 @TimestreamDatabase.filter_registry.register('kms-key')

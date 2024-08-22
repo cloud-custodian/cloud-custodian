@@ -1,0 +1,64 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "virtualRouters": [
+            {
+                "arn": "arn:aws:appmesh:us-east-1:644160558196:mesh/m1/virtualRouter/vr2",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 4,
+                    "day": 17,
+                    "hour": 16,
+                    "minute": 58,
+                    "second": 55,
+                    "microsecond": 426000
+                },
+                "lastUpdatedAt": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 4,
+                    "day": 17,
+                    "hour": 16,
+                    "minute": 58,
+                    "second": 55,
+                    "microsecond": 426000
+                },
+                "meshName": "m1",
+                "meshOwner": "644160558196",
+                "resourceOwner": "644160558196",
+                "version": 1,
+                "virtualRouterName": "vr2"
+            },
+            {
+                "arn": "arn:aws:appmesh:us-east-1:644160558196:mesh/m1/virtualRouter/vr1",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 4,
+                    "day": 17,
+                    "hour": 15,
+                    "minute": 53,
+                    "second": 35,
+                    "microsecond": 923000
+                },
+                "lastUpdatedAt": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 4,
+                    "day": 17,
+                    "hour": 15,
+                    "minute": 53,
+                    "second": 35,
+                    "microsecond": 923000
+                },
+                "meshName": "m1",
+                "meshOwner": "644160558196",
+                "resourceOwner": "644160558196",
+                "version": 1,
+                "virtualRouterName": "vr1"
+            }
+        ]
+    }
+}

@@ -1,0 +1,38 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Devices": [
+            {
+                "DeviceId": "device-0bb8d6ed08897811b",
+                "DeviceArn": "arn:aws:networkmanager::644160558196:device/global-network-0907a5c1e93ace9ea/device-0bb8d6ed08897811b",
+                "GlobalNetworkId": "global-network-0907a5c1e93ace9ea",
+                "Description": "test-device",
+                "Model": "C7n",
+                "SerialNumber": "ABC1234",
+                "SiteId": "site-0e84e8234f124f657",
+                "CreatedAt": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 7,
+                    "day": 17,
+                    "hour": 10,
+                    "minute": 53,
+                    "second": 30,
+                    "microsecond": 0
+                },
+                "State": "AVAILABLE",
+                "Tags": [
+                    {
+                        "Key": "c7n",
+                        "Value": "test"
+                    },
+                    {
+                        "Key": "Name",
+                        "Value": "test-device"
+                    }
+                ]
+            }
+        ]
+    }
+}

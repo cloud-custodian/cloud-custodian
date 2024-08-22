@@ -255,7 +255,7 @@ class ConfigValidFilter(Filter):
     def initialize(self, asgs):
         self.launch_info = LaunchInfo(self.manager).initialize(asgs)
         # pylint: disable=attribute-defined-outside-init
-        self.subnets = self.get_subnets()
+        self.subnets, self.default_subnets = self.get_subnets()
         self.security_groups = self.get_security_groups()
         self.key_pairs = self.get_key_pairs()
         self.elbs = self.get_elbs()
@@ -265,7 +265,10 @@ class ConfigValidFilter(Filter):
 
     def get_subnets(self):
         manager = self.manager.get_resource_manager('subnet')
-        return {s['SubnetId'] for s in manager.resources()}
+        subnets = manager.resources()
+        default_subnets = {s['SubnetId']: s['AvailabilityZone']
+                           for s in subnets if s['DefaultForAz']}
+        return {s['SubnetId'] for s in subnets}, default_subnets
 
     def get_security_groups(self):
         manager = self.manager.get_resource_manager('security-group')
@@ -314,12 +317,21 @@ class ConfigValidFilter(Filter):
 
     def get_asg_errors(self, asg):
         errors = []
+        cfg_id = self.launch_info.get_launch_id(asg)
+        cfg = self.launch_info.get(asg)
+
         subnets = asg.get('VPCZoneIdentifier', '').split(',')
 
-        for subnet in subnets:
-            subnet = subnet.strip()
-            if subnet not in self.subnets:
-                errors.append(('invalid-subnet', subnet))
+        if subnets[0]:
+            for subnet in subnets:
+                subnet = subnet.strip()
+                if subnet not in self.subnets:
+                    errors.append(('invalid-subnet', subnet))
+        else:
+            if 'NetworkInterfaces' not in cfg:
+                for az in asg.get('AvailabilityZones', []):
+                    if az not in self.default_subnets.values():
+                        errors.append(('invalid-availability-zone', az))
 
         for elb in asg['LoadBalancerNames']:
             elb = elb.strip()
@@ -330,9 +342,6 @@ class ConfigValidFilter(Filter):
             appelb_target = appelb_target.strip()
             if appelb_target not in self.appelb_target_groups:
                 errors.append(('invalid-appelb-target-group', appelb_target))
-
-        cfg_id = self.launch_info.get_launch_id(asg)
-        cfg = self.launch_info.get(asg)
 
         if cfg is None:
             errors.append(('invalid-config', cfg_id))

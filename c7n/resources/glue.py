@@ -369,9 +369,7 @@ class GlueTable(query.ChildResourceManager):
 class DescribeTable(query.ChildDescribeSource):
 
     def get_query(self):
-        query = super(DescribeTable, self).get_query()
-        query.capture_parent_id = True
-        return query
+        return super(DescribeTable, self).get_query(capture_parent_id=True)
 
     def augment(self, resources):
         result = []

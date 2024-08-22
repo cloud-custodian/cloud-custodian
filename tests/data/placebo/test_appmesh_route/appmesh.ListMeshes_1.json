@@ -1,0 +1,62 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "meshes": [
+            {
+                "arn": "arn:aws:appmesh:us-east-1:644160558196:mesh/m1",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 4,
+                    "day": 16,
+                    "hour": 19,
+                    "minute": 40,
+                    "second": 40,
+                    "microsecond": 707000
+                },
+                "lastUpdatedAt": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 4,
+                    "day": 16,
+                    "hour": 19,
+                    "minute": 40,
+                    "second": 40,
+                    "microsecond": 707000
+                },
+                "meshName": "m1",
+                "meshOwner": "644160558196",
+                "resourceOwner": "644160558196",
+                "version": 1
+            },
+            {
+                "arn": "arn:aws:appmesh:us-east-1:644160558196:mesh/m2",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 3,
+                    "day": 12,
+                    "hour": 18,
+                    "minute": 43,
+                    "second": 8,
+                    "microsecond": 267000
+                },
+                "lastUpdatedAt": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 3,
+                    "day": 12,
+                    "hour": 18,
+                    "minute": 43,
+                    "second": 8,
+                    "microsecond": 267000
+                },
+                "meshName": "m2",
+                "meshOwner": "644160558196",
+                "resourceOwner": "644160558196",
+                "version": 1
+            }
+        ]
+    }
+}

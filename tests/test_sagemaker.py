@@ -744,6 +744,77 @@ class TestSagemakerCompilationJob(BaseTest):
         self.assertEqual(job["CompilationJobStatus"], "STOPPING")
 
 
+class TestSageMakerModelBiasJobDefinition(BaseTest):
+
+    def test_sagemaker_model_bias_job_query(self):
+        session_factory = self.replay_flight_data("test_sagemaker_model_bias_job_definition_query")
+        p = self.load_policy(
+            {
+                "name": "query-model-bias-job-definition",
+                "resource": "sagemaker-model-bias-job-definition",
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_delete_sagemaker_model_bias_job_definition(self):
+        session_factory = self.replay_flight_data("test_sagemaker_model_bias_job_definition_delete")
+        client = session_factory(region="us-east-1").client("sagemaker")
+        p = self.load_policy(
+            {
+                "name": "delete-model-bias-job-definition",
+                "resource": "sagemaker-model-bias-job-definition",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "MonitoringJobDefinitionName",
+                        "value": "test",
+                        "op": "contains",
+                    }
+                ],
+                "actions": [{"type": "delete"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        jobs = client.list_model_bias_job_definitions().get("JobDefinitionSummaries")
+        self.assertEqual(len(jobs), 0)
+
+    def test_tag_data_sagemaker_model_bias_job_definition(self):
+        session_factory = self.replay_flight_data("test_sagemaker_model_bias_job_definition_tag")
+        p = self.load_policy(
+            {
+                "name": "tag-model-bias-job-definition",
+                "resource": "sagemaker-model-bias-job-definition",
+                "filters": [{"tag:Owner": "absent"}],
+                "actions": [{"type": "tag", "key": "Owner", "value": "c7n"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory(region="us-east-1").client("sagemaker")
+        tags = client.list_tags(ResourceArn=resources[0]["JobDefinitionArn"])["Tags"]
+        self.assertEqual(tags[1]['Key'], 'Owner')
+        self.assertEqual(tags[1]['Value'], 'c7n')
+
+        p = self.load_policy(
+            {
+                "name": "remove-model-bias-job-definition-tag",
+                "resource": "sagemaker-model-bias-job-definition",
+                "filters": [{"tag:Owner": "c7n"}],
+                "actions": [{"type": "remove-tag", "tags": ["Owner"]}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        tags = client.list_tags(ResourceArn=resources[0]["JobDefinitionArn"])["Tags"]
+        self.assertEqual(len(tags), 1)
+
+
 class TestSagemakerProcessingJob(BaseTest):
 
     def test_sagemaker_processing_job_query(self):

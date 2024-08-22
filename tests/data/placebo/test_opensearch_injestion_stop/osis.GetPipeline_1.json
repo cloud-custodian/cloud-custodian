@@ -1,0 +1,51 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Pipeline": {
+            "PipelineName": "custodian-test",
+            "PipelineArn": "arn:aws:osis:us-east-1:644160558196:pipeline/custodian-test",
+            "MinUnits": 1,
+            "MaxUnits": 2,
+            "Status": "ACTIVE",
+            "StatusReason": {
+                "Description": "The pipeline is ready to ingest data."
+            },
+            "PipelineConfigurationBody": "version: \"2\"\r\nlog-pipeline:\r\n  source:\r\n    s3:\r\n      codec:\r\n        newline: # Other options \"json\", \"csv\", \"parquet\"\r\n      # Provide compression property, can be \"none\", \"gzip\", or \"automatic\"\r\n      compression: \"none\"\r\n      aws:\r\n        region: \"us-east-1\"\r\n        sts_role_arn: \"arn:aws:iam::644160558196:role/CloudCustodianRole\"\r\n      acknowledgments: true\r\n      scan:\r\n        # Define scan start and end times at scan level. Applicable for all buckets.\r\n        # start_time: 2023-01-01T18:00:00\r\n        # end_time: 2023-08-31T18:00:00\r\n        # Alternatively scan can be defined as range as well. PT4H would scan all files created in the last 4 Hours.\r\n        # Examples: \"PT4H\" or \"PT30M\" or \"PT100S\" or \"P3D\" or \"P1W\"\r\n        # range: \"PT4H\"\r\n        buckets:\r\n          - bucket:\r\n              # You can define scan start and end times at bucket level in addition to scan level.\r\n              # Bucket level scan time always overwrites Scan level.\r\n              # start_time: 2023-01-01T18:00:00\r\n              # end_time: 2023-08-31T18:00:00\r\n              # Scan start and end time can be defined as range as well. PT4H would scan all files created in the last 4 Hours.\r\n              # range: \"PT4H\"\r\n              name: \"c7n-test-s3-bucket-copy\"\r\n      # delete_s3_objects_on_read: true # Default is false. This should be set to true only when acknowledgments are set to true\r\n  processor:\r\n    - date:\r\n        destination: \"@timestamp\"\r\n        from_time_received: true\r\n    - delete_entries:\r\n        with_keys: [ \"s3\" ]\r\n  sink:\r\n    - opensearch:\r\n        # Provide an AWS OpenSearch Service domain endpoint\r\n        hosts: [ \"https://search-c7ntest-1a2a3a4a5a6a7a8a9a0a9a8a7a.us-east-1.es.amazonaws.com\" ]\r\n        aws:\r\n          # Provide a Role ARN with access to the domain. This role should have a trust relationship with osis-pipelines.amazonaws.com\r\n          sts_role_arn: \"arn:aws:iam::644160558196:role/CloudCustodianRole\"\r\n          # Provide the region of the domain.\r\n          region: \"us-east-1\"\r\n          # Enable the 'serverless' flag if the sink is an Amazon OpenSearch Serverless collection\r\n          serverless: false\r\n          # serverless_options:\r\n            # Specify a name here to create or update network policy for the serverless collection\r\n            # network_policy_name: \"network-policy-name\"\r\n        index: \"uncompressed_logs\"\r\n        # Enable the 'distribution_version' setting if the AWS OpenSearch Service domain is of version Elasticsearch 6.x\r\n        # distribution_version: \"es6\"\r\n        # Enable and switch the 'enable_request_compression' flag if the default compression setting is changed in the domain. See https://docs.aws.amazon.com/opensearch-service/latest/developerguide/gzip.html\r\n        # enable_request_compression: true/false\r\n        # Optional: Enable the S3 DLQ to capture any failed requests in an S3 bucket. Delete this entire block if you don't want a DLQ.\r\n\r\n",
+            "CreatedAt": {
+                "__class__": "datetime",
+                "year": 2024,
+                "month": 8,
+                "day": 1,
+                "hour": 15,
+                "minute": 58,
+                "second": 5,
+                "microsecond": 0
+            },
+            "LastUpdatedAt": {
+                "__class__": "datetime",
+                "year": 2024,
+                "month": 8,
+                "day": 1,
+                "hour": 16,
+                "minute": 15,
+                "second": 2,
+                "microsecond": 0
+            },
+            "IngestEndpointUrls": [
+                "custodian-test-lyg5t3byan7sw6czehednzbmei.us-east-1.osis.amazonaws.com"
+            ],
+            "LogPublishingOptions": {
+                "IsLoggingEnabled": true,
+                "CloudWatchLogDestination": {
+                    "LogGroup": "/aws/vendedlogs/opensearch/c7n-log-group"
+                }
+            },
+            "EncryptionAtRestOptions": {
+                "KmsKeyArn": "arn:aws:kms:us-east-1:644160558196:key/082cd05f-96d1-49f6-a5ac-32093d2cfe38"
+            },
+            "ServiceVpcEndpoints": [],
+            "Tags": []
+        }
+    }
+}

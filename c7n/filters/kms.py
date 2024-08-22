@@ -66,14 +66,16 @@ class KmsRelatedFilter(RelatedResourceFilter):
 
     def get_related_ids(self, resources):
         related_ids = super().get_related_ids(resources)
-        normalized_ids = []
+        normalized_ids = set()
         for rid in related_ids:
-            if rid.startswith('alias'):
+            if rid.startswith('arn:'):  # key arn or alias arn
+                if 'alias/' in rid:
+                    rid = rid.rsplit(':', 1)[-1]  # alias name
+                else:
+                    rid = rid.rsplit('/', 1)[-1]  # key id
+            if rid.startswith('alias/'):
                 rid = self.alias_to_id.get(rid, rid)
-            if rid.startswith('arn:'):
-                normalized_ids.append(rid.rsplit('/', 1)[-1])
-            else:
-                normalized_ids.append(rid)
+            normalized_ids.add(rid)
         return normalized_ids
 
     def process(self, resources, event=None):

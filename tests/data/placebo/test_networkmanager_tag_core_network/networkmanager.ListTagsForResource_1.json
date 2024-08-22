@@ -1,0 +1,16 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "TagList": [
+            {
+                "Key": "Category",
+                "Value": "TestValue"
+            },
+            {
+                "Key": "Name",
+                "Value": "test-cloudwan"
+            }
+        ]
+    }
+}
