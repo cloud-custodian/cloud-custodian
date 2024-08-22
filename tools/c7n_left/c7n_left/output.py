@@ -179,7 +179,7 @@ class Summary(Output):
                     unevaluated[rtype] = len(resources)
                 else:
                     type_policies[rtype] += 1
-                    policy_resources[p.name] = len(resources)
+                    policy_resources[p.name] += len(resources)
 
         self.counter_unevaluated_by_type = unevaluated
         self.counter_resources_by_type = type_counts
