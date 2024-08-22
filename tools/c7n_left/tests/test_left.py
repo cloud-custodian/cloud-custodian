@@ -915,7 +915,7 @@ def test_cli_execution_error(policy_env, test, debug_cli_runner):
     )
 
     runner = debug_cli_runner
-    with patch.object(core.CollectionRunner, 'run_policy', side_effect=KeyError("abc")):
+    with patch.object(core.CollectionRunner, "run_policy", side_effect=KeyError("abc")):
         result = runner.invoke(
             cli.cli, ["run", "-p", policy_env.policy_dir, "-d", policy_env.policy_dir]
         )
@@ -1184,6 +1184,56 @@ def test_cli_no_policies(tmp_path, caplog):
     assert caplog.record_tuples == [("c7n.iac", 30, "no policies found")]
 
 
+def test_cli_validate_parse_error(tmp_path, caplog):
+    (tmp_path / "bad.json").write_text("{,}")
+    runner = CliRunner()
+    result = runner.invoke(cli.cli, ["validate", "-p", str(tmp_path)])
+    assert result.exit_code == 1
+    assert caplog.record_tuples[0] == ("c7n.iac", 40, "Validation failed with 1 errors")
+    assert "expected the node content, but found ','" in caplog.record_tuples[-1][-1]
+
+
+def test_cli_validate_structure_error(tmp_path, caplog, debug_cli_runner):
+    (tmp_path / "bad.json").write_text(json.dumps({"something": "else"}))
+    runner = CliRunner()
+    result = runner.invoke(cli.cli, ["validate", "-p", str(tmp_path)])
+    assert result.exit_code == 1
+    assert caplog.record_tuples[0] == ("c7n.iac", 40, "Validation failed with 1 errors")
+    assert "Policy files top level keys" in caplog.record_tuples[-1][-1]
+
+
+def test_cli_validate_schema_error(tmp_path, caplog, debug_cli_runner):
+    (tmp_path / "bad.json").write_text(
+        json.dumps(
+            {
+                "policies": [
+                    {"name": "xyz", "resource": ["terarform.*"], "filters": [{"type": "xyz"}]}
+                ]
+            }
+        )
+    )
+    runner = debug_cli_runner  # CliRunner()
+    runner.invoke(cli.cli, ["validate", "-p", str(tmp_path)])
+    # TODO
+
+
+def test_cli_validate_prechecks(tmp_path, caplog):
+    runner = CliRunner()
+    result = runner.invoke(
+        cli.cli,
+        ["validate", "-p", str(tmp_path)],
+    )
+    assert result.exit_code == 0
+    assert caplog.record_tuples[0][-1].startswith("No policy files found in")
+
+    result = runner.invoke(
+        cli.cli,
+        ["validate", "-p", str(tmp_path / "xyz")],
+    )
+    assert result.exit_code == 1
+    assert "does not exist" in caplog.record_tuples[1][-1]
+
+
 def test_cli_junit_output(policy_env, tmp_path, debug_cli_runner):
     policy_env.write_tf(
         """
@@ -1336,7 +1386,6 @@ def test_cli_output_rich(tmp_path):
 
 
 def test_cli_output_rich_pass_count(tmp_path, debug_cli_runner):
-
     (tmp_path / "policy.yaml").write_text(
         """
         policies:
