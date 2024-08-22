@@ -4,6 +4,7 @@
 multiple policies on the same resource type.
 """
 import pickle  # nosec nosemgrep
+import traceback
 
 from datetime import datetime, timedelta
 import os
@@ -156,11 +157,15 @@ class SqlKvCache(Cache):
             return pickle.loads(value)  # nosec nosemgrep
 
     def save(self, key, data, timestamp=None):
-        with self.conn as cursor:
-            timestamp = timestamp or datetime.utcnow()
-            cursor.execute(
-                'replace into c7n_cache (key, value, create_date) values (?, ?, ?)',
-                (sqlite3.Binary(encode(key)), sqlite3.Binary(encode(data)), timestamp))
+        try:
+            with self.conn as cursor:
+                timestamp = timestamp or datetime.utcnow()
+                cursor.execute(
+                    'replace into c7n_cache (key, value, create_date) values (?, ?, ?)',
+                    (sqlite3.Binary(encode(key)), sqlite3.Binary(encode(data)), timestamp))
+        except Exception as e:
+            log.error('Exception: %s', e)
+            pass
 
     def size(self):
         return os.path.exists(self.cache_path) and os.path.getsize(self.cache_path) or 0

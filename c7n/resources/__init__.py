@@ -37,7 +37,7 @@ def should_load_provider(name, provider_types, no_wild=False):
     return False
 
 
-PROVIDER_NAMES = ('aws', 'azure', 'gcp', 'k8s', 'openstack', 'awscc', 'tencentcloud', 'oci')
+PROVIDER_NAMES = ('aws', 'azure', 'gcp', 'k8s', 'openstack', 'awscc', 'tencentcloud', 'oci', 'aliyun')
 
 
 def load_available(resources=True):
@@ -92,6 +92,10 @@ def load_providers(provider_types):
     if should_load_provider('tencentcloud', provider_types):
         from c7n_tencentcloud.entry import initialize_tencentcloud
         initialize_tencentcloud()
+
+    if should_load_provider('aliyun', provider_types):
+        from c7n_aliyun.entry import initialize_aliyun
+        initialize_aliyun()
 
     if should_load_provider('oci', provider_types):
         from c7n_oci.entry import initialize_oci

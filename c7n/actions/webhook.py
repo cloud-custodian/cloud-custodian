@@ -1,5 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import json
+import requests
 
 try:
     import certifi
@@ -109,8 +111,8 @@ class Webhook(EventAction):
                 body=prepared_body,
                 headers=prepared_headers)
 
-            self.log.info("%s got response %s with URL %s" %
-                          (self.method, res.status, prepared_url))
+            self.log.info("%s header %s body %s got response %s with URL %s getresponse %s" %
+                          (self.method, prepared_headers, prepared_body, res.status, prepared_url, res.data))
         except urllib3.exceptions.HTTPError as e:
             self.log.error("Error calling %s. Code: %s" % (prepared_url, e.reason))
 
@@ -153,8 +155,15 @@ class Webhook(EventAction):
 
     def _build_body(self, resource):
         """Create a JSON body and dump it to encoded bytes."""
-
         if not self.body:
             return None
-
-        return utils.dumps(utils.jmespath_search(self.body, resource)).encode('utf-8')
+        elif self.headers.get("channel", None) == '`feishu`':
+            content = {
+                "msg_type": "text",
+                "content": {
+                    "text": json.dumps(utils.jmespath_search(self.body, resource))
+                }
+            }
+        else:
+            content = utils.jmespath_search(self.body, resource)
+        return utils.dumps(content).encode('utf-8')

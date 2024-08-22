@@ -1,0 +1,37 @@
+[tool.poetry]
+name = "c7n_aliyun"
+version = "0.1.0"
+description = "Cloud Custodian - ALIYUN Cloud Provider"
+readme = "readme.md"
+homepage = "https://cloudcustodian.io"
+repository = "https://github.com/cloud-custodian/cloud-custodian"
+documentation = "https://cloudcustodian.io/docs/"
+authors = ["Cloud Custodian Project"]
+license = "Apache-2.0"
+classifiers = [
+   "Topic :: System :: Systems Administration",
+   "Topic :: System :: Distributed Computing"
+]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+crcmod = "^1.7"
+oss2 = "^2.12.1"
+aliyun-python-sdk-core="^2.13.30"
+aliyun-python-sdk-ecs="^4.23.5"
+aliyun-python-sdk-cms="^7.0.18"
+aliyun-python-sdk-slb="^3.3.2"
+aliyun-python-sdk-rds="^2.5.4"
+aliyun-python-sdk-ram="^3.2.0"
+aliyun-python-sdk-cdn="^3.6.1"
+aliyun-python-sdk-dds="^3.4.0"
+aliyun-python-sdk-r-kvstore="^2.11.0"
+aliyun-python-sdk-polardb="^1.8.1"
+pycryptodome = "^3.9.8"
+cryptography = "^2.9.2"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry>=0.12", "setuptools>=40.8.0"]
+build-backend = "poetry.masonry.api"

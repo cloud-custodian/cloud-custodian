@@ -1,0 +1,23 @@
+policies:
+  - name: resource_policy-op-tag
+    resource: aliyun.ecs
+    description: |
+      Schedule a resource that does not meet tag compliance policies
+      to be stopped in four days.
+    filters:
+      - type: metrics
+        name: CPUUtilization
+        days: 4
+        period: 86400
+        value: 30
+        op: less-than
+    actions:
+      - type: webhook
+        url: ""
+        method: POST
+        batch: true
+        body: |
+          {"HostName": resources[*].HostName}
+        headers:
+          static-value: '`Content-type: application/json`'
+          channel: '`feishu`'
