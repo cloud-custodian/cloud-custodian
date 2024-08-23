@@ -956,6 +956,15 @@ class C7NJmespathFunctions(functions.Functions):
     def _func_split(self, sep, string):
         return string.split(sep)
 
+    @functions.signature(
+        {'types': ['string']}
+    )
+    def _func_from_json(self, string):
+        try:
+            return json.loads(string)
+        except json.JSONDecodeError:
+            return None
+
 
 class C7NJMESPathParser(Parser):
     def parse(self, expression):

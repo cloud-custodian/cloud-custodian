@@ -89,6 +89,25 @@ class StreamingDistribution(QueryResourceManager):
     }
 
 
+@resources.register("origin-access-control")
+class OriginAccessControl(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = "cloudfront"
+        arn_type = "origin-access-control"
+        enum_spec = (
+            "list_origin_access_controls",
+            "OriginAccessControlList.Items",
+            None,
+        )
+        id = "Id"
+        description = "Description"
+        name = "Name"
+        signing_protocol = "SigningProtocol"
+        signing_behavior = "SigningBehavior"
+        origin_type = "OriginAccessControlOriginType"
+        cfn_type = "AWS::CloudFront::OriginAccessControl"
+
+
 Distribution.filter_registry.register('shield-metrics', ShieldMetrics)
 Distribution.filter_registry.register('shield-enabled', IsShieldProtected)
 Distribution.action_registry.register('set-shield', SetShieldProtection)

@@ -137,3 +137,208 @@ class DeleteOpensearchServerless(BaseAction):
                 client.delete_collection(id=r['id'])
             except client.exceptions.ResourceNotFoundException:
                 continue
+
+
+@resources.register('opensearch-injestion')
+class OpensearchInjestion(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = 'osis'
+        arn_type = 'pipeline'
+        enum_spec = ('list_pipelines', 'Pipelines[]', None)
+        detail_spec = ('get_pipeline', 'PipelineName', 'PipelineName', 'Pipeline')
+        name = id = "PipelineName"
+        cfn_type = 'AWS::OSIS::Pipeline'
+        arn = "PipelineArn"
+        permission_prefix = 'osis'
+
+
+@OpensearchInjestion.filter_registry.register('kms-key')
+class OpensearchInjestionKmsFilter(KmsRelatedFilter):
+    RelatedIdsExpression = 'EncryptionAtRestOptions.KmsKeyArn'
+
+
+@OpensearchInjestion.action_registry.register('tag')
+class TagOpensearchInjestion(Tag):
+    """Create tags on an OpenSearch Injestion Pipeline
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+            - name: tag-opensearch-injestion
+              resource: opensearch-injestion
+              actions:
+                - type: tag
+                  key: test-key
+                  value: test-value
+    """
+    permissions = ('osis:TagResource',)
+
+    def process_resource_set(self, client, resources, new_tags):
+        tags = [{'Key': t['Key'], 'Value': t['Value']} for t in new_tags]
+        for r in resources:
+            client.tag_resource(Arn=r["PipelineArn"], Tags=tags)
+
+
+@OpensearchInjestion.action_registry.register('remove-tag')
+class RemoveTagOpensearchInjestion(RemoveTag):
+    """Remove tags from an OpenSearch Injestion Pipeline
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+            - name: remove-tag-opensearch-injestion
+              resource: opensearch-injestion
+              actions:
+                - type: remove-tag
+                  tags: ["tag-key"]
+    """
+    permissions = ('osis:UntagResource',)
+
+    def process_resource_set(self, client, resources, tags):
+        for r in resources:
+            client.untag_resource(Arn=r['PipelineArn'], TagKeys=tags)
+
+
+OpensearchInjestion.filter_registry.register('marked-for-op', TagActionFilter)
+
+
+@OpensearchInjestion.action_registry.register('mark-for-op')
+class MarkOpensearchInjestionForOp(TagDelayedAction):
+    """Mark OpenSearch Injestion Pipeline for deferred action
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: opensearch-injestion-invalid-tag-mark
+            resource: opensearch-injestion
+            filters:
+              - "tag:InvalidTag": present
+            actions:
+              - type: mark-for-op
+                op: delete
+                days: 1
+    """
+
+
+@OpensearchInjestion.action_registry.register('delete')
+class DeleteOpensearchInjestion(BaseAction):
+    """Delete an OpenSearch Injestion Pipeline
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: delete-opensearch-injestion
+            resource: opensearch-injestion
+            actions:
+              - type: delete
+    """
+    schema = type_schema('delete')
+    permissions = ('osis:DeletePipeline',)
+    valid_delete_states = (
+        'ACTIVE', 'CREATE_FAILED', 'UPDATE_FAILED', 'STARTING', 'START_FAILED', 'STOPPING',
+        'STOPPED'
+    )
+
+    def process(self, resources):
+        resources = self.filter_resources(resources, "Status", self.valid_delete_states)
+        client = local_session(self.manager.session_factory).client('osis')
+        for r in resources:
+            try:
+                client.delete_pipeline(PipelineName=r['PipelineName'])
+            except client.exceptions.ResourceNotFoundException:
+                continue
+
+
+@OpensearchInjestion.action_registry.register('stop')
+class StopOpensearchInjestion(BaseAction):
+    """Stops an Opensearch Injestion Pipeline
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: stop-osis-pipeline
+            resource: opensearch-injestion
+            filters:
+              - PipelineName: c7n-pipeline-1
+            actions:
+              - stop
+    """
+    schema = type_schema('stop')
+    permissions = ('osis:StopPipeline',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('osis')
+
+        for r in resources:
+            try:
+                client.stop_pipeline(PipelineName=r['PipelineName'])
+            except client.exceptions.ResourceNotFound:
+                pass
+
+
+@OpensearchInjestion.action_registry.register('update')
+class UpdateOpenSearchInjestion(BaseAction):
+    """Modifies MinUnits, MaxUnits, LogPublishingOptions, BufferOptions, and
+    EncryptionAtRestOptions for a given Opensearch Injestion pipeline.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: update-pipeline
+                resource: aws.opensearch-injestion
+                actions:
+                  - type: update
+                    LogPublishingOptions:
+                        IsLoggingEnabled: true
+                        CloudWatchLogDestination:
+                            LogGroup: c7n-log-group
+                    BufferOptions:
+                        PersistentBufferEnabled: true
+
+    """
+    schema = type_schema(
+        'update',
+        MinUnits={'type': 'integer'},
+        MaxUnits={'type': 'integer'},
+        LogPublishingOptions={'type': 'object',
+            'properties': {
+                'IsLoggingEnabled': {'type': 'boolean'},
+                'CloudWatchLogDestination': {'type': 'object',
+                    'required': ['LogGroup'],
+                    'properties': {
+                        'LogGroup': {'type': 'string'}
+                    }
+                }
+            }
+        },
+        BufferOptions={'type': 'object',
+            'required': ['PersistentBufferEnabled'],
+            'properties': {
+                'PersistentBufferEnabled': {'type': 'boolean'}}},
+        EncryptionAtRestOptions={'type': 'object',
+            'required': ['KmsKeyArn'],
+            'properties': {
+                'KmsKeyArn': {'type': 'string'}}})
+    permissions = ('osis:UpdatePipeline',)
+
+    def process(self, resources):
+        params = dict(self.data)
+        params.pop("type")
+        client = local_session(self.manager.session_factory).client('osis')
+        for r in resources:
+            try:
+                client.update_pipeline(PipelineName=r['PipelineName'], **params)
+            except client.exceptions.ResourceNotFoundException:
+                continue
