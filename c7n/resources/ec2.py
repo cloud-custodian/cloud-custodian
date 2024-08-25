@@ -931,6 +931,75 @@ class SsmStatus(ValueFilter):
             r[self.annotation] = info_map.get(r['InstanceId'], {})
 
 
+@EC2.filter_registry.register('ssm-inventory')
+class SsmInventory(Filter):
+    """Filter EC2 instances by their SSM software inventory.
+
+    :Example:
+
+    Find instances that have a specific package installed.
+
+    .. code-block:: yaml
+
+        policies:
+        - name: ec2-find-specific-package
+          resource: ec2
+          filters:
+          - type: ssm-inventory
+            query:
+            - Key: Name
+              Values:
+              - "docker"
+              Type: Equal
+
+        - name: ec2-get-all-packages
+          resource: ec2
+          filters:
+          - type: ssm-inventory
+    """
+    schema = type_schema(
+        'ssm-inventory',
+        **{'query': {'type': 'array', 'items': {
+            'type': 'object',
+            'properties': {
+                'Key': {'type': 'string'},
+                'Values': {'type': 'array', 'items': {'type': 'string'}},
+                'Type': {'enum': ['Equal', 'NotEqual', 'BeginWith', 'LessThan',
+                  'GreaterThan', 'Exists']}},
+            'required': ['Key', 'Values']}}})
+
+    permissions = ('ssm:ListInventoryEntries',)
+    annotation_key = 'c7n:SSM-Inventory'
+
+    def process(self, resources, event=None):
+        client = utils.local_session(self.manager.session_factory).client('ssm')
+        query = self.data.get("query")
+        found = []
+        for r in resources:
+            entries = []
+            next_token = None
+            while True:
+                params = {
+                    "InstanceId": r["InstanceId"],
+                    "TypeName": "AWS:Application"
+                }
+                if next_token:
+                    params['NextToken'] = next_token
+                if query:
+                    params['Filters'] = query
+                response = client.list_inventory_entries(**params)
+                all_entries = response["Entries"]
+                if all_entries:
+                    entries.extend(all_entries)
+                next_token = response.get('NextToken')
+                if not next_token:
+                    break
+            if entries:
+                r[self.annotation_key] = entries
+                found.append(r)
+        return found
+
+
 @EC2.filter_registry.register('ssm-compliance')
 class SsmCompliance(Filter):
     """Filter ec2 instances by their ssm compliance status.

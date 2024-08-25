@@ -293,3 +293,24 @@ class ApiKeyTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_api_key_time_range(self):
+        project_id = "cloud-custodian"
+        factory = self.replay_flight_data("gcp-apikeys-time-range", project_id)
+        p = self.load_policy(
+            {
+                "name": "gcp-api-key-list",
+                "resource": "gcp.api-key",
+                "filters": [{
+                    "type": "time-range",
+                    "value": 30
+                }],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]["name"],
+            "projects/cloud-custodian/locations/global/keys/03b651c2-718a-4702-b5d7-9946987cc4da"
+        )

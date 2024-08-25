@@ -1,0 +1,35 @@
+{
+    "status_code": 200,
+    "data": {
+        "Namespace": {
+            "Id": "ns2",
+            "Arn": "arn:aws:servicediscovery:us-east-1:644160558196:namespace/ns2",
+            "Name": "m1",
+            "Type": "DNS_PRIVATE",
+            "Description": "all services will be registered under this common namespace",
+            "Properties": {
+                "DnsProperties": {
+                    "HostedZoneId": "Z09639352MS105CN7CNN6",
+                    "SOA": {
+                        "TTL": 15
+                    }
+                },
+                "HttpProperties": {
+                    "HttpName": "m1"
+                }
+            },
+            "CreateDate": {
+                "__class__": "datetime",
+                "year": 2024,
+                "month": 4,
+                "day": 16,
+                "hour": 15,
+                "minute": 12,
+                "second": 51,
+                "microsecond": 33000
+            },
+            "CreatorRequestId": "terraform-20240416094214796100000001"
+        },
+        "ResponseMetadata": {}
+    }
+}

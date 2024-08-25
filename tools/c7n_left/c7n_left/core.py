@@ -401,7 +401,7 @@ class IACResourceMap(object):
         return ()
 
     def get(self, k, default=None):
-        # that the resource is in the map has alerady been verified
+        # that the resource is in the map has already been verified
         # we get the unprefixed resource on get
         return self.resource_class
 

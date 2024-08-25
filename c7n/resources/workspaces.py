@@ -14,6 +14,7 @@ from c7n.utils import get_retry, local_session, type_schema, chunks, jmespath_se
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.resolver import ValuesFrom
 import c7n.filters.vpc as net_filters
+import json
 
 
 class DescribeWorkspace(DescribeSource):
@@ -473,6 +474,49 @@ class WorkspacesWeb(QueryResourceManager):
         arn = id = "portalArn"
 
     augment = universal_augment
+
+
+@WorkspacesWeb.filter_registry.register('browser-policy')
+class BrowerPolicyFilter(ValueFilter):
+    """
+    Applies value type filter on the browser policy of a workspaces secured browser.
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: browser-policy-match
+                resource: workspaces-web
+                filters:
+                  - type: browser-policy
+                    key: chromePolicies.AllowDeletingBrowserHistory.value
+                    op: eq
+                    value: false
+    """
+
+    schema = type_schema('browser-policy', rinherit=ValueFilter.schema)
+    schema_alias = False
+    permissions = ('workspaces-web:GetBrowserSettings',)
+    matched_policy_annotation = 'c7n:BrowerPolicyMatches'
+    policy_annotation = "c7n:BrowserPolicy"
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('workspaces-web')
+        results = []
+        for r in resources:
+            if self.policy_annotation not in r:
+                browserSettings = self.manager.retry(
+                    client.get_browser_settings,
+                    browserSettingsArn=r['browserSettingsArn']).get('browserSettings')
+                browserPolicy = json.loads(browserSettings['browserPolicy'])
+                r[self.policy_annotation] = browserPolicy
+            if self.match(r[self.policy_annotation]):
+                if self.matched_policy_annotation not in r:
+                    r[self.matched_policy_annotation] = [self.data.get('key')]
+                else:
+                    r[self.matched_policy_annotation].append(self.data.get('key'))
+                results.append(r)
+        return results
 
 
 @WorkspacesWeb.action_registry.register('tag')

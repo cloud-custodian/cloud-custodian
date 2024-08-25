@@ -142,6 +142,16 @@ class CodeBuildProject(QueryResourceManager):
     }
 
 
+@resources.register('codebuild-credential')
+class CodeBuildSourceCredentials(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = 'codebuild'
+        enum_spec = ('list_source_credentials', 'sourceCredentialsInfos', None)
+        name = id = 'arn'
+        arn = 'arn'
+        cfn_type = 'AWS::CodeBuild::SourceCredential'
+
+
 @CodeBuildProject.filter_registry.register('subnet')
 class BuildSubnetFilter(SubnetFilter):
 
@@ -356,9 +366,7 @@ class CodeDeployDeployment(QueryResourceManager):
 class DescribeDeploymentGroup(query.ChildDescribeSource):
 
     def get_query(self):
-        query = super().get_query()
-        query.capture_parent_id = True
-        return query
+        return super().get_query(capture_parent_id=True)
 
     def augment(self, resources):
         client = local_session(self.manager.session_factory).client('codedeploy')

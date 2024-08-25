@@ -350,7 +350,7 @@ class SetPolicy(Action):
             return found["Id"]
         elif not self.data.get("contents"):
             raise PolicyValidationError(
-                "Policy references not existant org policy " "without specifying contents"
+                "Policy references not existent org policy " "without specifying contents"
             )
         ptags = [{"Key": k, "Value": v} for k, v in self.data.get("tags", {}).items()]
         ptags.append({"Key": "managed-by", "Value": "CloudCustodian"})

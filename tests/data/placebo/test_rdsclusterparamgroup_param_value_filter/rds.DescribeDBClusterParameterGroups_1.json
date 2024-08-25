@@ -1,0 +1,37 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "a9c511ae-6521-11e7-9155-e9c3bd8d0047", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "a9c511ae-6521-11e7-9155-e9c3bd8d0047", 
+                "vary": "Accept-Encoding", 
+                "content-length": "4265", 
+                "content-type": "text/xml", 
+                "date": "Mon, 10 Jul 2017 03:41:31 GMT"
+            }
+        }, 
+        "DBClusterParameterGroups": [
+            {
+                "DBClusterParameterGroupArn": "arn:aws:rds:us-east-1:123456789012:pg:default.aurora5.6", 
+                "DBClusterParameterGroupName": "default.aurora5.6", 
+                "DBParameterGroupFamily": "aurora5.6", 
+                "Description": "Default cluster parameter group for aurora5.6"
+            },
+            {
+                "DBClusterParameterGroupArn": "arn:aws:rds:us-east-1:123456789012:pg:default.mysql5.7", 
+                "DBClusterParameterGroupName": "default.mysql5.7", 
+                "DBParameterGroupFamily": "mysql5.7", 
+                "Description": "Default cluster parameter group for mysql5.7"
+            },
+            {
+                "DBClusterParameterGroupArn": "arn:aws:rds:us-east-1:123456789012:pg:test", 
+                "DBClusterParameterGroupName": "test", 
+                "DBParameterGroupFamily": "mysql5.5", 
+                "Description": "test cluster parameter group"
+            }
+        ]
+    }
+}
