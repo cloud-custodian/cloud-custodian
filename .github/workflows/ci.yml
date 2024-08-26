@@ -162,7 +162,7 @@ jobs:
       - name: Test
         shell: bash
         env:
-          COV_RUN: ${{ contains(matrix.python-version, '3.10') && contains(matrix.os, 'ubuntu') }}
+          COV_RUN: ${{ contains(matrix.python-version, '3.11') && contains(matrix.os, 'ubuntu') }}
         run: |
           if [[ "$COV_RUN" == "true" ]]
           then
