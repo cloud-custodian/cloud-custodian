@@ -210,3 +210,103 @@ class MemoryDbTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['Name'], 'test-cluster-2')
+
+    def test_memorydb_snapshot(self):
+        factory = self.replay_flight_data("test_memory_db_snapshot")
+        p = self.load_policy({
+            'name': 'memorydb-snapshot',
+            'resource': 'aws.memorydb-snapshot'},
+            session_factory=factory,
+            config={'region': 'us-east-1'})
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        assert resources[0]['Name'] == 'test-snapshot-2'
+
+    def test_memorydb_snapshot_tag_untag(self):
+        session_factory = self.replay_flight_data('test_memorydb_snapshot_tag_untag')
+        tag = {'env': 'dev'}
+        p = self.load_policy(
+            {
+                'name': 'memorydb-tag-untag',
+                'resource': 'memorydb-snapshot',
+                'filters': [{
+                    'tag:owner': 'policy'
+                }],
+                'actions': [{
+                    'type': 'tag',
+                    'tags': tag
+                },
+                {
+                    'type': 'remove-tag',
+                    'tags': ['owner']
+                }]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+        client = session_factory().client("memorydb")
+        tags = client.list_tags(ResourceArn=resources[0]["ARN"])["TagList"]
+        self.assertEqual(1, len(tags))
+        new_tag = {}
+        new_tag[tags[0]['Key']] = tags[0]['Value']
+        self.assertEqual(tag, new_tag)
+
+    def test_memorydb_snapshot_mark_for_op(self):
+        session_factory = self.replay_flight_data("test_memorydb_snapshot_mark_for_op")
+        p = self.load_policy(
+            {
+                "name": "memorydb-snapshot-mark",
+                "resource": "memorydb-snapshot",
+                "filters": [
+                    {'tag:owner': 'policy'},
+                ],
+                "actions": [
+                    {
+                        "type": "mark-for-op",
+                        "tag": "custodian_cleanup",
+                        "op": "delete",
+                        "days": 1,
+                    }
+                ],
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        p = self.load_policy(
+            {
+                "name": "memorydb-marked",
+                "resource": "memorydb-snapshot",
+                "filters": [
+                    {
+                        "type": "marked-for-op",
+                        "tag": "custodian_cleanup",
+                        "op": "delete",
+                        "skew": 3,
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        assert resources[0]['Name'] == 'test-snapshot-2'
+
+    def test_delete_memorydb_snapshot(self):
+        session_factory = self.replay_flight_data("test_delete_memorydb_snapshot")
+        p = self.load_policy(
+            {
+                "name": "delete-memorydb-snapshot",
+                "resource": "memorydb-snapshot",
+                "filters": [{"tag:owner": "policy"}],
+                "actions": [{
+                                "type": "delete",
+                            }],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+        self.assertEqual(resources[0]["Name"], "test-snapshot-2")

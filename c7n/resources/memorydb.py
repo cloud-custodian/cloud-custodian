@@ -46,7 +46,29 @@ class MemoryDb(QueryResourceManager):
     source_mapping = {'describe': DescribeMemoryDb}
 
 
+@resources.register('memorydb-snapshot')
+class MemoryDbSnapshot(QueryResourceManager):
+    """AWS MemoryDb Snapshot
+
+    https://docs.aws.amazon.com/memorydb/latest/devguide/snapshots.html
+    """
+
+    class resource_type(TypeInfo):
+
+        service = 'memorydb'
+        enum_spec = ('describe_snapshots', 'Snapshots', None)
+        arn = 'ARN'
+        arn_type = 'snapshot'
+        filter_name = "Name"
+        filter_type = "scalar"
+        id = name = 'Name'
+        permission_prefix = 'memorydb'
+
+    source_mapping = {'describe': DescribeMemoryDb}
+
+
 @MemoryDb.action_registry.register('tag')
+@MemoryDbSnapshot.action_registry.register('tag')
 class TagMemoryDb(Tag):
     """Create tags on MemoryDb
 
@@ -73,6 +95,7 @@ class TagMemoryDb(Tag):
 
 
 @MemoryDb.action_registry.register('remove-tag')
+@MemoryDbSnapshot.action_registry.register('remove-tag')
 class RemoveMemoryDbTag(RemoveTag):
     """Remove tags from a memorydb cluster
     :example:
@@ -98,10 +121,12 @@ class RemoveMemoryDbTag(RemoveTag):
 
 MemoryDb.filter_registry.register('marked-for-op', TagActionFilter)
 MemoryDb.action_registry.register('mark-for-op', TagDelayedAction)
+MemoryDbSnapshot.filter_registry.register('marked-for-op', TagActionFilter)
+MemoryDbSnapshot.action_registry.register('mark-for-op', TagDelayedAction)
 
 
 @MemoryDb.action_registry.register('delete')
-class DeleteMemoryDbResource(BaseAction):
+class DeleteMemoryDbCluster(BaseAction):
     """Delete a memorydb cluster
 
     :example:
@@ -203,3 +228,31 @@ class MemoryDbSubnetGroup(QueryResourceManager):
         universal_taggable = object()
         permissions = ('memorydb:DescribeSubnetGroups',)
     augment = universal_augment
+
+
+@MemoryDbSnapshot.action_registry.register('delete')
+class DeleteMemoryDbSnapshot(BaseAction):
+    """Delete a memorydb cluster snapshot
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: memorydb-snapshot-delete
+            resource: aws.memorydb-snapshot
+            actions:
+              - type: delete
+    """
+    schema = type_schema('delete', FinalSnapshotName={'type': 'string'})
+    permissions = ('memorydb:DeleteSnapshot',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('memorydb')
+        for r in resources:
+            try:
+                client.delete_snapshot(
+                    SnapshotName=r['Name'],
+                )
+            except client.exceptions.SnapshotNotFoundFault:
+                continue
