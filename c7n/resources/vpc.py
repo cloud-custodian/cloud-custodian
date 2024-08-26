@@ -1614,7 +1614,11 @@ class SGPermission(Filter):
                 matched.append(perm)
 
         if matched:
-            resource.setdefault('Matched%s' % self.ip_permissions_key, []).extend(matched)
+            matched_annotation = resource.setdefault('Matched%s' % self.ip_permissions_key, [])
+            # If the same rule matches multiple filters, only add it to the match annotation
+            # once. Note: Because we're looking for unique dicts and those aren't hashable,
+            # we can't conveniently use set() to de-duplicate rules.
+            matched_annotation.extend(m for m in matched if m not in matched_annotation)
             return True
 
 

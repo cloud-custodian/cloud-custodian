@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 
 from c7n.filters import Filter
+from c7n.utils import type_schema
 
 TAGGABLE_DATA_PATH = Path(__file__).parent / ".." / ".." / "data" / "taggable.json"
 
@@ -10,6 +11,8 @@ class Taggable(Filter):
     """Filter out resource types that are not taggable."""
 
     _taggable = None
+
+    schema = type_schema("taggable")
 
     @classmethod
     def get_tag_data(cls):
