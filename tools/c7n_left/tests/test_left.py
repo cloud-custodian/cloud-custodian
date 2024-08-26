@@ -720,6 +720,92 @@ def test_traverse_multi_resource_multi_set(tmp_path):
     }
 
 
+def test_traverse_multi_resource_inside_or(tmp_path):
+    resources = run_policy(
+        {
+            "name": "traverse-inside-or",
+            "resource": "terraform.aws_s3_bucket",
+            "filters": [
+                {
+                    "or": [
+                        {
+                            "type": "traverse",
+                            "resources": "aws_s3_bucket_ownership_controls",
+                            "attrs": [
+                                {
+                                    "type": "value",
+                                    "key": "rule.object_ownership",
+                                    "value": "BucketOwnerPreferred",
+                                },
+                            ],
+                        },
+                        {
+                            "type": "traverse",
+                            "resources": "aws_s3_bucket_ownership_controls",
+                            "attrs": [
+                                {
+                                    "type": "value",
+                                    "key": "rule.object_ownership",
+                                    "value": "BucketOwnerEnforced",
+                                },
+                            ],
+                        },
+                    ]
+                }
+            ],
+        },
+        terraform_dir / "s3_ownership",
+        tmp_path,
+    )
+    assert len(resources) == 2
+    assert {r.resource.name for r in resources} == {
+        "aws_s3_bucket.owner_enforced",
+        "aws_s3_bucket.owner_preferred",
+    }
+
+
+@pytest.mark.xfail(
+    strict=True,
+    reason="Known issue with branching inside attrs: https://github.com/cloud-custodian/cloud-custodian/issues/9690",
+)
+def test_traverse_multi_resource_nested_or(tmp_path):
+    resources = run_policy(
+        {
+            "name": "traverse-nested-or",
+            "resource": "terraform.aws_s3_bucket",
+            "filters": [
+                {
+                    "type": "traverse",
+                    "resources": "aws_s3_bucket_ownership_controls",
+                    "attrs": [
+                        {
+                            "or": [
+                                {
+                                    "type": "value",
+                                    "key": "rule.object_ownership",
+                                    "value": "BucketOwnerPreferred",
+                                },
+                                {
+                                    "type": "value",
+                                    "key": "rule.object_ownership",
+                                    "value": "BucketOwnerEnforced",
+                                },
+                            ],
+                        },
+                    ],
+                }
+            ],
+        },
+        terraform_dir / "s3_ownership",
+        tmp_path,
+    )
+    assert len(resources) == 2
+    assert {r.resource.name for r in resources} == {
+        "aws_s3_bucket.owner_enforced",
+        "aws_s3_bucket.owner_preferred",
+    }
+
+
 def test_traverse_filter_not_found(tmp_path):
     resources = run_policy(
         {
