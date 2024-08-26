@@ -18,9 +18,7 @@ from c7n.filters.kms import KmsRelatedFilter
 class NodeGroupDescribeSource(ChildDescribeSource):
 
     def get_query(self):
-        query = super(NodeGroupDescribeSource, self).get_query()
-        query.capture_parent_id = True
-        return query
+        return super().get_query(capture_parent_id=True)
 
     def augment(self, resources):
         results = []

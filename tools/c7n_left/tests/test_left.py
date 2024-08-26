@@ -1335,6 +1335,70 @@ def test_cli_output_rich(tmp_path):
     assert "1 failed 2 passed" in result.output
 
 
+def test_cli_output_rich_pass_count(tmp_path, debug_cli_runner):
+
+    (tmp_path / "policy.yaml").write_text(
+        """
+        policies:
+          - name: aws-rds-require-encryption
+            resource: [ terraform.aws_db_instance, terraform.aws_rds_cluster ]
+            description: |
+              RDS Databases should be encrypted at rest.
+            metadata:
+              category:
+               - [ encryption, security, database ]
+              severity: HIGH
+            filters:
+              - kms_key_id: absent
+              - or:
+                - storage_encrypted: absent
+                - storage_encrypted: false
+        """
+    )
+    (tmp_path / "tfroot").mkdir()
+    (tmp_path / "tfroot" / "main.tf").write_text(
+        """
+resource "aws_db_instance" "default" {
+  allocated_storage           = 10
+  db_name                     = "mydb"
+  engine                      = "mysql"
+  engine_version              = "8.0"
+  instance_class              = "db.t3.micro"
+  manage_master_user_password = true
+  username                    = "foo"
+  parameter_group_name        = "default.mysql8.0"
+  #
+  # storage_encrypted must be set to true OR kms_key_id must be set to pass the check
+  #
+  # storage_encrypted = true
+  # kms_key_id = "1234abcd-12ab-34cd-56ef-1234567890ab"
+}
+
+resource "aws_rds_cluster" "postgresql" {
+  cluster_identifier      = "aurora-cluster-demo"
+  engine                  = "aurora-postgresql"
+  availability_zones      = ["us-west-2a", "us-west-2b", "us-west-2c"]
+  database_name           = "mydb"
+  master_username         = "foo"
+  master_password         = "must_be_eight_characters"
+  backup_retention_period = 5
+  preferred_backup_window = "07:00-09:00"
+  #
+  # storage_encrypted must be set to true OR kms_key_id must be set to pass the check
+  #
+  #storage_encrypted = true
+  # kms_key_id = "1234abcd-12ab-34cd-56ef-1234567890ab"
+}
+ """
+    )
+
+    runner = CliRunner()
+    result = runner.invoke(
+        cli.cli, ["run", "-p", str(tmp_path), "-d", str(tmp_path / "tfroot"), "-o", "cli"]
+    )
+    assert "2 failed 0 passed" in result.output
+
+
 def test_cli_output_rich_warn_on_severity(tmp_path):
     (tmp_path / "policy.json").write_text(
         json.dumps(
