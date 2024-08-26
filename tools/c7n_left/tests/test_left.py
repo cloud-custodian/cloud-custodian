@@ -1207,14 +1207,20 @@ def test_cli_validate_schema_error(tmp_path, caplog, debug_cli_runner):
         json.dumps(
             {
                 "policies": [
-                    {"name": "xyz", "resource": ["terarform.*"], "filters": [{"type": "xyz"}]}
+                    {
+                        "name": "xyz",
+                        "resource": ["terraform.*"],
+                        "filters": [{"type": "xyz123", "key": "value"}],
+                    }
                 ]
             }
         )
     )
-    runner = debug_cli_runner  # CliRunner()
-    runner.invoke(cli.cli, ["validate", "-p", str(tmp_path)])
-    # TODO
+    runner = debug_cli_runner  #
+    result = runner.invoke(cli.cli, ["validate", "-p", str(tmp_path)])
+    assert result.exit_code == 1
+    caplog.record_tuples[0] == ('c7n.iac', 40, 'Validation failed with 1 errors')
+    assert "is not valid under any of the given schemas" in caplog.record_tuples[2][-1]
 
 
 def test_cli_validate_prechecks(tmp_path, caplog):

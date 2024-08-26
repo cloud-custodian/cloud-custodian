@@ -175,7 +175,6 @@ def validate(policy_dir=None):
         return
 
     file_errors = validate_files(policy_files)
-
     if file_errors:
         error_count = sum(map(len, file_errors.values()))
         log.error(f"Validation failed with {error_count} errors")

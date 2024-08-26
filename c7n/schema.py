@@ -30,7 +30,6 @@ from c7n.resolver import ValuesFrom
 from c7n.filters.core import (
     ValueFilter,
     EventFilter,
-    AgeFilter,
     ReduceFilter,
     OPERATORS,
     VALUE_TYPES,
@@ -130,7 +129,7 @@ def specific_error(error):
         t = error.instance.get('type')
         r = error.instance.get('resource')
 
-    if r is not None:
+    if r is not None and not isinstance(r, list):
         found = None
         for idx, v in enumerate(error.validator_value):
             if '$ref' in v and v['$ref'].rsplit('/', 2)[1].endswith(r):
@@ -254,13 +253,17 @@ def get_default_definitions(resource_defs):
         'filters': {
             'value': ValueFilter.schema,
             'event': EventFilter.schema,
-            'age': AgeFilter.schema,
             'reduce': ReduceFilter.schema,
             # Shortcut form of value filter as k=v
             'valuekv': {
                 'type': 'object',
-                'additionalProperties': {'oneOf': [{'type': 'number'}, {'type': 'null'},
-                    {'type': 'array', 'maxItems': 0}, {'type': 'string'}, {'type': 'boolean'}]},
+                'additionalProperties': {'oneOf': [
+                    {'type': 'number'},
+                    {'type': 'null'},
+                    {'type': 'array', 'maxItems': 0},
+                    {'type': 'string'},
+                    {'type': 'boolean'}
+                ]},
                 'minProperties': 1,
                 'maxProperties': 1},
         },
