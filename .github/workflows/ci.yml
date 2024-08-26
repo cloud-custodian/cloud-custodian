@@ -174,12 +174,12 @@ jobs:
 
       - name: Upload Code Coverage
         uses: codecov/codecov-action@v4
-        if: contains(matrix.python-version, '3.10') && contains(matrix.os, 'ubuntu')
+        if: contains(matrix.python-version, '3.11') && contains(matrix.os, 'ubuntu')
         with:
           files: ./coverage.xml
           name: codecov
 
       - name: License Check
-        if: contains(matrix.python-version, '3.10') && contains(matrix.os, 'ubuntu')
+        if: contains(matrix.python-version, '3.11') && contains(matrix.os, 'ubuntu')
         run: |
           poetry run python tools/dev/license-check.py
