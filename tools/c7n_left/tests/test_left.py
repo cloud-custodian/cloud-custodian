@@ -1184,16 +1184,23 @@ def test_cli_no_policies(tmp_path, caplog):
     assert caplog.record_tuples == [("c7n.iac", 30, "no policies found")]
 
 
+def test_cli_validate_no_dir(tmp_path, caplog):
+    runner = CliRunner()
+    result = runner.invoke(cli.cli, ["validate", "-p", str(tmp_path / "bad_dir")])
+    assert result.exit_code == 1
+    assert "does not exist" in caplog.record_tuples[-1][-1]
+
+
 def test_cli_validate_parse_error(tmp_path, caplog):
     (tmp_path / "bad.json").write_text("{,}")
     runner = CliRunner()
     result = runner.invoke(cli.cli, ["validate", "-p", str(tmp_path)])
     assert result.exit_code == 1
     assert caplog.record_tuples[0] == ("c7n.iac", 40, "Validation failed with 1 errors")
-    assert "expected the node content, but found ','" in caplog.record_tuples[-1][-1]
+    assert "did not find expected node content" in caplog.record_tuples[-1][-1]
 
 
-def test_cli_validate_structure_error(tmp_path, caplog, debug_cli_runner):
+def test_cli_validate_structure_error(tmp_path, caplog):
     (tmp_path / "bad.json").write_text(json.dumps({"something": "else"}))
     runner = CliRunner()
     result = runner.invoke(cli.cli, ["validate", "-p", str(tmp_path)])
@@ -1202,7 +1209,7 @@ def test_cli_validate_structure_error(tmp_path, caplog, debug_cli_runner):
     assert "Policy files top level keys" in caplog.record_tuples[-1][-1]
 
 
-def test_cli_validate_schema_error(tmp_path, caplog, debug_cli_runner):
+def test_cli_validate_schema_error(tmp_path, caplog):
     (tmp_path / "bad.json").write_text(
         json.dumps(
             {
@@ -1216,7 +1223,7 @@ def test_cli_validate_schema_error(tmp_path, caplog, debug_cli_runner):
             }
         )
     )
-    runner = debug_cli_runner  #
+    runner = CliRunner()
     result = runner.invoke(cli.cli, ["validate", "-p", str(tmp_path)])
     assert result.exit_code == 1
     caplog.record_tuples[0] == ('c7n.iac', 40, 'Validation failed with 1 errors')
