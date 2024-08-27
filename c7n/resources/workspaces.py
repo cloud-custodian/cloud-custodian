@@ -564,10 +564,10 @@ class UserAccessLoggingSettingsFilter(ValueFilter):
     .. code-block:: yaml
 
             policies:
-              - name: user-access-logging-settings-match
+              - name: user-access-logging-match
                 resource: workspaces-web
                 filters:
-                  - type: user-access-logging-settings
+                  - type: user-access-logging
                     key: kinesisStreamArn
                     value: present
     """
