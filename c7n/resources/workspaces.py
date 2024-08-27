@@ -519,10 +519,46 @@ class BrowerPolicyFilter(ValueFilter):
         return results
 
 
-@WorkspacesWeb.filter_registry.register('user-access-logging-settings')
+@WorkspacesWeb.filter_registry.register('user-settings')
+class UserSettingsFilter(ValueFilter):
+    """
+    Filters workspaces secured browsers based on their user settings.
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: user-settings-match
+                resource: workspaces-web
+                filters:
+                  - type: user-settings
+                    key: copyAllowed
+                    value: Disabled
+    """
+
+    schema = type_schema('user-settings', rinherit=ValueFilter.schema)
+    schema_alias = False
+    permissions = ('workspaces-web:GetUserSettings',)
+    policy_annotation = "c7n:UserSettings"
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('workspaces-web')
+        for r in resources:
+            if (self.policy_annotation not in r) and ('userSettingsArn' in r):
+                r[self.policy_annotation] = self.manager.retry(
+                    client.get_user_settings,
+                    userSettingsArn=r['userSettingsArn']).get(
+                        'userSettings', {})
+        return super().process(resources, event)
+
+    def __call__(self, r):
+        return super().__call__(r.get(self.policy_annotation, {}))
+
+
+@WorkspacesWeb.filter_registry.register('user-access-logging')
 class UserAccessLoggingSettingsFilter(ValueFilter):
     """
-    Filters workspaces secured browsers based on their user access loggging settings.
+    Filters workspaces secured browsers based on their user access logging settings.
     :example:
 
     .. code-block:: yaml
@@ -536,14 +572,13 @@ class UserAccessLoggingSettingsFilter(ValueFilter):
                     value: present
     """
 
-    schema = type_schema('user-access-logging-settings', rinherit=ValueFilter.schema)
+    schema = type_schema('user-access-logging', rinherit=ValueFilter.schema)
     schema_alias = False
     permissions = ('workspaces-web:GetUserAccessLoggingSettings',)
     policy_annotation = "c7n:UserAccessLoggingSettings"
 
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('workspaces-web')
-        results = []
         for r in resources:
             if (self.policy_annotation not in r) and (
                 'userAccessLoggingSettingsArn' in r):
@@ -551,8 +586,7 @@ class UserAccessLoggingSettingsFilter(ValueFilter):
                     client.get_user_access_logging_settings,
                     userAccessLoggingSettingsArn=r['userAccessLoggingSettingsArn']).get(
                         'userAccessLoggingSettings', {})
-            results.append(r)
-        return super().process(results, event)
+        return super().process(resources, event)
 
     def __call__(self, r):
         return super().__call__(r.get(self.policy_annotation, {}))

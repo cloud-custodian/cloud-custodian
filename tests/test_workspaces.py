@@ -484,17 +484,68 @@ class TestWorkspacesWeb(BaseTest):
 
         self.assertEqual(len(resources), 1)
 
-    def test_workspaces_web_user_access_logging_settings(self):
-        session_factory = self.replay_flight_data(
-            'test_workspaces_web_user_access_logging_settings'
-        )
+    def test_workspaces_web_user_settings(self):
+        session_factory = self.replay_flight_data('test_workspaces_web_user_settings')
         p = self.load_policy(
             {
-                'name': 'test-workspaces-web-user-access-logging-settings',
+                'name': 'test-workspaces-web-user-settings',
                 'resource': 'workspaces-web',
                 'filters': [
                     {
-                        'type': 'user-access-logging-settings',
+                        'type': 'user-settings',
+                        'key': 'copyAllowed',
+                        "value": 'Disabled'
+                    },
+                    {
+                        'type': 'user-settings',
+                        'key': 'downloadAllowed',
+                        "value": 'Disabled'
+                    },
+                    {
+                        'type': 'user-settings',
+                        'key': 'pasteAllowed',
+                        "value": 'Disabled'
+                    },
+                    {
+                        'type': 'user-settings',
+                        'key': 'printAllowed',
+                        "value": 'Disabled'
+                    },
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        p = self.load_policy(
+            {
+                'name': 'test-workspaces-web-user-settings',
+                'resource': 'workspaces-web',
+                'filters': [
+                    {
+                        'type': 'user-settings',
+                        'key': 'copyAllowed',
+                        "value": 'Enabled'
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    def test_workspaces_web_user_access_logging(self):
+        session_factory = self.replay_flight_data(
+            'test_workspaces_web_user_access_logging'
+        )
+        p = self.load_policy(
+            {
+                'name': 'test-workspaces-web-user-access-logging',
+                'resource': 'workspaces-web',
+                'filters': [
+                    {
+                        'type': 'user-access-logging',
                         'key': 'kinesisStreamArn',
                         "value": 'present'
                     }
@@ -506,11 +557,11 @@ class TestWorkspacesWeb(BaseTest):
 
         p = self.load_policy(
             {
-                'name': 'test-workspaces-web-user-access-logging-settings',
+                'name': 'test-workspaces-web-user-access-logging',
                 'resource': 'workspaces-web',
                 'filters': [
                     {
-                        'type': 'user-access-logging-settings',
+                        'type': 'user-access-logging',
                         'key': 'kinesisStreamArn',
                         "value": 'absent'
                     }
