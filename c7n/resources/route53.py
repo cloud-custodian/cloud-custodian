@@ -928,13 +928,8 @@ class RecoveryClusterRemoveTag(RemoveTag):
 @query.sources.register('describe-control-panel')
 class DescribeControlPanel(query.ChildDescribeSource):
 
-    def __init__(self, manager):
-        self.manager = manager
-        self.query = query.ChildResourceQuery(
-            self.manager.session_factory, self.manager)
-
     def augment(self, controlpanels):
-        for r in controlpanels:
+        for pid, r in controlpanels:
             Tags = self.manager.retry(
                 self.manager.get_client().list_tags_for_resource,
                 ResourceArn=r['ControlPanelArn'])['Tags']

@@ -149,9 +149,6 @@ class DeleteServer(BaseAction):
 
 class DescribeTransferUser(ChildDescribeSource):
 
-    def get_query(self):
-        return super().get_query(capture_parent_id=True)
-
     def augment(self, resources):
         client = local_session(self.manager.session_factory).client('transfer')
         results = []

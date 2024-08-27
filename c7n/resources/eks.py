@@ -17,9 +17,6 @@ from c7n.filters.kms import KmsRelatedFilter
 @query.sources.register('describe-eks-nodegroup')
 class NodeGroupDescribeSource(ChildDescribeSource):
 
-    def get_query(self):
-        return super().get_query(capture_parent_id=True)
-
     def augment(self, resources):
         results = []
         client = local_session(self.manager.session_factory).client('eks')

@@ -130,11 +130,6 @@ class ECSClusterResourceDescribeSource(query.ChildDescribeSource):
     #   handling for the string resources with parent id.
     #
 
-    def __init__(self, manager):
-        self.manager = manager
-        self.query = query.ChildResourceQuery(
-            self.manager.session_factory, self.manager, capture_parent_id=True)
-
     def get_resources(self, ids, cache=True):
         """Retrieve ecs resources for serverless policies or related resources
 

@@ -2192,6 +2192,9 @@ class TransitAttachmentSource(query.ChildDescribeSource):
 
     resource_query_factory = TransitGatewayAttachmentQuery
 
+    def get_query(self):
+        return super().get_query(capture_parent_id=False)
+
 
 @resources.register('transit-attachment')
 class TransitGatewayAttachment(query.ChildResourceManager):

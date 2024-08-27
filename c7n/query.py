@@ -118,7 +118,7 @@ class ChildResourceQuery(ResourceQuery):
 
     parent_key = 'c7n:parent-id'
 
-    def __init__(self, session_factory, manager, capture_parent_id=False):
+    def __init__(self, session_factory, manager, capture_parent_id=True):
         self.session_factory = session_factory
         self.manager = manager
         self.capture_parent_id = capture_parent_id
@@ -288,7 +288,7 @@ class ChildDescribeSource(DescribeSource):
 
     resource_query_factory = ChildResourceQuery
 
-    def get_query(self, capture_parent_id=False):
+    def get_query(self, capture_parent_id: bool = True):
         return self.resource_query_factory(
             self.manager.session_factory, self.manager, capture_parent_id=capture_parent_id)
 

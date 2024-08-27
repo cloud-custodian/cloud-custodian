@@ -84,9 +84,6 @@ class RepositoryImageDescribeSource(ChildDescribeSource):
 
     resource_query_factory = ECRImageQuery
 
-    def get_query(self):
-        return super().get_query(capture_parent_id=True)
-
     def augment(self, resources):
         results = []
         client = local_session(self.manager.session_factory).client('ecr')

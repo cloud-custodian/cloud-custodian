@@ -268,14 +268,6 @@ class DeleteApi(BaseAction):
 @query.sources.register('describe-rest-stage')
 class DescribeRestStage(query.ChildDescribeSource):
 
-    def __init__(self, manager):
-        self.manager = manager
-        self.query = query.ChildResourceQuery(
-            self.manager.session_factory, self.manager, capture_parent_id=True)
-
-    def get_query(self):
-        return super(DescribeRestStage, self).get_query(capture_parent_id=True)
-
     def augment(self, resources):
         results = []
         rest_apis = self.manager.get_resource_manager(
@@ -448,9 +440,6 @@ class RestResource(query.ChildResourceManager):
 
 @query.sources.register('describe-rest-resource')
 class DescribeRestResource(query.ChildDescribeSource):
-
-    def get_query(self):
-        return super(DescribeRestResource, self).get_query(capture_parent_id=True)
 
     def augment(self, resources):
         results = []
@@ -1180,7 +1169,7 @@ class StageDescribe(query.ChildDescribeSource):
 
     def augment(self, resources):
         # convert tags from {'Key': 'Value'} to standard aws format
-        for r in resources:
+        for pid, r in resources:
             r['Tags'] = [
                 {'Key': k, 'Value': v} for k, v in r.pop('Tags', {}).items()]
         return resources

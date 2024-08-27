@@ -73,6 +73,10 @@ class AppmeshMesh(QueryResourceManager):
 
 
 class DescribeVirtualGatewayDefinition(ChildDescribeSource):
+
+    def get_query(self):
+        return super().get_query(capture_parent_id=False)
+
     # This method is called in event mode and not pull mode.
     # Its purpose is to take a list of virtual gateway ARN's that the
     # framework has extracted from the events according to the policy yml file
@@ -202,6 +206,10 @@ class AppmeshVirtualGateway(ChildResourceManager):
 
 
 class DescribeVirtualNodeDefinition(ChildDescribeSource):
+
+    def get_query(self):
+        return super().get_query(capture_parent_id=False)
+
     # This method is called in event mode and not pull mode.
     # Its purpose is to take a list of virtual gateway ARN's that the
     # framework has extracted from the events according to the policy yml file
