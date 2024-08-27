@@ -6,6 +6,7 @@ from tfparse import load_from_path
 
 from c7n.provider import clouds
 from c7n.policy import execution
+from c7n.schema import process_resource
 from c7n.utils import type_schema
 
 from ...core import (
@@ -25,6 +26,38 @@ from .variables import VariableResolver
 class TerraformResourceManager(IACResourceManager):
     class resource_type:
         id = "id"
+
+    type_aliases = ()
+
+    @classmethod
+    def get_schema(cls, type_name, resource_definitions, definitions, provider_name):
+        # we want to provide our schema to allow for a looser name match, but also
+        # want to reuse the base schema generation logic.
+        rklass = type("terraform_resource", (cls,), {"get_schema": None})
+        ref = process_resource(
+            type_name,
+            rklass,
+            resource_definitions,
+            definitions=definitions,
+            provider_name=provider_name,
+        )
+        rschema = resource_definitions[type_name]
+        rschema["policy"]["allOf"][-1]["properties"]["resource"] = {
+            "oneOf": [
+                {
+                    "type": "string",
+                    "pattern": "^terraform\\.[a-z|_]*",
+                },
+                {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "pattern": "^terraform\\.[a-z|_]*",
+                    },
+                },
+            ]
+        }
+        return ref
 
     def get_model(self):
         return self.resource_type
@@ -65,6 +98,14 @@ TerraformResourceManager.filter_registry.register("taggable", Taggable)
 
 class TerraformResourceMap(IACResourceMap):
     resource_class = TerraformResourceManager
+
+    def items(self):
+        return (
+            (
+                "_",
+                self.resource_class,
+            ),
+        )
 
 
 @clouds.register("terraform")

@@ -40,6 +40,7 @@ class ResourceManager:
     retry = None
     permissions = ()
     get_client = None
+    get_schema = None
 
     def __init__(self, ctx, data):
         self.ctx = ctx
