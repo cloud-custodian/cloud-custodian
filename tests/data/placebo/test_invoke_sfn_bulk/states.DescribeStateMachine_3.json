@@ -1,0 +1,23 @@
+{
+    "status_code": 200,
+    "data": {
+        "stateMachineArn": "arn:aws:states:us-east-1:644160558196:stateMachine:Waitstate",
+        "name": "Waitstate",
+        "status": "ACTIVE",
+        "definition": "{\n  \"Comment\": \"An example of the Amazon States Language using wait states\",\n  \"StartAt\": \"wait_using_seconds\",\n  \"States\": {\n    \"wait_using_seconds\": {\n      \"Type\": \"Wait\",\n      \"Seconds\": 60,\n      \"Next\": \"PassOnInfoToCustodian\"\n    },\n    \"PassOnInfoToCustodian\": {\n      \"Type\": \"Task\",\n      \"Resource\": \"arn:aws:lambda:us-east-1:644160558196:function:custodian-s3-untag\",\n      \"End\": true\n    }\n  }\n}\n",
+        "roleArn": "arn:aws:iam::644160558196:role/CloudCustodianRole",
+        "type": "STANDARD",
+        "creationDate": {
+            "__class__": "datetime",
+            "year": 2019,
+            "month": 11,
+            "day": 26,
+            "hour": 23,
+            "minute": 24,
+            "second": 43,
+            "microsecond": 885000
+        },
+        "revisionId": "7ae504d9-4c79-4971-a89b-2f749978edbf",
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "activityArn": "arn:aws:states:us-east-1:644160558196:activity:test-c7n",
+        "name": "test-c7n",
+        "creationDate": {
+            "__class__": "datetime",
+            "year": 2024,
+            "month": 8,
+            "day": 27,
+            "hour": 11,
+            "minute": 55,
+            "second": 59,
+            "microsecond": 534000
+        },
+        "ResponseMetadata": {}
+    }
+}

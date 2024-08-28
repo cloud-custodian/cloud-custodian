@@ -11,6 +11,13 @@ class TestStepFunction(BaseTest):
         p = self.load_policy({
             'name': 'test-invoke-sfn-bulk',
             'resource': 'step-machine',
+            'filters': [
+                    {
+                        'type': 'value',
+                        'key': 'name',
+                        'value': 'Helloworld'
+                    }
+            ],
             'actions': [{
                 'type': 'invoke-sfn',
                 'bulk': True,
@@ -34,6 +41,13 @@ class TestStepFunction(BaseTest):
         p = self.load_policy({
             'name': 'test-invoke-sfn',
             'resource': 'step-machine',
+            'filters': [
+                    {
+                        'type': 'value',
+                        'key': 'name',
+                        'value': 'Helloworld'
+                    }
+            ],
             'actions': [{
                 'type': 'invoke-sfn',
                 'state-machine': 'Helloworld'}]},
@@ -61,7 +75,7 @@ class TestStepFunction(BaseTest):
                     {
                         'type': 'value',
                         'key': 'name',
-                        'value': 'test'
+                        'value': 'Helloworld'
                     }
                 ]
             },
@@ -70,7 +84,7 @@ class TestStepFunction(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertTrue(resources[0]['name'], 'test')
+        self.assertEqual(resources[0]['name'], 'Helloworld')
 
     def test_sfn_tag_resource(self):
         session_factory = self.replay_flight_data('test_sfn_tag_resource')
@@ -126,15 +140,11 @@ class TestStepFunction(BaseTest):
                 'name': 'test-sfn-get-activity',
                 'resource': 'activity',
                 'filters': [
-                    {
-                        'type': 'value',
-                        'key': 'name',
-                        'value': 'test'
-                    }
+                    {'tag:name': 'test'},
                 ]
             },
             session_factory=session_factory
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertTrue(resources[0]['name'], 'test')
+        self.assertEqual(resources[0]['name'], 'test-c7n')
