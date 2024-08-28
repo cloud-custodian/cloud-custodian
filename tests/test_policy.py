@@ -651,7 +651,6 @@ class PolicyMetaLint(BaseTest):
             'AWS::AccessAnalyzer::Analyzer',
             'AWS::WorkSpaces::ConnectionAlias',
             'AWS::DMS::ReplicationSubnetGroup',
-            'AWS::StepFunctions::Activity',
             'AWS::Route53Resolver::ResolverEndpoint',
             'AWS::Route53Resolver::ResolverRule',
             'AWS::Route53Resolver::ResolverRuleAssociation',

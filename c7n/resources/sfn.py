@@ -57,6 +57,7 @@ class Activity(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'stepfunctions'
+        permission_prefix = 'states'
         enum_spec = ('list_activities', 'activities', None)
         arn = id = 'activityArn'
         arn_type = 'activity'
