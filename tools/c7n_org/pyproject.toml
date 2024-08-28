@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "c7n_org"
-version = "0.6.39"
+version = "0.6.40"
 description = "Cloud Custodian - Parallel Execution"
 readme = "README.md"
 homepage = "https://cloudcustodian.io"
