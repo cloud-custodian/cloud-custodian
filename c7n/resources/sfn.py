@@ -200,6 +200,7 @@ class TagStepFunction(Tag):
 
 
 @StepFunction.action_registry.register('remove-tag')
+@Activity.action_registry.register('remove-tag')
 class UnTagStepFunction(RemoveTag):
     """Action to create tag(s) on a step function
 
