@@ -120,10 +120,10 @@ class TestStepFunction(BaseTest):
         self.assertTrue([t for t in tags['tags'] if t['key'] != 'test'])
 
     def test_sfn_get_activity(self):
-        session_factory = self.record_flight_data('test_sfn_get_activity')
+        session_factory = self.replay_flight_data('test_sfn_get_activity')
         p = self.load_policy(
             {
-                'name': 'test-sfn-get-acitivity',
+                'name': 'test-sfn-get-activity',
                 'resource': 'activity',
                 'filters': [
                     {

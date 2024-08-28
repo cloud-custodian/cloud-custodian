@@ -39,6 +39,17 @@ class StepFunction(QueryResourceManager):
         'config': ConfigSource
     }
 
+    def augment(self, resources):
+        client = local_session(self.session_factory).client('stepfunctions')
+
+        def _augment(r):
+            tags = self.retry(client.list_tags_for_resource,
+                resourceArn=r['stateMachineArn'])['tags']
+            r['Tags'] = [{'Key': t['key'], 'Value': t['value']} for t in tags]
+            return r
+        resources = super().augment(resources)
+        return list(map(_augment, resources))
+
 
 @resources.register('activity')
 class Activity(QueryResourceManager):
@@ -55,6 +66,17 @@ class Activity(QueryResourceManager):
         detail_spec = (
             "describe_activity", "activityArn",
             'activityArn', None)
+
+    def augment(self, resources):
+        client = local_session(self.session_factory).client('stepfunctions')
+
+        def _augment(r):
+            tags = self.retry(client.list_tags_for_resource,
+                resourceArn=r['activityArn'])['tags']
+            r['Tags'] = [{'Key': t['key'], 'Value': t['value']} for t in tags]
+            return r
+        resources = super().augment(resources)
+        return list(map(_augment, resources))
 
 
 class InvokeStepFunction(Action):
