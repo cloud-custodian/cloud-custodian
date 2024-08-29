@@ -43,15 +43,8 @@ class StepFunction(QueryResourceManager):
 class DescribeActivity(DescribeSource):
 
     def augment(self, resources):
-        client = local_session(self.session_factory).client('stepfunctions')
-
-        def _augment(r):
-            tags = self.retry(client.list_tags_for_resource,
-                resourceArn=r['stateMachineArn'])['tags']
-            r['Tags'] = [{'Key': t['key'], 'Value': t['value']} for t in tags]
-            return r
         resources = super().augment(resources)
-        return list(map(_augment, resources))
+        return universal_augment(self.manager, resources)
 
 
 @resources.register('activity')
@@ -72,7 +65,7 @@ class Activity(QueryResourceManager):
             'activityArn', None)
         permissions_augment = ("states:ListTagsForResource",)
 
-        source_mapping = {
+    source_mapping = {
             'describe': DescribeActivity,
             'config': ConfigSource
         }
