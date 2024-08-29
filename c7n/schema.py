@@ -30,7 +30,6 @@ from c7n.resolver import ValuesFrom
 from c7n.filters.core import (
     ValueFilter,
     EventFilter,
-    AgeFilter,
     ReduceFilter,
     OPERATORS,
     VALUE_TYPES,
@@ -130,7 +129,7 @@ def specific_error(error):
         t = error.instance.get('type')
         r = error.instance.get('resource')
 
-    if r is not None:
+    if r is not None and not isinstance(r, list):
         found = None
         for idx, v in enumerate(error.validator_value):
             if '$ref' in v and v['$ref'].rsplit('/', 2)[1].endswith(r):
@@ -201,9 +200,8 @@ def _get_attr_schema():
     return attr_schema
 
 
-def generate(resource_types=()):
-    resource_defs = {}
-    definitions = {
+def get_default_definitions(resource_defs):
+    return {
         'resources': resource_defs,
         'string_dict': {
             "type": "object",
@@ -255,13 +253,17 @@ def generate(resource_types=()):
         'filters': {
             'value': ValueFilter.schema,
             'event': EventFilter.schema,
-            'age': AgeFilter.schema,
             'reduce': ReduceFilter.schema,
             # Shortcut form of value filter as k=v
             'valuekv': {
                 'type': 'object',
-                'additionalProperties': {'oneOf': [{'type': 'number'}, {'type': 'null'},
-                    {'type': 'array', 'maxItems': 0}, {'type': 'string'}, {'type': 'boolean'}]},
+                'additionalProperties': {'oneOf': [
+                    {'type': 'number'},
+                    {'type': 'null'},
+                    {'type': 'array', 'maxItems': 0},
+                    {'type': 'string'},
+                    {'type': 'boolean'}
+                ]},
                 'minProperties': 1,
                 'maxProperties': 1},
         },
@@ -353,6 +355,11 @@ def generate(resource_types=()):
         }
     }
 
+
+def generate(resource_types=()):
+    resource_defs = {}
+    definitions = get_default_definitions(resource_defs)
+
     resource_refs = []
     for cloud_name, cloud_type in sorted(clouds.items()):
         for type_name, resource_type in sorted(cloud_type.resources.items()):
@@ -414,6 +421,12 @@ def process_resource(
         definitions=None, provider_name=None):
 
     r = resource_defs.setdefault(type_name, {'actions': {}, 'filters': {}})
+
+    if getattr(resource_type, "get_schema", None):
+        resource_type.get_schema(
+            type_name, resource_defs, definitions, provider_name
+        )
+        return {'$ref': '#/definitions/resources/%s/policy' % type_name}
 
     action_refs = []
     for a in ElementSchema.elements(resource_type.action_registry):

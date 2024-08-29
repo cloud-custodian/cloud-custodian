@@ -3244,6 +3244,10 @@ class SecurityGroupTest(BaseTest):
                         "Cidr": {
                             "value": "10.42.1.239", "op": "in", "value_type": "cidr"
                         },
+                    },
+                    {
+                        "type": "ingress",
+                        "SelfReference": False
                     }
                 ],
             },

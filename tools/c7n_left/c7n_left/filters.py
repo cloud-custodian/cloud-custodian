@@ -124,9 +124,9 @@ class Traverse(Filter):
 
     def match_attrs(self, working_set):
         vfilters = self.get_attr_filters()
-        found = True
         results = []
         for w in working_set:
+            found = True
             for v in vfilters:
                 if not v(w):
                     found = False

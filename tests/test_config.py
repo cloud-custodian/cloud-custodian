@@ -200,3 +200,21 @@ class ConfigRuleTest(BaseTest):
         p.expand_variables(p.get_variables())
         resources = p.run()
         self.assertEqual(len(resources), 0)
+
+    def test_retention_filter(self):
+        factory = self.replay_flight_data('test_configrecord_retention')
+
+        p = self.load_policy({
+            'name': 'recorder',
+            'resource': 'aws.config-recorder',
+            'filters': [
+                {
+                    'type': 'retention',
+                    'key': 'RetentionPeriodInDays',
+                    'op': 'gte',
+                    'value': 120
+                    }
+            ]},
+            session_factory=factory)
+        resources = p.run()
+        assert len(resources) == 1
