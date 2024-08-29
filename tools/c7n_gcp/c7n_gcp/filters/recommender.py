@@ -107,7 +107,7 @@ class RecommenderFilter(Filter):
         results = []
         rec_query = jmespath.compile('content.operationGroups[].operations[].resource')
         for r in recommends:
-            rids = rec_query.search(r)
+            rids = set(rec_query.search(r))
             for rid in list(rids):
                 # some resource operations are about creating new resources, ie snapshot disk
                 # before delete, remove those to focus on extant resources.
