@@ -51,6 +51,27 @@ class DescribeActivity(DescribeSource):
 @resources.register('activity')
 class Activity(QueryResourceManager):
     """AWS Step Functions Activity
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: activity-encrypted-cmk
+                resource: activity
+                filters:
+                  - not:
+                    - type: kms-key
+                      key: c7n:AliasName
+                      value: alias/test/sfn/encrypted
+              - name: activity-tag-untagged
+                resource: activity
+                filters:
+                  - "tag:target-tag": absent
+                actions:
+                  - type: tag
+                    key: target-tag
+                    value: target-tag-value
     """
 
     class resource_type(TypeInfo):
