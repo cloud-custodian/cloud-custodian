@@ -148,3 +148,23 @@ class TestStepFunction(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['name'], 'test-c7n')
+
+    def test_sfn_activity_kms_alias(self):
+        session_factory = self.replay_flight_data('test_sfn_activity_kms_alias')
+        p = self.load_policy(
+            {
+                'name': 'test-sfn-activity-kms-alias',
+                'resource': 'activity',
+                'filters': [
+                    {
+                        "type": "kms-key",
+                        "key": "c7n:AliasName",
+                        "value": "alias/test/sfn/encrypted",
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], 'test-c7n')

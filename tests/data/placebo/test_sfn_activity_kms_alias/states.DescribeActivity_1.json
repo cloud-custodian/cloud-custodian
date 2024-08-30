@@ -7,17 +7,17 @@
             "__class__": "datetime",
             "year": 2024,
             "month": 8,
-            "day": 27,
-            "hour": 11,
-            "minute": 55,
-            "second": 59,
-            "microsecond": 534000
+            "day": 29,
+            "hour": 21,
+            "minute": 43,
+            "second": 13,
+            "microsecond": 811000
         },
-        "ResponseMetadata": {},
-        "encryptionConfiguration": { 
-            "kmsDataKeyReusePeriodSeconds": 300,
+        "encryptionConfiguration": {
             "kmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/44d264df-da6f-45f9-9c18-1fc1beca6db0",
-            "type": "CUSTOMER_MANAGED_KMS"
-         }
+            "kmsDataKeyReusePeriodSeconds": 300,
+            "type": "CUSTOMER_MANAGED_KMS_KEY"
+        },
+        "ResponseMetadata": {}
     }
 }

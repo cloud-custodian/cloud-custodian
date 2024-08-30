@@ -1,0 +1,84 @@
+{
+    "status_code": 200,
+    "data": {
+        "Aliases": [
+            {
+                "AliasName": "alias/test-log-group",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/test-log-group",
+                "TargetKeyId": "326e2489-013e-4766-ba51-babc51f68dd4",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 12,
+                    "day": 4,
+                    "hour": 14,
+                    "minute": 20,
+                    "second": 37,
+                    "microsecond": 815000
+                },
+                "LastUpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 12,
+                    "day": 4,
+                    "hour": 14,
+                    "minute": 20,
+                    "second": 37,
+                    "microsecond": 815000
+                }
+            },
+            {
+                "AliasName": "alias/test/sfn/encrypted",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/test/sfn/encrypted",
+                "TargetKeyId": "44d264df-da6f-45f9-9c18-1fc1beca6db0",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 8,
+                    "day": 29,
+                    "hour": 10,
+                    "minute": 56,
+                    "second": 31,
+                    "microsecond": 505000
+                },
+                "LastUpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 8,
+                    "day": 29,
+                    "hour": 10,
+                    "minute": 56,
+                    "second": 31,
+                    "microsecond": 505000
+                }
+            },
+            {
+                "AliasName": "alias/test/timestream",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/test/timestream",
+                "TargetKeyId": "a75f7e18-1f8f-44df-8b38-8853ef42555d",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 5,
+                    "day": 6,
+                    "hour": 15,
+                    "minute": 14,
+                    "second": 47,
+                    "microsecond": 838000
+                },
+                "LastUpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 5,
+                    "day": 6,
+                    "hour": 15,
+                    "minute": 14,
+                    "second": 47,
+                    "microsecond": 838000
+                }
+            }
+        ],
+        "Truncated": false,
+        "ResponseMetadata": {}
+    }
+}

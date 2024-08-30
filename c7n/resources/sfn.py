@@ -6,6 +6,7 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, ConfigSource
 from c7n.tags import Tag, RemoveTag, universal_augment
 from c7n.utils import type_schema, local_session, dumps, chunks
+from c7n.filters.kms import KmsRelatedFilter
 
 
 class DescribeStepFunction(DescribeSource):
@@ -49,7 +50,8 @@ class DescribeActivity(DescribeSource):
 
 @resources.register('activity')
 class Activity(QueryResourceManager):
-    """AWS Step Functions Activity"""
+    """AWS Step Functions Activity
+    """
 
     class resource_type(TypeInfo):
         service = 'stepfunctions'
@@ -214,3 +216,10 @@ class UnTagStepFunction(RemoveTag):
         mid = self.manager.resource_type.arn
         for r in resources:
             client.untag_resource(resourceArn=r[mid], tagKeys=tag_keys)
+
+
+@Activity.filter_registry.register('kms-key')
+@StepFunction.filter_registry.register('kms-key')
+class StepFunctionKmsFilter(KmsRelatedFilter):
+
+    RelatedIdsExpression = "encryptionConfiguration.kmsKeyId"
