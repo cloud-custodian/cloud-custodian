@@ -764,10 +764,6 @@ def test_traverse_multi_resource_inside_or(tmp_path):
     }
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="Known issue with branching inside attrs: https://github.com/cloud-custodian/cloud-custodian/issues/9690",
-)
 def test_traverse_multi_resource_nested_or(tmp_path):
     resources = run_policy(
         {
