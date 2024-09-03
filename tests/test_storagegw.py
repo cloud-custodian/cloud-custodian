@@ -4,7 +4,7 @@ from .common import BaseTest
 class TestStorageGateway(BaseTest):
 
     def test_storage_gateway_tag(self):
-        session_factory = self.record_flight_data("test_storage_gateway_tag")
+        session_factory = self.replay_flight_data("test_storage_gateway_tag")
         client = session_factory().client("storagegateway")
         p = self.load_policy(
             {
