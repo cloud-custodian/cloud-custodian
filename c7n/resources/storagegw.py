@@ -15,4 +15,4 @@ class StorageGateway(QueryResourceManager):
         arn = id = 'GatewayARN'
         arn_type = 'gateway'
         name = 'GatewayName'
-        universal_taggble = object()
+        universal_taggable = object()
