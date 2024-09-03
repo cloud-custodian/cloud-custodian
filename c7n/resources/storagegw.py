@@ -11,10 +11,8 @@ class StorageGateway(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'storagegateway'
         enum_spec = ('list_gateways', 'Gateways', None)
+        detail_spec = ('describe_gateway_information', 'GatewayARN', 'GatewayARN', None)
         arn = id = 'GatewayARN'
         arn_type = 'gateway'
         name = 'GatewayName'
         universal_taggble = object()
-        permissions_augment = ("storagegateway:ListTagsForResource",)
-
-    augment = universal_augment
