@@ -494,6 +494,11 @@ class SubnetFilter(net_filters.SubnetFilter):
     """
     RelatedIdsExpression = ""
 
+    def get_permissions(self):
+        perms = super().get_permissions()
+        perms.add('workspaces-web:GetNetworkSettings')
+        return perms
+
     def get_related_ids(self, resources):
         subnetIds = set()
 
