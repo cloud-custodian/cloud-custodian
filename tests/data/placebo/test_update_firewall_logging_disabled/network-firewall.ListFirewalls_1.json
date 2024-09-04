@@ -1,0 +1,16 @@
+{
+    "status_code": 200,
+    "data": {
+        "Firewalls": [
+            {
+                "FirewallName": "test-firewall-1",
+                "FirewallArn": "arn:aws:network-firewall:us-east-1:644160558196:firewall/test-firewall-1"
+            },
+            {
+                "FirewallName": "test-firewall-2",
+                "FirewallArn": "arn:aws:network-firewall:us-east-1:644160558196:firewall/test-firewall-2"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

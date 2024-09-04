@@ -1,0 +1,74 @@
+{
+    "status_code": 200,
+    "data": {
+        "ProcessingInputs": [
+            {
+                "InputName": "input",
+                "AppManaged": false,
+                "S3Input": {
+                    "S3Uri": "s3://c7n-test-s3-bucket/DEMO-automatic-model-tuning-xgboost-dm/train",
+                    "LocalPath": "/opt/ml/processing/c7n-test-s3-bucket/DEMO-automatic-model-tuning-xgboost-dm/train",
+                    "S3DataType": "S3Prefix",
+                    "S3InputMode": "File",
+                    "S3DataDistributionType": "FullyReplicated",
+                    "S3CompressionType": "None"
+                }
+            }
+        ],
+        "ProcessingOutputConfig": {
+            "Outputs": [
+                {
+                    "OutputName": "output",
+                    "S3Output": {
+                        "S3Uri": "s3://c7n-test-s3-bucket/DEMO-automatic-model-tuning-xgboost-dm/output",
+                        "LocalPath": "/opt/ml/processing/c7n-test-s3-bucket/DEMO-automatic-model-tuning-xgboost-dm/output",
+                        "S3UploadMode": "EndOfJob"
+                    },
+                    "AppManaged": false
+                }
+            ]
+        },
+        "ProcessingJobName": "c7n-test-1",
+        "ProcessingResources": {
+            "ClusterConfig": {
+                "InstanceCount": 1,
+                "InstanceType": "ml.m4.xlarge",
+                "VolumeSizeInGB": 1
+            }
+        },
+        "StoppingCondition": {
+            "MaxRuntimeInSeconds": 86400
+        },
+        "AppSpecification": {
+            "ImageUri": "644160558196.dkr.ecr.us-east-1.amazonaws.com/ubuntu18.04"
+        },
+        "NetworkConfig": {
+            "EnableInterContainerTrafficEncryption": false,
+            "EnableNetworkIsolation": false
+        },
+        "RoleArn": "arn:aws:iam::644160558196:role/service-role/AmazonSageMaker-ExecutionRole-20240319T150889",
+        "ProcessingJobArn": "arn:aws:sagemaker:us-east-1:644160558196:processing-job/c7n-test-1",
+        "ProcessingJobStatus": "Stopping",
+        "LastModifiedTime": {
+            "__class__": "datetime",
+            "year": 2024,
+            "month": 4,
+            "day": 17,
+            "hour": 10,
+            "minute": 27,
+            "second": 41,
+            "microsecond": 794000
+        },
+        "CreationTime": {
+            "__class__": "datetime",
+            "year": 2024,
+            "month": 4,
+            "day": 17,
+            "hour": 10,
+            "minute": 27,
+            "second": 23,
+            "microsecond": 901000
+        },
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,58 @@
+{
+    "status_code": 200,
+    "data": {
+        "CompositeAlarms": [
+            {
+                "ActionsEnabled": true,
+                "AlarmActions": [
+                    "arn:aws:sns:us-east-1:644160558196:test-xyz"
+                ],
+                "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:ExampleCompositeAlarm",
+                "AlarmConfigurationUpdatedTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 2,
+                    "day": 16,
+                    "hour": 16,
+                    "minute": 32,
+                    "second": 54,
+                    "microsecond": 256000
+                },
+                "AlarmDescription": "Composite alarm based on c7n-test-alarm-tags-filter",
+                "AlarmName": "ExampleCompositeAlarm",
+                "AlarmRule": "ALARM(c7n-test-alarm-tags-filter)",
+                "InsufficientDataActions": [
+                    "arn:aws:sns:us-east-1:644160558196:test-zyx"
+                ],
+                "OKActions": [
+                    "arn:aws:sns:us-east-1:644160558196:test-xyz"
+                ],
+                "StateReason": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:ExampleCompositeAlarm was created and its alarm rule evaluates to OK",
+                "StateReasonData": "{\"triggeringAlarms\":[{\"arn\":\"arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-tags-filter\",\"state\":{\"value\":\"INSUFFICIENT_DATA\",\"timestamp\":\"2022-09-27T10:05:12.198+0000\"}}]}",
+                "StateUpdatedTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 2,
+                    "day": 16,
+                    "hour": 16,
+                    "minute": 32,
+                    "second": 54,
+                    "microsecond": 256000
+                },
+                "StateValue": "OK",
+                "StateTransitionedTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 2,
+                    "day": 16,
+                    "hour": 16,
+                    "minute": 32,
+                    "second": 54,
+                    "microsecond": 256000
+                }
+            }
+        ],
+        "MetricAlarms": [],
+        "ResponseMetadata": {}
+    }
+}

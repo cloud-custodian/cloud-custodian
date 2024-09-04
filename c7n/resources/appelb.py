@@ -87,6 +87,7 @@ class AppELB(QueryResourceManager):
         arn = "LoadBalancerArn"
         # The suffix varies by type of loadbalancer (app vs net)
         arn_type = 'loadbalancer/app'
+        permissions_augment = ("elasticloadbalancing:DescribeTags",)
 
     retry = staticmethod(get_retry(('Throttling',)))
     source_mapping = {

@@ -3,7 +3,7 @@
 
 from pytest_terraform import terraform
 
-from .constants import ACCOUNT_ID
+from .zpill import ACCOUNT_ID
 
 
 @terraform("budgets_budget")
@@ -17,4 +17,3 @@ def test_budget_query(test, budgets_budget):
 
     resources = policy.run()
     assert len(resources) > 0
-

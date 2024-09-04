@@ -1,0 +1,44 @@
+{
+    "status_code": 200,
+    "data": {
+        "ConnectionList": [
+            {
+                "Name": "test2",
+                "Description": "",
+                "ConnectionType": "NETWORK",
+                "ConnectionProperties": {
+                    "KAFKA_SSL_ENABLED": "false"
+                },
+                "PhysicalConnectionRequirements": {
+                    "SubnetId": "subnet-0cc56341f33e72de0",
+                    "SecurityGroupIdList": [
+                        "sg-09d0fe3ff46b19e83"
+                    ],
+                    "AvailabilityZone": "us-east-1f"
+                },
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 11,
+                    "day": 21,
+                    "hour": 15,
+                    "minute": 51,
+                    "second": 14,
+                    "microsecond": 646000
+                },
+                "LastUpdatedTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 11,
+                    "day": 21,
+                    "hour": 16,
+                    "minute": 22,
+                    "second": 52,
+                    "microsecond": 654000
+                },
+                "LastUpdatedBy": "user/timmy"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

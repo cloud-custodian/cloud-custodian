@@ -14,7 +14,7 @@ ALLOWED_NOPERM = set((
     'or', 'and', 'not', 'value', 'reduce',
     'offhour', 'onhour', 'marked-for-op',
     'event', 'webhook', 'missing', 'list-item',
-    'recommend' # this requires configuration to determine permission
+    'recommend'  # this requires configuration to determine permission
 ))
 
 

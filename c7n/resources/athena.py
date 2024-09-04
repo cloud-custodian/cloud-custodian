@@ -15,3 +15,4 @@ class AthenaNamedQuery(query.QueryResourceManager):
         id = "NamedQueryId"
         name = "Name"
         cfn_type = "AWS::Athena::NamedQuery"
+        permissions_augment = ("athena:ListTagsForResource",)

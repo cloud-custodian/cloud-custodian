@@ -61,10 +61,11 @@ class VariableResolver:
 
     def _write_file_content(self, content, suffix=".tfvars"):
         fh = tempfile.NamedTemporaryFile(
-            dir=self.source_dir, prefix="c7n-left-", suffix=suffix, mode="w+"
+            dir=self.source_dir, prefix="c7n-left-", suffix=suffix, mode="w+", delete=False
         )
         fh.write(content)
         fh.flush()
+        fh.close()
         self.temp_files.append(fh)
         return fh
 
@@ -84,24 +85,38 @@ class VariableResolver:
         finally:
             for t in self.temp_files:
                 t.close()
+                os.unlink(t.name)
 
     def get_uninitialized_var_files(self):
         # functions that operate on unknown values will typically result in
         # unknown / null results. to provide broad compatiblity we try to initialize
         # things with default values to facilitate attribute interpolation.
         var_map = self.get_env_variables()
-        self.report("environment", var_map)
+        if var_map:
+            self.report("environment", var_map)
         for type, f_set in self.resolved_files.items():
             for idx, f in enumerate(f_set):
                 if str(f).endswith(".tfvars.json"):
                     f_vars = json.loads((self.source_dir / f).read_text())
                 elif str(f).endswith(".tfvars"):
-                    f_vars = hcl2.loads((self.source_dir / f).read_text())
+                    contents = (self.source_dir / f).read_text()
+                    # the way the hcl2 library / parse is structured
+                    # in golang/terraform it supports a file contents
+                    # in either format, to preserve compatiblity, we
+                    # check if its json, and if its not then load with
+                    # hcl/terraform. we do json first as its fast to
+                    # check and we can return back any hcl parse
+                    # errors.
+                    try:
+                        f_vars = json.loads(contents)
+                    except json.JSONDecodeError:
+                        f_vars = hcl2.loads(contents)
 
                 fpath = type == "user" and self.var_files[idx] or f
                 if isinstance(fpath, Path):
                     fpath = fpath.name
-                self.report(type, f_vars, fpath)
+                if f_vars:
+                    self.report(type, f_vars, fpath)
                 var_map.update(f_vars)
 
         uninitialized_vars = {}
@@ -111,6 +126,8 @@ class VariableResolver:
         ):
             for v in variables:
                 if v.get("default"):
+                    continue
+                if not v["__tfmeta"]["path"].startswith("variable"):
                     continue
                 if v["__tfmeta"]["label"] not in var_map:
                     uninitialized_vars[v["__tfmeta"]["label"]] = self.type_defaults[
@@ -125,7 +142,7 @@ class VariableResolver:
         return [
             Path(
                 self._write_file_content(json.dumps(uninitialized_vars), ".tfvars.json").name
-            ).relative_to(self.source_dir)
+            ).relative_to(self.source_dir.absolute())
         ]
 
     def get_env_variables(self):
@@ -162,5 +179,5 @@ class VariableResolver:
             else:
                 suffix = str(v).endswith(".tfvars.json") and ".tfvars.json" or ".tfvars"
                 vfr = self._write_file_content(v.read_text(), suffix)
-                resolved_files.append(Path(vfr.name).relative_to(self.source_dir))
+                resolved_files.append(Path(vfr.name).relative_to(self.source_dir.absolute()))
         return resolved_files

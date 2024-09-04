@@ -43,6 +43,7 @@ class CdnProfile(ArmResourceManager):
         )
         resource_type = 'Microsoft.Cdn/profiles'
 
+
 @CdnProfile.filter_registry.register('waf')
 class WebAppFirewallFilter(Filter):
     """Check waf enabled/disabled on cdn profiles
@@ -58,16 +59,18 @@ class WebAppFirewallFilter(Filter):
                 - type: waf
                   state: Disabled
     """
-    schema = type_schema('waf',required=['state'],
-              state={'type': 'string', 'enum': ['Enabled', 'Disabled']})
+    schema = type_schema(
+        'waf',
+        required=['state'],
+        state={'type': 'string', 'enum': ['Enabled', 'Disabled']})
 
     def process(self, resources, event=None):
-      client = self.manager.get_client()
-      matched = []
-      for profiles in resources:
-        policies = list(client.security_policies.list_by_profile(
-                      profiles["resourceGroup"],profiles["name"]))
-        if (self.data.get('state') == 'Disabled' and not policies) or (self.data.get('state')
-                                                                      == 'Enabled' and policies):
-            matched.append(profiles)
-      return matched
+        client = self.manager.get_client()
+        matched = []
+        for profiles in resources:
+            policies = list(client.security_policies.list_by_profile(
+                profiles["resourceGroup"], profiles["name"]))
+            if (self.data.get('state') == 'Disabled' and not policies) \
+               or (self.data.get('state') == 'Enabled' and policies):
+                matched.append(profiles)
+        return matched

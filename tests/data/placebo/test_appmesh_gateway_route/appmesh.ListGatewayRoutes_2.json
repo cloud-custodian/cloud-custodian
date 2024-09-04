@@ -1,0 +1,37 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "gatewayRoutes": [
+            {
+                "arn": "arn:aws:appmesh:us-east-1:644160558196:mesh/m2/virtualGateway/g1/gatewayRoute/gr1",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 4,
+                    "day": 8,
+                    "hour": 17,
+                    "minute": 44,
+                    "second": 20,
+                    "microsecond": 96000
+                },
+                "gatewayRouteName": "gr1",
+                "lastUpdatedAt": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 4,
+                    "day": 8,
+                    "hour": 17,
+                    "minute": 44,
+                    "second": 20,
+                    "microsecond": 96000
+                },
+                "meshName": "m2",
+                "meshOwner": "644160558196",
+                "resourceOwner": "644160558197",
+                "version": 1,
+                "virtualGatewayName": "g1"
+            }
+        ]
+    }
+}

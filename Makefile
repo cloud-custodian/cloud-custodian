@@ -7,7 +7,7 @@ PKG_REPO = testpypi
 PKG_INCREMENT := patch
 PKG_SET := tools/c7n_gcp tools/c7n_kube tools/c7n_openstack tools/c7n_mailer tools/c7n_logexporter tools/c7n_policystream tools/c7n_trailcreator tools/c7n_org tools/c7n_sphinxext tools/c7n_awscc tools/c7n_tencentcloud tools/c7n_azure tools/c7n_oci tools/c7n_terraform
 
-FMT_SET := tools/c7n_left tools/c7n_mailer tools/c7n_oci tools/c7n_kube
+FMT_SET := tools/c7n_left tools/c7n_mailer tools/c7n_oci tools/c7n_kube tools/c7n_awscc
 
 PLATFORM_ARCH := $(shell python3 -c "import platform; print(platform.machine())")
 PLATFORM_OS := $(shell python3 -c "import platform; print(platform.system())")
@@ -18,13 +18,9 @@ ARGS :=
 IMAGE := c7n
 IMAGE_TAG := latest
 
-ifneq "$(findstring $(PLATFORM_OS), Linux Darwin)" ""
-  ifneq "$(findstring $(PY_VERSION), 3.10)" ""
+# we distribute tfparse binary wheels for 3.10+
+ifneq "$(findstring 3.1, $(PY_VERSION))" ""
     PKG_SET := tools/c7n_left $(PKG_SET)
-  endif
-  ifneq "$(findstring $(PY_VERSION), 3.11)" ""
-    PKG_SET := tools/c7n_left $(PKG_SET)
-  endif
 endif
 
 
@@ -39,10 +35,11 @@ install:
 .PHONY: test
 
 test:
-	. $(PWD)/test.env && poetry run pytest -n auto tests tools $(ARGS)
+	. $(PWD)/test.env && poetry run pytest -n auto $(ARGS) tests tools
 
 test-coverage:
 	. $(PWD)/test.env && poetry run pytest -n auto \
+            --cov-config .coveragerc \
             --cov-report $(COVERAGE_TYPE) \
             --cov c7n \
             --cov tools/c7n_azure/c7n_azure \
@@ -63,13 +60,13 @@ sphinx:
 	make -f docs/Makefile.sphinx html
 
 lint:
-	ruff c7n tests tools
+	ruff check c7n tests tools
 	black --check $(FMT_SET)
 	type -P terraform && terraform fmt -check -recursive .
 
 format:
 	black $(FMT_SET)
-	ruff --fix c7n tests tools
+	ruff check --fix c7n tests tools
 	type -P terraform && terraform fmt -recursive .
 
 clean:
@@ -143,7 +140,7 @@ data-update:
 	cd tools/c7n_left/scripts && terraform init && python get_taggable.py --output ../c7n_left/data/taggable.json
 # aws data sets
 	python tools/dev/cfntypedb.py -f tests/data/cfn-types.json
-	python tools/dev/updatearnref > tests/data/arn-types.json
+	python tools/dev/updatearnref.py > tests/data/arn-types.json
 	python tools/dev/iamdb.py -f tests/data/iam-actions.json
 # gcp data sets
 	python tools/dev/gcpiamdb.py -f tools/c7n_gcp/tests/data/iam-permissions.json

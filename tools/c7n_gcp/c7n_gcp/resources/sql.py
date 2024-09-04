@@ -153,6 +153,35 @@ class SqlInstanceEnableDeletion(MethodAction):
         }
 
 
+@SqlInstance.action_registry.register('set-high-availability')
+class SqlInstanceHighAvailability(MethodAction):
+
+    schema = type_schema(
+        'set-high-availability',
+        value={'type': 'boolean', 'required': True})
+    method_spec = {'op': 'patch'}
+    path_param_re = re.compile('.*?/projects/(.*?)/instances/(.*)')
+    method_perm = 'update'
+
+    def get_resource_params(self, model, resource):
+        if self.data['value'] is False:
+            availabilityType = 'ZONAL'
+        else:
+            availabilityType = 'REGIONAL'
+
+        project, instance = self.path_param_re.match(
+            resource['selfLink']).groups()
+        return {
+            'project': project,
+            'instance': instance,
+            'body': {
+                'settings': {
+                    'availabilityType': availabilityType
+                }
+            }
+        }
+
+
 class SQLInstanceChildTypeInfo(ChildTypeInfo):
     service = 'sqladmin'
     version = 'v1beta4'

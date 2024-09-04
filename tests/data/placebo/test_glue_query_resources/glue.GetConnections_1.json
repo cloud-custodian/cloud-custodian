@@ -1,57 +1,47 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "37c71491-2ea7-11e8-bc67-05ab693096d1", 
-            "HTTPHeaders": {
-                "date": "Fri, 23 Mar 2018 14:33:56 GMT", 
-                "x-amzn-requestid": "37c71491-2ea7-11e8-bc67-05ab693096d1", 
-                "content-length": "467", 
-                "content-type": "application/x-amz-json-1.1", 
-                "connection": "keep-alive"
-            }
-        }, 
         "ConnectionList": [
             {
-                "Name": "c7n-test-connection", 
-                "CreationTime": {
-                    "hour": 10, 
-                    "__class__": "datetime", 
-                    "month": 3, 
-                    "second": 12, 
-                    "microsecond": 358000, 
-                    "year": 2018, 
-                    "day": 23, 
-                    "minute": 30
-                }, 
-                "ConnectionType": "JDBC", 
-                "PhysicalConnectionRequirements": {
-                    "SubnetId": "subnet-3a334610", 
-                    "AvailabilityZone": "us-east-1d", 
-                    "SecurityGroupIdList": [
-                        "sg-6c7fa917"
-                    ]
-                }, 
-                "LastUpdatedBy": "user/joshuaroot", 
-                "LastUpdatedTime": {
-                    "hour": 10, 
-                    "__class__": "datetime", 
-                    "month": 3, 
-                    "second": 12, 
-                    "microsecond": 358000, 
-                    "year": 2018, 
-                    "day": 23, 
-                    "minute": 30
-                }, 
+                "Name": "test",
+                "Description": "",
+                "ConnectionType": "JDBC",
                 "ConnectionProperties": {
-                    "USERNAME": "username", 
-                    "JDBC_CONNECTION_URL": "jdbc:postgresql://localhost:5432/test", 
-                    "PASSWORD": "password"
-                }, 
-                "Description": "Glue test"
+                    "JDBC_ENFORCE_SSL": "false",
+                    "JDBC_CONNECTION_URL": "jdbc:mysql://database-3-instance-1.cz6wy8cci3uf.us-east-1.rds.amazonaws.com:3306/test",
+                    "SECRET_ID": "c7n",
+                    "KAFKA_SSL_ENABLED": "false"
+                },
+                "PhysicalConnectionRequirements": {
+                    "SubnetId": "subnet-00872ab56d5fa4cdc",
+                    "SecurityGroupIdList": [
+                        "sg-045f7d0c2467c3bfb"
+                    ],
+                    "AvailabilityZone": "us-east-1a"
+                },
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 5,
+                    "day": 4,
+                    "hour": 20,
+                    "minute": 1,
+                    "second": 0,
+                    "microsecond": 856000
+                },
+                "LastUpdatedTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 11,
+                    "day": 20,
+                    "hour": 17,
+                    "minute": 4,
+                    "second": 49,
+                    "microsecond": 864000
+                },
+                "LastUpdatedBy": "user/timmy"
             }
-        ]
+        ],
+        "ResponseMetadata": {}
     }
 }

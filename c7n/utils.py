@@ -95,9 +95,9 @@ def loads(body):
 
 def dumps(data, fh=None, indent=0):
     if fh:
-        return json.dump(data, fh, cls=DateTimeEncoder, indent=indent)
+        return json.dump(data, fh, cls=JsonEncoder, indent=indent)
     else:
-        return json.dumps(data, cls=DateTimeEncoder, indent=indent)
+        return json.dumps(data, cls=JsonEncoder, indent=indent)
 
 
 def format_event(evt):
@@ -212,13 +212,15 @@ def type_schema(
     return s
 
 
-class DateTimeEncoder(json.JSONEncoder):
+class JsonEncoder(json.JSONEncoder):
 
     def default(self, obj):
         if isinstance(obj, datetime):
             return obj.isoformat()
         if isinstance(obj, FormatDate):
             return obj.datetime.isoformat()
+        if isinstance(obj, bytes):
+            return obj.decode('utf8', errors="ignore")
         return json.JSONEncoder.default(self, obj)
 
 
@@ -338,6 +340,9 @@ def local_session(factory, region=None):
 def reset_session_cache():
     for k in [k for k in dir(CONN_CACHE) if not k.startswith('_')]:
         setattr(CONN_CACHE, k, {})
+
+    from .credentials import CustodianSession
+    CustodianSession.close()
 
 
 def annotation(i, k):
@@ -646,7 +651,7 @@ def get_policy_provider(policy_data):
     if isinstance(policy_data['resource'], list):
         provider_name, _ = policy_data['resource'][0].split('.', 1)
     elif '.' in policy_data['resource']:
-        provider_name, resource_type = policy_data['resource'].split('.', 1)
+        provider_name, _ = policy_data['resource'].split('.', 1)
     else:
         provider_name = 'aws'
     return provider_name
@@ -884,6 +889,18 @@ def get_support_region(manager):
     return support_region
 
 
+def get_resource_tagging_region(resource_type, region):
+    # For global resources, tags don't populate in the get_resources call
+    # unless the call is being made to us-east-1. For govcloud this is us-gov-west-1.
+
+    partition = get_partition(region)
+    if partition == "aws":
+        return getattr(resource_type, 'global_resource', None) and 'us-east-1' or region
+    elif partition == "aws-us-gov":
+        return getattr(resource_type, 'global_resource', None) and 'us-gov-west-1' or region
+    return region
+
+
 def get_eni_resource_type(eni):
     if eni.get('Attachment'):
         instance_id = eni['Attachment'].get('InstanceId')
@@ -925,9 +942,9 @@ def get_eni_resource_type(eni):
         rtype = 'hsm'
     elif description.startswith('CloudHsm ENI'):
         rtype = 'hsmv2'
-    elif description.startswith('AWS Lambda VPC'):
-        rtype = 'lambda'
     elif description.startswith('AWS Lambda VPC ENI'):
+        rtype = 'lambda'
+    elif description.startswith('AWS Lambda VPC'):
         rtype = 'lambda'
     elif description.startswith('Interface for NAT Gateway'):
         rtype = 'nat'
@@ -954,6 +971,15 @@ class C7NJmespathFunctions(functions.Functions):
     def _func_split(self, sep, string):
         return string.split(sep)
 
+    @functions.signature(
+        {'types': ['string']}
+    )
+    def _func_from_json(self, string):
+        try:
+            return json.loads(string)
+        except json.JSONDecodeError:
+            return None
+
 
 class C7NJMESPathParser(Parser):
     def parse(self, expression):
@@ -978,6 +1004,22 @@ def jmespath_search(*args, **kwargs):
         **kwargs,
         options=jmespath.Options(custom_functions=C7NJmespathFunctions())
     )
+
+
+def get_path(path: str, resource: dict):
+    """
+    This function provides a wrapper to obtain a value from a resource
+    in an efficient manner.
+    jmespath_search is expensive and it's rarely the case that
+    there is a path in the id field, therefore this wrapper is an optimisation.
+
+    :param path: the path or field name to fetch
+    :param resource: the resource instance description
+    :return: the field/path value
+    """
+    if '.' in path:
+        return jmespath_search(path, resource)
+    return resource[path]
 
 
 def jmespath_compile(expression):

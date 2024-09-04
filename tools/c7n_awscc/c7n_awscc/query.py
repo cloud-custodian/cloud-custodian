@@ -14,7 +14,6 @@ log = logging.getLogger("c7n_awscc.query")
 
 
 class CloudControl:
-
     resources_expr = jmespath_compile("ResourceDescriptions[].Properties")
     ids_expr = jmespath_compile("ResourceDescriptions[].Identifier")
 
@@ -48,9 +47,7 @@ class CloudControl:
         p = self._get_resource_paginator(client)
 
         augment = bool(self.get_rl_perm_delta())
-        results = p.paginate(
-            TypeName=self.manager.resource_type.cfn_type
-        ).build_full_result()
+        results = p.paginate(TypeName=self.manager.resource_type.cfn_type).build_full_result()
         if not augment:
             # properties are serialized json, in json.. yo dawg :/
             results = list(map(json.loads, self.resources_expr.search(results)))
@@ -63,9 +60,9 @@ class CloudControl:
         resources = []
         for i in ids:
             try:
-                r = client.get_resource(
-                    TypeName=self.manager.resource_type.cfn_type, Identifier=i
-                )["ResourceDescription"]["Properties"]
+                r = client.get_resource(TypeName=self.manager.resource_type.cfn_type, Identifier=i)[
+                    "ResourceDescription"
+                ]["Properties"]
                 resources.append(json.loads(r))
             except ClientError:
                 continue
@@ -73,22 +70,16 @@ class CloudControl:
 
     def get_rl_perm_delta(self):
         lperms = set(
-            self.manager.schema["handlers"]
-            .get("list", {"permissions": ()})
-            .get("permissions")
+            self.manager.schema["handlers"].get("list", {"permissions": ()}).get("permissions")
         )
         rperms = set(
-            self.manager.schema["handlers"]
-            .get("read", {"permissions": ()})
-            .get("permissions")
+            self.manager.schema["handlers"].get("read", {"permissions": ()}).get("permissions")
         )
 
         remainder = rperms.difference(lperms)
         if not remainder or len(remainder) < 2:
             return False
-        print(
-            f"cloud control {self.manager.type} forces augment {remainder} {lperms} {rperms}"
-        )
+        print(f"cloud control {self.manager.type} forces augment {remainder} {lperms} {rperms}")
         return remainder
 
     def augment(self, resources):

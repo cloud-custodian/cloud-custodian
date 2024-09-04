@@ -1,0 +1,202 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.MachineLearningServices/workspaces?api-version=2020-08-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Wed, 31 Aug 2022 10:37:40 GMT"
+                    ],
+                    "request-context": [
+                        "appId=cid-v1:2d2e8e63-272e-4b3c-8598-4ee570a0e70d"
+                    ],
+                    "server-timing": [
+                        "traceparent;desc=\"00-916d6a673ad6434b887d835d75337dea-b93427845d0114bd-00\""
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-request-time": [
+                        "0.018"
+                    ],
+                    "x-aml-cluster": [
+                        "vienna-eastus-01"
+                    ],
+                    "x-ms-response-type": [
+                        "standard"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "2618"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/VV/providers/Microsoft.MachineLearningServices/workspaces/vvmlwrkspc",
+                                "name": "vvmlwrkspc",
+                                "type": "Microsoft.MachineLearningServices/workspaces",
+                                "location": "eastus",
+                                "tags": {},
+                                "etag": null,
+                                "properties": {
+                                    "friendlyName": "vvmlwrkspc",
+                                    "description": "",
+                                    "storageAccount": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/VV/providers/Microsoft.Storage/storageAccounts/vvmlwrkspc8185571600",
+                                    "keyVault": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/VV/providers/Microsoft.Keyvault/vaults/vvmlwrkspc7131239577",
+                                    "applicationInsights": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/VV/providers/Microsoft.insights/components/vvmlwrkspc3663299591",
+                                    "hbiWorkspace": false,
+                                    "tenantId": "00000000-0000-0000-0000-000000000003",
+                                    "imageBuildCompute": null,
+                                    "provisioningState": "Succeeded",
+                                    "containerRegistry": null,
+                                    "creationTime": "2022-08-31T08:12:07.9603954+00:00",
+                                    "notebookInfo": {
+                                        "resourceId": "ac1da12724f346c09a3eaf3da59910d5",
+                                        "fqdn": "ml-vvmlwrkspc-eastus-013279f0-4aa8-40bf-bc31-f82cb6e680c9.eastus.notebooks.azure.net",
+                                        "isPrivateLinkEnabled": false,
+                                        "notebookPreparationError": null
+                                    },
+                                    "storageHnsEnabled": false,
+                                    "workspaceId": "013279f0-4aa8-40bf-bc31-f82cb6e680c9",
+                                    "linkedModelInventoryArmId": null,
+                                    "privateLinkCount": 0,
+                                    "allowPublicAccessWhenBehindVnet": true,
+                                    "discoveryUrl": "https://eastus.api.azureml.ms/discovery",
+                                    "mlFlowTrackingUri": "azureml://eastus.api.azureml.ms/mlflow/v1.0/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/VV/providers/Microsoft.MachineLearningServices/workspaces/vvmlwrkspc",
+                                    "sdkTelemetryAppInsightsKey": "f5784ccd-178d-4ecc-9998-b05841b44ae9"
+                                },
+                                "identity": {
+                                    "type": "SystemAssigned",
+                                    "principalId": "41293ae5-5d7a-4d4d-93f7-4ded935d0ab3",
+                                    "tenantId": "00000000-0000-0000-0000-000000000003"
+                                },
+                                "sku": {
+                                    "name": "Basic",
+                                    "tier": "Basic"
+                                },
+                                "systemData": {
+                                    "createdAt": "2022-08-31T08:12:07.0857487Z",
+                                    "createdBy": "Volodymyr_Vrydnyk@epam.com",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2022-08-31T08:12:07.0857487Z",
+                                    "lastModifiedBy": "Volodymyr_Vrydnyk@epam.com",
+                                    "lastModifiedByType": "User"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/VV/providers/Microsoft.MachineLearningServices/workspaces/vvmlwrkspc/computes?api-version=2020-08-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Wed, 31 Aug 2022 10:37:40 GMT"
+                    ],
+                    "request-context": [
+                        "appId=cid-v1:2d2e8e63-272e-4b3c-8598-4ee570a0e70d"
+                    ],
+                    "server-timing": [
+                        "traceparent;desc=\"00-84fbd7bab000b941aff0d037db21b4fd-ed4c67720b57a0c1-00\""
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-request-time": [
+                        "0.042"
+                    ],
+                    "x-aml-cluster": [
+                        "vienna-eastus-01"
+                    ],
+                    "x-ms-response-type": [
+                        "standard"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "1723"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/VV/providers/Microsoft.MachineLearningServices/workspaces/vvmlwrkspc/computes/vvmlwrkspc11",
+                                "name": "vvmlwrkspc11",
+                                "type": "Microsoft.MachineLearningServices/workspaces/computes",
+                                "location": "eastus",
+                                "tags": {},
+                                "properties": {
+                                    "createdOn": "2022-08-31T08:19:39.0074366+00:00",
+                                    "modifiedOn": "2022-08-31T08:19:45.7161131+00:00",
+                                    "disableLocalAuth": false,
+                                    "description": null,
+                                    "resourceId": null,
+                                    "computeType": "AmlCompute",
+                                    "computeLocation": "eastus",
+                                    "provisioningState": "Succeeded",
+                                    "provisioningErrors": null,
+                                    "isAttachedCompute": false,
+                                    "properties": {
+                                        "vmSize": "STANDARD_D1_V2",
+                                        "vmPriority": "LowPriority",
+                                        "scaleSettings": {
+                                            "maxNodeCount": 2,
+                                            "minNodeCount": 0,
+                                            "nodeIdleTimeBeforeScaleDown": "PT2M"
+                                        },
+                                        "subnet": null,
+                                        "currentNodeCount": 0,
+                                        "targetNodeCount": 0,
+                                        "nodeStateCounts": {
+                                            "preparingNodeCount": 0,
+                                            "runningNodeCount": 0,
+                                            "idleNodeCount": 0,
+                                            "unusableNodeCount": 0,
+                                            "leavingNodeCount": 0,
+                                            "preemptedNodeCount": 0
+                                        },
+                                        "allocationState": "Steady",
+                                        "allocationStateTransitionTime": "2022-08-31T08:19:43.44+00:00",
+                                        "errors": null,
+                                        "remoteLoginPortPublicAccess": "Enabled",
+                                        "osType": "Linux",
+                                        "virtualMachineImage": null,
+                                        "isolatedNetwork": false,
+                                        "enableNodePublicIp": true
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

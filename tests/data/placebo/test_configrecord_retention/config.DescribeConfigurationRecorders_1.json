@@ -1,0 +1,28 @@
+{
+    "status_code": 200,
+    "data": {
+        "ConfigurationRecorders": [
+            {
+                "name": "aws-controltower-BaselineConfigRecorder",
+                "roleARN": "arn:aws:iam::644160558196:role/aws-service-role/config.amazonaws.com/AWSServiceRoleForConfig",
+                "recordingGroup": {
+                    "allSupported": false,
+                    "includeGlobalResourceTypes": false,
+                    "resourceTypes": [
+                        "AWS::WAF::RateBasedRule",
+                        "AWS::WAF::Rule",
+                        "AWS::WAF::RuleGroup",
+                        "AWS::WAF::WebACL"
+                    ],
+                    "exclusionByResourceTypes": {
+                        "resourceTypes": []
+                    },
+                    "recordingStrategy": {
+                        "useOnly": "INCLUSION_BY_RESOURCE_TYPES"
+                    }
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

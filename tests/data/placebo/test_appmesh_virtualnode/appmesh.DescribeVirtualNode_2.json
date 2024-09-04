@@ -1,0 +1,54 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "virtualNode": {
+            "meshName": "m1",
+            "metadata": {
+                "arn": "arn:aws:appmesh:us-east-1:659775036450:mesh/m1/virtualNode/vn2",
+                "createdAt": "2024-03-22T23:14:07.869000+00:00",
+                "lastUpdatedAt": "2024-03-22T23:28:19.231000+00:00",
+                "meshOwner": "659775036450",
+                "resourceOwner": "659775036450",
+                "uid": "deab3c0d-37a9-4ec2-b690-594f27af3b24",
+                "version": 2
+            },
+            "spec": {
+                "backendDefaults": {
+                    "clientPolicy": {
+                        "tls": {
+                            "enforce": false,
+                            "ports": [],
+                            "validation": {
+                                "trust": {
+                                    "file": {
+                                        "certificateChain": "/the/capath"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "backends": [],
+                "listeners": [
+                    {
+                        "portMapping": {
+                            "port": 123,
+                            "protocol": "http"
+                        }
+                    }
+                ],
+                "logging": {},
+                "serviceDiscovery": {
+                    "dns": {
+                        "hostname": "vn2.hostname"
+                    }
+                }
+            },
+            "status": {
+                "status": "ACTIVE"
+            },
+            "virtualNodeName": "vn2"
+        }
+    }
+}

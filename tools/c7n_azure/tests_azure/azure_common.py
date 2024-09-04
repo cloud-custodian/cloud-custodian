@@ -6,7 +6,7 @@ import json
 import logging
 import os
 import re
-from distutils.util import strtobool
+from c7n.vendored.distutils.util import strtobool
 from functools import wraps
 from time import sleep
 

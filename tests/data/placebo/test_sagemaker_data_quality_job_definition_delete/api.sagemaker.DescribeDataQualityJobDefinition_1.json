@@ -1,0 +1,51 @@
+{
+    "status_code": 200,
+    "data": {
+        "JobDefinitionArn": "arn:aws:sagemaker:us-east-1:644160558196:data-quality-job-definition/c7n-test",
+        "JobDefinitionName": "c7n-test",
+        "CreationTime": {
+            "__class__": "datetime",
+            "year": 2024,
+            "month": 4,
+            "day": 24,
+            "hour": 15,
+            "minute": 33,
+            "second": 33,
+            "microsecond": 57000
+        },
+        "DataQualityAppSpecification": {
+            "ImageUri": "644160558196.dkr.ecr.us-east-1.amazonaws.com/data-quality-job:latest"
+        },
+        "DataQualityJobInput": {
+            "EndpointInput": {
+                "EndpointName": "c7n-test-endpoint",
+                "LocalPath": "/opt/ml/processing/input",
+                "S3InputMode": "File",
+                "S3DataDistributionType": "FullyReplicated"
+            }
+        },
+        "DataQualityJobOutputConfig": {
+            "MonitoringOutputs": [
+                {
+                    "S3Output": {
+                        "S3Uri": "s3://c7n-test-s3-bucket/DEMO-automatic-model-tuning-xgboost-dm/output",
+                        "LocalPath": "/opt/ml/processing/output",
+                        "S3UploadMode": "EndOfJob"
+                    }
+                }
+            ]
+        },
+        "JobResources": {
+            "ClusterConfig": {
+                "InstanceCount": 1,
+                "InstanceType": "ml.t3.medium",
+                "VolumeSizeInGB": 1
+            }
+        },
+        "RoleArn": "arn:aws:iam::644160558196:role/service-role/AmazonSageMaker-ExecutionRole-20240417T154464",
+        "StoppingCondition": {
+            "MaxRuntimeInSeconds": 3600
+        },
+        "ResponseMetadata": {}
+    }
+}

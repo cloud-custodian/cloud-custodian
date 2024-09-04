@@ -45,6 +45,9 @@ class Output:
     def on_policy_start(self, policy, event):
         """called when a policy is about to be run"""
 
+    def on_policy_error(self, exception, policy, rtype, resources):
+        """called on an unexpected policy error"""
+
     def on_results(self, policy, results):
         """called when a policy matches resources"""
 
@@ -72,6 +75,8 @@ class JsonGraph(Output):
         data = {}
         data["input_vars"] = self.input_vars
         data["graph"] = dict(self.graph.resource_data)
+        if self.config.output_query:
+            data = jmespath_search(self.config.output_query, data)
         self.config.output_file.write(json.dumps(data, cls=JSONEncoder, indent=2))
 
 
@@ -87,15 +92,20 @@ class RichCli(Output):
         self.started = time.time()
 
     def on_execution_ended(self):
-        message = "[green]Success[green]"
+        message = "[green]Success[/green]"
         if self.matches:
             message = "[red]%d Failures[/red]" % self.matches
         self.console.print(
             "Evaluation complete %0.2f seconds -> %s" % (time.time() - self.started, message)
         )
 
+    def on_policy_error(self, exception, policy, rtype, resources):
+        self.console.print(f"[red]error[/red] policy:{policy.name} resource:{rtype}")
+        self.console.print_exception()
+
     def on_vars_discovered(self, var_type, var_map, var_path=None):
-        if var_type != "uninitialized":
+        if var_type != "uninitialized" and var_map:
+            var_path = var_path or ""
             self.console.print(f"Loaded {len(var_map)} vars from {var_type} {var_path}")
 
     def on_results(self, policy, results):
@@ -116,7 +126,8 @@ class RichResult:
         yield "  [red]Failed[/red]"
         if policy.data.get("description"):
             yield f"  [red]Reason: {policy.data['description']}[/red]"
-        yield f"  [purple]File: {resource.filename}:{resource.line_start}-{resource.line_end}"
+        filename = f"{resource.src_dir}/{resource.filename}"
+        yield f"  [purple]File: {filename}:{resource.line_start}-{resource.line_end}"
 
         lines = resource.get_source_lines()
         yield Syntax(
@@ -154,7 +165,8 @@ class Summary(Output):
         resource_count = 0
 
         for rtype, resources in graph.get_resources_by_type():
-            resources = self.config.exec_filter.filter_resources(rtype, resources)
+            if self.config.exec_filter:
+                resources = self.config.exec_filter.filter_resources(rtype, resources)
             if "_" not in rtype:
                 continue
             if not resources:
@@ -167,7 +179,7 @@ class Summary(Output):
                     unevaluated[rtype] = len(resources)
                 else:
                     type_policies[rtype] += 1
-                    policy_resources[p.name] = len(resources)
+                    policy_resources[p.name] += len(resources)
 
         self.counter_unevaluated_by_type = unevaluated
         self.counter_resources_by_type = type_counts
@@ -337,6 +349,10 @@ class MultiOutput:
     def on_policy_start(self, policy, event):
         for o in self.outputs:
             o.on_policy_start(policy, event)
+
+    def on_policy_error(self, exception, policy, rtype, resources):
+        for o in self.outputs:
+            o.on_policy_error(exception, policy, rtype, resources)
 
     def on_results(self, policy, results):
         for o in self.outputs:

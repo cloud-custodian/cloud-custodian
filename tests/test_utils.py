@@ -10,6 +10,7 @@ from unittest import mock
 from botocore.exceptions import ClientError
 from dateutil.parser import parse as parse_date
 
+from c7n import query
 from c7n import utils
 from c7n.config import Config
 from .common import BaseTest
@@ -59,7 +60,7 @@ class Backoff(BaseTest):
 
     def test_delays_jitter(self):
         count = 0
-        while(count < 100000):
+        while (count < 100000):
             count += 1
             for idx, i in enumerate(utils.backoff_delays(1, 256, jitter=True)):
                 maxv = 2 ** idx
@@ -215,6 +216,13 @@ class UtilTest(BaseTest):
 
         self.assertEqual(utils.local_session(p.session_factory), previous)
 
+    def test_encode_bytes(self):
+        self.assertEqual(
+            json.loads(json.dumps(
+                {"bytes": b"123"}, cls=utils.JsonEncoder)),
+                {'bytes': '123'}
+            )
+
     def test_format_date(self):
         d = parse_date("2018-02-02 12:00")
         self.assertEqual("{}".format(utils.FormatDate(d)), "2018-02-02 12:00:00")
@@ -228,7 +236,7 @@ class UtilTest(BaseTest):
         self.assertEqual("{:+5M%M}".format(utils.FormatDate(d)), "05")
 
         self.assertEqual(json.dumps(utils.FormatDate(d),
-                                    cls=utils.DateTimeEncoder, indent=2),
+                                    cls=utils.JsonEncoder, indent=2),
                          '"2018-02-02T12:00:00"')
         self.assertEqual(str(d), '2018-02-02 12:00:00')
 
@@ -438,7 +446,7 @@ class UtilTest(BaseTest):
         self.assertEqual(json.loads(utils.format_event(event)), json.loads(event_json))
 
     def test_date_time_decoder(self):
-        dtdec = utils.DateTimeEncoder()
+        dtdec = utils.JsonEncoder()
         self.assertRaises(TypeError, dtdec.default, "test")
 
     def test_set_annotation(self):
@@ -566,6 +574,40 @@ class UtilTest(BaseTest):
         mock_manager.config.region = "cn-north-1"
         res = utils.get_support_region(mock_manager)
         self.assertEqual("cn-north-1", res)
+
+    def test_get_resource_tagging_region(self):
+
+        resource_type = query.TypeInfo()
+
+        # Regional endpoint checks
+        self.assertEqual(utils.get_resource_tagging_region(resource_type,
+                                                           'us-east-2'), 'us-east-2')
+        self.assertEqual(utils.get_resource_tagging_region(resource_type,
+                                                           'ap-southeast-1'), 'ap-southeast-1')
+        self.assertEqual(utils.get_resource_tagging_region(resource_type,
+                                                           'eu-west-1'), 'eu-west-1')
+        self.assertEqual(utils.get_resource_tagging_region(resource_type,
+                                                           'us-gov-east-1'), 'us-gov-east-1')
+        self.assertEqual(utils.get_resource_tagging_region(resource_type,
+                                                           'cn-north-1'), 'cn-north-1')
+        self.assertEqual(utils.get_resource_tagging_region(resource_type,
+                                                           'us-iso-east-1'), 'us-iso-east-1')
+
+        # Global resource checks
+        resource_type.global_resource = True
+
+        self.assertEqual(utils.get_resource_tagging_region(resource_type,
+                                                           'us-east-2'), 'us-east-1')
+        self.assertEqual(utils.get_resource_tagging_region(resource_type,
+                                                           'us-gov-east-1'), 'us-gov-west-1')
+        self.assertEqual(utils.get_resource_tagging_region(resource_type,
+                                                           'cn-north-1'), 'cn-north-1')
+        self.assertEqual(utils.get_resource_tagging_region(resource_type,
+                                                           'us-iso-east-1'), 'us-iso-east-1')
+        self.assertEqual(utils.get_resource_tagging_region(resource_type,
+                                                           'ap-southeast-1'), 'us-east-1')
+        self.assertEqual(utils.get_resource_tagging_region(resource_type,
+                                                              'eu-west-1'), 'us-east-1')
 
     def test_get_eni_resource_type(self):
         self.assertEqual(
@@ -704,3 +746,18 @@ def test_jmespath_parse_split():
         {'foo': {'bar': 'abc.xyz'}}
     )
     assert result == ['abc', 'xyz']
+
+
+def test_jmespath_parse_to_json():
+    result = utils.jmespath_search(
+        'from_json(foo).bar',
+        {'foo': '{"bar": "abc.xyz"}'}
+    )
+    assert result == 'abc.xyz'
+
+    # bad json comes in = return null
+    result = utils.jmespath_search(
+        'from_json(foo).bar',
+        {'foo': '{"]}'}
+    )
+    assert result is None

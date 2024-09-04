@@ -1,11 +1,13 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 #
+import itertools
 import logging
 from pathlib import Path
 import sys
 
 import click
+
 from c7n.config import Config
 
 from .core import CollectionRunner, ExecutionFilter, get_provider
@@ -13,7 +15,7 @@ from .entry import initialize_iac
 from .output import get_reporter, report_outputs, summary_options
 from .test import TestReporter, TestRunner
 from .policy import load_policies
-
+from .validate import validate_files
 
 log = logging.getLogger("c7n.iac")
 
@@ -47,12 +49,11 @@ def cli():
 )
 def dump(directory, var_file, output_file, output_query):
     """Dump the parsed resource graph or subset"""
-
-    config = Config.empty(
-        source_dir=Path(directory),
+    config = get_config(
+        directory,
         output="jsongraph",
         output_file=output_file,
-        var_files=var_file,
+        var_file=var_file,
         output_query=output_query,
     )
     reporter = get_reporter(config)
@@ -67,6 +68,9 @@ def dump(directory, var_file, output_file, output_query):
 @cli.command()
 @click.option("--format", default="terraform")
 @click.option("--filters", help="Filter policies or resources as k=v pairs with globbing")
+@click.option(
+    "--warn-on", help="Select policies to log instead of fail on via k=v pairs with globbing"
+)
 @click.option("-p", "--policy-dir", type=click.Path(), help="Directory with policies")
 @click.option("-d", "--directory", type=click.Path(), help="IaC directory to evaluate")
 @click.option(
@@ -105,6 +109,8 @@ def run(
     output_query,
     summary,
     filters,
+    warn_on,
+    reporter=None,
 ):
     """evaluate policies against IaC sources.
 
@@ -113,24 +119,23 @@ def run(
 
     WARNING - CLI interface subject to change.
     """
-    config = Config.empty(
-        source_dir=Path(directory),
-        policy_dir=Path(policy_dir),
+    config = get_config(
+        directory,
+        policy_dir,
         output=output,
         output_file=output_file,
-        var_files=var_file,
         output_query=output_query,
+        var_file=var_file,
         summary=summary,
+        warn_on=warn_on,
         filters=filters,
     )
-
-    exec_filter = ExecutionFilter.parse(config)
-    config["exec_filter"] = exec_filter
-    policies = exec_filter.filter_policies(load_policies(policy_dir, config))
+    policies = config.exec_filter.filter_policies(load_policies(policy_dir, config))
     if not policies:
         log.warning("no policies found")
         sys.exit(1)
-    reporter = get_reporter(config)
+    if reporter is None:
+        reporter = get_reporter(config)
     config["reporter"] = reporter
     runner = CollectionRunner(policies, config, reporter)
     sys.exit(int(runner.run()))
@@ -144,20 +149,69 @@ def test(policy_dir, filters):
     policy_dir = Path(policy_dir)
     source_dir = policy_dir / "tests"
 
-    config = Config.empty(
-        source_dir=source_dir,
-        policy_dir=policy_dir,
-        output_file=sys.stdout,
-        filters=filters,
-        var_files=(),
-    )
-
+    config = get_config(source_dir, policy_dir, output_file=sys.stdout, filters=filters)
     reporter = TestReporter(None, config)
-    exec_filter = ExecutionFilter.parse(config)
-    config["exec_filter"] = exec_filter
-    policies = exec_filter.filter_policies(load_policies(policy_dir, config))
+    policies = config.exec_filter.filter_policies(load_policies(policy_dir, config))
     runner = TestRunner(policies, config, reporter)
     sys.exit(int(runner.run()))
+
+
+@cli.command()
+@click.option("-p", "--policy-dir", type=click.Path(), help="Directory with policies")
+def validate(policy_dir=None):
+    """Validate configuration files"""
+
+    glob_patterns = ("*.yml", "*.yaml", "*.json")
+    policy_dir = Path(policy_dir)
+
+    if not policy_dir.is_dir():
+        log.error(f"Policy directory {policy_dir} does not exist.")
+        sys.exit(1)
+
+    # Find all policy files in the given directory that match the glob patterns
+    policy_files = list(itertools.chain(*(policy_dir.rglob(pattern) for pattern in glob_patterns)))
+    if not policy_files:
+        log.warning(f"No policy files found in {policy_dir} during validation.")
+        return
+
+    file_errors = validate_files(policy_files)
+    if file_errors:
+        error_count = sum(map(len, file_errors.values()))
+        log.error(f"Validation failed with {error_count} errors")
+        for policy_file, errors in file_errors.items():
+            log.error(f"In file: {policy_file}")
+            for error in errors:
+                log.error(error)
+        sys.exit(1)
+
+
+def get_config(
+    directory=None,
+    policy_dir=None,
+    output=None,
+    output_file=None,
+    var_file=(),
+    output_query=None,
+    summary=None,
+    filters=None,
+    warn_on=None,
+    format="terraform",
+):
+    config = Config.empty(
+        source_dir=directory and Path(directory),
+        policy_dir=policy_dir and Path(policy_dir),
+        output=output,
+        output_file=output_file,
+        var_files=var_file,
+        output_query=output_query,
+        summary=summary,
+        filters=filters,
+        warn_on=warn_on,
+        format=format,
+    )
+    config["exec_filter"] = ExecutionFilter.parse(config.filters)
+    config["warn_filter"] = ExecutionFilter.parse(config.warn_on, severity_direction="gte")
+    return config
 
 
 if __name__ == "__main__":  # pragma: no cover

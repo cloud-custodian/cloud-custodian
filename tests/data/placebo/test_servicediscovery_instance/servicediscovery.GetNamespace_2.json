@@ -1,0 +1,35 @@
+{
+    "status_code": 200,
+    "data": {
+        "Namespace": {
+            "Id": "ns-2",
+            "Arn": "arn:aws:servicediscovery:us-east-1:644160558196:namespace/ns-2",
+            "Name": "e1-test-public-ns.com",
+            "Type": "DNS_PUBLIC",
+            "Description": "testing public dbs",
+            "Properties": {
+                "DnsProperties": {
+                    "HostedZoneId": "Z0772636XQG65X86O6B0",
+                    "SOA": {
+                        "TTL": 60
+                    }
+                },
+                "HttpProperties": {
+                    "HttpName": "e1-test-public-ns.com"
+                }
+            },
+            "CreateDate": {
+                "__class__": "datetime",
+                "year": 2024,
+                "month": 6,
+                "day": 13,
+                "hour": 12,
+                "minute": 34,
+                "second": 12,
+                "microsecond": 275000
+            },
+            "CreatorRequestId": "terraform-20240416094214796100000001"
+        },
+        "ResponseMetadata": {}
+    }
+}

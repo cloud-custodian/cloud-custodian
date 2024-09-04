@@ -1,0 +1,163 @@
+{
+    "status_code": 200,
+    "data": {
+        "services": [
+            {
+                "serviceArn": "arn:aws:ecs:us-east-1:644160558196:service/c7n-test-cluster/c7n-test-service",
+                "serviceName": "c7n-test-service",
+                "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/c7n-test-cluster",
+                "loadBalancers": [],
+                "serviceRegistries": [],
+                "status": "ACTIVE",
+                "desiredCount": 1,
+                "runningCount": 1,
+                "pendingCount": 0,
+                "launchType": "FARGATE",
+                "platformVersion": "LATEST",
+                "platformFamily": "Linux",
+                "taskDefinition": "arn:aws:ecs:us-east-1:644160558196:task-definition/c7n-test-task-def:2",
+                "deploymentConfiguration": {
+                    "deploymentCircuitBreaker": {
+                        "enable": false,
+                        "rollback": false
+                    },
+                    "maximumPercent": 200,
+                    "minimumHealthyPercent": 100
+                },
+                "deployments": [
+                    {
+                        "id": "ecs-svc/1718156036370285947",
+                        "status": "PRIMARY",
+                        "taskDefinition": "arn:aws:ecs:us-east-1:644160558196:task-definition/c7n-test-task-def:2",
+                        "desiredCount": 1,
+                        "pendingCount": 0,
+                        "runningCount": 1,
+                        "failedTasks": 0,
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2023,
+                            "month": 8,
+                            "day": 31,
+                            "hour": 13,
+                            "minute": 52,
+                            "second": 26,
+                            "microsecond": 97000
+                        },
+                        "updatedAt": {
+                            "__class__": "datetime",
+                            "year": 2023,
+                            "month": 8,
+                            "day": 31,
+                            "hour": 13,
+                            "minute": 53,
+                            "second": 3,
+                            "microsecond": 916000
+                        },
+                        "launchType": "FARGATE",
+                        "platformVersion": "1.4.0",
+                        "platformFamily": "Linux",
+                        "networkConfiguration": {
+                            "awsvpcConfiguration": {
+                                "subnets": [
+                                    "subnet-00872ab56d5fa4cdc",
+                                    "subnet-0797208b821c08196"
+                                ],
+                                "securityGroups": [
+                                    "sg-045f7d0c2467c3bfb"
+                                ],
+                                "assignPublicIp": "ENABLED"
+                            }
+                        },
+                        "rolloutState": "COMPLETED",
+                        "rolloutStateReason": "ECS deployment ecs-svc/1718156036370285947 completed."
+                    }
+                ],
+                "roleArn": "arn:aws:iam::644160558196:role/aws-service-role/ecs.amazonaws.com/AWSServiceRoleForECS",
+                "events": [
+                    {
+                        "id": "f22515f3-9fe6-4be6-aff4-c1696bf5e9b2",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2023,
+                            "month": 8,
+                            "day": 31,
+                            "hour": 13,
+                            "minute": 53,
+                            "second": 3,
+                            "microsecond": 922000
+                        },
+                        "message": "(service c7n-test-service) has reached a steady state."
+                    },
+                    {
+                        "id": "3b1b1392-b06e-4884-810f-962a2cc7aaab",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2023,
+                            "month": 8,
+                            "day": 31,
+                            "hour": 13,
+                            "minute": 53,
+                            "second": 3,
+                            "microsecond": 921000
+                        },
+                        "message": "(service c7n-test-service) (deployment ecs-svc/1718156036370285947) deployment completed."
+                    },
+                    {
+                        "id": "2dc0f149-9230-4aea-a750-e8bde88b9146",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2023,
+                            "month": 8,
+                            "day": 31,
+                            "hour": 13,
+                            "minute": 52,
+                            "second": 35,
+                            "microsecond": 867000
+                        },
+                        "message": "(service c7n-test-service) has started 1 tasks: (task 83663272a85245a09dd7adcb3b59b509)."
+                    }
+                ],
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 8,
+                    "day": 31,
+                    "hour": 13,
+                    "minute": 52,
+                    "second": 26,
+                    "microsecond": 97000
+                },
+                "placementConstraints": [],
+                "placementStrategy": [],
+                "networkConfiguration": {
+                    "awsvpcConfiguration": {
+                        "subnets": [
+                            "subnet-00872ab56d5fa4cdc",
+                            "subnet-0797208b821c08196"
+                        ],
+                        "securityGroups": [
+                            "sg-045f7d0c2467c3bfb"
+                        ],
+                        "assignPublicIp": "ENABLED"
+                    }
+                },
+                "schedulingStrategy": "REPLICA",
+                "deploymentController": {
+                    "type": "ECS"
+                },
+                "tags": [
+                    {
+                        "key": "NetworkLocation",
+                        "value": "Customer"
+                    }
+                ],
+                "createdBy": "arn:aws:iam::644160558196:user/Lucas",
+                "enableECSManagedTags": false,
+                "propagateTags": "NONE",
+                "enableExecuteCommand": false
+            }
+        ],
+        "failures": [],
+        "ResponseMetadata": {}
+    }
+}

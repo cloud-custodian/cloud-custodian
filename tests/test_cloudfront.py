@@ -798,6 +798,28 @@ class CloudFront(BaseTest):
             'AwsCloudFrontDistributionDetails',
             'securityhub')
 
+    def test_origin_access_control(self):
+        factory = self.replay_flight_data("test_origin_access_control")
+
+        p = self.load_policy(
+            {
+                "name": "origin-access-control-signing-behavior",
+                "resource": "origin-access-control",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "SigningBehavior",
+                        "value": "always",
+                        "op": "eq"
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['Name'], "c7n-signing-behavior-always-oac")
+
 
 class CloudFrontWafV2(BaseTest):
 

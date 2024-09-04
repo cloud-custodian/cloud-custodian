@@ -7,6 +7,7 @@ from c7n.utils import local_session, type_schema
 from c7n.actions import Action
 from c7n.filters.kms import KmsRelatedFilter
 
+
 @resources.register('connect-instance')
 class Connect(QueryResourceManager):
 
@@ -135,4 +136,4 @@ class ConnectCampaign(QueryResourceManager):
 
 @ConnectCampaign.filter_registry.register('kms-key')
 class ConnectCampaignKmsFilter(KmsRelatedFilter):
-  RelatedIdsExpression = 'connectInstanceConfig.encryptionConfig.keyArn'
+    RelatedIdsExpression = 'connectInstanceConfig.encryptionConfig.keyArn'

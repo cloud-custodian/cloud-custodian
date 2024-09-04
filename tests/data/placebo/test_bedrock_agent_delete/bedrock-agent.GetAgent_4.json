@@ -1,0 +1,11 @@
+{
+    "status_code": 404,
+    "data": {
+        "Error": {
+            "Message": "Failed to retrieve Agent with ID: MH18JURTT7 and Version: DRAFT because it doesn't exist. Retry the request with a different resource identifier.",
+            "Code": "ResourceNotFoundException"
+        },
+        "ResponseMetadata": {},
+        "message": "Failed to retrieve Agent with ID: MH18JURTT7 and Version: DRAFT because it doesn't exist. Retry the request with a different resource identifier."
+    }
+}

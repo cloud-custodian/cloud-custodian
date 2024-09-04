@@ -1,0 +1,23 @@
+{
+    "status_code": 200,
+    "data": {
+        "ServerId": "s-e1445c881f5746b59",
+        "Users": [
+            {
+                "Arn": "arn:aws:transfer:us-east-2:644160558196:user/s-e1445c881f5746b59/test1",
+                "HomeDirectoryType": "PATH",
+                "Role": "arn:aws:iam::644160558196:role/custodian-testing",
+                "SshPublicKeyCount": 0,
+                "UserName": "test1"
+            },
+            {
+                "Arn": "arn:aws:transfer:us-east-2:644160558196:user/s-e1445c881f5746b59/test2",
+                "HomeDirectoryType": "PATH",
+                "Role": "arn:aws:iam::644160558196:role/custodian-testing",
+                "SshPublicKeyCount": 0,
+                "UserName": "test2"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

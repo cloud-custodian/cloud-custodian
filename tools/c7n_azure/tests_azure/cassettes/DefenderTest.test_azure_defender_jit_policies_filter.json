@@ -1,0 +1,78 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/jitNetworkAccessPolicies?api-version=2020-01-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Wed, 11 Aug 2021 12:12:09 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "749"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "",
+                        "",
+                        ""
+                    ],
+                    "content-length": [
+                        "713"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "kind": "Basic",
+                                "properties": {
+                                    "virtualMachines": [
+                                        {
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/VV/providers/Microsoft.Compute/virtualMachines/VVvm1",
+                                            "ports": [
+                                                {
+                                                    "number": 22,
+                                                    "protocol": "*",
+                                                    "allowedSourceAddressPrefix": "*",
+                                                    "maxRequestAccessDuration": "PT3H"
+                                                },
+                                                {
+                                                    "number": 3389,
+                                                    "protocol": "*",
+                                                    "allowedSourceAddressPrefix": "*",
+                                                    "maxRequestAccessDuration": "PT3H"
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    "requests": [],
+                                    "provisioningState": "Succeeded",
+                                    "appendMode": false
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/VV/providers/Microsoft.Security/locations/eastus/jitNetworkAccessPolicies/VVvm1",
+                                "name": "VVvm1",
+                                "type": "Microsoft.Security/locations/jitNetworkAccessPolicies",
+                                "location": "eastus"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

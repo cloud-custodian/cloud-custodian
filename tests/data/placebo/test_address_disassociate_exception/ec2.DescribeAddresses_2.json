@@ -1,0 +1,51 @@
+{
+    "status_code": 200,
+    "data": {
+        "Addresses": [
+            {
+                "PublicIp": "3.216.70.200",
+                "AllocationId": "eipalloc-0597dd9ddfcc9754d",
+                "AssociationId": "eipassoc-00330fd0b32eb4838",
+                "Domain": "vpc",
+                "NetworkInterfaceId": "eni-0449d9bc9a2d3536c",
+                "NetworkInterfaceOwnerId": "644160558196",
+                "PrivateIpAddress": "10.146.96.24",
+                "PublicIpv4Pool": "amazon",
+                "NetworkBorderGroup": "us-east-1"
+            },
+            {
+                "PublicIp": "52.86.57.191",
+                "AllocationId": "eipalloc-01a0fe3d323ee5a8c",
+                "AssociationId": "eipassoc-02a5073bcd1883ac5",
+                "Domain": "vpc",
+                "NetworkInterfaceId": "eni-0a97f5badf0f2b1db",
+                "NetworkInterfaceOwnerId": "644160558196",
+                "PrivateIpAddress": "10.146.96.5",
+                "Tags": [
+                    {
+                        "Key": "aws:cloudformation:logical-id",
+                        "Value": "EIP2"
+                    },
+                    {
+                        "Key": "aws:cloudformation:stack-name",
+                        "Value": "devsecops-sandbox-vpc-1"
+                    },
+                    {
+                        "Key": "aws:cloudformation:stack-id",
+                        "Value": "arn:aws:cloudformation:us-east-1:644160558196:stack/devsecops-sandbox-vpc-1/e61b0170-9296-11e9-bab1-0e24761bd22a"
+                    }
+                ],
+                "PublicIpv4Pool": "amazon",
+                "NetworkBorderGroup": "us-east-1"
+            },
+            {
+                "PublicIp": "54.226.178.1",
+                "AllocationId": "eipalloc-064c7be63c6334ade",
+                "Domain": "vpc",
+                "PublicIpv4Pool": "amazon",
+                "NetworkBorderGroup": "us-east-1"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

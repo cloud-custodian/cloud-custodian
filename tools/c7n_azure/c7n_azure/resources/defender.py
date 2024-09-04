@@ -165,3 +165,67 @@ class DefenderAlertSettings(DefenderResourceManager, metaclass=QueryMeta):
         filter_name = None
         service = "security"
         resource_type = "Microsoft.Security/alertNotifications"
+
+
+@resources.register("defender-assessment")
+class DefenderAssessment(DefenderResourceManager, metaclass=QueryMeta):
+    class resource_type(TypeInfo):
+        doc_groups = ["Security"]
+
+        id = "id"
+        name = "name"
+        service = "security"
+        client = "SecurityCenter"
+        enum_spec = ("assessments", "list", None)
+        resource_type = 'Microsoft.Security/assessments'
+        default_report_fields = ["id", "name"]
+
+        @classmethod
+        def extra_args(cls, resource_manager):
+            scope = '/subscriptions/{0}'\
+                .format(resource_manager.get_session().get_subscription_id())
+            return {'scope': scope}
+
+
+@resources.register("defender-contact")
+class DefenderSecurityContact(DefenderResourceManager, metaclass=QueryMeta):
+    """Security Contacts Resource
+
+    :example:
+
+    Finds security contacts with emails
+
+    .. code-block:: yaml
+
+        policies:
+          - name: test-security-contacts
+            resource: azure.defender-contact
+            filters:
+              - type: value
+                key: properties.email
+                value: null
+                op: ne
+
+    """
+    class resource_type(TypeInfo):
+        doc_groups = ["Security"]
+
+        id = "id"
+        name = "name"
+        service = "security"
+        client = "SecurityCenter"
+        enum_spec = ("security_contacts", "list", None)
+        resource_type = "Microsoft.Security/securityContacts"
+        default_report_fields = ["id", "name"]
+
+
+@resources.register("defender-jit-policy")
+class DefenderJitPolicy(DefenderResourceManager, metaclass=QueryMeta):
+    class resource_type(TypeInfo):
+        doc_groups = ["Security"]
+
+        service = "security"
+        client = "SecurityCenter"
+        enum_spec = ("jit_network_access_policies", "list", None)
+        resource_type = "Microsoft.Security/jitNetworkAccessPolicies"
+        default_report_fields = ["id", "name"]

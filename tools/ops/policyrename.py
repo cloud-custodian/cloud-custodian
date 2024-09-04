@@ -45,7 +45,7 @@ def s3_rename(output_dir, old, new, sse_kms_key_id):
     session = Session()
     client = session.client('s3')
     s3 = session.resource('s3')
-    s3_path, bucket, key_prefix = parse_s3(output_dir)
+    _, bucket, _ = parse_s3(output_dir)
 
     # Ensure bucket exists
     try:

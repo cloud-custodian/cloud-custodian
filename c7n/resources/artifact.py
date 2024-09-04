@@ -16,6 +16,7 @@ class ArtifactDomain(QueryResourceManager):
         cfn_type = 'AWS::CodeArtifact::Domain'
         id = name = 'name'
         arn = 'arn'
+        permissions_augment = ("codeartifact:ListTagsForResource",)
 
 
 @ArtifactDomain.filter_registry.register('cross-account')

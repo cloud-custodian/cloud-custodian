@@ -121,7 +121,7 @@ class AutoTagUser(EventAction):
             principal_id_value = event['userIdentity'].get('principalId', '')
         elif utype == "AssumedRole" or utype == "FederatedUser":
             user = event['userIdentity']['arn']
-            prefix, user = user.rsplit('/', 1)
+            _, user = user.rsplit('/', 1)
             principal_id_value = event['userIdentity'].get('principalId', '').split(':')[0]
             # instance role
             if user.startswith('i-'):

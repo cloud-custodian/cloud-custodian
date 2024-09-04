@@ -28,7 +28,6 @@ class CustodianGCPTesting(PyTestUtils, GoogleFlightRecorder):
                                'replay or record flight data is invoked')
         return get_default_project()
 
-
     @staticmethod
     def check_report_fields(policy, resources):
         for f in policy.resource_manager.resource_type.default_report_fields:

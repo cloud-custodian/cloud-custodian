@@ -366,6 +366,18 @@ class S3(query.QueryResourceManager):
         enum_spec = ('list_buckets', 'Buckets[]', None)
         # not used but we want some consistency on the metadata
         detail_spec = ('get_bucket_location', 'Bucket', 'Name', 'LocationConstraint')
+        permissions_augment = (
+            "s3:GetBucketAcl",
+            "s3:GetBucketLocation",
+            "s3:GetBucketPolicy",
+            "s3:GetBucketTagging",
+            "s3:GetBucketVersioning",
+            "s3:GetBucketLogging",
+            "s3:GetBucketNotification",
+            "s3:GetBucketWebsite",
+            "s3:GetLifecycleConfiguration",
+            "s3:GetReplicationConfiguration"
+        )
         name = id = 'Name'
         date = 'CreationDate'
         dimension = 'BucketName'
@@ -825,6 +837,63 @@ class HasStatementFilter(polstmt_filter.HasStatementFilter):
             'bucket_name': bucket['Name'],
             'bucket_region': get_region(bucket)
         }
+
+
+@S3.filter_registry.register('lock-configuration')
+class S3LockConfigurationFilter(ValueFilter):
+    """
+    Filter S3 buckets based on their object lock configurations
+
+    :example:
+
+    Get all buckets where lock configuration mode is COMPLIANCE
+
+        .. code-block:: yaml
+
+                policies:
+                  - name: lock-configuration-compliance
+                    resource: aws.s3
+                    filters:
+                      - type: lock-configuration
+                        key: Rule.DefaultRetention.Mode
+                        value: COMPLIANCE
+
+    """
+    schema = type_schema('lock-configuration', rinherit=ValueFilter.schema)
+    permissions = ('s3:GetBucketObjectLockConfiguration',)
+    annotate = True
+    annotation_key = 'c7n:ObjectLockConfiguration'
+
+    def _process_resource(self, client, resource):
+        try:
+            config = client.get_object_lock_configuration(
+                Bucket=resource['Name']
+            )['ObjectLockConfiguration']
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'ObjectLockConfigurationNotFoundError':
+                config = None
+            else:
+                raise
+        resource[self.annotation_key] = config
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('s3')
+        with self.executor_factory(max_workers=3) as w:
+            futures = []
+            for res in resources:
+                if self.annotation_key in res:
+                    continue
+                futures.append(w.submit(self._process_resource, client, res))
+            for f in as_completed(futures):
+                exc = f.exception()
+                if exc:
+                    self.log.error(
+                        "Exception getting bucket lock configuration \n %s" % (
+                            exc))
+        return super().process(resources, event)
+
+    def __call__(self, r):
+        return super().__call__(r.setdefault(self.annotation_key, None))
 
 
 ENCRYPTION_STATEMENT_GLOB = {
@@ -1738,7 +1807,7 @@ class AttachLambdaEncrypt(BucketActionBase):
         else:
             source = BucketLambdaNotification(
                 {'account_s3': account_id}, session_factory, bucket)
-        return source.add(func)
+        return source.add(func, None)
 
 
 @actions.register('encryption-policy')
@@ -2273,7 +2342,7 @@ class EncryptExtantKeys(ScanBucket):
 
 def restore_complete(restore):
     if ',' in restore:
-        ongoing, avail = restore.split(',', 1)
+        ongoing, _ = restore.split(',', 1)
     else:
         ongoing = restore
     return 'false' in ongoing
@@ -2564,6 +2633,11 @@ class RemoveBucketTag(RemoveTag):
 
 @filters.register('data-events')
 class DataEvents(Filter):
+    """Find buckets for which CloudTrail is logging data events.
+
+    Note that this filter only examines trails that are defined in the
+    current account.
+    """
 
     schema = type_schema('data-events', state={'enum': ['present', 'absent']})
     permissions = (
@@ -2595,8 +2669,12 @@ class DataEvents(Filter):
 
     def process(self, resources, event=None):
         trails = self.manager.get_resource_manager('cloudtrail').resources()
+        local_trails = self.filter_resources(
+            trails,
+            "split(':', TrailARN)[4]", (self.manager.account_id,)
+        )
         session = local_session(self.manager.session_factory)
-        event_buckets = self.get_event_buckets(session, trails)
+        event_buckets = self.get_event_buckets(session, local_trails)
         ops = {
             'present': lambda x: (
                 x['Name'] in event_buckets or '' in event_buckets),
@@ -2604,7 +2682,7 @@ class DataEvents(Filter):
                 lambda x: x['Name'] not in event_buckets and ''
                 not in event_buckets)}
 
-        op = ops[self.data['state']]
+        op = ops[self.data.get('state', 'present')]
         results = []
         for b in resources:
             if op(b):
@@ -3780,7 +3858,7 @@ class BucketReplication(ListItemFilter):
     def get_item_values(self, b):
         client = bucket_client(local_session(self.manager.session_factory), b)
         # replication configuration is called in S3_AUGMENT_TABLE:
-        bucket_replication = b[self.annotation_key]
+        bucket_replication = b.get(self.annotation_key)
 
         rules = []
         if bucket_replication is not None:
@@ -3796,3 +3874,19 @@ class BucketReplication(ListItemFilter):
         source_region = get_region(b)
         replication['DestinationRegion'] = destination_region
         replication['CrossRegion'] = destination_region != source_region
+
+
+@resources.register('s3-directory')
+class S3Directory(query.QueryResourceManager):
+
+    class resource_type(query.TypeInfo):
+        service = 's3'
+        permission_prefix = "s3express"
+        arn_service = "s3express"
+        arn_type = 'bucket'
+        enum_spec = ('list_directory_buckets', 'Buckets[]', None)
+        name = id = 'Name'
+        date = 'CreationDate'
+        dimension = 'BucketName'
+        cfn_type = 'AWS::S3Express::DirectoryBucket'
+        permissions_enum = ("s3express:ListAllMyDirectoryBuckets",)

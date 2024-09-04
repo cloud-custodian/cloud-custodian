@@ -1,0 +1,86 @@
+{
+    "status_code": 200,
+    "data": {
+        "AutoScalingGroups": [
+            {
+                "AutoScalingGroupName": "asg-(launch-template-no-subnet)-red",
+                "AutoScalingGroupARN": "arn:aws:autoscaling:ap-south-1:644160558196:autoScalingGroup:0bb34db4-873e-436b-b89c-1e649f62b272:autoScalingGroupName/asg-(launch-template-no-subnet)-red",
+                "LaunchTemplate": {
+                    "LaunchTemplateId": "lt-02c3094a20ba5f667",
+                    "LaunchTemplateName": "launch-template-(no_subnet)-red20240804090130866400000005",
+                    "Version": "$Latest"
+                },
+                "MinSize": 0,
+                "MaxSize": 0,
+                "DesiredCapacity": 0,
+                "DefaultCooldown": 300,
+                "AvailabilityZones": [
+                    "ap-south-1b"
+                ],
+                "LoadBalancerNames": [],
+                "TargetGroupARNs": [],
+                "HealthCheckType": "EC2",
+                "HealthCheckGracePeriod": 300,
+                "Instances": [],
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 8,
+                    "day": 4,
+                    "hour": 9,
+                    "minute": 3,
+                    "second": 17,
+                    "microsecond": 221000
+                },
+                "SuspendedProcesses": [],
+                "VPCZoneIdentifier": "",
+                "EnabledMetrics": [],
+                "Tags": [],
+                "TerminationPolicies": [
+                    "Default"
+                ],
+                "NewInstancesProtectedFromScaleIn": false,
+                "ServiceLinkedRoleARN": "arn:aws:iam::644160558196:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling",
+                "TrafficSources": []
+            },
+            {
+                "AutoScalingGroupName": "asg-launch-config-red",
+                "AutoScalingGroupARN": "arn:aws:autoscaling:ap-south-1:644160558196:autoScalingGroup:dd4ac0c1-4ee0-4591-8d83-0675704640eb:autoScalingGroupName/asg-launch-config-red",
+                "LaunchConfigurationName": "launch-configuration-red20240804090130862100000001",
+                "MinSize": 0,
+                "MaxSize": 0,
+                "DesiredCapacity": 0,
+                "DefaultCooldown": 300,
+                "AvailabilityZones": [
+                    "ap-south-1a"
+                ],
+                "LoadBalancerNames": [],
+                "TargetGroupARNs": [],
+                "HealthCheckType": "EC2",
+                "HealthCheckGracePeriod": 300,
+                "Instances": [],
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 8,
+                    "day": 4,
+                    "hour": 9,
+                    "minute": 1,
+                    "second": 33,
+                    "microsecond": 287000
+                },
+                "SuspendedProcesses": [],
+                "VPCZoneIdentifier": "",
+                "EnabledMetrics": [],
+                "Tags": [],
+                "TerminationPolicies": [
+                    "Default"
+                ],
+                "NewInstancesProtectedFromScaleIn": false,
+                "ServiceLinkedRoleARN": "arn:aws:iam::644160558196:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling",
+                "TrafficSources": []
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

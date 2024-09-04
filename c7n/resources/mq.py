@@ -10,7 +10,6 @@ from c7n.utils import local_session, type_schema
 from c7n.tags import RemoveTag, Tag, TagDelayedAction, TagActionFilter, universal_augment
 
 
-
 class DescribeMessageBroker(DescribeSource):
 
     def augment(self, resources):
@@ -38,7 +37,6 @@ class MessageBroker(QueryResourceManager):
     permissions = ('mq:ListTags',)
 
     source_mapping = {'describe': DescribeMessageBroker, 'config': ConfigSource}
-
 
 
 @MessageBroker.filter_registry.register('kms-key')

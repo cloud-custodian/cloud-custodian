@@ -370,6 +370,9 @@ Cloud Custodian supports additional custom JMESPath functions, including:
             key: "split(`/`, logGroupName)[-1]"
             tags: "*"
 
+- ``from_json(json_encoded_string) -> obj``: takes 1 argument, a json encoded string.
+  Returns an json decoded value.
+
 
 Value Regex
 ~~~~~~~~~~~
@@ -436,6 +439,59 @@ Value Path
   The iam-policy uses the generic Value Filter implementation.
   This implementation allows for the comparison of two separate lists of values
   within the same resource.
+
+List Item Filter
+----------------
+
+The ``list-item`` filter makes it easier to evaluate resource properties that contain
+a list of values.
+
+Example 1: AWS ECS Task Definitions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+AWS ECS task definitions include a list of container definitions. This policy matches
+a task definition if any of its container images reference an image from outside a given
+account and region:
+
+  .. code-block:: yaml
+
+    - name: find-task-def-not-using-registry
+      resource: aws.ecs-task-definition
+      filters:
+        - not:
+          - type: list-item
+            key: containerDefinitions
+            attrs:
+              - not:
+                - type: value
+                  key: image
+                  value: "${account_id}.dkr.ecr.us-east-2.amazonaws.com.*"
+                  op: regex
+
+That check is not possible with the ``value`` filter alone, because the ``regex``
+operator cannot operate directly against a list.
+
+Example 2: S3 Lifecycle Rules
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+S3 buckets can have lifecycle policies that include multiple rules.
+This policy matches buckets that are missing a rule for cleaning up
+incomplete multipart uploads.
+
+  .. code-block:: yaml
+
+    - name: s3-mpu-cleanup-not-configured
+      resource: aws.s3
+      filters:
+        - not:
+          - type: list-item
+            key: Lifecycle.Rules[]
+            attrs:
+              - Status: Enabled
+              - AbortIncompleteMultipartUpload.DaysAfterInitiation: not-null
+
+Here the ``list-item`` filter ensures that we check a combination of multiple
+properties for each individual lifecycle rule.
 
 Event Filter
 -------------

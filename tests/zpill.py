@@ -1,14 +1,15 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import base64
 import fnmatch
-from io import StringIO
+from io import BytesIO
 import json
 import os
 import shutil
 import zipfile
 import re
 from datetime import datetime, timedelta, tzinfo
-from distutils.util import strtobool
+from c7n.vendored.distutils.util import strtobool
 
 import boto3
 import placebo
@@ -20,6 +21,7 @@ from c7n.testing import CustodianTestCore
 # Custodian Test Account. This is used only for testing.
 
 ACCOUNT_ID = "644160558196"
+ORG_ID = "o-abc123cc32"
 
 ###########################################################################
 # BEGIN PLACEBO MONKEY PATCH
@@ -63,7 +65,10 @@ def deserialize(obj):
     if class_name == "datetime":
         return datetime(tzinfo=utc, **target)
     if class_name == "StreamingBody":
-        return StringIO(target["body"])
+        b64_body = obj["body"]
+        decoded_body = base64.b64decode(b64_body)
+        raw_stream = BytesIO(decoded_body)
+        return StreamingBody(raw_stream, raw_stream.getbuffer().nbytes)
     # Return unrecognized structures as-is
     return obj
 
@@ -89,12 +94,12 @@ def serialize(obj):
         return result
     if isinstance(obj, StreamingBody):
         result["body"] = obj.read()
-        obj._raw_stream = StringIO(result["body"])
+        obj._raw_stream = BytesIO(result["body"])
         obj._amount_read = 0
         return result
     if isinstance(obj, bytes):
-        return obj.decode('utf8')
-
+        encoded = base64.b64encode(obj)
+        return encoded.decode('utf-8')
     # Raise a TypeError if the object isn't recognized
     raise TypeError("Type not serializable")
 
@@ -108,7 +113,6 @@ placebo.pill.deserialize = deserialize
 
 
 class BluePill(pill.Pill):
-
     def playback(self):
         super(BluePill, self).playback()
         self._avail = self.get_available()
@@ -136,7 +140,6 @@ class BluePill(pill.Pill):
 
 
 class ZippedPill(pill.Pill):
-
     def __init__(self, path, prefix=None, debug=False):
         super(ZippedPill, self).__init__(prefix, debug)
         self.path = path
@@ -191,12 +194,8 @@ class ZippedPill(pill.Pill):
         response_file = self.get_next_file_path(service, operation)
         self._used.add(response_file)
         pill.LOG.debug("load_responses: %s", response_file)
-        response_data = json.loads(
-            self.archive.read(response_file), object_hook=pill.deserialize
-        )
-        return (
-            pill.FakeHttpResponse(response_data["status_code"]), response_data["data"]
-        )
+        response_data = json.loads(self.archive.read(response_file), object_hook=pill.deserialize)
+        return (pill.FakeHttpResponse(response_data["status_code"]), response_data["data"])
 
     def get_new_file_path(self, service, operation):
         base_name = "{0}.{1}".format(service, operation)
@@ -245,13 +244,11 @@ def attach(session, data_path, prefix=None, debug=False):
 
 
 class RedPill(pill.Pill):
-
     def datetime_converter(self, obj):
         if isinstance(obj, datetime):
             return obj.isoformat()
 
-    def save_response(self, service, operation, response_data,
-                    http_response=200):
+    def save_response(self, service, operation, response_data, http_response=200):
         """
         Override to sanitize response metadata and account_ids
         """
@@ -264,25 +261,18 @@ class RedPill(pill.Pill):
 
         response_data = json.dumps(response_data, default=serialize)
         response_data = re.sub(r"\b\d{12}\b", ACCOUNT_ID, response_data)  # noqa
+        response_data = re.sub(r"^o-[a-z0-9]{10,32}$", ORG_ID, response_data)
         response_data = json.loads(response_data, object_hook=deserialize)
 
-        super(RedPill, self).save_response(service, operation, response_data,
-                    http_response)
+        super(RedPill, self).save_response(service, operation, response_data, http_response)
 
 
 class PillTest(CustodianTestCore):
+    archive_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "placebo_data.zip")
 
-    archive_path = os.path.join(
-        os.path.dirname(os.path.abspath(__file__)), "placebo_data.zip"
-    )
+    placebo_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "placebo")
 
-    placebo_dir = os.path.join(
-        os.path.dirname(os.path.abspath(__file__)), "data", "placebo"
-    )
-
-    output_dir = os.path.join(
-        os.path.dirname(os.path.abspath(__file__)), "data", "output"
-    )
+    output_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "output")
 
     recording = False
 
@@ -311,7 +301,6 @@ class PillTest(CustodianTestCore):
         self.addCleanup(self.cleanUp)
 
         class FakeFactory:
-
             def __call__(fake, region=None, assume=None):
                 new_session = None
                 # slightly experimental for test recording, using
@@ -322,13 +311,14 @@ class PillTest(CustodianTestCore):
                 if 0 and (assume is not False and fake.assume_role):
                     client = session.client('sts')
                     creds = client.assume_role(
-                        RoleArn=fake.assume_role,
-                        RoleSessionName='CustodianTest')['Credentials']
+                        RoleArn=fake.assume_role, RoleSessionName='CustodianTest'
+                    )['Credentials']
                     new_session = boto3.Session(
                         aws_access_key_id=creds['AccessKeyId'],
                         aws_secret_access_key=creds['SecretAccessKey'],
                         aws_session_token=creds['SessionToken'],
-                        region_name=region or fake.region or default_region)
+                        region_name=region or fake.region or default_region,
+                    )
                 elif region and region != default_region:
                     new_session = boto3.Session(region_name=region)
 

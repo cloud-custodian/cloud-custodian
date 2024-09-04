@@ -37,7 +37,7 @@ def should_load_provider(name, provider_types, no_wild=False):
     return False
 
 
-PROVIDER_NAMES = ('aws', 'azure', 'gcp', 'k8s', 'openstack', 'awscc', 'tencentcloud', 'terraform', 'oci')
+PROVIDER_NAMES = ('aws', 'azure', 'gcp', 'k8s', 'openstack', 'awscc', 'tencentcloud', 'oci', 'terraform')
 
 
 def load_available(resources=True):
@@ -89,13 +89,13 @@ def load_providers(provider_types):
         from c7n_openstack.entry import initialize_openstack
         initialize_openstack()
 
-    if should_load_provider('tencentcloud', provider_types):
-        from c7n_tencentcloud.entry import initialize_tencentcloud
-        initialize_tencentcloud()
-
     if should_load_provider('terraform', provider_types, no_wild=True):
         from c7n_left.entry import initialize_iac
         initialize_iac()
+
+    if should_load_provider('tencentcloud', provider_types):
+        from c7n_tencentcloud.entry import initialize_tencentcloud
+        initialize_tencentcloud()
 
     if should_load_provider('oci', provider_types):
         from c7n_oci.entry import initialize_oci

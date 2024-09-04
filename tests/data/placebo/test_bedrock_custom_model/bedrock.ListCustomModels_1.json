@@ -1,0 +1,24 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "modelSummaries": [
+            {
+                "modelArn": "arn:aws:bedrock:us-east-1:644160558196:custom-model/amazon.titan-text-express-v1:0:8k/w4vtut9aq95n",
+                "modelName": "c7n-test3",
+                "creationTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 11,
+                    "day": 17,
+                    "hour": 17,
+                    "minute": 36,
+                    "second": 7,
+                    "microsecond": 245000
+                },
+                "baseModelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.titan-text-express-v1:0:8k",
+                "baseModelName": ""
+            }
+        ]
+    }
+}

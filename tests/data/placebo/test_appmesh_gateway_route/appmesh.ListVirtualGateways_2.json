@@ -1,0 +1,36 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "virtualGateways": [
+            {
+                "arn": "arn:aws:appmesh:us-east-1:644160558196:mesh/m2/virtualGateway/g1",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 3,
+                    "day": 12,
+                    "hour": 18,
+                    "minute": 43,
+                    "second": 10,
+                    "microsecond": 481000
+                },
+                "lastUpdatedAt": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 3,
+                    "day": 12,
+                    "hour": 18,
+                    "minute": 43,
+                    "second": 10,
+                    "microsecond": 481000
+                },
+                "meshName": "m2",
+                "meshOwner": "644160558196",
+                "resourceOwner": "644160558196",
+                "version": 1,
+                "virtualGatewayName": "g1"
+            }
+        ]
+    }
+}

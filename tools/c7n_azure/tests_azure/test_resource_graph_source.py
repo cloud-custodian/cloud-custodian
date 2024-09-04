@@ -104,7 +104,7 @@ def resource_cmp(res1, res2, ignore_properties=[]):
     :param res2: dictionary that represents the Resource Graph resource
     :return: True if every property for ARM is returned in the Resource Graph, else False
     """
-    if type(res1) != type(res2):
+    if not isinstance(res1, type(res2)):
         return False
 
     if isinstance(res1, dict):

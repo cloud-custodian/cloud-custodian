@@ -1,44 +1,55 @@
 {
     "status_code": 200,
     "data": {
-	"ResponseMetadata": {
-	    "RequestId": "5ff0dcad-f273-4bd4-9388-19a52c50fb10",
-	    "HTTPStatusCode": 200,
-	    "HTTPHeaders": {
-		"date": "Tue, 09 Nov 2021 10:01:16 GMT",
-		"content-type": "application/json",
-		"content-length": "1009",
-		"connection": "keep-alive",
-		"x-amzn-requestid": "5ff0dcad-f273-4bd4-9388-19a52c50fb10"
-	    },
-	    "RetryAttempts": 0
-	},
-	"FunctionName": "custodian-ec2-run-check",
-	"FunctionArn": "arn:aws:lambda:us-east-1:490065885863:function:custodian-ec2-run-check",
-	"Runtime": "python3.9",
-	"Role": "arn:aws:iam::490065885863:role/assetdb-functional",
-	"Handler": "custodian_policy.run",
-	"CodeSize": 508556,
-	"Description": "aws:states:opt-in test3",
-	"Timeout": 900,
-	"MemorySize": 512,
-	"LastModified": "2021-11-09T09:58:31.337+0000",
-	"CodeSha256": "l6PKfcRj3aTEy84ko8+sXgwGQa1jImiO7ywr5WQKyLI=",
-	"Version": "$LATEST",
-	"VpcConfig": {
-	    "SubnetIds": [],
-	    "SecurityGroupIds": [],
-	    "VpcId": ""
-	},
-	"TracingConfig": {
-	    "Mode": "PassThrough"
-	},
-	"RevisionId": "73d4d394-3acb-4f5e-b7d0-0e53e431d79b",
-	"State": "Active",
-	"LastUpdateStatus": "Successful",
-	"PackageType": "Zip",
-	"Architectures": [
-	    "x86_64"
-	]
+        "ResponseMetadata": {},
+        "FunctionName": "test-foo-bar",
+        "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:test-foo-bar",
+        "Runtime": "python3.12",
+        "Role": "arn:aws:iam::644160558196:role/custodian-mu",
+        "Handler": "index.handler",
+        "CodeSize": 168,
+        "Description": "test",
+        "Timeout": 3,
+        "MemorySize": 128,
+        "LastModified": "2024-01-13T06:44:16.390+0000",
+        "CodeSha256": "vGPycvFY/krzGmxtrdge41pUwYXQ5jyzBfyVO53ockM=",
+        "Version": "$LATEST",
+        "VpcConfig": {
+            "SubnetIds": [],
+            "SecurityGroupIds": [],
+            "VpcId": "",
+            "Ipv6AllowedForDualStack": false
+        },
+        "TracingConfig": {
+            "Mode": "PassThrough"
+        },
+        "RevisionId": "ce86ae06-55ce-4329-a63e-eefd0859fbbb",
+        "Layers": [
+            {
+                "Arn": "arn:aws:lambda:us-east-1:644160558196:layer:AWSLambdaPowertoolsPythonV2:59",
+                "CodeSize": 4164937
+            }
+        ],
+        "State": "Pending",
+        "StateReason": "The function is being created.",
+        "StateReasonCode": "Creating",
+        "PackageType": "Zip",
+        "Architectures": [
+            "x86_64"
+        ],
+        "EphemeralStorage": {
+            "Size": 512
+        },
+        "SnapStart": {
+            "ApplyOn": "None",
+            "OptimizationStatus": "Off"
+        },
+        "RuntimeVersionConfig": {
+            "RuntimeVersionArn": "arn:aws:lambda:us-east-1::runtime:c9875014cbcc77e3455765804516f064d18fe7b27ae7bdb2b1d84ab01ba784f5"
+        },
+        "LoggingConfig": {
+            "LogFormat": "Text",
+            "LogGroup": "/aws/lambda/test-foo-bar"
+        }
     }
 }

@@ -1,4 +1,5 @@
 [
+  "africa-south1",
   "asia-east1",
   "asia-east2",
   "asia-northeast1",
@@ -39,5 +40,6 @@
   "us-west1",
   "us-west2",
   "us-west3",
-  "us-west4"
+  "us-west4",
+  "us-west8"
 ]

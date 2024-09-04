@@ -1,58 +1,55 @@
-# Dockerfiles are generated from tools/dev/dockerpkg.py
-FROM ubuntu:22.04 as build-env
+FROM cgr.dev/chainguard/wolfi-base as builder
 
-ARG POETRY_VERSION="1.5.1"
-SHELL ["/bin/bash", "-c"]
+ARG POETRY_VERSION="1.8.3"
+ARG PY_VERSION=3.12
+WORKDIR /app
 
-# pre-requisite distro deps, and build env setup
-RUN adduser --disabled-login --gecos "" custodian
-RUN apt-get --yes update
-RUN apt-get --yes install --no-install-recommends build-essential curl python3-venv python3-dev
-RUN python3 -m venv /usr/local
-RUN /usr/local/bin/pip install -U pip setuptools &&     /usr/local/bin/pip install "poetry==${POETRY_VERSION}"
-ARG PATH="/root/.local/bin:$PATH"
+RUN apk add python-${PY_VERSION} py${PY_VERSION}-pip && \
+    chown -R nonroot.nonroot /app/
 
-WORKDIR /src
-ADD pyproject.toml poetry.lock README.md /src
-RUN . /usr/local/bin/activate && poetry install --without dev --no-root
+USER nonroot
 
-ADD c7n /src/c7n/
-RUN . /usr/local/bin/activate && poetry install --only-root
+# Install Poetry in its own virtual environment
+RUN python3 -m venv "${HOME}/tools" && \
+    . "${HOME}/tools/bin/activate" && \
+    pip install --verbose "poetry==${POETRY_VERSION}"
 
-ADD tools/c7n_left /src/tools/c7n_left
-RUN . /usr/local/bin/activate && cd tools/c7n_left && poetry install --without dev
 
-RUN mkdir /output
+# Copy enough of the c7n source that poetry can
+# use it when installing c7n-left
+WORKDIR /app/c7n
+COPY pyproject.toml poetry.lock README.md /app/c7n
+COPY c7n /app/c7n/c7n
 
-FROM ubuntu:22.04
+# Install c7n-left, which comes with a path-based dependency
+# on c7n
+WORKDIR /app/c7n/tools/c7n_left
+COPY tools/c7n_left /app/c7n/tools/c7n_left
+RUN python -m venv "${HOME}/venv" && \
+    . "${HOME}/venv/bin/activate" && \
+    ~/tools/bin/poetry install --only main
 
-LABEL name="left" \
+
+FROM chainguard/wolfi-base
+
+LABEL name="c7n-left" \
       repository="http://github.com/cloud-custodian/cloud-custodian"
+LABEL "org.opencontainers.image.title"="c7n-left"
+LABEL "org.opencontainers.image.description"="IaC Policy Engine"
+LABEL "org.opencontainers.image.documentation"="https://cloudcustodian.io/docs"
 
-ENV DEBIAN_FRONTEND=noninteractive
+ARG PY_VERSION=3.12
 
-RUN apt-get --yes update \
-        && apt-get --yes install python3 python3-venv git --no-install-recommends \
-        && rm -Rf /var/cache/apt \
-        && rm -Rf /var/lib/apt/lists/* \
-        && rm -Rf /var/log/*
+WORKDIR /app
+RUN apk add git python-${PY_VERSION} && \
+    chown -R nonroot.nonroot /app/
 
-# These should remain below any other commands because they will invalidate
-# the layer cache
-COPY --from=build-env /src /src
-COPY --from=build-env /usr/local /usr/local
-COPY --from=build-env /output /output
+COPY --from=builder /home/nonroot/venv/lib/python${PY_VERSION}/site-packages /home/nonroot/.local/lib/python${PY_VERSION}/site-packages
+RUN rm -Rf /home/nonroot/.local/lib/python${PY_VERSION}/site-packages/pip*
+COPY --from=builder /app/c7n/c7n /app/c7n
+COPY --from=builder /app/c7n/tools/c7n_left /app/c7n/tools/c7n_left
 
-
-RUN adduser --disabled-login --gecos "" custodian
-USER custodian
-WORKDIR /home/custodian
 ENV LC_ALL="C.UTF-8" LANG="C.UTF-8"
-VOLUME ["/home/custodian"]
-ENTRYPOINT ["/usr/local/bin/c7n-left"]
-CMD ["--help"]
+ENV PYTHONPATH=/app:/app/c7n/tools/c7n_left:/home/nonroot/.local/lib/python${PY_VERSION}/site-packages:$PYTHONPATH
 
-
-LABEL "org.opencontainers.image.title"="left"
-LABEL "org.opencontainers.image.description"="Cloud Custodian IaC Engine"
-LABEL "org.opencontainers.image.documentation"="https://cloudcustodian.io/docs/tools/c7n-left.html"
+ENTRYPOINT [ "python", "-m", "c7n_left.cli"]

@@ -1,0 +1,60 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/assessments?api-version=2020-01-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Mon, 06 Sep 2021 12:53:41 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "749"
+                    ],
+                    "content-length": [
+                        "27102"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "type": "Microsoft.Security/assessments",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/RG-140asbvmnetrecomm/providers/Microsoft.Compute/virtualMachines/vmm-140asbvmnetrecomm/providers/Microsoft.Security/assessments/2a548cf9-6de3-491e-b24a-cf277fe36d4d",
+                                "name": "2a548cf9-6de3-491e-b24a-cf277fe36d4d",
+                                "properties": {
+                                    "resourceDetails": {
+                                        "Source": "Azure",
+                                        "Id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/RG-140asbvmnetrecomm/providers/Microsoft.Compute/virtualMachines/vmm-140asbvmnetrecomm"
+                                    },
+                                    "displayName": "test-140asbvmnetrecomm",
+                                    "status": {
+                                        "code": "Healthy",
+                                        "cause": "",
+                                        "description": ""
+                                    },
+                                    "additionalData": {}
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

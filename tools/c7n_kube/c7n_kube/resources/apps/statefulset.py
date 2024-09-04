@@ -9,6 +9,7 @@ from c7n_kube.provider import resources
 class StatefulSet(QueryResourceManager):
     class resource_type(TypeInfo):
         group = "Apps"
+        canonical_group = "apps"
         version = "V1"
         patch = "patch_namespaced_stateful_set"
         delete = "delete_namespaced_stateful_set"

@@ -1,0 +1,52 @@
+{
+    "status_code": 200,
+    "data": {
+        "UpdateToken": "4385a21b-b202-4c01-b670-5c5c4034d38b",
+        "Firewall": {
+            "FirewallName": "test-firewall-1",
+            "FirewallArn": "arn:aws:network-firewall:us-east-1:644160558196:firewall/test-firewall-1",
+            "FirewallPolicyArn": "arn:aws:network-firewall:us-east-1:644160558196:firewall-policy/test-firewall-policy",
+            "VpcId": "vpc-0207cdabbb60970eb",
+            "SubnetMappings": [
+                {
+                    "SubnetId": "subnet-0a0cc24bfabbd5f02",
+                    "IPAddressType": "IPV4"
+                }
+            ],
+            "DeleteProtection": true,
+            "SubnetChangeProtection": true,
+            "FirewallPolicyChangeProtection": false,
+            "FirewallId": "0352a57a-c398-45d7-997b-54f4219315e0",
+            "Tags": [
+                {
+                    "Key": "owner",
+                    "Value": "policy"
+                }
+            ],
+            "EncryptionConfiguration": {
+                "KeyId": "AWS_OWNED_KMS_KEY",
+                "Type": "AWS_OWNED_KMS_KEY"
+            }
+        },
+        "FirewallStatus": {
+            "Status": "READY",
+            "ConfigurationSyncStateSummary": "IN_SYNC",
+            "SyncStates": {
+                "us-east-1a": {
+                    "Attachment": {
+                        "SubnetId": "subnet-0a0cc24bfabbd5f02",
+                        "EndpointId": "vpce-04a40cca99b4d3de0",
+                        "Status": "READY"
+                    },
+                    "Config": {
+                        "arn:aws:network-firewall:us-east-1:644160558196:firewall-policy/test-firewall-policy": {
+                            "SyncStatus": "IN_SYNC",
+                            "UpdateToken": "63dbfbb3-295f-4429-82c5-d4a1ff900162"
+                        }
+                    }
+                }
+            }
+        },
+        "ResponseMetadata": {}
+    }
+}

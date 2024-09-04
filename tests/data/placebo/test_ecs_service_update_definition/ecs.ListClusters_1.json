@@ -1,0 +1,9 @@
+{
+    "status_code": 200,
+    "data": {
+        "clusterArns": [
+            "arn:aws:ecs:us-east-2:644160558196:cluster/dev-redash"
+        ],
+        "ResponseMetadata": {}
+    }
+}

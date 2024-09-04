@@ -1,0 +1,52 @@
+{
+    "status_code": 200,
+    "data": {
+        "JobDefinitionArn": "arn:aws:sagemaker:us-east-1:644160558196:model-explainability-job-definition/c7n-test",
+        "JobDefinitionName": "c7n-test",
+        "CreationTime": {
+            "__class__": "datetime",
+            "year": 2024,
+            "month": 4,
+            "day": 25,
+            "hour": 11,
+            "minute": 27,
+            "second": 13,
+            "microsecond": 953000
+        },
+        "ModelExplainabilityAppSpecification": {
+            "ImageUri": "644160558196.dkr.ecr.us-east-1.amazonaws.com/model-explainability-job:latest",
+            "ConfigUri": "s3://c7n-test-s3-bucket/config.json"
+        },
+        "ModelExplainabilityJobInput": {
+            "EndpointInput": {
+                "EndpointName": "c7n-test-endpoint",
+                "LocalPath": "/opt/ml/processing/input",
+                "S3InputMode": "File",
+                "S3DataDistributionType": "FullyReplicated"
+            }
+        },
+        "ModelExplainabilityJobOutputConfig": {
+            "MonitoringOutputs": [
+                {
+                    "S3Output": {
+                        "S3Uri": "s3://c7n-test-s3-bucket/DEMO-automatic-model-tuning-xgboost-dm/output",
+                        "LocalPath": "/opt/ml/processing/output",
+                        "S3UploadMode": "EndOfJob"
+                    }
+                }
+            ]
+        },
+        "JobResources": {
+            "ClusterConfig": {
+                "InstanceCount": 1,
+                "InstanceType": "ml.t3.medium",
+                "VolumeSizeInGB": 1
+            }
+        },
+        "RoleArn": "arn:aws:iam::644160558196:role/service-role/AmazonSageMaker-ExecutionRole-20240417T154464",
+        "StoppingCondition": {
+            "MaxRuntimeInSeconds": 3600
+        },
+        "ResponseMetadata": {}
+    }
+}

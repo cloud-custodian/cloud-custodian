@@ -10,17 +10,17 @@ jobs:
       contents: read
       checks: write
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - uses: aws-actions/configure-aws-credentials@v2
+      - uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_FTEST_ROLE }}
           aws-region: us-east-1
 
-      - uses: hashicorp/setup-terraform@v2
+      - uses: hashicorp/setup-terraform@v3
         with:
           terraform_wrapper: false
           # last OSS version
@@ -32,7 +32,7 @@ jobs:
           python-version: "3.11"
 
       - name: Set up cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         id: tfcache
         with:
           path: .tfcache

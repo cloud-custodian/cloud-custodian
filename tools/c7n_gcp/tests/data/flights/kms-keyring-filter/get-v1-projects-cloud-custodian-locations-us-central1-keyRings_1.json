@@ -1,0 +1,26 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 06 Sep 2023 16:13:33 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "6922",
+    "-content-encoding": "gzip",
+    "content-location": "https://cloudkms.googleapis.com/v1/projects/cloud-custodian/locations/us-central1/keyRings?alt=json"
+  },
+  "body": {
+    "keyRings": [
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/keyRings/keyring-c7n",
+        "createTime": "2023-06-09T10:47:42.831969663Z"
+      }
+    ],
+    "totalSize": 1
+  }
+}

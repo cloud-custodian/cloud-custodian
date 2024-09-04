@@ -286,14 +286,14 @@ class TestValueFilter(unittest.TestCase):
         self.assertRaises(TypeError, vf.match(resource))
 
     def test_value_path(self):
-        resource = {'list':[{'a':['one','two'],'b':'one'},{'a':['one'],'b':'two'}]}
+        resource = {'list': [{'a': ['one', 'two'], 'b': 'one'}, {'a': ['one'], 'b': 'two'}]}
         vf = filters.factory({
             "type": "value",
             "key": "list[?(b=='one')].a[]",
             "value_path": "list[?(b=='two')].a[]",
             "op": "intersect"})
         res = vf.match(resource)
-        self.assertEqual(res,True)
+        self.assertEqual(res, True)
 
         vf = filters.factory({
             "type": "value",
@@ -301,7 +301,7 @@ class TestValueFilter(unittest.TestCase):
             "value_path": "list[?(b=='three')].a[]",
             "op": "intersect"})
         res = vf.match(resource)
-        self.assertEqual(res,False)
+        self.assertEqual(res, False)
 
 
 class TestAgeFilter(unittest.TestCase):
@@ -1079,6 +1079,22 @@ class TestIntersect(unittest.TestCase):
         )
         self.assertEqual(f(instance(Thing=["D", "E", "F"])), False)
         self.assertEqual(f(instance(Thing=["C", "D", "E"])), True)
+
+
+class TestModValue(unittest.TestCase):
+    def test_mod(self):
+        f = filters.factory({
+            "type": "value",
+            "key": "Number",
+            "value": 3,
+            "op": "mod"
+        })
+        self.assertEqual(f(instance(Number=3)), False)
+        self.assertEqual(f(instance(Number=6)), False)
+        self.assertEqual(f(instance(Number=24)), False)
+        self.assertEqual(f(instance(Number=2)), True)
+        self.assertEqual(f(instance(Number=5)), True)
+        self.assertEqual(f(instance(Number=23)), True)
 
 
 class TestFilterRegistry(unittest.TestCase):

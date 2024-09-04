@@ -73,6 +73,7 @@ class SQS(QueryResourceManager):
         date = 'CreatedTimestamp'
         dimension = 'QueueName'
         universal_taggable = object()
+        permissions_augment = ("sqs:ListQueueTags",)
         default_report_fields = (
             'QueueArn',
             'CreatedTimestamp',
@@ -221,7 +222,7 @@ class RemovePolicyStatement(RemovePolicyBase):
             return
 
         p = json.loads(resource['Policy'])
-        statements, found = self.process_policy(
+        _, found = self.process_policy(
             p, resource, CrossAccountAccessFilter.annotation_key)
 
         if not found:

@@ -43,7 +43,7 @@ RUN if [[ " ${{providers[*]}} " =~ "{pkg}" ]]; then \
 fi
 """
 
-default_providers = ["gcp", "azure", "kube", "openstack", "tencentcloud", "oci"]
+default_providers = ["gcp", "azure", "kube", "openstack", "tencentcloud", "oci", "awscc"]
 
 PHASE_1_PKG_INSTALL_DEP = """\
 # We include `pyproject.toml` and `poetry.lock` first to allow
@@ -65,13 +65,15 @@ BOOTSTRAP_STAGE = """\
 # Dockerfiles are generated from tools/dev/dockerpkg.py
 FROM {base_build_image} as build-env
 
-ARG POETRY_VERSION="1.5.1"
+ARG POETRY_VERSION="1.8.3"
 SHELL ["/bin/bash", "-c"]
 
 # pre-requisite distro deps, and build env setup
-RUN adduser --disabled-login --gecos "" custodian
 RUN apt-get --yes update
-RUN apt-get --yes install --no-install-recommends build-essential curl python3-venv python3-dev
+RUN apt-get --yes install --no-install-recommends build-essential \
+    curl python3-venv python3-dev adduser
+# todo: 24.04 is trying to standardize on ubuntu as builtin non root.
+RUN adduser --disabled-login --gecos "" custodian
 RUN python3 -m venv /usr/local
 RUN /usr/local/bin/pip install -U pip setuptools && \
     /usr/local/bin/pip install "poetry=={poetry_version}"
@@ -82,13 +84,13 @@ WORKDIR /src
 
 LEFT_BUILD_STAGE = BOOTSTRAP_STAGE + """\
 ADD pyproject.toml poetry.lock README.md /src
-RUN . /usr/local/bin/activate && poetry install --without dev --no-root
+RUN . /usr/local/bin/activate && poetry install --only main --no-root
 
 ADD c7n /src/c7n/
 RUN . /usr/local/bin/activate && poetry install --only-root
 
 ADD tools/c7n_left /src/tools/c7n_left
-RUN . /usr/local/bin/activate && cd tools/c7n_left && poetry install --without dev
+RUN . /usr/local/bin/activate && cd tools/c7n_left && poetry install --only main
 
 RUN mkdir /output
 """
@@ -113,6 +115,10 @@ ARG providers="{providers}"
 
 {PHASE_2_PKG_INSTALL_ROOT}
 
+# Install c7n_awscc
+ADD tools/c7n_awscc /src/tools/c7n_awscc
+RUN . /usr/local/bin/activate && cd tools/c7n_awscc && poetry install
+
 RUN mkdir /output
 """
 
@@ -125,7 +131,7 @@ LABEL name="{name}" \\
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get --yes update \\
-        && apt-get --yes install python3 python3-venv {packages} --no-install-recommends \\
+        && apt-get --yes install python3 python3-venv adduser {packages} --no-install-recommends \\
         && rm -Rf /var/cache/apt \\
         && rm -Rf /var/lib/apt/lists/* \\
         && rm -Rf /var/log/*
@@ -229,12 +235,18 @@ LABEL "org.opencontainers.image.description"="Custodian policy changes streamed 
 LABEL "org.opencontainers.image.documentation"="https://cloudcustodian.io/docs"
 """
 
+BUILD_AWSCC = """\
+# Install c7n-awscc
+ADD tools/c7n_awscc /src/tools/c7n_awscc
+RUN . /usr/local/bin/activate && cd tools/c7n_awscc && poetry install
+"""
+
 
 class Image:
 
     defaults = dict(
-        base_build_image="ubuntu:22.04",
-        base_target_image="ubuntu:22.04",
+        base_build_image="ubuntu:24.04",
+        base_target_image="ubuntu:24.04",
         poetry_version="${POETRY_VERSION}",
         packages="",
         providers=" ".join(default_providers),
@@ -279,17 +291,6 @@ ImageMap = {
         ),
         build=[BUILD_STAGE],
         target=[TARGET_UBUNTU_STAGE, TARGET_CLI],
-    ),
-    "docker/c7n-left": Image(
-        dict(
-            name="left",
-            repo="c7n",
-            description="Cloud Custodian IaC Governance",
-            entrypoint="/usr/local/bin/c7n-left",
-            packages="git"
-        ),
-        build=[LEFT_BUILD_STAGE],
-        target=[TARGET_UBUNTU_STAGE, TARGET_LEFT],
     ),
     "docker/c7n-kube": Image(
         dict(

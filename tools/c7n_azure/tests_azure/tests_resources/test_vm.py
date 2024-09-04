@@ -357,3 +357,19 @@ class VMTest(BaseTest):
         client = local_session(Session)\
             .client('azure.mgmt.compute.ComputeManagementClient').virtual_machines
         return client.__module__ + '.' + client.__class__.__name__
+
+    @arm_template('vm.json')
+    def test_vm_backup_status_protected(self):
+        p = self.load_policy({
+            'name': 'vm-backup-status-protected',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'backup-status',
+                 "key": "protectionStatus",
+                 "value": "Protected"}
+            ]
+        })
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual('vm1226', resources[0]['name'])

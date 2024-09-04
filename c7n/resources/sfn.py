@@ -32,6 +32,7 @@ class StepFunction(QueryResourceManager):
         detail_spec = (
             "describe_state_machine", "stateMachineArn",
             'stateMachineArn', None)
+        permissions_augment = ("states:ListTagsForResource",)
 
     source_mapping = {
         'describe': DescribeStepFunction,

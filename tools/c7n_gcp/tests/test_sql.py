@@ -217,6 +217,38 @@ class SqlInstanceTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_set_high_availability(self):
+        project_id = 'cloud-custodian'
+        instance_name = 'custodiantestsql'
+        factory = self.replay_flight_data('sqlinstance-high-availability', project_id=project_id)
+        p = self.load_policy(
+            {
+                'name': 'set-high-availability',
+                'resource': 'gcp.sql-instance',
+                'filters': [
+                    {
+                        'name': 'custodiantestsql'
+                    },
+                    {
+                        'type': 'value',
+                        'key': 'settings.availabilityType',
+                        'op': 'equal',
+                        'value': 'ZONAL'
+                    }
+                ],
+                'actions': [{"type": 'set-high-availability', "value": True}]
+            },
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        if self.recording:
+            time.sleep(1)
+        client = p.resource_manager.get_client()
+        result = client.execute_query(
+            'get', {'project': project_id,
+                    'instance': instance_name})
+        self.assertEqual(result['settings']['availabilityType'], 'REGIONAL')
+
 
 class SqlUserTest(BaseTest):
 

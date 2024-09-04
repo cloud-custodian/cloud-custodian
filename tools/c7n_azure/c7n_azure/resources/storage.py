@@ -320,7 +320,7 @@ class StorageDiagnosticSettingsFilter(ValueFilter):
 
     def process(self, resources, event=None):
         session = local_session(self.manager.session_factory)
-        result, errors = ThreadHelper.execute_in_parallel(
+        result, _ = ThreadHelper.execute_in_parallel(
             resources=resources,
             event=event,
             execution_method=self.process_resource_set,

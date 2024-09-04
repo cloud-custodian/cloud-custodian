@@ -3,6 +3,7 @@
 from .common import BaseTest
 from c7n.utils import jmespath_search
 
+
 class TestApacheAirflow(BaseTest):
     def test_airflow_environment_value_filter(self):
         session_factory = self.replay_flight_data('test_airflow_environment_value_filter')

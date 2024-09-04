@@ -5,11 +5,11 @@ from ..azure_common import BaseTest
 
 class ServiceBusNamespaceTest(BaseTest):
     def test_azure_servicebus_namespace_schema_validate(self):
-            p = self.load_policy({
-                'name': 'test-azure-servicebus-namespace-schema-validate',
-                'resource': 'azure.servicebus-namespace'
-            }, validate=True)
-            self.assertTrue(p)
+        p = self.load_policy({
+            'name': 'test-azure-servicebus-namespace-schema-validate',
+            'resource': 'azure.servicebus-namespace'
+        }, validate=True)
+        self.assertTrue(p)
 
     def test_find_by_name(self):
         p = self.load_policy({

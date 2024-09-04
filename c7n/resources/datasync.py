@@ -16,6 +16,7 @@ class DataSyncAgent(query.QueryResourceManager):
         name = "Name"
         cfn_type = "AWS::DataSync::Agent"
         universal_taggable = object()
+        permissions_augment = ("datasync:ListTagsForResource",)
 
     source_mapping = {
         "describe": query.DescribeWithResourceTags,
@@ -34,5 +35,6 @@ class DataSyncTask(query.QueryResourceManager):
         name = "Name"
         cfn_type = config_type = "AWS::DataSync::Task"
         universal_taggable = object()
+        permissions_augment = ("datasync:ListTagsForResource",)
 
     source_mapping = {"describe": query.DescribeWithResourceTags, "config": query.ConfigSource}

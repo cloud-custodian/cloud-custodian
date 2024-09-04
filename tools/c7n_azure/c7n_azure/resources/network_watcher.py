@@ -5,7 +5,7 @@ from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 
 
-@resources.register('networkwatcher')
+@resources.register('networkwatcher', aliases=['network-watcher'])
 class NetworkWatcher(ArmResourceManager):
     """Azure Network Watcher Resource
 

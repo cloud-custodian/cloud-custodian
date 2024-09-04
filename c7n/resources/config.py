@@ -4,9 +4,30 @@ from c7n.actions import BaseAction
 from c7n.filters import Filter, ValueFilter, CrossAccountAccessFilter
 from c7n.manager import resources
 from c7n.resolver import ValuesFrom
-from c7n.query import QueryResourceManager, TypeInfo
+from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, ConfigSource
 from c7n.utils import local_session, chunks, type_schema
 from c7n.tags import universal_augment
+
+
+class RecorderDescribe(DescribeSource):
+
+    def augment(self, resources):
+        # in general we don't to default augmentation beyond tags, to
+        # avoid extraneous api calls. in this case config recorder is
+        # a singleton (so no cardinality issues in terms of api calls)
+        # and the common case is looking checking against all of the
+        # attributes to ensure proper configuration.
+        client = local_session(self.manager.session_factory).client('config')
+        for r in resources:
+            status = client.describe_configuration_recorder_status(
+                ConfigurationRecorderNames=[r['name']])['ConfigurationRecordersStatus']
+            if status:
+                r.update({'status': status.pop()})
+
+            channels = client.describe_delivery_channels().get('DeliveryChannels')
+            if channels:
+                r.update({'deliveryChannel': channels.pop()})
+        return resources
 
 
 @resources.register('config-recorder')
@@ -19,26 +40,9 @@ class ConfigRecorder(QueryResourceManager):
         filter_name = 'ConfigurationRecorderNames'
         filter_type = 'list'
         arn = False
-        cfn_type = 'AWS::Config::ConfigurationRecorder'
+        config_type = cfn_type = 'AWS::Config::ConfigurationRecorder'
 
-    def augment(self, resources):
-        # in general we don't to default augmentation beyond tags, to
-        # avoid extraneous api calls. in this case config recorder is
-        # a singleton (so no cardinality issues in terms of api calls)
-        # and the common case is looking checking against all of the
-        # attributes to ensure proper configuration.
-        client = local_session(self.session_factory).client('config')
-
-        for r in resources:
-            status = client.describe_configuration_recorder_status(
-                ConfigurationRecorderNames=[r['name']])['ConfigurationRecordersStatus']
-            if status:
-                r.update({'status': status.pop()})
-
-            channels = client.describe_delivery_channels().get('DeliveryChannels')
-            if channels:
-                r.update({'deliveryChannel': channels.pop()})
-        return resources
+    source_mapping = {'describe': RecorderDescribe, 'config': ConfigSource}
 
 
 @ConfigRecorder.filter_registry.register('cross-account')
@@ -70,6 +74,64 @@ class ConfigCrossAccountFilter(CrossAccountAccessFilter):
         # only 1 config recorder per account
         resources[0][self.annotation_key] = matched
         return resources
+
+
+@ConfigRecorder.filter_registry.register("retention")
+class ConfigRetentionConfigurations(ValueFilter):
+    """
+    Filter to look for config retention configurations
+
+    AWS Config supports only one retention configuration per region in a particular account.
+
+    RetentionPeriodInDays value should be an integer ranging from 30 to 2557
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+        - name: config-recorder-verify-retention
+          resource: config-recorder
+          filters:
+            - type: retention
+              key: RetentionPeriodInDays
+              value: 30
+
+    Also retrieves the retention configuration if no key/value is provided:
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+        - name: config-recorder
+          resource: config-recorder
+          filters:
+            - type: retention
+    """
+
+    schema = type_schema(
+        "retention",
+        rinherit=ValueFilter.schema,
+
+    )
+    schema_alias = False
+    permissions = ("config:DescribeRetentionConfigurations",)
+    annotation_key = "c7n:ConfigRetentionConfigs"
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client("config")
+
+        retention_configs = client.describe_retention_configurations().get(
+            "RetentionConfigurations", []
+        )
+        retention_config = retention_configs and retention_configs[0] or {}
+        for resource in resources:
+            resource[self.annotation_key] = retention_config
+        return super().process(resources, event)
+
+    def __call__(self, resource):
+        return super().__call__(resource[self.annotation_key])
 
 
 @resources.register('config-rule')

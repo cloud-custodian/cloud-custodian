@@ -159,6 +159,7 @@ class DirectoryTests(BaseTest):
         self.assertEqual(len(remainder), 2)
         self.assertEqual(remainder[1]["Stage"], "Deleting")
 
+
 class CloudDirectoryQueryParse(BaseTest):
 
     def test_query(self):

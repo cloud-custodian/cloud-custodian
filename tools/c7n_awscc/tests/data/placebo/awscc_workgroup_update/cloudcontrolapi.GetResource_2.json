@@ -1,0 +1,11 @@
+{
+    "status_code": 200,
+    "data": {
+        "TypeName": "AWS::Athena::WorkGroup",
+        "ResourceDescription": {
+            "Identifier": "tf-test-loving-llama",
+            "Properties": "{\"WorkGroupConfiguration\":{\"EnforceWorkGroupConfiguration\":true,\"EngineVersion\":{\"SelectedEngineVersion\":\"AUTO\",\"EffectiveEngineVersion\":\"Athena engine version 3\"},\"PublishCloudWatchMetricsEnabled\":true,\"RequesterPaysEnabled\":false},\"State\":\"ENABLED\",\"CreationTime\":\"1708539251\",\"Tags\":[],\"Name\":\"tf-test-loving-llama\"}"
+        },
+        "ResponseMetadata": {}
+    }
+}

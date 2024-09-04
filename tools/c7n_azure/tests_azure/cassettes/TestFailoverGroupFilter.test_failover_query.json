@@ -1,0 +1,201 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Sql/servers?api-version=2019-06-01-preview",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "906"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "0a2ff448-1359-4675-8b9f-7fb5ccf5c175",
+                        "4cddd2d5-6366-4230-bd4c-0632b8898dad"
+                    ],
+                    "date": [
+                        "Mon, 14 Mar 2022 12:50:59 GMT"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "kind": "v12.0",
+                                "properties": {
+                                    "administratorLogin": "raNpTpVo",
+                                    "version": "12.0",
+                                    "state": "Ready",
+                                    "fullyQualifiedDomainName": "293-sql1-green.database.windows.net",
+                                    "privateEndpointConnections": [],
+                                    "publicNetworkAccess": "Enabled"
+                                },
+                                "location": "eastus",
+                                "tags": {},
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/293-rg-green/providers/Microsoft.Sql/servers/293-sql1-green",
+                                "name": "293-sql1-green",
+                                "type": "Microsoft.Sql/servers"
+                            },
+                            {
+                                "kind": "v12.0",
+                                "properties": {
+                                    "administratorLogin": "raNpTpVo",
+                                    "version": "12.0",
+                                    "state": "Ready",
+                                    "fullyQualifiedDomainName": "293-sql2-green.database.windows.net",
+                                    "privateEndpointConnections": [],
+                                    "publicNetworkAccess": "Enabled"
+                                },
+                                "location": "northeurope",
+                                "tags": {},
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/293-rg-green/providers/Microsoft.Sql/servers/293-sql2-green",
+                                "name": "293-sql2-green",
+                                "type": "Microsoft.Sql/servers"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/293-rg-green/providers/Microsoft.Sql/servers/293-sql1-green/failoverGroups?api-version=2015-05-01-preview",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Mon, 14 Mar 2022 12:50:59 GMT"
+                    ],
+                    "content-length": [
+                        "974"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "location": "East US",
+                                "tags": {
+                                    "ComplianceStatus": "Green",
+                                    "CustodianRule": "epam-azure-293-sql_data_replication_failover_groups"
+                                },
+                                "properties": {
+                                    "readWriteEndpoint": {
+                                        "failoverPolicy": "Automatic",
+                                        "failoverWithDataLossGracePeriodMinutes": 60
+                                    },
+                                    "readOnlyEndpoint": {
+                                        "failoverPolicy": "Disabled"
+                                    },
+                                    "replicationRole": "Primary",
+                                    "replicationState": "CATCH_UP",
+                                    "partnerServers": [
+                                        {
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/293-rg-green/providers/Microsoft.Sql/servers/293-sql2-green",
+                                            "location": "North Europe",
+                                            "replicationRole": "Secondary"
+                                        }
+                                    ],
+                                    "databases": [
+                                        "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/293-rg-green/providers/Microsoft.Sql/servers/293-sql1-green/databases/293-db-green"
+                                    ]
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/293-rg-green/providers/Microsoft.Sql/servers/293-sql1-green/failoverGroups/293failover-group",
+                                "name": "293failover-group",
+                                "type": "Microsoft.Sql/servers/failoverGroups"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/293-rg-green/providers/Microsoft.Sql/servers/293-sql2-green/failoverGroups?api-version=2015-05-01-preview",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Mon, 14 Mar 2022 12:50:59 GMT"
+                    ],
+                    "content-length": [
+                        "868"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "location": "North Europe",
+                                "properties": {
+                                    "readWriteEndpoint": {
+                                        "failoverPolicy": "Automatic",
+                                        "failoverWithDataLossGracePeriodMinutes": 60
+                                    },
+                                    "readOnlyEndpoint": {
+                                        "failoverPolicy": "Disabled"
+                                    },
+                                    "replicationRole": "Secondary",
+                                    "replicationState": "CATCH_UP",
+                                    "partnerServers": [
+                                        {
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/293-rg-green/providers/Microsoft.Sql/servers/293-sql1-green",
+                                            "location": "East US",
+                                            "replicationRole": "Primary"
+                                        }
+                                    ],
+                                    "databases": [
+                                        "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/293-rg-green/providers/Microsoft.Sql/servers/293-sql2-green/databases/293-db-green"
+                                    ]
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/293-rg-green/providers/Microsoft.Sql/servers/293-sql2-green/failoverGroups/293failover-group",
+                                "name": "293failover-group",
+                                "type": "Microsoft.Sql/servers/failoverGroups"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

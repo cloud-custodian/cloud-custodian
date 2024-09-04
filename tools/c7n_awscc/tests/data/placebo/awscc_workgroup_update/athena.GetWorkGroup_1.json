@@ -1,0 +1,36 @@
+{
+    "status_code": 200,
+    "data": {
+        "WorkGroup": {
+            "Name": "tf-test-loving-llama",
+            "State": "ENABLED",
+            "Configuration": {
+                "ResultConfiguration": {
+                    "EncryptionConfiguration": {
+                        "EncryptionOption": "SSE_S3"
+                    }
+                },
+                "EnforceWorkGroupConfiguration": false,
+                "PublishCloudWatchMetricsEnabled": true,
+                "RequesterPaysEnabled": false,
+                "EngineVersion": {
+                    "SelectedEngineVersion": "AUTO",
+                    "EffectiveEngineVersion": "Athena engine version 3"
+                },
+                "EnableMinimumEncryptionConfiguration": false
+            },
+            "Description": "",
+            "CreationTime": {
+                "__class__": "datetime",
+                "year": 2024,
+                "month": 2,
+                "day": 21,
+                "hour": 13,
+                "minute": 14,
+                "second": 11,
+                "microsecond": 444000
+            }
+        },
+        "ResponseMetadata": {}
+    }
+}

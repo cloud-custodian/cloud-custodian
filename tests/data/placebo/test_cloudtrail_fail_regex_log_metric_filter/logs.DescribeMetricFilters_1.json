@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "metricFilters": [
+            {
+                "filterName": "Iam_Policy_Changes",
+                "filterPattern": "{ $.errorMessage = \"Failed authentication\" }",
+                "metricTransformations": [
+                    {
+                        "metricName": "Management_Console_Auth_Failure",
+                        "metricNamespace": "Management_Console_Auth_Failure",
+                        "metricValue": "1",
+                        "unit": "None"
+                    }
+                ],
+                "creationTime": 1695371533620,
+                "logGroupName": "test_log_group"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -249,7 +249,9 @@ For Azure and GCP, only the environment variables
 the system env variables).
 
 c7n-org also supports generating reports for a given policy execution
-across accounts via the `c7n-org report` subcommand.
+across accounts via the `c7n-org report` subcommand. By default,
+account_id is not exposed to the output, but you may append it by
+using `--field AccountID=account_id` in the cli.
 
 ## Additional Azure Instructions
 

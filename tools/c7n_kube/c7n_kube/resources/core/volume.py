@@ -9,6 +9,7 @@ from c7n_kube.provider import resources
 class PersistentVolume(QueryResourceManager):
     class resource_type(TypeInfo):
         group = "Core"
+        canonical_group = ""
         version = "V1"
         namespaced = False
         patch = "patch_persistent_volume"
@@ -21,6 +22,7 @@ class PersistentVolume(QueryResourceManager):
 class PersistentVolumeClaim(QueryResourceManager):
     class resource_type(TypeInfo):
         group = "Core"
+        canonical_group = ""
         version = "V1"
         patch = "patch_namespaced_persistent_volume_claim"
         delete = "delete_namespaced_persistent_volume_claim"

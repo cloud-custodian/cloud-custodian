@@ -58,6 +58,7 @@ class ElasticSearchDomain(QueryResourceManager):
         name = 'Name'
         dimension = "DomainName"
         cfn_type = config_type = 'AWS::Elasticsearch::Domain'
+        permissions_augment = ("es:ListTags",)
 
     def resources(self, query=None):
         if 'query' in self.data:
@@ -183,23 +184,20 @@ class ElasticSearchCrossClusterFilter(Filter):
         for r in resources:
             if self.annotation_key not in r:
                 r[self.annotation_key] = {}
-                try:
-                    if "inbound" in self.data:
-                        inbound = self.manager.retry(
-                            client.describe_inbound_cross_cluster_search_connections,
-                            Filters=[{'Name': 'destination-domain-info.domain-name',
-                                    'Values': [r['DomainName']]}])
-                        inbound.pop('ResponseMetadata')
-                        r[self.annotation_key]["inbound"] = inbound
-                    if "outbound" in self.data:
-                        outbound = self.manager.retry(
-                            client.describe_outbound_cross_cluster_search_connections,
-                            Filters=[{'Name': 'source-domain-info.domain-name',
-                                    'Values': [r['DomainName']]}])
-                        outbound.pop('ResponseMetadata')
-                        r[self.annotation_key]["outbound"] = outbound
-                except client.exceptions.ResourceNotFoundExecption:
-                    continue
+                if "inbound" in self.data:
+                    inbound = self.manager.retry(
+                        client.describe_inbound_cross_cluster_search_connections,
+                        Filters=[{'Name': 'destination-domain-info.domain-name',
+                                'Values': [r['DomainName']]}])
+                    inbound.pop('ResponseMetadata')
+                    r[self.annotation_key]["inbound"] = inbound
+                if "outbound" in self.data:
+                    outbound = self.manager.retry(
+                        client.describe_outbound_cross_cluster_search_connections,
+                        Filters=[{'Name': 'source-domain-info.domain-name',
+                                'Values': [r['DomainName']]}])
+                    outbound.pop('ResponseMetadata')
+                    r[self.annotation_key]["outbound"] = outbound
             matchFound = False
             r[self.matched_key] = {}
             for direction in r[self.annotation_key]:
@@ -348,7 +346,7 @@ class RemovePolicyStatement(RemovePolicyBase):
         if p is None:
             return
 
-        statements, found = self.process_policy(
+        _, found = self.process_policy(
             p, resource, CrossAccountAccessFilter.annotation_key)
 
         if found:
@@ -455,7 +453,7 @@ class ElasticSearchAddTag(Tag):
         for d in domains:
             try:
                 client.add_tags(ARN=d['ARN'], TagList=tags)
-            except client.exceptions.ResourceNotFoundExecption:
+            except client.exceptions.ValidationException:
                 continue
 
 
@@ -482,7 +480,7 @@ class ElasticSearchRemoveTag(RemoveTag):
         for d in domains:
             try:
                 client.remove_tags(ARN=d['ARN'], TagKeys=tags)
-            except client.exceptions.ResourceNotFoundExecption:
+            except client.exceptions.ValidationException:
                 continue
 
 
@@ -627,7 +625,8 @@ class UpdateTlsConfig(Action):
     """
 
     schema = type_schema('update-tls-config', value={'type': 'string',
-        'enum': ['Policy-Min-TLS-1-0-2019-07', 'Policy-Min-TLS-1-2-2019-07']}, required=['value'])
+        'enum': ['Policy-Min-TLS-1-0-2019-07', 'Policy-Min-TLS-1-2-2019-07',
+                 'Policy-Min-TLS-1-2-PFS-2023-10']}, required=['value'])
     permissions = ('es:UpdateElasticsearchDomainConfig', 'es:ListDomainNames')
 
     def process(self, resources):
