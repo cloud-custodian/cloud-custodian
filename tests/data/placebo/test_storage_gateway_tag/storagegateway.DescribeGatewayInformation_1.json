@@ -1,0 +1,28 @@
+{
+    "status_code": 200,
+    "data": {
+        "GatewayARN": "arn:aws:storagegateway:us-east-1:644160558196:gateway/sgw-EBA41682",
+        "GatewayId": "sgw-EBA41682",
+        "GatewayName": "c7n-test",
+        "GatewayTimezone": "GMT-8:00",
+        "GatewayState": "RUNNING",
+        "GatewayNetworkInterfaces": [
+            {
+                "Ipv4Address": "10.0.0.23"
+            }
+        ],
+        "GatewayType": "FILE_S3",
+        "LastSoftwareUpdate": "2024-09-03T06:25:13",
+        "Ec2InstanceId": "i-0c156e5af9675c6ab",
+        "Ec2InstanceRegion": "us-east-1",
+        "Tags": [],
+        "HostEnvironment": "EC2",
+        "EndpointType": "STANDARD",
+        "GatewayCapacity": "Small",
+        "SupportedGatewayCapacities": [
+            "Small"
+        ],
+        "SoftwareVersion": "1.26.1",
+        "ResponseMetadata": {}
+    }
+}
