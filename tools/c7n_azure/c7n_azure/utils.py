@@ -123,7 +123,7 @@ def custodian_azure_send_override(self, request, headers=None, content=None, **k
     """ Overrides ServiceClient.send() function to implement retries & log headers
     """
     retries = 0
-    max_retries = 3
+    max_retries = 8
     while retries < max_retries:
         response = self.orig_send(request, headers, content, **kwargs)
 

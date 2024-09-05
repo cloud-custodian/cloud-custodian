@@ -720,6 +720,92 @@ def test_traverse_multi_resource_multi_set(tmp_path):
     }
 
 
+def test_traverse_multi_resource_inside_or(tmp_path):
+    resources = run_policy(
+        {
+            "name": "traverse-inside-or",
+            "resource": "terraform.aws_s3_bucket",
+            "filters": [
+                {
+                    "or": [
+                        {
+                            "type": "traverse",
+                            "resources": "aws_s3_bucket_ownership_controls",
+                            "attrs": [
+                                {
+                                    "type": "value",
+                                    "key": "rule.object_ownership",
+                                    "value": "BucketOwnerPreferred",
+                                },
+                            ],
+                        },
+                        {
+                            "type": "traverse",
+                            "resources": "aws_s3_bucket_ownership_controls",
+                            "attrs": [
+                                {
+                                    "type": "value",
+                                    "key": "rule.object_ownership",
+                                    "value": "BucketOwnerEnforced",
+                                },
+                            ],
+                        },
+                    ]
+                }
+            ],
+        },
+        terraform_dir / "s3_ownership",
+        tmp_path,
+    )
+    assert len(resources) == 2
+    assert {r.resource.name for r in resources} == {
+        "aws_s3_bucket.owner_enforced",
+        "aws_s3_bucket.owner_preferred",
+    }
+
+
+@pytest.mark.xfail(
+    strict=True,
+    reason="Known issue with branching inside attrs: https://github.com/cloud-custodian/cloud-custodian/issues/9690",
+)
+def test_traverse_multi_resource_nested_or(tmp_path):
+    resources = run_policy(
+        {
+            "name": "traverse-nested-or",
+            "resource": "terraform.aws_s3_bucket",
+            "filters": [
+                {
+                    "type": "traverse",
+                    "resources": "aws_s3_bucket_ownership_controls",
+                    "attrs": [
+                        {
+                            "or": [
+                                {
+                                    "type": "value",
+                                    "key": "rule.object_ownership",
+                                    "value": "BucketOwnerPreferred",
+                                },
+                                {
+                                    "type": "value",
+                                    "key": "rule.object_ownership",
+                                    "value": "BucketOwnerEnforced",
+                                },
+                            ],
+                        },
+                    ],
+                }
+            ],
+        },
+        terraform_dir / "s3_ownership",
+        tmp_path,
+    )
+    assert len(resources) == 2
+    assert {r.resource.name for r in resources} == {
+        "aws_s3_bucket.owner_enforced",
+        "aws_s3_bucket.owner_preferred",
+    }
+
+
 def test_traverse_filter_not_found(tmp_path):
     resources = run_policy(
         {
@@ -915,7 +1001,7 @@ def test_cli_execution_error(policy_env, test, debug_cli_runner):
     )
 
     runner = debug_cli_runner
-    with patch.object(core.CollectionRunner, 'run_policy', side_effect=KeyError("abc")):
+    with patch.object(core.CollectionRunner, "run_policy", side_effect=KeyError("abc")):
         result = runner.invoke(
             cli.cli, ["run", "-p", policy_env.policy_dir, "-d", policy_env.policy_dir]
         )
@@ -1184,6 +1270,69 @@ def test_cli_no_policies(tmp_path, caplog):
     assert caplog.record_tuples == [("c7n.iac", 30, "no policies found")]
 
 
+def test_cli_validate_no_dir(tmp_path, caplog):
+    runner = CliRunner()
+    result = runner.invoke(cli.cli, ["validate", "-p", str(tmp_path / "bad_dir")])
+    assert result.exit_code == 1
+    assert "does not exist" in caplog.record_tuples[-1][-1]
+
+
+def test_cli_validate_parse_error(tmp_path, caplog):
+    (tmp_path / "bad.json").write_text("{,}")
+    runner = CliRunner()
+    result = runner.invoke(cli.cli, ["validate", "-p", str(tmp_path)])
+    assert result.exit_code == 1
+    assert caplog.record_tuples[0] == ("c7n.iac", 40, "Validation failed with 1 errors")
+    assert "did not find expected node content" in caplog.record_tuples[-1][-1]
+
+
+def test_cli_validate_structure_error(tmp_path, caplog):
+    (tmp_path / "bad.json").write_text(json.dumps({"something": "else"}))
+    runner = CliRunner()
+    result = runner.invoke(cli.cli, ["validate", "-p", str(tmp_path)])
+    assert result.exit_code == 1
+    assert caplog.record_tuples[0] == ("c7n.iac", 40, "Validation failed with 1 errors")
+    assert "Policy files top level keys" in caplog.record_tuples[-1][-1]
+
+
+def test_cli_validate_schema_error(tmp_path, caplog):
+    (tmp_path / "bad.json").write_text(
+        json.dumps(
+            {
+                "policies": [
+                    {
+                        "name": "xyz",
+                        "resource": ["terraform.*"],
+                        "filters": [{"type": "xyz123", "key": "value"}],
+                    }
+                ]
+            }
+        )
+    )
+    runner = CliRunner()
+    result = runner.invoke(cli.cli, ["validate", "-p", str(tmp_path)])
+    assert result.exit_code == 1
+    caplog.record_tuples[0] == ('c7n.iac', 40, 'Validation failed with 1 errors')
+    assert "is not valid under any of the given schemas" in caplog.record_tuples[2][-1]
+
+
+def test_cli_validate_prechecks(tmp_path, caplog):
+    runner = CliRunner()
+    result = runner.invoke(
+        cli.cli,
+        ["validate", "-p", str(tmp_path)],
+    )
+    assert result.exit_code == 0
+    assert caplog.record_tuples[0][-1].startswith("No policy files found in")
+
+    result = runner.invoke(
+        cli.cli,
+        ["validate", "-p", str(tmp_path / "xyz")],
+    )
+    assert result.exit_code == 1
+    assert "does not exist" in caplog.record_tuples[1][-1]
+
+
 def test_cli_junit_output(policy_env, tmp_path, debug_cli_runner):
     policy_env.write_tf(
         """
@@ -1333,6 +1482,69 @@ def test_cli_output_rich(tmp_path):
     assert result.exit_code == 1
     assert "Reason: a description\n" in result.output
     assert "1 failed 2 passed" in result.output
+
+
+def test_cli_output_rich_pass_count(tmp_path, debug_cli_runner):
+    (tmp_path / "policy.yaml").write_text(
+        """
+        policies:
+          - name: aws-rds-require-encryption
+            resource: [ terraform.aws_db_instance, terraform.aws_rds_cluster ]
+            description: |
+              RDS Databases should be encrypted at rest.
+            metadata:
+              category:
+               - [ encryption, security, database ]
+              severity: HIGH
+            filters:
+              - kms_key_id: absent
+              - or:
+                - storage_encrypted: absent
+                - storage_encrypted: false
+        """
+    )
+    (tmp_path / "tfroot").mkdir()
+    (tmp_path / "tfroot" / "main.tf").write_text(
+        """
+resource "aws_db_instance" "default" {
+  allocated_storage           = 10
+  db_name                     = "mydb"
+  engine                      = "mysql"
+  engine_version              = "8.0"
+  instance_class              = "db.t3.micro"
+  manage_master_user_password = true
+  username                    = "foo"
+  parameter_group_name        = "default.mysql8.0"
+  #
+  # storage_encrypted must be set to true OR kms_key_id must be set to pass the check
+  #
+  # storage_encrypted = true
+  # kms_key_id = "1234abcd-12ab-34cd-56ef-1234567890ab"
+}
+
+resource "aws_rds_cluster" "postgresql" {
+  cluster_identifier      = "aurora-cluster-demo"
+  engine                  = "aurora-postgresql"
+  availability_zones      = ["us-west-2a", "us-west-2b", "us-west-2c"]
+  database_name           = "mydb"
+  master_username         = "foo"
+  master_password         = "must_be_eight_characters"
+  backup_retention_period = 5
+  preferred_backup_window = "07:00-09:00"
+  #
+  # storage_encrypted must be set to true OR kms_key_id must be set to pass the check
+  #
+  #storage_encrypted = true
+  # kms_key_id = "1234abcd-12ab-34cd-56ef-1234567890ab"
+}
+ """
+    )
+
+    runner = CliRunner()
+    result = runner.invoke(
+        cli.cli, ["run", "-p", str(tmp_path), "-d", str(tmp_path / "tfroot"), "-o", "cli"]
+    )
+    assert "2 failed 0 passed" in result.output
 
 
 def test_cli_output_rich_warn_on_severity(tmp_path):
