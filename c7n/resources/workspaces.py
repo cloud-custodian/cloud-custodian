@@ -517,7 +517,7 @@ class SubnetFilter(net_filters.SubnetFilter):
                     networkSettingsArn=r['networkSettingsArn']
                     ).get('networkSettings', {}
                 )
-        return super(SubnetFilter, self).process(resources, event)
+        return super().process(resources, event)
 
 
 @WorkspacesWeb.filter_registry.register('browser-policy')
