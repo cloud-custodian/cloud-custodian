@@ -138,6 +138,11 @@ def custodian_azure_send_override(self, request, headers=None, content=None, **k
             for k in response.headers.keys():
                 if StringUtils.equal('retry-after', k):
                     retry_after = int(response.headers[k])
+            if retry_after and retry_after > constants.DEFAULT_MAX_RETRY_AFTER:
+                send_logger.error("Received throttling error, retry time is %i"
+                                  "(retry only if < %i seconds)."
+                                  % (retry_after or 0, constants.DEFAULT_MAX_RETRY_AFTER))
+                break
             if retry_after is None:
                 # we want to attempt retries even when azure fails to send a header
                 # this has been a constant source of instability in larger environments
