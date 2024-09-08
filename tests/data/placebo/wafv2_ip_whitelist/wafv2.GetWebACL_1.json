@@ -1,0 +1,43 @@
+{
+    "status_code": 200,
+    "data": {
+        "WebACL": {
+            "Name": "allowed-addresses-only",
+            "Id": "029995cf-302f-4108-b6ec-2015582115a4",
+            "ARN": "arn:aws:wafv2:us-east-1:644160558196:regional/webacl/allowed-addresses-only/029995cf-302f-4108-b6ec-2015582115a4",
+            "DefaultAction": {
+                "Block": {}
+            },
+            "Description": "",
+            "Rules": [
+                {
+                    "Name": "foo",
+                    "Priority": 1,
+                    "Statement": {
+                        "IPSetReferenceStatement": {
+                            "ARN": "arn:aws:wafv2:us-east-1:644160558196:regional/ipset/allowed-addresses-only/e2193fb2-1020-44e9-85f5-8577be6552cd"
+                        }
+                    },
+                    "Action": {
+                        "Allow": {}
+                    },
+                    "VisibilityConfig": {
+                        "SampledRequestsEnabled": false,
+                        "CloudWatchMetricsEnabled": false,
+                        "MetricName": "foo"
+                    }
+                }
+            ],
+            "VisibilityConfig": {
+                "SampledRequestsEnabled": false,
+                "CloudWatchMetricsEnabled": false,
+                "MetricName": "foo"
+            },
+            "Capacity": 1,
+            "ManagedByFirewallManager": false,
+            "LabelNamespace": "awswaf:644160558196:webacl:allowed-addresses-only:"
+        },
+        "LockToken": "8098d8e2-f927-4d7e-b023-d5df3a007903",
+        "ResponseMetadata": {}
+    }
+}

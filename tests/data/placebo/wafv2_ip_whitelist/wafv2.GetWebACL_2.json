@@ -1,0 +1,43 @@
+{
+    "status_code": 200,
+    "data": {
+        "WebACL": {
+            "Name": "unallowed-addresses",
+            "Id": "b4a90669-c7c9-49ae-85f3-b40df89e4c9f",
+            "ARN": "arn:aws:wafv2:us-east-1:644160558196:regional/webacl/unallowed-addresses/b4a90669-c7c9-49ae-85f3-b40df89e4c9f",
+            "DefaultAction": {
+                "Block": {}
+            },
+            "Description": "",
+            "Rules": [
+                {
+                    "Name": "foo",
+                    "Priority": 1,
+                    "Statement": {
+                        "IPSetReferenceStatement": {
+                            "ARN": "arn:aws:wafv2:us-east-1:644160558196:regional/ipset/unallowed-addresses/b53ad693-870b-4a03-93fa-853fa308311b"
+                        }
+                    },
+                    "Action": {
+                        "Allow": {}
+                    },
+                    "VisibilityConfig": {
+                        "SampledRequestsEnabled": false,
+                        "CloudWatchMetricsEnabled": false,
+                        "MetricName": "foo"
+                    }
+                }
+            ],
+            "VisibilityConfig": {
+                "SampledRequestsEnabled": false,
+                "CloudWatchMetricsEnabled": false,
+                "MetricName": "foo"
+            },
+            "Capacity": 1,
+            "ManagedByFirewallManager": false,
+            "LabelNamespace": "awswaf:644160558196:webacl:unallowed-addresses:"
+        },
+        "LockToken": "c1d5bb3e-daa7-4ce5-a3ff-e14cd3e461a1",
+        "ResponseMetadata": {}
+    }
+}

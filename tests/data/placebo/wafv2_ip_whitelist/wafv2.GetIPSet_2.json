@@ -1,0 +1,17 @@
+{
+    "status_code": 200,
+    "data": {
+        "IPSet": {
+            "Name": "unallowed-addresses",
+            "Id": "b53ad693-870b-4a03-93fa-853fa308311b",
+            "ARN": "arn:aws:wafv2:us-east-1:644160558196:regional/ipset/unallowed-addresses/b53ad693-870b-4a03-93fa-853fa308311b",
+            "Description": "",
+            "IPAddressVersion": "IPV4",
+            "Addresses": [
+                "192.168.0.0/16"
+            ]
+        },
+        "LockToken": "75ab9ef1-cdcb-4060-8022-3b5727293f6b",
+        "ResponseMetadata": {}
+    }
+}

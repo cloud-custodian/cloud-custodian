@@ -1,0 +1,420 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_internet_gateway": {
+            "this": {
+                "arn": "arn:aws:ec2:us-east-1:644160558196:internet-gateway/igw-03e65a8679e7e8b37",
+                "id": "igw-03e65a8679e7e8b37",
+                "owner_id": "644160558196",
+                "tags": null,
+                "tags_all": {},
+                "timeouts": null,
+                "vpc_id": "vpc-066a4955032b41ca7"
+            }
+        },
+        "aws_lb": {
+            "alb_allowed": {
+                "access_logs": [
+                    {
+                        "bucket": "",
+                        "enabled": false,
+                        "prefix": ""
+                    }
+                ],
+                "arn": "arn:aws:elasticloadbalancing:us-east-1:644160558196:loadbalancer/app/alb-allowed/ae462e03fa09c5c7",
+                "arn_suffix": "app/alb-allowed/ae462e03fa09c5c7",
+                "connection_logs": [
+                    {
+                        "bucket": "",
+                        "enabled": false,
+                        "prefix": ""
+                    }
+                ],
+                "customer_owned_ipv4_pool": "",
+                "desync_mitigation_mode": "defensive",
+                "dns_name": "alb-allowed-1616791576.us-east-1.elb.amazonaws.com",
+                "dns_record_client_routing_policy": null,
+                "drop_invalid_header_fields": false,
+                "enable_cross_zone_load_balancing": true,
+                "enable_deletion_protection": false,
+                "enable_http2": true,
+                "enable_tls_version_and_cipher_suite_headers": false,
+                "enable_waf_fail_open": false,
+                "enable_xff_client_port": false,
+                "enforce_security_group_inbound_rules_on_private_link_traffic": "",
+                "id": "arn:aws:elasticloadbalancing:us-east-1:644160558196:loadbalancer/app/alb-allowed/ae462e03fa09c5c7",
+                "idle_timeout": 60,
+                "internal": false,
+                "ip_address_type": "ipv4",
+                "load_balancer_type": "application",
+                "name": "alb-allowed",
+                "name_prefix": "",
+                "preserve_host_header": false,
+                "security_groups": [
+                    "sg-0ade5766c7964b4f2"
+                ],
+                "subnet_mapping": [
+                    {
+                        "allocation_id": "",
+                        "ipv6_address": "",
+                        "outpost_id": "",
+                        "private_ipv4_address": "",
+                        "subnet_id": "subnet-034475ac41bcb9abd"
+                    },
+                    {
+                        "allocation_id": "",
+                        "ipv6_address": "",
+                        "outpost_id": "",
+                        "private_ipv4_address": "",
+                        "subnet_id": "subnet-0c31f5e6f8c2fcf57"
+                    }
+                ],
+                "subnets": [
+                    "subnet-034475ac41bcb9abd",
+                    "subnet-0c31f5e6f8c2fcf57"
+                ],
+                "tags": null,
+                "tags_all": {},
+                "timeouts": null,
+                "vpc_id": "vpc-066a4955032b41ca7",
+                "xff_header_processing_mode": "append",
+                "zone_id": "Z35SXDOTRQ7X7K"
+            },
+            "alb_unallowed": {
+                "access_logs": [
+                    {
+                        "bucket": "",
+                        "enabled": false,
+                        "prefix": ""
+                    }
+                ],
+                "arn": "arn:aws:elasticloadbalancing:us-east-1:644160558196:loadbalancer/app/alb-unallowed/80b601d6253ea5b4",
+                "arn_suffix": "app/alb-unallowed/80b601d6253ea5b4",
+                "connection_logs": [
+                    {
+                        "bucket": "",
+                        "enabled": false,
+                        "prefix": ""
+                    }
+                ],
+                "customer_owned_ipv4_pool": "",
+                "desync_mitigation_mode": "defensive",
+                "dns_name": "alb-unallowed-1522071122.us-east-1.elb.amazonaws.com",
+                "dns_record_client_routing_policy": null,
+                "drop_invalid_header_fields": false,
+                "enable_cross_zone_load_balancing": true,
+                "enable_deletion_protection": false,
+                "enable_http2": true,
+                "enable_tls_version_and_cipher_suite_headers": false,
+                "enable_waf_fail_open": false,
+                "enable_xff_client_port": false,
+                "enforce_security_group_inbound_rules_on_private_link_traffic": "",
+                "id": "arn:aws:elasticloadbalancing:us-east-1:644160558196:loadbalancer/app/alb-unallowed/80b601d6253ea5b4",
+                "idle_timeout": 60,
+                "internal": false,
+                "ip_address_type": "ipv4",
+                "load_balancer_type": "application",
+                "name": "alb-unallowed",
+                "name_prefix": "",
+                "preserve_host_header": false,
+                "security_groups": [
+                    "sg-0c8d97a6602b4be43"
+                ],
+                "subnet_mapping": [
+                    {
+                        "allocation_id": "",
+                        "ipv6_address": "",
+                        "outpost_id": "",
+                        "private_ipv4_address": "",
+                        "subnet_id": "subnet-034475ac41bcb9abd"
+                    },
+                    {
+                        "allocation_id": "",
+                        "ipv6_address": "",
+                        "outpost_id": "",
+                        "private_ipv4_address": "",
+                        "subnet_id": "subnet-0c31f5e6f8c2fcf57"
+                    }
+                ],
+                "subnets": [
+                    "subnet-034475ac41bcb9abd",
+                    "subnet-0c31f5e6f8c2fcf57"
+                ],
+                "tags": null,
+                "tags_all": {},
+                "timeouts": null,
+                "vpc_id": "vpc-066a4955032b41ca7",
+                "xff_header_processing_mode": "append",
+                "zone_id": "Z35SXDOTRQ7X7K"
+            },
+            "nlb_allowed": {
+                "access_logs": [
+                    {
+                        "bucket": "",
+                        "enabled": false,
+                        "prefix": ""
+                    }
+                ],
+                "arn": "arn:aws:elasticloadbalancing:us-east-1:644160558196:loadbalancer/net/nlb-allowed/85bc4c230334f70a",
+                "arn_suffix": "net/nlb-allowed/85bc4c230334f70a",
+                "connection_logs": [],
+                "customer_owned_ipv4_pool": "",
+                "desync_mitigation_mode": null,
+                "dns_name": "nlb-allowed-85bc4c230334f70a.elb.us-east-1.amazonaws.com",
+                "dns_record_client_routing_policy": "any_availability_zone",
+                "drop_invalid_header_fields": null,
+                "enable_cross_zone_load_balancing": false,
+                "enable_deletion_protection": false,
+                "enable_http2": null,
+                "enable_tls_version_and_cipher_suite_headers": null,
+                "enable_waf_fail_open": null,
+                "enable_xff_client_port": null,
+                "enforce_security_group_inbound_rules_on_private_link_traffic": "",
+                "id": "arn:aws:elasticloadbalancing:us-east-1:644160558196:loadbalancer/net/nlb-allowed/85bc4c230334f70a",
+                "idle_timeout": null,
+                "internal": false,
+                "ip_address_type": "ipv4",
+                "load_balancer_type": "network",
+                "name": "nlb-allowed",
+                "name_prefix": "",
+                "preserve_host_header": null,
+                "security_groups": [
+                    "sg-0ade5766c7964b4f2"
+                ],
+                "subnet_mapping": [
+                    {
+                        "allocation_id": "",
+                        "ipv6_address": "",
+                        "outpost_id": "",
+                        "private_ipv4_address": "",
+                        "subnet_id": "subnet-034475ac41bcb9abd"
+                    },
+                    {
+                        "allocation_id": "",
+                        "ipv6_address": "",
+                        "outpost_id": "",
+                        "private_ipv4_address": "",
+                        "subnet_id": "subnet-0c31f5e6f8c2fcf57"
+                    }
+                ],
+                "subnets": [
+                    "subnet-034475ac41bcb9abd",
+                    "subnet-0c31f5e6f8c2fcf57"
+                ],
+                "tags": null,
+                "tags_all": {},
+                "timeouts": null,
+                "vpc_id": "vpc-066a4955032b41ca7",
+                "xff_header_processing_mode": null,
+                "zone_id": "Z26RNL4JYFTOTI"
+            },
+            "nlb_unallowed": {
+                "access_logs": [
+                    {
+                        "bucket": "",
+                        "enabled": false,
+                        "prefix": ""
+                    }
+                ],
+                "arn": "arn:aws:elasticloadbalancing:us-east-1:644160558196:loadbalancer/net/nlb-unallowed/a761c77f84282027",
+                "arn_suffix": "net/nlb-unallowed/a761c77f84282027",
+                "connection_logs": [],
+                "customer_owned_ipv4_pool": "",
+                "desync_mitigation_mode": null,
+                "dns_name": "nlb-unallowed-a761c77f84282027.elb.us-east-1.amazonaws.com",
+                "dns_record_client_routing_policy": "any_availability_zone",
+                "drop_invalid_header_fields": null,
+                "enable_cross_zone_load_balancing": false,
+                "enable_deletion_protection": false,
+                "enable_http2": null,
+                "enable_tls_version_and_cipher_suite_headers": null,
+                "enable_waf_fail_open": null,
+                "enable_xff_client_port": null,
+                "enforce_security_group_inbound_rules_on_private_link_traffic": "",
+                "id": "arn:aws:elasticloadbalancing:us-east-1:644160558196:loadbalancer/net/nlb-unallowed/a761c77f84282027",
+                "idle_timeout": null,
+                "internal": false,
+                "ip_address_type": "ipv4",
+                "load_balancer_type": "network",
+                "name": "nlb-unallowed",
+                "name_prefix": "",
+                "preserve_host_header": null,
+                "security_groups": [
+                    "sg-0c8d97a6602b4be43"
+                ],
+                "subnet_mapping": [
+                    {
+                        "allocation_id": "",
+                        "ipv6_address": "",
+                        "outpost_id": "",
+                        "private_ipv4_address": "",
+                        "subnet_id": "subnet-034475ac41bcb9abd"
+                    },
+                    {
+                        "allocation_id": "",
+                        "ipv6_address": "",
+                        "outpost_id": "",
+                        "private_ipv4_address": "",
+                        "subnet_id": "subnet-0c31f5e6f8c2fcf57"
+                    }
+                ],
+                "subnets": [
+                    "subnet-034475ac41bcb9abd",
+                    "subnet-0c31f5e6f8c2fcf57"
+                ],
+                "tags": null,
+                "tags_all": {},
+                "timeouts": null,
+                "vpc_id": "vpc-066a4955032b41ca7",
+                "xff_header_processing_mode": null,
+                "zone_id": "Z26RNL4JYFTOTI"
+            }
+        },
+        "aws_security_group": {
+            "allowed": {
+                "arn": "arn:aws:ec2:us-east-1:644160558196:security-group/sg-0ade5766c7964b4f2",
+                "description": "Managed by Terraform",
+                "egress": [],
+                "id": "sg-0ade5766c7964b4f2",
+                "ingress": [],
+                "name": "allowed",
+                "name_prefix": "",
+                "owner_id": "644160558196",
+                "revoke_rules_on_delete": false,
+                "tags": null,
+                "tags_all": {},
+                "timeouts": null,
+                "vpc_id": "vpc-066a4955032b41ca7"
+            },
+            "unallowed": {
+                "arn": "arn:aws:ec2:us-east-1:644160558196:security-group/sg-0c8d97a6602b4be43",
+                "description": "Managed by Terraform",
+                "egress": [],
+                "id": "sg-0c8d97a6602b4be43",
+                "ingress": [],
+                "name": "unallowed",
+                "name_prefix": "",
+                "owner_id": "644160558196",
+                "revoke_rules_on_delete": false,
+                "tags": null,
+                "tags_all": {},
+                "timeouts": null,
+                "vpc_id": "vpc-066a4955032b41ca7"
+            }
+        },
+        "aws_subnet": {
+            "subnet_1": {
+                "arn": "arn:aws:ec2:us-east-1:644160558196:subnet/subnet-034475ac41bcb9abd",
+                "assign_ipv6_address_on_creation": false,
+                "availability_zone": "us-east-1a",
+                "availability_zone_id": "use1-az6",
+                "cidr_block": "10.0.1.0/24",
+                "customer_owned_ipv4_pool": "",
+                "enable_dns64": false,
+                "enable_lni_at_device_index": 0,
+                "enable_resource_name_dns_a_record_on_launch": false,
+                "enable_resource_name_dns_aaaa_record_on_launch": false,
+                "id": "subnet-034475ac41bcb9abd",
+                "ipv6_cidr_block": "",
+                "ipv6_cidr_block_association_id": "",
+                "ipv6_native": false,
+                "map_customer_owned_ip_on_launch": false,
+                "map_public_ip_on_launch": false,
+                "outpost_arn": "",
+                "owner_id": "644160558196",
+                "private_dns_hostname_type_on_launch": "ip-name",
+                "tags": null,
+                "tags_all": {},
+                "timeouts": null,
+                "vpc_id": "vpc-066a4955032b41ca7"
+            },
+            "subnet_2": {
+                "arn": "arn:aws:ec2:us-east-1:644160558196:subnet/subnet-0c31f5e6f8c2fcf57",
+                "assign_ipv6_address_on_creation": false,
+                "availability_zone": "us-east-1b",
+                "availability_zone_id": "use1-az1",
+                "cidr_block": "10.0.2.0/24",
+                "customer_owned_ipv4_pool": "",
+                "enable_dns64": false,
+                "enable_lni_at_device_index": 0,
+                "enable_resource_name_dns_a_record_on_launch": false,
+                "enable_resource_name_dns_aaaa_record_on_launch": false,
+                "id": "subnet-0c31f5e6f8c2fcf57",
+                "ipv6_cidr_block": "",
+                "ipv6_cidr_block_association_id": "",
+                "ipv6_native": false,
+                "map_customer_owned_ip_on_launch": false,
+                "map_public_ip_on_launch": false,
+                "outpost_arn": "",
+                "owner_id": "644160558196",
+                "private_dns_hostname_type_on_launch": "ip-name",
+                "tags": null,
+                "tags_all": {},
+                "timeouts": null,
+                "vpc_id": "vpc-066a4955032b41ca7"
+            }
+        },
+        "aws_vpc": {
+            "this": {
+                "arn": "arn:aws:ec2:us-east-1:644160558196:vpc/vpc-066a4955032b41ca7",
+                "assign_generated_ipv6_cidr_block": false,
+                "cidr_block": "10.0.0.0/16",
+                "default_network_acl_id": "acl-08a5722727adcd9fc",
+                "default_route_table_id": "rtb-078f30f00ae1d4d37",
+                "default_security_group_id": "sg-093e7374a322becd4",
+                "dhcp_options_id": "dopt-03feeee1774dcc896",
+                "enable_dns_hostnames": false,
+                "enable_dns_support": true,
+                "enable_network_address_usage_metrics": false,
+                "id": "vpc-066a4955032b41ca7",
+                "instance_tenancy": "default",
+                "ipv4_ipam_pool_id": null,
+                "ipv4_netmask_length": null,
+                "ipv6_association_id": "",
+                "ipv6_cidr_block": "",
+                "ipv6_cidr_block_network_border_group": "",
+                "ipv6_ipam_pool_id": "",
+                "ipv6_netmask_length": 0,
+                "main_route_table_id": "rtb-078f30f00ae1d4d37",
+                "owner_id": "644160558196",
+                "tags": null,
+                "tags_all": {}
+            }
+        },
+        "aws_vpc_security_group_ingress_rule": {
+            "allowed": {
+                "arn": "arn:aws:ec2:us-east-1:644160558196:security-group-rule/sgr-0e0de03bbe1635e94",
+                "cidr_ipv4": "192.168.0.0/28",
+                "cidr_ipv6": null,
+                "description": null,
+                "from_port": null,
+                "id": "sgr-0e0de03bbe1635e94",
+                "ip_protocol": "-1",
+                "prefix_list_id": null,
+                "referenced_security_group_id": null,
+                "security_group_id": "sg-0ade5766c7964b4f2",
+                "security_group_rule_id": "sgr-0e0de03bbe1635e94",
+                "tags": null,
+                "tags_all": {},
+                "to_port": null
+            },
+            "unallowed": {
+                "arn": "arn:aws:ec2:us-east-1:644160558196:security-group-rule/sgr-0ababb54ace929996",
+                "cidr_ipv4": "0.0.0.0/0",
+                "cidr_ipv6": null,
+                "description": null,
+                "from_port": null,
+                "id": "sgr-0ababb54ace929996",
+                "ip_protocol": "-1",
+                "prefix_list_id": null,
+                "referenced_security_group_id": null,
+                "security_group_id": "sg-0c8d97a6602b4be43",
+                "security_group_rule_id": "sgr-0ababb54ace929996",
+                "tags": null,
+                "tags_all": {},
+                "to_port": null
+            }
+        }
+    }
+}

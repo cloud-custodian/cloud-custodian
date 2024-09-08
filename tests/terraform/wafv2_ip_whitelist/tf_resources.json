@@ -1,0 +1,534 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_internet_gateway": {
+            "this": {
+                "arn": "arn:aws:ec2:us-east-1:644160558196:internet-gateway/igw-0b7b829cc0d43d35f",
+                "id": "igw-0b7b829cc0d43d35f",
+                "owner_id": "644160558196",
+                "tags": null,
+                "tags_all": {},
+                "timeouts": null,
+                "vpc_id": "vpc-0adfe6deab1c0aaee"
+            }
+        },
+        "aws_lb": {
+            "alb_waf_v2_assoc_missing": {
+                "access_logs": [
+                    {
+                        "bucket": "",
+                        "enabled": false,
+                        "prefix": ""
+                    }
+                ],
+                "arn": "arn:aws:elasticloadbalancing:us-east-1:644160558196:loadbalancer/app/alb-wafv2-assoc-missing/ddae56c934706596",
+                "arn_suffix": "app/alb-wafv2-assoc-missing/ddae56c934706596",
+                "connection_logs": [
+                    {
+                        "bucket": "",
+                        "enabled": false,
+                        "prefix": ""
+                    }
+                ],
+                "customer_owned_ipv4_pool": "",
+                "desync_mitigation_mode": "defensive",
+                "dns_name": "alb-wafv2-assoc-missing-766810461.us-east-1.elb.amazonaws.com",
+                "dns_record_client_routing_policy": null,
+                "drop_invalid_header_fields": false,
+                "enable_cross_zone_load_balancing": true,
+                "enable_deletion_protection": false,
+                "enable_http2": true,
+                "enable_tls_version_and_cipher_suite_headers": false,
+                "enable_waf_fail_open": false,
+                "enable_xff_client_port": false,
+                "enforce_security_group_inbound_rules_on_private_link_traffic": "",
+                "id": "arn:aws:elasticloadbalancing:us-east-1:644160558196:loadbalancer/app/alb-wafv2-assoc-missing/ddae56c934706596",
+                "idle_timeout": 60,
+                "internal": false,
+                "ip_address_type": "ipv4",
+                "load_balancer_type": "application",
+                "name": "alb-wafv2-assoc-missing",
+                "name_prefix": "",
+                "preserve_host_header": false,
+                "security_groups": [
+                    "sg-005969d7de9255e78"
+                ],
+                "subnet_mapping": [
+                    {
+                        "allocation_id": "",
+                        "ipv6_address": "",
+                        "outpost_id": "",
+                        "private_ipv4_address": "",
+                        "subnet_id": "subnet-04bb5f4565aaa1246"
+                    },
+                    {
+                        "allocation_id": "",
+                        "ipv6_address": "",
+                        "outpost_id": "",
+                        "private_ipv4_address": "",
+                        "subnet_id": "subnet-094698ba0a219f65d"
+                    }
+                ],
+                "subnets": [
+                    "subnet-04bb5f4565aaa1246",
+                    "subnet-094698ba0a219f65d"
+                ],
+                "tags": null,
+                "tags_all": {},
+                "timeouts": null,
+                "vpc_id": "vpc-0adfe6deab1c0aaee",
+                "xff_header_processing_mode": "append",
+                "zone_id": "Z35SXDOTRQ7X7K"
+            },
+            "alb_waf_v2_ip_whitelisting_allowed_addresses_only": {
+                "access_logs": [
+                    {
+                        "bucket": "",
+                        "enabled": false,
+                        "prefix": ""
+                    }
+                ],
+                "arn": "arn:aws:elasticloadbalancing:us-east-1:644160558196:loadbalancer/app/alb-wafv2-allowed-addresses-only/e407c71a3cd741ad",
+                "arn_suffix": "app/alb-wafv2-allowed-addresses-only/e407c71a3cd741ad",
+                "connection_logs": [
+                    {
+                        "bucket": "",
+                        "enabled": false,
+                        "prefix": ""
+                    }
+                ],
+                "customer_owned_ipv4_pool": "",
+                "desync_mitigation_mode": "defensive",
+                "dns_name": "alb-wafv2-allowed-addresses-only-454105941.us-east-1.elb.amazonaws.com",
+                "dns_record_client_routing_policy": null,
+                "drop_invalid_header_fields": false,
+                "enable_cross_zone_load_balancing": true,
+                "enable_deletion_protection": false,
+                "enable_http2": true,
+                "enable_tls_version_and_cipher_suite_headers": false,
+                "enable_waf_fail_open": false,
+                "enable_xff_client_port": false,
+                "enforce_security_group_inbound_rules_on_private_link_traffic": "",
+                "id": "arn:aws:elasticloadbalancing:us-east-1:644160558196:loadbalancer/app/alb-wafv2-allowed-addresses-only/e407c71a3cd741ad",
+                "idle_timeout": 60,
+                "internal": false,
+                "ip_address_type": "ipv4",
+                "load_balancer_type": "application",
+                "name": "alb-wafv2-allowed-addresses-only",
+                "name_prefix": "",
+                "preserve_host_header": false,
+                "security_groups": [
+                    "sg-005969d7de9255e78"
+                ],
+                "subnet_mapping": [
+                    {
+                        "allocation_id": "",
+                        "ipv6_address": "",
+                        "outpost_id": "",
+                        "private_ipv4_address": "",
+                        "subnet_id": "subnet-04bb5f4565aaa1246"
+                    },
+                    {
+                        "allocation_id": "",
+                        "ipv6_address": "",
+                        "outpost_id": "",
+                        "private_ipv4_address": "",
+                        "subnet_id": "subnet-094698ba0a219f65d"
+                    }
+                ],
+                "subnets": [
+                    "subnet-04bb5f4565aaa1246",
+                    "subnet-094698ba0a219f65d"
+                ],
+                "tags": null,
+                "tags_all": {},
+                "timeouts": null,
+                "vpc_id": "vpc-0adfe6deab1c0aaee",
+                "xff_header_processing_mode": "append",
+                "zone_id": "Z35SXDOTRQ7X7K"
+            },
+            "alb_waf_v2_ip_whitelisting_unallowed_addresses": {
+                "access_logs": [
+                    {
+                        "bucket": "",
+                        "enabled": false,
+                        "prefix": ""
+                    }
+                ],
+                "arn": "arn:aws:elasticloadbalancing:us-east-1:644160558196:loadbalancer/app/alb-wafv2-unallowed-addresses/af785a5aff31d4d1",
+                "arn_suffix": "app/alb-wafv2-unallowed-addresses/af785a5aff31d4d1",
+                "connection_logs": [
+                    {
+                        "bucket": "",
+                        "enabled": false,
+                        "prefix": ""
+                    }
+                ],
+                "customer_owned_ipv4_pool": "",
+                "desync_mitigation_mode": "defensive",
+                "dns_name": "alb-wafv2-unallowed-addresses-884719842.us-east-1.elb.amazonaws.com",
+                "dns_record_client_routing_policy": null,
+                "drop_invalid_header_fields": false,
+                "enable_cross_zone_load_balancing": true,
+                "enable_deletion_protection": false,
+                "enable_http2": true,
+                "enable_tls_version_and_cipher_suite_headers": false,
+                "enable_waf_fail_open": false,
+                "enable_xff_client_port": false,
+                "enforce_security_group_inbound_rules_on_private_link_traffic": "",
+                "id": "arn:aws:elasticloadbalancing:us-east-1:644160558196:loadbalancer/app/alb-wafv2-unallowed-addresses/af785a5aff31d4d1",
+                "idle_timeout": 60,
+                "internal": false,
+                "ip_address_type": "ipv4",
+                "load_balancer_type": "application",
+                "name": "alb-wafv2-unallowed-addresses",
+                "name_prefix": "",
+                "preserve_host_header": false,
+                "security_groups": [
+                    "sg-005969d7de9255e78"
+                ],
+                "subnet_mapping": [
+                    {
+                        "allocation_id": "",
+                        "ipv6_address": "",
+                        "outpost_id": "",
+                        "private_ipv4_address": "",
+                        "subnet_id": "subnet-04bb5f4565aaa1246"
+                    },
+                    {
+                        "allocation_id": "",
+                        "ipv6_address": "",
+                        "outpost_id": "",
+                        "private_ipv4_address": "",
+                        "subnet_id": "subnet-094698ba0a219f65d"
+                    }
+                ],
+                "subnets": [
+                    "subnet-04bb5f4565aaa1246",
+                    "subnet-094698ba0a219f65d"
+                ],
+                "tags": null,
+                "tags_all": {},
+                "timeouts": null,
+                "vpc_id": "vpc-0adfe6deab1c0aaee",
+                "xff_header_processing_mode": "append",
+                "zone_id": "Z35SXDOTRQ7X7K"
+            }
+        },
+        "aws_security_group": {
+            "foo": {
+                "arn": "arn:aws:ec2:us-east-1:644160558196:security-group/sg-005969d7de9255e78",
+                "description": "Managed by Terraform",
+                "egress": [],
+                "id": "sg-005969d7de9255e78",
+                "ingress": [],
+                "name": "foo",
+                "name_prefix": "",
+                "owner_id": "644160558196",
+                "revoke_rules_on_delete": false,
+                "tags": null,
+                "tags_all": {},
+                "timeouts": null,
+                "vpc_id": "vpc-0adfe6deab1c0aaee"
+            }
+        },
+        "aws_subnet": {
+            "subnet_1": {
+                "arn": "arn:aws:ec2:us-east-1:644160558196:subnet/subnet-094698ba0a219f65d",
+                "assign_ipv6_address_on_creation": false,
+                "availability_zone": "us-east-1a",
+                "availability_zone_id": "use1-az6",
+                "cidr_block": "10.0.1.0/24",
+                "customer_owned_ipv4_pool": "",
+                "enable_dns64": false,
+                "enable_lni_at_device_index": 0,
+                "enable_resource_name_dns_a_record_on_launch": false,
+                "enable_resource_name_dns_aaaa_record_on_launch": false,
+                "id": "subnet-094698ba0a219f65d",
+                "ipv6_cidr_block": "",
+                "ipv6_cidr_block_association_id": "",
+                "ipv6_native": false,
+                "map_customer_owned_ip_on_launch": false,
+                "map_public_ip_on_launch": false,
+                "outpost_arn": "",
+                "owner_id": "644160558196",
+                "private_dns_hostname_type_on_launch": "ip-name",
+                "tags": null,
+                "tags_all": {},
+                "timeouts": null,
+                "vpc_id": "vpc-0adfe6deab1c0aaee"
+            },
+            "subnet_2": {
+                "arn": "arn:aws:ec2:us-east-1:644160558196:subnet/subnet-04bb5f4565aaa1246",
+                "assign_ipv6_address_on_creation": false,
+                "availability_zone": "us-east-1b",
+                "availability_zone_id": "use1-az1",
+                "cidr_block": "10.0.2.0/24",
+                "customer_owned_ipv4_pool": "",
+                "enable_dns64": false,
+                "enable_lni_at_device_index": 0,
+                "enable_resource_name_dns_a_record_on_launch": false,
+                "enable_resource_name_dns_aaaa_record_on_launch": false,
+                "id": "subnet-04bb5f4565aaa1246",
+                "ipv6_cidr_block": "",
+                "ipv6_cidr_block_association_id": "",
+                "ipv6_native": false,
+                "map_customer_owned_ip_on_launch": false,
+                "map_public_ip_on_launch": false,
+                "outpost_arn": "",
+                "owner_id": "644160558196",
+                "private_dns_hostname_type_on_launch": "ip-name",
+                "tags": null,
+                "tags_all": {},
+                "timeouts": null,
+                "vpc_id": "vpc-0adfe6deab1c0aaee"
+            }
+        },
+        "aws_vpc": {
+            "this": {
+                "arn": "arn:aws:ec2:us-east-1:644160558196:vpc/vpc-0adfe6deab1c0aaee",
+                "assign_generated_ipv6_cidr_block": false,
+                "cidr_block": "10.0.0.0/16",
+                "default_network_acl_id": "acl-0d642770ef09c0e2e",
+                "default_route_table_id": "rtb-0bf31f40f871fe429",
+                "default_security_group_id": "sg-0c38a6995c84d1972",
+                "dhcp_options_id": "dopt-03feeee1774dcc896",
+                "enable_dns_hostnames": false,
+                "enable_dns_support": true,
+                "enable_network_address_usage_metrics": false,
+                "id": "vpc-0adfe6deab1c0aaee",
+                "instance_tenancy": "default",
+                "ipv4_ipam_pool_id": null,
+                "ipv4_netmask_length": null,
+                "ipv6_association_id": "",
+                "ipv6_cidr_block": "",
+                "ipv6_cidr_block_network_border_group": "",
+                "ipv6_ipam_pool_id": "",
+                "ipv6_netmask_length": 0,
+                "main_route_table_id": "rtb-0bf31f40f871fe429",
+                "owner_id": "644160558196",
+                "tags": null,
+                "tags_all": {}
+            }
+        },
+        "aws_wafv2_ip_set": {
+            "allowed_addresses_only": {
+                "addresses": [
+                    "192.168.0.0/28"
+                ],
+                "arn": "arn:aws:wafv2:us-east-1:644160558196:regional/ipset/allowed-addresses-only/e2193fb2-1020-44e9-85f5-8577be6552cd",
+                "description": "",
+                "id": "e2193fb2-1020-44e9-85f5-8577be6552cd",
+                "ip_address_version": "IPV4",
+                "lock_token": "b8193474-d9a5-41dd-bb72-2cfcd32445e9",
+                "name": "allowed-addresses-only",
+                "scope": "REGIONAL",
+                "tags": null,
+                "tags_all": {}
+            },
+            "unallowed_addresses": {
+                "addresses": [
+                    "192.168.0.0/16"
+                ],
+                "arn": "arn:aws:wafv2:us-east-1:644160558196:regional/ipset/unallowed-addresses/b53ad693-870b-4a03-93fa-853fa308311b",
+                "description": "",
+                "id": "b53ad693-870b-4a03-93fa-853fa308311b",
+                "ip_address_version": "IPV4",
+                "lock_token": "75ab9ef1-cdcb-4060-8022-3b5727293f6b",
+                "name": "unallowed-addresses",
+                "scope": "REGIONAL",
+                "tags": null,
+                "tags_all": {}
+            }
+        },
+        "aws_wafv2_web_acl": {
+            "ip_whitelisting_allowed_addresses_only": {
+                "arn": "arn:aws:wafv2:us-east-1:644160558196:regional/webacl/allowed-addresses-only/029995cf-302f-4108-b6ec-2015582115a4",
+                "association_config": [],
+                "capacity": 1,
+                "captcha_config": [],
+                "challenge_config": [],
+                "custom_response_body": [],
+                "default_action": [
+                    {
+                        "allow": [],
+                        "block": [
+                            {
+                                "custom_response": []
+                            }
+                        ]
+                    }
+                ],
+                "description": "",
+                "id": "029995cf-302f-4108-b6ec-2015582115a4",
+                "lock_token": "8098d8e2-f927-4d7e-b023-d5df3a007903",
+                "name": "allowed-addresses-only",
+                "rule": [
+                    {
+                        "action": [
+                            {
+                                "allow": [
+                                    {
+                                        "custom_request_handling": []
+                                    }
+                                ],
+                                "block": [],
+                                "captcha": [],
+                                "challenge": [],
+                                "count": []
+                            }
+                        ],
+                        "captcha_config": [],
+                        "name": "foo",
+                        "override_action": [],
+                        "priority": 1,
+                        "rule_label": [],
+                        "statement": [
+                            {
+                                "and_statement": [],
+                                "byte_match_statement": [],
+                                "geo_match_statement": [],
+                                "ip_set_reference_statement": [
+                                    {
+                                        "arn": "arn:aws:wafv2:us-east-1:644160558196:regional/ipset/allowed-addresses-only/e2193fb2-1020-44e9-85f5-8577be6552cd",
+                                        "ip_set_forwarded_ip_config": []
+                                    }
+                                ],
+                                "label_match_statement": [],
+                                "managed_rule_group_statement": [],
+                                "not_statement": [],
+                                "or_statement": [],
+                                "rate_based_statement": [],
+                                "regex_match_statement": [],
+                                "regex_pattern_set_reference_statement": [],
+                                "rule_group_reference_statement": [],
+                                "size_constraint_statement": [],
+                                "sqli_match_statement": [],
+                                "xss_match_statement": []
+                            }
+                        ],
+                        "visibility_config": [
+                            {
+                                "cloudwatch_metrics_enabled": false,
+                                "metric_name": "foo",
+                                "sampled_requests_enabled": false
+                            }
+                        ]
+                    }
+                ],
+                "scope": "REGIONAL",
+                "tags": null,
+                "tags_all": {},
+                "token_domains": null,
+                "visibility_config": [
+                    {
+                        "cloudwatch_metrics_enabled": false,
+                        "metric_name": "foo",
+                        "sampled_requests_enabled": false
+                    }
+                ]
+            },
+            "ip_whitelisting_unallowed_addresses": {
+                "arn": "arn:aws:wafv2:us-east-1:644160558196:regional/webacl/unallowed-addresses/b4a90669-c7c9-49ae-85f3-b40df89e4c9f",
+                "association_config": [],
+                "capacity": 1,
+                "captcha_config": [],
+                "challenge_config": [],
+                "custom_response_body": [],
+                "default_action": [
+                    {
+                        "allow": [],
+                        "block": [
+                            {
+                                "custom_response": []
+                            }
+                        ]
+                    }
+                ],
+                "description": "",
+                "id": "b4a90669-c7c9-49ae-85f3-b40df89e4c9f",
+                "lock_token": "c1d5bb3e-daa7-4ce5-a3ff-e14cd3e461a1",
+                "name": "unallowed-addresses",
+                "rule": [
+                    {
+                        "action": [
+                            {
+                                "allow": [
+                                    {
+                                        "custom_request_handling": []
+                                    }
+                                ],
+                                "block": [],
+                                "captcha": [],
+                                "challenge": [],
+                                "count": []
+                            }
+                        ],
+                        "captcha_config": [],
+                        "name": "foo",
+                        "override_action": [],
+                        "priority": 1,
+                        "rule_label": [],
+                        "statement": [
+                            {
+                                "and_statement": [],
+                                "byte_match_statement": [],
+                                "geo_match_statement": [],
+                                "ip_set_reference_statement": [
+                                    {
+                                        "arn": "arn:aws:wafv2:us-east-1:644160558196:regional/ipset/unallowed-addresses/b53ad693-870b-4a03-93fa-853fa308311b",
+                                        "ip_set_forwarded_ip_config": []
+                                    }
+                                ],
+                                "label_match_statement": [],
+                                "managed_rule_group_statement": [],
+                                "not_statement": [],
+                                "or_statement": [],
+                                "rate_based_statement": [],
+                                "regex_match_statement": [],
+                                "regex_pattern_set_reference_statement": [],
+                                "rule_group_reference_statement": [],
+                                "size_constraint_statement": [],
+                                "sqli_match_statement": [],
+                                "xss_match_statement": []
+                            }
+                        ],
+                        "visibility_config": [
+                            {
+                                "cloudwatch_metrics_enabled": false,
+                                "metric_name": "foo",
+                                "sampled_requests_enabled": false
+                            }
+                        ]
+                    }
+                ],
+                "scope": "REGIONAL",
+                "tags": null,
+                "tags_all": {},
+                "token_domains": null,
+                "visibility_config": [
+                    {
+                        "cloudwatch_metrics_enabled": false,
+                        "metric_name": "foo",
+                        "sampled_requests_enabled": false
+                    }
+                ]
+            }
+        },
+        "aws_wafv2_web_acl_association": {
+            "allowed_addresses_only": {
+                "id": "arn:aws:wafv2:us-east-1:644160558196:regional/webacl/allowed-addresses-only/029995cf-302f-4108-b6ec-2015582115a4,arn:aws:elasticloadbalancing:us-east-1:644160558196:loadbalancer/app/alb-wafv2-allowed-addresses-only/e407c71a3cd741ad",
+                "resource_arn": "arn:aws:elasticloadbalancing:us-east-1:644160558196:loadbalancer/app/alb-wafv2-allowed-addresses-only/e407c71a3cd741ad",
+                "timeouts": null,
+                "web_acl_arn": "arn:aws:wafv2:us-east-1:644160558196:regional/webacl/allowed-addresses-only/029995cf-302f-4108-b6ec-2015582115a4"
+            },
+            "unallowed_addresses": {
+                "id": "arn:aws:wafv2:us-east-1:644160558196:regional/webacl/unallowed-addresses/b4a90669-c7c9-49ae-85f3-b40df89e4c9f,arn:aws:elasticloadbalancing:us-east-1:644160558196:loadbalancer/app/alb-wafv2-unallowed-addresses/af785a5aff31d4d1",
+                "resource_arn": "arn:aws:elasticloadbalancing:us-east-1:644160558196:loadbalancer/app/alb-wafv2-unallowed-addresses/af785a5aff31d4d1",
+                "timeouts": null,
+                "web_acl_arn": "arn:aws:wafv2:us-east-1:644160558196:regional/webacl/unallowed-addresses/b4a90669-c7c9-49ae-85f3-b40df89e4c9f"
+            }
+        }
+    }
+}

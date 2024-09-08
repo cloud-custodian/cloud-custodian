@@ -1,0 +1,9 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResourceArns": [
+            "arn:aws:elasticloadbalancing:us-east-1:644160558196:loadbalancer/app/alb-wafv2-unallowed-addresses/af785a5aff31d4d1"
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -3,6 +3,7 @@
 """
 Application & Network Load Balancers
 """
+from ipaddress import ip_network
 import json
 import logging
 import re
@@ -27,7 +28,13 @@ from c7n.utils import (
     local_session, chunks, type_schema, get_retry, set_annotation)
 
 from c7n.resources.aws import Arn
+
 from c7n.resources.shield import IsShieldProtected, SetShieldProtection
+
+from c7n.resources.elb_shared import AdvancedIpPermissionsFilter
+from c7n.resources.vpc import SGPermissionSchema
+
+from c7n.resolver import ValuesFrom
 
 log = logging.getLogger('custodian.app-elb')
 
@@ -124,6 +131,142 @@ AppELB.filter_registry.register('marked-for-op', tags.TagActionFilter)
 AppELB.filter_registry.register('shield-enabled', IsShieldProtected)
 AppELB.filter_registry.register('network-location', net_filters.NetworkLocation)
 AppELB.action_registry.register('set-shield', SetShieldProtection)
+
+
+@AppELB.filter_registry.register('wafv2-ip-whitelisting')
+class WAFv2IpWhitelistingFilter(Filter):
+    """
+    Search any ALBs that have (no) IP-Whitelisting enabled through WAFv2.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name:     app-elb-test
+            resource: app-elb
+            filters:
+              - type: wafv2-ip-whitelisting
+                enabled: True # False
+                whitelist:
+                  - "192.168.1.0/28"
+                  - "192.168.2.0/28"
+                  - ...
+    """
+    schema = type_schema(
+        'wafv2-ip-whitelisting', required=['enabled'],
+        **{
+            'whitelist_from': ValuesFrom.schema,
+            'whitelist': {'type': 'array', 'items': {'type': 'string'}},
+            'enabled':   {'type': 'boolean'},
+        }
+    )
+
+    permissions = (
+        'wafv2:ListResourcesForWebACL',
+        'wafv2:ListWebACLs',
+        'wafv2:GetWebACL',
+    )
+
+    def _list_web_acls(self, waf_v2):
+        return waf_v2.list_web_acls(Scope='REGIONAL').get('WebACLs', [])
+
+    def _load_web_acl_association(self, waf_v2, alb_arn):
+        for web_acl in self._list_web_acls(waf_v2):
+            arns = waf_v2.list_resources_for_web_acl(
+                ResourceType='APPLICATION_LOAD_BALANCER', WebACLArn=web_acl['ARN']
+            )
+            if alb_arn in arns.get('ResourceArns', []):
+                return web_acl
+        return {}
+
+    def _load_web_acl(self, waf_v2, name, id):
+        return waf_v2.get_web_acl(Name=name, Id=id, Scope='REGIONAL').get('WebACL', {})
+
+    def _load_addresses(self, waf_v2, ip_sets_arns):
+        addresses = []
+
+        for arn in ip_sets_arns:
+            name = arn.split('/')[-2]
+            id   = arn.split('/')[-1]
+            addresses.extend(
+                waf_v2.get_ip_set(Name=name, Id=id, Scope='REGIONAL')['IPSet'].get('Addresses', [])
+            )
+
+        return addresses
+
+    def _load_ip_sets_arns(self, web_acl):
+        arns = []
+
+        for rule in web_acl.get('Rules', []):
+
+            if rule['Action'].get('Allow') == {}: # => vs Count or Block
+
+                if 'IPSetReferenceStatement' in rule['Statement']:
+                    arns.append(rule['Statement']['IPSetReferenceStatement']['ARN'])
+
+        return arns
+
+    def _check_if_every_address_allowed(self, addresses):
+        cidrs = (
+            self.data['whitelist'] if 'whitelist' in self.data
+            else ValuesFrom(self.data['whitelist_from'], self.manager).get_values()
+        )
+
+        for address in addresses:
+            if not any(ip_network(address).subnet_of(ip_network(cidr)) for cidr in cidrs):
+                return False
+
+        return True
+
+    def process(self, resources, event=None):
+        filter = []
+        waf_v2 = local_session(self.manager.session_factory).client('wafv2')
+
+        for r in resources:
+            try:
+                association = self._load_web_acl_association(waf_v2, r['LoadBalancerArn'])
+                if association:
+                    web_acl = self._load_web_acl(waf_v2,  association['Name'],  association['Id'])
+                    if web_acl and web_acl.get('DefaultAction').get('Block') == {}:
+                        addresses = self._load_addresses(waf_v2, self._load_ip_sets_arns(web_acl))
+                        if len(addresses) > 0:
+                            if any(k in self.data for k in ['whitelist', 'whitelist_from']):
+                                if self._check_if_every_address_allowed(addresses):
+                                    filter.append(r)
+                            else:
+                                filter.append(r)
+            except Exception as ex:
+                log.error(ex)
+
+        if not self.data['enabled']:
+            return [x for x in resources if x not in filter]
+        else:
+            return filter
+
+
+@AppELB.filter_registry.register('ingress')
+class AdvancedIngressFilter(AdvancedIpPermissionsFilter):
+    schema = {
+        'type': 'object',
+        'additionalProperties': False,
+        'properties': {'type': {'enum': ['ingress']}}, 'required': ['type']
+    }
+    schema['properties'].update(SGPermissionSchema)
+
+    permissions_key = 'IpPermissions'
+
+
+@AppELB.filter_registry.register('egress')
+class AdvancedEgressFilter(AdvancedIpPermissionsFilter):
+    schema = {
+        'type': 'object',
+        'additionalProperties': False,
+        'properties': {'type': {'enum': ['egress']}}, 'required': ['type']
+    }
+    schema['properties'].update(SGPermissionSchema)
+
+    permissions_key = 'IpPermissionsEgress'
 
 
 @AppELB.filter_registry.register('metrics')
