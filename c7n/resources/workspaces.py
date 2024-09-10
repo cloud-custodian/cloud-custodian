@@ -476,6 +476,50 @@ class WorkspacesWeb(QueryResourceManager):
     augment = universal_augment
 
 
+@WorkspacesWeb.filter_registry.register('subnet')
+class SubnetFilter(net_filters.SubnetFilter):
+    """Filters Workspaces Secure Browsers based on their associated subnet
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: workspaces-web-in-subnet-x
+                resource: workspaces-web
+                filters:
+                  - type: subnet
+                    key: SubnetId
+                    value: subnet-068dfbf3f275a6ae8
+    """
+    RelatedIdsExpression = ""
+
+    def get_permissions(self):
+        perms = super().get_permissions()
+        perms.append('workspaces-web:GetNetworkSettings')
+        return perms
+
+    def get_related_ids(self, resources):
+        subnetIds = set()
+
+        for r in resources:
+            if 'networkSettings' in r:
+                for s in r['networkSettings']['subnetIds']:
+                    subnetIds.add(s)
+        return subnetIds
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('workspaces-web')
+
+        for r in resources:
+            if 'networkSettingsArn' in r:
+                r['networkSettings'] = client.get_network_settings(
+                    networkSettingsArn=r['networkSettingsArn']
+                    ).get('networkSettings', {}
+                )
+        return super().process(resources, event)
+
+
 @WorkspacesWeb.filter_registry.register('browser-policy')
 class BrowerPolicyFilter(ValueFilter):
     """
