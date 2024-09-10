@@ -267,9 +267,9 @@ class UtilsTest(BaseTest):
         with patch('time.sleep', new_callable=time.sleep(0)):
             mock.send('')
 
-        self.assertEqual(mock.orig_send.call_count, 7)
-        self.assertEqual(logger_debug.call_count, 6)
-        self.assertEqual(logger_warning.call_count, 7)
+        self.assertEqual(mock.orig_send.call_count, 8)
+        self.assertEqual(logger_debug.call_count, 8)
+        self.assertEqual(logger_warning.call_count, 8)
 
     managed_group_return_value = [
         _get_descendant_info(type='managementGroups/subscriptions', name=DEFAULT_SUBSCRIPTION_ID),
