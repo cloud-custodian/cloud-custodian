@@ -600,7 +600,7 @@ class UserSettingsFilter(ValueFilter):
 
 
 @WorkspacesWeb.filter_registry.register('user-access-logging')
-class UserAccessLoggingSettingsFilter(ValueFilter):
+class UserAccessLoggingFilter(ValueFilter):
     """
     Filters workspaces secured browsers based on their user access logging settings.
     :example:
@@ -619,7 +619,7 @@ class UserAccessLoggingSettingsFilter(ValueFilter):
     schema = type_schema('user-access-logging', rinherit=ValueFilter.schema)
     schema_alias = False
     permissions = ('workspaces-web:GetUserAccessLoggingSettings',)
-    policy_annotation = "c7n:UserAccessLoggingSettings"
+    policy_annotation = "c7n:UserAccessLogging"
 
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('workspaces-web')
