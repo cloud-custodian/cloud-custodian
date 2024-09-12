@@ -43,8 +43,19 @@ class TerraformResourceManager(IACResourceManager):
         )
         rschema = resource_definitions[type_name]
         rschema["policy"]["allOf"][-1]["properties"]["resource"] = {
-            "type": "string",
-            "pattern": "^terraform\\.[a-z|_]*",
+            "oneOf": [
+                {
+                    "type": "string",
+                    "pattern": "^terraform\\.[a-z|_]*",
+                },
+                {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "pattern": "^terraform\\.[a-z|_]*",
+                    },
+                },
+            ]
         }
         return ref
 

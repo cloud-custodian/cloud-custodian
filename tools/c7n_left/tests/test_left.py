@@ -720,6 +720,92 @@ def test_traverse_multi_resource_multi_set(tmp_path):
     }
 
 
+def test_traverse_multi_resource_inside_or(tmp_path):
+    resources = run_policy(
+        {
+            "name": "traverse-inside-or",
+            "resource": "terraform.aws_s3_bucket",
+            "filters": [
+                {
+                    "or": [
+                        {
+                            "type": "traverse",
+                            "resources": "aws_s3_bucket_ownership_controls",
+                            "attrs": [
+                                {
+                                    "type": "value",
+                                    "key": "rule.object_ownership",
+                                    "value": "BucketOwnerPreferred",
+                                },
+                            ],
+                        },
+                        {
+                            "type": "traverse",
+                            "resources": "aws_s3_bucket_ownership_controls",
+                            "attrs": [
+                                {
+                                    "type": "value",
+                                    "key": "rule.object_ownership",
+                                    "value": "BucketOwnerEnforced",
+                                },
+                            ],
+                        },
+                    ]
+                }
+            ],
+        },
+        terraform_dir / "s3_ownership",
+        tmp_path,
+    )
+    assert len(resources) == 2
+    assert {r.resource.name for r in resources} == {
+        "aws_s3_bucket.owner_enforced",
+        "aws_s3_bucket.owner_preferred",
+    }
+
+
+@pytest.mark.xfail(
+    strict=True,
+    reason="Known issue with branching inside attrs: https://github.com/cloud-custodian/cloud-custodian/issues/9690",
+)
+def test_traverse_multi_resource_nested_or(tmp_path):
+    resources = run_policy(
+        {
+            "name": "traverse-nested-or",
+            "resource": "terraform.aws_s3_bucket",
+            "filters": [
+                {
+                    "type": "traverse",
+                    "resources": "aws_s3_bucket_ownership_controls",
+                    "attrs": [
+                        {
+                            "or": [
+                                {
+                                    "type": "value",
+                                    "key": "rule.object_ownership",
+                                    "value": "BucketOwnerPreferred",
+                                },
+                                {
+                                    "type": "value",
+                                    "key": "rule.object_ownership",
+                                    "value": "BucketOwnerEnforced",
+                                },
+                            ],
+                        },
+                    ],
+                }
+            ],
+        },
+        terraform_dir / "s3_ownership",
+        tmp_path,
+    )
+    assert len(resources) == 2
+    assert {r.resource.name for r in resources} == {
+        "aws_s3_bucket.owner_enforced",
+        "aws_s3_bucket.owner_preferred",
+    }
+
+
 def test_traverse_filter_not_found(tmp_path):
     resources = run_policy(
         {
@@ -915,7 +1001,7 @@ def test_cli_execution_error(policy_env, test, debug_cli_runner):
     )
 
     runner = debug_cli_runner
-    with patch.object(core.CollectionRunner, 'run_policy', side_effect=KeyError("abc")):
+    with patch.object(core.CollectionRunner, "run_policy", side_effect=KeyError("abc")):
         result = runner.invoke(
             cli.cli, ["run", "-p", policy_env.policy_dir, "-d", policy_env.policy_dir]
         )
@@ -1184,6 +1270,69 @@ def test_cli_no_policies(tmp_path, caplog):
     assert caplog.record_tuples == [("c7n.iac", 30, "no policies found")]
 
 
+def test_cli_validate_no_dir(tmp_path, caplog):
+    runner = CliRunner()
+    result = runner.invoke(cli.cli, ["validate", "-p", str(tmp_path / "bad_dir")])
+    assert result.exit_code == 1
+    assert "does not exist" in caplog.record_tuples[-1][-1]
+
+
+def test_cli_validate_parse_error(tmp_path, caplog):
+    (tmp_path / "bad.json").write_text("{,}")
+    runner = CliRunner()
+    result = runner.invoke(cli.cli, ["validate", "-p", str(tmp_path)])
+    assert result.exit_code == 1
+    assert caplog.record_tuples[0] == ("c7n.iac", 40, "Validation failed with 1 errors")
+    assert "did not find expected node content" in caplog.record_tuples[-1][-1]
+
+
+def test_cli_validate_structure_error(tmp_path, caplog):
+    (tmp_path / "bad.json").write_text(json.dumps({"something": "else"}))
+    runner = CliRunner()
+    result = runner.invoke(cli.cli, ["validate", "-p", str(tmp_path)])
+    assert result.exit_code == 1
+    assert caplog.record_tuples[0] == ("c7n.iac", 40, "Validation failed with 1 errors")
+    assert "Policy files top level keys" in caplog.record_tuples[-1][-1]
+
+
+def test_cli_validate_schema_error(tmp_path, caplog):
+    (tmp_path / "bad.json").write_text(
+        json.dumps(
+            {
+                "policies": [
+                    {
+                        "name": "xyz",
+                        "resource": ["terraform.*"],
+                        "filters": [{"type": "xyz123", "key": "value"}],
+                    }
+                ]
+            }
+        )
+    )
+    runner = CliRunner()
+    result = runner.invoke(cli.cli, ["validate", "-p", str(tmp_path)])
+    assert result.exit_code == 1
+    caplog.record_tuples[0] == ('c7n.iac', 40, 'Validation failed with 1 errors')
+    assert "is not valid under any of the given schemas" in caplog.record_tuples[2][-1]
+
+
+def test_cli_validate_prechecks(tmp_path, caplog):
+    runner = CliRunner()
+    result = runner.invoke(
+        cli.cli,
+        ["validate", "-p", str(tmp_path)],
+    )
+    assert result.exit_code == 0
+    assert caplog.record_tuples[0][-1].startswith("No policy files found in")
+
+    result = runner.invoke(
+        cli.cli,
+        ["validate", "-p", str(tmp_path / "xyz")],
+    )
+    assert result.exit_code == 1
+    assert "does not exist" in caplog.record_tuples[1][-1]
+
+
 def test_cli_junit_output(policy_env, tmp_path, debug_cli_runner):
     policy_env.write_tf(
         """
@@ -1336,7 +1485,6 @@ def test_cli_output_rich(tmp_path):
 
 
 def test_cli_output_rich_pass_count(tmp_path, debug_cli_runner):
-
     (tmp_path / "policy.yaml").write_text(
         """
         policies:

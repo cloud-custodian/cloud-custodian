@@ -1,11 +1,13 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 #
+import itertools
 import logging
 from pathlib import Path
 import sys
 
 import click
+
 from c7n.config import Config
 
 from .core import CollectionRunner, ExecutionFilter, get_provider
@@ -13,7 +15,7 @@ from .entry import initialize_iac
 from .output import get_reporter, report_outputs, summary_options
 from .test import TestReporter, TestRunner
 from .policy import load_policies
-
+from .validate import validate_files
 
 log = logging.getLogger("c7n.iac")
 
@@ -154,6 +156,35 @@ def test(policy_dir, filters):
     sys.exit(int(runner.run()))
 
 
+@cli.command()
+@click.option("-p", "--policy-dir", type=click.Path(), help="Directory with policies")
+def validate(policy_dir=None):
+    """Validate configuration files"""
+
+    glob_patterns = ("*.yml", "*.yaml", "*.json")
+    policy_dir = Path(policy_dir)
+
+    if not policy_dir.is_dir():
+        log.error(f"Policy directory {policy_dir} does not exist.")
+        sys.exit(1)
+
+    # Find all policy files in the given directory that match the glob patterns
+    policy_files = list(itertools.chain(*(policy_dir.rglob(pattern) for pattern in glob_patterns)))
+    if not policy_files:
+        log.warning(f"No policy files found in {policy_dir} during validation.")
+        return
+
+    file_errors = validate_files(policy_files)
+    if file_errors:
+        error_count = sum(map(len, file_errors.values()))
+        log.error(f"Validation failed with {error_count} errors")
+        for policy_file, errors in file_errors.items():
+            log.error(f"In file: {policy_file}")
+            for error in errors:
+                log.error(error)
+        sys.exit(1)
+
+
 def get_config(
     directory=None,
     policy_dir=None,
@@ -164,7 +195,7 @@ def get_config(
     summary=None,
     filters=None,
     warn_on=None,
-    format='terraform',
+    format="terraform",
 ):
     config = Config.empty(
         source_dir=directory and Path(directory),
@@ -179,7 +210,7 @@ def get_config(
         format=format,
     )
     config["exec_filter"] = ExecutionFilter.parse(config.filters)
-    config["warn_filter"] = ExecutionFilter.parse(config.warn_on, severity_direction='gte')
+    config["warn_filter"] = ExecutionFilter.parse(config.warn_on, severity_direction="gte")
     return config
 
 
