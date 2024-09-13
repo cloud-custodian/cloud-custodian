@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:logs:us-east-2:644160558196:log-group:/aws/codebuild/custodian",
+                "Tags": [
+                    {
+                        "Key": "Application",
+                        "Value": "greeter"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
