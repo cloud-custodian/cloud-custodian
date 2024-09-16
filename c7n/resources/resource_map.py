@@ -185,7 +185,7 @@ ResourceMap = {
   "aws.networkmanager-global": "c7n.resources.networkmanager.GlobalNetwork",
   "aws.networkmanager-link": "c7n.resources.networkmanager.Link",
   "aws.networkmanager-site": "c7n.resources.networkmanager.Site",
-  "aws.opensearch-injestion": "c7n.resources.opensearch.OpensearchInjestion",
+  "aws.opensearch-ingestion": "c7n.resources.opensearch.OpensearchIngestion",
   "aws.opensearch-serverless": "c7n.resources.opensearch.OpensearchServerless",
   "aws.ops-item": "c7n.resources.ssm.OpsItem",
   "aws.opswork-cm": "c7n.resources.opsworks.OpsworksCM",

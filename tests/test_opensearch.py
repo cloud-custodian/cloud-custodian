@@ -93,14 +93,14 @@ class OpensearchServerless(BaseTest):
             'arn:aws:kms:us-east-1:644160558196:key/082cd05f-96d1-49f6-a5ac-32093d2cfe38')
 
 
-class OpensearchInjestion(BaseTest):
+class OpensearchIngestion(BaseTest):
 
-    def test_opensearch_serverless_tag(self):
-        session_factory = self.replay_flight_data('test_opensearch_injestion_tag')
+    def test_opensearch_ingestion_tag(self):
+        session_factory = self.replay_flight_data('test_opensearch_ingestion_tag')
         p = self.load_policy(
             {
-                'name': 'test-opensearch-injestion-tag',
-                'resource': 'opensearch-injestion',
+                'name': 'test-opensearch-ingestion-tag',
+                'resource': 'opensearch-ingestion',
                 'filters': [
                     {
                         'tag:foo': 'absent',
@@ -122,8 +122,8 @@ class OpensearchInjestion(BaseTest):
 
         p = self.load_policy(
             {
-                'name': 'test-opensearch-injestion-remove-tag',
-                'resource': 'opensearch-injestion',
+                'name': 'test-opensearch-ingestion-remove-tag',
+                'resource': 'opensearch-ingestion',
                 'filters': [
                     {
                         'tag:foo': 'present',
@@ -143,12 +143,12 @@ class OpensearchInjestion(BaseTest):
         tags = client.list_tags_for_resource(Arn=resources[0]['PipelineArn'])['Tags']
         self.assertEqual(len(tags), 0)
 
-    def test_opensearch_injestion_kms_filter(self):
-        session_factory = self.replay_flight_data("test_opensearch_injestion_kms_filter")
+    def test_opensearch_ingestion_kms_filter(self):
+        session_factory = self.replay_flight_data("test_opensearch_ingestion_kms_filter")
         p = self.load_policy(
             {
-                "name": "opensearch-injestion-kms",
-                "resource": "opensearch-injestion",
+                "name": "opensearch-ingestion-kms",
+                "resource": "opensearch-ingestion",
                 'filters': [
                     {
                         'type': 'kms-key',
@@ -162,11 +162,11 @@ class OpensearchInjestion(BaseTest):
         self.assertEqual(resources[0]['EncryptionAtRestOptions']['KmsKeyArn'],
             'arn:aws:kms:us-east-1:644160558196:key/082cd05f-96d1-49f6-a5ac-32093d2cfe38')
 
-    def test_opensearch_injestion_update(self):
-        session_factory = self.replay_flight_data('test_opensearch_update_update')
+    def test_opensearch_ingestion_update(self):
+        session_factory = self.replay_flight_data('test_opensearch_ingestion_update')
         policy = {
-                'name': 'test-opensearch-injestion-update',
-                'resource': 'opensearch-injestion',
+                'name': 'test-opensearch-ingestion-update',
+                'resource': 'opensearch-ingestion',
                 'actions': [
                     {
                         'type': 'update',
@@ -198,12 +198,12 @@ class OpensearchInjestion(BaseTest):
         for key in updated_config.keys():
             self.assertEqual(pipeline[key], updated_config[key])
 
-    def test_opensearch_injestion_stop(self):
-        session_factory = self.replay_flight_data('test_opensearch_injestion_stop')
+    def test_opensearch_ingestion_stop(self):
+        session_factory = self.replay_flight_data('test_opensearch_ingestion_stop')
         p = self.load_policy(
             {
-                'name': 'test-opensearch-injestion-stop',
-                'resource': 'opensearch-injestion',
+                'name': 'test-opensearch-ingestion-stop',
+                'resource': 'opensearch-ingestion',
                 'filters': [{'PipelineName': 'custodian-test'}],
                 'actions': [{'type': 'stop'}]
             },
@@ -215,12 +215,12 @@ class OpensearchInjestion(BaseTest):
         pipeline = client.list_pipelines()['Pipelines'][0]
         self.assertEqual(pipeline["Status"], "STOPPING")
 
-    def test_opensearch_injestion_delete(self):
-        session_factory = self.replay_flight_data('test_opensearch_injestion_delete')
+    def test_opensearch_ingestion_delete(self):
+        session_factory = self.replay_flight_data('test_opensearch_ingestion_delete')
         p = self.load_policy(
             {
-                'name': 'test-opensearch-injestion-delete',
-                'resource': 'opensearch-injestion',
+                'name': 'test-opensearch-ingestion-delete',
+                'resource': 'opensearch-ingestion',
                 'filters': [{'PipelineName': 'custodian-test'}],
                 'actions': [{'type': 'delete'}]
             },
