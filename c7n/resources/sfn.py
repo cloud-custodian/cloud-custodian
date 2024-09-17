@@ -48,7 +48,7 @@ class DescribeActivity(DescribeSource):
         return universal_augment(self.manager, resources)
 
 
-@resources.register('activity')
+@resources.register('sfn-activity')
 class Activity(QueryResourceManager):
     """AWS Step Functions Activity
 
@@ -58,14 +58,14 @@ class Activity(QueryResourceManager):
 
             policies:
               - name: activity-encrypted-cmk
-                resource: activity
+                resource: sfn-activity
                 filters:
                   - not:
                     - type: kms-key
                       key: c7n:AliasName
                       value: alias/test/sfn/encrypted
               - name: activity-tag-untagged
-                resource: activity
+                resource: sfn-activity
                 filters:
                   - "tag:target-tag": absent
                 actions:

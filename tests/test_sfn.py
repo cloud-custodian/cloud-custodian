@@ -138,7 +138,7 @@ class TestStepFunction(BaseTest):
         p = self.load_policy(
             {
                 'name': 'test-sfn-get-activity',
-                'resource': 'activity',
+                'resource': 'sfn-activity',
                 'filters': [
                     {'tag:name': 'test'},
                 ]
@@ -154,7 +154,7 @@ class TestStepFunction(BaseTest):
         p = self.load_policy(
             {
                 'name': 'test-sfn-activity-kms-alias',
-                'resource': 'activity',
+                'resource': 'sfn-activity',
                 'filters': [
                     {
                         "type": "kms-key",
