@@ -86,6 +86,7 @@ class Activity(QueryResourceManager):
         detail_spec = (
             "describe_activity", "activityArn",
             'activityArn', None)
+        universal_taggable = object()
         permissions_augment = ("states:ListTagsForResource",)
 
     source_mapping = {
@@ -184,7 +185,6 @@ resources.subscribe(InvokeStepFunction.register_resources)
 
 
 @StepFunction.action_registry.register('tag')
-@Activity.action_registry.register('tag')
 class TagStepFunction(Tag):
     """Action to create tag(s) on a step function
 
@@ -215,7 +215,6 @@ class TagStepFunction(Tag):
 
 
 @StepFunction.action_registry.register('remove-tag')
-@Activity.action_registry.register('remove-tag')
 class UnTagStepFunction(RemoveTag):
     """Action to create tag(s) on a step function
 
