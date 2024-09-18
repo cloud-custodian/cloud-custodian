@@ -108,7 +108,6 @@ class LambdaPermissionTest(BaseTest):
         self.assertRaises(ClientError, client.get_policy, FunctionName=name)
 
 
-
 def test_function_url_absent(test):
     factory = test.replay_flight_data('test_aws_lambda_function_url', region='us-west-2')
     p = test.load_policy({
