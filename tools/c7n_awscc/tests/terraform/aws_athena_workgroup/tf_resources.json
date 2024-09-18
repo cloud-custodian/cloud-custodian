@@ -1,0 +1,43 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_athena_workgroup": {
+            "example": {
+                "arn": "arn:aws:athena:us-east-1:490065885863:workgroup/tf-test-loving-llama",
+                "configuration": [
+                    {
+                        "bytes_scanned_cutoff_per_query": 0,
+                        "enforce_workgroup_configuration": true,
+                        "engine_version": [
+                            {
+                                "effective_engine_version": "Athena engine version 3",
+                                "selected_engine_version": "AUTO"
+                            }
+                        ],
+                        "execution_role": "",
+                        "publish_cloudwatch_metrics_enabled": true,
+                        "requester_pays_enabled": false,
+                        "result_configuration": []
+                    }
+                ],
+                "description": "",
+                "force_destroy": false,
+                "id": "tf-test-loving-llama",
+                "name": "tf-test-loving-llama",
+                "state": "ENABLED",
+                "tags": null,
+                "tags_all": {}
+            }
+        },
+        "random_pet": {
+            "names": {
+                "id": "tf-test-loving-llama",
+                "keepers": null,
+                "length": 2,
+                "prefix": "tf-test",
+                "separator": "-"
+            }
+        }
+    }
+}

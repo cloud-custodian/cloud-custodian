@@ -85,7 +85,7 @@ class ResourceMessageBuffer:
 
         payload = self.envelope
         payload = "%s%s%s" % (
-            payload[:rbegin_idx+1],
+            payload[:rbegin_idx + 1],
             ",".join(self.resource_parts),
             payload[rend_idx:]
         )

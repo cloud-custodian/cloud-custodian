@@ -331,7 +331,7 @@ class ChildResourceManager(QueryResourceManager):
             # Without this support you could only map parent-child elements with the raw data
             # they hold, but with regex you could regex that data as well while you map.
             if 'regex' in mapping:
-                result[mapping[1]] = re.search(mapping[3],result[mapping[1]]).group(1)
+                result[mapping[1]] = re.search(mapping[3], result[mapping[1]]).group(1)
 
         return result
 

@@ -931,17 +931,24 @@ class RDSTest(BaseTest):
                 "resource": "rds",
                 "query": [
                     {
-                        "DBInstanceIdentifier": "qbopp011"
+                        "DBInstanceIdentifier": "asset-sync-instance-1"
                     }
                 ],
                 "filters": [
                     {
                         "type": "value",
                         "key": "DBInstanceIdentifier",
-                        "value": "qbopp011"
+                        "value": "asset-sync-instance-1"
                     },
                     {
                         "type": "pending-maintenance"
+                    },
+                    {
+                        "type": "value",
+                        "key": '"c7n:PendingMaintenance"[].PendingMaintenanceActionDetails['
+                               '].Action',
+                        "op": "intersect",
+                        "value": ["system-update"]
                     }
                 ],
             },
@@ -1768,6 +1775,31 @@ class TestModifyVpcSecurityGroupsAction(BaseTest):
 
         self.assertEqual(len(resources), 4)
         self.assertEqual("vpc-09b75e60", resources[0]["DBSubnetGroup"]["VpcId"])
+
+    def test_rds_sg_add_by_tag(self):
+        session_factory = self.replay_flight_data("test_rds_sg_add_by_tag")
+        client = session_factory().client('rds')
+        policy = self.load_policy({
+            "name": "add-sg-via-tags",
+            "resource": "rds",
+                "filters": [
+                    {"type": "security-group", "key": "tag:c7n", "value": "add", "op": "ne"}],
+            "actions": [
+                {"type": "modify-security-groups",
+                 "add-by-tag": {
+                      "key": "c7n",
+                      "values": ["add"]}}]},
+            session_factory=session_factory,
+        )
+        resources = policy.run()
+        if self.recording:
+            time.sleep(60)
+        self.assertEqual(len(resources), 1)
+        self.assertAlmostEqual(
+            len(resources[0]['VpcSecurityGroups']), 1)
+        db = client.describe_db_instances(DBInstanceIdentifier="database-1")
+        mod_sgs = db.get('DBInstances')[0].get('VpcSecurityGroups')
+        self.assertTrue(len(mod_sgs), 2)
 
 
 class TestHealthEventsFilter(BaseTest):

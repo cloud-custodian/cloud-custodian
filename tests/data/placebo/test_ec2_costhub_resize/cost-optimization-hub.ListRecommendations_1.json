@@ -1,0 +1,40 @@
+{
+    "status_code": 200,
+    "data": {
+        "items": [
+            {
+                "accountId": "644160558196",
+                "actionType": "Rightsize",
+                "currencyCode": "USD",
+                "currentResourceSummary": "m5a.xlarge",
+                "currentResourceType": "Ec2Instance",
+                "estimatedMonthlyCost": 82.49,
+                "estimatedMonthlySavings": 43.07,
+                "estimatedSavingsPercentage": 35.0,
+                "implementationEffort": "Medium",
+                "lastRefreshTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 2,
+                    "day": 6,
+                    "hour": 14,
+                    "minute": 31,
+                    "second": 0,
+                    "microsecond": 915000
+                },
+                "recommendationId": "NDkwMDY1ODg1ODYzX2YxNDhmM2ExLWUyNDQtNGM5ZC1iMDkxLTEzMjQwZTZjNGYxYg==",
+                "recommendationLookbackPeriodInDays": 14,
+                "recommendedResourceSummary": "r5a.large",
+                "recommendedResourceType": "Ec2Instance",
+                "region": "us-east-2",
+                "resourceArn": "arn:aws:ec2:us-east-2:644160558196:instance/i-000ce83ee0c70e572",
+                "resourceId": "i-000ce83ee0c70e572",
+                "restartNeeded": true,
+                "rollbackPossible": true,
+                "source": "ComputeOptimizer",
+                "tags": []
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

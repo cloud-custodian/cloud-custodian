@@ -9,6 +9,7 @@ from c7n_kube.provider import resources
 class Node(QueryResourceManager):
     class resource_type(TypeInfo):
         group = "Core"
+        canonical_group = ""
         version = "V1"
         namespaced = False
         patch = "patch_node"

@@ -31,7 +31,6 @@ class PinpointApp(BaseTest):
         self.assertEqual(len(tags), 1)
         self.assertEqual(tags, {'foo': 'bar'})
 
-
     def test_pinpoint_app_remove_tag(self):
         session_factory = self.replay_flight_data('test_pinpoint_app_remove_tag')
         p = self.load_policy(

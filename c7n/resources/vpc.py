@@ -16,13 +16,14 @@ from c7n.manager import resources
 from c7n.resources.securityhub import OtherResourcePostFinding, PostFinding
 from c7n.utils import (
     chunks,
-    local_session,
-    type_schema,
-    get_retry,
-    parse_cidr,
     get_eni_resource_type,
+    get_retry,
+    jmespath_compile,
     jmespath_search,
-    jmespath_compile
+    local_session,
+    merge_dict,
+    parse_cidr,
+    type_schema,
 )
 from c7n.resources.aws import shape_validate
 from c7n.resources.shield import IsEIPShieldProtected, SetEIPShieldProtection
@@ -720,6 +721,7 @@ class SubnetIpAddressUsageFilter(ValueFilter):
                 results.append(r)
         return results
 
+
 class ConfigSG(query.ConfigSource):
 
     def load_resource(self, item):
@@ -924,7 +926,7 @@ class SecurityGroupPatch:
                 client.create_tags, Resources=[group['GroupId']], Tags=tags)
 
     def process_rules(self, client, rule_type, group, delta):
-        key, revoke_op, auth_op = self.RULE_TYPE_MAP[rule_type]
+        _, revoke_op, auth_op = self.RULE_TYPE_MAP[rule_type]
         revoke, authorize = getattr(
             client, revoke_op), getattr(client, auth_op)
 
@@ -1612,7 +1614,11 @@ class SGPermission(Filter):
                 matched.append(perm)
 
         if matched:
-            resource.setdefault('Matched%s' % self.ip_permissions_key, []).extend(matched)
+            matched_annotation = resource.setdefault('Matched%s' % self.ip_permissions_key, [])
+            # If the same rule matches multiple filters, only add it to the match annotation
+            # once. Note: Because we're looking for unique dicts and those aren't hashable,
+            # we can't conveniently use set() to de-duplicate rules.
+            matched_annotation.extend(m for m in matched if m not in matched_annotation)
             return True
 
 
@@ -2036,6 +2042,47 @@ class DeleteNetworkInterface(BaseAction):
                     raise
 
 
+@NetworkInterface.action_registry.register('detach')
+class DetachNetworkInterface(BaseAction):
+    """Detach a network interface from an EC2 instance.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: detach-enis
+            comment: Detach ENIs attached to EC2 with public IP addresses
+            resource: eni
+            filters:
+              - type: value
+                key: Attachment.InstanceId
+                value: present
+              - type: value
+                key: Association.PublicIp
+                value: present
+            actions:
+              - type: detach
+    """
+    permissions = ('ec2:DetachNetworkInterface',)
+    schema = type_schema('detach')
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ec2')
+        att_resources = [ar for ar in resources if ('Attachment' in ar
+            and ar['Attachment'].get('InstanceId')
+            and ar['Attachment'].get('DeviceIndex') != 0)]
+        if att_resources and (len(att_resources) < len(resources)):
+            self.log.warning(
+                "Filtered {} of {} non-primary network interfaces attatched to EC2".format(
+                len(att_resources), len(resources))
+            )
+        elif not att_resources:
+            self.log.warning("No non-primary EC2 interfaces indentified - revise c7n filters")
+        for r in att_resources:
+            client.detach_network_interface(AttachmentId=r['Attachment']['AttachmentId'])
+
+
 @resources.register('route-table')
 class RouteTable(query.QueryResourceManager):
 
@@ -2432,8 +2479,50 @@ class AddressRelease(BaseAction):
                 client.release_address(AllocationId=r['AllocationId'])
             except ClientError as e:
                 # If its already been released, ignore, else raise.
+                if e.response['Error']['Code'] == 'InvalidAddress.PtrSet':
+                    self.log.warning(
+                        "EIP %s cannot be released because it has a PTR record set.",
+                        r['AllocationId'])
+                if e.response['Error']['Code'] == 'InvalidAddress.Locked':
+                    self.log.warning(
+                        "EIP %s cannot be released because it is locked to your account.",
+                        r['AllocationId'])
                 if e.response['Error']['Code'] != 'InvalidAllocationID.NotFound':
                     raise
+
+
+@NetworkAddress.action_registry.register('disassociate')
+class DisassociateAddress(BaseAction):
+    """Disassociate elastic IP addresses from resources without releasing them.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: disassociate-network-addr
+                resource: network-addr
+                filters:
+                  - AllocationId: ...
+                actions:
+                  - type: disassociate
+    """
+
+    schema = type_schema('disassociate')
+    permissions = ('ec2:DisassociateAddress',)
+
+    def process(self, network_addrs):
+        client = local_session(self.manager.session_factory).client('ec2')
+        assoc_addrs = [addr for addr in network_addrs if 'AssociationId' in addr]
+
+        for aa in assoc_addrs:
+            try:
+                client.disassociate_address(AssociationId=aa['AssociationId'])
+            except ClientError as e:
+                # If its already been diassociated ignore, else raise.
+                if not (e.response['Error']['Code'] == 'InvalidAssocationID.NotFound' and
+                       aa['AssocationId'] in e.response['Error']['Message']):
+                    raise e
 
 
 @resources.register('customer-gateway')
@@ -2491,7 +2580,15 @@ class DeleteInternetGateway(BaseAction):
             try:
                 client.delete_internet_gateway(InternetGatewayId=r['InternetGatewayId'])
             except ClientError as err:
-                if not err.response['Error']['Code'] == 'InvalidInternetGatewayId.NotFound':
+                if err.response['Error']['Code'] == 'DependencyViolation':
+                    self.log.warning(
+                        "%s error hit deleting internetgateway: %s",
+                        err.response['Error']['Code'],
+                        err.response['Error']['Message'],
+                    )
+                elif err.response['Error']['Code'] == 'InvalidInternetGatewayId.NotFound':
+                    pass
+                else:
                     raise
 
 
@@ -2608,7 +2705,6 @@ class EndpointPolicyStatementFilter(HasStatementFilter):
             'account_id': self.manager.config.account_id,
             'region': self.manager.config.region
         }
-
 
 
 @VpcEndpoint.filter_registry.register('cross-account')
@@ -2750,13 +2846,14 @@ class UnusedKeyPairs(Filter):
 
     def _pull_ec2_keynames(self):
         ec2_manager = self.manager.get_resource_manager('ec2')
-        return {i.get('KeyName',None) for i in ec2_manager.resources()}
+        return {i.get('KeyName', None) for i in ec2_manager.resources()}
 
     def process(self, resources, event=None):
         keynames = self._pull_ec2_keynames().union(self._pull_asg_keynames())
         if self.data.get('state', True):
             return [r for r in resources if r['KeyName'] not in keynames]
         return [r for r in resources if r['KeyName'] in keynames]
+
 
 @KeyPair.action_registry.register('delete')
 class DeleteUnusedKeyPairs(BaseAction):
@@ -2865,6 +2962,11 @@ class SetFlowLogs(BaseAction):
         ]
 
     def validate(self):
+        if set(self.legacy_schema).intersection(self.data) and 'attrs' in self.data:
+            raise PolicyValidationError(
+                "set-flow-log: legacy top level keys aren't compatible with `attrs` mapping"
+            )
+
         self.convert()
         attrs = dict(self.data['attrs'])
         model = self.manager.get_model()
@@ -2878,7 +2980,7 @@ class SetFlowLogs(BaseAction):
         for k in set(self.legacy_schema).intersection(data):
             attrs[k] = data.pop(k)
         self.source_data = self.data
-        self.data['attrs'] = attrs
+        self.data['attrs'] = merge_dict(attrs, self.data.get('attrs', {}))
 
     def run_client_op(self, op, params, log_err_codes=()):
         try:
@@ -2909,7 +3011,7 @@ class SetFlowLogs(BaseAction):
         self.run_client_op(
             client.delete_flow_logs,
             {'FlowLogIds': [f['FlowLogId'] for f in flow_logs]},
-            ('InvalidParameterValue',)
+            ('InvalidParameterValue', 'InvalidFlowLogId.NotFound',)
         )
 
     def process(self, resources):
@@ -2917,7 +3019,9 @@ class SetFlowLogs(BaseAction):
         enabled = self.data.get('state', True)
 
         if not enabled:
-            return self.delete_flow_logs(client, resources)
+            model_id = self.manager.get_model().id
+            rids = [r[model_id] for r in resources]
+            return self.delete_flow_logs(client, rids)
 
         model = self.manager.get_model()
         params = {'ResourceIds': [r[model.id] for r in resources]}

@@ -85,8 +85,6 @@ class ValidatingControllerMode(K8sEventMode):
 
     def _handle_group(self, request, value):
         group = request["resource"]["group"]
-        if group == "" and "core" in value:
-            return True
         return group == value
 
     def _handle_resources(self, request, value):
@@ -141,12 +139,9 @@ class ValidatingControllerMode(K8sEventMode):
         else:
             # set default values based on our models
             resource = model.plural.lower()
-            group = model.group.lower()
+            group = model.canonical_group
             version = model.version.lower()
             scope = "Namespaced" if model.namespaced else "Cluster"
-
-        if group == "core":
-            group = ""
 
         resources = []
 

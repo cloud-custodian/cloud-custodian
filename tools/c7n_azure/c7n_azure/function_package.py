@@ -6,7 +6,7 @@ import logging
 import os
 import time
 
-import distutils.util
+from c7n.vendored.distutils.util import strtobool
 import requests
 from c7n_azure.constants import (
     AUTH_TYPE_MSI,
@@ -47,7 +47,7 @@ class FunctionPackage:
         self.function_path = function_path or os.path.join(
             os.path.dirname(os.path.realpath(__file__)), 'function.py')
         self.cache_override_path = cache_override_path
-        self.enable_ssl_cert = not distutils.util.strtobool(
+        self.enable_ssl_cert = not strtobool(
             os.environ.get(ENV_CUSTODIAN_DISABLE_SSL_CERT_VERIFICATION, 'no'))
 
         if target_sub_ids is not None:

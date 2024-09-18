@@ -527,6 +527,367 @@ class TestSagemakerTransformJob(BaseTest):
         self.assertEqual(len(tags), 0)
 
 
+class TestSagemakerHyperParameterTuningJob(BaseTest):
+
+    def test_sagemaker_hyperparameter_tuning_job_query(self):
+        session_factory = self.replay_flight_data("test_sagemaker_hyperparameter_tuning_job_query")
+        p = self.load_policy(
+            {
+                "name": "query-hyperparameter-tuning-jobs",
+                "resource": "sagemaker-hyperparameter-tuning-job",
+                "query": [{"StatusEquals": "Failed"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_stop_hyperparameter_tuning_job(self):
+        session_factory = self.replay_flight_data("test_sagemaker_hyperparameter_tuning_job_stop")
+        client = session_factory(region="us-east-1").client("sagemaker")
+        p = self.load_policy(
+            {
+                "name": "stop-hyperparameter-tuning-job",
+                "resource": "sagemaker-hyperparameter-tuning-job",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "HyperParameterTuningJobName",
+                        "value": "test",
+                        "op": "contains",
+                    }
+                ],
+                "actions": [{"type": "stop"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        job = client.describe_hyper_parameter_tuning_job(
+            HyperParameterTuningJobName=resources[0]["HyperParameterTuningJobName"]
+        )
+        self.assertEqual(job["HyperParameterTuningJobStatus"], "Stopping")
+
+    def test_tag_hyperparameter_tuning_job(self):
+        session_factory = self.replay_flight_data("test_sagemaker_hyperparameter_tuning_job_tag")
+        p = self.load_policy(
+            {
+                "name": "tag-hyperparameter-tuning-job",
+                "resource": "sagemaker-hyperparameter-tuning-job",
+                "filters": [{"tag:JobTag": "absent"}],
+                "actions": [{"type": "tag", "key": "JobTag", "value": "JobTagValue"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory(region="us-east-1").client("sagemaker")
+        tags = client.list_tags(ResourceArn=resources[0]["HyperParameterTuningJobArn"])["Tags"]
+        self.assertEqual([tags[0]["Key"], tags[0]["Value"]], ["JobTag", "JobTagValue"])
+
+        p = self.load_policy(
+            {
+                "name": "remove-hyperparameter-tuning-job-tag",
+                "resource": "sagemaker-hyperparameter-tuning-job",
+                "filters": [{"tag:JobTag": "JobTagValue"}],
+                "actions": [{"type": "remove-tag", "tags": ["JobTag"]}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        tags = client.list_tags(ResourceArn=resources[0]["HyperParameterTuningJobArn"])["Tags"]
+        self.assertEqual(len(tags), 0)
+
+
+class TestSageMakerAutoMLJob(BaseTest):
+
+    def test_sagemaker_automl_job_query(self):
+        session_factory = self.replay_flight_data("test_sagemaker_auto_ml_job_query")
+        p = self.load_policy(
+            {
+                "name": "query-auto-ml-jobs",
+                "resource": "sagemaker-auto-ml-job",
+                "query": [{"StatusEquals": "Completed"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_stop_sagemaker_auto_ml_job(self):
+        session_factory = self.replay_flight_data("test_sagemaker_auto_ml_job_stop")
+        client = session_factory(region="us-east-1").client("sagemaker")
+        p = self.load_policy(
+            {
+                "name": "stop-auto-ml-job",
+                "resource": "sagemaker-auto-ml-job",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "AutoMLJobName",
+                        "value": "Canvas",
+                        "op": "contains",
+                    }
+                ],
+                "actions": [{"type": "stop"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        job = client.describe_auto_ml_job_v2(AutoMLJobName=resources[0]["AutoMLJobName"])
+        self.assertEqual(job["AutoMLJobStatus"], "Stopping")
+
+    def test_tag_sagemaker_auto_ml_job(self):
+        session_factory = self.replay_flight_data("test_sagemaker_auto_ml_job_tag")
+        p = self.load_policy(
+            {
+                "name": "tag-auto-ml-job",
+                "resource": "sagemaker-auto-ml-job",
+                "filters": [{"tag:JobTag": "absent"}],
+                "actions": [{"type": "tag", "key": "JobTag", "value": "JobTagValue"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory(region="us-east-1").client("sagemaker")
+        tags = client.list_tags(ResourceArn=resources[0]["AutoMLJobArn"])["Tags"]
+        self.assertEqual([tags[0]["Key"], tags[0]["Value"]], ["JobTag", "JobTagValue"])
+
+        p = self.load_policy(
+            {
+                "name": "remove-auto-ml-job-tag",
+                "resource": "sagemaker-auto-ml-job",
+                "filters": [{"tag:JobTag": "JobTagValue"}],
+                "actions": [{"type": "remove-tag", "tags": ["JobTag"]}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        tags = client.list_tags(ResourceArn=resources[0]["AutoMLJobArn"])["Tags"]
+        assert "JobTag" not in [tag["Key"] for tag in tags]
+
+
+class TestSagemakerCompilationJob(BaseTest):
+
+    def test_sagemaker_compilation_job_query(self):
+        session_factory = self.replay_flight_data("test_sagemaker_compilation_job_query")
+        p = self.load_policy(
+            {
+                "name": "query-compilation-jobs",
+                "resource": "sagemaker-compilation-job",
+                "query": [{"StatusEquals": "FAILED"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_tag_sagemaker_compilation_job(self):
+        session_factory = self.replay_flight_data("test_sagemaker_compilation_job_tag")
+        p = self.load_policy(
+            {
+                "name": "tag-compilation-job",
+                "resource": "sagemaker-compilation-job",
+                "filters": [{"tag:JobTag": "absent"}],
+                "actions": [{"type": "tag", "key": "JobTag", "value": "JobTagValue"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory(region="us-east-1").client("sagemaker")
+        tags = client.list_tags(ResourceArn=resources[0]["CompilationJobArn"])["Tags"]
+        self.assertEqual([tags[0]["Key"], tags[0]["Value"]], ["JobTag", "JobTagValue"])
+
+        p = self.load_policy(
+            {
+                "name": "remove-compilation-job-tag",
+                "resource": "sagemaker-compilation-job",
+                "filters": [{"tag:JobTag": "JobTagValue"}],
+                "actions": [{"type": "remove-tag", "tags": ["JobTag"]}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        tags = client.list_tags(ResourceArn=resources[0]["CompilationJobArn"])["Tags"]
+        assert "JobTag" not in [tag["Key"] for tag in tags]
+
+    def test_stop_sagemaker_compilation_job(self):
+        session_factory = self.replay_flight_data("test_sagemaker_compilation_job_stop")
+        client = session_factory(region="us-east-1").client("sagemaker")
+        p = self.load_policy(
+            {
+                "name": "stop-compilation-job",
+                "resource": "sagemaker-compilation-job",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "CompilationJobName",
+                        "value": "c7n",
+                        "op": "contains",
+                    }
+                ],
+                "actions": [{"type": "stop"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        job = client.describe_compilation_job(
+            CompilationJobName=resources[0]["CompilationJobName"]
+        )
+        self.assertEqual(job["CompilationJobStatus"], "STOPPING")
+
+
+class TestSageMakerModelBiasJobDefinition(BaseTest):
+
+    def test_sagemaker_model_bias_job_query(self):
+        session_factory = self.replay_flight_data("test_sagemaker_model_bias_job_definition_query")
+        p = self.load_policy(
+            {
+                "name": "query-model-bias-job-definition",
+                "resource": "sagemaker-model-bias-job-definition",
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_delete_sagemaker_model_bias_job_definition(self):
+        session_factory = self.replay_flight_data("test_sagemaker_model_bias_job_definition_delete")
+        client = session_factory(region="us-east-1").client("sagemaker")
+        p = self.load_policy(
+            {
+                "name": "delete-model-bias-job-definition",
+                "resource": "sagemaker-model-bias-job-definition",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "MonitoringJobDefinitionName",
+                        "value": "test",
+                        "op": "contains",
+                    }
+                ],
+                "actions": [{"type": "delete"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        jobs = client.list_model_bias_job_definitions().get("JobDefinitionSummaries")
+        self.assertEqual(len(jobs), 0)
+
+    def test_tag_data_sagemaker_model_bias_job_definition(self):
+        session_factory = self.replay_flight_data("test_sagemaker_model_bias_job_definition_tag")
+        p = self.load_policy(
+            {
+                "name": "tag-model-bias-job-definition",
+                "resource": "sagemaker-model-bias-job-definition",
+                "filters": [{"tag:Owner": "absent"}],
+                "actions": [{"type": "tag", "key": "Owner", "value": "c7n"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory(region="us-east-1").client("sagemaker")
+        tags = client.list_tags(ResourceArn=resources[0]["JobDefinitionArn"])["Tags"]
+        self.assertEqual(tags[1]['Key'], 'Owner')
+        self.assertEqual(tags[1]['Value'], 'c7n')
+
+        p = self.load_policy(
+            {
+                "name": "remove-model-bias-job-definition-tag",
+                "resource": "sagemaker-model-bias-job-definition",
+                "filters": [{"tag:Owner": "c7n"}],
+                "actions": [{"type": "remove-tag", "tags": ["Owner"]}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        tags = client.list_tags(ResourceArn=resources[0]["JobDefinitionArn"])["Tags"]
+        self.assertEqual(len(tags), 1)
+
+
+class TestSagemakerProcessingJob(BaseTest):
+
+    def test_sagemaker_processing_job_query(self):
+        session_factory = self.replay_flight_data("test_sagemaker_processing_job_query")
+        p = self.load_policy(
+            {
+                "name": "query-processing-jobs",
+                "resource": "sagemaker-processing-job",
+                "query": [{"StatusEquals": "Failed"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_tag_sagemaker_processing_job(self):
+        session_factory = self.replay_flight_data("test_sagemaker_processing_job_tag")
+        p = self.load_policy(
+            {
+                "name": "tag-processing-job",
+                "resource": "sagemaker-processing-job",
+                "filters": [{"tag:JobTag": "absent"}],
+                "actions": [{"type": "tag", "key": "JobTag", "value": "JobTagValue"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory(region="us-east-1").client("sagemaker")
+        tags = client.list_tags(ResourceArn=resources[0]["ProcessingJobArn"])["Tags"]
+        self.assertEqual([tags[0]["Key"], tags[0]["Value"]], ["JobTag", "JobTagValue"])
+
+        p = self.load_policy(
+            {
+                "name": "remove-processing-job-tag",
+                "resource": "sagemaker-processing-job",
+                "filters": [{"tag:JobTag": "JobTagValue"}],
+                "actions": [{"type": "remove-tag", "tags": ["JobTag"]}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        tags = client.list_tags(ResourceArn=resources[0]["ProcessingJobArn"])["Tags"]
+        assert "JobTag" not in [tag["Key"] for tag in tags]
+
+    def test_stop_sagemaker_processing_job(self):
+        session_factory = self.replay_flight_data("test_sagemaker_processing_job_stop")
+        client = session_factory(region="us-east-1").client("sagemaker")
+        p = self.load_policy(
+            {
+                "name": "stop-processing-job",
+                "resource": "sagemaker-processing-job",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "ProcessingJobName",
+                        "value": "c7n",
+                        "op": "contains",
+                    }
+                ],
+                "actions": [{"type": "stop"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        job = client.describe_processing_job(
+            ProcessingJobName=resources[0]["ProcessingJobName"]
+        )
+        self.assertEqual(job["ProcessingJobStatus"], "Stopping")
+
+
 class TestSagemakerEndpoint(BaseTest):
 
     def test_sagemaker_endpoints(self):
@@ -797,3 +1158,317 @@ class TestSagemakerEndpointConfig(BaseTest):
         self.assertEqual(len(resources), 1)
         aliases = kms.list_aliases(KeyId=resources[0]['KmsKeyId'])
         self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/skunk/trails')
+
+
+class TestSagemakerDomain(BaseTest):
+
+    def test_tag_sagemaker_domain(self):
+        session_factory = self.replay_flight_data("test_tag_sagemaker_domain")
+        p = self.load_policy(
+            {
+                "name": "tag-sagemaker-domain",
+                "resource": "sagemaker-domain",
+                "filters": [{"tag:owner": "absent"}],
+                "actions": [{"type": "tag", "key": "owner", "value": "policy"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client("sagemaker")
+        tags = client.list_tags(ResourceArn=resources[0]["DomainArn"])["Tags"]
+        self.assertEqual(tags[0]['Key'], 'owner')
+        self.assertEqual(tags[0]['Value'], 'policy')
+
+        p = self.load_policy(
+            {
+                "name": "untag-sagemaker-domain",
+                "resource": "sagemaker-domain",
+                "filters": [{"tag:owner": "policy"}],
+                "actions": [{"type": "remove-tag", "tags": ["owner"]}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client("sagemaker")
+        tags = client.list_tags(ResourceArn=resources[0]["DomainArn"])["Tags"]
+        self.assertEqual(len(tags), 0)
+
+    def test_sagemaker_domain_kms_alias(self):
+        session_factory = self.replay_flight_data("test_sagemaker_domain_kms_key_filter")
+        kms = session_factory().client('kms')
+        p = self.load_policy(
+            {
+                "name": "sagemaker-domain-kms-alias",
+                "resource": "aws.sagemaker-domain",
+                "filters": [
+                    {
+                        "type": "kms-key",
+                        "key": "c7n:AliasName",
+                        "value": "alias/sagemaker",
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        aliases = kms.list_aliases(KeyId=resources[0]['KmsKeyId'])
+        self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/sagemaker')
+
+
+class TestCluster(BaseTest):
+
+    def test_tag_cluster(self):
+        session_factory = self.replay_flight_data("test_sagemaker_tag_cluster")
+        p = self.load_policy(
+            {
+                "name": "tag-sagemaker-cluster",
+                "resource": "sagemaker-cluster",
+                "filters": [{"tag:Owner": "absent"}],
+                "actions": [{"type": "tag", "key": "Owner", "value": "c7n"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = session_factory().client("sagemaker")
+        tags = client.list_tags(ResourceArn=resources[0]["ClusterArn"])["Tags"]
+        self.assertEqual(tags[0]['Key'], 'Owner')
+        self.assertEqual(tags[0]['Value'], 'c7n')
+
+        p = self.load_policy(
+            {
+                "name": "untag-sagemaker-cluster",
+                "resource": "sagemaker-cluster",
+                "filters": [{"tag:Owner": "c7n"}],
+                "actions": [{"type": "remove-tag", "tags": ["Owner"]}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        tags = client.list_tags(ResourceArn=resources[0]["ClusterArn"])["Tags"]
+        self.assertEqual(len(tags), 0)
+
+    def test_delete_cluster(self):
+        session_factory = self.replay_flight_data("test_sagemaker_delete_cluster")
+        p = self.load_policy(
+            {
+                "name": "delete-sagemaker-cluster",
+                "resource": "sagemaker-cluster",
+                "filters": [{"ClusterName": "test-c7n-cluster"}],
+                "actions": [{"type": "delete"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = session_factory().client("sagemaker")
+        notebook = client.describe_cluster(
+            ClusterName=resources[0]["ClusterName"]
+        )
+        self.assertTrue(notebook["ClusterStatus"], "Deleting")
+
+    def test_cluster_subnet(self):
+        c = "c7n-test-cluster"
+        session_factory = self.replay_flight_data("test_sagemaker_cluster_subnet_filter")
+        p = self.load_policy(
+            {
+                "name": "sagemaker-cluster",
+                "resource": "sagemaker-cluster",
+                "filters": [{"type": "subnet", "key": "tag:Name", "value": "PrivateSubnetA"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["ClusterName"], c)
+
+    def test_cluster_security_group(self):
+        c = "c7n-test-cluster"
+        session_factory = self.replay_flight_data(
+            "test_sagemaker_cluster_security_group_filter"
+        )
+        p = self.load_policy(
+            {
+                "name": "sagemaker-cluster",
+                "resource": "sagemaker-cluster",
+                "filters": [
+                    {"type": "security-group", "key": "GroupName", "value": "default"}
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["ClusterName"], c)
+
+
+class TestDataQualityJobDefinition(BaseTest):
+
+    def test_sagemaker_data_quality_job_definition_delete(self):
+        session_factory = self.replay_flight_data(
+            "test_sagemaker_data_quality_job_definition_delete"
+        )
+        client = session_factory(region="us-east-1").client("sagemaker")
+        p = self.load_policy(
+            {
+                "name": "delete-data-quality-job-definition",
+                "resource": "sagemaker-data-quality-job-definition",
+                "filters": [{"JobDefinitionName": "c7n-test"}],
+                "actions": [{"type": "delete"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        job_defs = client.list_data_quality_job_definitions().get("JobDefinitionSummaries")
+        self.assertEqual(job_defs, [])
+
+    def test_tag_data_quality_job_definition(self):
+        session_factory = self.replay_flight_data("test_sagemaker_data_quality_job_definition_tag")
+        p = self.load_policy(
+            {
+                "name": "tag-data-quality-job-definition",
+                "resource": "sagemaker-data-quality-job-definition",
+                "filters": [{"tag:Owner": "absent"}],
+                "actions": [{"type": "tag", "key": "Owner", "value": "c7n"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory(region="us-east-1").client("sagemaker")
+        tags = client.list_tags(ResourceArn=resources[0]["JobDefinitionArn"])["Tags"]
+        self.assertEqual(tags[0]['Key'], 'Owner')
+        self.assertEqual(tags[0]['Value'], 'c7n')
+
+        p = self.load_policy(
+            {
+                "name": "remove-data-quality-job-definition-tag",
+                "resource": "sagemaker-data-quality-job-definition",
+                "filters": [{"tag:Owner": "c7n"}],
+                "actions": [{"type": "remove-tag", "tags": ["Owner"]}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        tags = client.list_tags(ResourceArn=resources[0]["JobDefinitionArn"])["Tags"]
+        self.assertEqual(len(tags), 0)
+
+
+class TestModelExplainabilityJobDefinition(BaseTest):
+
+    def test_sagemaker_model_explainability_job_definition_delete(self):
+        session_factory = self.replay_flight_data(
+            "test_sagemaker_model_explainability_job_definition_delete"
+        )
+        client = session_factory(region="us-east-1").client("sagemaker")
+        p = self.load_policy(
+            {
+                "name": "delete-model-explainability-job-definition",
+                "resource": "sagemaker-model-explainability-job-definition",
+                "filters": [{"JobDefinitionName": "c7n-test"}],
+                "actions": [{"type": "delete"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        job_defs = client.list_model_explainability_job_definitions().get("JobDefinitionSummaries")
+        self.assertEqual(job_defs, [])
+
+    def test_tag_model_explainability_job_definition(self):
+        session_factory = self.replay_flight_data(
+            "test_sagemaker_model_explainability_job_definition_tag"
+        )
+        p = self.load_policy(
+            {
+                "name": "tag-model-explainability-job-definition",
+                "resource": "sagemaker-model-explainability-job-definition",
+                "filters": [{"tag:Owner": "absent"}],
+                "actions": [{"type": "tag", "key": "Owner", "value": "c7n"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory(region="us-east-1").client("sagemaker")
+        tags = client.list_tags(ResourceArn=resources[0]["JobDefinitionArn"])["Tags"]
+        self.assertEqual(tags[0]['Key'], 'Owner')
+        self.assertEqual(tags[0]['Value'], 'c7n')
+
+        p = self.load_policy(
+            {
+                "name": "remove-model-explainability-job-definition-tag",
+                "resource": "sagemaker-model-explainability-job-definition",
+                "filters": [{"tag:Owner": "c7n"}],
+                "actions": [{"type": "remove-tag", "tags": ["Owner"]}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        tags = client.list_tags(ResourceArn=resources[0]["JobDefinitionArn"])["Tags"]
+        self.assertEqual(len(tags), 0)
+
+
+class TestModelQualityJobDefinition(BaseTest):
+
+    def test_sagemaker_model_quality_job_definition_delete(self):
+        session_factory = self.replay_flight_data(
+            "test_sagemaker_model_quality_job_definition_delete"
+        )
+        client = session_factory(region="us-east-1").client("sagemaker")
+        p = self.load_policy(
+            {
+                "name": "delete-model-quality-job-definition",
+                "resource": "sagemaker-model-quality-job-definition",
+                "filters": [{"JobDefinitionName": "c7n-test"}],
+                "actions": [{"type": "delete"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        job_defs = client.list_model_quality_job_definitions().get("JobDefinitionSummaries")
+        self.assertEqual(job_defs, [])
+
+    def test_tag_model_quality_job_definition(self):
+        session_factory = self.replay_flight_data(
+            "test_sagemaker_model_quality_job_definition_tag"
+        )
+        p = self.load_policy(
+            {
+                "name": "tag-model-quality-job-definition",
+                "resource": "sagemaker-model-quality-job-definition",
+                "filters": [{"tag:Owner": "absent"}],
+                "actions": [{"type": "tag", "key": "Owner", "value": "c7n"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory(region="us-east-1").client("sagemaker")
+        tags = client.list_tags(ResourceArn=resources[0]["JobDefinitionArn"])["Tags"]
+        self.assertEqual(tags[0]['Key'], 'Owner')
+        self.assertEqual(tags[0]['Value'], 'c7n')
+
+        p = self.load_policy(
+            {
+                "name": "remove-model-quality-job-definition-tag",
+                "resource": "sagemaker-model-quality-job-definition",
+                "filters": [{"tag:Owner": "c7n"}],
+                "actions": [{"type": "remove-tag", "tags": ["Owner"]}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        tags = client.list_tags(ResourceArn=resources[0]["JobDefinitionArn"])["Tags"]
+        self.assertEqual(len(tags), 0)

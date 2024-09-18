@@ -31,6 +31,7 @@ class ElasticBeanstalk(QueryResourceManager):
         filter_name = 'ApplicationNames'
         filter_type = 'list'
         cfn_type = config_type = 'AWS::ElasticBeanstalk::Application'
+        permissions_augment = ("elasticbeanstalk:ListTagsForResource",)
 
 
 class DescribeEnvironment(DescribeSource):
@@ -58,6 +59,7 @@ class ElasticBeanstalkEnvironment(QueryResourceManager):
         filter_name = 'EnvironmentNames'
         filter_type = 'list'
         cfn_type = config_type = 'AWS::ElasticBeanstalk::Environment'
+        permissions_augment = ("elasticbeanstalk:ListTagsForResource",)
 
     permissions = ('elasticbeanstalk:ListTagsForResource',)
     source_mapping = {
@@ -83,7 +85,7 @@ def _eb_env_tags(envs, session_factory, retry):
                 client.list_tags_for_resource,
                 ResourceArn=eb_env['EnvironmentArn'])['ResourceTags']
         except client.exceptions.ResourceNotFoundException:
-            return
+            eb_env['Tags'] = []
         return eb_env
 
     # Handle API rate-limiting, which is a problem for accounts with many

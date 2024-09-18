@@ -271,13 +271,10 @@ class DescribeRestStage(query.ChildDescribeSource):
     def __init__(self, manager):
         self.manager = manager
         self.query = query.ChildResourceQuery(
-            self.manager.session_factory, self.manager)
-        self.query.capture_parent_id = True
+            self.manager.session_factory, self.manager, capture_parent_id=True)
 
     def get_query(self):
-        query = super(DescribeRestStage, self).get_query()
-        query.capture_parent_id = True
-        return query
+        return super(DescribeRestStage, self).get_query(capture_parent_id=True)
 
     def augment(self, resources):
         results = []
@@ -453,9 +450,7 @@ class RestResource(query.ChildResourceManager):
 class DescribeRestResource(query.ChildDescribeSource):
 
     def get_query(self):
-        query = super(DescribeRestResource, self).get_query()
-        query.capture_parent_id = True
-        return query
+        return super(DescribeRestResource, self).get_query(capture_parent_id=True)
 
     def augment(self, resources):
         results = []
@@ -1216,5 +1211,3 @@ class ApiGatewayV2Stage(query.ChildResourceManager):
                 partition, self.config.region, r['c7n:parent-id'], r['StageName']
             )
             for r in resources]
-
-

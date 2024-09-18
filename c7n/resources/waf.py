@@ -8,12 +8,24 @@ from c7n.utils import type_schema, local_session
 
 
 class DescribeRegionalWaf(DescribeSource):
+
+    def get_permissions(self):
+        perms = super().get_permissions()
+        perms.remove('waf-regional:GetWebAcl')
+        return perms
+
     def augment(self, resources):
         resources = super().augment(resources)
         return universal_augment(self.manager, resources)
 
 
 class DescribeWafV2(DescribeSource):
+
+    def get_permissions(self):
+        perms = super().get_permissions()
+        perms.remove('wafv2:GetWebAcl')
+        return perms
+
     def augment(self, resources):
         client = local_session(self.manager.session_factory).client(
             'wafv2',
@@ -51,7 +63,7 @@ class DescribeWafV2(DescribeSource):
         # is a required parameter for most API calls - we augment the resource with the desired
         # scope here in order to use it downstream for API calls
         return [
-            { 'Scope': scope, **r }
+            {'Scope': scope, **r}
             for r in super().resources(query)
         ]
 
@@ -61,10 +73,18 @@ class DescribeWafV2(DescribeSource):
 
         resources = self.query.filter(self.manager, **params)
         return [
-            { 'Scope': scope, **r }
+            {'Scope': scope, **r}
             for r in resources
             if r[self.manager.resource_type.id] in ids
         ]
+
+
+class DescribeWaf(DescribeSource):
+
+    def get_permissions(self):
+        perms = super().get_permissions()
+        perms.remove('waf:GetWebAcl')
+        return perms
 
 
 @resources.register('waf')
@@ -81,7 +101,13 @@ class WAF(QueryResourceManager):
         arn_type = "webacl"
         # override defaults to casing issues
         permissions_enum = ('waf:ListWebACLs',)
-        permissions_augment = ('waf:GetWebACL',)
+        permissions_augment = ('waf:GetWebACL', "waf:ListTagsForResource")
+        global_resource = True
+
+    source_mapping = {
+        'describe': DescribeWaf,
+        'config': ConfigSource
+    }
 
 
 @resources.register('waf-regional')
@@ -99,7 +125,7 @@ class RegionalWAF(QueryResourceManager):
         arn_type = "webacl"
         # override defaults to casing issues
         permissions_enum = ('waf-regional:ListWebACLs',)
-        permissions_augment = ('waf-regional:GetWebACL',)
+        permissions_augment = ('waf-regional:GetWebACL', "waf-regional:ListTagsForResource")
         universal_taggable = object()
 
     source_mapping = {
@@ -123,7 +149,7 @@ class WAFV2(QueryResourceManager):
         arn_type = "webacl"
         # override defaults to casing issues
         permissions_enum = ('wafv2:ListWebACLs',)
-        permissions_augment = ('wafv2:GetWebACL',)
+        permissions_augment = ('wafv2:GetWebACL', "wafv2:ListTagsForResource")
         universal_taggable = object()
 
     source_mapping = {

@@ -10,7 +10,7 @@ import os
 from c7n.actions import ActionRegistry
 from c7n.cache import NullCache
 from c7n.config import Config
-from c7n.filters import FilterRegistry
+from c7n.filters import FilterRegistry, ValueFilter
 from c7n.manager import ResourceManager
 
 from c7n.provider import Provider, clouds
@@ -29,10 +29,23 @@ class IACSourceProvider(Provider):
         return lambda *args, **kw: None
 
     def initialize(self, options):
-        pass
+        """Initialize the provider"""
 
     def initialize_policies(self, policies, options):
         return policies
+
+    def parse(self, source_dir, var_files):
+        """Return the resource graph for the provider"""
+
+
+def get_provider(source_dir):
+    """For a given source directory return an appropriate IaC provider"""
+    for name, provider_class in clouds.items():
+        if not issubclass(provider_class, IACSourceProvider):
+            continue
+        provider = provider_class()
+        if provider.match_dir(source_dir):
+            return provider
 
 
 class PolicyMetadata:
@@ -97,24 +110,26 @@ class PolicyMetadata:
 
 class ExecutionFilter:
     supported_filters = ("policy", "type", "severity", "category", "id")
+    severity_op_map = {'lte': operator.le, 'gte': operator.ge}
 
-    def __init__(self, filters):
+    def __init__(self, filters, severity_direction='lte'):
         self.filters = filters
+        self.severity_op = self.severity_op_map[severity_direction]
 
     def __len__(self):
         return len(self.filters)
 
     @classmethod
-    def parse(cls, options):
+    def parse(cls, filters_config, severity_direction='lte'):
         """cli option filtering support
 
         --filters "type=aws_sqs_queue,aws_rds_* policy=*encryption* severity=high"
         """
-        if not options.filters:
+        if not filters_config:
             return cls(defaultdict(list))
 
         filters = defaultdict(list)
-        for kv in options.filters.split(" "):
+        for kv in filters_config.split(" "):
             if "=" not in kv:
                 raise ValueError("key=value pair missing `=`")
             k, v = kv.split("=")
@@ -126,7 +141,7 @@ class ExecutionFilter:
                 v = [v]
             filters[k] = v
         cls._validate_severities(filters)
-        return cls(filters)
+        return cls(filters, severity_direction)
 
     @classmethod
     def _validate_severities(cls, filters):
@@ -166,7 +181,7 @@ class ExecutionFilter:
         def filter_severity(p):
             p_slevel = SEVERITY_LEVELS.get(p.severity) or SEVERITY_LEVELS.get("unknown")
             f_slevel = SEVERITY_LEVELS[self.filters["severity"][0]]
-            return p_slevel <= f_slevel
+            return self.severity_op(p_slevel, f_slevel)
 
         if len(self.filters["severity"]) == 1:
             return list(filter(filter_severity, policies))
@@ -211,6 +226,7 @@ class CollectionRunner:
         self.policies = policies
         self.options = options
         self.reporter = reporter
+        self.provider = None
 
     def run(self) -> bool:
         # return value is used to signal process exit code.
@@ -221,7 +237,7 @@ class CollectionRunner:
             log.warning("no %s source files found" % provider.type)
             return True
 
-        graph = provider.parse(self.options.source_dir, self.options.var_files)
+        graph = self.provider.parse(self.options.source_dir, self.options.var_files)
 
         for p in self.policies:
             p.expand_variables(p.get_variables())
@@ -239,9 +255,18 @@ class CollectionRunner:
             for p in self.policies:
                 if not self.match_type(rtype, p):
                     continue
-                result_set = self.run_policy(p, graph, resources, event, rtype)
+                result_set = []
+                try:
+                    result_set = self.run_policy(p, graph, resources, event, rtype)
+                except Exception as e:
+                    found = True
+                    self.reporter.on_policy_error(e, p, rtype, resources)
                 if result_set:
-                    self.reporter.on_results(result_set)
+                    self.reporter.on_results(p, result_set)
+                if result_set and (
+                    not self.options.warn_filter
+                    or not self.options.warn_filter.filter_policies((p,))
+                ):
                     found = True
         self.reporter.on_execution_ended()
         return found
@@ -249,12 +274,14 @@ class CollectionRunner:
     def run_policy(self, policy, graph, resources, event, resource_type):
         event = dict(event)
         event.update({"graph": graph, "resources": resources, "resource_type": resource_type})
+        self.reporter.on_policy_start(policy, event)
         return policy.push(event)
 
     def get_provider(self):
         provider_name = {p.provider_name for p in self.policies}.pop()
-        provider = clouds[provider_name]()
-        return provider
+        self.provider = clouds[provider_name]()
+        self.provider.initialize(self.options)
+        return self.provider
 
     def get_event(self):
         return {"config": self.options, "env": dict(os.environ)}
@@ -309,8 +336,20 @@ class PolicyResourceResult:
         }
 
 
+class LeftValueFilter(ValueFilter):
+    def get_resource_value(self, k, i):
+        if k.startswith('tag:') and 'tags' in i:
+            tk = k.split(':', 1)[1]
+            r = (i.get('tags') or {}).get(tk)
+            return r
+        return super().get_resource_value(k, i)
+
+
 class IACResourceManager(ResourceManager):
     filter_registry = FilterRegistry("iac.filters")
+    filter_registry.register('value', LeftValueFilter)
+    filter_registry.value_filter_class = LeftValueFilter
+
     action_registry = ActionRegistry("iac.actions")
     log = log
 
@@ -362,7 +401,7 @@ class IACResourceMap(object):
         return ()
 
     def get(self, k, default=None):
-        # that the resource is in the map has alerady been verified
+        # that the resource is in the map has already been verified
         # we get the unprefixed resource on get
         return self.resource_class
 
@@ -375,7 +414,7 @@ class ResourceGraph:
     def __len__(self):
         raise NotImplementedError()
 
-    def get_resource_by_type(self):
+    def get_resources_by_type(self, types=()):
         raise NotImplementedError()
 
     def resolve_refs(self, resource, target_type):

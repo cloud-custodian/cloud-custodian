@@ -170,7 +170,7 @@ class CustodianResource(CustodianDirective):
     @classmethod
     def render_resource(cls, resource_path):
         resource_class = cls.resolve(resource_path)
-        provider_type, resource_name = resource_path.split('.', 1)
+        provider_type, _ = resource_path.split('.', 1)
         return cls._render('resource.rst',
             variables=dict(
                 provider_name=clouds[provider_type].display_name,

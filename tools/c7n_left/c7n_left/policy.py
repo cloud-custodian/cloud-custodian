@@ -29,12 +29,12 @@ class LeftCollection(PolicyCollection):
         # session factory param introduction needs an audit and review
         # on tests.
         sf = session_factory if session_factory else cls.session_factory()
-        policies = [LeftPolicy(p, options, session_factory=sf) for p in data.get('policies', ())]
+        policies = [LeftPolicy(p, options, session_factory=sf) for p in data.get("policies", ())]
         return cls(policies, options)
 
 
 class LeftPolicy(Policy):
     def get_variables(self, variables=None):
         vars = super().get_variables(variables)
-        vars['env'] = dict(os.environ)
+        vars["env"] = dict(os.environ)
         return vars

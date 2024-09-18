@@ -9,6 +9,7 @@ from c7n_kube.provider import resources
 class Deployment(QueryResourceManager):
     class resource_type(TypeInfo):
         group = "Apps"
+        canonical_group = "apps"
         version = "V1"
         patch = "patch_namespaced_deployment"
         delete = "delete_namespaced_deployment"

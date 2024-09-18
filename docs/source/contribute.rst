@@ -21,7 +21,7 @@ Discussion is also available on `Gitter <https://gitter.im/cloud-custodian/cloud
 Code of Conduct
 ---------------
 
-This project adheres to the [CNCF Code of Conduct](https://github.com/cncf/foundation/blob/master/code-of-conduct.md)
+This project adheres to the `CNCF Code of Conduct <https://github.com/cncf/foundation/blob/master/code-of-conduct.md>`_
 
 By participating, you are expected to honor this code.
 

@@ -446,4 +446,5 @@ class Subnet(SubnetFilter):
 
     RelatedIdsExpression = 'SubnetIds[]'
 
+
 FSx.filter_registry.register('consecutive-aws-backups', ConsecutiveAwsBackupsFilter)

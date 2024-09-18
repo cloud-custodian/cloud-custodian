@@ -208,6 +208,6 @@ class TestReporter(RichCli):
 
 
 class TestChecker(Output):
-    def on_results(self, results):
+    def on_results(self, policy, results):
         for r in results:
             self.ctx.check_execution_result(r)

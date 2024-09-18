@@ -18,6 +18,7 @@ class TransferServer(QueryResourceManager):
         id = name = 'ServerId'
         arn_type = "server"
         cfn_type = 'AWS::Transfer::Server'
+        permissions_augment = ("transfer:ListTagsForResource",)
 
 
 @TransferServer.action_registry.register('stop')
@@ -142,16 +143,14 @@ class DeleteServer(BaseAction):
     def process_server(self, client, server):
         try:
             client.delete_server(ServerId=server['ServerId'])
-        except client.exceptions.NotFoundException:
+        except client.exceptions.ResourceNotFoundException:
             pass
 
 
 class DescribeTransferUser(ChildDescribeSource):
 
     def get_query(self):
-        query = super().get_query()
-        query.capture_parent_id = True
-        return query
+        return super().get_query(capture_parent_id=True)
 
     def augment(self, resources):
         client = local_session(self.manager.session_factory).client('transfer')
@@ -223,5 +222,5 @@ class DeleteUser(BaseAction):
             client.delete_user(
                 ServerId=user['Arn'].split('/')[1],
                 UserName=user['UserName'])
-        except client.exceptions.NotFoundException:
+        except client.exceptions.ResourceNotFoundException:
             pass

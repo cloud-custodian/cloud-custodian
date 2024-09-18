@@ -1,6 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-from ..azure_common import BaseTest,  arm_template
+from ..azure_common import BaseTest, arm_template
 
 
 class MySQLTest(BaseTest):
@@ -43,3 +43,33 @@ class MySQLTest(BaseTest):
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+
+class MySQLSecurityAlertPoliciesFilterTest(BaseTest):
+    def test_schema_validate(self):
+        p = self.load_policy({
+            'name': 'test-azure-mysql',
+            'resource': 'azure.mysql',
+            'filters': [
+                {'type': 'security-alert-policy',
+                 'key': 'state',
+                 'op': 'eq',
+                 'value': 'Enabled'}]
+        }, validate=True)
+        self.assertTrue(p)
+
+    def test_query(self):
+        p = self.load_policy({
+            'name': 'test-azure-mysql',
+            'resource': 'azure.mysql',
+            'filters': [
+                {'type': 'security-alert-policy',
+                 'key': 'state',
+                 'op': 'eq',
+                 'value': 'Enabled'}]
+        })
+
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], '344-mysql-server-green')

@@ -59,7 +59,8 @@ class ReplicationInstance(QueryResourceManager):
         name = id = 'ReplicationInstanceIdentifier'
         arn = 'ReplicationInstanceArn'
         date = 'InstanceCreateTime'
-        cfn_type = 'AWS::DMS::ReplicationInstance'
+        config_type = cfn_type = 'AWS::DMS::ReplicationInstance'
+        permissions_augment = ("dms:ListTagsForResource",)
 
     filters = FilterRegistry('dms-instance.filters')
     filters.register('marked-for-op', TagActionFilter)
@@ -72,6 +73,12 @@ class ReplicationInstance(QueryResourceManager):
     }
 
 
+class EndpointDescribe(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(self.manager, resources)
+
+
 @resources.register('dms-endpoint')
 class DmsEndpoints(QueryResourceManager):
 
@@ -82,9 +89,13 @@ class DmsEndpoints(QueryResourceManager):
         name = 'EndpointIdentifier'
         arn_type = 'endpoint'
         universal_taggable = object()
-        cfn_type = 'AWS::DMS::Endpoint'
+        config_type = cfn_type = 'AWS::DMS::Endpoint'
+        permissions_augment = ("dms:ListTagsForResource",)
 
-    augment = universal_augment
+    source_mapping = {
+        'describe': EndpointDescribe,
+        'config': ConfigSource
+    }
 
 
 @ReplicationInstance.filter_registry.register('kms-key')
@@ -402,7 +413,6 @@ class DeleteDmsEndpoint(BaseAction):
                 continue
 
 
-
 @resources.register("dms-replication-task")
 class DMSReplicationTask(QueryResourceManager):
     class resource_type(TypeInfo):
@@ -414,6 +424,7 @@ class DMSReplicationTask(QueryResourceManager):
         name = "ReplicationTaskIdentifier"
         cfn_type = config_type = "AWS::DMS::ReplicationTask"
         universal_taggable = object()
+        permissions_augment = ("dms:ListTagsForResource",)
 
     source_mapping = {
        "describe": DescribeWithResourceTags,

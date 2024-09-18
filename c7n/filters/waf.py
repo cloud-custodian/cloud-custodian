@@ -42,13 +42,12 @@ class WafClassicRegionalFilterBase(ValueFilter, metaclass=ABCMeta):
 
     permissions = (
         'waf-regional:ListWebACLs',
-        'waf-regional:GetWebACL', # for augment
-        'waf-regional:ListResourcesForWebACL' # for finding associated resources
+        'waf-regional:GetWebACL',  # for augment
+        'waf-regional:ListResourcesForWebACL'  # for finding associated resources
     )
 
     def __init__(self, data, manager=None):
         super().__init__(data, manager)
-
 
         # "legacy" mode matches previous WAF based filters for backwards compatability and is
         # enabled when one of the legacy properties is provided or when no value filter properties
@@ -56,7 +55,7 @@ class WafClassicRegionalFilterBase(ValueFilter, metaclass=ABCMeta):
         self._is_legacy = (
             'web-acl' in self.data
                 or 'state' in self.data
-                or len(self.data.keys()) == 1 # only filter "type" is given
+                or len(self.data.keys()) == 1  # only filter "type" is given
         )
         self._cached_web_acls = None
 
@@ -191,8 +190,8 @@ class WafV2FilterBase(ValueFilter, metaclass=ABCMeta):
 
     permissions = (
         'wafv2:ListWebACLs',
-        'wafv2:GetWebACL', # for augment
-        'wafv2:ListResourcesForWebACL' # for finding associated regional resources
+        'wafv2:GetWebACL',  # for augment
+        'wafv2:ListResourcesForWebACL'  # for finding associated regional resources
     )
 
     def __init__(self, data, manager=None):
@@ -204,7 +203,7 @@ class WafV2FilterBase(ValueFilter, metaclass=ABCMeta):
         self._is_legacy = (
             'web-acl' in self.data
                 or 'state' in self.data
-                or len(self.data.keys()) == 1 # only filter "type" is given
+                or len(self.data.keys()) == 1  # only filter "type" is given
         )
         self._cached_web_acls = None
 

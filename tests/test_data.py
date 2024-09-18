@@ -60,7 +60,21 @@ def test_load_array_expression(test):
             "query": [{"path": data_path("iam-actions.json"), "key": "account"}],
         }
     )
-    assert p.run() == ["DisableRegion", "EnableRegion", "ListRegions"]
+    assert p.run() == [
+        'CloseAccount',
+        'DeleteAlternateContact',
+        'DisableRegion',
+        'EnableRegion',
+        'GetAccountInformation',
+        'GetAlternateContact',
+        'GetChallengeQuestions',
+        'GetContactInformation',
+        'GetRegionOptStatus',
+        'ListRegions',
+        'PutAlternateContact',
+        'PutChallengeQuestions',
+        'PutContactInformation',
+    ]
 
 
 def test_disk_bad_path(tmpdir, test):
@@ -88,9 +102,7 @@ def test_dir_missing_glob(tmpdir, test):
 
 
 def test_invalid_static_record(test):
-    with pytest.raises(
-        PolicyValidationError, match="invalid static data source `records`"
-    ):
+    with pytest.raises(PolicyValidationError, match="invalid static data source `records`"):
         test.load_policy(
             {
                 "name": "smack",
@@ -102,11 +114,10 @@ def test_invalid_static_record(test):
 
 
 def test_bad_source(test):
-
     with pytest.raises(PolicyValidationError, match="invalid source dask"):
         test.load_policy(
-            {"name": "snack", "resource": "c7n.data", "source": "dask"},
-            validate=False)
+            {"name": "snack", "resource": "c7n.data", "source": "dask"}, validate=False
+        )
 
 
 def test_provider_initialize(test):

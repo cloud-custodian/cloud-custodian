@@ -716,3 +716,47 @@ class ClusterParameterFilter(ParameterFilter):
                     self.data.get('key'))
                 results.append(resource)
         return results
+
+
+@RDSCluster.filter_registry.register('pending-maintenance')
+class PendingMaintenance(Filter):
+    """
+    Scan DB Clusters for those with pending maintenance
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: rds-cluster-pending-maintenance
+                resource: rds-cluster
+                filters:
+                  - pending-maintenance
+                  - type: value
+                    key: '"c7n:PendingMaintenance".PendingMaintenanceActionDetails[].Action'
+                    op: intersect
+                    value:
+                      - system-update
+    """
+
+    annotation_key = 'c7n:PendingMaintenance'
+    schema = type_schema('pending-maintenance')
+    permissions = ('rds:DescribePendingMaintenanceActions',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('rds')
+
+        results = []
+        resource_maintenances = {}
+        paginator = client.get_paginator('describe_pending_maintenance_actions')
+        for page in paginator.paginate():
+            for action in page['PendingMaintenanceActions']:
+                resource_maintenances.setdefault(action['ResourceIdentifier'], []).append(action)
+
+        for r in resources:
+            pending_maintenances = resource_maintenances.get(r['DBClusterArn'], [])
+            if len(pending_maintenances) > 0:
+                r[self.annotation_key] = pending_maintenances
+                results.append(r)
+
+        return results

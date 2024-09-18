@@ -1,0 +1,9 @@
+{
+    "status_code": 200,
+    "data": {
+        "serviceArns": [
+            "arn:aws:ecs:us-east-1:644160558196:service/timmy-test-cluster/test-task-set-delete"
+        ],
+        "ResponseMetadata": {}
+    }
+}

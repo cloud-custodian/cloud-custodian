@@ -5,18 +5,8 @@
             "Message": "Function not found: arn:aws:lambda:us-east-1:644160558196:function:test-foo-bar",
             "Code": "ResourceNotFoundException"
         },
-        "ResponseMetadata": {
-            "RequestId": "a3edd260-2672-11e9-8ef1-3ff6f1b2707f",
-            "HTTPStatusCode": 404,
-            "HTTPHeaders": {
-                "date": "Fri, 01 Feb 2019 22:42:23 GMT",
-                "content-type": "application/json",
-                "content-length": "107",
-                "connection": "keep-alive",
-                "x-amzn-requestid": "a3edd260-2672-11e9-8ef1-3ff6f1b2707f",
-                "x-amzn-errortype": "ResourceNotFoundException"
-            },
-            "RetryAttempts": 0
-        }
+        "ResponseMetadata": {},
+        "Type": "User",
+        "Message": "Function not found: arn:aws:lambda:us-east-1:644160558196:function:test-foo-bar"
     }
 }

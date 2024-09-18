@@ -4,7 +4,7 @@
         {
             "request": {
                 "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Web/serverfarms?api-version=2018-02-01",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Web/serverfarms?detailed=true&api-version=2018-02-01",
                 "body": null,
                 "headers": {}
             },

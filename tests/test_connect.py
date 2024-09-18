@@ -125,7 +125,7 @@ class ConnectCampaignTest(BaseTest):
                         'value': True
                     }
                 ]
-            },session_factory=session_factory)
+            }, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 2)
 
@@ -142,6 +142,6 @@ class ConnectCampaignTest(BaseTest):
                         'value': 'alias/eks'
                     }
                 ]
-            },session_factory=session_factory)
+            }, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 2)

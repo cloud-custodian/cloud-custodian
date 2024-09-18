@@ -1,0 +1,35 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 14 Sep 2023 15:42:25 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "server-timing": "gfet4t7; dur=679",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "581",
+    "-content-encoding": "gzip",
+    "content-location": "https://spanner.googleapis.com/v1/projects/cloud-custodian/instances/test-spanner/backups?alt=json"
+  },
+  "body": {
+    "backups": [
+      {
+        "name": "projects/cloud-custodian/instances/test-spanner/backups/test_backup",
+        "database": "projects/cloud-custodian/instances/test-spanner/databases/test_database",
+        "expireTime": "2024-09-13T15:33:59Z",
+        "createTime": "2023-09-14T15:33:59.652187Z",
+        "state": "CREATING",
+        "encryptionInfo": {
+          "encryptionType": "GOOGLE_DEFAULT_ENCRYPTION"
+        },
+        "versionTime": "2023-09-14T15:33:59.652187Z",
+        "databaseDialect": "GOOGLE_STANDARD_SQL",
+        "maxExpireTime": "2024-09-14T15:33:59.652187Z"
+      }
+    ]
+  }
+}

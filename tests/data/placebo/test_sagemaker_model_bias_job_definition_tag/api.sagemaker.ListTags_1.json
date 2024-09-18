@@ -1,0 +1,16 @@
+{
+    "status_code": 200,
+    "data": {
+        "Tags": [
+            {
+                "Key": "c7n-test",
+                "Value": "c7n-test"
+            },
+            {
+                "Key": "Owner",
+                "Value": "c7n"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

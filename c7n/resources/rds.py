@@ -42,7 +42,7 @@ from datetime import timedelta
 
 from decimal import Decimal as D, ROUND_HALF_UP
 
-from distutils.version import LooseVersion
+from c7n.vendored.distutils.version import LooseVersion
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 
@@ -454,7 +454,9 @@ START_STOP_ELIGIBLE_ENGINES = {
     'postgres', 'sqlserver-ee',
     'oracle-se2', 'mariadb', 'oracle-ee',
     'sqlserver-ex', 'sqlserver-se', 'oracle-se',
-    'mysql', 'oracle-se1', 'sqlserver-web'}
+    'mysql', 'oracle-se1', 'sqlserver-web',
+    'db2-ae', 'db2-se', 'oracle-ee-cdb',
+    'sqlserver-ee', 'oracle-se2-cdb'}
 
 
 def _eligible_start_stop(db, state="available"):
@@ -1046,7 +1048,7 @@ class RDSSnapshot(QueryResourceManager):
         enum_spec = ('describe_db_snapshots', 'DBSnapshots', None)
         name = id = 'DBSnapshotIdentifier'
         date = 'SnapshotCreateTime'
-        config_type = cfn_type = "AWS::RDS::DBSnapshot"
+        config_type = "AWS::RDS::DBSnapshot"
         filter_name = "DBSnapshotIdentifier"
         filter_type = "scalar"
         universal_taggable = True
@@ -2076,7 +2078,7 @@ class RDSProxy(QueryResourceManager):
         enum_spec = ('describe_db_proxies', 'DBProxies', None)
         arn = 'DBProxyArn'
         arn_type = 'db-proxy'
-        cfn_type = config_type = 'AWS::RDS::DBInstance'
+        cfn_type = 'AWS::RDS::DBProxy'
         permissions_enum = ('rds:DescribeDBProxies',)
         universal_taggable = object()
 
@@ -2130,6 +2132,7 @@ class RDSProxySubnetFilter(net_filters.SubnetFilter):
 class RDSProxySecurityGroupFilter(net_filters.SecurityGroupFilter):
 
     RelatedIdsExpression = "VpcSecurityGroupIds[]"
+
 
 @RDSProxy.filter_registry.register('vpc')
 class RDSProxyVpcFilter(net_filters.VpcFilter):
@@ -2227,7 +2230,7 @@ class DbOptionGroups(ValueFilter):
 
 @filters.register('pending-maintenance')
 class PendingMaintenance(Filter):
-    """ Scan DB instances for those with pending maintenance
+    """Scan DB instances for those with pending maintenance
 
     :example:
 
@@ -2238,8 +2241,14 @@ class PendingMaintenance(Filter):
             resource: aws.rds
             filters:
               - pending-maintenance
+              - type: value
+                key: '"c7n:PendingMaintenance"[].PendingMaintenanceActionDetails[].Action'
+                op: intersect
+                value:
+                  - system-update
     """
 
+    annotation_key = 'c7n:PendingMaintenance'
     schema = type_schema('pending-maintenance')
     permissions = ('rds:DescribePendingMaintenanceActions',)
 
@@ -2247,15 +2256,16 @@ class PendingMaintenance(Filter):
         client = local_session(self.manager.session_factory).client('rds')
 
         results = []
-        pending_maintenance = set()
+        resource_maintenances = {}
         paginator = client.get_paginator('describe_pending_maintenance_actions')
         for page in paginator.paginate():
-            pending_maintenance.update(
-                {action['ResourceIdentifier'] for action in page['PendingMaintenanceActions']}
-            )
+            for action in page['PendingMaintenanceActions']:
+                resource_maintenances.setdefault(action['ResourceIdentifier'], []).append(action)
 
         for r in resources:
-            if r['DBInstanceArn'] in pending_maintenance:
+            pending_maintenances = resource_maintenances.get(r['DBInstanceArn'], [])
+            if len(pending_maintenances) > 0:
+                r[self.annotation_key] = pending_maintenances
                 results.append(r)
 
         return results

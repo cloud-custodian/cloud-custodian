@@ -1,0 +1,33 @@
+{
+    "status_code": 200,
+    "data": {
+        "ClusterArn": "arn:aws:sagemaker:us-east-1:644160558196:cluster/u72dzcdx4scy",
+        "ClusterName": "test-c7n-cluster",
+        "ClusterStatus": "Deleting",
+        "CreationTime": {
+            "__class__": "datetime",
+            "year": 2024,
+            "month": 3,
+            "day": 28,
+            "hour": 11,
+            "minute": 15,
+            "second": 18,
+            "microsecond": 328000
+        },
+        "InstanceGroups": [
+            {
+                "CurrentCount": 1,
+                "TargetCount": 1,
+                "InstanceGroupName": "test-c7n-ig",
+                "InstanceType": "ml.t3.medium",
+                "LifeCycleConfig": {
+                    "SourceS3Uri": "s3://hyperpod-lifecycle-scripts-test/src/",
+                    "OnCreate": "on_create.sh"
+                },
+                "ExecutionRole": "arn:aws:iam::644160558196:role/service-role/AmazonSageMaker-ExecutionRole-20240319T150889",
+                "ThreadsPerCore": 1
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

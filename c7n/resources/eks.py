@@ -18,9 +18,7 @@ from c7n.filters.kms import KmsRelatedFilter
 class NodeGroupDescribeSource(ChildDescribeSource):
 
     def get_query(self):
-        query = super(NodeGroupDescribeSource, self).get_query()
-        query.capture_parent_id = True
-        return query
+        return super().get_query(capture_parent_id=True)
 
     def augment(self, resources):
         results = []
@@ -119,6 +117,7 @@ class EKSSubnetFilter(SubnetFilter):
 class EKSSGFilter(SecurityGroupFilter):
 
     RelatedIdsExpression = "resourcesVpcConfig.securityGroupIds[]"
+
 
 EKS.filter_registry.register('network-location', net_filters.NetworkLocation)
 
@@ -283,7 +282,7 @@ class AssociateEncryptionConfig(Action):
                 params['encryptionConfig'][0]['provider']['keyArn'] = _key_arn
             except kms_client.exceptions.NotFoundException as e:
                 self.log.error(
-                    "The following error was received for kms:DescribeKey: " \
+                    "The following error was received for kms:DescribeKey: "
                     f"{e.response['Error']['Message']}"
                 )
                 raise e
@@ -296,7 +295,7 @@ class AssociateEncryptionConfig(Action):
             except client.exceptions.InvalidParameterException as e:
                 error = e
                 self.log.error(
-                    "The following error was received for cluster " \
+                    "The following error was received for cluster "
                     f"{r['name']}: {e.response['Error']['Message']}"
                 )
                 continue

@@ -212,6 +212,7 @@ This works for GCP resources as well.
 - ; as u3b
 - = as u3d
 - / as u2f
+- - as u2d
 
 **Examples**::
 
@@ -327,8 +328,8 @@ class Time(Filter):
         'nzst': 'Pacific/Auckland',
         'utc': 'Etc/UTC',
     }
-    TAG_RESTRICTIONS = ["(", ")", "[", "]", ",", ";", "=", "/"]
-    # mapping to ['u28', 'u29', 'u5b', 'u5d', 'u2c', 'u3b', 'u3d', 'u2f']
+    TAG_RESTRICTIONS = ["(", ")", "[", "]", ",", ";", "=", "/", "-"]
+    # mapping to ['u28', 'u29', 'u5b', 'u5d', 'u2c', 'u3b', 'u3d', 'u2f', "u2d"]
     TAG_RESTRICTIONS_ESCAPE = ["u" + hex(ord(c))[2:] for c in TAG_RESTRICTIONS]
 
     z_names = list(zoneinfo.get_zonefile_instance().zones)

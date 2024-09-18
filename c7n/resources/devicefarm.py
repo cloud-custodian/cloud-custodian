@@ -15,5 +15,6 @@ class DevicefarmProject(query.QueryResourceManager):
         name = "name"
         config_type = "AWS::DeviceFarm::Project"
         universal_taggable = object()
+        permissions_augment = ("devicefarm:ListTagsForResource",)
 
     source_mapping = {"describe": query.DescribeWithResourceTags, "config": query.ConfigSource}

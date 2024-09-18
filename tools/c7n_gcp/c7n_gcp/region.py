@@ -28,6 +28,7 @@ class Region:
 
     def __init__(self, ctx=None, data=()):
         self.ctx = ctx
+        self.config = ctx.options
         self.data = data
         if self._static_regions:
             self.regions = list(self._static_regions)
@@ -48,6 +49,13 @@ class Region:
     def resources(self, resource_ids=()):
         if resource_ids:
             return [{'name': r} for r in self.regions if r in resource_ids]
+        elif self.config.regions or self.config.region != 'us-east-1':
+            regions = list(self.config.regions)
+            regions.append(self.config.region)
+            regions = list(filter(None, regions))
+            if 'us-east-1' in regions:
+                regions.remove('us-east-1')
+            return [{'name': r} for r in self.regions if r in regions]
         elif 'query' in self.data:
             qregions = {q['name'] for q in self.data['query']}
             return [{'name': r} for r in self.regions if r in qregions]

@@ -125,6 +125,7 @@ class OCIFlightRecorder(CustodianTestCore):
 
     def _get_mock_triples(self):
         import oci.base_client as ocibase
+        import oci._vendor.urllib3.connectionpool as conn
 
         mock_triples = (
             (ocibase, "OCIConnectionPool", requests_stubs.VCROCIConnectionPool),
@@ -133,6 +134,8 @@ class OCIFlightRecorder(CustodianTestCore):
                 "ConnectionCls",
                 requests_stubs.VCROCIConnection,
             ),
+            (conn.HTTPConnectionPool, "ConnectionCls", requests_stubs.VCRHTTPConnection),
+            (conn.HTTPSConnectionPool, "ConnectionCls", requests_stubs.VCRHTTPSConnection),
         )
         return mock_triples
 
@@ -201,7 +204,7 @@ class OCIFlightRecorder(CustodianTestCore):
         multi_requests_map = {}
         tmp_requests_map = {}
         for t in self.cassette.data:
-            (r, b) = t
+            (r, _) = t
             k = f"{r.method}_{r.uri}"
             tmp_requests_map[k] = tmp_requests_map.get(k, 0) + 1
         for k, v in tmp_requests_map.items():

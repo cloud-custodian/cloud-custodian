@@ -1,0 +1,14 @@
+{
+    "status_code": 200,
+    "data": {
+        "Instances": [
+            {
+                "Id": "test-instance",
+                "Attributes": {
+                    "AWS_INSTANCE_IPV4": "100.64.17.202"
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

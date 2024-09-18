@@ -11,7 +11,6 @@ import pytest
 from pytest_terraform import terraform
 
 
-
 def test_log_group_rename_validation(test):
     with pytest.raises(PolicyValidationError) as ecm:
         test.load_policy({

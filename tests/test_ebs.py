@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 import logging
 from unittest import mock
+import datetime
+from dateutil import parser
 
 from botocore.exceptions import ClientError
 
@@ -16,8 +18,8 @@ from c7n.resources.ebs import (
     ErrorHandler,
     SnapshotQueryParser as QueryParser
 )
-
 from .common import BaseTest
+from c7n.testing import mock_datetime_now
 
 
 class SnapshotQueryParse(BaseTest):
@@ -387,7 +389,6 @@ class SnapshotSetPermissions(BaseTest):
             SnapshotId=resources[0]['SnapshotId'],
             Attribute='createVolumePermission')['CreateVolumePermissions']
         assert perms == []
-
 
     def test_add(self):
         # For this test, we assume only 665544332211 has permissions,
@@ -978,3 +979,29 @@ class HealthEventsFilterTest(BaseTest):
                 ("c7n:HealthEvent" in r) and
                 ("Description" in e for e in r["c7n:HealthEvent"])
             )
+
+
+class EbsSnapshotsFilterTest(BaseTest):
+    def test_filter_match(self):
+        session_factory = self.replay_flight_data("test_ebs_volume_snapshots_filter")
+        p = self.load_policy({
+            "name": "ebs-volumes",
+            "resource": "aws.ebs",
+            "filters": [{
+                "not": [{
+                    "type": "snapshots",
+                    "attrs": [{
+                      "type": "value",
+                      "key": "StartTime",
+                      "value_type": "age",
+                      "value": 2,
+                      "op": "less-than"
+                    }]
+                }]
+            }]
+        }, session_factory=session_factory)
+        with mock_datetime_now(parser.parse("2024-02-01T10:32:48.405000+00:00"),
+                               datetime):
+            resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["VolumeId"], "vol-0c7930681fe5a17db")

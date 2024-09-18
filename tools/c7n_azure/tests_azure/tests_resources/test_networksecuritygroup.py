@@ -317,7 +317,6 @@ class NetworkSecurityGroupTest(BaseTest):
         self.assertEqual(len(resources), 0)
 
 
-
 class NetworkSecurityGroupFlowLogsFilterTest(BaseTest):
     def test_flow_log_filter_all(self):
         p = self.load_policy({

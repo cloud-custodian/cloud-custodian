@@ -1,0 +1,37 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "routes": [
+            {
+                "arn": "arn:aws:appmesh:us-east-1:644160558196:mesh/m1/virtualRouter/vr2/route/vr2-default-8080-http",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 4,
+                    "day": 17,
+                    "hour": 15,
+                    "minute": 53,
+                    "second": 36,
+                    "microsecond": 174000
+                },
+                "lastUpdatedAt": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 4,
+                    "day": 17,
+                    "hour": 15,
+                    "minute": 53,
+                    "second": 36,
+                    "microsecond": 174000
+                },
+                "meshName": "m1",
+                "meshOwner": "644160558196",
+                "resourceOwner": "644160558196",
+                "routeName": "vr2-default-8080-http",
+                "version": 1,
+                "virtualRouterName": "vr2"
+            }
+        ]
+    }
+}

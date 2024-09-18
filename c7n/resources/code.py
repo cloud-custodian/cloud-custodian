@@ -37,6 +37,7 @@ class CodeRepository(QueryResourceManager):
         date = 'creationDate'
         cfn_type = 'AWS::CodeCommit::Repository'
         universal_taggable = object()
+        permissions_augment = ("codecommit:ListTagsForResource",)
 
     source_mapping = {
         'describe': DescribeRepo,
@@ -139,6 +140,16 @@ class CodeBuildProject(QueryResourceManager):
         'describe': DescribeBuild,
         'config': ConfigBuild
     }
+
+
+@resources.register('codebuild-credential')
+class CodeBuildSourceCredentials(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = 'codebuild'
+        enum_spec = ('list_source_credentials', 'sourceCredentialsInfos', None)
+        name = id = 'arn'
+        arn = 'arn'
+        cfn_type = 'AWS::CodeBuild::SourceCredential'
 
 
 @CodeBuildProject.filter_registry.register('subnet')
@@ -349,14 +360,13 @@ class CodeDeployDeployment(QueryResourceManager):
         cfn_type = None
         arn_type = "deploymentgroup"
         date = 'createTime'
+        permissions_augment = ("codedeploy:ListTagsForResource",)
 
 
 class DescribeDeploymentGroup(query.ChildDescribeSource):
 
     def get_query(self):
-        query = super().get_query()
-        query.capture_parent_id = True
-        return query
+        return super().get_query(capture_parent_id=True)
 
     def augment(self, resources):
         client = local_session(self.manager.session_factory).client('codedeploy')

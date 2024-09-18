@@ -13,8 +13,8 @@ implementation.
 
 ## Message Relay
 
-Custodian Mailer subscribes to an SQS queue, looks up users, and sends email
-via SES and/or send notification to DataDog. Custodian lambda and instance policies can send to it. SQS queues
+Custodian Mailer subscribes to an SQS queue, looks up users, and sends emails
+via SES, Slack messages, and/or notifications to DataDog or Splunk. Custodian Lambda and instance policies can send messages to the SQS queue. SQS queues
 should be cross-account enabled for sending between accounts.
 
 
@@ -23,7 +23,7 @@ should be cross-account enabled for sending between accounts.
 Our goal in starting out with the Custodian mailer is to install the mailer,
 and run a policy that triggers an email to your inbox.
 
-1. [Install](#Developer Install (OS X El Capitan) the mailer on your laptop (if you are not running as a [Docker container](https://hub.docker.com/r/cloudcustodian/mailer)
+1. [Install](#developer-install-os-x-el-capitan) the mailer on your laptop (if you are not running as a [Docker container](https://hub.docker.com/r/cloudcustodian/mailer)
    - or use `pip install c7n-mailer`
 2. In your text editor, create a `mailer.yml` file to hold your mailer config.
 3. In the AWS console, create a new standard SQS queue (quick create is fine).
@@ -86,7 +86,7 @@ c7n integration with AWS CloudWatch and use the
 to collect CloudWatch metrics. The mailer/messenger integration is only
 for the case you don't want or you can't use AWS CloudWatch, e.g. in Azure or GCP.
 
-Note this integration requires the additional dependency of datadog python bindings:
+Note this integration requires the additional dependency of Datadog Python bindings:
 ```
 pip install datadog
 ```
@@ -102,7 +102,7 @@ datadog_application_key: YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
 
 (Also set `region` if you are in a region other than `us-east-1`.)
 
-Now let's make a Custodian policy to populate your mailer queue. Create a
+Now, let's make a Custodian policy to populate your mailer queue. Create a
 `test-policy.yml`:
 
 ```yaml
@@ -120,13 +120,14 @@ policies:
           queue: https://sqs.us-east-1.amazonaws.com/1234567890/c7n-mailer-test
 ```
 
-There is a special `to` format that specifies datadog delivery, and includes the datadog configuration via url parameters.
-- metric_name: is the name of the metrics send to DataDog
-- metric_value_tag: by default the metric value send to DataDog is `1` but if you want to use one of the tags returned in the policy you can set it with the attribute `metric_value_tag`, for example in the `test-policy.yml` the value used is the size of the EBS volume. The value must be a number and it's transformed to a float value.
+There is a special `to` format that specifies Datadog delivery and it includes the Datadog configuration via URL parameters:
+
+- `metric_name`: is the name of the metrics send to DataDog.
+- `metric_value_tag`: by default the metric value to send to DataDog is `1`, but if you want to use one of the tags returned in the policy, you can set it with the attribute `metric_value_tag`. For example, in the `test-policy.yml` policy, the value used is the size of the EBS volume. The value must be a number and it will be transformed to a float value.
 
 ### Slack:
 
-The Custodian mailer supports Slack messaging as a separate notification mechanism for the SQS transport method. To enable Slack integration, you must specify a Slack token in the `slack_token` field under the `mailer.yml` file.
+The Custodian mailer supports Slack messaging as a separate notification mechanism for the SQS transport method. To enable Slack integration, you must specify a Slack token in the `slack_token` field in your `mailer.yml` file. For example:
 
 ```yaml
 queue_url: https://sqs.us-east-1.amazonaws.com/1234567890/c7n-mailer-test
@@ -158,21 +159,21 @@ policies:
           queue: https://sqs.us-east-1.amazonaws.com/1234567890/c7n-mailer-test
 ```
 
-Slack messages support use of a unique template field specified by `slack_template`. This field is unique and usage will not break
+Slack messages support the use of a unique template field specified in `slack_template`. This field is unique and usage will not break
 existing functionality for messages also specifying an email template in the `template` field. This field is optional, however,
 and if not specified, the mailer will use the default value `slack_default`.
 
 The unique template field `slack_msg_color` can be used to specify a color
-border for the slack message. This accepts the Slack presets of `danger` (red),
-`warning` (yellow) and `good` (green). It can also accept a HTML hex code. See
+border for the Slack message. This accepts the Slack presets of `danger` (red),
+`warning` (yellow) and `good` (green). It can also accept an HTML hex code. See
 the [Slack documentation](https://api.slack.com/reference/messaging/attachments#fields)
 for details.
 
-Note: if you are using a hex color code it will need to be wrapped in quotes
-like so: `slack_msg_color: '#4287f51'`. Otherwise the YAML interpreter will consider it a
+**Note:** if you are using a hex color code, it will need to be wrapped in quotes
+like so: `slack_msg_color: '#4287f51'`. Otherwise, the YAML interpreter will consider it a
 [comment](https://yaml.org/spec/1.2/spec.html#id2780069).
 
-Slack integration for the mailer supports several flavors of messaging, listed below. These are not mutually exclusive and any combination of the types can be used, but the preferred method is [incoming webhooks](https://api.slack.com/incoming-webhooks).
+The Slack integration for c7n-mailer supports several flavors of messaging, listed below. These are not mutually exclusive and any combination of the types can be used, but the preferred method is [incoming webhooks](https://api.slack.com/incoming-webhooks).
 
 | Requires&nbsp;`slack_token` | Key                                                                             | Type   | Notes                                                                                                                                                           |
 |:---------------------------:|:--------------------------------------------------------------------------------|:-------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -183,17 +184,17 @@ Slack integration for the mailer supports several flavors of messaging, listed b
 |             No              | `slack://webhook/#c7n-webhook-test`                                             | string | **(DEPRECATED)** Send to a Slack webhook; appended with the target channel. **IMPORTANT**: *This requires a `slack_webhook` value defined in the `mailer.yml`.* |
 |             Yes             | `slack://tag/resource-tag`                                                      | string | Send to target found in resource tag. Example of value in tag: https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX                    |
 
-Slack delivery can also be set via a resource's tag name. For example, using "slack://tag/slack_channel" will look for a tag name of 'slack_channel', and if matched on a resource will deliver the message to the value of that resource's tag:
+Slack delivery can also be set via a resource's tag name. For example, using `slack://tag/slack_channel` will look for a tag name of `slack_channel`, and if matched on a resource will deliver the message to the value of that resource's tag:
 
 `slack_channel:https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX`
 `slack_channel:custodian-test`
 `owner:foo@bar`
 
-Delivery via tag has been tested with webhooks but should support all delivery methods.
+Delivery via tag has been tested with webhooks, but it should support all delivery methods.
 
 ### Splunk HTTP Event Collector (HEC)
 
-The Custodian mailer supports delivery to the HTTP Event Collector (HEC) endpoint of a Splunk instance as a separate notification mechanism for the SQS transport method. To enable Splunk HEC integration, you must specify the URL to the HEC endpoint as well as a valid username and token:
+The Custodian mailer supports delivery to the HTTP Event Collector (HEC) endpoint of a Splunk instance as a separate notification mechanism for the SES transport method. To enable Splunk HEC integration, you must specify the URL to the HEC endpoint as well as a valid username and token:
 
 ```yaml
 queue_url: https://sqs.us-east-1.amazonaws.com/1234567890/c7n-mailer-test
@@ -250,9 +251,9 @@ Custodian mailer.
 
 ## Usage & Configuration
 
-Once [installed](#Developer Install (OS X El Capitan)) you should have a
+Once [installed](#developer-install-os-x-el-capitan) you should have a
 `c7n-mailer` executable on your path:
-aws
+
 ```
 (env) $ c7n-mailer
 usage: c7n-mailer [-h] -c CONFIG
@@ -260,33 +261,40 @@ c7n-mailer: error: argument -c/--config is required
 (env) $
 ```
 
-Fundamentally what `c7n-mailer` does is deploy a Lambda (using
+Fundamentally, what `c7n-mailer` does is it deploys a Lambda function (using
 [Mu](http://cloudcustodian.io/docs/policy/mu.html)) based on
-configuration you specify in a YAML file.  Here is [the
-schema](https://github.com/cloud-custodian/cloud-custodian/blob/18d4247e913d54f36a078ed61386695362a3b10d/tools/c7n_mailer/c7n_mailer/cli.py#L43) to which the file must conform,
+the configuration you specify in a YAML file.  Here is [the
+schema](https://github.com/cloud-custodian/cloud-custodian/blob/18d4247e913d54f36a078ed61386695362a3b10d/tools/c7n_mailer/c7n_mailer/cli.py#L43) to which the file must conform
 and here is a description of the options:
 
-| Required? | Key             | Type             | Notes                                                             |
-|:---------:|:----------------|:-----------------|:------------------------------------------------------------------|
-| &#x2705;  | `queue_url`     | string           | the queue to listen to for messages                               | 
-|           | `from_address`  | string           | default from address                                              |
-|           | `endpoint_url`  | string           | SQS API URL (for use with VPC Endpoints)                          |
-|           | `contact_tags`  | array of strings | tags that we should look at for address information               |
-|           | `email_base_url`| string           | Base URL to construct a valid email address from a resource owner |
+| Required? | Key                       | Type             | Notes                                                             |
+|:---------:|:--------------------------|:-----------------|:------------------------------------------------------------------|
+| &#x2705;  | `queue_url`               | string           | the queue to listen to for messages                               | 
+|           | `from_address`            | string           | default from address                                              |
+|           | `endpoint_url`            | string           | SQS API URL (for use with VPC Endpoints)                          |
+|           | `contact_tags`            | array of strings | tags that we should look at for address information               |
+|           | `email_base_url`          | string           | Base URL to construct a valid email address from a resource owner |
+|           | `additional_email_headers`| object           | Additional email headers. |
+|           | `org_domain`              | string           | Domain to add to AWS usernames to construct email addresses. |
+
 
 
 ### Standard Lambda Function Config
 
 | Required? | Key                  | Type             |
 |:---------:|:---------------------|:-----------------|
+| &#x2705;  | `role`               | string           |
 |           | `dead_letter_config` | object           |
 |           | `memory`             | integer          |
 |           | `region`             | string           |
-| &#x2705;  | `role`               | string           |
 |           | `runtime`            | string           |
 |           | `security_groups`    | array of strings |
 |           | `subnets`            | array of strings |
 |           | `timeout`            | integer          |
+|           | `lambda_name`        | string           |
+|           | `lambda_description` | string           |
+|           | `lambda_tags`        | object           |
+|           | `lambda_schedule`    | string           |
 
 ### Standard Azure Functions Config
 
@@ -472,7 +480,7 @@ policies:
 
 So breaking it down, you add an action of type `notify`. You can specify a
 template that's used to format the email; customizing templates is described
-[below](#Writing an email template).
+[below](#writing-an-email-template).
 
 The `to` list specifies the intended recipient for the email. You can specify
 either an email address, an SNS topic, a Datadog Metric, or a special value. The special values

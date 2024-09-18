@@ -1,0 +1,135 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.DataLakeAnalytics/accounts?api-version=2016-11-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json"
+                    ],
+                    "date": [
+                        "Sun, 17 Oct 2021 11:05:34 GMT"
+                    ],
+                    "content-length": [
+                        "543"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "state": "Active",
+                                    "endpoint": "test2analytics.azuredatalakeanalytics.net",
+                                    "accountId": "d938d8e5-ee05-44e6-ad6a-5c363fd9bb43",
+                                    "creationTime": "2021-10-17T10:22:58.2811228Z",
+                                    "lastModifiedTime": "2021-10-17T10:22:58.2811228Z"
+                                },
+                                "location": "eastus2",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-shell-storage-eastus/providers/Microsoft.DataLakeAnalytics/accounts/test2analytics",
+                                "name": "test2analytics",
+                                "type": "Microsoft.DataLakeAnalytics/accounts"
+                            }
+                        ],
+                        "count": 1
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-shell-storage-eastus/providers/Microsoft.DataLakeAnalytics/accounts/test2analytics/providers/microsoft.insights/diagnosticSettings?api-version=2017-05-01-preview",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Sun, 17 Oct 2021 11:05:38 GMT"
+                    ],
+                    "content-length": [
+                        "1008"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cloud-shell-storage-eastus/providers/microsoft.datalakeanalytics/accounts/test2analytics/providers/microsoft.insights/diagnosticSettings/test3diagnosticsettings",
+                                "type": "Microsoft.Insights/diagnosticSettings",
+                                "name": "test3diagnosticsettings",
+                                "location": null,
+                                "kind": null,
+                                "tags": null,
+                                "properties": {
+                                    "storageAccountId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/Test12-rg/providers/Microsoft.Storage/storageAccounts/test3storageaccount",
+                                    "serviceBusRuleId": null,
+                                    "workspaceId": null,
+                                    "eventHubAuthorizationRuleId": null,
+                                    "eventHubName": null,
+                                    "metrics": [
+                                        {
+                                            "category": "AllMetrics",
+                                            "enabled": false,
+                                            "retentionPolicy": {
+                                                "enabled": false,
+                                                "days": 0
+                                            }
+                                        }
+                                    ],
+                                    "logs": [
+                                        {
+                                            "category": "Audit",
+                                            "categoryGroup": null,
+                                            "enabled": true,
+                                            "retentionPolicy": {
+                                                "enabled": true,
+                                                "days": 5
+                                            }
+                                        },
+                                        {
+                                            "category": "Requests",
+                                            "categoryGroup": null,
+                                            "enabled": true,
+                                            "retentionPolicy": {
+                                                "enabled": true,
+                                                "days": 10
+                                            }
+                                        }
+                                    ],
+                                    "logAnalyticsDestinationType": null
+                                },
+                                "identity": null
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

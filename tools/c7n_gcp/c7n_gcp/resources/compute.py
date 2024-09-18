@@ -180,7 +180,6 @@ class Delete(InstanceAction):
     method_spec = {'op': 'delete'}
 
 
-
 @Instance.action_registry.register('detach-disks')
 class DetachDisks(MethodAction):
     """

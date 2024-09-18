@@ -1,0 +1,12 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "tags": [
+            {
+                "key": "foo",
+                "value": "bar"
+            }
+        ]
+    }
+}

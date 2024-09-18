@@ -1,0 +1,74 @@
+{
+    "status_code": 200,
+    "data": {
+        "Subnets": [
+            {
+                "AvailabilityZone": "us-east-1a",
+                "AvailabilityZoneId": "use1-az4",
+                "AvailableIpAddressCount": 249,
+                "CidrBlock": "10.0.0.0/24",
+                "DefaultForAz": false,
+                "MapPublicIpOnLaunch": true,
+                "MapCustomerOwnedIpOnLaunch": false,
+                "State": "available",
+                "SubnetId": "subnet-0707ce1b2a6305995",
+                "VpcId": "vpc-0d4f819d13b730139",
+                "OwnerId": "644160558196",
+                "AssignIpv6AddressOnCreation": false,
+                "Ipv6CidrBlockAssociationSet": [],
+                "Tags": [
+                    {
+                        "Key": "ASV",
+                        "Value": "Policy"
+                    },
+                    {
+                        "Key": "Name",
+                        "Value": "PublicSubnetA"
+                    }
+                ],
+                "SubnetArn": "arn:aws:ec2:us-east-1:644160558196:subnet/subnet-0707ce1b2a6305995",
+                "EnableDns64": false,
+                "Ipv6Native": false,
+                "PrivateDnsNameOptionsOnLaunch": {
+                    "HostnameType": "ip-name",
+                    "EnableResourceNameDnsARecord": false,
+                    "EnableResourceNameDnsAAAARecord": false
+                }
+            },
+            {
+                "AvailabilityZone": "us-east-1a",
+                "AvailabilityZoneId": "use1-az4",
+                "AvailableIpAddressCount": 4090,
+                "CidrBlock": "10.0.16.0/20",
+                "DefaultForAz": false,
+                "MapPublicIpOnLaunch": false,
+                "MapCustomerOwnedIpOnLaunch": false,
+                "State": "available",
+                "SubnetId": "subnet-0bd18cd4df2d0d3b9",
+                "VpcId": "vpc-0d4f819d13b730139",
+                "OwnerId": "644160558196",
+                "AssignIpv6AddressOnCreation": false,
+                "Ipv6CidrBlockAssociationSet": [],
+                "Tags": [
+                    {
+                        "Key": "ASV",
+                        "Value": "Policy"
+                    },
+                    {
+                        "Key": "Name",
+                        "Value": "PrivateSubnetA"
+                    }
+                ],
+                "SubnetArn": "arn:aws:ec2:us-east-1:644160558196:subnet/subnet-0bd18cd4df2d0d3b9",
+                "EnableDns64": false,
+                "Ipv6Native": false,
+                "PrivateDnsNameOptionsOnLaunch": {
+                    "HostnameType": "ip-name",
+                    "EnableResourceNameDnsARecord": false,
+                    "EnableResourceNameDnsAAAARecord": false
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

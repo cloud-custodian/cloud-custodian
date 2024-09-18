@@ -21,6 +21,20 @@ more than 50% of the limit and raise the limit for 25%.
 Noted that the ``threshold`` in ``service-limit`` filter is an optional field. If
 not mentioned on the policy, the default value is 80.
 
+As there are numerous services available in AWS, you have the option to specify
+the services you wish to include or exclude, thereby preventing prolonged execution times
+and unnecessary API calls. Please utilize either of the attributes:
+"include_service_codes" or "exclude_service_codes". This special filter only works for
+`aws.service-quota`. An example is provided below.
+
+.. code-block:: yaml
+
+   policies:
+     - name: service-quota-usage
+       resource: aws.service-quota
+       query:
+         - include_service_codes:
+             - ec2
 
 Global Services
   Services like IAM are not region-based. Custodian will put the limit 

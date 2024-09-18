@@ -8,7 +8,8 @@ import os
 
 from botocore.paginate import Paginator
 
-from c7n.query import QueryResourceManager, ChildResourceManager, TypeInfo, RetryPageIterator
+from c7n.query import (
+    QueryResourceManager, ChildResourceManager, TypeInfo, RetryPageIterator)
 from c7n.manager import resources
 from c7n.utils import chunks, get_retry, generate_arn, local_session, type_schema
 from c7n.actions import BaseAction
@@ -71,6 +72,16 @@ def _describe_route53_tags(
         return list(w.map(process_tags, chunks(resources, 20)))
 
 
+def generate_rrset(recordset):
+    keys = (
+        'Name', 'Type', 'TTL', 'SetIdentifier', 'Region', 'AliasTarget', 'ResourceRecords')
+    rrset_payload = dict()
+    for key in keys:
+        if key in recordset:
+            rrset_payload.update({key: recordset[key]})
+    return rrset_payload
+
+
 @resources.register('hostedzone')
 class HostedZone(Route53Base, QueryResourceManager):
 
@@ -86,6 +97,7 @@ class HostedZone(Route53Base, QueryResourceManager):
         # Denotes this resource type exists across regions
         global_resource = True
         cfn_type = 'AWS::Route53::HostedZone'
+        permissions_augment = ("route53:ListTagsForResource",)
 
     def get_arns(self, resource_set):
         arns = []
@@ -118,6 +130,7 @@ class HealthCheck(Route53Base, QueryResourceManager):
         universal_taggable = True
         cfn_type = 'AWS::Route53::HealthCheck'
         global_resource = True
+        permissions_augment = ("route53:ListTagsForResource",)
 
 
 @resources.register('rrset')
@@ -141,7 +154,7 @@ class Route53Domain(QueryResourceManager):
         arn_type = 'r53domain'
         enum_spec = ('list_domains', 'Domains', None)
         name = id = 'DomainName'
-        global_resource = True
+        global_resource = False
 
     permissions = ('route53domains:ListTagsForDomain',)
 
@@ -208,6 +221,58 @@ class Route53DomainRemoveTag(RemoveTag):
                 TagsToDelete=keys)
 
 
+@ResourceRecordSet.action_registry.register('delete')
+class ResourceRecordSetRemove(BaseAction):
+    """Action to delete resource records from Route 53 hosted zones.
+
+    It is recommended to use a filter to avoid unwanted deletion
+    of R53 records from all hosted zones.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: route53-remove-filtered-records
+                resource: aws.rrset
+                filters:
+                  - type: value
+                    key: AliasTarget.DNSName
+                    value: "email.gc.example.com."
+                actions:
+                  - type: delete
+
+    """
+    schema = type_schema('delete',)
+    permissions = ('route53:ChangeResourceRecordSets',)
+
+    def process(self, recordsets):
+        client = local_session(self.manager.session_factory).client('route53')
+        try:
+            for rrset in recordsets:
+
+                # Exempt the two zone associated mandatory records
+                if rrset['Type'] in ('NS', 'SOA'):
+                    continue
+
+                rrsetdata = generate_rrset(rrset)
+                self.manager.retry(
+                    client.change_resource_record_sets,
+                    HostedZoneId=rrset['c7n:parent-id'],
+                    ChangeBatch={
+                        'Changes': [
+                            {
+                                'Action': 'DELETE',
+                                'ResourceRecordSet': rrsetdata,
+                            }
+                        ]
+                    },
+                    ignore_err_codes=('InvalidChangeBatch'))
+        except Exception as e:
+            self.log.warning(
+                "ResourceRecordSet delete error: %s", e)
+
+
 @HostedZone.action_registry.register('delete')
 class Delete(BaseAction):
     """Action to delete Route 53 hosted zones.
@@ -234,6 +299,8 @@ class Delete(BaseAction):
 
     schema = type_schema('delete', force={'type': 'boolean'})
     permissions = ('route53:DeleteHostedZone',)
+    keys = (
+        'Name', 'Type', 'TTL', 'SetIdentifier', 'Region', 'AliasTarget', 'ResourceRecords')
 
     def process(self, hosted_zones):
         client = local_session(self.manager.session_factory).client('route53')
@@ -267,6 +334,7 @@ class Delete(BaseAction):
             # Exempt the two zone associated mandatory records
             if rrset['Name'] == hz['Name'] and rrset['Type'] in ('NS', 'SOA'):
                 continue
+            rrsetdata = generate_rrset(rrset)
             self.manager.retry(
                 client.change_resource_record_sets,
                 HostedZoneId=hz['Id'],
@@ -274,12 +342,7 @@ class Delete(BaseAction):
                     'Changes': [
                         {
                             'Action': 'DELETE',
-                            'ResourceRecordSet': {
-                                'Name': rrset['Name'],
-                                'Type': rrset['Type'],
-                                'TTL': rrset['TTL'],
-                                'ResourceRecords': rrset['ResourceRecords']
-                            },
+                            'ResourceRecordSet': rrsetdata,
                         }
                     ]
                 },
@@ -497,7 +560,7 @@ class IsQueryLoggingEnabled(Filter):
             logging = zid in enabled_zones
             if logging and state:
                 r['c7n:log-config'] = enabled_zones[zid]
-                log_group_name = r['c7n:log-config']['CloudWatchLogsLogGroupArn'].split(":")[-1]
+                log_group_name = r['c7n:log-config']['CloudWatchLogsLogGroupArn'].split(":")[6]
                 response = cw_client.describe_subscription_filters(logGroupName=log_group_name)
                 r['c7n:log-config']['loggroup_subscription'] = response['subscriptionFilters']
                 results.append(r)
@@ -769,7 +832,6 @@ class ReadinessCheckCrossAccount(CrossAccountAccessFilter):
         return results
 
 
-
 class DescribeCluster(query.DescribeSource):
     def augment(self, clusters):
         for r in clusters:
@@ -799,7 +861,6 @@ class RecoveryCluster(QueryResourceManager):
     def get_client(self):
         return local_session(self.session_factory) \
             .client('route53-recovery-control-config', region_name=ARC_REGION)
-
 
 
 @RecoveryCluster.action_registry.register('tag')

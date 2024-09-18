@@ -7,7 +7,7 @@ import time
 import click
 import requests
 from c7n_azure.policy import AzureFunctionMode
-from distutils.util import strtobool
+from c7n.vendored.distutils.util import strtobool
 from enum import Enum
 
 from c7n.config import Config

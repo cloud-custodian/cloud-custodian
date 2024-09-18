@@ -281,7 +281,8 @@ def filter_accounts(accounts_config, tags, accounts, not_accounts=None):
     accounts = comma_expand(accounts)
     not_accounts = comma_expand(not_accounts)
     for a in accounts_config.get('accounts', ()):
-        account_id = a.get('account_id') or a.get('project_id') or a.get('subscription_id') or ''
+        # NOTE only "account_id" would be available since the account conf has been normalized
+        account_id = a.get('account_id') or ''
         if not_accounts and (a['name'] in not_accounts or account_id in not_accounts):
             continue
         if accounts and a['name'] not in accounts and account_id not in accounts:
@@ -360,6 +361,7 @@ def report_account(account, region, policies_config, output_path, cache_path, de
             r['policy'] = p.name
             r['region'] = p.options.region
             r['account'] = account['name']
+            r['account_id'] = account.get('account_id', '')
             for t in account.get('tags', ()):
                 if ':' in t:
                     k, v = t.split(':', 1)
@@ -516,7 +518,7 @@ def run_account_script(account, region, output_dir, debug, script_args):
 def run_script(config, output_dir, accounts, tags, region, echo, serial, script_args):
     """run an aws/azure/gcp script across accounts"""
     # TODO count up on success / error / error list by account
-    accounts_config, custodian_config, executor = init(
+    accounts_config, _, executor = init(
         config, None, serial, True, accounts, tags, (), ())
     if echo:
         print("command to run: `%s`" % (" ".join(script_args)))
@@ -563,6 +565,8 @@ def run_script(config, output_dir, accounts, tags, region, echo, serial, script_
 
 
 def accounts_iterator(config):
+    # NOTE Normalize the account configuration for multi-cloud environments,
+    # ensuring that attributes such as "account_id" are readily available.
     org_vars = config.get("vars", {})
     for a in config.get('accounts', ()):
         if 'role' in a:
@@ -798,3 +802,7 @@ def run(config, use, output_dir, accounts, not_accounts, tags, region,
 
     if not success:
         sys.exit(1)
+
+
+if __name__ == "__main__":
+    cli()

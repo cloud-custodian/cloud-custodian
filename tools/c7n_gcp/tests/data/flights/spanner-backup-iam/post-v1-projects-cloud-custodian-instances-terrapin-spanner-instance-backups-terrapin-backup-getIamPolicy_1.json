@@ -1,0 +1,29 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Fri, 15 Sep 2023 14:29:13 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "server-timing": "gfet4t7; dur=446",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "214",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "version": 1,
+    "etag": "BwYFZp2qChg=",
+    "bindings": [
+      {
+        "role": "roles/editor",
+        "members": [
+          "serviceAccount:terrapin-sa@cloud-custodian.iam.gserviceaccount.com"
+        ]
+      }
+    ]
+  }
+}

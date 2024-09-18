@@ -12,7 +12,7 @@ jobs:
       contents: read
       checks: write    
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -24,7 +24,7 @@ jobs:
       - name: Build Wheels
         shell: bash
         run: |
-          poetry self add poetry-plugin-freeze
+          poetry self add poetry-plugin-freeze==1.0.5
           pip install twine
           make pkg-build-wheel
 
@@ -35,7 +35,7 @@ jobs:
              --path . --since last --skip-provider awscc
           cat release.md
 
-      - uses: aws-actions/configure-aws-credentials@v2
+      - uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_FTEST_ROLE }}
           aws-region: us-east-1
@@ -61,7 +61,7 @@ jobs:
           python tools/dev/poetrypkg.py gen-qa-requires -r . --output wheels-manifest.txt
           make pkg-publish-wheel PKG_REPO=${{ env.PKG_REPO }}
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: built-wheels
           path: |
@@ -77,21 +77,20 @@ jobs:
       contents: read
       checks: write    
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: built-wheels
 
-      - uses: aws-actions/configure-aws-credentials@v2
+      - uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_FTEST_ROLE }}
           aws-region: us-east-1
-
 
       - name: Auth Staging Repository
         shell: bash
@@ -119,13 +118,13 @@ jobs:
     runs-on: ubuntu-latest
     needs: TestWheels
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Install Custodian
         uses: ./.github/composites/install
         with:
           python-version: "3.11"          
 
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: built-wheels
 

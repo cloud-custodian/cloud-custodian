@@ -4,6 +4,8 @@
 from gcp_common import BaseTest, event_data
 import time
 
+from pytest_terraform import terraform
+
 
 class SpannerInstanceTest(BaseTest):
 
@@ -400,3 +402,43 @@ class TestSpannerInstanceBackup(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['name'],
                          'projects/cloud-custodian/instances/spanner-instance-0/backups/backup-1')
+
+    def test_spanner_instance_backup_filter_iam_query(self):
+        factory = self.replay_flight_data(
+            'spanner-instance-backup-filter-iam', project_id='cloud-custodian')
+        p = self.load_policy({
+            'name': 'spanner-instance-backup-filter-iam',
+            'resource': 'gcp.spanner-backup',
+            'filters': [{
+                'type': 'iam-policy',
+                'doc': {
+                    'key': "bindings[?(role=='roles/editor' || role=='roles/owner')]",
+                    'op': 'ne',
+                    'value': []
+                }
+            }]
+        }, session_factory=factory)
+        resources = p.run()
+
+        self.assertEqual(1, len(resources))
+
+
+@terraform('spanner_backup')
+def test_spanner_backup_iam(test):
+    session_factory = test.replay_flight_data('spanner-backup-iam')
+    policy = test.load_policy({
+        'name': 'spanner-backup-iam',
+        'resource': 'gcp.spanner-backup',
+        'filters': [{
+            'type': 'iam-policy',
+            'doc': {
+                'key': 'bindings[*].role',
+                'op': 'intersect',
+                'value': ['roles/editor', 'roles/owner']
+            }
+        }]
+    }, session_factory=session_factory)
+
+    resources = policy.run()
+    assert len(resources) == 1
+    assert resources[0]['c7n:iamPolicy']['bindings'][0]['role'] == 'roles/editor'

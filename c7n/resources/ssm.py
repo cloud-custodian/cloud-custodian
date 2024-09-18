@@ -7,7 +7,7 @@ import operator
 from concurrent.futures import as_completed
 from c7n.actions import Action
 from c7n.exceptions import PolicyValidationError
-from c7n.filters import Filter, CrossAccountAccessFilter
+from c7n.filters import Filter, CrossAccountAccessFilter, ValueFilter
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.manager import resources
@@ -613,8 +613,49 @@ class SSMDocument(QueryResourceManager):
         name = id = 'Name'
         date = 'RegistrationDate'
         arn_type = 'document'
+        cfn_type = config_type = "AWS::SSM::Document"
+        universal_taggable = object()
 
     permissions = ('ssm:ListDocuments',)
+
+
+@SSMDocument.filter_registry.register('content')
+class ContentFilter(ValueFilter):
+    """
+    Applies value type filter on the content of an SSM Document.
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: document-content
+                resource: ssm-document
+                filters:
+                  - type: content
+                    key: cloudWatchEncryptionEnabled
+                    op: eq
+                    value: false
+    """
+
+    schema = type_schema('content', rinherit=ValueFilter.schema)
+    schema_alias = False
+    permissions = ('ssm:GetDocument',)
+    policy_annotation = 'c7n:MatchedContent'
+    content_annotation = "c7n:Content"
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('ssm')
+        results = []
+        for r in resources:
+            if self.content_annotation not in r:
+                doc = self.manager.retry(client.get_document, Name=r['Name'])
+                doc['Content'] = json.loads(doc['Content'])
+                doc.pop('ResponseMetadata', None)
+                r[self.content_annotation] = doc
+            if self.match(doc['Content']):
+                r[self.policy_annotation] = self.data.get('value')
+                results.append(r)
+        return results
 
 
 @SSMDocument.filter_registry.register('cross-account')
@@ -832,7 +873,6 @@ class DeleteDataSync(Action):
                 continue
 
 
-
 @resources.register("ssm-patch-group")
 class SsmPatchGroup(QueryResourceManager):
     class resource_type(TypeInfo):
@@ -865,6 +905,7 @@ class SSMSessionManager(QueryResourceManager):
             # Default to Active if not given
             query['State'] = 'Active'
         return super(SSMSessionManager, self).resources(query=query)
+
 
 @SSMSessionManager.action_registry.register('terminate')
 class TerminateSession(Action):

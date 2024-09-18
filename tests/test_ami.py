@@ -397,7 +397,7 @@ class TestAMI(BaseTest):
             {
                 "name": "test-cancel-launch-permissions",
                 "resource": "ami",
-                "actions": [{"type": "cancel-launch-permission",}]},
+                "actions": [{"type": "cancel-launch-permission", }]},
                 session_factory=factory
         )
         resources = p.run()

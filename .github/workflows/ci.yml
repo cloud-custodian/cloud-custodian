@@ -17,8 +17,8 @@ jobs:
   Lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: ${{ env.DEFAULT_PY_VERSION }}
       - name: Install Linter
@@ -27,14 +27,14 @@ jobs:
           BLACK_VERSION="$(python tools/dev/lint_version.py black poetry.lock)"
           pip install ruff=="$RUFF_VERSION" black=="$BLACK_VERSION"
       - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v2
+        uses: hashicorp/setup-terraform@v3
         with:
           terraform_wrapper: false
           # last OSS version
           terraform_version: "1.5.5"
       - name: Lint Check
         env:
-          RUFF_FORMAT: github
+          RUFF_OUTPUT_FORMAT: github
         run: |
           make lint
       - name: Check Workflows
@@ -46,8 +46,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: Lint
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: ${{ env.DEFAULT_PY_VERSION }}
       - name: Run Bandit
@@ -66,7 +66,7 @@ jobs:
       id-token: write
       contents: read
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Install Custodian
         uses: ./.github/composites/install
@@ -75,7 +75,7 @@ jobs:
           poetry-version: ${{ env.POETRY_VERSION }}
 
       - name: Set up doc cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         id: sphinx
         with:
           path: |
@@ -85,7 +85,7 @@ jobs:
             docs/source/azure/resources
             docs/source/awscc/resources
             docs/source/tencentcloud/resources
-          key: sphinx-docs-${{ runner.os }}-3.11-v2-${{ hashFiles('**/poetry.lock') }}
+          key: sphinx-docs-${{ runner.os }}-3.11-v3-${{ hashFiles('**/poetry.lock') }}
 
       - name: Build Docs
         shell: bash
@@ -97,7 +97,7 @@ jobs:
         # on its contents, on merges to main we update the cache to prevent
         # staleness.
         if: ${{ github.event_name == 'push' }}
-        uses: actions/cache/save@v3
+        uses: actions/cache/save@v4
         with:
           path: |
             docs/build
@@ -106,7 +106,7 @@ jobs:
             docs/source/azure/resources
             docs/source/awscc/resources
             docs/source/tencentcloud/resources
-          key: sphinx-docs-${{ runner.os }}-3.11-v2-${{ hashFiles('**/poetry.lock') }}
+          key: sphinx-docs-${{ runner.os }}-3.11-v3-${{ hashFiles('**/poetry.lock') }}
 
       - name: Deploy Docs
         if: ${{ github.event_name == 'push' }}
@@ -119,7 +119,7 @@ jobs:
   Docker:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: c7n build and test
         uses: ./.github/composites/docker-build-push
         with:
@@ -136,16 +136,18 @@ jobs:
         python-version: ["3.11"]
         include:
           - os: ubuntu-latest
+            python-version: "3.12"
+          - os: ubuntu-latest
             python-version: "3.10"
           - os: ubuntu-latest
             python-version: "3.9"
           - os: ubuntu-latest
             python-version: "3.8"
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v2
+        uses: hashicorp/setup-terraform@v3
         with:
           terraform_wrapper: false
           # last OSS version
@@ -160,7 +162,7 @@ jobs:
       - name: Test
         shell: bash
         env:
-          COV_RUN: ${{ contains(matrix.python-version, '3.10') && contains(matrix.os, 'ubuntu') }}
+          COV_RUN: ${{ contains(matrix.python-version, '3.11') && contains(matrix.os, 'ubuntu') }}
         run: |
           if [[ "$COV_RUN" == "true" ]]
           then
@@ -171,13 +173,13 @@ jobs:
           fi
 
       - name: Upload Code Coverage
-        uses: codecov/codecov-action@v3
-        if: contains(matrix.python-version, '3.10') && contains(matrix.os, 'ubuntu')
+        uses: codecov/codecov-action@v4
+        if: contains(matrix.python-version, '3.11') && contains(matrix.os, 'ubuntu')
         with:
           files: ./coverage.xml
           name: codecov
 
       - name: License Check
-        if: contains(matrix.python-version, '3.10') && contains(matrix.os, 'ubuntu')
+        if: contains(matrix.python-version, '3.11') && contains(matrix.os, 'ubuntu')
         run: |
           poetry run python tools/dev/license-check.py

@@ -35,6 +35,7 @@ class CognitoIdentityPool(QueryResourceManager):
         arn_type = "identitypool"
         cfn_type = 'AWS::Cognito::IdentityPool'
         universal_taggable = object()
+        permissions_augment = ("cognito-identity:ListTagsForResource",)
 
     source_mapping = {
         'describe': DescribeIdentityPool,
@@ -87,8 +88,9 @@ class CognitoUserPool(QueryResourceManager):
         name = 'Name'
         arn = 'Arn'
         arn_type = "userpool"
-        cfn_type = 'AWS::Cognito::UserPool'
+        config_type = cfn_type = 'AWS::Cognito::UserPool'
         universal_taggable = object()
+        permissions_augment = ("cognito-idp:ListTagsForResource",)
 
     source_mapping = {
         'describe': DescribeUserPool,

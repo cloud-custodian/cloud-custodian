@@ -1,0 +1,149 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/virtualMachines?api-version=2019-07-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 03 Sep 2021 09:44:48 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/HighCostGet3Min;137,Microsoft.Compute/HighCostGet30Min;689"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "2844"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "name": "vm1226",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/1226/providers/Microsoft.Compute/virtualMachines/vm1226",
+                                "type": "Microsoft.Compute/virtualMachines",
+                                "location": "eastus",
+                                "properties": {
+                                    "vmId": "c8c8074a-614f-4d3d-acbd-37f50fda216d",
+                                    "hardwareProfile": {
+                                        "vmSize": "Standard_B1ls"
+                                    },
+                                    "storageProfile": {
+                                        "imageReference": {
+                                            "publisher": "canonical",
+                                            "offer": "0001-com-ubuntu-server-focal",
+                                            "sku": "20_04-lts",
+                                            "version": "latest",
+                                            "exactVersion": "20.04.202108250"
+                                        },
+                                        "osDisk": {
+                                            "osType": "Linux",
+                                            "name": "vm1226_disk1_e7467d8fc2d74eb2ae05d75bbf1f0526",
+                                            "createOption": "FromImage",
+                                            "caching": "ReadWrite",
+                                            "managedDisk": {
+                                                "storageAccountType": "Standard_LRS",
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/1226/providers/Microsoft.Compute/disks/vm1226_disk1_e7467d8fc2d74eb2ae05d75bbf1f0526"
+                                            },
+                                            "diskSizeGB": 30
+                                        },
+                                        "dataDisks": []
+                                    },
+                                    "osProfile": {
+                                        "computerName": "vm1226",
+                                        "adminUsername": "azureuser",
+                                        "linuxConfiguration": {
+                                            "disablePasswordAuthentication": true,
+                                            "ssh": {
+                                                "publicKeys": [
+                                                    {
+                                                        "path": "/home/azureuser/.ssh/authorized_keys",
+                                                        "keyData": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDwPVynUNpBp2t4GO5WOmzbU9wx\r\nIG/GUkI+4dr5BQCuQkKWqiWC1FysYP3xdwuUgdIzjGKRqnORrqUMD6+DYuL2n6vl\r\nkBf5ehG6/9gzS9mystMielI58x/8Jwf7Xb74qfMyIyr5VBxGKuv4BAHrXaGoIon/\r\nber0pn0PJwEc1W4MhE7i1gv2sIfIW+V2vsE3kYMF0cPUFdZBFbZkWm0z5+T5QxMJ\r\nZaklQBsUBl94IUYjbXDqMidBVusg2M13DIMg1KySyMhHD2ZkqNI/bLUKgCexSRkc\r\nLdwnN1vtxAojuJPliQACDL8Ht8hFCYOhwxeVERE/ycp5FDJpayEt5G3ziondIOAh\r\nkWo80dCoLbScgfjZhysnVitTzuSQ/RzhZXGdQ8s+USevvfF0C3ihbPD6/m34GiNM\r\nglKz6LiQdTKP+j3ZwWhIQy3gF9dysVYSY1FZ/7z2JN3iIagLoKMixyLVuobFez+h\r\nE+HLpPIENkr6L8sjOF9tadnUSGtiGkBeQqpYkdk= generated-by-azure\r\n"
+                                                    }
+                                                ]
+                                            },
+                                            "provisionVMAgent": true
+                                        },
+                                        "secrets": [],
+                                        "allowExtensionOperations": true,
+                                        "requireGuestProvisionSignal": true
+                                    },
+                                    "networkProfile": {
+                                        "networkInterfaces": [
+                                            {
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/1226/providers/Microsoft.Network/networkInterfaces/vm1226408"
+                                            }
+                                        ]
+                                    },
+                                    "diagnosticsProfile": {
+                                        "bootDiagnostics": {
+                                            "enabled": true
+                                        }
+                                    },
+                                    "provisioningState": "Succeeded"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "POST",
+                "uri": "https://management.azure.com/Subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.RecoveryServices/locations/eastus/backupStatus?api-version=2017-07-01",
+                "body": "mock_body",
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-ratelimit-remaining-subscription-writes": [
+                        "1199"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 03 Sep 2021 09:44:50 GMT"
+                    ],
+                    "content-type": [
+                        "application/json"
+                    ],
+                    "content-length": [
+                        "369"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "protectionStatus": "Protected",
+                        "vaultId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/1226/providers/Microsoft.RecoveryServices/vaults/vault935",
+                        "fabricName": "Azure",
+                        "containerName": "iaasvmcontainer;iaasvmcontainerv2;1226;vm1226",
+                        "protectedItemName": "vm;iaasvmcontainerv2;1226;vm1226",
+                        "policyName": "DailyPolicy-kt452rnm",
+                        "protectedItemsCount": 0
+                    }
+                }
+            }
+        }
+    ]
+}

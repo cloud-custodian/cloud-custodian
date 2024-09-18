@@ -1,0 +1,162 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.ApiManagement/service?api-version=2021-08-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Wed, 31 Aug 2022 10:52:07 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "2536"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/VV/providers/Microsoft.ApiManagement/service/vvapimgmt1",
+                                "name": "vvapimgmt1",
+                                "type": "Microsoft.ApiManagement/service",
+                                "tags": {},
+                                "location": "East US",
+                                "etag": "AAAAAABz4DA=",
+                                "properties": {
+                                    "publisherEmail": "admin@example.com",
+                                    "publisherName": "example.com",
+                                    "notificationSenderEmail": "apimgmt-noreply@mail.windowsazure.com",
+                                    "provisioningState": "Succeeded",
+                                    "targetProvisioningState": "",
+                                    "createdAtUtc": "2022-08-31T08:13:43.0623636Z",
+                                    "gatewayUrl": "https://vvapimgmt1.azure-api.net",
+                                    "gatewayRegionalUrl": "https://vvapimgmt1-eastus-01.regional.azure-api.net",
+                                    "portalUrl": "https://vvapimgmt1.portal.azure-api.net",
+                                    "developerPortalUrl": "https://vvapimgmt1.developer.azure-api.net",
+                                    "managementApiUrl": "https://vvapimgmt1.management.azure-api.net",
+                                    "scmUrl": "https://vvapimgmt1.scm.azure-api.net",
+                                    "hostnameConfigurations": [
+                                        {
+                                            "type": "Proxy",
+                                            "hostName": "vvapimgmt1.azure-api.net",
+                                            "encodedCertificate": null,
+                                            "keyVaultId": null,
+                                            "certificatePassword": null,
+                                            "negotiateClientCertificate": false,
+                                            "certificate": null,
+                                            "defaultSslBinding": true,
+                                            "identityClientId": null,
+                                            "certificateSource": "BuiltIn",
+                                            "certificateStatus": null
+                                        }
+                                    ],
+                                    "publicIPAddresses": [
+                                        "20.242.244.4"
+                                    ],
+                                    "privateIPAddresses": null,
+                                    "additionalLocations": null,
+                                    "virtualNetworkConfiguration": null,
+                                    "customProperties": {
+                                        "Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Protocols.Tls11": "false",
+                                        "Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Protocols.Tls10": "false",
+                                        "Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Backend.Protocols.Tls11": "false",
+                                        "Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Backend.Protocols.Tls10": "false",
+                                        "Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Backend.Protocols.Ssl30": "false",
+                                        "Microsoft.WindowsAzure.ApiManagement.Gateway.Protocols.Server.Http2": "false",
+                                        "Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Ciphers.TripleDes168": "false",
+                                        "Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Protocols.Ssl30": "false"
+                                    },
+                                    "virtualNetworkType": "None",
+                                    "certificates": null,
+                                    "disableGateway": false,
+                                    "apiVersionConstraint": {
+                                        "minApiVersion": null
+                                    },
+                                    "publicIpAddressId": null,
+                                    "publicNetworkAccess": "Enabled",
+                                    "privateEndpointConnections": null,
+                                    "platformVersion": "stv2"
+                                },
+                                "sku": {
+                                    "name": "Developer",
+                                    "capacity": 1
+                                },
+                                "identity": null,
+                                "zones": null,
+                                "systemData": {
+                                    "createdBy": "Volodymyr_Vrydnyk@epam.com",
+                                    "createdByType": "User",
+                                    "createdAt": "2022-08-31T08:13:42.965079Z",
+                                    "lastModifiedBy": "Volodymyr_Vrydnyk@epam.com",
+                                    "lastModifiedByType": "User",
+                                    "lastModifiedAt": "2022-08-31T08:13:42.965079Z"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/VV/providers/Microsoft.ApiManagement/service/vvapimgmt1/certificates?api-version=2021-08-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Wed, 31 Aug 2022 10:52:08 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "546"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/VV/providers/Microsoft.ApiManagement/service/vvapimgmt1/certificates/test",
+                                "type": "Microsoft.ApiManagement/service/certificates",
+                                "name": "test",
+                                "properties": {
+                                    "subject": "O=Internet Widgits Pty Ltd, S=Some-State, C=AU",
+                                    "thumbprint": "35ADD62C80093F0062B9CD9C859A6883070B6634",
+                                    "expirationDate": "2023-08-22T14:32:02Z",
+                                    "hasPrivateKey": true
+                                }
+                            }
+                        ],
+                        "count": 1
+                    }
+                }
+            }
+        }
+    ]
+}

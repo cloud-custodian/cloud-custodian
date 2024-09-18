@@ -13,9 +13,9 @@ class AppStreamFleet(query.QueryResourceManager):
         arn = "Arn"
         id = "Name"
         name = "Name"
-        cfn_type = "AWS::AppStream::Fleet"
+        config_type = cfn_type = "AWS::AppStream::Fleet"
         universal_taggable = object()
-
+        permissions_augment = ("appstream:ListTagsForResource",)
     source_mapping = {
         "describe": query.DescribeWithResourceTags,
     }
@@ -30,7 +30,7 @@ class AppStreamStack(query.QueryResourceManager):
         arn = "Arn"
         id = "Name"
         name = "Name"
-        cfn_type = "AWS::AppStream::Stack"
+        config_type = cfn_type = "AWS::AppStream::Stack"
         universal_taggable = object()
 
     source_mapping = {

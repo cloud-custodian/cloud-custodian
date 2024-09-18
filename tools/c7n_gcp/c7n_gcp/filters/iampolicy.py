@@ -147,7 +147,8 @@ class IamPolicyUserRolePairFilter(ValueFilter):
         client = self.get_client(session, model)
 
         for r in resources:
-            iam_policy = client.execute_command('getIamPolicy', {"resource": r["projectId"]})
+            resource_key = 'projectId' if 'projectId' in r else 'name'
+            iam_policy = client.execute_command('getIamPolicy', {"resource": r[resource_key]})
             r["c7n:iamPolicyUserRolePair"] = {}
             userToRolesMap = {}
 

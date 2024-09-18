@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "trailList": [
+            {
+                "Name": "test-cloudtrail",
+                "S3BucketName": "test-bucket",
+                "IncludeGlobalServiceEvents": true,
+                "IsMultiRegionTrail": true,
+                "HomeRegion": "us-east-1",
+                "TrailARN": "arn:aws:cloudtrail:us-east-1:644160558196:trail/test-cloudtrail",
+                "LogFileValidationEnabled": false,
+                "CloudWatchLogsLogGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:test_log_group:*",
+                "CloudWatchLogsRoleArn": "arn:aws:iam::644160558196:role/test_role",
+                "HasCustomEventSelectors": true,
+                "HasInsightSelectors": false,
+                "IsOrganizationTrail": false
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

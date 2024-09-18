@@ -16,5 +16,6 @@ class LexBot(query.QueryResourceManager):
         cfn_type = config_type = "AWS::Lex::Bot"
         universal_taggable = object()
         permission_prefix = "lex"
+        permissions_augment = ("lex:ListTagsForResource",)
 
     source_mapping = {"describe": query.DescribeWithResourceTags, "config": query.ConfigSource}

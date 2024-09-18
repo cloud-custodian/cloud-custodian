@@ -4,6 +4,7 @@
 from c7n_azure.resources.arm import ArmResourceManager
 from c7n_azure.provider import resources
 
+
 @resources.register('front-door-policy')
 class FrontDoorPolicy(ArmResourceManager):
     """Azure Front Door Resource
@@ -31,4 +32,3 @@ class FrontDoorPolicy(ArmResourceManager):
             'resourceGroup'
         )
         resource_type = 'Microsoft.Network/frontDoorWebApplicationFirewallPolicies'
-

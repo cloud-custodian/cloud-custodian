@@ -9,6 +9,7 @@ from c7n_kube.provider import resources
 class Service(QueryResourceManager):
     class resource_type(TypeInfo):
         group = "Core"
+        canonical_group = ""
         version = "V1"
         patch = "patch_namespaced_service"
         delete = "delete_namespaced_service"

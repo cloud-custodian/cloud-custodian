@@ -19,11 +19,11 @@ class GraphQLApi(QueryResourceManager):
         enum_spec = ('list_graphql_apis', 'graphqlApis', {'maxResults': 25})
         id = 'apiId'
         name = 'name'
-        cfn_type = 'AWS::AppSync::GraphQLApi'
+        config_type = cfn_type = 'AWS::AppSync::GraphQLApi'
         arn_type = 'apis'
         arn = 'arn'
         universal_taggable = True
-
+        permissions_augment = ("appsync:ListTagsForResource",)
 
 
 @GraphQLApi.filter_registry.register('wafv2-enabled')

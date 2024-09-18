@@ -1,0 +1,164 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Content-Type: [application/json]
+    method: GET
+    uri: http://keystone:5000/
+  response:
+    body:
+      string: '{"versions": {"values": [{"id": "v3.14", "status": "stable", "updated":
+        "2020-04-07T00:00:00Z", "links": [{"rel": "self", "href": "http://10.0.2.8/identity/v3/"}],
+        "media-types": [{"base": "application/json", "type": "application/vnd.openstack.identity-v3+json"}]}]}}'
+    headers:
+      Content-Type: [application/json]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Content-Type: [application/json]
+    method: POST
+    uri: http://keystone:5000/v3/auth/tokens
+  response:
+    body:
+      string: '{"token": {"methods": ["password"], "user": {"domain": {"id": "default",
+        "name": "Default"}, "id": "aceb39599e174c0f90a758f752d96ee9", "name": "demo_reader",
+        "password_expires_at": null}, "audit_ids": ["vmm91OqeT1WbfmU2H3hDnA"], "expires_at":
+        "2023-11-09T20:35:21.000000Z", "issued_at": "2023-11-09T19:35:21.000000Z",
+        "project": {"domain": {"id": "default", "name": "Default"}, "id": "09c9e0b643a14ad1a0d8dbb712e39cba",
+        "name": "demo"}, "is_domain": false, "roles": [{"id": "515c393aa3a744a1b95d44551923dae5",
+        "name": "reader"}], "catalog": [{"endpoints": [{"id": "dfd065d7be1040cdb34ec81cc965b180",
+        "interface": "public", "region_id": "RegionOne", "url": "http://10.0.2.8/share/v2",
+        "region": "RegionOne"}], "id": "03085335dfa946228a5ca16640da3ea6", "type":
+        "sharev2", "name": "manilav2"}, {"endpoints": [{"id": "50c004b4e61841e5a0623c06d9e48aae",
+        "interface": "admin", "region_id": "RegionOne", "url": "http://10.0.2.8/key-manager",
+        "region": "RegionOne"}, {"id": "aa309cf823114807a1884bcba50b95b1", "interface":
+        "internal", "region_id": "RegionOne", "url": "http://10.0.2.8/key-manager",
+        "region": "RegionOne"}, {"id": "db3803ea0c3d4b51b023c2325cf171cc", "interface":
+        "public", "region_id": "RegionOne", "url": "http://10.0.2.8/key-manager",
+        "region": "RegionOne"}], "id": "063e8f1665344538a714e9042ea2d616", "type":
+        "key-manager", "name": "barbican"}, {"endpoints": [{"id": "53b513ec31944773bcb1c2c2b00225dd",
+        "interface": "public", "region_id": "RegionOne", "url": "http://10.0.2.8/share/v2",
+        "region": "RegionOne"}], "id": "2d804c490dbd4e9aa77317eca1687105", "type":
+        "shared-file-system", "name": "shared-file-system"}, {"endpoints": [{"id":
+        "6d321267b55646e08891557c53a7e21c", "interface": "public", "region_id": "RegionOne",
+        "url": "http://10.0.2.8/share/v2/09c9e0b643a14ad1a0d8dbb712e39cba", "region":
+        "RegionOne"}], "id": "46d6d2a799744225aa156b8f9ba7d8aa", "type": "sharev2_legacy",
+        "name": "manilav2_legacy"}, {"endpoints": [{"id": "26a4bbf2077b4d24b17b2b8c039f141b",
+        "interface": "public", "region_id": "RegionOne", "url": "http://10.0.2.8/placement",
+        "region": "RegionOne"}], "id": "4cf552d6b7fc48e8b63cb2877bfb3337", "type":
+        "placement", "name": "placement"}, {"endpoints": [{"id": "5183b04299b047c38fa7f708159495dd",
+        "interface": "public", "region_id": "RegionOne", "url": "http://10.0.2.8/compute/v2.1",
+        "region": "RegionOne"}], "id": "4f65326baae74e2db72c6b514e9aec36", "type":
+        "compute", "name": "nova"}, {"endpoints": [{"id": "094b1e73b8434f4fb6c42375194ca09e",
+        "interface": "public", "region_id": "RegionOne", "url": "http://10.0.2.8/metric",
+        "region": "RegionOne"}, {"id": "532a74f150fa4ebd8504915a721ad808", "interface":
+        "internal", "region_id": "RegionOne", "url": "http://10.0.2.8/metric", "region":
+        "RegionOne"}, {"id": "63989ad9368d4080aab0f13c2d7f659c", "interface": "admin",
+        "region_id": "RegionOne", "url": "http://10.0.2.8/metric", "region": "RegionOne"}],
+        "id": "672576f69b144552b1fb488ecc38fd8b", "type": "metric", "name": "gnocchi"},
+        {"endpoints": [{"id": "fc9f7375a6de442aaa68c86f80542d7e", "interface": "public",
+        "region_id": "RegionOne", "url": "http://10.0.2.8/compute/v2/09c9e0b643a14ad1a0d8dbb712e39cba",
+        "region": "RegionOne"}], "id": "8a44267c76504bfdab99a764f8677f13", "type":
+        "compute_legacy", "name": "nova_legacy"}, {"endpoints": [{"id": "a8ed2c35720648f780a65cec7a223871",
+        "interface": "public", "region_id": "RegionOne", "url": "http://10.0.2.8/identity",
+        "region": "RegionOne"}], "id": "8c364fe75b5f4fe68badb8c0478724b2", "type":
+        "identity", "name": "keystone"}, {"endpoints": [{"id": "8482df95138d42e382db4aa79cb6602b",
+        "interface": "public", "region_id": "RegionOne", "url": "http://10.0.2.8/image",
+        "region": "RegionOne"}], "id": "9e6af1cd68d840eba3f3d0645306876f", "type":
+        "image", "name": "glance"}, {"endpoints": [{"id": "56abc5c5d0bb4821ac2fbbdaba6702f4",
+        "interface": "public", "region_id": "RegionOne", "url": "http://10.0.2.8:9696/networking",
+        "region": "RegionOne"}], "id": "a5cc9d4c81a0445ba77da478ec15f296", "type":
+        "network", "name": "neutron"}, {"endpoints": [{"id": "55042efcb15b471382c1a10b3d87f217",
+        "interface": "admin", "region_id": "RegionOne", "url": "http://10.0.2.8:8080",
+        "region": "RegionOne"}, {"id": "8abc8abc0f5e449eb813f81c9f04199c", "interface":
+        "public", "region_id": "RegionOne", "url": "http://10.0.2.8:8080/v1/AUTH_09c9e0b643a14ad1a0d8dbb712e39cba",
+        "region": "RegionOne"}], "id": "b4e296264187434d8ef26617c6651b4d", "type":
+        "object-store", "name": "swift"}, {"endpoints": [{"id": "c581d3ddd4704953b21e8088ec3bd385",
+        "interface": "public", "region_id": "RegionOne", "url": "http://10.0.2.8/volume/v3/09c9e0b643a14ad1a0d8dbb712e39cba",
+        "region": "RegionOne"}], "id": "ccb32f09d5ef46b698b423dd2645481d", "type":
+        "volumev3", "name": "cinderv3"}, {"endpoints": [{"id": "cfb1751ffbff4abfadc1ef0353ba8ce8",
+        "interface": "public", "region_id": "RegionOne", "url": "http://10.0.2.8/volume/v3/09c9e0b643a14ad1a0d8dbb712e39cba",
+        "region": "RegionOne"}], "id": "dd1fec52fad846fcb9904580c188da06", "type":
+        "block-storage", "name": "cinder"}, {"endpoints": [{"id": "0d0a7477115447099a39b3afb1c44165",
+        "interface": "public", "region_id": "RegionOne", "url": "http://10.0.2.8/share/v1/09c9e0b643a14ad1a0d8dbb712e39cba",
+        "region": "RegionOne"}], "id": "ee71c84b7b98488ca353d126678a7c72", "type":
+        "share", "name": "manila"}]}}'
+    headers:
+      X-Subject-Token: "test-token"
+      Content-Type: [application/json]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Content-Type: [application/json]
+    method: GET
+    uri: http://10.0.2.8/image
+  response:
+    body:
+      string: '{"versions": [{"id": "v2.16", "status": "CURRENT", "links": [{"rel":
+        "self", "href": "http://10.0.2.8/image/v2/"}]}, {"id": "v2.15", "status":
+        "SUPPORTED", "links": [{"rel": "self", "href": "http://10.0.2.8/image/v2/"}]},
+        {"id": "v2.14", "status": "SUPPORTED", "links": [{"rel": "self", "href": "http://10.0.2.8/image/v2/"}]},
+        {"id": "v2.9", "status": "SUPPORTED", "links": [{"rel": "self", "href": "http://10.0.2.8/image/v2/"}]},
+        {"id": "v2.7", "status": "SUPPORTED", "links": [{"rel": "self", "href": "http://10.0.2.8/image/v2/"}]},
+        {"id": "v2.6", "status": "SUPPORTED", "links": [{"rel": "self", "href": "http://10.0.2.8/image/v2/"}]},
+        {"id": "v2.5", "status": "SUPPORTED", "links": [{"rel": "self", "href": "http://10.0.2.8/image/v2/"}]},
+        {"id": "v2.4", "status": "SUPPORTED", "links": [{"rel": "self", "href": "http://10.0.2.8/image/v2/"}]},
+        {"id": "v2.3", "status": "SUPPORTED", "links": [{"rel": "self", "href": "http://10.0.2.8/image/v2/"}]},
+        {"id": "v2.2", "status": "SUPPORTED", "links": [{"rel": "self", "href": "http://10.0.2.8/image/v2/"}]},
+        {"id": "v2.1", "status": "SUPPORTED", "links": [{"rel": "self", "href": "http://10.0.2.8/image/v2/"}]},
+        {"id": "v2.0", "status": "SUPPORTED", "links": [{"rel": "self", "href": "http://10.0.2.8/image/v2/"}]}]}'
+    headers:
+      Content-Type: [application/json]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Content-Type: [application/json]
+    method: GET
+    uri: http://10.0.2.8/image/v2/images
+  response:
+    body:
+      string: '{"images": [{"img_signature": "ILqdn0lpahys0wk2XjL52j+mceBYp6ISJO/f36WNjV1FkmNTdZridOuWJ3/D9IvQkKVsdEdKkeDW6BzKsBq5Yyg/76fJ2/WLqq8Ug6teMgVKD+gD8Ua+MjrjZW/3ZyWKh0BLldrYjPD6WDbdcFDsvQxxpUT6dXmafvDs7Ulnofk=",
+        "img_signature_certificate_uuid": "b63ed0b8-f39d-48af-9de9-a5a691a472f0",
+        "img_signature_hash_method": "SHA-256", "img_signature_key_type": "RSA-PSS",
+        "name": "mySignedImage", "disk_format": "qcow2", "container_format": "bare",
+        "visibility": "shared", "size": 22, "virtual_size": null, "status": "active",
+        "checksum": "69bcebf29946998555945bfd562df6f0", "protected": false, "min_ram":
+        0, "min_disk": 0, "owner": "09c9e0b643a14ad1a0d8dbb712e39cba", "os_hidden":
+        false, "os_hash_algo": "sha512", "os_hash_value": "756138eda333dfdd93b80d8bae18b447fbab34462db0cc57df732b81e51015961e815e04c09b42da7de16058d0fc34812d6ecc3496bd7519c395202e88705ccc",
+        "id": "1a869eeb-429e-49d5-98ae-b6a02760fb43", "created_at": "2023-11-08T17:28:14Z",
+        "updated_at": "2023-11-08T17:28:15Z", "tags": [], "self": "/v2/images/1a869eeb-429e-49d5-98ae-b6a02760fb43",
+        "file": "/v2/images/1a869eeb-429e-49d5-98ae-b6a02760fb43/file", "schema":
+        "/v2/schemas/image"}, {"hw_rng_model": "virtio", "owner_specified.openstack.md5":
+        "", "owner_specified.openstack.object": "images/manila-service-image-master",
+        "owner_specified.openstack.sha256": "", "name": "manila-service-image-master",
+        "disk_format": "qcow2", "container_format": "bare", "visibility": "public",
+        "size": 837025792, "virtual_size": 3555459072, "status": "active", "checksum":
+        "e18bfc677e90197c6bbf95c24ecf6ae8", "protected": false, "min_ram": 0, "min_disk":
+        0, "owner": "26b4f1211a3b47abb8f0d85a149f1b4c", "os_hidden": false, "os_hash_algo":
+        "sha512", "os_hash_value": "c8a4af7490c9c1ddf1e2929a98adb9e9398b98d78f71a1fd6d01f30564e1b78292ea175088994834cf7635403a96d285ca09d1278eecea3a1fc8d77d5ee6c8a7",
+        "id": "c46ea455-bb13-43f1-8408-1defa073ae70", "created_at": "2023-11-04T21:13:12Z",
+        "updated_at": "2023-11-04T21:13:20Z", "tags": [], "self": "/v2/images/c46ea455-bb13-43f1-8408-1defa073ae70",
+        "file": "/v2/images/c46ea455-bb13-43f1-8408-1defa073ae70/file", "schema":
+        "/v2/schemas/image"}, {"hw_rng_model": "virtio", "owner_specified.openstack.md5":
+        "", "owner_specified.openstack.object": "images/cirros-0.6.2-x86_64-disk",
+        "owner_specified.openstack.sha256": "", "name": "cirros-0.6.2-x86_64-disk",
+        "disk_format": "qcow2", "container_format": "bare", "visibility": "public",
+        "size": 21430272, "virtual_size": 117440512, "status": "active", "checksum":
+        "c8fc807773e5354afe61636071771906", "protected": false, "min_ram": 0, "min_disk":
+        0, "owner": "26b4f1211a3b47abb8f0d85a149f1b4c", "os_hidden": false, "os_hash_algo":
+        "sha512", "os_hash_value": "1103b92ce8ad966e41235a4de260deb791ff571670c0342666c8582fbb9caefe6af07ebb11d34f44f8414b609b29c1bdf1d72ffa6faa39c88e8721d09847952b",
+        "id": "36994730-a707-4ea7-be53-43c29a2f40f4", "created_at": "2023-11-04T21:06:48Z",
+        "updated_at": "2023-11-04T21:06:50Z", "tags": [], "self": "/v2/images/36994730-a707-4ea7-be53-43c29a2f40f4",
+        "file": "/v2/images/36994730-a707-4ea7-be53-43c29a2f40f4/file", "schema":
+        "/v2/schemas/image"}], "first": "/v2/images", "schema": "/v2/schemas/images"}'
+    headers:
+      Content-Type: [application/json]
+    status: {code: 200, message: OK}
+version: 1
