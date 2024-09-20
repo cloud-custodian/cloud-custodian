@@ -318,7 +318,7 @@ class KeyVaultUpdateAccessPolicyAction(AzureBaseAction):
                 resource_group_name=resource['resourceGroup'],
                 vault_name=resource['name'],
                 operation_kind=operation,
-                properties=access_policies
+                parameters=dict(properties=access_policies),
             )
         except Exception as error:
             log.warning(error)
