@@ -587,15 +587,50 @@ class UserSettingsFilter(ValueFilter):
 
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('workspaces-web')
-        results = []
         for r in resources:
             if (self.policy_annotation not in r) and ('userSettingsArn' in r):
                 r[self.policy_annotation] = self.manager.retry(
                     client.get_user_settings,
                     userSettingsArn=r['userSettingsArn']).get(
                         'userSettings', {})
-            results.append(r)
-        return super().process(results, event)
+        return super().process(resources, event)
+
+    def __call__(self, r):
+        return super().__call__(r.get(self.policy_annotation, {}))
+
+
+@WorkspacesWeb.filter_registry.register('user-access-logging')
+class UserAccessLoggingFilter(ValueFilter):
+    """
+    Filters workspaces secured browsers based on their user access logging settings.
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: user-access-logging-match
+                resource: workspaces-web
+                filters:
+                  - type: user-access-logging
+                    key: kinesisStreamArn
+                    value: present
+    """
+
+    schema = type_schema('user-access-logging', rinherit=ValueFilter.schema)
+    schema_alias = False
+    permissions = ('workspaces-web:GetUserAccessLoggingSettings',)
+    policy_annotation = "c7n:UserAccessLogging"
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('workspaces-web')
+        for r in resources:
+            if (self.policy_annotation not in r) and (
+                'userAccessLoggingSettingsArn' in r):
+                r[self.policy_annotation] = self.manager.retry(
+                    client.get_user_access_logging_settings,
+                    userAccessLoggingSettingsArn=r['userAccessLoggingSettingsArn']).get(
+                        'userAccessLoggingSettings', {})
+        return super().process(resources, event)
 
     def __call__(self, r):
         return super().__call__(r.get(self.policy_annotation, {}))
