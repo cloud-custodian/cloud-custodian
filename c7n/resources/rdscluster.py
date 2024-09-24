@@ -659,7 +659,6 @@ class RDSClusterSnapshotRegionCopy(BaseAction):
                     rtags.extend(r['Tags'])
                 self.process_resource(target_client, target_key, rtags, r)
 
-               
 @RDSClusterSnapshot.action_registry.register('delete')
 class RDSClusterSnapshotDelete(BaseAction):
     """Action to delete rds cluster snapshots
