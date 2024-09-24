@@ -35,6 +35,9 @@ rule additions on them!
              - source: ec2.amazonaws.com
                event: RevokeSecurityGroupIngress
                ids: "requestParameters.groupId"
+             - source: ec2.amazonaws.com
+               event: ModifySecurityGroupRules
+               ids: "requestParameters.ModifySecurityGroupRulesRequest.GroupId"
        filters:
          - or:
                - type: ingress
