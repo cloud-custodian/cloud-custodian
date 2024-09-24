@@ -1,0 +1,15 @@
+{
+    "status_code": 200,
+    "data": {
+        "Instances": [
+            {
+                "Id": "instance-id-1",
+                "Attributes": {
+                    "AWS_INSTANCE_CNAME": "ecs.e1.us-east-1.local",
+                    "AWS_INSTANCE_PORT" : 8080
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

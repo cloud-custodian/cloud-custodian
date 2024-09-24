@@ -36,7 +36,8 @@ extensions = [
     'sphinx.ext.viewcode',
     'c7n_sphinxext.docgen',
     'myst_parser',
-    'sphinx_markdown_tables'
+    'sphinx_markdown_tables',
+    'sphinxcontrib.jquery',
 ]
 
 # Extract only a classes docstrings

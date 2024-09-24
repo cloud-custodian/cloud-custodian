@@ -1,0 +1,30 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "portals": [
+            {
+                "authenticationType": "IAM_Identity_Center",
+                "browserSettingsArn": "arn:aws:workspaces-web:us-east-1:644160558196:browserSettings/43c78162-dfe7-4724-ba86-7bf0fda450d5",
+                "browserType": "Chrome",
+                "creationDate": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 7,
+                    "day": 14,
+                    "hour": 21,
+                    "minute": 18,
+                    "second": 3,
+                    "microsecond": 542000
+                },
+                "displayName": "Barbara Custom Portal - Sun, Jul 14, 2024, 21:14:36",
+                "networkSettingsArn": "arn:aws:workspaces-web:us-east-1:644160558196:networkSettings/6efdca32-660f-49d6-8e96-a3c04ac49ba5",
+                "portalArn": "arn:aws:workspaces-web:us-east-1:644160558196:portal/ccef0dcf-2073-4fa9-98e2-60160a7d7976",
+                "portalEndpoint": "ccef0dcf-2073-4fa9-98e2-60160a7d7976.workspaces-web.com",
+                "portalStatus": "Active",
+                "rendererType": "AppStream",
+                "userSettingsArn": "arn:aws:workspaces-web:us-east-1:644160558196:userSettings/45e0804a-bf8b-44e2-b036-17239a3439a1"
+            }
+        ]
+    }
+}

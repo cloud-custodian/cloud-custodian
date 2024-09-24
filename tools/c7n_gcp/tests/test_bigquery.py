@@ -26,6 +26,25 @@ class BigQueryDataSetTest(BaseTest):
             ["gcp:bigquery::cloud-custodian:dataset/devxyz"],
         )
 
+    def test_dataset_delete(self):
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data('bq-dataset-delete', project_id=project_id)
+        p = self.load_policy(
+            {
+                'name': 'bq-dataset-delete',
+                'resource': 'gcp.bq-dataset',
+                'filters': [{'tag:delete_me': 'yes'}],
+                'actions': [
+                    'delete'
+                ]
+            },
+            session_factory=factory
+        )
+        resources = p.run()
+        if self.recording:
+            time.sleep(1)
+        self.assertEqual(len(resources), 1)
+
 
 class BigQueryJobTest(BaseTest):
 

@@ -1,0 +1,39 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Pipelines": [
+            {
+                "Status": "STOPPING",
+                "StatusReason": {
+                    "Description": " "
+                },
+                "PipelineName": "custodian-test",
+                "PipelineArn": "arn:aws:osis:us-east-1:644160558196:pipeline/custodian-test",
+                "MinUnits": 1,
+                "MaxUnits": 2,
+                "CreatedAt": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 8,
+                    "day": 1,
+                    "hour": 15,
+                    "minute": 58,
+                    "second": 5,
+                    "microsecond": 0
+                },
+                "LastUpdatedAt": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 8,
+                    "day": 1,
+                    "hour": 16,
+                    "minute": 17,
+                    "second": 39,
+                    "microsecond": 0
+                },
+                "Tags": []
+            }
+        ]
+    }
+}

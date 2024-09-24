@@ -1,0 +1,95 @@
+{
+    "status_code": 200,
+    "data": {
+        "clusters": [
+            {
+                "clusterArn": "arn:aws:ecs:us-east-1:111111111111:cluster/ecs-green",
+                "clusterName": "ecs-green-1",
+                "configuration": {
+                    "executeCommandConfiguration": {
+                        "kmsKeyId": "arn:aws:kms:us-east-1:111111111111:key/bde45335-a5b7-5bc6f92da2dd",
+                        "logging": "OVERRIDE",
+                        "logConfiguration": {
+                            "cloudWatchLogGroupName": "/aws/ecs/ecs-green",
+                            "cloudWatchEncryptionEnabled": true,
+                            "s3EncryptionEnabled": false
+                        }
+                    }
+                },
+                "status": "ACTIVE",
+                "registeredContainerInstancesCount": 0,
+                "runningTasksCount": 1,
+                "pendingTasksCount": 0,
+                "activeServicesCount": 1,
+                "statistics": [],
+                "tags": [
+                    {
+                        "key": "ComplianceStatus",
+                        "value": "Green"
+                    }
+                ],
+                "settings": [
+                    {
+                        "name": "containerInsights",
+                        "value": "enabled"
+                    }
+                ],
+                "capacityProviders": [],
+                "defaultCapacityProviderStrategy": []
+            },
+            {
+                "clusterArn": "arn:aws:ecs:us-east-1:111111111111:cluster/ecs-red-1",
+                "clusterName": "ecs-red-1",
+                "configuration": {},
+                "status": "ACTIVE",
+                "registeredContainerInstancesCount": 0,
+                "runningTasksCount": 0,
+                "pendingTasksCount": 0,
+                "activeServicesCount": 1,
+                "statistics": [],
+                "tags": [],
+                "settings": [
+                    {
+                        "name": "containerInsights",
+                        "value": "disabled"
+                    }
+                ],
+                "capacityProviders": [],
+                "defaultCapacityProviderStrategy": []
+            },
+            {
+                "clusterArn": "arn:aws:ecs:us-east-1:111111111111:cluster/ecs-red-2",
+                "clusterName": "ecs-red-2",
+                "configuration": {
+                    "executeCommandConfiguration": {
+                        "logging": "OVERRIDE",
+                        "logConfiguration": {
+                            "cloudWatchLogGroupName": "/aws/ecs/ecs-red",
+                            "cloudWatchEncryptionEnabled": false,
+                            "s3BucketName": "bucket-red-59239",
+                            "s3EncryptionEnabled": false
+                        }
+                    }
+                },
+                "status": "ACTIVE",
+                "registeredContainerInstancesCount": 0,
+                "runningTasksCount": 0,
+                "pendingTasksCount": 0,
+                "activeServicesCount": 1,
+                "statistics": [],
+                "tags": [],
+                "settings": [
+                    {
+                        "name": "containerInsights",
+                        "value": "disabled"
+                    }
+                ],
+                "capacityProviders": [],
+                "defaultCapacityProviderStrategy": []
+            }
+
+        ],
+        "failures": [],
+        "ResponseMetadata": {}
+    }
+}

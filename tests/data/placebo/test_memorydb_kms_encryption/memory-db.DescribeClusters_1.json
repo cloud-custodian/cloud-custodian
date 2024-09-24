@@ -1,0 +1,61 @@
+{
+    "status_code": 200,
+    "data": {
+        "Clusters": [
+            {
+                "Name": "test-cluster-2",
+                "Status": "creating",
+                "NumberOfShards": 1,
+                "ClusterEndpoint": {
+                    "Port": 6379
+                },
+                "NodeType": "db.t4g.small",
+                "EngineVersion": "7.1",
+                "EnginePatchVersion": "7.1.0",
+                "ParameterGroupName": "default.memorydb-redis7",
+                "ParameterGroupStatus": "in-sync",
+                "SubnetGroupName": "test-subnet",
+                "TLSEnabled": true,
+                "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/082cd05f-96d1-49f6-a5ac-32093d2cfe38",
+                "ARN": "arn:aws:memorydb:us-east-1:644160558196:cluster/test-cluster-2",
+                "SnapshotRetentionLimit": 1,
+                "MaintenanceWindow": "mon:10:00-mon:11:00",
+                "SnapshotWindow": "07:30-08:30",
+                "ACLName": "open-access",
+                "AutoMinorVersionUpgrade": true,
+                "DataTiering": "false"
+            },
+            {
+                "Name": "test-cluster-custodian",
+                "Description": "Easy created demo cluster on 2024-06-19T02:18:43.782Z",
+                "Status": "available",
+                "NumberOfShards": 1,
+                "ClusterEndpoint": {
+                    "Address": "clustercfg.test-cluster-custodian.qgcgte.memorydb.us-east-1.amazonaws.com",
+                    "Port": 6379
+                },
+                "NodeType": "db.t4g.small",
+                "EngineVersion": "7.1",
+                "EnginePatchVersion": "7.1.0",
+                "ParameterGroupName": "default.memorydb-redis7",
+                "ParameterGroupStatus": "in-sync",
+                "SecurityGroups": [
+                    {
+                        "SecurityGroupId": "sg-03c0b84cdad91744f",
+                        "Status": "active"
+                    }
+                ],
+                "SubnetGroupName": "test-subnet",
+                "TLSEnabled": true,
+                "ARN": "arn:aws:memorydb:us-east-1:644160558196:cluster/test-cluster-custodian",
+                "SnapshotRetentionLimit": 1,
+                "MaintenanceWindow": "sat:03:30-sat:04:30",
+                "SnapshotWindow": "04:30-05:30",
+                "ACLName": "open-access",
+                "AutoMinorVersionUpgrade": true,
+                "DataTiering": "false"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

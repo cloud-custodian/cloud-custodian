@@ -1,0 +1,34 @@
+{
+    "status_code": 200,
+    "data": {
+        "Namespace": {
+            "Id": "ns1",
+            "Arn": "arn:aws:servicediscovery:us-east-1:644160558196:namespace/ns1",
+            "Name": "testnik.local",
+            "Type": "DNS_PRIVATE",
+            "Properties": {
+                "DnsProperties": {
+                    "HostedZoneId": "Z03288441NHEED4TM6QWT",
+                    "SOA": {
+                        "TTL": 15
+                    }
+                },
+                "HttpProperties": {
+                    "HttpName": "testnik.local"
+                }
+            },
+            "CreateDate": {
+                "__class__": "datetime",
+                "year": 2022,
+                "month": 11,
+                "day": 28,
+                "hour": 10,
+                "minute": 33,
+                "second": 4,
+                "microsecond": 54000
+            },
+            "CreatorRequestId": "e5fdb62d-52a9-457e-a233-23dd7b22759e"
+        },
+        "ResponseMetadata": {}
+    }
+}

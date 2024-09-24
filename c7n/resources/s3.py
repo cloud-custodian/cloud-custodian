@@ -839,6 +839,63 @@ class HasStatementFilter(polstmt_filter.HasStatementFilter):
         }
 
 
+@S3.filter_registry.register('lock-configuration')
+class S3LockConfigurationFilter(ValueFilter):
+    """
+    Filter S3 buckets based on their object lock configurations
+
+    :example:
+
+    Get all buckets where lock configuration mode is COMPLIANCE
+
+        .. code-block:: yaml
+
+                policies:
+                  - name: lock-configuration-compliance
+                    resource: aws.s3
+                    filters:
+                      - type: lock-configuration
+                        key: Rule.DefaultRetention.Mode
+                        value: COMPLIANCE
+
+    """
+    schema = type_schema('lock-configuration', rinherit=ValueFilter.schema)
+    permissions = ('s3:GetBucketObjectLockConfiguration',)
+    annotate = True
+    annotation_key = 'c7n:ObjectLockConfiguration'
+
+    def _process_resource(self, client, resource):
+        try:
+            config = client.get_object_lock_configuration(
+                Bucket=resource['Name']
+            )['ObjectLockConfiguration']
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'ObjectLockConfigurationNotFoundError':
+                config = None
+            else:
+                raise
+        resource[self.annotation_key] = config
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('s3')
+        with self.executor_factory(max_workers=3) as w:
+            futures = []
+            for res in resources:
+                if self.annotation_key in res:
+                    continue
+                futures.append(w.submit(self._process_resource, client, res))
+            for f in as_completed(futures):
+                exc = f.exception()
+                if exc:
+                    self.log.error(
+                        "Exception getting bucket lock configuration \n %s" % (
+                            exc))
+        return super().process(resources, event)
+
+    def __call__(self, r):
+        return super().__call__(r.setdefault(self.annotation_key, None))
+
+
 ENCRYPTION_STATEMENT_GLOB = {
     'Effect': 'Deny',
     'Principal': '*',

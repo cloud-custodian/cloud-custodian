@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "c7n_trailcreator"
-version = "0.2.36"
+version = "0.2.40"
 readme = "readme.md"
 homepage = "https://cloudcustodian.io"
 repository = "https://github.com/cloud-custodian/cloud-custodian"

@@ -403,6 +403,66 @@ class TestSSM(BaseTest):
         except Exception as e:
             self.assertTrue(e, client.exceptions.InvalidDocumentOperation)
 
+    def test_ssm_document_content(self):
+        session_factory = self.replay_flight_data("test_ssm_document_content")
+        p = self.load_policy(
+            {
+                "name": "doc-content",
+                "resource": "ssm-document",
+                "filters": [
+                    {
+                        "type": "content",
+                        "key": "inputs.cloudWatchEncryptionEnabled",
+                        "op": "eq",
+                        "value": True
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+
+    def test_ssm_document_tag(self):
+        session_factory = self.replay_flight_data("test_ssm_document_tag")
+        client = session_factory().client("ssm")
+        p = self.load_policy(
+            {
+                "name": "ssm-document-tag",
+                "resource": "ssm-document",
+                "filters": [{"Name": "Test-Document-1"}],
+                "actions": [
+                    {
+                        "type": "tag",
+                        "key": "TestTag",
+                        "value": "c7n"
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory(region="us-east-1").client("ssm")
+        tags = client.list_tags_for_resource(ResourceType='Document', ResourceId='Test-Document-1')
+        self.assertEqual(tags["TagList"][0]['Key'], 'TestTag')
+        self.assertEqual(tags["TagList"][0]['Value'], 'c7n')
+
+        p = self.load_policy(
+            {
+                "name": "ssm-document-untag",
+                "resource": "ssm-document",
+                "filters": [{"tag:TestTag": "c7n"}],
+                "actions": [{"type": "remove-tag", "tags": ["TestTag"]}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        tags = client.list_tags_for_resource(ResourceType='Document', ResourceId='Test-Document-1')
+        self.assertEqual(len(tags["TagList"]), 0)
+
     def test_get_data_sync_resources(self):
         session_factory = self.replay_flight_data("test_get_data_sync_resources")
         p = self.load_policy(

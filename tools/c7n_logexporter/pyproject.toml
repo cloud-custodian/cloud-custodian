@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "c7n_logexporter"
-version = "0.4.36"
+version = "0.4.40"
 description = "Cloud Custodian - Cloud Watch Log S3 exporter"
 readme = "README.md"
 homepage = "https://cloudcustodian.io"

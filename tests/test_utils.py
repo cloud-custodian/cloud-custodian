@@ -746,3 +746,18 @@ def test_jmespath_parse_split():
         {'foo': {'bar': 'abc.xyz'}}
     )
     assert result == ['abc', 'xyz']
+
+
+def test_jmespath_parse_to_json():
+    result = utils.jmespath_search(
+        'from_json(foo).bar',
+        {'foo': '{"bar": "abc.xyz"}'}
+    )
+    assert result == 'abc.xyz'
+
+    # bad json comes in = return null
+    result = utils.jmespath_search(
+        'from_json(foo).bar',
+        {'foo': '{"]}'}
+    )
+    assert result is None

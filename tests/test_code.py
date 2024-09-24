@@ -179,6 +179,32 @@ class CodeBuild(BaseTest):
             'securityhub')
 
 
+class CodeBuildSourceCredentials(BaseTest):
+    def test_get_source_credentials(self):
+        p = self.load_policy(
+            data={
+                "name": "test-get-source-credentials",
+                "resource": "aws.codebuild-credential",
+                "filters": [{
+                    "type": "value",
+                    "key": "serverType",
+                    "value": "GITHUB"
+                }, {
+                    "type": "value",
+                    "key": "authType",
+                    "value": "PERSONAL_ACCESS_TOKEN"
+                }]
+            },
+            session_factory=self.replay_flight_data('test_codebuild_get_source_credentials')
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['arn'],
+            'arn:aws:codebuild:eu-central-1:543742734891:token/github'
+        )
+
+
 class CodePipeline(BaseTest):
 
     def test_config_pipeline(self):

@@ -927,9 +927,9 @@ def get_eni_resource_type(eni):
         rtype = 'hsm'
     elif description.startswith('CloudHsm ENI'):
         rtype = 'hsmv2'
-    elif description.startswith('AWS Lambda VPC'):
-        rtype = 'lambda'
     elif description.startswith('AWS Lambda VPC ENI'):
+        rtype = 'lambda'
+    elif description.startswith('AWS Lambda VPC'):
         rtype = 'lambda'
     elif description.startswith('Interface for NAT Gateway'):
         rtype = 'nat'
@@ -955,6 +955,15 @@ class C7NJmespathFunctions(functions.Functions):
     )
     def _func_split(self, sep, string):
         return string.split(sep)
+
+    @functions.signature(
+        {'types': ['string']}
+    )
+    def _func_from_json(self, string):
+        try:
+            return json.loads(string)
+        except json.JSONDecodeError:
+            return None
 
 
 class C7NJMESPathParser(Parser):

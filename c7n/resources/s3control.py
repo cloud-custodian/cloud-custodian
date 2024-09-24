@@ -6,7 +6,7 @@ from c7n.manager import resources
 from c7n.resources.aws import Arn
 from c7n.query import QueryResourceManager, TypeInfo, DescribeSource
 from c7n.utils import local_session, type_schema
-from c7n.tags import TagActionFilter, TagDelayedAction, universal_augment
+from c7n.tags import universal_augment
 from c7n.actions import BaseAction
 
 
@@ -161,26 +161,3 @@ class DeleteStorageLens(BaseAction):
                 ConfigId=configId,
                 AccountId=accountId
             )
-
-
-StorageLens.filter_registry.register('marked-for-op', TagActionFilter)
-
-
-@StorageLens.action_registry.register('mark-for-op')
-class MarkStorageLensForOp(TagDelayedAction):
-    """Mark storage lens configuration for future actions
-
-    :example:
-
-    .. code-block:: yaml
-
-        policies:
-          - name: s3-storage-lens-mark
-            resource: aws.s3-storage-lens
-            filters:
-              - "tag:delete": present
-            actions:
-              - type: mark-for-op
-                op: delete
-                days: 1
-    """

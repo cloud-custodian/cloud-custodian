@@ -457,6 +457,140 @@ class TestWorkspacesWeb(BaseTest):
         portals = client.list_portals()['portals']
         self.assertEqual(len(portals), 0)
 
+    def test_workspaces_web_browser_policy(self):
+        session_factory = self.replay_flight_data("test_workspaces_web_browser_policy")
+        p = self.load_policy(
+            {
+                "name": "test-browser-policy",
+                "resource": "workspaces-web",
+                "filters": [
+                    {
+                        "type": "browser-policy",
+                        "key": "chromePolicies.AllowDeletingBrowserHistory.value",
+                        "op": "eq",
+                        "value": False
+                    },
+                    {
+                        "type": "browser-policy",
+                        "key": "chromePolicies.BookmarkBarEnabled.value",
+                        "op": "eq",
+                        "value": False
+                    },
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+
+    def test_workspaces_web_subnet(self):
+        session_factory = self.replay_flight_data("test_workspaces_web_subnet")
+        p = self.load_policy(
+            {
+                "name": "test-workspaces-web-subnet",
+                "resource": "workspaces-web",
+                "filters": [
+                    {
+                        "type": "subnet",
+                        "key": "SubnetId",
+                        "value": "subnet-068dfbf3f275a6ae8"
+                    },
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+
+    def test_workspaces_web_user_settings(self):
+        session_factory = self.replay_flight_data('test_workspaces_web_user_settings')
+        p = self.load_policy(
+            {
+                'name': 'test-workspaces-web-user-settings',
+                'resource': 'workspaces-web',
+                'filters': [
+                    {
+                        'type': 'user-settings',
+                        'key': 'copyAllowed',
+                        "value": 'Disabled'
+                    },
+                    {
+                        'type': 'user-settings',
+                        'key': 'downloadAllowed',
+                        "value": 'Disabled'
+                    },
+                    {
+                        'type': 'user-settings',
+                        'key': 'pasteAllowed',
+                        "value": 'Disabled'
+                    },
+                    {
+                        'type': 'user-settings',
+                        'key': 'printAllowed',
+                        "value": 'Disabled'
+                    },
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        p = self.load_policy(
+            {
+                'name': 'test-workspaces-web-user-settings',
+                'resource': 'workspaces-web',
+                'filters': [
+                    {
+                        'type': 'user-settings',
+                        'key': 'copyAllowed',
+                        "value": 'Enabled'
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    def test_workspaces_web_user_access_logging(self):
+        session_factory = self.replay_flight_data(
+            'test_workspaces_web_user_access_logging'
+        )
+        p = self.load_policy(
+            {
+                'name': 'test-workspaces-web-user-access-logging',
+                'resource': 'workspaces-web',
+                'filters': [
+                    {
+                        'type': 'user-access-logging',
+                        'key': 'kinesisStreamArn',
+                        "value": 'present'
+                    }
+                ]
+            }, session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        p = self.load_policy(
+            {
+                'name': 'test-workspaces-web-user-access-logging',
+                'resource': 'workspaces-web',
+                'filters': [
+                    {
+                        'type': 'user-access-logging',
+                        'key': 'kinesisStreamArn',
+                        "value": 'absent'
+                    }
+                ]
+            }, session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
 
 class TestWorkspacesBundleDelete(BaseTest):
 
