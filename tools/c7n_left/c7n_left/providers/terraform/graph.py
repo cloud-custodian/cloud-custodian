@@ -86,6 +86,8 @@ class Resolver:
         refs = self._ref_map.get(block["id"], ())
         for rid in refs:
             r = self._id_map[rid]
+            if not "__tfmeta" in r:
+                continue
             rtype = r["__tfmeta"]["label"]
             if r["__tfmeta"].get("type") == "data":
                 rtype = f"data.{rtype}"
