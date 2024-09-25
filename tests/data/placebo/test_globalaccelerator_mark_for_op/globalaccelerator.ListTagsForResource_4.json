@@ -1,0 +1,16 @@
+{
+    "status_code": 200,
+    "data": {
+        "Tags": [
+            {
+                "Key": "owner",
+                "Value": "policy"
+            },
+            {
+                "Key": "custodian_cleanup",
+                "Value": "Resource does not meet policy: notify@2024/09/26"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

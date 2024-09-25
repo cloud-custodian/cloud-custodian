@@ -117,6 +117,7 @@ ResourceMap = {
   "aws.gamelift-build": "c7n.resources.gamelift.GameLiftBuild",
   "aws.gamelift-fleet": "c7n.resources.gamelift.GameLiftFleet",
   "aws.glacier": "c7n.resources.glacier.Glacier",
+  "aws.globalaccelerator": "c7n.resources.globalaccelerator.GlobalAccelerator",
   "aws.glue-catalog": "c7n.resources.glue.GlueDataCatalog",
   "aws.glue-classifier": "c7n.resources.glue.GlueClassifier",
   "aws.glue-connection": "c7n.resources.glue.GlueConnection",

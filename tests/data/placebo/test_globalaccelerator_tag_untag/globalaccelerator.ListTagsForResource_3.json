@@ -1,0 +1,23 @@
+{
+    "status_code": 200,
+    "data": {
+        "Tags": [
+            {
+                "Key": "env",
+                "Value": "dev"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "b0edc38f-05d3-4c4f-8441-3c0f3ee5a72b",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Tue, 24 Sep 2024 17:05:04 GMT",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "38",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "b0edc38f-05d3-4c4f-8441-3c0f3ee5a72b"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
