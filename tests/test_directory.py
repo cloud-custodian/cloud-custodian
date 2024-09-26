@@ -186,6 +186,19 @@ class DirectoryTests(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["c7n:LDAPSSettings"][0]['LDAPSStatus'], "Enabled")
 
+    def test_directory_settings(self):
+        factory = self.replay_flight_data("test_directory_settings")
+        p = self.load_policy(
+            {
+                "name": "tls_1_0-enabled",
+                "resource": "directory",
+                "filters": [{"type": "settings", "key": "TLS_1_0", "value": "Enable"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
 
 class CloudDirectoryQueryParse(BaseTest):
 

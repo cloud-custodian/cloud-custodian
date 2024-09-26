@@ -98,6 +98,47 @@ class DirectoryLDAPFilter(Filter):
         return matches
 
 
+@Directory.filter_registry.register('settings')
+class DirectorySettingsFilter(Filter):
+    """Filter directories based on their settings
+
+    :example:
+
+        .. code-block:: yaml
+
+            policies:
+              - name: settings-enabled-directories
+                resource: directory
+                filters:
+                  - type: settings
+                    key: TLS_1_0
+                    value: Enable
+    """
+    schema = type_schema(
+        'settings',
+        required=['key', 'value'],
+        key={'type': 'string'},
+        value={'type': 'string'})
+
+    permissions = ('ds:DescribeSettings',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('ds')
+        key = self.data.get('key')
+        value = self.data.get('value')
+        matches = []
+        for r in resources:
+            if r['Type'] != 'MicrosoftAD':
+                continue
+            settings = client.describe_settings(
+                DirectoryId=r['DirectoryId'])['SettingEntries']
+            for setting in settings:
+                if setting['Name'] == key and setting['AppliedValue'] == value:
+                    matches.append(r)
+                    break
+        return matches
+
+
 @Directory.action_registry.register('tag')
 class DirectoryTag(Tag):
     """Add tags to a directory
