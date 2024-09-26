@@ -1,5 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+from c7n.filters.core import Filter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema, QueryParser
@@ -48,6 +49,53 @@ class DirectorySecurityGroupFilter(SecurityGroupFilter):
 class DirectoryVpcFilter(VpcFilter):
 
     RelatedIdsExpression = "VpcSettings.VpcId"
+
+
+@Directory.filter_registry.register('ldap')
+class DirectoryLDAPFilter(Filter):
+    """Filter directories based on their LDAP status
+
+    :example:
+
+        .. code-block:: yaml
+
+            policies:
+              - name: ldap-enabled-directories
+                resource: directory
+                filters:
+                  - type: ldap
+                    status: Disabled
+    """
+    schema = type_schema(
+        'ldap',
+        **{'status': {'type': 'string', 'enum': ['Enabled', 'Disabled']}})
+
+    permissions = ('ds:DescribeLDAPSSettings',)
+    annotation_key = 'c7n:LDAPSSettings'
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('ds')
+        status = self.data.get('status', 'Enabled')
+        matches = []
+        for r in resources:
+            # Skip Directories that do not support LDAP settings
+            if r['Type'] != 'MicrosoftAD':
+                continue
+            if self.annotation_key not in r:
+                try:
+                    ldap_settings = client.describe_ldaps_settings(
+                        DirectoryId=r['DirectoryId'])['LDAPSSettingsInfo']
+                except client.exceptions.ClientError:
+                    continue
+                r[self.annotation_key] = ldap_settings
+            if status == "Disabled" and len(r[self.annotation_key]) == 0:
+                matches.append(r)
+            else:
+                for setting in r[self.annotation_key]:
+                    if setting['LDAPSStatus'] == status:
+                        matches.append(r)
+                        break
+        return matches
 
 
 @Directory.action_registry.register('tag')

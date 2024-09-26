@@ -159,6 +159,33 @@ class DirectoryTests(BaseTest):
         self.assertEqual(len(remainder), 2)
         self.assertEqual(remainder[1]["Stage"], "Deleting")
 
+    def test_directory_ldap_setting_no_settings(self):
+        factory = self.replay_flight_data("test_directory_ldap_setting")
+        p = self.load_policy(
+            {
+                "name": "ldap-disabled",
+                "resource": "directory",
+                "filters": [{"type": "ldap", "status": "Disabled"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_directory_ldap_setting_enabled(self):
+        factory = self.replay_flight_data("test_directory_ldap_setting_enabled")
+        p = self.load_policy(
+            {
+                "name": "ldap-enabled",
+                "resource": "directory",
+                "filters": [{"type": "ldap", "status": "Enabled"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["c7n:LDAPSSettings"][0]['LDAPSStatus'], "Enabled")
+
 
 class CloudDirectoryQueryParse(BaseTest):
 
