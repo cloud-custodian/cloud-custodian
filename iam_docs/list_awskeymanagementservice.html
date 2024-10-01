@@ -1,0 +1,3645 @@
+<!DOCTYPE html>
+<html lang="en-US" xmlns="http://www.w3.org/1999/xhtml">
+ <head>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+  <title>
+   Actions, resources, and condition keys for AWS Key Management Service - Service Authorization Reference
+  </title>
+  <meta content="width=device-width,initial-scale=1" name="viewport"/>
+  <meta content="/assets" name="assets_root"/>
+  <meta content="list_awskeymanagementservice" name="target_state"/>
+  <meta content="list_awskeymanagementservice" name="default_state"/>
+  <link href="https://docs.aws.amazon.com/assets/images/favicon.ico" rel="icon" type="image/ico"/>
+  <link href="https://docs.aws.amazon.com/assets/images/favicon.ico" rel="shortcut icon" type="image/ico"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awskeymanagementservice.html" rel="canonical"/>
+  <meta content="Lists all of the available service-specific resources, actions, and condition keys that can be used in IAM policies to control access to AWS Key Management Service." name="description"/>
+  <meta content="IAD" name="deployment_region"/>
+  <meta content="Service Authorization Reference" name="product"/>
+  <meta content="Service Authorization Reference" name="guide"/>
+  <meta content="Provides a list of the actions, resources, and condition keys supported by each AWS service that can be used in an IAM policy." name="abstract"/>
+  <meta content="en_us" name="guide-locale"/>
+  <meta content="toc-contents.json;toc-list_awskeymanagementservice.json" name="tocs"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awskeymanagementservice.html" rel="canonical"/>
+  <link href="https://docs.aws.amazon.com/id_id/service-authorization/latest/reference/list_awskeymanagementservice.html" hreflang="id-id" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/id_id/service-authorization/latest/reference/list_awskeymanagementservice.html" hreflang="id" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/de_de/service-authorization/latest/reference/list_awskeymanagementservice.html" hreflang="de-de" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/de_de/service-authorization/latest/reference/list_awskeymanagementservice.html" hreflang="de" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awskeymanagementservice.html" hreflang="en-us" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awskeymanagementservice.html" hreflang="en" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/es_es/service-authorization/latest/reference/list_awskeymanagementservice.html" hreflang="es-es" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/es_es/service-authorization/latest/reference/list_awskeymanagementservice.html" hreflang="es" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/fr_fr/service-authorization/latest/reference/list_awskeymanagementservice.html" hreflang="fr-fr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/fr_fr/service-authorization/latest/reference/list_awskeymanagementservice.html" hreflang="fr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/it_it/service-authorization/latest/reference/list_awskeymanagementservice.html" hreflang="it-it" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/it_it/service-authorization/latest/reference/list_awskeymanagementservice.html" hreflang="it" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ja_jp/service-authorization/latest/reference/list_awskeymanagementservice.html" hreflang="ja-jp" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ja_jp/service-authorization/latest/reference/list_awskeymanagementservice.html" hreflang="ja" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ko_kr/service-authorization/latest/reference/list_awskeymanagementservice.html" hreflang="ko-kr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ko_kr/service-authorization/latest/reference/list_awskeymanagementservice.html" hreflang="ko" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/pt_br/service-authorization/latest/reference/list_awskeymanagementservice.html" hreflang="pt-br" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/pt_br/service-authorization/latest/reference/list_awskeymanagementservice.html" hreflang="pt" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/zh_cn/service-authorization/latest/reference/list_awskeymanagementservice.html" hreflang="zh-cn" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/zh_tw/service-authorization/latest/reference/list_awskeymanagementservice.html" hreflang="zh-tw" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awskeymanagementservice.html" hreflang="x-default" rel="alternative"/>
+  <meta content="Service Authorization Docs" name="feedback-item"/>
+  <meta content="Service Authorization Reference" name="this_doc_product"/>
+  <meta content="Service Authorization Reference" name="this_doc_guide"/>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor4.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor3.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor1.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/awsdocs-common.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/awsdocs-doc-page.js?version=2021.12.02">
+  </script>
+  <link href="https://docs.aws.amazon.com/assets/r/vendor4.css?version=2021.12.02" rel="stylesheet"/>
+  <link href="https://docs.aws.amazon.com/assets/r/awsdocs-common.css?version=2021.12.02" rel="stylesheet"/>
+  <link href="https://docs.aws.amazon.com/assets/r/awsdocs-doc-page.css?version=2021.12.02" rel="stylesheet"/>
+  <script async="" data-config="{'appEntity':'aws-documentation','region':'us-east-1','service':'iam'}" id="awsc-panorama-bundle" src="https://prod.pa.cdn.uis.awsstatic.com/panorama-nav-init.js" type="text/javascript">
+  </script>
+  <meta id="panorama-serviceSubSection" value="Service Authorization Reference"/>
+  <meta id="panorama-serviceConsolePage" value="Actions, resources, and condition keys for AWS Key Management Service"/>
+ </head>
+ <body class="awsdocs awsui">
+  <div class="awsdocs-container">
+   <awsdocs-header>
+   </awsdocs-header>
+   <awsui-app-layout class="awsui-util-no-gutters" header-selector="awsdocs-header" id="app-layout" navigation-change="$ctrl.onNavChange($event)" navigation-hide="false" navigation-open="$ctrl.navOpen" navigation-width="$ctrl.navWidth" ng-controller="ContentController as $ctrl" tools-change="$ctrl.onToolsChange($event)" tools-hide="$ctrl.hideTools" tools-open="$ctrl.toolsOpen" tools-width="$ctrl.toolsWidth">
+    <div dom-region="navigation" id="guide-toc">
+     <awsdocs-toc>
+     </awsdocs-toc>
+    </div>
+    <div dom-region="content" id="main-column" tabindex="-1">
+     <awsdocs-view class="awsdocs-view">
+      <div id="awsdocs-content">
+       <head>
+        <title>
+         Actions, resources, and condition keys for AWS Key Management Service - Service Authorization Reference
+        </title>
+        <meta content="https://repost.aws/tags/TAO7Z4bI5hQVWMiYFs34QhIA" name="forums"/>
+        <meta content="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service%20Authorization%20Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awskeymanagementservice.html" name="feedback"/>
+        <meta content="feedbackyes.html?topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awskeymanagementservice.html" name="feedback-yes"/>
+        <meta content="feedbackno.html?topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awskeymanagementservice.html" name="feedback-no"/>
+        <script type="application/ld+json">
+         {
+    "@context" : "https://schema.org",
+    "@type" : "BreadcrumbList",
+    "itemListElement" : [
+      {
+        "@type" : "ListItem",
+        "position" : 1,
+        "name" : "AWS",
+        "item" : "https://aws.amazon.com"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 2,
+        "name" : "Service Authorization Reference",
+        "item" : "https://docs.aws.amazon.com/iam/index.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 3,
+        "name" : "Service Authorization Reference",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 4,
+        "name" : "Actions, resources, and condition keys for AWS Key Management Service",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/list_awskeymanagementservice.html"
+      }
+    ]
+}
+        </script>
+       </head>
+       <body>
+        <div id="main">
+         <div style="display: none">
+         </div>
+         <div class="breadcrumb" id="breadcrumbs">
+          <a href="https://aws.amazon.com">
+           AWS
+          </a>
+          <a href="/index.html">
+           Documentation
+          </a>
+          <a href="/iam/index.html">
+           Service Authorization Reference
+          </a>
+          <a href="list_awskeymanagementservice.html">
+           Service Authorization Reference
+          </a>
+         </div>
+         <div id="page-toc-src">
+          <a href="#awskeymanagementservice-actions-as-permissions">
+           Actions
+          </a>
+          <a href="#awskeymanagementservice-resources-for-iam-policies">
+           Resource types
+          </a>
+          <a href="#awskeymanagementservice-policy-keys">
+           Condition keys
+          </a>
+         </div>
+         <div class="awsui-util-container" id="main-content">
+          <div id="main-col-body">
+           <awsdocs-language-banner data-service="$ctrl.pageService">
+           </awsdocs-language-banner>
+           <h1 class="topictitle" id="list_awskeymanagementservice">
+            Actions, resources, and condition keys for      AWS Key Management Service
+           </h1>
+           <div class="awsdocs-page-header-container">
+            <awsdocs-page-header>
+            </awsdocs-page-header>
+            <awsdocs-filter-selector id="awsdocs-filter-selector">
+            </awsdocs-filter-selector>
+           </div>
+           <p>
+            AWS Key Management Service (service prefix:
+            <code class="code">
+             kms
+            </code>
+            ) provides the following    service-specific resources, actions, and condition context keys for use in IAM permission    policies.
+           </p>
+           <p>
+            References:
+           </p>
+           <div class="itemizedlist">
+            <ul class="itemizedlist">
+             <li class="listitem">
+              <p>
+               Learn how to
+               <a href="https://docs.aws.amazon.com/kms/latest/developerguide/overview.html">
+                configure this service
+               </a>
+               .
+              </p>
+             </li>
+             <li class="listitem">
+              <p>
+               View a list of the
+               <a href="https://docs.aws.amazon.com/kms/latest/APIReference/">
+                API operations available for this        service
+               </a>
+               .
+              </p>
+             </li>
+             <li class="listitem">
+              <p>
+               Learn how to secure this service and its resources by
+               <a href="https://docs.aws.amazon.com/kms/latest/developerguide/control-access.html">
+                using        IAM
+               </a>
+               permission policies.
+              </p>
+             </li>
+            </ul>
+           </div>
+           <div class="highlights" id="inline-topiclist">
+            <h6>
+             Topics
+            </h6>
+            <ul>
+             <li>
+              <a href="#awskeymanagementservice-actions-as-permissions">
+               Actions defined by        AWS Key Management Service
+              </a>
+             </li>
+             <li>
+              <a href="#awskeymanagementservice-resources-for-iam-policies">
+               Resource types defined by        AWS Key Management Service
+              </a>
+             </li>
+             <li>
+              <a href="#awskeymanagementservice-policy-keys">
+               Condition keys for        AWS Key Management Service
+              </a>
+             </li>
+            </ul>
+           </div>
+           <h2 id="awskeymanagementservice-actions-as-permissions">
+            Actions defined by        AWS Key Management Service
+           </h2>
+           <p>
+            You can specify the following actions in the
+            <code class="code">
+             Action
+            </code>
+            element of an IAM      policy statement. Use policies to grant permissions to perform an operation in AWS. When you      use an action in a policy, you usually allow or deny access to the API operation or CLI      command with the same name. However, in some cases, a single action controls access to more      than one operation. Alternatively, some operations require several different actions.
+           </p>
+           <p>
+            The
+            <b>
+             Resource types
+            </b>
+            column of the Actions table indicates whether each      action supports resource-level permissions. If there is no value for this column, you must      specify all resources ("*") to which the policy applies in the
+            <code class="code">
+             Resource
+            </code>
+            element      of your policy statement. If the column includes a resource type, then you can specify an ARN      of that type in a statement with that action. If the action has one or more required      resources, the caller must have permission to use the action with those resources. Required      resources are indicated in the table with an asterisk (*). If you limit resource access with      the
+            <code class="code">
+             Resource
+            </code>
+            element in an IAM policy, you must include an ARN or pattern for      each required resource type. Some actions support multiple resource types. If the resource      type is optional (not indicated as required), then you can choose to use one of the optional      resource types.
+           </p>
+           <p>
+            The
+            <b>
+             Condition keys
+            </b>
+            column of the Actions table includes keys that you      can specify in a policy statement's
+            <code class="code">
+             Condition
+            </code>
+            element. For more information on      the condition keys that are associated with resources for the service, see the
+            <b>
+             Condition keys
+            </b>
+            column of the Resource types table.
+           </p>
+           <div class="awsdocs-note">
+            <div class="awsdocs-note-title">
+             <awsui-icon name="status-info" variant="link">
+             </awsui-icon>
+             <h6>
+              Note
+             </h6>
+            </div>
+            <div class="awsdocs-note-text">
+             <p>
+              Resource condition keys are listed in the
+              <a href="#awskeymanagementservice-resources-for-iam-policies">
+               Resource types
+              </a>
+              table. You        can find a link to the resource type that applies to an action in the
+              <b>
+               Resource          types (*required)
+              </b>
+              column of the Actions table. The resource type in the        Resource types table includes the
+              <b>
+               Condition keys
+              </b>
+              column, which are the        resource condition keys that apply to an action in the Actions table.
+             </p>
+            </div>
+           </div>
+           <p>
+            For details about the columns in the following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#actions_table" rel="noopener noreferrer" target="_blank">
+             Actions table
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w61aab7c11c13">
+              <thead>
+               <tr>
+                <th>
+                 Actions
+                </th>
+                <th>
+                 Description
+                </th>
+                <th>
+                 Access level
+                </th>
+                <th>
+                 Resource types (*required)
+                </th>
+                <th>
+                 Condition keys
+                </th>
+                <th>
+                 Dependent actions
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="awskeymanagementservice-CancelKeyDeletion" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/APIReference/API_CancelKeyDeletion.html">
+                 CancelKeyDeletion
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Controls permission to cancel the scheduled deletion of an AWS KMS key
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-key">
+                  key*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-kms_CallerAccount">
+                  kms:CallerAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_ViaService">
+                  kms:ViaService
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-ConnectCustomKeyStore" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/APIReference/API_ConnectCustomKeyStore.html">
+                 ConnectCustomKeyStore
+                </a>
+               </td>
+               <td tabindex="-1">
+                Controls permission to connect or reconnect a custom key store to its associated AWS CloudHSM cluster or external key manager outside of AWS
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-kms_CallerAccount">
+                  kms:CallerAccount
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-CreateAlias" rowspan="3" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/APIReference/API_CreateAlias.html">
+                 CreateAlias
+                </a>
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Controls permission to create an alias for an AWS KMS key. Aliases are optional friendly names that you can associate with KMS keys
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-alias">
+                  alias*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-key">
+                  key*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-kms_CallerAccount">
+                  kms:CallerAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_ViaService">
+                  kms:ViaService
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-CreateCustomKeyStore" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/APIReference/API_CreateCustomKeyStore.html">
+                 CreateCustomKeyStore
+                </a>
+               </td>
+               <td tabindex="-1">
+                Controls permission to create a custom key store that is backed by an AWS CloudHSM cluster or an external key manager outside of AWS
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-kms_CallerAccount">
+                  kms:CallerAccount
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 cloudhsm:DescribeClusters
+                </p>
+                <p>
+                 iam:CreateServiceLinkedRole
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-CreateGrant" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/APIReference/API_CreateGrant.html">
+                 CreateGrant
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Controls permission to add a grant to an AWS KMS key. You can use grants to add permissions without changing the key policy or IAM policy
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Permissions management
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-key">
+                  key*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-kms_CallerAccount">
+                  kms:CallerAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_EncryptionContext___EncryptionContextKey_">
+                  kms:EncryptionContext:${EncryptionContextKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_EncryptionContextKeys">
+                  kms:EncryptionContextKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_GrantConstraintType">
+                  kms:GrantConstraintType
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_GranteePrincipal">
+                  kms:GranteePrincipal
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_GrantIsForAWSResource">
+                  kms:GrantIsForAWSResource
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_GrantOperations">
+                  kms:GrantOperations
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_RetiringPrincipal">
+                  kms:RetiringPrincipal
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_ViaService">
+                  kms:ViaService
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-CreateKey" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/APIReference/API_CreateKey.html">
+                 CreateKey
+                </a>
+               </td>
+               <td tabindex="-1">
+                Controls permission to create an AWS KMS key that can be used to protect data keys and other sensitive information
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_BypassPolicyLockoutSafetyCheck">
+                  kms:BypassPolicyLockoutSafetyCheck
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_CallerAccount">
+                  kms:CallerAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_KeySpec">
+                  kms:KeySpec
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_KeyUsage">
+                  kms:KeyUsage
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_KeyOrigin">
+                  kms:KeyOrigin
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_MultiRegion">
+                  kms:MultiRegion
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_MultiRegionKeyType">
+                  kms:MultiRegionKeyType
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_ViaService">
+                  kms:ViaService
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 iam:CreateServiceLinkedRole
+                </p>
+                <p>
+                 kms:PutKeyPolicy
+                </p>
+                <p>
+                 kms:TagResource
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-Decrypt" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/APIReference/API_Decrypt.html">
+                 Decrypt
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Controls permission to decrypt ciphertext that was encrypted under an AWS KMS key
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-key">
+                  key*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-kms_CallerAccount">
+                  kms:CallerAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_EncryptionAlgorithm">
+                  kms:EncryptionAlgorithm
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_EncryptionContext___EncryptionContextKey_">
+                  kms:EncryptionContext:${EncryptionContextKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_EncryptionContextKeys">
+                  kms:EncryptionContextKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_RecipientAttestation_ImageSha384">
+                  kms:RecipientAttestation:ImageSha384
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_RequestAlias">
+                  kms:RequestAlias
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_ViaService">
+                  kms:ViaService
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-DeleteAlias" rowspan="3" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/APIReference/API_DeleteAlias.html">
+                 DeleteAlias
+                </a>
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Controls permission to delete an alias. Aliases are optional friendly names that you can associate with AWS KMS keys
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-alias">
+                  alias*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-key">
+                  key*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-kms_CallerAccount">
+                  kms:CallerAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_ViaService">
+                  kms:ViaService
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-DeleteCustomKeyStore" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/APIReference/API_DeleteCustomKeyStore.html">
+                 DeleteCustomKeyStore
+                </a>
+               </td>
+               <td tabindex="-1">
+                Controls permission to delete a custom key store
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-kms_CallerAccount">
+                  kms:CallerAccount
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-DeleteImportedKeyMaterial" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/APIReference/API_DeleteImportedKeyMaterial.html">
+                 DeleteImportedKeyMaterial
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Controls permission to delete cryptographic material that you imported into an AWS KMS key. This action makes the key unusable
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-key">
+                  key*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-kms_CallerAccount">
+                  kms:CallerAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_ViaService">
+                  kms:ViaService
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-DeriveSharedSecret" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/APIReference/API_DeriveSharedSecret.html">
+                 DeriveSharedSecret
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Controls permission to use the specified AWS KMS key to derive shared secrets
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-key">
+                  key*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-kms_CallerAccount">
+                  kms:CallerAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_KeyAgreementAlgorithm">
+                  kms:KeyAgreementAlgorithm
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_RecipientAttestation_ImageSha384">
+                  kms:RecipientAttestation:ImageSha384
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_RequestAlias">
+                  kms:RequestAlias
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_ViaService">
+                  kms:ViaService
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-DescribeCustomKeyStores" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/APIReference/API_DescribeCustomKeyStores.html">
+                 DescribeCustomKeyStores
+                </a>
+               </td>
+               <td tabindex="-1">
+                Controls permission to view detailed information about custom key stores in the account and region
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-kms_CallerAccount">
+                  kms:CallerAccount
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-DescribeKey" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/APIReference/API_DescribeKey.html">
+                 DescribeKey
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Controls permission to view detailed information about an AWS KMS key
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-key">
+                  key*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-kms_CallerAccount">
+                  kms:CallerAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_RequestAlias">
+                  kms:RequestAlias
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_ViaService">
+                  kms:ViaService
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-DisableKey" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/APIReference/API_DisableKey.html">
+                 DisableKey
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Controls permission to disable an AWS KMS key, which prevents it from being used in cryptographic operations
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-key">
+                  key*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-kms_CallerAccount">
+                  kms:CallerAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_ViaService">
+                  kms:ViaService
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-DisableKeyRotation" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/APIReference/API_DisableKeyRotation.html">
+                 DisableKeyRotation
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Controls permission to disable automatic rotation of a customer managed AWS KMS key
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-key">
+                  key*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-kms_CallerAccount">
+                  kms:CallerAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_ViaService">
+                  kms:ViaService
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-DisconnectCustomKeyStore" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/APIReference/API_DisconnectCustomKeyStore.html">
+                 DisconnectCustomKeyStore
+                </a>
+               </td>
+               <td tabindex="-1">
+                Controls permission to disconnect the custom key store from its associated AWS CloudHSM cluster or external key manager outside of AWS
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-kms_CallerAccount">
+                  kms:CallerAccount
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-EnableKey" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/APIReference/API_EnableKey.html">
+                 EnableKey
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Controls permission to change the state of an AWS KMS key to enabled. This allows the KMS key to be used in cryptographic operations
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-key">
+                  key*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-kms_CallerAccount">
+                  kms:CallerAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_ViaService">
+                  kms:ViaService
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-EnableKeyRotation" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/APIReference/API_EnableKeyRotation.html">
+                 EnableKeyRotation
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Controls permission to enable automatic rotation of the cryptographic material in an AWS KMS key
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-key">
+                  key*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-kms_CallerAccount">
+                  kms:CallerAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_RotationPeriodInDays">
+                  kms:RotationPeriodInDays
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_ViaService">
+                  kms:ViaService
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-Encrypt" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/APIReference/API_Encrypt.html">
+                 Encrypt
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Controls permission to use the specified AWS KMS key to encrypt data and data keys
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-key">
+                  key*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-kms_CallerAccount">
+                  kms:CallerAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_EncryptionAlgorithm">
+                  kms:EncryptionAlgorithm
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_EncryptionContext___EncryptionContextKey_">
+                  kms:EncryptionContext:${EncryptionContextKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_EncryptionContextKeys">
+                  kms:EncryptionContextKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_RequestAlias">
+                  kms:RequestAlias
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_ViaService">
+                  kms:ViaService
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-GenerateDataKey" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/APIReference/API_GenerateDataKey.html">
+                 GenerateDataKey
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Controls permission to use the AWS KMS key to generate data keys. You can use the data keys to encrypt data outside of AWS KMS
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-key">
+                  key*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-kms_CallerAccount">
+                  kms:CallerAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_EncryptionAlgorithm">
+                  kms:EncryptionAlgorithm
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_EncryptionContext___EncryptionContextKey_">
+                  kms:EncryptionContext:${EncryptionContextKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_EncryptionContextKeys">
+                  kms:EncryptionContextKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_RecipientAttestation_ImageSha384">
+                  kms:RecipientAttestation:ImageSha384
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_RequestAlias">
+                  kms:RequestAlias
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_ViaService">
+                  kms:ViaService
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-GenerateDataKeyPair" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/APIReference/API_GenerateDataKeyPair.html">
+                 GenerateDataKeyPair
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Controls permission to use the AWS KMS key to generate data key pairs
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-key">
+                  key*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-kms_CallerAccount">
+                  kms:CallerAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_DataKeyPairSpec">
+                  kms:DataKeyPairSpec
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_EncryptionAlgorithm">
+                  kms:EncryptionAlgorithm
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_EncryptionContext___EncryptionContextKey_">
+                  kms:EncryptionContext:${EncryptionContextKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_EncryptionContextKeys">
+                  kms:EncryptionContextKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_RequestAlias">
+                  kms:RequestAlias
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_ViaService">
+                  kms:ViaService
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-GenerateDataKeyPairWithoutPlaintext" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/APIReference/API_GenerateDataKeyPairWithoutPlaintext.html">
+                 GenerateDataKeyPairWithoutPlaintext
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Controls permission to use the AWS KMS key to generate data key pairs. Unlike the GenerateDataKeyPair operation, this operation returns an encrypted private key without a plaintext copy
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-key">
+                  key*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-kms_CallerAccount">
+                  kms:CallerAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_DataKeyPairSpec">
+                  kms:DataKeyPairSpec
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_EncryptionAlgorithm">
+                  kms:EncryptionAlgorithm
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_EncryptionContext___EncryptionContextKey_">
+                  kms:EncryptionContext:${EncryptionContextKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_EncryptionContextKeys">
+                  kms:EncryptionContextKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_RequestAlias">
+                  kms:RequestAlias
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_ViaService">
+                  kms:ViaService
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-GenerateDataKeyWithoutPlaintext" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/APIReference/API_GenerateDataKeyWithoutPlaintext.html">
+                 GenerateDataKeyWithoutPlaintext
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Controls permission to use the AWS KMS key to generate a data key. Unlike the GenerateDataKey operation, this operation returns an encrypted data key without a plaintext version of the data key
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-key">
+                  key*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-kms_CallerAccount">
+                  kms:CallerAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_EncryptionAlgorithm">
+                  kms:EncryptionAlgorithm
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_EncryptionContext___EncryptionContextKey_">
+                  kms:EncryptionContext:${EncryptionContextKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_EncryptionContextKeys">
+                  kms:EncryptionContextKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_RequestAlias">
+                  kms:RequestAlias
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_ViaService">
+                  kms:ViaService
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-GenerateMac" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/APIReference/API_GenerateMac.html">
+                 GenerateMac
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Controls permission to use the AWS KMS key to generate message authentication codes
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-key">
+                  key*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-kms_CallerAccount">
+                  kms:CallerAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_MacAlgorithm">
+                  kms:MacAlgorithm
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_RequestAlias">
+                  kms:RequestAlias
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_ViaService">
+                  kms:ViaService
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-GenerateRandom" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/APIReference/API_GenerateRandom.html">
+                 GenerateRandom
+                </a>
+               </td>
+               <td tabindex="-1">
+                Controls permission to get a cryptographically secure random byte string from AWS KMS
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-kms_RecipientAttestation_ImageSha384">
+                  kms:RecipientAttestation:ImageSha384
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-GetKeyPolicy" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/APIReference/API_GetKeyPolicy.html">
+                 GetKeyPolicy
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Controls permission to view the key policy for the specified AWS KMS key
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-key">
+                  key*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-kms_CallerAccount">
+                  kms:CallerAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_ViaService">
+                  kms:ViaService
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-GetKeyRotationStatus" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/APIReference/API_GetKeyRotationStatus.html">
+                 GetKeyRotationStatus
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Controls permission to view the key rotation status for an AWS KMS key
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-key">
+                  key*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-kms_CallerAccount">
+                  kms:CallerAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_ViaService">
+                  kms:ViaService
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-GetParametersForImport" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/APIReference/API_GetParametersForImport.html">
+                 GetParametersForImport
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Controls permission to get data that is required to import cryptographic material into a customer managed key, including a public key and import token
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-key">
+                  key*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-kms_CallerAccount">
+                  kms:CallerAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_ViaService">
+                  kms:ViaService
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_WrappingAlgorithm">
+                  kms:WrappingAlgorithm
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_WrappingKeySpec">
+                  kms:WrappingKeySpec
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-GetPublicKey" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/APIReference/API_GetPublicKey.html">
+                 GetPublicKey
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Controls permission to download the public key of an asymmetric AWS KMS key
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-key">
+                  key*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-kms_CallerAccount">
+                  kms:CallerAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_RequestAlias">
+                  kms:RequestAlias
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_ViaService">
+                  kms:ViaService
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-ImportKeyMaterial" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/APIReference/API_ImportKeyMaterial.html">
+                 ImportKeyMaterial
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Controls permission to import cryptographic material into an AWS KMS key
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-key">
+                  key*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-kms_CallerAccount">
+                  kms:CallerAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_ExpirationModel">
+                  kms:ExpirationModel
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_ValidTo">
+                  kms:ValidTo
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_ViaService">
+                  kms:ViaService
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-ListAliases" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/APIReference/API_ListAliases.html">
+                 ListAliases
+                </a>
+               </td>
+               <td tabindex="-1">
+                Controls permission to view the aliases that are defined in the account. Aliases are optional friendly names that you can associate with AWS KMS keys
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-ListGrants" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/APIReference/API_ListGrants.html">
+                 ListGrants
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Controls permission to view all grants for an AWS KMS key
+               </td>
+               <td rowspan="2" tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-key">
+                  key*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-kms_CallerAccount">
+                  kms:CallerAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_GrantIsForAWSResource">
+                  kms:GrantIsForAWSResource
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_ViaService">
+                  kms:ViaService
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-ListKeyPolicies" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/APIReference/API_ListKeyPolicies.html">
+                 ListKeyPolicies
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Controls permission to view the names of key policies for an AWS KMS key
+               </td>
+               <td rowspan="2" tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-key">
+                  key*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-kms_CallerAccount">
+                  kms:CallerAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_ViaService">
+                  kms:ViaService
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-ListKeyRotations" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/APIReference/API_ListKeyRotations.html">
+                 ListKeyRotations
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Controls permission to view the list of completed key rotations for an AWS KMS key
+               </td>
+               <td rowspan="2" tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-key">
+                  key*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-kms_CallerAccount">
+                  kms:CallerAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_ViaService">
+                  kms:ViaService
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-ListKeys" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/APIReference/API_ListKeys.html">
+                 ListKeys
+                </a>
+               </td>
+               <td tabindex="-1">
+                Controls permission to view the key ID and Amazon Resource Name (ARN) of all AWS KMS keys in the account
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-ListResourceTags" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/APIReference/API_ListResourceTags.html">
+                 ListResourceTags
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Controls permission to view all tags that are attached to an AWS KMS key
+               </td>
+               <td rowspan="2" tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-key">
+                  key*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-kms_CallerAccount">
+                  kms:CallerAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_ViaService">
+                  kms:ViaService
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-ListRetirableGrants" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/APIReference/API_ListRetirableGrants.html">
+                 ListRetirableGrants
+                </a>
+               </td>
+               <td tabindex="-1">
+                Controls permission to view grants in which the specified principal is the retiring principal. Other principals might be able to retire the grant and this principal might be able to retire other grants
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-PutKeyPolicy" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/APIReference/API_PutKeyPolicy.html">
+                 PutKeyPolicy
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Controls permission to replace the key policy for the specified AWS KMS key
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Permissions management
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-key">
+                  key*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-kms_BypassPolicyLockoutSafetyCheck">
+                  kms:BypassPolicyLockoutSafetyCheck
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_CallerAccount">
+                  kms:CallerAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_ViaService">
+                  kms:ViaService
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-ReEncryptFrom" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/APIReference/API_ReEncrypt.html">
+                 ReEncryptFrom
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Controls permission to decrypt data as part of the process that decrypts and reencrypts the data within AWS KMS
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-key">
+                  key*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-kms_CallerAccount">
+                  kms:CallerAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_EncryptionAlgorithm">
+                  kms:EncryptionAlgorithm
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_EncryptionContext___EncryptionContextKey_">
+                  kms:EncryptionContext:${EncryptionContextKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_EncryptionContextKeys">
+                  kms:EncryptionContextKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_ReEncryptOnSameKey">
+                  kms:ReEncryptOnSameKey
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_RequestAlias">
+                  kms:RequestAlias
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_ViaService">
+                  kms:ViaService
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-ReEncryptTo" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/APIReference/API_ReEncrypt.html">
+                 ReEncryptTo
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Controls permission to encrypt data as part of the process that decrypts and reencrypts the data within AWS KMS
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-key">
+                  key*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-kms_CallerAccount">
+                  kms:CallerAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_EncryptionAlgorithm">
+                  kms:EncryptionAlgorithm
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_EncryptionContext___EncryptionContextKey_">
+                  kms:EncryptionContext:${EncryptionContextKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_EncryptionContextKeys">
+                  kms:EncryptionContextKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_ReEncryptOnSameKey">
+                  kms:ReEncryptOnSameKey
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_RequestAlias">
+                  kms:RequestAlias
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_ViaService">
+                  kms:ViaService
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-ReplicateKey" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/APIReference/API_ReplicateKey.html">
+                 ReplicateKey
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Controls permission to replicate a multi-Region primary key
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-key">
+                  key*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 iam:CreateServiceLinkedRole
+                </p>
+                <p>
+                 kms:CreateKey
+                </p>
+                <p>
+                 kms:PutKeyPolicy
+                </p>
+                <p>
+                 kms:TagResource
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-kms_CallerAccount">
+                  kms:CallerAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_ReplicaRegion">
+                  kms:ReplicaRegion
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_ViaService">
+                  kms:ViaService
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-RetireGrant" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/APIReference/API_RetireGrant.html">
+                 RetireGrant
+                </a>
+               </td>
+               <td tabindex="-1">
+                Controls permission to retire a grant. The RetireGrant operation is typically called by the grant user after they complete the tasks that the grant allowed them to perform
+               </td>
+               <td tabindex="-1">
+                Permissions management
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-key">
+                  key*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-RevokeGrant" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/APIReference/API_RevokeGrant.html">
+                 RevokeGrant
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Controls permission to revoke a grant, which denies permission for all operations that depend on the grant
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Permissions management
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-key">
+                  key*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-kms_CallerAccount">
+                  kms:CallerAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_GrantIsForAWSResource">
+                  kms:GrantIsForAWSResource
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_ViaService">
+                  kms:ViaService
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-RotateKeyOnDemand" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/APIReference/API_RotateKeyOnDemand.html">
+                 RotateKeyOnDemand
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Controls permission to invoke on-demand rotation of the cryptographic material in an AWS KMS key
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-key">
+                  key*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-kms_CallerAccount">
+                  kms:CallerAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_ViaService">
+                  kms:ViaService
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-ScheduleKeyDeletion" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/APIReference/API_ScheduleKeyDeletion.html">
+                 ScheduleKeyDeletion
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Controls permission to schedule deletion of an AWS KMS key
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-key">
+                  key*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-kms_CallerAccount">
+                  kms:CallerAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_ScheduleKeyDeletionPendingWindowInDays">
+                  kms:ScheduleKeyDeletionPendingWindowInDays
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_ViaService">
+                  kms:ViaService
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-Sign" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/APIReference/API_Sign.html">
+                 Sign
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Controls permission to produce a digital signature for a message
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-key">
+                  key*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-kms_CallerAccount">
+                  kms:CallerAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_MessageType">
+                  kms:MessageType
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_RequestAlias">
+                  kms:RequestAlias
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_SigningAlgorithm">
+                  kms:SigningAlgorithm
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_ViaService">
+                  kms:ViaService
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-SynchronizeMultiRegionKey" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/developerguide/multi-region-keys-auth.html#multi-region-auth-slr">
+                 SynchronizeMultiRegionKey
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Controls access to internal APIs that synchronize multi-Region keys
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-key">
+                  key*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-TagResource" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/APIReference/API_TagResource.html">
+                 TagResource
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Controls permission to create or update tags that are attached to an AWS KMS key
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Tagging
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-key">
+                  key*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_CallerAccount">
+                  kms:CallerAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_ViaService">
+                  kms:ViaService
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-UntagResource" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/APIReference/API_UntagResource.html">
+                 UntagResource
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Controls permission to delete tags that are attached to an AWS KMS key
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Tagging
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-key">
+                  key*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_CallerAccount">
+                  kms:CallerAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_ViaService">
+                  kms:ViaService
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-UpdateAlias" rowspan="3" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/APIReference/API_UpdateAlias.html">
+                 UpdateAlias
+                </a>
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Controls permission to associate an alias with a different AWS KMS key. An alias is an optional friendly name that you can associate with a KMS key
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-alias">
+                  alias*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-key">
+                  key*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-kms_CallerAccount">
+                  kms:CallerAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_ViaService">
+                  kms:ViaService
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-UpdateCustomKeyStore" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/APIReference/API_UpdateCustomKeyStore.html">
+                 UpdateCustomKeyStore
+                </a>
+               </td>
+               <td tabindex="-1">
+                Controls permission to change the properties of a custom key store
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-kms_CallerAccount">
+                  kms:CallerAccount
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-UpdateKeyDescription" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/APIReference/API_UpdateKeyDescription.html">
+                 UpdateKeyDescription
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Controls permission to delete or change the description of an AWS KMS key
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-key">
+                  key*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-kms_CallerAccount">
+                  kms:CallerAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_ViaService">
+                  kms:ViaService
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-UpdatePrimaryRegion" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/APIReference/API_UpdatePrimaryRegion.html">
+                 UpdatePrimaryRegion
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Controls permission to update the primary Region of a multi-Region primary key
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-key">
+                  key*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-kms_CallerAccount">
+                  kms:CallerAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_PrimaryRegion">
+                  kms:PrimaryRegion
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_ViaService">
+                  kms:ViaService
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-Verify" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/APIReference/API_Verify.html">
+                 Verify
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Controls permission to use the specified AWS KMS key to verify digital signatures
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-key">
+                  key*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-kms_CallerAccount">
+                  kms:CallerAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_MessageType">
+                  kms:MessageType
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_RequestAlias">
+                  kms:RequestAlias
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_SigningAlgorithm">
+                  kms:SigningAlgorithm
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_ViaService">
+                  kms:ViaService
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-VerifyMac" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/APIReference/API_VerifyMac.html">
+                 VerifyMac
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Controls permission to use the AWS KMS key to verify message authentication codes
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-key">
+                  key*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-kms_CallerAccount">
+                  kms:CallerAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_MacAlgorithm">
+                  kms:MacAlgorithm
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_RequestAlias">
+                  kms:RequestAlias
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_ViaService">
+                  kms:ViaService
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <h2 id="awskeymanagementservice-resources-for-iam-policies">
+            Resource types defined by        AWS Key Management Service
+           </h2>
+           <p>
+            The following resource types are defined by this service and can be used in the
+            <code class="code">
+             Resource
+            </code>
+            element of IAM permission policy statements. Each action in the
+            <a href="#awskeymanagementservice-actions-as-permissions">
+             Actions table
+            </a>
+            identifies the      resource types that can be specified with that action. A resource type can also define which      condition keys you can include in a policy. These keys are displayed in the last column of the      table. For details about the columns in the following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#resources_table" rel="noopener noreferrer" target="_blank">
+             Resource types table
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w61aab7c13b5">
+              <thead>
+               <tr>
+                <th>
+                 Resource types
+                </th>
+                <th>
+                 ARN
+                </th>
+                <th>
+                 Condition keys
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="awskeymanagementservice-alias" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#alias-concept">
+                 alias
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:kms:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:alias/$
+                 <span>
+                  {
+                 </span>
+                 Alias}
+                </code>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-key" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#kms_keys">
+                 key
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:kms:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:key/$
+                 <span>
+                  {
+                 </span>
+                 KeyId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awskeymanagementservice-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_KeyOrigin">
+                  kms:KeyOrigin
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_KeySpec">
+                  kms:KeySpec
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_KeyUsage">
+                  kms:KeyUsage
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_MultiRegion">
+                  kms:MultiRegion
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_MultiRegionKeyType">
+                  kms:MultiRegionKeyType
+                 </a>
+                </p>
+                <p>
+                 <a href="#awskeymanagementservice-kms_ResourceAliases">
+                  kms:ResourceAliases
+                 </a>
+                </p>
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <h2 id="awskeymanagementservice-policy-keys">
+            Condition keys for        AWS Key Management Service
+           </h2>
+           <p>
+            AWS Key Management Service defines the following condition keys that can be used in the
+            <code class="code">
+             Condition
+            </code>
+            element of an IAM policy. You can use these keys to further refine      the conditions under which the policy statement applies. For details about the columns in the      following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#context_keys_table" rel="noopener noreferrer" target="_blank">
+             Condition keys table
+            </a>
+            .
+           </p>
+           <p>
+            To view the global condition keys that are available to all services, see
+            <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#AvailableKeys">
+             Available global condition keys
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w61aab7c15b7">
+              <thead>
+               <tr>
+                <th>
+                 Condition keys
+                </th>
+                <th>
+                 Description
+                </th>
+                <th>
+                 Type
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="awskeymanagementservice-aws_RequestTag___TagKey_" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-requesttag">
+                 aws:RequestTag/${TagKey}
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access to the specified AWS KMS operations based on both the key and value of the tag in the request
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-aws_ResourceTag___TagKey_" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/developerguide/tag-authorization.html">
+                 aws:ResourceTag/${TagKey}
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access to the specified AWS KMS operations based on tags assigned to the AWS KMS key
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-aws_TagKeys" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-tagkeys">
+                 aws:TagKeys
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access to the specified AWS KMS operations based on tag keys in the request
+               </td>
+               <td tabindex="-1">
+                ArrayOfString
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-kms_BypassPolicyLockoutSafetyCheck" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/developerguide/conditions-kms.html#conditions-kms-bypass-policy-lockout-safety-check">
+                 kms:BypassPolicyLockoutSafetyCheck
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access to the CreateKey and PutKeyPolicy operations based on the value of the BypassPolicyLockoutSafetyCheck parameter in the request
+               </td>
+               <td tabindex="-1">
+                Bool
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-kms_CallerAccount" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/developerguide/conditions-kms.html#conditions-kms-caller-account">
+                 kms:CallerAccount
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access to specified AWS KMS operations based on the AWS account ID of the caller. You can use this condition key to allow or deny access to all IAM users and roles in an AWS account in a single policy statement
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-kms_CustomerMasterKeySpec" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/developerguide/conditions-kms.html#conditions-kms-key-spec-replaced">
+                 kms:CustomerMasterKeySpec
+                </a>
+               </td>
+               <td tabindex="-1">
+                The kms:CustomerMasterKeySpec condition key is deprecated. Instead, use the kms:KeySpec condition key
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-kms_CustomerMasterKeyUsage" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/developerguide/conditions-kms.html#conditions-kms-key-usage-replaced">
+                 kms:CustomerMasterKeyUsage
+                </a>
+               </td>
+               <td tabindex="-1">
+                The kms:CustomerMasterKeyUsage condition key is deprecated. Instead, use the kms:KeyUsage condition key
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-kms_DataKeyPairSpec" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/developerguide/conditions-kms.html#conditions-kms-data-key-pair-spec">
+                 kms:DataKeyPairSpec
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access to GenerateDataKeyPair and GenerateDataKeyPairWithoutPlaintext operations based on the value of the KeyPairSpec parameter in the request
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-kms_EncryptionAlgorithm" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/developerguide/conditions-kms.html#conditions-kms-encryption-algorithm">
+                 kms:EncryptionAlgorithm
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access to encryption operations based on the value of the encryption algorithm in the request
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-kms_EncryptionContext___EncryptionContextKey_" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/developerguide/conditions-kms.html#conditions-kms-encryption-context">
+                 kms:EncryptionContext:${EncryptionContextKey}
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access to a symmetric AWS KMS key based on the encryption context in a cryptographic operation. This condition evaluates the key and value in each key-value encryption context pair
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-kms_EncryptionContextKeys" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/developerguide/conditions-kms.html#conditions-kms-encryption-context-keys">
+                 kms:EncryptionContextKeys
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access to a symmetric AWS KMS key based on the encryption context in a cryptographic operation. This condition key evaluates only the key in each key-value encryption context pair
+               </td>
+               <td tabindex="-1">
+                ArrayOfString
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-kms_ExpirationModel" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/developerguide/conditions-kms.html#conditions-kms-expiration-model">
+                 kms:ExpirationModel
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access to the ImportKeyMaterial operation based on the value of the ExpirationModel parameter in the request
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-kms_GrantConstraintType" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/developerguide/conditions-kms.html#conditions-kms-grant-constraint-type">
+                 kms:GrantConstraintType
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access to the CreateGrant operation based on the grant constraint in the request
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-kms_GrantIsForAWSResource" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/developerguide/conditions-kms.html#conditions-kms-grant-is-for-aws-resource">
+                 kms:GrantIsForAWSResource
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access to the CreateGrant operation when the request comes from a specified AWS service
+               </td>
+               <td tabindex="-1">
+                Bool
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-kms_GrantOperations" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/developerguide/conditions-kms.html#conditions-kms-grant-operations">
+                 kms:GrantOperations
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access to the CreateGrant operation based on the operations in the grant
+               </td>
+               <td tabindex="-1">
+                ArrayOfString
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-kms_GranteePrincipal" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/developerguide/conditions-kms.html#conditions-kms-grantee-principal">
+                 kms:GranteePrincipal
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access to the CreateGrant operation based on the grantee principal in the grant
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-kms_KeyAgreementAlgorithm" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/developerguide/conditions-kms.html#conditions-kms-key-agreement-algorithm">
+                 kms:KeyAgreementAlgorithm
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access to the DeriveSharedSecret operation based on the value of the KeyAgreementAlgorithm parameter in the request
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-kms_KeyOrigin" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/developerguide/conditions-kms.html#conditions-kms-key-origin">
+                 kms:KeyOrigin
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access to an API operation based on the Origin property of the AWS KMS key created by or used in the operation. Use it to qualify authorization of the CreateKey operation or any operation that is authorized for a KMS key
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-kms_KeySpec" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/developerguide/conditions-kms.html#conditions-kms-key-spec">
+                 kms:KeySpec
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access to an API operation based on the KeySpec property of the AWS KMS key that is created by or used in the operation. Use it to qualify authorization of the CreateKey operation or any operation that is authorized for a KMS key resource
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-kms_KeyUsage" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/developerguide/conditions-kms.html#conditions-kms-key-usage">
+                 kms:KeyUsage
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access to an API operation based on the KeyUsage property of the AWS KMS key created by or used in the operation. Use it to qualify authorization of the CreateKey operation or any operation that is authorized for a KMS key resource
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-kms_MacAlgorithm" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/developerguide/conditions-kms.html#conditions-kms-mac-algorithm">
+                 kms:MacAlgorithm
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access to the GenerateMac and VerifyMac operations based on the MacAlgorithm parameter in the request
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-kms_MessageType" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/developerguide/conditions-kms.html#conditions-kms-message-type">
+                 kms:MessageType
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access to the Sign and Verify operations based on the value of the MessageType parameter in the request
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-kms_MultiRegion" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/developerguide/conditions-kms.html#conditions-kms-multi-region">
+                 kms:MultiRegion
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access to an API operation based on the MultiRegion property of the AWS KMS key created by or used in the operation. Use it to qualify authorization of the CreateKey operation or any operation that is authorized for a KMS key resource
+               </td>
+               <td tabindex="-1">
+                Bool
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-kms_MultiRegionKeyType" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/developerguide/conditions-kms.html#conditions-kms-multi-region-key-type">
+                 kms:MultiRegionKeyType
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access to an API operation based on the MultiRegionKeyType property of the AWS KMS key created by or used in the operation. Use it to qualify authorization of the CreateKey operation or any operation that is authorized for a KMS key resource
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-kms_PrimaryRegion" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/developerguide/conditions-kms.html#conditions-kms-primary-region">
+                 kms:PrimaryRegion
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access to the UpdatePrimaryRegion operation based on the value of the PrimaryRegion parameter in the request
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-kms_ReEncryptOnSameKey" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/developerguide/conditions-kms.html#conditions-kms-reencrypt-on-same-key">
+                 kms:ReEncryptOnSameKey
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access to the ReEncrypt operation when it uses the same AWS KMS key that was used for the Encrypt operation
+               </td>
+               <td tabindex="-1">
+                Bool
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-kms_RecipientAttestation_ImageSha384" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/developerguide/conditions-nitro-enclaves.html#conditions-kms-recipient-image-sha">
+                 kms:RecipientAttestation:ImageSha384
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access to the Decrypt, DeriveSharedSecret, GenerateDataKey, GenerateDataKeyPair, and GenerateRandom operations based on the image hash in the attestation document in the request
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-kms_RecipientAttestation_PCR" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/developerguide/conditions-nitro-enclaves.html#conditions-kms-recipient-pcrs">
+                 kms:RecipientAttestation:PCR
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access to the Decrypt, GenerateDataKey, and GenerateRandom operations based on the platform configuration registers (PCRs) in the attestation document in the request
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-kms_ReplicaRegion" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/developerguide/conditions-kms.html#conditions-kms-replica-region">
+                 kms:ReplicaRegion
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access to the ReplicateKey operation based on the value of the ReplicaRegion parameter in the request
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-kms_RequestAlias" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/developerguide/conditions-kms.html#conditions-kms-request-alias">
+                 kms:RequestAlias
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access to cryptographic operations, DescribeKey, and GetPublicKey based on the alias in the request
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-kms_ResourceAliases" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/developerguide/conditions-kms.html#conditions-kms-resource-aliases">
+                 kms:ResourceAliases
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access to specified AWS KMS operations based on aliases associated with the AWS KMS key
+               </td>
+               <td tabindex="-1">
+                ArrayOfString
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-kms_RetiringPrincipal" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/developerguide/conditions-kms.html#conditions-kms-retiring-principal">
+                 kms:RetiringPrincipal
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access to the CreateGrant operation based on the retiring principal in the grant
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-kms_RotationPeriodInDays" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/developerguide/conditions-kms.html#conditions-kms-rotation-period-in-days">
+                 kms:RotationPeriodInDays
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access to the EnableKeyRotation operation based on the value of the RotationPeriodInDays parameter in the request
+               </td>
+               <td tabindex="-1">
+                Numeric
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-kms_ScheduleKeyDeletionPendingWindowInDays" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/developerguide/conditions-kms.html#conditions-kms-schedule-key-deletion-pending-window-in-days">
+                 kms:ScheduleKeyDeletionPendingWindowInDays
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access to the ScheduleKeyDeletion operation based on the value of the PendingWindowInDays parameter in the request
+               </td>
+               <td tabindex="-1">
+                Numeric
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-kms_SigningAlgorithm" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/developerguide/conditions-kms.html#conditions-kms-signing-algorithm">
+                 kms:SigningAlgorithm
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access to the Sign and Verify operations based on the signing algorithm in the request
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-kms_ValidTo" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/developerguide/conditions-kms.html#conditions-kms-valid-to">
+                 kms:ValidTo
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access to the ImportKeyMaterial operation based on the value of the ValidTo parameter in the request. You can use this condition key to allow users to import key material only when it expires by the specified date
+               </td>
+               <td tabindex="-1">
+                Date
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-kms_ViaService" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/developerguide/conditions-kms.html#conditions-kms-via-service">
+                 kms:ViaService
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access when a request made on the principal's behalf comes from a specified AWS service
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-kms_WrappingAlgorithm" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/developerguide/conditions-kms.html#conditions-kms-wrapping-algorithm">
+                 kms:WrappingAlgorithm
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access to the GetParametersForImport operation based on the value of the WrappingAlgorithm parameter in the request
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awskeymanagementservice-kms_WrappingKeySpec" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/kms/latest/developerguide/conditions-kms.html#conditions-kms-wrapping-key-spec">
+                 kms:WrappingKeySpec
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access to the GetParametersForImport operation based on the value of the WrappingKeySpec parameter in the request
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <awsdocs-copyright class="copyright-print">
+           </awsdocs-copyright>
+           <awsdocs-thumb-feedback right-edge="{{$ctrl.thumbFeedbackRightEdge}}">
+           </awsdocs-thumb-feedback>
+          </div>
+          <noscript>
+           <div>
+            <div>
+             <div>
+              <div id="js_error_message">
+               <p>
+                <img alt="Warning" src="https://d1ge0kk1l5kms0.cloudfront.net/images/G/01/webservices/console/warning.png"/>
+                <strong>
+                 Javascript is disabled or is unavailable in your browser.
+                </strong>
+               </p>
+               <p>
+                To use the Amazon Web Services Documentation, Javascript must be enabled. Please refer to your browser's Help pages for instructions.
+               </p>
+              </div>
+             </div>
+            </div>
+           </div>
+          </noscript>
+          <div class="awsui-util-font-size-0" id="main-col-footer">
+           <div id="doc-conventions">
+            <a href="/general/latest/gr/docconventions.html" target="_top">
+             Document Conventions
+            </a>
+           </div>
+           <div class="prev-next">
+            <div accesskey="p" class="prev-link" href="list_awskeymanagementservice.previous" id="previous" target="_self">
+             Previous
+            </div>
+            <div accesskey="n" class="next-link" href="list_awskeymanagementservice.next" id="next" target="_self">
+             Next
+            </div>
+           </div>
+          </div>
+          <awsdocs-page-utilities>
+          </awsdocs-page-utilities>
+         </div>
+         <div id="quick-feedback-yes" style="display: none;">
+          <div class="title">
+           Did this page help you? - Yes
+          </div>
+          <div class="content">
+           <p>
+            Thanks for letting us know we're doing a good job!
+           </p>
+           <p>
+            If you've got a moment, please tell us what we did right so we can do more of it.
+           </p>
+           <p>
+            <awsui-button click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service Authorization Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awskeymanagementservice.html" id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback">
+            </awsui-button>
+           </p>
+          </div>
+         </div>
+         <div id="quick-feedback-no" style="display: none;">
+          <div class="title">
+           Did this page help you? - No
+          </div>
+          <div class="content">
+           <p>
+            Thanks for letting us know this page needs work. We're sorry we let you down.
+           </p>
+           <p>
+            If you've got a moment, please tell us how we can make the documentation better.
+           </p>
+           <p>
+            <awsui-button click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service Authorization Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awskeymanagementservice.html" id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback">
+            </awsui-button>
+           </p>
+          </div>
+         </div>
+        </div>
+       </body>
+      </div>
+     </awsdocs-view>
+     <div class="page-loading-indicator" id="page-loading-indicator">
+      <awsui-spinner size="large">
+      </awsui-spinner>
+     </div>
+    </div>
+    <div dom-region="tools" id="tools-panel">
+     <awsdocs-tools-panel id="awsdocs-tools-panel">
+     </awsdocs-tools-panel>
+    </div>
+   </awsui-app-layout>
+   <awsdocs-cookie-banner class="doc-cookie-banner">
+   </awsdocs-cookie-banner>
+  </div>
+ </body>
+</html>

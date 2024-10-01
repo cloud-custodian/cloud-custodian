@@ -1,0 +1,2093 @@
+<!DOCTYPE html>
+<html lang="en-US" xmlns="http://www.w3.org/1999/xhtml">
+ <head>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+  <title>
+   Actions, resources, and condition keys for Amazon Transcribe - Service Authorization Reference
+  </title>
+  <meta content="width=device-width,initial-scale=1" name="viewport"/>
+  <meta content="/assets" name="assets_root"/>
+  <meta content="list_amazontranscribe" name="target_state"/>
+  <meta content="list_amazontranscribe" name="default_state"/>
+  <link href="https://docs.aws.amazon.com/assets/images/favicon.ico" rel="icon" type="image/ico"/>
+  <link href="https://docs.aws.amazon.com/assets/images/favicon.ico" rel="shortcut icon" type="image/ico"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazontranscribe.html" rel="canonical"/>
+  <meta content="Lists all of the available service-specific resources, actions, and condition keys that can be used in IAM policies to control access to Amazon Transcribe." name="description"/>
+  <meta content="IAD" name="deployment_region"/>
+  <meta content="Service Authorization Reference" name="product"/>
+  <meta content="Service Authorization Reference" name="guide"/>
+  <meta content="Provides a list of the actions, resources, and condition keys supported by each AWS service that can be used in an IAM policy." name="abstract"/>
+  <meta content="en_us" name="guide-locale"/>
+  <meta content="toc-contents.json" name="tocs"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazontranscribe.html" rel="canonical"/>
+  <link href="https://docs.aws.amazon.com/id_id/service-authorization/latest/reference/list_amazontranscribe.html" hreflang="id-id" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/id_id/service-authorization/latest/reference/list_amazontranscribe.html" hreflang="id" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/de_de/service-authorization/latest/reference/list_amazontranscribe.html" hreflang="de-de" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/de_de/service-authorization/latest/reference/list_amazontranscribe.html" hreflang="de" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazontranscribe.html" hreflang="en-us" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazontranscribe.html" hreflang="en" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/es_es/service-authorization/latest/reference/list_amazontranscribe.html" hreflang="es-es" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/es_es/service-authorization/latest/reference/list_amazontranscribe.html" hreflang="es" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/fr_fr/service-authorization/latest/reference/list_amazontranscribe.html" hreflang="fr-fr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/fr_fr/service-authorization/latest/reference/list_amazontranscribe.html" hreflang="fr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/it_it/service-authorization/latest/reference/list_amazontranscribe.html" hreflang="it-it" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/it_it/service-authorization/latest/reference/list_amazontranscribe.html" hreflang="it" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ja_jp/service-authorization/latest/reference/list_amazontranscribe.html" hreflang="ja-jp" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ja_jp/service-authorization/latest/reference/list_amazontranscribe.html" hreflang="ja" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ko_kr/service-authorization/latest/reference/list_amazontranscribe.html" hreflang="ko-kr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ko_kr/service-authorization/latest/reference/list_amazontranscribe.html" hreflang="ko" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/pt_br/service-authorization/latest/reference/list_amazontranscribe.html" hreflang="pt-br" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/pt_br/service-authorization/latest/reference/list_amazontranscribe.html" hreflang="pt" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/zh_cn/service-authorization/latest/reference/list_amazontranscribe.html" hreflang="zh-cn" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/zh_tw/service-authorization/latest/reference/list_amazontranscribe.html" hreflang="zh-tw" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazontranscribe.html" hreflang="x-default" rel="alternative"/>
+  <meta content="Service Authorization Docs" name="feedback-item"/>
+  <meta content="Service Authorization Reference" name="this_doc_product"/>
+  <meta content="Service Authorization Reference" name="this_doc_guide"/>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor4.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor3.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor1.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/awsdocs-common.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/awsdocs-doc-page.js?version=2021.12.02">
+  </script>
+  <link href="https://docs.aws.amazon.com/assets/r/vendor4.css?version=2021.12.02" rel="stylesheet"/>
+  <link href="https://docs.aws.amazon.com/assets/r/awsdocs-common.css?version=2021.12.02" rel="stylesheet"/>
+  <link href="https://docs.aws.amazon.com/assets/r/awsdocs-doc-page.css?version=2021.12.02" rel="stylesheet"/>
+  <script async="" data-config="{'appEntity':'aws-documentation','region':'us-east-1','service':'iam'}" id="awsc-panorama-bundle" src="https://prod.pa.cdn.uis.awsstatic.com/panorama-nav-init.js" type="text/javascript">
+  </script>
+  <meta id="panorama-serviceSubSection" value="Service Authorization Reference"/>
+  <meta id="panorama-serviceConsolePage" value="Actions, resources, and condition keys for Amazon Transcribe"/>
+ </head>
+ <body class="awsdocs awsui">
+  <div class="awsdocs-container">
+   <awsdocs-header>
+   </awsdocs-header>
+   <awsui-app-layout class="awsui-util-no-gutters" header-selector="awsdocs-header" id="app-layout" navigation-change="$ctrl.onNavChange($event)" navigation-hide="false" navigation-open="$ctrl.navOpen" navigation-width="$ctrl.navWidth" ng-controller="ContentController as $ctrl" tools-change="$ctrl.onToolsChange($event)" tools-hide="$ctrl.hideTools" tools-open="$ctrl.toolsOpen" tools-width="$ctrl.toolsWidth">
+    <div dom-region="navigation" id="guide-toc">
+     <awsdocs-toc>
+     </awsdocs-toc>
+    </div>
+    <div dom-region="content" id="main-column" tabindex="-1">
+     <awsdocs-view class="awsdocs-view">
+      <div id="awsdocs-content">
+       <head>
+        <title>
+         Actions, resources, and condition keys for Amazon Transcribe - Service Authorization Reference
+        </title>
+        <meta content="/pdfs/service-authorization/latest/reference/service-authorization.pdf#list_amazontranscribe" name="pdf"/>
+        <meta content="https://repost.aws/tags/TAO7Z4bI5hQVWMiYFs34QhIA" name="forums"/>
+        <meta content="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service%20Authorization%20Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazontranscribe.html" name="feedback"/>
+        <meta content="feedbackyes.html?topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazontranscribe.html" name="feedback-yes"/>
+        <meta content="feedbackno.html?topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazontranscribe.html" name="feedback-no"/>
+        <script type="application/ld+json">
+         {
+    "@context" : "https://schema.org",
+    "@type" : "BreadcrumbList",
+    "itemListElement" : [
+      {
+        "@type" : "ListItem",
+        "position" : 1,
+        "name" : "AWS",
+        "item" : "https://aws.amazon.com"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 2,
+        "name" : "Service Authorization Reference",
+        "item" : "https://docs.aws.amazon.com/iam/index.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 3,
+        "name" : "Service Authorization Reference",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 4,
+        "name" : "Reference",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 5,
+        "name" : "Actions, resources, and condition keys for AWS services",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference_policies_actions-resources-contextkeys.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 6,
+        "name" : "Actions, resources, and condition keys for Amazon Transcribe",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference_policies_actions-resources-contextkeys.html"
+      }
+    ]
+}
+        </script>
+       </head>
+       <body>
+        <div id="main">
+         <div style="display: none">
+          <a href="/pdfs/service-authorization/latest/reference/service-authorization.pdf#list_amazontranscribe" rel="noopener noreferrer" target="_blank" title="Open PDF">
+          </a>
+         </div>
+         <div class="breadcrumb" id="breadcrumbs">
+          <a href="https://aws.amazon.com">
+           AWS
+          </a>
+          <a href="/index.html">
+           Documentation
+          </a>
+          <a href="/iam/index.html">
+           Service Authorization Reference
+          </a>
+          <a href="reference.html">
+           Service Authorization Reference
+          </a>
+         </div>
+         <div id="page-toc-src">
+          <a href="#amazontranscribe-actions-as-permissions">
+           Actions
+          </a>
+          <a href="#amazontranscribe-resources-for-iam-policies">
+           Resource types
+          </a>
+          <a href="#amazontranscribe-policy-keys">
+           Condition keys
+          </a>
+         </div>
+         <div class="awsui-util-container" id="main-content">
+          <div id="main-col-body">
+           <awsdocs-language-banner data-service="$ctrl.pageService">
+           </awsdocs-language-banner>
+           <h1 class="topictitle" id="list_amazontranscribe">
+            Actions, resources, and condition keys for      Amazon Transcribe
+           </h1>
+           <div class="awsdocs-page-header-container">
+            <awsdocs-page-header>
+            </awsdocs-page-header>
+            <awsdocs-filter-selector id="awsdocs-filter-selector">
+            </awsdocs-filter-selector>
+           </div>
+           <p>
+            Amazon Transcribe (service prefix:
+            <code class="code">
+             transcribe
+            </code>
+            ) provides the following    service-specific resources, actions, and condition context keys for use in IAM permission    policies.
+           </p>
+           <p>
+            References:
+           </p>
+           <div class="itemizedlist">
+            <ul class="itemizedlist">
+             <li class="listitem">
+              <p>
+               Learn how to
+               <a href="https://docs.aws.amazon.com/transcribe/latest/dg/">
+                configure this service
+               </a>
+               .
+              </p>
+             </li>
+             <li class="listitem">
+              <p>
+               View a list of the
+               <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_Reference.html">
+                API operations available for this          service
+               </a>
+               .
+              </p>
+             </li>
+             <li class="listitem">
+              <p>
+               Learn how to secure this service and its resources by
+               <a href="https://docs.aws.amazon.com/transcribe/latest/dg/auth-and-access-control.html">
+                using          IAM
+               </a>
+               permission policies.
+              </p>
+             </li>
+            </ul>
+           </div>
+           <div class="highlights" id="inline-topiclist">
+            <h6>
+             Topics
+            </h6>
+            <ul>
+             <li>
+              <a href="#amazontranscribe-actions-as-permissions">
+               Actions defined by        Amazon Transcribe
+              </a>
+             </li>
+             <li>
+              <a href="#amazontranscribe-resources-for-iam-policies">
+               Resource types defined by        Amazon Transcribe
+              </a>
+             </li>
+             <li>
+              <a href="#amazontranscribe-policy-keys">
+               Condition keys for        Amazon Transcribe
+              </a>
+             </li>
+            </ul>
+           </div>
+           <h2 id="amazontranscribe-actions-as-permissions">
+            Actions defined by        Amazon Transcribe
+           </h2>
+           <p>
+            You can specify the following actions in the
+            <code class="code">
+             Action
+            </code>
+            element of an IAM      policy statement. Use policies to grant permissions to perform an operation in AWS. When you      use an action in a policy, you usually allow or deny access to the API operation or CLI      command with the same name. However, in some cases, a single action controls access to more      than one operation. Alternatively, some operations require several different actions.
+           </p>
+           <p>
+            The
+            <b>
+             Resource types
+            </b>
+            column of the Actions table indicates whether each      action supports resource-level permissions. If there is no value for this column, you must      specify all resources ("*") to which the policy applies in the
+            <code class="code">
+             Resource
+            </code>
+            element      of your policy statement. If the column includes a resource type, then you can specify an ARN      of that type in a statement with that action. If the action has one or more required      resources, the caller must have permission to use the action with those resources. Required      resources are indicated in the table with an asterisk (*). If you limit resource access with      the
+            <code class="code">
+             Resource
+            </code>
+            element in an IAM policy, you must include an ARN or pattern for      each required resource type. Some actions support multiple resource types. If the resource      type is optional (not indicated as required), then you can choose to use one of the optional      resource types.
+           </p>
+           <p>
+            The
+            <b>
+             Condition keys
+            </b>
+            column of the Actions table includes keys that you      can specify in a policy statement's
+            <code class="code">
+             Condition
+            </code>
+            element. For more information on      the condition keys that are associated with resources for the service, see the
+            <b>
+             Condition keys
+            </b>
+            column of the Resource types table.
+           </p>
+           <div class="awsdocs-note">
+            <div class="awsdocs-note-title">
+             <awsui-icon name="status-info" variant="link">
+             </awsui-icon>
+             <h6>
+              Note
+             </h6>
+            </div>
+            <div class="awsdocs-note-text">
+             <p>
+              Resource condition keys are listed in the
+              <a href="#amazontranscribe-resources-for-iam-policies">
+               Resource types
+              </a>
+              table. You        can find a link to the resource type that applies to an action in the
+              <b>
+               Resource          types (*required)
+              </b>
+              column of the Actions table. The resource type in the        Resource types table includes the
+              <b>
+               Condition keys
+              </b>
+              column, which are the        resource condition keys that apply to an action in the Actions table.
+             </p>
+            </div>
+           </div>
+           <p>
+            For details about the columns in the following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#actions_table" rel="noopener noreferrer" target="_blank">
+             Actions table
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9e1587c11c13">
+              <thead>
+               <tr>
+                <th>
+                 Actions
+                </th>
+                <th>
+                 Description
+                </th>
+                <th>
+                 Access level
+                </th>
+                <th>
+                 Resource types (*required)
+                </th>
+                <th>
+                 Condition keys
+                </th>
+                <th>
+                 Dependent actions
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="amazontranscribe-CreateCallAnalyticsCategory" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_CreateCallAnalyticsCategory.html">
+                 CreateCallAnalyticsCategory
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create an analytics category. Amazon Transcribe applies the conditions specified by your analytics categories to your call analytics jobs
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-CreateLanguageModel" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_CreateLanguageModel.html">
+                 CreateLanguageModel
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a new custom language model
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazontranscribe-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazontranscribe-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 s3:GetObject
+                </p>
+                <p>
+                 s3:ListBucket
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-CreateMedicalVocabulary" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_CreateMedicalVocabulary.html">
+                 CreateMedicalVocabulary
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a new custom vocabulary that you can use to change the way Amazon Transcribe Medical handles transcription of an audio file
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazontranscribe-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazontranscribe-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 s3:GetObject
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-CreateVocabulary" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_CreateVocabulary.html">
+                 CreateVocabulary
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a new custom vocabulary that you can use to change the way Amazon Transcribe handles transcription of an audio file
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazontranscribe-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazontranscribe-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 s3:GetObject
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-CreateVocabularyFilter" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_CreateVocabularyFilter.html">
+                 CreateVocabularyFilter
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a new vocabulary filter that you can use to filter out words from the transcription of an audio file generated by Amazon Transcribe
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazontranscribe-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazontranscribe-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 s3:GetObject
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-DeleteCallAnalyticsCategory" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_DeleteCallAnalyticsCategory.html">
+                 DeleteCallAnalyticsCategory
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a call analytics category using its name from Amazon Transcribe
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-DeleteCallAnalyticsJob" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_DeleteCallAnalyticsJob.html">
+                 DeleteCallAnalyticsJob
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a previously submitted call analytics job along with any other generated results such as the transcription, models, and so on
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-DeleteLanguageModel" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_DeleteLanguageModel.html">
+                 DeleteLanguageModel
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a previously created custom language model
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazontranscribe-languagemodel">
+                  languagemodel*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-DeleteMedicalScribeJob" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_DeleteMedicalScribeJob.html">
+                 DeleteMedicalScribeJob
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a previously submitted Medical Scribe job
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazontranscribe-medicalscribejob">
+                  medicalscribejob*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-DeleteMedicalTranscriptionJob" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_DeleteMedicalTranscriptionJob.html">
+                 DeleteMedicalTranscriptionJob
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a previously submitted medical transcription job
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazontranscribe-medicaltranscriptionjob">
+                  medicaltranscriptionjob*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-DeleteMedicalVocabulary" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_DeleteMedicalVocabulary.html">
+                 DeleteMedicalVocabulary
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a medical vocabulary from Amazon Transcribe
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazontranscribe-medicalvocabulary">
+                  medicalvocabulary*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-DeleteTranscriptionJob" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_DeleteTranscriptionJob.html">
+                 DeleteTranscriptionJob
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a previously submitted transcription job along with any other generated results such as the transcription, models, and so on
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazontranscribe-transcriptionjob">
+                  transcriptionjob*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-DeleteVocabulary" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_DeleteVocabulary.html">
+                 DeleteVocabulary
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a vocabulary from Amazon Transcribe
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazontranscribe-vocabulary">
+                  vocabulary*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-DeleteVocabularyFilter" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_DeleteVocabularyFilter.html">
+                 DeleteVocabularyFilter
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a vocabulary filter from Amazon Transcribe
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazontranscribe-vocabularyfilter">
+                  vocabularyfilter*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-DescribeLanguageModel" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_DescribeLanguageModel.html">
+                 DescribeLanguageModel
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return information about a custom language model
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazontranscribe-languagemodel">
+                  languagemodel*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-GetCallAnalyticsCategory" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_GetCallAnalyticsCategory.html">
+                 GetCallAnalyticsCategory
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retrieve information about a call analytics category
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-GetCallAnalyticsJob" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_GetCallAnalyticsJob.html">
+                 GetCallAnalyticsJob
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return information about a call analytics job
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-GetMedicalScribeJob" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_GetMedicalScribeJob.html">
+                 GetMedicalScribeJob
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return information about a Medical Scribe job
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazontranscribe-medicalscribejob">
+                  medicalscribejob*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-GetMedicalTranscriptionJob" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_GetMedicalTranscriptionJob.html">
+                 GetMedicalTranscriptionJob
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return information about a medical transcription job
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazontranscribe-medicaltranscriptionjob">
+                  medicaltranscriptionjob*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-GetMedicalVocabulary" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_GetMedicalVocabulary.html">
+                 GetMedicalVocabulary
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get information about a medical vocabulary
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazontranscribe-medicalvocabulary">
+                  medicalvocabulary*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-GetTranscriptionJob" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_GetTranscriptionJob.html">
+                 GetTranscriptionJob
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return information about a transcription job
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazontranscribe-transcriptionjob">
+                  transcriptionjob*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-GetVocabulary" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_GetVocabulary.html">
+                 GetVocabulary
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to to get information about a vocabulary
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazontranscribe-vocabulary">
+                  vocabulary*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-GetVocabularyFilter" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_GetVocabularyFilter.html">
+                 GetVocabularyFilter
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get information about a vocabulary filter
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazontranscribe-vocabularyfilter">
+                  vocabularyfilter*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-ListCallAnalyticsCategories" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_ListCallAnalyticsCategories.html">
+                 ListCallAnalyticsCategories
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list call analytics categories that has been created
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-ListCallAnalyticsJobs" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_ListCallAnalyticsJobs.html">
+                 ListCallAnalyticsJobs
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list call analytics jobs with the specified status
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-ListLanguageModels" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_ListLanguageModels.html">
+                 ListLanguageModels
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list custom language models
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-ListMedicalScribeJobs" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_ListMedicalScribeJobs.html">
+                 ListMedicalScribeJobs
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list Medical Scribe jobs with the specified status
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-ListMedicalTranscriptionJobs" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_ListMedicalTranscriptionJobs.html">
+                 ListMedicalTranscriptionJobs
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list medical transcription jobs with the specified status
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-ListMedicalVocabularies" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_ListMedicalVocabularies.html">
+                 ListMedicalVocabularies
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return a list of medical vocabularies that match the specified criteria. If no criteria are specified, returns the entire list of vocabularies
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-ListTagsForResource" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_ListTagsForResource.html">
+                 ListTagsForResource
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list tags for a resource
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-ListTranscriptionJobs" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_ListTranscriptionJobs.html">
+                 ListTranscriptionJobs
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list transcription jobs with the specified status
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-ListVocabularies" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_ListVocabularies.html">
+                 ListVocabularies
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return a list of vocabularies that match the specified criteria. If no criteria are specified, returns the entire list of vocabularies
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-ListVocabularyFilters" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_ListVocabularyFilters.html">
+                 ListVocabularyFilters
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return a list of vocabulary filters that match the specified criteria. If no criteria are specified, returns the at most 5 vocabulary filters
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-StartCallAnalyticsJob" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_StartCallAnalyticsJob.html">
+                 StartCallAnalyticsJob
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to start an asynchronous analytics job that not only transcribes the audio recording of a caller and agent, but also returns additional insights
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazontranscribe-transcribe_OutputEncryptionKMSKeyId">
+                  transcribe:OutputEncryptionKMSKeyId
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazontranscribe-transcribe_OutputLocation">
+                  transcribe:OutputLocation
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 s3:GetObject
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-StartCallAnalyticsStreamTranscription" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_streaming_StartCallAnalyticsStreamTranscription.html">
+                 StartCallAnalyticsStreamTranscription
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to start a protocol where audio is streamed to Transcribe Call Analytics and the transcription results are streamed to your application
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-StartCallAnalyticsStreamTranscriptionWebSocket" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_streaming_StartCallAnalyticsStreamTranscriptionWebSocket.html">
+                 StartCallAnalyticsStreamTranscriptionWebSocket
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to start a WebSocket where audio is streamed to Transcribe Call Analytics and the transcription results are streamed to your application
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-StartMedicalScribeJob" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_StartMedicalScribeJob.html">
+                 StartMedicalScribeJob
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to start an asynchronous job to transcribe patient-clinician conversations and generates clinical notes
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazontranscribe-transcribe_OutputBucketName">
+                  transcribe:OutputBucketName
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazontranscribe-transcribe_OutputEncryptionKMSKeyId">
+                  transcribe:OutputEncryptionKMSKeyId
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazontranscribe-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazontranscribe-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 s3:GetObject
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-StartMedicalStreamTranscription" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_streaming_StartMedicalStreamTranscription.html">
+                 StartMedicalStreamTranscription
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to start a protocol where audio is streamed to Transcribe Medical and the transcription results are streamed to your application
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-StartMedicalStreamTranscriptionWebSocket" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_streaming_StartMedicalStreamTranscriptionWebSocket.html">
+                 StartMedicalStreamTranscriptionWebSocket
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to start a WebSocket where audio is streamed to Transcribe Medical and the transcription results are streamed to your application
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-StartMedicalTranscriptionJob" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_StartMedicalTranscriptionJob.html">
+                 StartMedicalTranscriptionJob
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to start an asynchronous job to transcribe medical speech to text
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazontranscribe-transcribe_OutputBucketName">
+                  transcribe:OutputBucketName
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazontranscribe-transcribe_OutputEncryptionKMSKeyId">
+                  transcribe:OutputEncryptionKMSKeyId
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazontranscribe-transcribe_OutputKey">
+                  transcribe:OutputKey
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazontranscribe-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazontranscribe-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 s3:GetObject
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-StartStreamTranscription" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_streaming_StartStreamTranscription.html">
+                 StartStreamTranscription
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to start a bidirectional HTTP2 stream to transcribe speech to text in real time
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-StartStreamTranscriptionWebSocket" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_streaming_StartStreamTranscriptionWebSocket.html">
+                 StartStreamTranscriptionWebSocket
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to start a websocket stream to transcribe speech to text in real time
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-StartTranscriptionJob" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_StartTranscriptionJob.html">
+                 StartTranscriptionJob
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to start an asynchronous job to transcribe speech to text
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazontranscribe-transcribe_OutputBucketName">
+                  transcribe:OutputBucketName
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazontranscribe-transcribe_OutputEncryptionKMSKeyId">
+                  transcribe:OutputEncryptionKMSKeyId
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazontranscribe-transcribe_OutputKey">
+                  transcribe:OutputKey
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazontranscribe-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazontranscribe-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 s3:GetObject
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-TagResource" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_TagResource.html">
+                 TagResource
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to tag a resource with given key value pairs
+               </td>
+               <td tabindex="-1">
+                Tagging
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazontranscribe-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazontranscribe-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-UntagResource" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_UntagResource.html">
+                 UntagResource
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to untag a resource with given key
+               </td>
+               <td tabindex="-1">
+                Tagging
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazontranscribe-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-UpdateCallAnalyticsCategory" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_UpdateCallAnalyticsCategory.html">
+                 UpdateCallAnalyticsCategory
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update the call analytics category with new values. The UpdateCallAnalyticsCategory operation overwrites all of the existing information with the values that you provide in the request
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-UpdateMedicalVocabulary" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_UpdateMedicalVocabulary.html">
+                 UpdateMedicalVocabulary
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update an existing medical vocabulary with new values. The UpdateMedicalVocabulary operation overwrites all of the existing information with the values that you provide in the request
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazontranscribe-medicalvocabulary">
+                  medicalvocabulary*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 s3:GetObject
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-UpdateVocabulary" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_UpdateVocabulary.html">
+                 UpdateVocabulary
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update an existing vocabulary with new values. The UpdateVocabulary operation overwrites all of the existing information with the values that you provide in the request
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazontranscribe-vocabulary">
+                  vocabulary*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 s3:GetObject
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-UpdateVocabularyFilter" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_UpdateVocabularyFilter.html">
+                 UpdateVocabularyFilter
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update an existing vocabulary filter with new values. The UpdateVocabularyFilter operation overwrites all of the existing information with the values that you provide in the request
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazontranscribe-vocabularyfilter">
+                  vocabularyfilter*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 s3:GetObject
+                </p>
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <h2 id="amazontranscribe-resources-for-iam-policies">
+            Resource types defined by        Amazon Transcribe
+           </h2>
+           <p>
+            The following resource types are defined by this service and can be used in the
+            <code class="code">
+             Resource
+            </code>
+            element of IAM permission policy statements. Each action in the
+            <a href="#amazontranscribe-actions-as-permissions">
+             Actions table
+            </a>
+            identifies the      resource types that can be specified with that action. A resource type can also define which      condition keys you can include in a policy. These keys are displayed in the last column of the      Resource types table. For details about the columns in the following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#resources_table" rel="noopener noreferrer" target="_blank">
+             Resource types table
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9e1587c13b5">
+              <thead>
+               <tr>
+                <th>
+                 Resource types
+                </th>
+                <th>
+                 ARN
+                </th>
+                <th>
+                 Condition keys
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="amazontranscribe-transcriptionjob" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_TranscriptionJob.html">
+                 transcriptionjob
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:transcribe:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:transcription-job/$
+                 <span>
+                  {
+                 </span>
+                 JobName}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazontranscribe-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-vocabulary" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_CreateVocabulary.html">
+                 vocabulary
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:transcribe:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:vocabulary/$
+                 <span>
+                  {
+                 </span>
+                 VocabularyName}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazontranscribe-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-vocabularyfilter" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_CreateVocabularyFilter.html">
+                 vocabularyfilter
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:transcribe:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:vocabulary-filter/$
+                 <span>
+                  {
+                 </span>
+                 VocabularyFilterName}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazontranscribe-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-languagemodel" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_LanguageModel.html">
+                 languagemodel
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:transcribe:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:language-model/$
+                 <span>
+                  {
+                 </span>
+                 ModelName}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazontranscribe-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-medicaltranscriptionjob" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_MedicalTranscriptionJob.html">
+                 medicaltranscriptionjob
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:transcribe:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:medical-transcription-job/$
+                 <span>
+                  {
+                 </span>
+                 JobName}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazontranscribe-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-medicalvocabulary" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_CreateMedicalVocabulary.html">
+                 medicalvocabulary
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:transcribe:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:medical-vocabulary/$
+                 <span>
+                  {
+                 </span>
+                 VocabularyName}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazontranscribe-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-callanalyticsjob" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_CallAnalyticsJob.html">
+                 callanalyticsjob
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:transcribe:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:analytics-job/$
+                 <span>
+                  {
+                 </span>
+                 JobName}
+                </code>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-callanalyticscategory" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_CreateCallAnalyticsCategory.html">
+                 callanalyticscategory
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:transcribe:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:analytics-category/$
+                 <span>
+                  {
+                 </span>
+                 CategoryName}
+                </code>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-medicalscribejob" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/transcribe/latest/dg/API_MedicalScribeJob.html">
+                 medicalscribejob
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:transcribe:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:medical-scribe-job/$
+                 <span>
+                  {
+                 </span>
+                 JobName}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazontranscribe-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <h2 id="amazontranscribe-policy-keys">
+            Condition keys for        Amazon Transcribe
+           </h2>
+           <p>
+            Amazon Transcribe defines the following condition keys that can be used in the
+            <code class="code">
+             Condition
+            </code>
+            element of an IAM policy. You can use these keys to further refine      the conditions under which the policy statement applies. For details about the columns in the      following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#context_keys_table" rel="noopener noreferrer" target="_blank">
+             Condition keys table
+            </a>
+            .
+           </p>
+           <p>
+            To view the global condition keys that are available to all services, see
+            <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#AvailableKeys">
+             Available global condition keys
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9e1587c15b7">
+              <thead>
+               <tr>
+                <th>
+                 Condition keys
+                </th>
+                <th>
+                 Description
+                </th>
+                <th>
+                 Type
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="amazontranscribe-aws_RequestTag___TagKey_" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-globally-available">
+                 aws:RequestTag/${TagKey}
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by requiring tag values present in a resource creation request
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-aws_ResourceTag___TagKey_" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-globally-available">
+                 aws:ResourceTag/${TagKey}
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by requiring tag value associated with the resource
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-aws_TagKeys" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-globally-available">
+                 aws:TagKeys
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by requiring the presence of mandatory tags in the request
+               </td>
+               <td tabindex="-1">
+                ArrayOfString
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-transcribe_OutputBucketName" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/list_amazontranscribe.html#amazontranscribe-policy-keys">
+                 transcribe:OutputBucketName
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access based on the output bucket name included in the request
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-transcribe_OutputEncryptionKMSKeyId" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/list_amazontranscribe.html#amazontranscribe-policy-keys">
+                 transcribe:OutputEncryptionKMSKeyId
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access based on the KMS key id included in the request
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-transcribe_OutputKey" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/list_amazontranscribe.html#amazontranscribe-policy-keys">
+                 transcribe:OutputKey
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access based on the output key included in the request
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="amazontranscribe-transcribe_OutputLocation" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/list_amazontranscribe.html#amazontranscribe-policy-keys">
+                 transcribe:OutputLocation
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access based on the output location included in the request
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <awsdocs-copyright class="copyright-print">
+           </awsdocs-copyright>
+           <awsdocs-thumb-feedback right-edge="{{$ctrl.thumbFeedbackRightEdge}}">
+           </awsdocs-thumb-feedback>
+          </div>
+          <noscript>
+           <div>
+            <div>
+             <div>
+              <div id="js_error_message">
+               <p>
+                <img alt="Warning" src="https://d1ge0kk1l5kms0.cloudfront.net/images/G/01/webservices/console/warning.png"/>
+                <strong>
+                 Javascript is disabled or is unavailable in your browser.
+                </strong>
+               </p>
+               <p>
+                To use the Amazon Web Services Documentation, Javascript must be enabled. Please refer to your browser's Help pages for instructions.
+               </p>
+              </div>
+             </div>
+            </div>
+           </div>
+          </noscript>
+          <div class="awsui-util-font-size-0" id="main-col-footer">
+           <div id="doc-conventions">
+            <a href="/general/latest/gr/docconventions.html" target="_top">
+             Document Conventions
+            </a>
+           </div>
+           <div class="prev-next">
+            <div accesskey="p" class="prev-link" href="./list_awstiros.html" id="previous">
+             AWS Tiros
+            </div>
+            <div accesskey="n" class="next-link" href="./list_awstransferfamily.html" id="next">
+             AWS Transfer Family
+            </div>
+           </div>
+          </div>
+          <awsdocs-page-utilities>
+          </awsdocs-page-utilities>
+         </div>
+         <div id="quick-feedback-yes" style="display: none;">
+          <div class="title">
+           Did this page help you? - Yes
+          </div>
+          <div class="content">
+           <p>
+            Thanks for letting us know we're doing a good job!
+           </p>
+           <p>
+            If you've got a moment, please tell us what we did right so we can do more of it.
+           </p>
+           <p>
+            <awsui-button click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service Authorization Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazontranscribe.html" id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback">
+            </awsui-button>
+           </p>
+          </div>
+         </div>
+         <div id="quick-feedback-no" style="display: none;">
+          <div class="title">
+           Did this page help you? - No
+          </div>
+          <div class="content">
+           <p>
+            Thanks for letting us know this page needs work. We're sorry we let you down.
+           </p>
+           <p>
+            If you've got a moment, please tell us how we can make the documentation better.
+           </p>
+           <p>
+            <awsui-button click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service Authorization Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazontranscribe.html" id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback">
+            </awsui-button>
+           </p>
+          </div>
+         </div>
+        </div>
+       </body>
+      </div>
+     </awsdocs-view>
+     <div class="page-loading-indicator" id="page-loading-indicator">
+      <awsui-spinner size="large">
+      </awsui-spinner>
+     </div>
+    </div>
+    <div dom-region="tools" id="tools-panel">
+     <awsdocs-tools-panel id="awsdocs-tools-panel">
+     </awsdocs-tools-panel>
+    </div>
+   </awsui-app-layout>
+   <awsdocs-cookie-banner class="doc-cookie-banner">
+   </awsdocs-cookie-banner>
+  </div>
+ </body>
+</html>

@@ -1,0 +1,2053 @@
+<!DOCTYPE html>
+<html lang="en-US" xmlns="http://www.w3.org/1999/xhtml">
+ <head>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+  <title>
+   Actions, resources, and condition keys for AWS Security Token Service - Service Authorization Reference
+  </title>
+  <meta content="width=device-width,initial-scale=1" name="viewport"/>
+  <meta content="/assets" name="assets_root"/>
+  <meta content="list_awssecuritytokenservice" name="target_state"/>
+  <meta content="list_awssecuritytokenservice" name="default_state"/>
+  <link href="https://docs.aws.amazon.com/assets/images/favicon.ico" rel="icon" type="image/ico"/>
+  <link href="https://docs.aws.amazon.com/assets/images/favicon.ico" rel="shortcut icon" type="image/ico"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awssecuritytokenservice.html" rel="canonical"/>
+  <meta content="Lists all of the available service-specific resources, actions, and condition keys that can be used in IAM policies to control access to AWS Security Token Service." name="description"/>
+  <meta content="IAD" name="deployment_region"/>
+  <meta content="Service Authorization Reference" name="product"/>
+  <meta content="Service Authorization Reference" name="guide"/>
+  <meta content="Provides a list of the actions, resources, and condition keys supported by each AWS service that can be used in an IAM policy." name="abstract"/>
+  <meta content="en_us" name="guide-locale"/>
+  <meta content="toc-contents.json;toc-list_awssecuritytokenservice.json" name="tocs"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awssecuritytokenservice.html" rel="canonical"/>
+  <link href="https://docs.aws.amazon.com/id_id/service-authorization/latest/reference/list_awssecuritytokenservice.html" hreflang="id-id" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/id_id/service-authorization/latest/reference/list_awssecuritytokenservice.html" hreflang="id" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/de_de/service-authorization/latest/reference/list_awssecuritytokenservice.html" hreflang="de-de" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/de_de/service-authorization/latest/reference/list_awssecuritytokenservice.html" hreflang="de" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awssecuritytokenservice.html" hreflang="en-us" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awssecuritytokenservice.html" hreflang="en" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/es_es/service-authorization/latest/reference/list_awssecuritytokenservice.html" hreflang="es-es" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/es_es/service-authorization/latest/reference/list_awssecuritytokenservice.html" hreflang="es" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/fr_fr/service-authorization/latest/reference/list_awssecuritytokenservice.html" hreflang="fr-fr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/fr_fr/service-authorization/latest/reference/list_awssecuritytokenservice.html" hreflang="fr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/it_it/service-authorization/latest/reference/list_awssecuritytokenservice.html" hreflang="it-it" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/it_it/service-authorization/latest/reference/list_awssecuritytokenservice.html" hreflang="it" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ja_jp/service-authorization/latest/reference/list_awssecuritytokenservice.html" hreflang="ja-jp" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ja_jp/service-authorization/latest/reference/list_awssecuritytokenservice.html" hreflang="ja" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ko_kr/service-authorization/latest/reference/list_awssecuritytokenservice.html" hreflang="ko-kr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ko_kr/service-authorization/latest/reference/list_awssecuritytokenservice.html" hreflang="ko" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/pt_br/service-authorization/latest/reference/list_awssecuritytokenservice.html" hreflang="pt-br" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/pt_br/service-authorization/latest/reference/list_awssecuritytokenservice.html" hreflang="pt" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/zh_cn/service-authorization/latest/reference/list_awssecuritytokenservice.html" hreflang="zh-cn" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/zh_tw/service-authorization/latest/reference/list_awssecuritytokenservice.html" hreflang="zh-tw" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awssecuritytokenservice.html" hreflang="x-default" rel="alternative"/>
+  <meta content="Service Authorization Docs" name="feedback-item"/>
+  <meta content="Service Authorization Reference" name="this_doc_product"/>
+  <meta content="Service Authorization Reference" name="this_doc_guide"/>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor4.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor3.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor1.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/awsdocs-common.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/awsdocs-doc-page.js?version=2021.12.02">
+  </script>
+  <link href="https://docs.aws.amazon.com/assets/r/vendor4.css?version=2021.12.02" rel="stylesheet"/>
+  <link href="https://docs.aws.amazon.com/assets/r/awsdocs-common.css?version=2021.12.02" rel="stylesheet"/>
+  <link href="https://docs.aws.amazon.com/assets/r/awsdocs-doc-page.css?version=2021.12.02" rel="stylesheet"/>
+  <script async="" data-config="{'appEntity':'aws-documentation','region':'us-east-1','service':'iam'}" id="awsc-panorama-bundle" src="https://prod.pa.cdn.uis.awsstatic.com/panorama-nav-init.js" type="text/javascript">
+  </script>
+  <meta id="panorama-serviceSubSection" value="Service Authorization Reference"/>
+  <meta id="panorama-serviceConsolePage" value="Actions, resources, and condition keys for AWS Security Token Service"/>
+ </head>
+ <body class="awsdocs awsui">
+  <div class="awsdocs-container">
+   <awsdocs-header>
+   </awsdocs-header>
+   <awsui-app-layout class="awsui-util-no-gutters" header-selector="awsdocs-header" id="app-layout" navigation-change="$ctrl.onNavChange($event)" navigation-hide="false" navigation-open="$ctrl.navOpen" navigation-width="$ctrl.navWidth" ng-controller="ContentController as $ctrl" tools-change="$ctrl.onToolsChange($event)" tools-hide="$ctrl.hideTools" tools-open="$ctrl.toolsOpen" tools-width="$ctrl.toolsWidth">
+    <div dom-region="navigation" id="guide-toc">
+     <awsdocs-toc>
+     </awsdocs-toc>
+    </div>
+    <div dom-region="content" id="main-column" tabindex="-1">
+     <awsdocs-view class="awsdocs-view">
+      <div id="awsdocs-content">
+       <head>
+        <title>
+         Actions, resources, and condition keys for AWS Security Token Service - Service Authorization Reference
+        </title>
+        <meta content="https://repost.aws/tags/TAO7Z4bI5hQVWMiYFs34QhIA" name="forums"/>
+        <meta content="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service%20Authorization%20Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awssecuritytokenservice.html" name="feedback"/>
+        <meta content="feedbackyes.html?topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awssecuritytokenservice.html" name="feedback-yes"/>
+        <meta content="feedbackno.html?topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awssecuritytokenservice.html" name="feedback-no"/>
+        <script type="application/ld+json">
+         {
+    "@context" : "https://schema.org",
+    "@type" : "BreadcrumbList",
+    "itemListElement" : [
+      {
+        "@type" : "ListItem",
+        "position" : 1,
+        "name" : "AWS",
+        "item" : "https://aws.amazon.com"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 2,
+        "name" : "Service Authorization Reference",
+        "item" : "https://docs.aws.amazon.com/iam/index.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 3,
+        "name" : "Service Authorization Reference",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 4,
+        "name" : "Actions, resources, and condition keys for AWS Security Token Service",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/list_awssecuritytokenservice.html"
+      }
+    ]
+}
+        </script>
+       </head>
+       <body>
+        <div id="main">
+         <div style="display: none">
+         </div>
+         <div class="breadcrumb" id="breadcrumbs">
+          <a href="https://aws.amazon.com">
+           AWS
+          </a>
+          <a href="/index.html">
+           Documentation
+          </a>
+          <a href="/iam/index.html">
+           Service Authorization Reference
+          </a>
+          <a href="list_awssecuritytokenservice.html">
+           Service Authorization Reference
+          </a>
+         </div>
+         <div id="page-toc-src">
+          <a href="#awssecuritytokenservice-actions-as-permissions">
+           Actions
+          </a>
+          <a href="#awssecuritytokenservice-resources-for-iam-policies">
+           Resource types
+          </a>
+          <a href="#awssecuritytokenservice-policy-keys">
+           Condition keys
+          </a>
+         </div>
+         <div class="awsui-util-container" id="main-content">
+          <div id="main-col-body">
+           <awsdocs-language-banner data-service="$ctrl.pageService">
+           </awsdocs-language-banner>
+           <h1 class="topictitle" id="list_awssecuritytokenservice">
+            Actions, resources, and condition keys for      AWS Security Token Service
+           </h1>
+           <div class="awsdocs-page-header-container">
+            <awsdocs-page-header>
+            </awsdocs-page-header>
+            <awsdocs-filter-selector id="awsdocs-filter-selector">
+            </awsdocs-filter-selector>
+           </div>
+           <p>
+            AWS Security Token Service (service prefix:
+            <code class="code">
+             sts
+            </code>
+            ) provides the following    service-specific resources, actions, and condition context keys for use in IAM permission    policies.
+           </p>
+           <p>
+            References:
+           </p>
+           <div class="itemizedlist">
+            <ul class="itemizedlist">
+             <li class="listitem">
+              <p>
+               Learn how to
+               <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html">
+                configure this service
+               </a>
+               .
+              </p>
+             </li>
+             <li class="listitem">
+              <p>
+               View a list of the
+               <a href="https://docs.aws.amazon.com/STS/latest/APIReference/">
+                API operations available for this        service
+               </a>
+               .
+              </p>
+             </li>
+             <li class="listitem">
+              <p>
+               Learn how to secure this service and its resources by
+               <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/access_permissions.html">
+                using        IAM
+               </a>
+               permission policies.
+              </p>
+             </li>
+            </ul>
+           </div>
+           <div class="highlights" id="inline-topiclist">
+            <h6>
+             Topics
+            </h6>
+            <ul>
+             <li>
+              <a href="#awssecuritytokenservice-actions-as-permissions">
+               Actions defined by        AWS Security Token Service
+              </a>
+             </li>
+             <li>
+              <a href="#awssecuritytokenservice-resources-for-iam-policies">
+               Resource types defined by        AWS Security Token Service
+              </a>
+             </li>
+             <li>
+              <a href="#awssecuritytokenservice-policy-keys">
+               Condition keys for        AWS Security Token Service
+              </a>
+             </li>
+            </ul>
+           </div>
+           <h2 id="awssecuritytokenservice-actions-as-permissions">
+            Actions defined by        AWS Security Token Service
+           </h2>
+           <p>
+            You can specify the following actions in the
+            <code class="code">
+             Action
+            </code>
+            element of an IAM      policy statement. Use policies to grant permissions to perform an operation in AWS. When you      use an action in a policy, you usually allow or deny access to the API operation or CLI      command with the same name. However, in some cases, a single action controls access to more      than one operation. Alternatively, some operations require several different actions.
+           </p>
+           <p>
+            The
+            <b>
+             Resource types
+            </b>
+            column of the Actions table indicates whether each      action supports resource-level permissions. If there is no value for this column, you must      specify all resources ("*") to which the policy applies in the
+            <code class="code">
+             Resource
+            </code>
+            element      of your policy statement. If the column includes a resource type, then you can specify an ARN      of that type in a statement with that action. If the action has one or more required      resources, the caller must have permission to use the action with those resources. Required      resources are indicated in the table with an asterisk (*). If you limit resource access with      the
+            <code class="code">
+             Resource
+            </code>
+            element in an IAM policy, you must include an ARN or pattern for      each required resource type. Some actions support multiple resource types. If the resource      type is optional (not indicated as required), then you can choose to use one of the optional      resource types.
+           </p>
+           <p>
+            The
+            <b>
+             Condition keys
+            </b>
+            column of the Actions table includes keys that you      can specify in a policy statement's
+            <code class="code">
+             Condition
+            </code>
+            element. For more information on      the condition keys that are associated with resources for the service, see the
+            <b>
+             Condition keys
+            </b>
+            column of the Resource types table.
+           </p>
+           <div class="awsdocs-note">
+            <div class="awsdocs-note-title">
+             <awsui-icon name="status-info" variant="link">
+             </awsui-icon>
+             <h6>
+              Note
+             </h6>
+            </div>
+            <div class="awsdocs-note-text">
+             <p>
+              Resource condition keys are listed in the
+              <a href="#awssecuritytokenservice-resources-for-iam-policies">
+               Resource types
+              </a>
+              table. You        can find a link to the resource type that applies to an action in the
+              <b>
+               Resource          types (*required)
+              </b>
+              column of the Actions table. The resource type in the        Resource types table includes the
+              <b>
+               Condition keys
+              </b>
+              column, which are the        resource condition keys that apply to an action in the Actions table.
+             </p>
+            </div>
+           </div>
+           <p>
+            For details about the columns in the following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#actions_table" rel="noopener noreferrer" target="_blank">
+             Actions table
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w61aab7c11c13">
+              <thead>
+               <tr>
+                <th>
+                 Actions
+                </th>
+                <th>
+                 Description
+                </th>
+                <th>
+                 Access level
+                </th>
+                <th>
+                 Resource types (*required)
+                </th>
+                <th>
+                 Condition keys
+                </th>
+                <th>
+                 Dependent actions
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="awssecuritytokenservice-AssumeRole" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRole.html">
+                 AssumeRole
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to obtain a set of temporary security credentials that you can use to access AWS resources that you might not normally have access to
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awssecuritytokenservice-role">
+                  role*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awssecuritytokenservice-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-sts_TransitiveTagKeys">
+                  sts:TransitiveTagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-sts_ExternalId">
+                  sts:ExternalId
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-sts_RoleSessionName">
+                  sts:RoleSessionName
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-iam_ResourceTag___TagKey_">
+                  iam:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-sts_SourceIdentity">
+                  sts:SourceIdentity
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-cognito-identity.amazonaws.com_amr">
+                  cognito-identity.amazonaws.com:amr
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-cognito-identity.amazonaws.com_aud">
+                  cognito-identity.amazonaws.com:aud
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-cognito-identity.amazonaws.com_sub">
+                  cognito-identity.amazonaws.com:sub
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-www.amazon.com_app_id">
+                  www.amazon.com:app_id
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-www.amazon.com_user_id">
+                  www.amazon.com:user_id
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-graph.facebook.com_app_id">
+                  graph.facebook.com:app_id
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-graph.facebook.com_id">
+                  graph.facebook.com:id
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-accounts.google.com_aud">
+                  accounts.google.com:aud
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-accounts.google.com_sub">
+                  accounts.google.com:sub
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-saml_namequalifier">
+                  saml:namequalifier
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-saml_sub">
+                  saml:sub
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-saml_sub_type">
+                  saml:sub_type
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-AssumeRoleWithSAML" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRoleWithSAML.html">
+                 AssumeRoleWithSAML
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to obtain a set of temporary security credentials for users who have been authenticated via a SAML authentication response
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awssecuritytokenservice-role">
+                  role*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awssecuritytokenservice-saml_namequalifier">
+                  saml:namequalifier
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-saml_sub">
+                  saml:sub
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-saml_sub_type">
+                  saml:sub_type
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-saml_aud">
+                  saml:aud
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-saml_iss">
+                  saml:iss
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-saml_doc">
+                  saml:doc
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-saml_cn">
+                  saml:cn
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-saml_commonName">
+                  saml:commonName
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-saml_eduorghomepageuri">
+                  saml:eduorghomepageuri
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-saml_eduorgidentityauthnpolicyuri">
+                  saml:eduorgidentityauthnpolicyuri
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-saml_eduorglegalname">
+                  saml:eduorglegalname
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-saml_eduorgsuperioruri">
+                  saml:eduorgsuperioruri
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-saml_eduorgwhitepagesuri">
+                  saml:eduorgwhitepagesuri
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-saml_edupersonaffiliation">
+                  saml:edupersonaffiliation
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-saml_edupersonassurance">
+                  saml:edupersonassurance
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-saml_edupersonentitlement">
+                  saml:edupersonentitlement
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-saml_edupersonnickname">
+                  saml:edupersonnickname
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-saml_edupersonorgdn">
+                  saml:edupersonorgdn
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-saml_edupersonorgunitdn">
+                  saml:edupersonorgunitdn
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-saml_edupersonprimaryaffiliation">
+                  saml:edupersonprimaryaffiliation
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-saml_edupersonprimaryorgunitdn">
+                  saml:edupersonprimaryorgunitdn
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-saml_edupersonprincipalname">
+                  saml:edupersonprincipalname
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-saml_edupersonscopedaffiliation">
+                  saml:edupersonscopedaffiliation
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-saml_edupersontargetedid">
+                  saml:edupersontargetedid
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-saml_givenName">
+                  saml:givenName
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-saml_mail">
+                  saml:mail
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-saml_name">
+                  saml:name
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-saml_organizationStatus">
+                  saml:organizationStatus
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-saml_primaryGroupSID">
+                  saml:primaryGroupSID
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-saml_surname">
+                  saml:surname
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-saml_uid">
+                  saml:uid
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-saml_x500UniqueIdentifier">
+                  saml:x500UniqueIdentifier
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-sts_TransitiveTagKeys">
+                  sts:TransitiveTagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-sts_SourceIdentity">
+                  sts:SourceIdentity
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-sts_RoleSessionName">
+                  sts:RoleSessionName
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-AssumeRoleWithWebIdentity" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRoleWithWebIdentity.html">
+                 AssumeRoleWithWebIdentity
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to obtain a set of temporary security credentials for users who have been authenticated in a mobile or web application with a web identity provider
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awssecuritytokenservice-role">
+                  role*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awssecuritytokenservice-cognito-identity.amazonaws.com_amr">
+                  cognito-identity.amazonaws.com:amr
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-cognito-identity.amazonaws.com_aud">
+                  cognito-identity.amazonaws.com:aud
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-cognito-identity.amazonaws.com_sub">
+                  cognito-identity.amazonaws.com:sub
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-www.amazon.com_app_id">
+                  www.amazon.com:app_id
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-www.amazon.com_user_id">
+                  www.amazon.com:user_id
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-graph.facebook.com_app_id">
+                  graph.facebook.com:app_id
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-graph.facebook.com_id">
+                  graph.facebook.com:id
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-accounts.google.com_aud">
+                  accounts.google.com:aud
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-accounts.google.com_oaud">
+                  accounts.google.com:oaud
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-accounts.google.com_sub">
+                  accounts.google.com:sub
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-sts_TransitiveTagKeys">
+                  sts:TransitiveTagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-sts_SourceIdentity">
+                  sts:SourceIdentity
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-sts_RoleSessionName">
+                  sts:RoleSessionName
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-DecodeAuthorizationMessage" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/STS/latest/APIReference/API_DecodeAuthorizationMessage.html">
+                 DecodeAuthorizationMessage
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to decode additional information about the authorization status of a request from an encoded message returned in response to an AWS request
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-GetAccessKeyInfo" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/STS/latest/APIReference/API_GetAccessKeyInfo.html">
+                 GetAccessKeyInfo
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to obtain details about the access key id passed as a parameter to the request
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-GetCallerIdentity" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/STS/latest/APIReference/API_GetCallerIdentity.html">
+                 GetCallerIdentity
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to obtain details about the IAM identity whose credentials are used to call the API
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-GetFederationToken" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/STS/latest/APIReference/API_GetFederationToken.html">
+                 GetFederationToken
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to obtain a set of temporary security credentials (consisting of an access key ID, a secret access key, and a security token) for a federated user
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awssecuritytokenservice-user">
+                  user
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awssecuritytokenservice-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-GetServiceBearerToken" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_bearer.html">
+                 GetServiceBearerToken
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to obtain a STS bearer token for an AWS root user, IAM role, or an IAM user
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awssecuritytokenservice-sts_AWSServiceName">
+                  sts:AWSServiceName
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-sts_DurationSeconds">
+                  sts:DurationSeconds
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-GetSessionToken" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/STS/latest/APIReference/API_GetSessionToken.html">
+                 GetSessionToken
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to obtain a set of temporary security credentials (consisting of an access key ID, a secret access key, and a security token) for an AWS account or IAM user
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-SetContext" rowspan="3" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_iam-condition-keys.html#condition-keys-sts">
+                 SetContext
+                </a>
+                [permission only]
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Grants permission to set context keys on a STS session
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awssecuritytokenservice-role">
+                  role
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awssecuritytokenservice-self-session">
+                  self-session
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awssecuritytokenservice-sts_RequestContext___ContextKey_">
+                  sts:RequestContext/${ContextKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-sts_RequestContextProviders">
+                  sts:RequestContextProviders
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-SetSourceIdentity" rowspan="3" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_control-access_monitor.html#id_credentials_temp_control-access_monitor-perms">
+                 SetSourceIdentity
+                </a>
+                [permission only]
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Grants permission to set a source identity on a STS session
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awssecuritytokenservice-role">
+                  role
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awssecuritytokenservice-user">
+                  user
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awssecuritytokenservice-sts_SourceIdentity">
+                  sts:SourceIdentity
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-TagSession" rowspan="3" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_session-tags.html">
+                 TagSession
+                </a>
+                [permission only]
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Grants permission to add tags to a STS session
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Tagging
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awssecuritytokenservice-role">
+                  role
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awssecuritytokenservice-user">
+                  user
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awssecuritytokenservice-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-sts_TransitiveTagKeys">
+                  sts:TransitiveTagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-saml_aud">
+                  saml:aud
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <h2 id="awssecuritytokenservice-resources-for-iam-policies">
+            Resource types defined by        AWS Security Token Service
+           </h2>
+           <p>
+            The following resource types are defined by this service and can be used in the
+            <code class="code">
+             Resource
+            </code>
+            element of IAM permission policy statements. Each action in the
+            <a href="#awssecuritytokenservice-actions-as-permissions">
+             Actions table
+            </a>
+            identifies the      resource types that can be specified with that action. A resource type can also define which      condition keys you can include in a policy. These keys are displayed in the last column of the      table. For details about the columns in the following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#resources_table" rel="noopener noreferrer" target="_blank">
+             Resource types table
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w61aab7c13b5">
+              <thead>
+               <tr>
+                <th>
+                 Resource types
+                </th>
+                <th>
+                 ARN
+                </th>
+                <th>
+                 Condition keys
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="awssecuritytokenservice-role" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html">
+                 role
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:iam::$
+                 <span>
+                  {
+                 </span>
+                 Account}:role/$
+                 <span>
+                  {
+                 </span>
+                 RoleNameWithPath}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awssecuritytokenservice-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awssecuritytokenservice-iam_ResourceTag___TagKey_">
+                  iam:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-user" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users.html">
+                 user
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:iam::$
+                 <span>
+                  {
+                 </span>
+                 Account}:user/$
+                 <span>
+                  {
+                 </span>
+                 UserNameWithPath}
+                </code>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-self-session" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_identifiers.html#identifiers-arns">
+                 self-session
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:sts::$
+                 <span>
+                  {
+                 </span>
+                 Account}:self
+                </code>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <h2 id="awssecuritytokenservice-policy-keys">
+            Condition keys for        AWS Security Token Service
+           </h2>
+           <p>
+            AWS Security Token Service defines the following condition keys that can be used in the
+            <code class="code">
+             Condition
+            </code>
+            element of an IAM policy. You can use these keys to further refine      the conditions under which the policy statement applies. For details about the columns in the      following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#context_keys_table" rel="noopener noreferrer" target="_blank">
+             Condition keys table
+            </a>
+            .
+           </p>
+           <p>
+            To view the global condition keys that are available to all services, see
+            <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#AvailableKeys">
+             Available global condition keys
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w61aab7c15b7">
+              <thead>
+               <tr>
+                <th>
+                 Condition keys
+                </th>
+                <th>
+                 Description
+                </th>
+                <th>
+                 Type
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="awssecuritytokenservice-accounts.google.com_aud" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_iam-condition-keys.html#ck_aud">
+                 accounts.google.com:aud
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the Google application ID
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-accounts.google.com_oaud" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_iam-condition-keys.html#ck_oaud">
+                 accounts.google.com:oaud
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the Google audience
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-accounts.google.com_sub" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_iam-condition-keys.html#ck_sub">
+                 accounts.google.com:sub
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the subject of the claim (the Google user ID)
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-aws_RequestTag___TagKey_" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-requesttag">
+                 aws:RequestTag/${TagKey}
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the tags that are passed in the request
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-aws_ResourceTag___TagKey_" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-resourcetag">
+                 aws:ResourceTag/${TagKey}
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the tags associated with the resource
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-aws_TagKeys" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-tagkeys">
+                 aws:TagKeys
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the tag keys that are passed in the request
+               </td>
+               <td tabindex="-1">
+                ArrayOfString
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-cognito-identity.amazonaws.com_amr" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_iam-condition-keys.html#ck_amr">
+                 cognito-identity.amazonaws.com:amr
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the login information for Amazon Cognito
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-cognito-identity.amazonaws.com_aud" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_iam-condition-keys.html#ck_aud">
+                 cognito-identity.amazonaws.com:aud
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the Amazon Cognito identity pool ID
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-cognito-identity.amazonaws.com_sub" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_iam-condition-keys.html#ck_sub">
+                 cognito-identity.amazonaws.com:sub
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the subject of the claim (the Amazon Cognito user ID)
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-graph.facebook.com_app_id" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_iam-condition-keys.html#ck_id">
+                 graph.facebook.com:app_id
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the Facebook application ID
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-graph.facebook.com_id" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_iam-condition-keys.html#ck_id">
+                 graph.facebook.com:id
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the Facebook user ID
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-iam_ResourceTag___TagKey_" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_iam-condition-keys.html#ck_ResourceTag">
+                 iam:ResourceTag/${TagKey}
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the tags that are attached to the role that is being assumed
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-saml_aud" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_iam-condition-keys.html#ck_aud">
+                 saml:aud
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the endpoint URL to which SAML assertions are presented
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-saml_cn" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_iam-condition-keys.html#ck_cn">
+                 saml:cn
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the eduOrg attribute
+               </td>
+               <td tabindex="-1">
+                ArrayOfString
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-saml_commonName" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_iam-condition-keys.html#ck_commonname">
+                 saml:commonName
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the commonName attribute
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-saml_doc" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_iam-condition-keys.html#ck_doc">
+                 saml:doc
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by on the principal that was used to assume the role
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-saml_eduorghomepageuri" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_iam-condition-keys.html#ck_eduorghomepageuri">
+                 saml:eduorghomepageuri
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the eduOrg attribute
+               </td>
+               <td tabindex="-1">
+                ArrayOfString
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-saml_eduorgidentityauthnpolicyuri" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_iam-condition-keys.html#ck_aud">
+                 saml:eduorgidentityauthnpolicyuri
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the eduOrg attribute
+               </td>
+               <td tabindex="-1">
+                ArrayOfString
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-saml_eduorglegalname" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_iam-condition-keys.html#ck_eduorglegalname">
+                 saml:eduorglegalname
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the eduOrg attribute
+               </td>
+               <td tabindex="-1">
+                ArrayOfString
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-saml_eduorgsuperioruri" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_iam-condition-keys.html#ck_eduorgsuperioruri">
+                 saml:eduorgsuperioruri
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the eduOrg attribute
+               </td>
+               <td tabindex="-1">
+                ArrayOfString
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-saml_eduorgwhitepagesuri" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_iam-condition-keys.html#ck_eduorgwhitepagesuri">
+                 saml:eduorgwhitepagesuri
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the eduOrg attribute
+               </td>
+               <td tabindex="-1">
+                ArrayOfString
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-saml_edupersonaffiliation" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_iam-condition-keys.html#ck_edupersonaffiliation">
+                 saml:edupersonaffiliation
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the eduPerson attribute
+               </td>
+               <td tabindex="-1">
+                ArrayOfString
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-saml_edupersonassurance" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_iam-condition-keys.html#ck_edupersonassurance">
+                 saml:edupersonassurance
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the eduPerson attribute
+               </td>
+               <td tabindex="-1">
+                ArrayOfString
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-saml_edupersonentitlement" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_iam-condition-keys.html#ck_edupersonentitlement">
+                 saml:edupersonentitlement
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the eduPerson attribute
+               </td>
+               <td tabindex="-1">
+                ArrayOfString
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-saml_edupersonnickname" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_iam-condition-keys.html#ck_edupersonnickname">
+                 saml:edupersonnickname
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the eduPerson attribute
+               </td>
+               <td tabindex="-1">
+                ArrayOfString
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-saml_edupersonorgdn" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_iam-condition-keys.html#ck_edupersonorgdn">
+                 saml:edupersonorgdn
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the eduPerson attribute
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-saml_edupersonorgunitdn" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_iam-condition-keys.html#ck_edupersonorgunitdn">
+                 saml:edupersonorgunitdn
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the eduPerson attribute
+               </td>
+               <td tabindex="-1">
+                ArrayOfString
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-saml_edupersonprimaryaffiliation" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_iam-condition-keys.html#ck_edupersonprimaryaffiliation">
+                 saml:edupersonprimaryaffiliation
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the eduPerson attribute
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-saml_edupersonprimaryorgunitdn" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_iam-condition-keys.html#ck_edupersonprimaryorgunitdn">
+                 saml:edupersonprimaryorgunitdn
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the eduPerson attribute
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-saml_edupersonprincipalname" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_iam-condition-keys.html#ck_edupersonprincipalname">
+                 saml:edupersonprincipalname
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the eduPerson attribute
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-saml_edupersonscopedaffiliation" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_iam-condition-keys.html#ck_edupersonscopedaffiliation">
+                 saml:edupersonscopedaffiliation
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the eduPerson attribute
+               </td>
+               <td tabindex="-1">
+                ArrayOfString
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-saml_edupersontargetedid" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_iam-condition-keys.html#ck_edupersontargetedid">
+                 saml:edupersontargetedid
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the eduPerson attribute
+               </td>
+               <td tabindex="-1">
+                ArrayOfString
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-saml_givenName" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_iam-condition-keys.html#ck_givenname">
+                 saml:givenName
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the givenName attribute
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-saml_iss" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_iam-condition-keys.html#ck_iss">
+                 saml:iss
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by on the issuer, which is represented by a URN
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-saml_mail" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_iam-condition-keys.html#ck_mail">
+                 saml:mail
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the mail attribute
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-saml_name" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_iam-condition-keys.html#ck_name">
+                 saml:name
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the name attribute
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-saml_namequalifier" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_iam-condition-keys.html#ck_namequalifier">
+                 saml:namequalifier
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the hash value of the issuer, account ID, and friendly name
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-saml_organizationStatus" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_iam-condition-keys.html#ck_organizationstatus">
+                 saml:organizationStatus
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the organizationStatus attribute
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-saml_primaryGroupSID" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_iam-condition-keys.html#ck_primarygroupsid">
+                 saml:primaryGroupSID
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the primaryGroupSID attribute
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-saml_sub" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_iam-condition-keys.html#ck_sub">
+                 saml:sub
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the subject of the claim (the SAML user ID)
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-saml_sub_type" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_iam-condition-keys.html#ck_subtype">
+                 saml:sub_type
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the value persistent, transient, or the full Format URI
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-saml_surname" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_iam-condition-keys.html#ck_surname">
+                 saml:surname
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the surname attribute
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-saml_uid" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_iam-condition-keys.html#ck_uid">
+                 saml:uid
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the uid attribute
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-saml_x500UniqueIdentifier" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_iam-condition-keys.html#ck_x500uniqueidentifier">
+                 saml:x500UniqueIdentifier
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the uid attribute
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-sts_AWSServiceName" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_iam-condition-keys.html#ck_awsservicename">
+                 sts:AWSServiceName
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the service that is obtaining a bearer token
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-sts_DurationSeconds" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_iam-condition-keys.html#ck_durationseconds">
+                 sts:DurationSeconds
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the duration in seconds when getting a bearer token
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-sts_ExternalId" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_iam-condition-keys.html#ck_externalid">
+                 sts:ExternalId
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the unique identifier required when you assume a role in another account
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-sts_RequestContext___ContextKey_" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_iam-condition-keys.html#condition-keys-sts">
+                 sts:RequestContext/${ContextKey}
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the session context key-value pairs embedded in the signed context assertion retrieved from a trusted context provider
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-sts_RequestContextProviders" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_iam-condition-keys.html#condition-keys-sts">
+                 sts:RequestContextProviders
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the context provider ARNs
+               </td>
+               <td tabindex="-1">
+                ArrayOfARN
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-sts_RoleSessionName" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_iam-condition-keys.html#ck_rolesessionname">
+                 sts:RoleSessionName
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the role session name required when you assume a role
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-sts_SourceIdentity" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_iam-condition-keys.html#ck_sourceidentity">
+                 sts:SourceIdentity
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the source identity that is passed in the request
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-sts_TransitiveTagKeys" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_iam-condition-keys.html#ck_TransitiveTagKeys">
+                 sts:TransitiveTagKeys
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the transitive tag keys that are passed in the request
+               </td>
+               <td tabindex="-1">
+                ArrayOfString
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-www.amazon.com_app_id" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_iam-condition-keys.html#ck_id">
+                 www.amazon.com:app_id
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the Login with Amazon application ID
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awssecuritytokenservice-www.amazon.com_user_id" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_iam-condition-keys.html#ck_id">
+                 www.amazon.com:user_id
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the Login with Amazon user ID
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <awsdocs-copyright class="copyright-print">
+           </awsdocs-copyright>
+           <awsdocs-thumb-feedback right-edge="{{$ctrl.thumbFeedbackRightEdge}}">
+           </awsdocs-thumb-feedback>
+          </div>
+          <noscript>
+           <div>
+            <div>
+             <div>
+              <div id="js_error_message">
+               <p>
+                <img alt="Warning" src="https://d1ge0kk1l5kms0.cloudfront.net/images/G/01/webservices/console/warning.png"/>
+                <strong>
+                 Javascript is disabled or is unavailable in your browser.
+                </strong>
+               </p>
+               <p>
+                To use the Amazon Web Services Documentation, Javascript must be enabled. Please refer to your browser's Help pages for instructions.
+               </p>
+              </div>
+             </div>
+            </div>
+           </div>
+          </noscript>
+          <div class="awsui-util-font-size-0" id="main-col-footer">
+           <div id="doc-conventions">
+            <a href="/general/latest/gr/docconventions.html" target="_top">
+             Document Conventions
+            </a>
+           </div>
+           <div class="prev-next">
+            <div accesskey="p" class="prev-link" href="list_awssecuritytokenservice.previous" id="previous" target="_self">
+             Previous
+            </div>
+            <div accesskey="n" class="next-link" href="list_awssecuritytokenservice.next" id="next" target="_self">
+             Next
+            </div>
+           </div>
+          </div>
+          <awsdocs-page-utilities>
+          </awsdocs-page-utilities>
+         </div>
+         <div id="quick-feedback-yes" style="display: none;">
+          <div class="title">
+           Did this page help you? - Yes
+          </div>
+          <div class="content">
+           <p>
+            Thanks for letting us know we're doing a good job!
+           </p>
+           <p>
+            If you've got a moment, please tell us what we did right so we can do more of it.
+           </p>
+           <p>
+            <awsui-button click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service Authorization Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awssecuritytokenservice.html" id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback">
+            </awsui-button>
+           </p>
+          </div>
+         </div>
+         <div id="quick-feedback-no" style="display: none;">
+          <div class="title">
+           Did this page help you? - No
+          </div>
+          <div class="content">
+           <p>
+            Thanks for letting us know this page needs work. We're sorry we let you down.
+           </p>
+           <p>
+            If you've got a moment, please tell us how we can make the documentation better.
+           </p>
+           <p>
+            <awsui-button click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service Authorization Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awssecuritytokenservice.html" id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback">
+            </awsui-button>
+           </p>
+          </div>
+         </div>
+        </div>
+       </body>
+      </div>
+     </awsdocs-view>
+     <div class="page-loading-indicator" id="page-loading-indicator">
+      <awsui-spinner size="large">
+      </awsui-spinner>
+     </div>
+    </div>
+    <div dom-region="tools" id="tools-panel">
+     <awsdocs-tools-panel id="awsdocs-tools-panel">
+     </awsdocs-tools-panel>
+    </div>
+   </awsui-app-layout>
+   <awsdocs-cookie-banner class="doc-cookie-banner">
+   </awsdocs-cookie-banner>
+  </div>
+ </body>
+</html>

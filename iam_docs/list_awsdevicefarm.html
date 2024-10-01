@@ -1,0 +1,3567 @@
+<!DOCTYPE html>
+<html lang="en-US" xmlns="http://www.w3.org/1999/xhtml">
+ <head>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+  <title>
+   Actions, resources, and condition keys for AWS Device Farm - Service Authorization Reference
+  </title>
+  <meta content="width=device-width,initial-scale=1" name="viewport"/>
+  <meta content="/assets" name="assets_root"/>
+  <meta content="list_awsdevicefarm" name="target_state"/>
+  <meta content="list_awsdevicefarm" name="default_state"/>
+  <link href="https://docs.aws.amazon.com/assets/images/favicon.ico" rel="icon" type="image/ico"/>
+  <link href="https://docs.aws.amazon.com/assets/images/favicon.ico" rel="shortcut icon" type="image/ico"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsdevicefarm.html" rel="canonical"/>
+  <meta content="Lists all of the available service-specific resources, actions, and condition keys that can be used in IAM policies to control access to AWS Device Farm." name="description"/>
+  <meta content="IAD" name="deployment_region"/>
+  <meta content="Service Authorization Reference" name="product"/>
+  <meta content="Service Authorization Reference" name="guide"/>
+  <meta content="Provides a list of the actions, resources, and condition keys supported by each AWS service that can be used in an IAM policy." name="abstract"/>
+  <meta content="en_us" name="guide-locale"/>
+  <meta content="toc-contents.json" name="tocs"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsdevicefarm.html" rel="canonical"/>
+  <link href="https://docs.aws.amazon.com/id_id/service-authorization/latest/reference/list_awsdevicefarm.html" hreflang="id-id" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/id_id/service-authorization/latest/reference/list_awsdevicefarm.html" hreflang="id" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/de_de/service-authorization/latest/reference/list_awsdevicefarm.html" hreflang="de-de" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/de_de/service-authorization/latest/reference/list_awsdevicefarm.html" hreflang="de" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsdevicefarm.html" hreflang="en-us" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsdevicefarm.html" hreflang="en" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/es_es/service-authorization/latest/reference/list_awsdevicefarm.html" hreflang="es-es" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/es_es/service-authorization/latest/reference/list_awsdevicefarm.html" hreflang="es" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/fr_fr/service-authorization/latest/reference/list_awsdevicefarm.html" hreflang="fr-fr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/fr_fr/service-authorization/latest/reference/list_awsdevicefarm.html" hreflang="fr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/it_it/service-authorization/latest/reference/list_awsdevicefarm.html" hreflang="it-it" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/it_it/service-authorization/latest/reference/list_awsdevicefarm.html" hreflang="it" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ja_jp/service-authorization/latest/reference/list_awsdevicefarm.html" hreflang="ja-jp" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ja_jp/service-authorization/latest/reference/list_awsdevicefarm.html" hreflang="ja" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ko_kr/service-authorization/latest/reference/list_awsdevicefarm.html" hreflang="ko-kr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ko_kr/service-authorization/latest/reference/list_awsdevicefarm.html" hreflang="ko" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/pt_br/service-authorization/latest/reference/list_awsdevicefarm.html" hreflang="pt-br" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/pt_br/service-authorization/latest/reference/list_awsdevicefarm.html" hreflang="pt" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/zh_cn/service-authorization/latest/reference/list_awsdevicefarm.html" hreflang="zh-cn" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/zh_tw/service-authorization/latest/reference/list_awsdevicefarm.html" hreflang="zh-tw" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsdevicefarm.html" hreflang="x-default" rel="alternative"/>
+  <meta content="Service Authorization Docs" name="feedback-item"/>
+  <meta content="Service Authorization Reference" name="this_doc_product"/>
+  <meta content="Service Authorization Reference" name="this_doc_guide"/>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor4.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor3.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor1.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/awsdocs-common.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/awsdocs-doc-page.js?version=2021.12.02">
+  </script>
+  <link href="https://docs.aws.amazon.com/assets/r/vendor4.css?version=2021.12.02" rel="stylesheet"/>
+  <link href="https://docs.aws.amazon.com/assets/r/awsdocs-common.css?version=2021.12.02" rel="stylesheet"/>
+  <link href="https://docs.aws.amazon.com/assets/r/awsdocs-doc-page.css?version=2021.12.02" rel="stylesheet"/>
+  <script async="" data-config="{'appEntity':'aws-documentation','region':'us-east-1','service':'iam'}" id="awsc-panorama-bundle" src="https://prod.pa.cdn.uis.awsstatic.com/panorama-nav-init.js" type="text/javascript">
+  </script>
+  <meta id="panorama-serviceSubSection" value="Service Authorization Reference"/>
+  <meta id="panorama-serviceConsolePage" value="Actions, resources, and condition keys for AWS Device Farm"/>
+ </head>
+ <body class="awsdocs awsui">
+  <div class="awsdocs-container">
+   <awsdocs-header>
+   </awsdocs-header>
+   <awsui-app-layout class="awsui-util-no-gutters" header-selector="awsdocs-header" id="app-layout" navigation-change="$ctrl.onNavChange($event)" navigation-hide="false" navigation-open="$ctrl.navOpen" navigation-width="$ctrl.navWidth" ng-controller="ContentController as $ctrl" tools-change="$ctrl.onToolsChange($event)" tools-hide="$ctrl.hideTools" tools-open="$ctrl.toolsOpen" tools-width="$ctrl.toolsWidth">
+    <div dom-region="navigation" id="guide-toc">
+     <awsdocs-toc>
+     </awsdocs-toc>
+    </div>
+    <div dom-region="content" id="main-column" tabindex="-1">
+     <awsdocs-view class="awsdocs-view">
+      <div id="awsdocs-content">
+       <head>
+        <title>
+         Actions, resources, and condition keys for AWS Device Farm - Service Authorization Reference
+        </title>
+        <meta content="/pdfs/service-authorization/latest/reference/service-authorization.pdf#list_awsdevicefarm" name="pdf"/>
+        <meta content="https://repost.aws/tags/TAO7Z4bI5hQVWMiYFs34QhIA" name="forums"/>
+        <meta content="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service%20Authorization%20Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awsdevicefarm.html" name="feedback"/>
+        <meta content="feedbackyes.html?topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awsdevicefarm.html" name="feedback-yes"/>
+        <meta content="feedbackno.html?topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awsdevicefarm.html" name="feedback-no"/>
+        <script type="application/ld+json">
+         {
+    "@context" : "https://schema.org",
+    "@type" : "BreadcrumbList",
+    "itemListElement" : [
+      {
+        "@type" : "ListItem",
+        "position" : 1,
+        "name" : "AWS",
+        "item" : "https://aws.amazon.com"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 2,
+        "name" : "Service Authorization Reference",
+        "item" : "https://docs.aws.amazon.com/iam/index.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 3,
+        "name" : "Service Authorization Reference",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 4,
+        "name" : "Reference",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 5,
+        "name" : "Actions, resources, and condition keys for AWS services",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference_policies_actions-resources-contextkeys.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 6,
+        "name" : "Actions, resources, and condition keys for AWS Device Farm",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference_policies_actions-resources-contextkeys.html"
+      }
+    ]
+}
+        </script>
+       </head>
+       <body>
+        <div id="main">
+         <div style="display: none">
+          <a href="/pdfs/service-authorization/latest/reference/service-authorization.pdf#list_awsdevicefarm" rel="noopener noreferrer" target="_blank" title="Open PDF">
+          </a>
+         </div>
+         <div class="breadcrumb" id="breadcrumbs">
+          <a href="https://aws.amazon.com">
+           AWS
+          </a>
+          <a href="/index.html">
+           Documentation
+          </a>
+          <a href="/iam/index.html">
+           Service Authorization Reference
+          </a>
+          <a href="reference.html">
+           Service Authorization Reference
+          </a>
+         </div>
+         <div id="page-toc-src">
+          <a href="#awsdevicefarm-actions-as-permissions">
+           Actions
+          </a>
+          <a href="#awsdevicefarm-resources-for-iam-policies">
+           Resource types
+          </a>
+          <a href="#awsdevicefarm-policy-keys">
+           Condition keys
+          </a>
+         </div>
+         <div class="awsui-util-container" id="main-content">
+          <div id="main-col-body">
+           <awsdocs-language-banner data-service="$ctrl.pageService">
+           </awsdocs-language-banner>
+           <h1 class="topictitle" id="list_awsdevicefarm">
+            Actions, resources, and condition keys for      AWS Device Farm
+           </h1>
+           <div class="awsdocs-page-header-container">
+            <awsdocs-page-header>
+            </awsdocs-page-header>
+            <awsdocs-filter-selector id="awsdocs-filter-selector">
+            </awsdocs-filter-selector>
+           </div>
+           <p>
+            AWS Device Farm (service prefix:
+            <code class="code">
+             devicefarm
+            </code>
+            ) provides the following    service-specific resources, actions, and condition context keys for use in IAM permission    policies.
+           </p>
+           <p>
+            References:
+           </p>
+           <div class="itemizedlist">
+            <ul class="itemizedlist">
+             <li class="listitem">
+              <p>
+               Learn how to
+               <a href="https://docs.aws.amazon.com/devicefarm/latest/developerguide/welcome.html">
+                configure this service
+               </a>
+               .
+              </p>
+             </li>
+             <li class="listitem">
+              <p>
+               View a list of the
+               <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_Operations.html">
+                API operations available for this          service
+               </a>
+               .
+              </p>
+             </li>
+             <li class="listitem">
+              <p>
+               Learn how to secure this service and its resources by
+               <a href="https://docs.aws.amazon.com/devicefarm/latest/developerguide/permissions.html">
+                using          IAM
+               </a>
+               permission policies.
+              </p>
+             </li>
+            </ul>
+           </div>
+           <div class="highlights" id="inline-topiclist">
+            <h6>
+             Topics
+            </h6>
+            <ul>
+             <li>
+              <a href="#awsdevicefarm-actions-as-permissions">
+               Actions defined by        AWS Device Farm
+              </a>
+             </li>
+             <li>
+              <a href="#awsdevicefarm-resources-for-iam-policies">
+               Resource types defined by        AWS Device Farm
+              </a>
+             </li>
+             <li>
+              <a href="#awsdevicefarm-policy-keys">
+               Condition keys for        AWS Device Farm
+              </a>
+             </li>
+            </ul>
+           </div>
+           <h2 id="awsdevicefarm-actions-as-permissions">
+            Actions defined by        AWS Device Farm
+           </h2>
+           <p>
+            You can specify the following actions in the
+            <code class="code">
+             Action
+            </code>
+            element of an IAM      policy statement. Use policies to grant permissions to perform an operation in AWS. When you      use an action in a policy, you usually allow or deny access to the API operation or CLI      command with the same name. However, in some cases, a single action controls access to more      than one operation. Alternatively, some operations require several different actions.
+           </p>
+           <p>
+            The
+            <b>
+             Resource types
+            </b>
+            column of the Actions table indicates whether each      action supports resource-level permissions. If there is no value for this column, you must      specify all resources ("*") to which the policy applies in the
+            <code class="code">
+             Resource
+            </code>
+            element      of your policy statement. If the column includes a resource type, then you can specify an ARN      of that type in a statement with that action. If the action has one or more required      resources, the caller must have permission to use the action with those resources. Required      resources are indicated in the table with an asterisk (*). If you limit resource access with      the
+            <code class="code">
+             Resource
+            </code>
+            element in an IAM policy, you must include an ARN or pattern for      each required resource type. Some actions support multiple resource types. If the resource      type is optional (not indicated as required), then you can choose to use one of the optional      resource types.
+           </p>
+           <p>
+            The
+            <b>
+             Condition keys
+            </b>
+            column of the Actions table includes keys that you      can specify in a policy statement's
+            <code class="code">
+             Condition
+            </code>
+            element. For more information on      the condition keys that are associated with resources for the service, see the
+            <b>
+             Condition keys
+            </b>
+            column of the Resource types table.
+           </p>
+           <div class="awsdocs-note">
+            <div class="awsdocs-note-title">
+             <awsui-icon name="status-info" variant="link">
+             </awsui-icon>
+             <h6>
+              Note
+             </h6>
+            </div>
+            <div class="awsdocs-note-text">
+             <p>
+              Resource condition keys are listed in the
+              <a href="#awsdevicefarm-resources-for-iam-policies">
+               Resource types
+              </a>
+              table. You        can find a link to the resource type that applies to an action in the
+              <b>
+               Resource          types (*required)
+              </b>
+              column of the Actions table. The resource type in the        Resource types table includes the
+              <b>
+               Condition keys
+              </b>
+              column, which are the        resource condition keys that apply to an action in the Actions table.
+             </p>
+            </div>
+           </div>
+           <p>
+            For details about the columns in the following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#actions_table" rel="noopener noreferrer" target="_blank">
+             Actions table
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9d496c11c13">
+              <thead>
+               <tr>
+                <th>
+                 Actions
+                </th>
+                <th>
+                 Description
+                </th>
+                <th>
+                 Access level
+                </th>
+                <th>
+                 Resource types (*required)
+                </th>
+                <th>
+                 Condition keys
+                </th>
+                <th>
+                 Dependent actions
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="awsdevicefarm-CreateDevicePool" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_CreateDevicePool.html">
+                 CreateDevicePool
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a device pool within a project
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-project">
+                  project*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-CreateInstanceProfile" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_CreateInstanceProfile.html">
+                 CreateInstanceProfile
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a device instance profile
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-CreateNetworkProfile" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_CreateNetworkProfile.html">
+                 CreateNetworkProfile
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a network profile within a project
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-project">
+                  project*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-CreateProject" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_CreateProject.html">
+                 CreateProject
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a project for mobile testing
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 ec2:CreateNetworkInterface
+                </p>
+                <p>
+                 ec2:DescribeSecurityGroups
+                </p>
+                <p>
+                 ec2:DescribeSubnets
+                </p>
+                <p>
+                 ec2:DescribeVpcs
+                </p>
+                <p>
+                 iam:CreateServiceLinkedRole
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-CreateRemoteAccessSession" rowspan="4" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_CreateRemoteAccessSession.html">
+                 CreateRemoteAccessSession
+                </a>
+               </td>
+               <td rowspan="4" tabindex="-1">
+                Grants permission to start a remote access session to a device instance
+               </td>
+               <td rowspan="4" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-device">
+                  device*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-project">
+                  project*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-deviceinstance">
+                  deviceinstance
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-upload">
+                  upload
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-CreateTestGridProject" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_CreateTestGridProject.html">
+                 CreateTestGridProject
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a project for desktop testing
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 ec2:CreateNetworkInterface
+                </p>
+                <p>
+                 ec2:DescribeSecurityGroups
+                </p>
+                <p>
+                 ec2:DescribeSubnets
+                </p>
+                <p>
+                 ec2:DescribeVpcs
+                </p>
+                <p>
+                 iam:CreateServiceLinkedRole
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-CreateTestGridUrl" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_CreateTestGridUrl.html">
+                 CreateTestGridUrl
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to generate a new pre-signed url used to access our test grid service
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-testgrid-project">
+                  testgrid-project*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-CreateUpload" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_CreateUpload.html">
+                 CreateUpload
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to upload a new file or app within a project
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-project">
+                  project*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-CreateVPCEConfiguration" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_CreateVPCEConfiguration.html">
+                 CreateVPCEConfiguration
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create an Amazon Virtual Private Cloud (VPC) endpoint configuration
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-DeleteDevicePool" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_DeleteDevicePool.html">
+                 DeleteDevicePool
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a user-generated device pool
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-devicepool">
+                  devicepool*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-DeleteInstanceProfile" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_DeleteInstanceProfile.html">
+                 DeleteInstanceProfile
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a user-generated instance profile
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-instanceprofile">
+                  instanceprofile*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-DeleteNetworkProfile" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/DeleteNetworkProfile.html">
+                 DeleteNetworkProfile
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a user-generated network profile
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-networkprofile">
+                  networkprofile*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-DeleteProject" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_DeleteProject.html">
+                 DeleteProject
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a mobile testing project
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-project">
+                  project*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-DeleteRemoteAccessSession" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_DeleteRemoteAccessSession.html">
+                 DeleteRemoteAccessSession
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a completed remote access session and its results
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-session">
+                  session*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-DeleteRun" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_DeleteRun.html">
+                 DeleteRun
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a run
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-run">
+                  run*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-DeleteTestGridProject" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_DeleteTestGridProject.html">
+                 DeleteTestGridProject
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a desktop testing project
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-testgrid-project">
+                  testgrid-project*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-DeleteUpload" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_DeleteUpload.html">
+                 DeleteUpload
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a user-uploaded file
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-upload">
+                  upload*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-DeleteVPCEConfiguration" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_DeleteVPCEConfiguration.html">
+                 DeleteVPCEConfiguration
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete an Amazon Virtual Private Cloud (VPC) endpoint configuration
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-vpceconfiguration">
+                  vpceconfiguration*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-GetAccountSettings" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_GetAccountSettings.html">
+                 GetAccountSettings
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retrieve the number of unmetered iOS and/or unmetered Android devices purchased by the account
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-GetDevice" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_GetDevice.html">
+                 GetDevice
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retrieve the information of a unique device type
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-device">
+                  device*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-GetDeviceInstance" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_GetDeviceInstance.html">
+                 GetDeviceInstance
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retireve the information of a device instance
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-deviceinstance">
+                  deviceinstance*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-GetDevicePool" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_GetDevicePool.html">
+                 GetDevicePool
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retireve the information of a device pool
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-devicepool">
+                  devicepool*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-GetDevicePoolCompatibility" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_GetDevicePoolCompatibility.html">
+                 GetDevicePoolCompatibility
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to retrieve information about the compatibility of a test and/or app with a device pool
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-devicepool">
+                  devicepool*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-upload">
+                  upload
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-GetInstanceProfile" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_GetInstanceProfile.html">
+                 GetInstanceProfile
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retireve the information of an instance profile
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-instanceprofile">
+                  instanceprofile*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-GetJob" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_GetJob.html">
+                 GetJob
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retireve the information of a job
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-job">
+                  job*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-GetNetworkProfile" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_GetNetworkProfile.html">
+                 GetNetworkProfile
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retireve the information of a network profile
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-networkprofile">
+                  networkprofile*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-GetOfferingStatus" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_GetOfferingStatus.html">
+                 GetOfferingStatus
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retrieve the current status and future status of all offerings purchased by an AWS account
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-GetProject" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_GetProject.html">
+                 GetProject
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retrieve information about a mobile testing project
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-project">
+                  project*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-GetRemoteAccessSession" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_GetRemoteAccessSession.html">
+                 GetRemoteAccessSession
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retireve the link to a currently running remote access session
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-session">
+                  session*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-GetRun" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_GetRun.html">
+                 GetRun
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retireve the information of a run
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-run">
+                  run*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-GetSuite" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_GetSuite.html">
+                 GetSuite
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retireve the information of a testing suite
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-suite">
+                  suite*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-GetTest" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_GetTest.html">
+                 GetTest
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retireve the information of a test case
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-test">
+                  test*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-GetTestGridProject" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_GetTestGridProject.html">
+                 GetTestGridProject
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retrieve information about a desktop testing project
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-testgrid-project">
+                  testgrid-project*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-GetTestGridSession" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_GetTestGridSession.html">
+                 GetTestGridSession
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to retireve the information of a test grid session
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-testgrid-project">
+                  testgrid-project
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-testgrid-session">
+                  testgrid-session
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-GetUpload" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_GetUpload.html">
+                 GetUpload
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retireve the information of an uploaded file
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-upload">
+                  upload*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-GetVPCEConfiguration" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_GetVPCEConfiguration.html">
+                 GetVPCEConfiguration
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retireve the information of an Amazon Virtual Private Cloud (VPC) endpoint configuration
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-vpceconfiguration">
+                  vpceconfiguration*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-InstallToRemoteAccessSession" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_InstallToRemoteAccessSession.html">
+                 InstallToRemoteAccessSession
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to install an application to a device in a remote access session
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-session">
+                  session*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-upload">
+                  upload*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-ListArtifacts" rowspan="4" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_ListArtifacts.html">
+                 ListArtifacts
+                </a>
+               </td>
+               <td rowspan="4" tabindex="-1">
+                Grants permission to list the artifacts in a project
+               </td>
+               <td rowspan="4" tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-job">
+                  job
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-run">
+                  run
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-suite">
+                  suite
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-test">
+                  test
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-ListDeviceInstances" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_ListDeviceInstances.html">
+                 ListDeviceInstances
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list the information of device instances
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-ListDevicePools" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_ListDevicePools.html">
+                 ListDevicePools
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list the information of device pools
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-project">
+                  project*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-ListDevices" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_ListDevices.html">
+                 ListDevices
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list the information of unique device types
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-ListInstanceProfiles" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_ListInstanceProfiles.html">
+                 ListInstanceProfiles
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list the information of device instance profiles
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-ListJobs" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_ListJobs.html">
+                 ListJobs
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list the information of jobs within a run
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-run">
+                  run*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-ListNetworkProfiles" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_ListNetworkProfiles.html">
+                 ListNetworkProfiles
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list the information of network profiles within a project
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-project">
+                  project*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-ListOfferingPromotions" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_ListOfferingPromotions.html">
+                 ListOfferingPromotions
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list the offering promotions
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-ListOfferingTransactions" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_ListOfferingTransactions.html">
+                 ListOfferingTransactions
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list all of the historical purchases, renewals, and system renewal transactions for an AWS account
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-ListOfferings" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_ListOfferings.html">
+                 ListOfferings
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list the products or offerings that the user can manage through the API
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-ListProjects" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_ListProjects.html">
+                 ListProjects
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list the information of mobile testing projects for an AWS account
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-ListRemoteAccessSessions" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_ListRemoteAccessSessions.html">
+                 ListRemoteAccessSessions
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list the information of currently running remote access sessions
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-project">
+                  project*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-ListRuns" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_ListRuns.html">
+                 ListRuns
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list the information of runs within a project
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-project">
+                  project*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-ListSamples" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_ListSamples.html">
+                 ListSamples
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list the information of samples within a project
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-job">
+                  job*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-ListSuites" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_ListSuites.html">
+                 ListSuites
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list the information of testing suites within a job
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-job">
+                  job*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-ListTagsForResource" rowspan="11" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_ListTagsForResource.html">
+                 ListTagsForResource
+                </a>
+               </td>
+               <td rowspan="11" tabindex="-1">
+                Grants permission to list the tags of a resource
+               </td>
+               <td rowspan="11" tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-device">
+                  device
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-deviceinstance">
+                  deviceinstance
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-devicepool">
+                  devicepool
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-instanceprofile">
+                  instanceprofile
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-networkprofile">
+                  networkprofile
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-project">
+                  project
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-run">
+                  run
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-session">
+                  session
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-testgrid-project">
+                  testgrid-project
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-testgrid-session">
+                  testgrid-session
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-vpceconfiguration">
+                  vpceconfiguration
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-ListTestGridProjects" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_ListTestGridProjects.html">
+                 ListTestGridProjects
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list the information of desktop testing projects for an AWS account
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-ListTestGridSessionActions" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_ListTestGridSessionActions.html">
+                 ListTestGridSessionActions
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list the session actions performed during a test grid session
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-testgrid-session">
+                  testgrid-session*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-ListTestGridSessionArtifacts" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_ListTestGridSessionArtifacts.html">
+                 ListTestGridSessionArtifacts
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list the artifacts generated by a test grid session
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-testgrid-session">
+                  testgrid-session*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-ListTestGridSessions" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_ListTestGridSessions.html">
+                 ListTestGridSessions
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list the sessions within a test grid project
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-testgrid-project">
+                  testgrid-project*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-ListTests" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_ListTests.html">
+                 ListTests
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list the information of tests within a testing suite
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-suite">
+                  suite*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-ListUniqueProblems" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_ListUniqueProblems.html">
+                 ListUniqueProblems
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list the information of unique problems within a run
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-run">
+                  run*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-ListUploads" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_ListUploads.html">
+                 ListUploads
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list the information of uploads within a project
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-project">
+                  project*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-ListVPCEConfigurations" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_ListVPCEConfigurations.html">
+                 ListVPCEConfigurations
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list the information of Amazon Virtual Private Cloud (VPC) endpoint configurations
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-PurchaseOffering" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_PurchaseOffering.html">
+                 PurchaseOffering
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to purchase offerings for an AWS account
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-RenewOffering" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_RenewOffering.html">
+                 RenewOffering
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to set the quantity of devices to renew for an offering
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-ScheduleRun" rowspan="5" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_ScheduleRun.html">
+                 ScheduleRun
+                </a>
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Grants permission to schedule a run
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-project">
+                  project*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-devicepool">
+                  devicepool
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-upload">
+                  upload
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <b>
+                  SCENARIO:
+                 </b>
+                 Device Pool as filter
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-devicepool">
+                  devicepool*
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsdevicefarm-project">
+                  project*
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsdevicefarm-upload">
+                  upload
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <b>
+                  SCENARIO:
+                 </b>
+                 Device Selection Configuration as filter
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-project">
+                  project*
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsdevicefarm-upload">
+                  upload
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-StopJob" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_StopJob.html">
+                 StopJob
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to terminate a running job
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-job">
+                  job*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-StopRemoteAccessSession" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_StopRemoteAccessSession.html">
+                 StopRemoteAccessSession
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to terminate a running remote access session
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-session">
+                  session*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-StopRun" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_StopRun.html">
+                 StopRun
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to terminate a running test run
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-run">
+                  run*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-TagResource" rowspan="12" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_TagResource.html">
+                 TagResource
+                </a>
+               </td>
+               <td rowspan="12" tabindex="-1">
+                Grants permission to add tags to a resource
+               </td>
+               <td rowspan="12" tabindex="-1">
+                Tagging
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-device">
+                  device
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-deviceinstance">
+                  deviceinstance
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-devicepool">
+                  devicepool
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-instanceprofile">
+                  instanceprofile
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-networkprofile">
+                  networkprofile
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-project">
+                  project
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-run">
+                  run
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-session">
+                  session
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-testgrid-project">
+                  testgrid-project
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-testgrid-session">
+                  testgrid-session
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-vpceconfiguration">
+                  vpceconfiguration
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsdevicefarm-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-UntagResource" rowspan="12" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_UntagResource.html">
+                 UntagResource
+                </a>
+               </td>
+               <td rowspan="12" tabindex="-1">
+                Grants permission to remove tags from a resource
+               </td>
+               <td rowspan="12" tabindex="-1">
+                Tagging
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-device">
+                  device
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-deviceinstance">
+                  deviceinstance
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-devicepool">
+                  devicepool
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-instanceprofile">
+                  instanceprofile
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-networkprofile">
+                  networkprofile
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-project">
+                  project
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-run">
+                  run
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-session">
+                  session
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-testgrid-project">
+                  testgrid-project
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-testgrid-session">
+                  testgrid-session
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-vpceconfiguration">
+                  vpceconfiguration
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-UpdateDeviceInstance" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_UpdateDeviceInstance.html">
+                 UpdateDeviceInstance
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to modify an existing device instance
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-deviceinstance">
+                  deviceinstance*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-instanceprofile">
+                  instanceprofile
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-UpdateDevicePool" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_UpdateDevicePool.html">
+                 UpdateDevicePool
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to modify an existing device pool
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-devicepool">
+                  devicepool*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-UpdateInstanceProfile" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_UpdateInstanceProfile.html">
+                 UpdateInstanceProfile
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to modify an existing instance profile
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-instanceprofile">
+                  instanceprofile*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-UpdateNetworkProfile" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_UpdateNetworkProfile.html">
+                 UpdateNetworkProfile
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to modify an existing network profile
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-networkprofile">
+                  networkprofile*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-UpdateProject" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_UpdateProject.html">
+                 UpdateProject
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to modify an existing mobile testing project
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-project">
+                  project*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 ec2:CreateNetworkInterface
+                </p>
+                <p>
+                 ec2:DescribeSecurityGroups
+                </p>
+                <p>
+                 ec2:DescribeSubnets
+                </p>
+                <p>
+                 ec2:DescribeVpcs
+                </p>
+                <p>
+                 iam:CreateServiceLinkedRole
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-UpdateTestGridProject" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_UpdateTestGridProject.html">
+                 UpdateTestGridProject
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to modify an existing desktop testing project
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-testgrid-project">
+                  testgrid-project*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 ec2:CreateNetworkInterface
+                </p>
+                <p>
+                 ec2:DescribeSecurityGroups
+                </p>
+                <p>
+                 ec2:DescribeSubnets
+                </p>
+                <p>
+                 ec2:DescribeVpcs
+                </p>
+                <p>
+                 iam:CreateServiceLinkedRole
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-UpdateUpload" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_UpdateUpload.html">
+                 UpdateUpload
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to modify an existing upload
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-upload">
+                  upload*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-UpdateVPCEConfiguration" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_UpdateVPCEConfiguration.html">
+                 UpdateVPCEConfiguration
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to modify an existing Amazon Virtual Private Cloud (VPC) endpoint configuration
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-vpceconfiguration">
+                  vpceconfiguration*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <h2 id="awsdevicefarm-resources-for-iam-policies">
+            Resource types defined by        AWS Device Farm
+           </h2>
+           <p>
+            The following resource types are defined by this service and can be used in the
+            <code class="code">
+             Resource
+            </code>
+            element of IAM permission policy statements. Each action in the
+            <a href="#awsdevicefarm-actions-as-permissions">
+             Actions table
+            </a>
+            identifies the      resource types that can be specified with that action. A resource type can also define which      condition keys you can include in a policy. These keys are displayed in the last column of the      Resource types table. For details about the columns in the following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#resources_table" rel="noopener noreferrer" target="_blank">
+             Resource types table
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9d496c13b5">
+              <thead>
+               <tr>
+                <th>
+                 Resource types
+                </th>
+                <th>
+                 ARN
+                </th>
+                <th>
+                 Condition keys
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="awsdevicefarm-project" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_Project.html">
+                 project
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:devicefarm:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:project:$
+                 <span>
+                  {
+                 </span>
+                 ResourceId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-run" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_Run.html">
+                 run
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:devicefarm:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:run:$
+                 <span>
+                  {
+                 </span>
+                 ResourceId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-job" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_Job.html">
+                 job
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:devicefarm:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:job:$
+                 <span>
+                  {
+                 </span>
+                 ResourceId}
+                </code>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-suite" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_Suite.html">
+                 suite
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:devicefarm:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:suite:$
+                 <span>
+                  {
+                 </span>
+                 ResourceId}
+                </code>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-test" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_Test.html">
+                 test
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:devicefarm:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:test:$
+                 <span>
+                  {
+                 </span>
+                 ResourceId}
+                </code>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-upload" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_Upload.html">
+                 upload
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:devicefarm:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:upload:$
+                 <span>
+                  {
+                 </span>
+                 ResourceId}
+                </code>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-artifact" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_Artifact.html">
+                 artifact
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:devicefarm:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:artifact:$
+                 <span>
+                  {
+                 </span>
+                 ResourceId}
+                </code>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-sample" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_Sample.html">
+                 sample
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:devicefarm:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:sample:$
+                 <span>
+                  {
+                 </span>
+                 ResourceId}
+                </code>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-networkprofile" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_NetworkProfile.html">
+                 networkprofile
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:devicefarm:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:networkprofile:$
+                 <span>
+                  {
+                 </span>
+                 ResourceId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-deviceinstance" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_DeviceInstance.html">
+                 deviceinstance
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:devicefarm:$
+                 <span>
+                  {
+                 </span>
+                 Region}::deviceinstance:$
+                 <span>
+                  {
+                 </span>
+                 ResourceId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-session" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_RemoteAccessSession.html">
+                 session
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:devicefarm:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:session:$
+                 <span>
+                  {
+                 </span>
+                 ResourceId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-devicepool" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_DevicePool.html">
+                 devicepool
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:devicefarm:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:devicepool:$
+                 <span>
+                  {
+                 </span>
+                 ResourceId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-device" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_Device.html">
+                 device
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:devicefarm:$
+                 <span>
+                  {
+                 </span>
+                 Region}::device:$
+                 <span>
+                  {
+                 </span>
+                 ResourceId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-instanceprofile" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_InstanceProfile.html">
+                 instanceprofile
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:devicefarm:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:instanceprofile:$
+                 <span>
+                  {
+                 </span>
+                 ResourceId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-vpceconfiguration" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_VPCEConfiguration.html">
+                 vpceconfiguration
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:devicefarm:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:vpceconfiguration:$
+                 <span>
+                  {
+                 </span>
+                 ResourceId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-testgrid-project" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_TestGridProject.html">
+                 testgrid-project
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:devicefarm:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:testgrid-project:$
+                 <span>
+                  {
+                 </span>
+                 ResourceId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-testgrid-session" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_TestGridSession.html">
+                 testgrid-session
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:devicefarm:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:testgrid-session:$
+                 <span>
+                  {
+                 </span>
+                 ResourceId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsdevicefarm-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <h2 id="awsdevicefarm-policy-keys">
+            Condition keys for        AWS Device Farm
+           </h2>
+           <p>
+            AWS Device Farm defines the following condition keys that can be used in the
+            <code class="code">
+             Condition
+            </code>
+            element of an IAM policy. You can use these keys to further refine      the conditions under which the policy statement applies. For details about the columns in the      following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#context_keys_table" rel="noopener noreferrer" target="_blank">
+             Condition keys table
+            </a>
+            .
+           </p>
+           <p>
+            To view the global condition keys that are available to all services, see
+            <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#AvailableKeys">
+             Available global condition keys
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9d496c15b7">
+              <thead>
+               <tr>
+                <th>
+                 Condition keys
+                </th>
+                <th>
+                 Description
+                </th>
+                <th>
+                 Type
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="awsdevicefarm-aws_RequestTag___TagKey_" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-requesttag">
+                 aws:RequestTag/${TagKey}
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters actions based on the allowed set of values for each of the tags
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-aws_ResourceTag___TagKey_" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-resourcetag">
+                 aws:ResourceTag/${TagKey}
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters actions based on tag-value assoicated with the resource
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awsdevicefarm-aws_TagKeys" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-tagkeys">
+                 aws:TagKeys
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters actions based on the presence of mandatory tags in the request
+               </td>
+               <td tabindex="-1">
+                ArrayOfString
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <awsdocs-copyright class="copyright-print">
+           </awsdocs-copyright>
+           <awsdocs-thumb-feedback right-edge="{{$ctrl.thumbFeedbackRightEdge}}">
+           </awsdocs-thumb-feedback>
+          </div>
+          <noscript>
+           <div>
+            <div>
+             <div>
+              <div id="js_error_message">
+               <p>
+                <img alt="Warning" src="https://d1ge0kk1l5kms0.cloudfront.net/images/G/01/webservices/console/warning.png"/>
+                <strong>
+                 Javascript is disabled or is unavailable in your browser.
+                </strong>
+               </p>
+               <p>
+                To use the Amazon Web Services Documentation, Javascript must be enabled. Please refer to your browser's Help pages for instructions.
+               </p>
+              </div>
+             </div>
+            </div>
+           </div>
+          </noscript>
+          <div class="awsui-util-font-size-0" id="main-col-footer">
+           <div id="doc-conventions">
+            <a href="/general/latest/gr/docconventions.html" target="_top">
+             Document Conventions
+            </a>
+           </div>
+           <div class="prev-next">
+            <div accesskey="p" class="prev-link" href="./list_amazondetective.html" id="previous">
+             Amazon Detective
+            </div>
+            <div accesskey="n" class="next-link" href="./list_amazondevopsguru.html" id="next">
+             Amazon DevOps Guru
+            </div>
+           </div>
+          </div>
+          <awsdocs-page-utilities>
+          </awsdocs-page-utilities>
+         </div>
+         <div id="quick-feedback-yes" style="display: none;">
+          <div class="title">
+           Did this page help you? - Yes
+          </div>
+          <div class="content">
+           <p>
+            Thanks for letting us know we're doing a good job!
+           </p>
+           <p>
+            If you've got a moment, please tell us what we did right so we can do more of it.
+           </p>
+           <p>
+            <awsui-button click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service Authorization Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awsdevicefarm.html" id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback">
+            </awsui-button>
+           </p>
+          </div>
+         </div>
+         <div id="quick-feedback-no" style="display: none;">
+          <div class="title">
+           Did this page help you? - No
+          </div>
+          <div class="content">
+           <p>
+            Thanks for letting us know this page needs work. We're sorry we let you down.
+           </p>
+           <p>
+            If you've got a moment, please tell us how we can make the documentation better.
+           </p>
+           <p>
+            <awsui-button click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service Authorization Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awsdevicefarm.html" id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback">
+            </awsui-button>
+           </p>
+          </div>
+         </div>
+        </div>
+       </body>
+      </div>
+     </awsdocs-view>
+     <div class="page-loading-indicator" id="page-loading-indicator">
+      <awsui-spinner size="large">
+      </awsui-spinner>
+     </div>
+    </div>
+    <div dom-region="tools" id="tools-panel">
+     <awsdocs-tools-panel id="awsdocs-tools-panel">
+     </awsdocs-tools-panel>
+    </div>
+   </awsui-app-layout>
+   <awsdocs-cookie-banner class="doc-cookie-banner">
+   </awsdocs-cookie-banner>
+  </div>
+ </body>
+</html>

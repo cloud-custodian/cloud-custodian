@@ -1,0 +1,3033 @@
+<!DOCTYPE html>
+<html lang="en-US" xmlns="http://www.w3.org/1999/xhtml">
+ <head>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+  <title>
+   Actions, resources, and condition keys for Amazon Route 53 Resolver - Service Authorization Reference
+  </title>
+  <meta content="width=device-width,initial-scale=1" name="viewport"/>
+  <meta content="/assets" name="assets_root"/>
+  <meta content="list_amazonroute53resolver" name="target_state"/>
+  <meta content="list_amazonroute53resolver" name="default_state"/>
+  <link href="https://docs.aws.amazon.com/assets/images/favicon.ico" rel="icon" type="image/ico"/>
+  <link href="https://docs.aws.amazon.com/assets/images/favicon.ico" rel="shortcut icon" type="image/ico"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonroute53resolver.html" rel="canonical"/>
+  <meta content="Lists all of the available service-specific resources, actions, and condition keys that can be used in IAM policies to control access to Amazon Route 53 Resolver." name="description"/>
+  <meta content="IAD" name="deployment_region"/>
+  <meta content="Service Authorization Reference" name="product"/>
+  <meta content="Service Authorization Reference" name="guide"/>
+  <meta content="Provides a list of the actions, resources, and condition keys supported by each AWS service that can be used in an IAM policy." name="abstract"/>
+  <meta content="en_us" name="guide-locale"/>
+  <meta content="toc-contents.json" name="tocs"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonroute53resolver.html" rel="canonical"/>
+  <link href="https://docs.aws.amazon.com/id_id/service-authorization/latest/reference/list_amazonroute53resolver.html" hreflang="id-id" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/id_id/service-authorization/latest/reference/list_amazonroute53resolver.html" hreflang="id" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/de_de/service-authorization/latest/reference/list_amazonroute53resolver.html" hreflang="de-de" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/de_de/service-authorization/latest/reference/list_amazonroute53resolver.html" hreflang="de" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonroute53resolver.html" hreflang="en-us" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonroute53resolver.html" hreflang="en" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/es_es/service-authorization/latest/reference/list_amazonroute53resolver.html" hreflang="es-es" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/es_es/service-authorization/latest/reference/list_amazonroute53resolver.html" hreflang="es" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/fr_fr/service-authorization/latest/reference/list_amazonroute53resolver.html" hreflang="fr-fr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/fr_fr/service-authorization/latest/reference/list_amazonroute53resolver.html" hreflang="fr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/it_it/service-authorization/latest/reference/list_amazonroute53resolver.html" hreflang="it-it" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/it_it/service-authorization/latest/reference/list_amazonroute53resolver.html" hreflang="it" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ja_jp/service-authorization/latest/reference/list_amazonroute53resolver.html" hreflang="ja-jp" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ja_jp/service-authorization/latest/reference/list_amazonroute53resolver.html" hreflang="ja" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ko_kr/service-authorization/latest/reference/list_amazonroute53resolver.html" hreflang="ko-kr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ko_kr/service-authorization/latest/reference/list_amazonroute53resolver.html" hreflang="ko" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/pt_br/service-authorization/latest/reference/list_amazonroute53resolver.html" hreflang="pt-br" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/pt_br/service-authorization/latest/reference/list_amazonroute53resolver.html" hreflang="pt" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/zh_cn/service-authorization/latest/reference/list_amazonroute53resolver.html" hreflang="zh-cn" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/zh_tw/service-authorization/latest/reference/list_amazonroute53resolver.html" hreflang="zh-tw" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonroute53resolver.html" hreflang="x-default" rel="alternative"/>
+  <meta content="Service Authorization Docs" name="feedback-item"/>
+  <meta content="Service Authorization Reference" name="this_doc_product"/>
+  <meta content="Service Authorization Reference" name="this_doc_guide"/>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor4.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor3.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor1.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/awsdocs-common.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/awsdocs-doc-page.js?version=2021.12.02">
+  </script>
+  <link href="https://docs.aws.amazon.com/assets/r/vendor4.css?version=2021.12.02" rel="stylesheet"/>
+  <link href="https://docs.aws.amazon.com/assets/r/awsdocs-common.css?version=2021.12.02" rel="stylesheet"/>
+  <link href="https://docs.aws.amazon.com/assets/r/awsdocs-doc-page.css?version=2021.12.02" rel="stylesheet"/>
+  <script async="" data-config="{'appEntity':'aws-documentation','region':'us-east-1','service':'iam'}" id="awsc-panorama-bundle" src="https://prod.pa.cdn.uis.awsstatic.com/panorama-nav-init.js" type="text/javascript">
+  </script>
+  <meta id="panorama-serviceSubSection" value="Service Authorization Reference"/>
+  <meta id="panorama-serviceConsolePage" value="Actions, resources, and condition keys for Amazon Route 53 Resolver"/>
+ </head>
+ <body class="awsdocs awsui">
+  <div class="awsdocs-container">
+   <awsdocs-header>
+   </awsdocs-header>
+   <awsui-app-layout class="awsui-util-no-gutters" header-selector="awsdocs-header" id="app-layout" navigation-change="$ctrl.onNavChange($event)" navigation-hide="false" navigation-open="$ctrl.navOpen" navigation-width="$ctrl.navWidth" ng-controller="ContentController as $ctrl" tools-change="$ctrl.onToolsChange($event)" tools-hide="$ctrl.hideTools" tools-open="$ctrl.toolsOpen" tools-width="$ctrl.toolsWidth">
+    <div dom-region="navigation" id="guide-toc">
+     <awsdocs-toc>
+     </awsdocs-toc>
+    </div>
+    <div dom-region="content" id="main-column" tabindex="-1">
+     <awsdocs-view class="awsdocs-view">
+      <div id="awsdocs-content">
+       <head>
+        <title>
+         Actions, resources, and condition keys for Amazon Route 53 Resolver - Service Authorization Reference
+        </title>
+        <meta content="/pdfs/service-authorization/latest/reference/service-authorization.pdf#list_amazonroute53resolver" name="pdf"/>
+        <meta content="https://repost.aws/tags/TAO7Z4bI5hQVWMiYFs34QhIA" name="forums"/>
+        <meta content="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service%20Authorization%20Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazonroute53resolver.html" name="feedback"/>
+        <meta content="feedbackyes.html?topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazonroute53resolver.html" name="feedback-yes"/>
+        <meta content="feedbackno.html?topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazonroute53resolver.html" name="feedback-no"/>
+        <script type="application/ld+json">
+         {
+    "@context" : "https://schema.org",
+    "@type" : "BreadcrumbList",
+    "itemListElement" : [
+      {
+        "@type" : "ListItem",
+        "position" : 1,
+        "name" : "AWS",
+        "item" : "https://aws.amazon.com"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 2,
+        "name" : "Service Authorization Reference",
+        "item" : "https://docs.aws.amazon.com/iam/index.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 3,
+        "name" : "Service Authorization Reference",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 4,
+        "name" : "Reference",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 5,
+        "name" : "Actions, resources, and condition keys for AWS services",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference_policies_actions-resources-contextkeys.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 6,
+        "name" : "Actions, resources, and condition keys for Amazon Route 53 Resolver",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference_policies_actions-resources-contextkeys.html"
+      }
+    ]
+}
+        </script>
+       </head>
+       <body>
+        <div id="main">
+         <div style="display: none">
+          <a href="/pdfs/service-authorization/latest/reference/service-authorization.pdf#list_amazonroute53resolver" rel="noopener noreferrer" target="_blank" title="Open PDF">
+          </a>
+         </div>
+         <div class="breadcrumb" id="breadcrumbs">
+          <a href="https://aws.amazon.com">
+           AWS
+          </a>
+          <a href="/index.html">
+           Documentation
+          </a>
+          <a href="/iam/index.html">
+           Service Authorization Reference
+          </a>
+          <a href="reference.html">
+           Service Authorization Reference
+          </a>
+         </div>
+         <div id="page-toc-src">
+          <a href="#amazonroute53resolver-actions-as-permissions">
+           Actions
+          </a>
+          <a href="#amazonroute53resolver-resources-for-iam-policies">
+           Resource types
+          </a>
+          <a href="#amazonroute53resolver-policy-keys">
+           Condition keys
+          </a>
+         </div>
+         <div class="awsui-util-container" id="main-content">
+          <div id="main-col-body">
+           <awsdocs-language-banner data-service="$ctrl.pageService">
+           </awsdocs-language-banner>
+           <h1 class="topictitle" id="list_amazonroute53resolver">
+            Actions, resources, and condition keys for      Amazon Route 53 Resolver
+           </h1>
+           <div class="awsdocs-page-header-container">
+            <awsdocs-page-header>
+            </awsdocs-page-header>
+            <awsdocs-filter-selector id="awsdocs-filter-selector">
+            </awsdocs-filter-selector>
+           </div>
+           <p>
+            Amazon Route 53 Resolver (service prefix:
+            <code class="code">
+             route53resolver
+            </code>
+            ) provides the following    service-specific resources, actions, and condition context keys for use in IAM permission    policies.
+           </p>
+           <p>
+            References:
+           </p>
+           <div class="itemizedlist">
+            <ul class="itemizedlist">
+             <li class="listitem">
+              <p>
+               Learn how to
+               <a href="https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/">
+                configure this service
+               </a>
+               .
+              </p>
+             </li>
+             <li class="listitem">
+              <p>
+               View a list of the
+               <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/">
+                API operations available for this          service
+               </a>
+               .
+              </p>
+             </li>
+             <li class="listitem">
+              <p>
+               Learn how to secure this service and its resources by
+               <a href="https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/auth-and-access-control.html">
+                using          IAM
+               </a>
+               permission policies.
+              </p>
+             </li>
+            </ul>
+           </div>
+           <div class="highlights" id="inline-topiclist">
+            <h6>
+             Topics
+            </h6>
+            <ul>
+             <li>
+              <a href="#amazonroute53resolver-actions-as-permissions">
+               Actions defined by        Amazon Route 53 Resolver
+              </a>
+             </li>
+             <li>
+              <a href="#amazonroute53resolver-resources-for-iam-policies">
+               Resource types defined by        Amazon Route 53 Resolver
+              </a>
+             </li>
+             <li>
+              <a href="#amazonroute53resolver-policy-keys">
+               Condition keys for        Amazon Route 53 Resolver
+              </a>
+             </li>
+            </ul>
+           </div>
+           <h2 id="amazonroute53resolver-actions-as-permissions">
+            Actions defined by        Amazon Route 53 Resolver
+           </h2>
+           <p>
+            You can specify the following actions in the
+            <code class="code">
+             Action
+            </code>
+            element of an IAM      policy statement. Use policies to grant permissions to perform an operation in AWS. When you      use an action in a policy, you usually allow or deny access to the API operation or CLI      command with the same name. However, in some cases, a single action controls access to more      than one operation. Alternatively, some operations require several different actions.
+           </p>
+           <p>
+            The
+            <b>
+             Resource types
+            </b>
+            column of the Actions table indicates whether each      action supports resource-level permissions. If there is no value for this column, you must      specify all resources ("*") to which the policy applies in the
+            <code class="code">
+             Resource
+            </code>
+            element      of your policy statement. If the column includes a resource type, then you can specify an ARN      of that type in a statement with that action. If the action has one or more required      resources, the caller must have permission to use the action with those resources. Required      resources are indicated in the table with an asterisk (*). If you limit resource access with      the
+            <code class="code">
+             Resource
+            </code>
+            element in an IAM policy, you must include an ARN or pattern for      each required resource type. Some actions support multiple resource types. If the resource      type is optional (not indicated as required), then you can choose to use one of the optional      resource types.
+           </p>
+           <p>
+            The
+            <b>
+             Condition keys
+            </b>
+            column of the Actions table includes keys that you      can specify in a policy statement's
+            <code class="code">
+             Condition
+            </code>
+            element. For more information on      the condition keys that are associated with resources for the service, see the
+            <b>
+             Condition keys
+            </b>
+            column of the Resource types table.
+           </p>
+           <div class="awsdocs-note">
+            <div class="awsdocs-note-title">
+             <awsui-icon name="status-info" variant="link">
+             </awsui-icon>
+             <h6>
+              Note
+             </h6>
+            </div>
+            <div class="awsdocs-note-text">
+             <p>
+              Resource condition keys are listed in the
+              <a href="#amazonroute53resolver-resources-for-iam-policies">
+               Resource types
+              </a>
+              table. You        can find a link to the resource type that applies to an action in the
+              <b>
+               Resource          types (*required)
+              </b>
+              column of the Actions table. The resource type in the        Resource types table includes the
+              <b>
+               Condition keys
+              </b>
+              column, which are the        resource condition keys that apply to an action in the Actions table.
+             </p>
+            </div>
+           </div>
+           <p>
+            For details about the columns in the following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#actions_table" rel="noopener noreferrer" target="_blank">
+             Actions table
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9e1375c11c13">
+              <thead>
+               <tr>
+                <th>
+                 Actions
+                </th>
+                <th>
+                 Description
+                </th>
+                <th>
+                 Access level
+                </th>
+                <th>
+                 Resource types (*required)
+                </th>
+                <th>
+                 Condition keys
+                </th>
+                <th>
+                 Dependent actions
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="amazonroute53resolver-AssociateFirewallRuleGroup" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_AssociateFirewallRuleGroup.html">
+                 AssociateFirewallRuleGroup
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to associate an Amazon VPC with a specified firewall rule group
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-firewall-rule-group-association">
+                  firewall-rule-group-association*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 ec2:DescribeVpcs
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonroute53resolver-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-AssociateResolverEndpointIpAddress" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_AssociateResolverEndpointIpAddress.html">
+                 AssociateResolverEndpointIpAddress
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to associate a specified IP address with a Resolver endpoint. This is an IP address that DNS queries pass through on the way to your network (outbound) or your VPCs (inbound)
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-resolver-endpoint">
+                  resolver-endpoint*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 ec2:CreateNetworkInterface
+                </p>
+                <p>
+                 ec2:DescribeNetworkInterfaces
+                </p>
+                <p>
+                 ec2:DescribeSubnets
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-AssociateResolverQueryLogConfig" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_AssociateResolverQueryLogConfig.html">
+                 AssociateResolverQueryLogConfig
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to associate an Amazon VPC with a specified query logging configuration
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-resolver-query-log-config">
+                  resolver-query-log-config*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 ec2:DescribeVpcs
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-AssociateResolverRule" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_AssociateResolverRule.html">
+                 AssociateResolverRule
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to associate a specified Resolver rule with a specified VPC
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-resolver-rule">
+                  resolver-rule*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 ec2:DescribeVpcs
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-CreateFirewallDomainList" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_CreateFirewallDomainList.html">
+                 CreateFirewallDomainList
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to create a Firewall domain list
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-firewall-domain-list">
+                  firewall-domain-list*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonroute53resolver-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-CreateFirewallRule" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_CreateFirewallRule.html">
+                 CreateFirewallRule
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to create a Firewall rule within a Firewall rule group
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-firewall-domain-list">
+                  firewall-domain-list*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-firewall-rule-group">
+                  firewall-rule-group*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-CreateFirewallRuleGroup" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_CreateFirewallRuleGroup.html">
+                 CreateFirewallRuleGroup
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to create a Firewall rule group
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-firewall-rule-group">
+                  firewall-rule-group*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonroute53resolver-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-CreateOutpostResolver" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_CreateOutpostResolver.html">
+                 CreateOutpostResolver
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to create a Route 53 Resolver on Outposts
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-outpost-resolver">
+                  outpost-resolver*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 outposts:GetOutpost
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonroute53resolver-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-CreateResolverEndpoint" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_CreateResolverEndpoint.html">
+                 CreateResolverEndpoint
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to create a Resolver endpoint. There are two types of Resolver endpoints, inbound and outbound
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-resolver-endpoint">
+                  resolver-endpoint*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 ec2:CreateNetworkInterface
+                </p>
+                <p>
+                 ec2:DescribeNetworkInterfaces
+                </p>
+                <p>
+                 ec2:DescribeSecurityGroups
+                </p>
+                <p>
+                 ec2:DescribeSubnets
+                </p>
+                <p>
+                 ec2:DescribeVpcs
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonroute53resolver-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-CreateResolverQueryLogConfig" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_CreateResolverQueryLogConfig.html">
+                 CreateResolverQueryLogConfig
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a Resolver query logging configuration, which defines where you want Resolver to save DNS query logs that originate in your VPCs
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonroute53resolver-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-CreateResolverRule" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_CreateResolverRule.html">
+                 CreateResolverRule
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to define how to route queries originating from your VPC out of the VPC
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-resolver-rule">
+                  resolver-rule*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonroute53resolver-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-DeleteFirewallDomainList" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_DeleteFirewallDomainList.html">
+                 DeleteFirewallDomainList
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a Firewall domain list
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-firewall-domain-list">
+                  firewall-domain-list*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-DeleteFirewallRule" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_DeleteFirewallRule.html">
+                 DeleteFirewallRule
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to delete a Firewall rule within a Firewall rule group
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-firewall-domain-list">
+                  firewall-domain-list*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-firewall-rule-group">
+                  firewall-rule-group*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-DeleteFirewallRuleGroup" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_DeleteFirewallRuleGroup.html">
+                 DeleteFirewallRuleGroup
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a Firewall rule group
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-firewall-rule-group">
+                  firewall-rule-group*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-DeleteOutpostResolver" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_DeleteOutpostResolver.html">
+                 DeleteOutpostResolver
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a Route 53 Resolver on Outposts
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-outpost-resolver">
+                  outpost-resolver*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-DeleteResolverEndpoint" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_DeleteResolverEndpoint.html">
+                 DeleteResolverEndpoint
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a Resolver endpoint. The effect of deleting a Resolver endpoint depends on whether it's an inbound or an outbound endpoint
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-resolver-endpoint">
+                  resolver-endpoint*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 ec2:DeleteNetworkInterface
+                </p>
+                <p>
+                 ec2:DescribeNetworkInterfaces
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-DeleteResolverQueryLogConfig" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_DeleteResolverQueryLogConfig.html">
+                 DeleteResolverQueryLogConfig
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a Resolver query logging configuration
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-resolver-query-log-config">
+                  resolver-query-log-config*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-DeleteResolverRule" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_DeleteResolverRule.html">
+                 DeleteResolverRule
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a Resolver rule
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-resolver-rule">
+                  resolver-rule*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-DisassociateFirewallRuleGroup" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_DisassociateFirewallRuleGroup.html">
+                 DisassociateFirewallRuleGroup
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to remove the association between a specified Firewall rule group and a specified VPC
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-firewall-rule-group-association">
+                  firewall-rule-group-association*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-DisassociateResolverEndpointIpAddress" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_DisassociateResolverEndpointIpAddress.html">
+                 DisassociateResolverEndpointIpAddress
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to remove a specified IP address from a Resolver endpoint. This is an IP address that DNS queries pass through on the way to your network (outbound) or your VPCs (inbound)
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-resolver-endpoint">
+                  resolver-endpoint*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 ec2:DeleteNetworkInterface
+                </p>
+                <p>
+                 ec2:DescribeNetworkInterfaces
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-DisassociateResolverQueryLogConfig" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_DisassociateResolverQueryLogConfig.html">
+                 DisassociateResolverQueryLogConfig
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to remove the association between a specified Resolver query logging configuration and a specified VPC
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-resolver-query-log-config">
+                  resolver-query-log-config*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-DisassociateResolverRule" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_DisassociateResolverRule.html">
+                 DisassociateResolverRule
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to remove the association between a specified Resolver rule and a specified VPC
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-resolver-rule">
+                  resolver-rule*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-GetFirewallConfig" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_GetFirewallConfig.html">
+                 GetFirewallConfig
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get information about a specified Firewall config
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-firewall-config">
+                  firewall-config*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 ec2:DescribeVpcs
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-GetFirewallDomainList" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_GetFirewallDomainList.html">
+                 GetFirewallDomainList
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get information about a specified Firewall domain list
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-firewall-domain-list">
+                  firewall-domain-list*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-GetFirewallRuleGroup" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_GetFirewallRuleGroup.html">
+                 GetFirewallRuleGroup
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get information about a specified Firewall rule group
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-firewall-rule-group">
+                  firewall-rule-group*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-GetFirewallRuleGroupAssociation" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_GetFirewallRuleGroupAssociation.html">
+                 GetFirewallRuleGroupAssociation
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get information about an association between a specified Firewall rule group and a VPC
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-firewall-rule-group-association">
+                  firewall-rule-group-association*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-GetFirewallRuleGroupPolicy" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_GetFirewallRuleGroupPolicy.html">
+                 GetFirewallRuleGroupPolicy
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get information about a specified Firewall rule group policy, which specifies the Firewall rule group operations and resources that you want to allow another AWS account to use
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-firewall-rule-group">
+                  firewall-rule-group*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-GetOutpostResolver" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_GetOutpostResolver.html">
+                 GetOutpostResolver
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get information about a specified Route 53 Resolver on Outposts
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-outpost-resolver">
+                  outpost-resolver*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-GetResolverConfig" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_GetResolverConfig.html">
+                 GetResolverConfig
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get the Resolver Config status within the specified resource
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-resolver-config">
+                  resolver-config*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 ec2:DescribeVpcs
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-GetResolverDnssecConfig" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_GetResolverDnssecConfig.html">
+                 GetResolverDnssecConfig
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get the DNSSEC validation support status for DNS queries within the specified resource
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-resolver-dnssec-config">
+                  resolver-dnssec-config*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-GetResolverEndpoint" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_GetResolverEndpoint.html">
+                 GetResolverEndpoint
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get information about a specified Resolver endpoint, such as whether it's an inbound or an outbound endpoint, and the IP addresses in your VPC that DNS queries are forwarded to on the way into or out of your VPC
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-resolver-endpoint">
+                  resolver-endpoint*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-GetResolverQueryLogConfig" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_GetResolverQueryLogConfig.html">
+                 GetResolverQueryLogConfig
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get information about a specified Resolver query logging configuration, such as the number of VPCs that the configuration is logging queries for and the location that logs are sent to
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-resolver-query-log-config">
+                  resolver-query-log-config*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 ec2:DescribeVpcs
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-GetResolverQueryLogConfigAssociation" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_GetResolverQueryLogConfigAssociation.html">
+                 GetResolverQueryLogConfigAssociation
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get information about a specified association between a Resolver query logging configuration and an Amazon VPC. When you associate a VPC with a query logging configuration, Resolver logs DNS queries that originate in that VPC
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-GetResolverQueryLogConfigPolicy" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_GetResolverQueryLogConfigPolicy.html">
+                 GetResolverQueryLogConfigPolicy
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get information about a specified Resolver query logging policy, which specifies the Resolver query logging operations and resources that you want to allow another AWS account to use
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-resolver-query-log-config">
+                  resolver-query-log-config*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-GetResolverRule" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_GetResolverRule.html">
+                 GetResolverRule
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get information about a specified Resolver rule, such as the domain name that the rule forwards DNS queries for and the IP address that queries are forwarded to
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-resolver-rule">
+                  resolver-rule*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-GetResolverRuleAssociation" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_GetResolverRuleAssociation.html">
+                 GetResolverRuleAssociation
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get information about an association between a specified Resolver rule and a VPC
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-resolver-rule">
+                  resolver-rule*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-GetResolverRulePolicy" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_GetResolverRulePolicy.html">
+                 GetResolverRulePolicy
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get information about a Resolver rule policy, which specifies the Resolver operations and resources that you want to allow another AWS account to use
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-resolver-rule">
+                  resolver-rule*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-ImportFirewallDomains" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_ImportFirewallDomains.html">
+                 ImportFirewallDomains
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to add, remove or replace Firewall domains in a Firewall domain list
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-firewall-domain-list">
+                  firewall-domain-list*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-ListFirewallConfigs" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_ListFirewallConfigs.html">
+                 ListFirewallConfigs
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list all the Firewall config that current AWS account is able to check
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 ec2:DescribeVpcs
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-ListFirewallDomainLists" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_ListFirewallDomainLists.html">
+                 ListFirewallDomainLists
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list all the Firewall domain list that current AWS account is able to use
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-ListFirewallDomains" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_ListFirewallDomains.html">
+                 ListFirewallDomains
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list all the Firewall domain under a speicfied Firewall domain list
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-firewall-domain-list">
+                  firewall-domain-list*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-ListFirewallRuleGroupAssociations" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_ListFirewallRuleGroupAssociations.html">
+                 ListFirewallRuleGroupAssociations
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list information about associations between Amazon VPCs and Firewall rule group
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-ListFirewallRuleGroups" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_ListFirewallRuleGroups.html">
+                 ListFirewallRuleGroups
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list all the Firewall rule group that current AWS account is able to use
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-ListFirewallRules" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_ListFirewallRules.html">
+                 ListFirewallRules
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list all the Firewall rule under a speicfied Firewall rule group
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-firewall-rule-group">
+                  firewall-rule-group*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-ListOutpostResolvers" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_ListOutpostResolvers.html">
+                 ListOutpostResolvers
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list all instances of Route 53 Resolver on Outposts that were created using the current AWS account
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-ListResolverConfigs" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_ListResolverConfigs.html">
+                 ListResolverConfigs
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list Resolver Config statuses
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-resolver-config">
+                  resolver-config*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 ec2:DescribeVpcs
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-ListResolverDnssecConfigs" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_ListResolverDnssecConfigs.html">
+                 ListResolverDnssecConfigs
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list the DNSSEC validation support status for DNS queries
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-resolver-dnssec-config">
+                  resolver-dnssec-config*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-ListResolverEndpointIpAddresses" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_ListResolverEndpointIpAddresses.html">
+                 ListResolverEndpointIpAddresses
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list the IP addresses that DNS queries pass through on the way to your network (outbound) or your VPCs (inbound) for a specified Resolver endpoint
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-resolver-endpoint">
+                  resolver-endpoint*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-ListResolverEndpoints" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_ListResolverEndpoints.html">
+                 ListResolverEndpoints
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list all the Resolver endpoints that were created using the current AWS account
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-ListResolverQueryLogConfigAssociations" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_ListResolverQueryLogConfigAssociations.html">
+                 ListResolverQueryLogConfigAssociations
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list information about associations between Amazon VPCs and query logging configurations
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 ec2:DescribeVpcs
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-ListResolverQueryLogConfigs" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_ListResolverQueryLogConfigs.html">
+                 ListResolverQueryLogConfigs
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list information about the specified query logging configurations, which define where you want Resolver to save DNS query logs and specify the VPCs that you want to log queries for
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 ec2:DescribeVpcs
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-ListResolverRuleAssociations" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_ListResolverRuleAssociations.html">
+                 ListResolverRuleAssociations
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list the associations that were created between Resolver rules and VPCs using the current AWS account
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 ec2:DescribeVpcs
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-ListResolverRules" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_ListResolverRules.html">
+                 ListResolverRules
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list the Resolver rules that were created using the current AWS account
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-ListTagsForResource" rowspan="7" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_ListTagsForResource.html">
+                 ListTagsForResource
+                </a>
+               </td>
+               <td rowspan="7" tabindex="-1">
+                Grants permission to list the tags that you associated with the specified resource
+               </td>
+               <td rowspan="7" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-firewall-domain-list">
+                  firewall-domain-list
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-firewall-rule-group">
+                  firewall-rule-group
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-firewall-rule-group-association">
+                  firewall-rule-group-association
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-outpost-resolver">
+                  outpost-resolver
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-resolver-endpoint">
+                  resolver-endpoint
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-resolver-query-log-config">
+                  resolver-query-log-config
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-resolver-rule">
+                  resolver-rule
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-PutFirewallRuleGroupPolicy" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_PutFirewallRuleGroupPolicy.html">
+                 PutFirewallRuleGroupPolicy
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to specify an AWS account that you want to share a Firewall rule group with, the Firewall rule group that you want to share, and the operations that you want the account to be able to perform on the configuration
+               </td>
+               <td tabindex="-1">
+                Permissions management
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-firewall-rule-group">
+                  firewall-rule-group*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-PutResolverQueryLogConfigPolicy" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_PutResolverQueryLogConfigPolicy.html">
+                 PutResolverQueryLogConfigPolicy
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to specify an AWS account that you want to share a query logging configuration with, the query logging configuration that you want to share, and the operations that you want the account to be able to perform on the configuration
+               </td>
+               <td tabindex="-1">
+                Permissions management
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-resolver-query-log-config">
+                  resolver-query-log-config*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-PutResolverRulePolicy" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_PutResolverRulePolicy.html">
+                 PutResolverRulePolicy
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to specify an AWS account that you want to share rules with, the Resolver rules that you want to share, and the operations that you want the account to be able to perform on those rules
+               </td>
+               <td tabindex="-1">
+                Permissions management
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-resolver-rule">
+                  resolver-rule*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-TagResource" rowspan="10" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_TagResource.html">
+                 TagResource
+                </a>
+               </td>
+               <td rowspan="10" tabindex="-1">
+                Grants permission to add one or more tags to a specified resource
+               </td>
+               <td rowspan="10" tabindex="-1">
+                Tagging
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-firewall-config">
+                  firewall-config
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-firewall-domain-list">
+                  firewall-domain-list
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-firewall-rule-group">
+                  firewall-rule-group
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-firewall-rule-group-association">
+                  firewall-rule-group-association
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-outpost-resolver">
+                  outpost-resolver
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-resolver-dnssec-config">
+                  resolver-dnssec-config
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-resolver-endpoint">
+                  resolver-endpoint
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-resolver-query-log-config">
+                  resolver-query-log-config
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-resolver-rule">
+                  resolver-rule
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonroute53resolver-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-UntagResource" rowspan="10" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_UntagResource.html">
+                 UntagResource
+                </a>
+               </td>
+               <td rowspan="10" tabindex="-1">
+                Grants permission to remove one or more tags from a specified resource
+               </td>
+               <td rowspan="10" tabindex="-1">
+                Tagging
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-firewall-config">
+                  firewall-config
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-firewall-domain-list">
+                  firewall-domain-list
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-firewall-rule-group">
+                  firewall-rule-group
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-firewall-rule-group-association">
+                  firewall-rule-group-association
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-outpost-resolver">
+                  outpost-resolver
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-resolver-dnssec-config">
+                  resolver-dnssec-config
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-resolver-endpoint">
+                  resolver-endpoint
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-resolver-query-log-config">
+                  resolver-query-log-config
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-resolver-rule">
+                  resolver-rule
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-UpdateFirewallConfig" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_UpdateFirewallConfig.html">
+                 UpdateFirewallConfig
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update selected settings for an Firewall config
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-firewall-config">
+                  firewall-config*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 ec2:DescribeVpcs
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-UpdateFirewallDomains" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_UpdateFirewallDomains.html">
+                 UpdateFirewallDomains
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to add, remove or replace Firewall domains in a Firewall domain list
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-firewall-domain-list">
+                  firewall-domain-list*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-UpdateFirewallRule" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_UpdateFirewallRule.html">
+                 UpdateFirewallRule
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to update selected settings for an Firewall rule in a Firewall rule group
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-firewall-domain-list">
+                  firewall-domain-list*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-firewall-rule-group">
+                  firewall-rule-group*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-UpdateFirewallRuleGroupAssociation" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_UpdateFirewallRuleGroupAssociation.html">
+                 UpdateFirewallRuleGroupAssociation
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update selected settings for an Firewall rule group association
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-firewall-rule-group-association">
+                  firewall-rule-group-association*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-UpdateOutpostResolver" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_UpdateOutpostResolver.html">
+                 UpdateOutpostResolver
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update seletected settings for a specified Route 53 Resolver on Outposts
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-outpost-resolver">
+                  outpost-resolver*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-UpdateResolverConfig" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_UpdateResolverConfig.html">
+                 UpdateResolverConfig
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update the Resolver Config status within the specified resource
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-resolver-config">
+                  resolver-config*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 ec2:DescribeVpcs
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-UpdateResolverDnssecConfig" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_UpdateResolverDnssecConfig.html">
+                 UpdateResolverDnssecConfig
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update the DNSSEC validation support status for DNS queries within the specified resource
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-resolver-dnssec-config">
+                  resolver-dnssec-config*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-UpdateResolverEndpoint" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_UpdateResolverEndpoint.html">
+                 UpdateResolverEndpoint
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update selected settings for an inbound or an outbound Resolver endpoint
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-resolver-endpoint">
+                  resolver-endpoint*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 ec2:AssignIpv6Addresses
+                </p>
+                <p>
+                 ec2:DescribeNetworkInterfaces
+                </p>
+                <p>
+                 ec2:DescribeSubnets
+                </p>
+                <p>
+                 ec2:ModifyNetworkInterfaceAttribute
+                </p>
+                <p>
+                 ec2:UnassignIpv6Addresses
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-UpdateResolverRule" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_route53resolver_UpdateResolverRule.html">
+                 UpdateResolverRule
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update settings for a specified Resolver rule
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-resolver-rule">
+                  resolver-rule*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <h2 id="amazonroute53resolver-resources-for-iam-policies">
+            Resource types defined by        Amazon Route 53 Resolver
+           </h2>
+           <p>
+            The following resource types are defined by this service and can be used in the
+            <code class="code">
+             Resource
+            </code>
+            element of IAM permission policy statements. Each action in the
+            <a href="#amazonroute53resolver-actions-as-permissions">
+             Actions table
+            </a>
+            identifies the      resource types that can be specified with that action. A resource type can also define which      condition keys you can include in a policy. These keys are displayed in the last column of the      Resource types table. For details about the columns in the following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#resources_table" rel="noopener noreferrer" target="_blank">
+             Resource types table
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9e1375c13b5">
+              <thead>
+               <tr>
+                <th>
+                 Resource types
+                </th>
+                <th>
+                 ARN
+                </th>
+                <th>
+                 Condition keys
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="amazonroute53resolver-resolver-dnssec-config" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/access-control-overview.html#access-control-resources">
+                 resolver-dnssec-config
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:route53resolver:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:resolver-dnssec-config/$
+                 <span>
+                  {
+                 </span>
+                 ResourceId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-resolver-query-log-config" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/access-control-overview.html#access-control-resources">
+                 resolver-query-log-config
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:route53resolver:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:resolver-query-log-config/$
+                 <span>
+                  {
+                 </span>
+                 ResourceId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-resolver-rule" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/access-control-overview.html#access-control-resources">
+                 resolver-rule
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:route53resolver:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:resolver-rule/$
+                 <span>
+                  {
+                 </span>
+                 ResourceId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-resolver-endpoint" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/access-control-overview.html#access-control-resources">
+                 resolver-endpoint
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:route53resolver:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:resolver-endpoint/$
+                 <span>
+                  {
+                 </span>
+                 ResourceId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-firewall-rule-group" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/access-control-overview.html#access-control-resources">
+                 firewall-rule-group
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:route53resolver:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:firewall-rule-group/$
+                 <span>
+                  {
+                 </span>
+                 ResourceId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-firewall-rule-group-association" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/access-control-overview.html#access-control-resources">
+                 firewall-rule-group-association
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:route53resolver:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:firewall-rule-group-association/$
+                 <span>
+                  {
+                 </span>
+                 ResourceId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-firewall-domain-list" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/access-control-overview.html#access-control-resources">
+                 firewall-domain-list
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:route53resolver:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:firewall-domain-list/$
+                 <span>
+                  {
+                 </span>
+                 ResourceId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-firewall-config" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/access-control-overview.html#access-control-resources">
+                 firewall-config
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:route53resolver:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:firewall-config/$
+                 <span>
+                  {
+                 </span>
+                 ResourceId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-resolver-config" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/access-control-overview.html#access-control-resources">
+                 resolver-config
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:route53resolver:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:resolver-config/$
+                 <span>
+                  {
+                 </span>
+                 ResourceId}
+                </code>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-outpost-resolver" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/access-control-overview.html#access-control-resources">
+                 outpost-resolver
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:route53resolver:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:outpost-resolver/$
+                 <span>
+                  {
+                 </span>
+                 ResourceId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonroute53resolver-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <h2 id="amazonroute53resolver-policy-keys">
+            Condition keys for        Amazon Route 53 Resolver
+           </h2>
+           <p>
+            Amazon Route 53 Resolver defines the following condition keys that can be used in the
+            <code class="code">
+             Condition
+            </code>
+            element of an IAM policy. You can use these keys to further refine      the conditions under which the policy statement applies. For details about the columns in the      following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#context_keys_table" rel="noopener noreferrer" target="_blank">
+             Condition keys table
+            </a>
+            .
+           </p>
+           <p>
+            To view the global condition keys that are available to all services, see
+            <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#AvailableKeys">
+             Available global condition keys
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9e1375c15b7">
+              <thead>
+               <tr>
+                <th>
+                 Condition keys
+                </th>
+                <th>
+                 Description
+                </th>
+                <th>
+                 Type
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="amazonroute53resolver-aws_RequestTag___TagKey_" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-requesttag">
+                 aws:RequestTag/${TagKey}
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the presence of tag key-value pairs in the request
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-aws_ResourceTag___TagKey_" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-resourcetag">
+                 aws:ResourceTag/${TagKey}
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the presence of tag key-value pairs attached to the resource
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonroute53resolver-aws_TagKeys" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-tagkeys">
+                 aws:TagKeys
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the presence of tag keys in the request
+               </td>
+               <td tabindex="-1">
+                ArrayOfString
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <awsdocs-copyright class="copyright-print">
+           </awsdocs-copyright>
+           <awsdocs-thumb-feedback right-edge="{{$ctrl.thumbFeedbackRightEdge}}">
+           </awsdocs-thumb-feedback>
+          </div>
+          <noscript>
+           <div>
+            <div>
+             <div>
+              <div id="js_error_message">
+               <p>
+                <img alt="Warning" src="https://d1ge0kk1l5kms0.cloudfront.net/images/G/01/webservices/console/warning.png"/>
+                <strong>
+                 Javascript is disabled or is unavailable in your browser.
+                </strong>
+               </p>
+               <p>
+                To use the Amazon Web Services Documentation, Javascript must be enabled. Please refer to your browser's Help pages for instructions.
+               </p>
+              </div>
+             </div>
+            </div>
+           </div>
+          </noscript>
+          <div class="awsui-util-font-size-0" id="main-col-footer">
+           <div id="doc-conventions">
+            <a href="/general/latest/gr/docconventions.html" target="_top">
+             Document Conventions
+            </a>
+           </div>
+           <div class="prev-next">
+            <div accesskey="p" class="prev-link" href="./list_amazonroute53recoveryreadiness.html" id="previous">
+             Amazon Route 53 Recovery Readiness
+            </div>
+            <div accesskey="n" class="next-link" href="./list_amazons3.html" id="next">
+             Amazon S3
+            </div>
+           </div>
+          </div>
+          <awsdocs-page-utilities>
+          </awsdocs-page-utilities>
+         </div>
+         <div id="quick-feedback-yes" style="display: none;">
+          <div class="title">
+           Did this page help you? - Yes
+          </div>
+          <div class="content">
+           <p>
+            Thanks for letting us know we're doing a good job!
+           </p>
+           <p>
+            If you've got a moment, please tell us what we did right so we can do more of it.
+           </p>
+           <p>
+            <awsui-button click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service Authorization Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazonroute53resolver.html" id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback">
+            </awsui-button>
+           </p>
+          </div>
+         </div>
+         <div id="quick-feedback-no" style="display: none;">
+          <div class="title">
+           Did this page help you? - No
+          </div>
+          <div class="content">
+           <p>
+            Thanks for letting us know this page needs work. We're sorry we let you down.
+           </p>
+           <p>
+            If you've got a moment, please tell us how we can make the documentation better.
+           </p>
+           <p>
+            <awsui-button click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service Authorization Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazonroute53resolver.html" id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback">
+            </awsui-button>
+           </p>
+          </div>
+         </div>
+        </div>
+       </body>
+      </div>
+     </awsdocs-view>
+     <div class="page-loading-indicator" id="page-loading-indicator">
+      <awsui-spinner size="large">
+      </awsui-spinner>
+     </div>
+    </div>
+    <div dom-region="tools" id="tools-panel">
+     <awsdocs-tools-panel id="awsdocs-tools-panel">
+     </awsdocs-tools-panel>
+    </div>
+   </awsui-app-layout>
+   <awsdocs-cookie-banner class="doc-cookie-banner">
+   </awsdocs-cookie-banner>
+  </div>
+ </body>
+</html>

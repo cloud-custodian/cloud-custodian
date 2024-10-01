@@ -1,0 +1,3758 @@
+<!DOCTYPE html>
+<html lang="en-US" xmlns="http://www.w3.org/1999/xhtml">
+ <head>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+  <title>
+   Actions, resources, and condition keys for Amazon Lex V2 - Service Authorization Reference
+  </title>
+  <meta content="width=device-width,initial-scale=1" name="viewport"/>
+  <meta content="/assets" name="assets_root"/>
+  <meta content="list_amazonlexv2" name="target_state"/>
+  <meta content="list_amazonlexv2" name="default_state"/>
+  <link href="https://docs.aws.amazon.com/assets/images/favicon.ico" rel="icon" type="image/ico"/>
+  <link href="https://docs.aws.amazon.com/assets/images/favicon.ico" rel="shortcut icon" type="image/ico"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonlexv2.html" rel="canonical"/>
+  <meta content="Lists all of the available service-specific resources, actions, and condition keys that can be used in IAM policies to control access to Amazon Lex V2." name="description"/>
+  <meta content="IAD" name="deployment_region"/>
+  <meta content="Service Authorization Reference" name="product"/>
+  <meta content="Service Authorization Reference" name="guide"/>
+  <meta content="Provides a list of the actions, resources, and condition keys supported by each AWS service that can be used in an IAM policy." name="abstract"/>
+  <meta content="en_us" name="guide-locale"/>
+  <meta content="toc-contents.json" name="tocs"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonlexv2.html" rel="canonical"/>
+  <link href="https://docs.aws.amazon.com/id_id/service-authorization/latest/reference/list_amazonlexv2.html" hreflang="id-id" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/id_id/service-authorization/latest/reference/list_amazonlexv2.html" hreflang="id" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/de_de/service-authorization/latest/reference/list_amazonlexv2.html" hreflang="de-de" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/de_de/service-authorization/latest/reference/list_amazonlexv2.html" hreflang="de" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonlexv2.html" hreflang="en-us" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonlexv2.html" hreflang="en" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/es_es/service-authorization/latest/reference/list_amazonlexv2.html" hreflang="es-es" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/es_es/service-authorization/latest/reference/list_amazonlexv2.html" hreflang="es" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/fr_fr/service-authorization/latest/reference/list_amazonlexv2.html" hreflang="fr-fr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/fr_fr/service-authorization/latest/reference/list_amazonlexv2.html" hreflang="fr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/it_it/service-authorization/latest/reference/list_amazonlexv2.html" hreflang="it-it" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/it_it/service-authorization/latest/reference/list_amazonlexv2.html" hreflang="it" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ja_jp/service-authorization/latest/reference/list_amazonlexv2.html" hreflang="ja-jp" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ja_jp/service-authorization/latest/reference/list_amazonlexv2.html" hreflang="ja" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ko_kr/service-authorization/latest/reference/list_amazonlexv2.html" hreflang="ko-kr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ko_kr/service-authorization/latest/reference/list_amazonlexv2.html" hreflang="ko" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/pt_br/service-authorization/latest/reference/list_amazonlexv2.html" hreflang="pt-br" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/pt_br/service-authorization/latest/reference/list_amazonlexv2.html" hreflang="pt" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/zh_cn/service-authorization/latest/reference/list_amazonlexv2.html" hreflang="zh-cn" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/zh_tw/service-authorization/latest/reference/list_amazonlexv2.html" hreflang="zh-tw" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonlexv2.html" hreflang="x-default" rel="alternative"/>
+  <meta content="Service Authorization Docs" name="feedback-item"/>
+  <meta content="Service Authorization Reference" name="this_doc_product"/>
+  <meta content="Service Authorization Reference" name="this_doc_guide"/>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor4.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor3.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor1.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/awsdocs-common.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/awsdocs-doc-page.js?version=2021.12.02">
+  </script>
+  <link href="https://docs.aws.amazon.com/assets/r/vendor4.css?version=2021.12.02" rel="stylesheet"/>
+  <link href="https://docs.aws.amazon.com/assets/r/awsdocs-common.css?version=2021.12.02" rel="stylesheet"/>
+  <link href="https://docs.aws.amazon.com/assets/r/awsdocs-doc-page.css?version=2021.12.02" rel="stylesheet"/>
+  <script async="" data-config="{'appEntity':'aws-documentation','region':'us-east-1','service':'iam'}" id="awsc-panorama-bundle" src="https://prod.pa.cdn.uis.awsstatic.com/panorama-nav-init.js" type="text/javascript">
+  </script>
+  <meta id="panorama-serviceSubSection" value="Service Authorization Reference"/>
+  <meta id="panorama-serviceConsolePage" value="Actions, resources, and condition keys for Amazon Lex V2"/>
+ </head>
+ <body class="awsdocs awsui">
+  <div class="awsdocs-container">
+   <awsdocs-header>
+   </awsdocs-header>
+   <awsui-app-layout class="awsui-util-no-gutters" header-selector="awsdocs-header" id="app-layout" navigation-change="$ctrl.onNavChange($event)" navigation-hide="false" navigation-open="$ctrl.navOpen" navigation-width="$ctrl.navWidth" ng-controller="ContentController as $ctrl" tools-change="$ctrl.onToolsChange($event)" tools-hide="$ctrl.hideTools" tools-open="$ctrl.toolsOpen" tools-width="$ctrl.toolsWidth">
+    <div dom-region="navigation" id="guide-toc">
+     <awsdocs-toc>
+     </awsdocs-toc>
+    </div>
+    <div dom-region="content" id="main-column" tabindex="-1">
+     <awsdocs-view class="awsdocs-view">
+      <div id="awsdocs-content">
+       <head>
+        <title>
+         Actions, resources, and condition keys for Amazon Lex V2 - Service Authorization Reference
+        </title>
+        <meta content="/pdfs/service-authorization/latest/reference/service-authorization.pdf#list_amazonlexv2" name="pdf"/>
+        <meta content="https://repost.aws/tags/TAO7Z4bI5hQVWMiYFs34QhIA" name="forums"/>
+        <meta content="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service%20Authorization%20Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazonlexv2.html" name="feedback"/>
+        <meta content="feedbackyes.html?topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazonlexv2.html" name="feedback-yes"/>
+        <meta content="feedbackno.html?topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazonlexv2.html" name="feedback-no"/>
+        <script type="application/ld+json">
+         {
+    "@context" : "https://schema.org",
+    "@type" : "BreadcrumbList",
+    "itemListElement" : [
+      {
+        "@type" : "ListItem",
+        "position" : 1,
+        "name" : "AWS",
+        "item" : "https://aws.amazon.com"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 2,
+        "name" : "Service Authorization Reference",
+        "item" : "https://docs.aws.amazon.com/iam/index.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 3,
+        "name" : "Service Authorization Reference",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 4,
+        "name" : "Reference",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 5,
+        "name" : "Actions, resources, and condition keys for AWS services",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference_policies_actions-resources-contextkeys.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 6,
+        "name" : "Actions, resources, and condition keys for Amazon Lex V2",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference_policies_actions-resources-contextkeys.html"
+      }
+    ]
+}
+        </script>
+       </head>
+       <body>
+        <div id="main">
+         <div style="display: none">
+          <a href="/pdfs/service-authorization/latest/reference/service-authorization.pdf#list_amazonlexv2" rel="noopener noreferrer" target="_blank" title="Open PDF">
+          </a>
+         </div>
+         <div class="breadcrumb" id="breadcrumbs">
+          <a href="https://aws.amazon.com">
+           AWS
+          </a>
+          <a href="/index.html">
+           Documentation
+          </a>
+          <a href="/iam/index.html">
+           Service Authorization Reference
+          </a>
+          <a href="reference.html">
+           Service Authorization Reference
+          </a>
+         </div>
+         <div id="page-toc-src">
+          <a href="#amazonlexv2-actions-as-permissions">
+           Actions
+          </a>
+          <a href="#amazonlexv2-resources-for-iam-policies">
+           Resource types
+          </a>
+          <a href="#amazonlexv2-policy-keys">
+           Condition keys
+          </a>
+         </div>
+         <div class="awsui-util-container" id="main-content">
+          <div id="main-col-body">
+           <awsdocs-language-banner data-service="$ctrl.pageService">
+           </awsdocs-language-banner>
+           <h1 class="topictitle" id="list_amazonlexv2">
+            Actions, resources, and condition keys for      Amazon Lex V2
+           </h1>
+           <div class="awsdocs-page-header-container">
+            <awsdocs-page-header>
+            </awsdocs-page-header>
+            <awsdocs-filter-selector id="awsdocs-filter-selector">
+            </awsdocs-filter-selector>
+           </div>
+           <p>
+            Amazon Lex V2 (service prefix:
+            <code class="code">
+             lex
+            </code>
+            ) provides the following    service-specific resources, actions, and condition context keys for use in IAM permission    policies.
+           </p>
+           <p>
+            References:
+           </p>
+           <div class="itemizedlist">
+            <ul class="itemizedlist">
+             <li class="listitem">
+              <p>
+               Learn how to
+               <a href="https://docs.aws.amazon.com/lexv2/latest/dg/">
+                configure this service
+               </a>
+               .
+              </p>
+             </li>
+             <li class="listitem">
+              <p>
+               View a list of the
+               <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/welcome.html">
+                API operations available for this          service
+               </a>
+               .
+              </p>
+             </li>
+             <li class="listitem">
+              <p>
+               Learn how to secure this service and its resources by
+               <a href="https://docs.aws.amazon.com/lexv2/latest/dg/security-iam.html">
+                using          IAM
+               </a>
+               permission policies.
+              </p>
+             </li>
+            </ul>
+           </div>
+           <div class="highlights" id="inline-topiclist">
+            <h6>
+             Topics
+            </h6>
+            <ul>
+             <li>
+              <a href="#amazonlexv2-actions-as-permissions">
+               Actions defined by        Amazon Lex V2
+              </a>
+             </li>
+             <li>
+              <a href="#amazonlexv2-resources-for-iam-policies">
+               Resource types defined by        Amazon Lex V2
+              </a>
+             </li>
+             <li>
+              <a href="#amazonlexv2-policy-keys">
+               Condition keys for        Amazon Lex V2
+              </a>
+             </li>
+            </ul>
+           </div>
+           <h2 id="amazonlexv2-actions-as-permissions">
+            Actions defined by        Amazon Lex V2
+           </h2>
+           <p>
+            You can specify the following actions in the
+            <code class="code">
+             Action
+            </code>
+            element of an IAM      policy statement. Use policies to grant permissions to perform an operation in AWS. When you      use an action in a policy, you usually allow or deny access to the API operation or CLI      command with the same name. However, in some cases, a single action controls access to more      than one operation. Alternatively, some operations require several different actions.
+           </p>
+           <p>
+            The
+            <b>
+             Resource types
+            </b>
+            column of the Actions table indicates whether each      action supports resource-level permissions. If there is no value for this column, you must      specify all resources ("*") to which the policy applies in the
+            <code class="code">
+             Resource
+            </code>
+            element      of your policy statement. If the column includes a resource type, then you can specify an ARN      of that type in a statement with that action. If the action has one or more required      resources, the caller must have permission to use the action with those resources. Required      resources are indicated in the table with an asterisk (*). If you limit resource access with      the
+            <code class="code">
+             Resource
+            </code>
+            element in an IAM policy, you must include an ARN or pattern for      each required resource type. Some actions support multiple resource types. If the resource      type is optional (not indicated as required), then you can choose to use one of the optional      resource types.
+           </p>
+           <p>
+            The
+            <b>
+             Condition keys
+            </b>
+            column of the Actions table includes keys that you      can specify in a policy statement's
+            <code class="code">
+             Condition
+            </code>
+            element. For more information on      the condition keys that are associated with resources for the service, see the
+            <b>
+             Condition keys
+            </b>
+            column of the Resource types table.
+           </p>
+           <div class="awsdocs-note">
+            <div class="awsdocs-note-title">
+             <awsui-icon name="status-info" variant="link">
+             </awsui-icon>
+             <h6>
+              Note
+             </h6>
+            </div>
+            <div class="awsdocs-note-text">
+             <p>
+              Resource condition keys are listed in the
+              <a href="#amazonlexv2-resources-for-iam-policies">
+               Resource types
+              </a>
+              table. You        can find a link to the resource type that applies to an action in the
+              <b>
+               Resource          types (*required)
+              </b>
+              column of the Actions table. The resource type in the        Resource types table includes the
+              <b>
+               Condition keys
+              </b>
+              column, which are the        resource condition keys that apply to an action in the Actions table.
+             </p>
+            </div>
+           </div>
+           <p>
+            For details about the columns in the following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#actions_table" rel="noopener noreferrer" target="_blank">
+             Actions table
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9d949c11c13">
+              <thead>
+               <tr>
+                <th>
+                 Actions
+                </th>
+                <th>
+                 Description
+                </th>
+                <th>
+                 Access level
+                </th>
+                <th>
+                 Resource types (*required)
+                </th>
+                <th>
+                 Condition keys
+                </th>
+                <th>
+                 Dependent actions
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="amazonlexv2-BatchCreateCustomVocabularyItem" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_BatchCreateCustomVocabularyItem.html">
+                 BatchCreateCustomVocabularyItem
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create new items in an existing custom vocabulary
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-BatchDeleteCustomVocabularyItem" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_BatchDeleteCustomVocabularyItem.html">
+                 BatchDeleteCustomVocabularyItem
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete existing items in an existing custom vocabulary
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-BatchUpdateCustomVocabularyItem" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_BatchUpdateCustomVocabularyItem.html">
+                 BatchUpdateCustomVocabularyItem
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update existing items in an existing custom vocabulary
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-BuildBotLocale" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_BuildBotLocale.html">
+                 BuildBotLocale
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to build an existing bot locale in a bot
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-CreateBot" rowspan="3" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_CreateBot.html">
+                 CreateBot
+                </a>
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Grants permission to create a new bot and a test bot alias pointing to the DRAFT bot version
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-botalias">
+                  bot alias*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonlexv2-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-CreateBotAlias" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_CreateBotAlias.html">
+                 CreateBotAlias
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to create a new bot alias in a bot
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-botalias">
+                  bot alias*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonlexv2-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-CreateBotChannel" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/dg/deploying-messaging-platform.html">
+                 CreateBotChannel
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a bot channel in an existing bot
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-CreateBotLocale" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_CreateBotLocale.html">
+                 CreateBotLocale
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a new bot locale in an existing bot
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-CreateBotReplica" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_CreateBotReplica.html">
+                 CreateBotReplica
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create bot replica for a bot
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-CreateBotVersion" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_CreateBotVersion.html">
+                 CreateBotVersion
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a new version of an existing bot
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-CreateCustomVocabulary" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/dg/vocab.html">
+                 CreateCustomVocabulary
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a new custom vocabulary in an existing bot locale
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-CreateExport" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_CreateExport.html">
+                 CreateExport
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to create an export for an existing resource
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-testset">
+                  test set
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-CreateIntent" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_CreateIntent.html">
+                 CreateIntent
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a new intent in an existing bot locale
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-CreateResourcePolicy" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_CreateResourcePolicy.html">
+                 CreateResourcePolicy
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to create a new resource policy for a Lex resource
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-botalias">
+                  bot alias
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-CreateSlot" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_CreateSlot.html">
+                 CreateSlot
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a new slot in an intent
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-CreateSlotType" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_CreateSlotType.html">
+                 CreateSlotType
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a new slot type in an existing bot locale
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-CreateTestSet" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/dg/create-test-set-from-CSV.html">
+                 CreateTestSet
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to import a new test-set
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-CreateTestSetDiscrepancyReport" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_CreateTestSetDiscrepancyReport.html">
+                 CreateTestSetDiscrepancyReport
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a test set discrepancy report
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-testset">
+                  test set*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-CreateUploadUrl" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_CreateUploadUrl.html">
+                 CreateUploadUrl
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create an upload url for import file
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-DeleteBot" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_DeleteBot.html">
+                 DeleteBot
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to delete an existing bot
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 lex:DeleteBotAlias
+                </p>
+                <p>
+                 lex:DeleteBotChannel
+                </p>
+                <p>
+                 lex:DeleteBotLocale
+                </p>
+                <p>
+                 lex:DeleteBotVersion
+                </p>
+                <p>
+                 lex:DeleteIntent
+                </p>
+                <p>
+                 lex:DeleteSlot
+                </p>
+                <p>
+                 lex:DeleteSlotType
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-botalias">
+                  bot alias*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-DeleteBotAlias" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_DeleteBotAlias.html">
+                 DeleteBotAlias
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete an existing bot alias in a bot
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-botalias">
+                  bot alias*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-DeleteBotChannel" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/dg/deploying-messaging-platform.html">
+                 DeleteBotChannel
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete an existing bot channel
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-DeleteBotLocale" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_DeleteBotLocale.html">
+                 DeleteBotLocale
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete an existing bot locale in a bot
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 lex:DeleteIntent
+                </p>
+                <p>
+                 lex:DeleteSlot
+                </p>
+                <p>
+                 lex:DeleteSlotType
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-DeleteBotReplica" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_DeleteBotReplica.html">
+                 DeleteBotReplica
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete an existing bot replica
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-DeleteBotVersion" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_DeleteBotVersion.html">
+                 DeleteBotVersion
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete an existing bot version
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-DeleteCustomVocabulary" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_DeleteCustomVocabulary.html">
+                 DeleteCustomVocabulary
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete an existing custom vocabulary in a bot locale
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-DeleteExport" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_DeleteExport.html">
+                 DeleteExport
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to delete an existing export
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-testset">
+                  test set
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-DeleteImport" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_DeleteImport.html">
+                 DeleteImport
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to delete an existing import
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-testset">
+                  test set
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-DeleteIntent" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_DeleteIntent.html">
+                 DeleteIntent
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete an existing intent in a bot locale
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-DeleteResourcePolicy" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_DeleteResourcePolicy.html">
+                 DeleteResourcePolicy
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to delete an existing resource policy for a Lex resource
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-botalias">
+                  bot alias
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-DeleteSession" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_runtime_DeleteSession.html">
+                 DeleteSession
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete session information for a bot alias and user ID
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-botalias">
+                  bot alias*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-DeleteSlot" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_DeleteSlot.html">
+                 DeleteSlot
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete an existing slot in an intent
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-DeleteSlotType" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_DeleteSlotType.html">
+                 DeleteSlotType
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete an existing slot type in a bot locale
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-DeleteTestSet" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_DeleteTestSet.html">
+                 DeleteTestSet
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete an existing test set
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-testset">
+                  test set*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-DeleteUtterances" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_DeleteUtterances.html">
+                 DeleteUtterances
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete utterance data for a bot
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-DescribeBot" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_DescribeBot.html">
+                 DescribeBot
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retrieve an existing bot
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-DescribeBotAlias" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_DescribeBotAlias.html">
+                 DescribeBotAlias
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retrieve an existing bot alias
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-botalias">
+                  bot alias*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-DescribeBotChannel" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/dg/deploying-messaging-platform.html">
+                 DescribeBotChannel
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to retrieve an existing bot channel
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-DescribeBotLocale" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_DescribeBotLocale.html">
+                 DescribeBotLocale
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retrieve an existing bot locale
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-DescribeBotRecommendation" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_DescribeBotRecommendation.html">
+                 DescribeBotRecommendation
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retrieve metadata information about a bot recommendation
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-DescribeBotReplica" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_DescribeBotReplica.html">
+                 DescribeBotReplica
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retrieve an existing bot replica
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-DescribeBotResourceGeneration" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_DescribeBotResourceGeneration.html">
+                 DescribeBotResourceGeneration
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retrieve metadata information for a bot resource generation
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-DescribeBotVersion" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_DescribeBotVersion.html">
+                 DescribeBotVersion
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retrieve an existing bot version
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-DescribeCustomVocabulary" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/dg/vocab.html">
+                 DescribeCustomVocabulary
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to retrieve an existing custom vocabulary
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-DescribeCustomVocabularyMetadata" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_DescribeCustomVocabularyMetadata.html">
+                 DescribeCustomVocabularyMetadata
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retrieve metadata of an existing custom vocabulary
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-DescribeExport" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_DescribeExport.html">
+                 DescribeExport
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to retrieve an existing export
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 lex:DescribeBot
+                </p>
+                <p>
+                 lex:DescribeBotLocale
+                </p>
+                <p>
+                 lex:DescribeIntent
+                </p>
+                <p>
+                 lex:DescribeSlot
+                </p>
+                <p>
+                 lex:DescribeSlotType
+                </p>
+                <p>
+                 lex:ListBotLocales
+                </p>
+                <p>
+                 lex:ListIntents
+                </p>
+                <p>
+                 lex:ListSlotTypes
+                </p>
+                <p>
+                 lex:ListSlots
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-testset">
+                  test set
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-DescribeImport" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_DescribeImport.html">
+                 DescribeImport
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to retrieve an existing import
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-testset">
+                  test set
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-DescribeIntent" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_DescribeIntent.html">
+                 DescribeIntent
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retrieve an existing intent
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-DescribeResourcePolicy" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_DescribeResourcePolicy.html">
+                 DescribeResourcePolicy
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to retrieve an existing resource policy for a Lex resource
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-botalias">
+                  bot alias
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-DescribeSlot" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_DescribeSlot.html">
+                 DescribeSlot
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retrieve an existing slot
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-DescribeSlotType" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_DescribeSlotType.html">
+                 DescribeSlotType
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retrieve an existing slot type
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-DescribeTestExecution" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_DescribeTestExecution.html">
+                 DescribeTestExecution
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retrieve test execution metadata
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-testset">
+                  test set*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-DescribeTestSet" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_DescribeTestSet.html">
+                 DescribeTestSet
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retrieve an existing test set
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-testset">
+                  test set*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-DescribeTestSetDiscrepancyReport" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_DescribeTestSetDiscrepancyReport.html">
+                 DescribeTestSetDiscrepancyReport
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retrieve test set discrepancy report metadata
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-testset">
+                  test set*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-DescribeTestSetGeneration" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_DescribeTestSetGeneration.html">
+                 DescribeTestSetGeneration
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retrieve test set generation metadata
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-testset">
+                  test set
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-GenerateBotElement" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_GenerateBotElement.html">
+                 GenerateBotElement
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to generate supported fields or elements for a bot
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-GetSession" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_runtime_GetSession.html">
+                 GetSession
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retrieve session information for a bot alias and user ID
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-botalias">
+                  bot alias*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-GetTestExecutionArtifactsUrl" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_GetTestExecutionArtifactsUrl.html">
+                 GetTestExecutionArtifactsUrl
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retrieve artifacts URL for a test execution
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-testset">
+                  test set*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-ListAggregatedUtterances" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_ListAggregatedUtterances.html">
+                 ListAggregatedUtterances
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list utterances and statistics for a bot
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-ListBotAliasReplicas" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_ListBotAliasReplicas.html">
+                 ListBotAliasReplicas
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list alias replicas in a bot replica
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-ListBotAliases" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_ListBotAliases.html">
+                 ListBotAliases
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list bot aliases in an bot
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-ListBotChannels" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/dg/deploying-messaging-platform.html">
+                 ListBotChannels
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to list bot channels
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-ListBotLocales" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_ListBotLocales.html">
+                 ListBotLocales
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list bot locales in a bot
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-ListBotRecommendations" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_ListBotRecommendations.html">
+                 ListBotRecommendations
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get a list of bot recommendations that meet the specified criteria
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-ListBotReplicas" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_ListBotReplicas.html">
+                 ListBotReplicas
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list replicas of a bot
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-ListBotResourceGenerations" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_ListBotResourceGenerations.html">
+                 ListBotResourceGenerations
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list the resource generations for a bot
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-ListBotVersionReplicas" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_ListBotVersionReplicas.html">
+                 ListBotVersionReplicas
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list version replicas in a bot replica
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-ListBotVersions" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_ListBotVersions.html">
+                 ListBotVersions
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list existing bot versions
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-ListBots" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_ListBots.html">
+                 ListBots
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list existing bots
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-ListBuiltInIntents" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_ListBuiltInIntents.html">
+                 ListBuiltInIntents
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list built-in intents
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-ListBuiltInSlotTypes" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_ListBuiltInSlotTypes.html">
+                 ListBuiltInSlotTypes
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list built-in slot types
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-ListCustomVocabularyItems" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_ListCustomVocabularyItems.html">
+                 ListCustomVocabularyItems
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list items of an existing custom vocabulary
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-ListExports" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_ListExports.html">
+                 ListExports
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list existing exports
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-ListImports" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_ListImports.html">
+                 ListImports
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list existing imports
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-ListIntentMetrics" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_ListIntentMetrics.html">
+                 ListIntentMetrics
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list intent analytics metrics for a bot
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-ListIntentPaths" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_ListIntentPaths.html">
+                 ListIntentPaths
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list intent path analytics for a bot
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-ListIntentStageMetrics" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_ListIntentStageMetrics.html">
+                 ListIntentStageMetrics
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list intentStage analytics metrics for a bot
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-ListIntents" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_ListIntents.html">
+                 ListIntents
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list intents in a bot
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-ListRecommendedIntents" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_ListRecommendedIntents.html">
+                 ListRecommendedIntents
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get a list of recommended intents provided by the bot recommendation
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-ListSessionAnalyticsData" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_ListSessionAnalyticsData.html">
+                 ListSessionAnalyticsData
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list session analytics data for a bot
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-ListSessionMetrics" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_ListSessionMetrics.html">
+                 ListSessionMetrics
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list session analytics metrics for a bot
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-ListSlotTypes" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_ListSlotTypes.html">
+                 ListSlotTypes
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list slot types in a bot
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-ListSlots" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_ListSlots.html">
+                 ListSlots
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list slots in an intent
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-ListTagsForResource" rowspan="3" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_ListTagsForResource.html">
+                 ListTagsForResource
+                </a>
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Grants permission to lists tags for a Lex resource
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-botalias">
+                  bot alias
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-testset">
+                  test set
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-ListTestExecutionResultItems" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_ListTestExecutionResultItems.html">
+                 ListTestExecutionResultItems
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retrieve test results data for a test execution
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-testset">
+                  test set*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 lex:ListTestSetRecords
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-ListTestExecutions" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_ListTestExecutions.html">
+                 ListTestExecutions
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list test executions
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-ListTestSetRecords" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_ListTestSetRecords.html">
+                 ListTestSetRecords
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retrieve records inside an existing test set
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-testset">
+                  test set*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-ListTestSets" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_ListTestSets.html">
+                 ListTestSets
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list test sets
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-PutSession" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_runtime_PutSession.html">
+                 PutSession
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a new session or modify an existing session for a bot alias and user ID
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-botalias">
+                  bot alias*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-RecognizeText" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_runtime_RecognizeText.html">
+                 RecognizeText
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to send user input (text-only) to an bot alias
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-botalias">
+                  bot alias*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-RecognizeUtterance" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_runtime_RecognizeUtterance.html">
+                 RecognizeUtterance
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to send user input (text or speech) to an bot alias
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-botalias">
+                  bot alias*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-SearchAssociatedTranscripts" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_SearchAssociatedTranscripts.html">
+                 SearchAssociatedTranscripts
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to search for associated transcripts that meet the specified criteria
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-StartBotRecommendation" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_StartBotRecommendation.html">
+                 StartBotRecommendation
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to start a bot recommendation for an existing bot locale
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-StartBotResourceGeneration" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_StartBotResourceGeneration.html">
+                 StartBotResourceGeneration
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to start a resource generation for an existing bot locale
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-StartConversation" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_runtime_StartConversation.html">
+                 StartConversation
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to stream user input (speech/text/DTMF) to a bot alias
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-botalias">
+                  bot alias*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-StartImport" rowspan="4" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_StartImport.html">
+                 StartImport
+                </a>
+               </td>
+               <td rowspan="4" tabindex="-1">
+                Grants permission to start a new import with the uploaded import file
+               </td>
+               <td rowspan="4" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 lex:CreateBot
+                </p>
+                <p>
+                 lex:CreateBotLocale
+                </p>
+                <p>
+                 lex:CreateCustomVocabulary
+                </p>
+                <p>
+                 lex:CreateIntent
+                </p>
+                <p>
+                 lex:CreateSlot
+                </p>
+                <p>
+                 lex:CreateSlotType
+                </p>
+                <p>
+                 lex:CreateTestSet
+                </p>
+                <p>
+                 lex:DeleteBotLocale
+                </p>
+                <p>
+                 lex:DeleteCustomVocabulary
+                </p>
+                <p>
+                 lex:DeleteIntent
+                </p>
+                <p>
+                 lex:DeleteSlot
+                </p>
+                <p>
+                 lex:DeleteSlotType
+                </p>
+                <p>
+                 lex:UpdateBot
+                </p>
+                <p>
+                 lex:UpdateBotLocale
+                </p>
+                <p>
+                 lex:UpdateCustomVocabulary
+                </p>
+                <p>
+                 lex:UpdateIntent
+                </p>
+                <p>
+                 lex:UpdateSlot
+                </p>
+                <p>
+                 lex:UpdateSlotType
+                </p>
+                <p>
+                 lex:UpdateTestSet
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-botalias">
+                  bot alias
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-testset">
+                  test set
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonlexv2-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-StartTestExecution" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_StartTestExecution.html">
+                 StartTestExecution
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to start a test execution using a test set
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-testset">
+                  test set*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-StartTestSetGeneration" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_StartTestSetGeneration.html">
+                 StartTestSetGeneration
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to generate a test set
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-testset">
+                  test set
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-StopBotRecommendation" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_StopBotRecommendation.html">
+                 StopBotRecommendation
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to stop a bot recommendation for an existing bot locale
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-TagResource" rowspan="4" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_TagResource.html">
+                 TagResource
+                </a>
+               </td>
+               <td rowspan="4" tabindex="-1">
+                Grants permission to add or overwrite tags of a Lex resource
+               </td>
+               <td rowspan="4" tabindex="-1">
+                Tagging
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-botalias">
+                  bot alias
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-testset">
+                  test set
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonlexv2-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-UntagResource" rowspan="4" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_UntagResource.html">
+                 UntagResource
+                </a>
+               </td>
+               <td rowspan="4" tabindex="-1">
+                Grants permission to remove tags from a Lex resource
+               </td>
+               <td rowspan="4" tabindex="-1">
+                Tagging
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-botalias">
+                  bot alias
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-testset">
+                  test set
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-UpdateBot" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_UpdateBot.html">
+                 UpdateBot
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update an existing bot
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-UpdateBotAlias" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_UpdateBotAlias.html">
+                 UpdateBotAlias
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update an existing bot alias
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-botalias">
+                  bot alias*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-UpdateBotLocale" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_UpdateBotLocale.html">
+                 UpdateBotLocale
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update an existing bot locale
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-UpdateBotRecommendation" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_UpdateBotRecommendation.html">
+                 UpdateBotRecommendation
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update an existing bot recommendation request
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-UpdateCustomVocabulary" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/dg/vocab.html">
+                 UpdateCustomVocabulary
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to update an existing custom vocabulary
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-UpdateExport" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_UpdateExport.html">
+                 UpdateExport
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update an existing export
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-UpdateIntent" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_UpdateIntent.html">
+                 UpdateIntent
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update an existing intent
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-UpdateResourcePolicy" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_UpdateResourcePolicy.html">
+                 UpdateResourcePolicy
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to update an existing resource policy for a Lex resource
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-botalias">
+                  bot alias
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-UpdateSlot" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_UpdateSlot.html">
+                 UpdateSlot
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update an existing slot
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-UpdateSlotType" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_UpdateSlotType.html">
+                 UpdateSlotType
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update an existing slot type
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-bot">
+                  bot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-UpdateTestSet" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/APIReference/API_UpdateTestSet.html">
+                 UpdateTestSet
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update an existing test set
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-testset">
+                  test set*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <h2 id="amazonlexv2-resources-for-iam-policies">
+            Resource types defined by        Amazon Lex V2
+           </h2>
+           <p>
+            The following resource types are defined by this service and can be used in the
+            <code class="code">
+             Resource
+            </code>
+            element of IAM permission policy statements. Each action in the
+            <a href="#amazonlexv2-actions-as-permissions">
+             Actions table
+            </a>
+            identifies the      resource types that can be specified with that action. A resource type can also define which      condition keys you can include in a policy. These keys are displayed in the last column of the      Resource types table. For details about the columns in the following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#resources_table" rel="noopener noreferrer" target="_blank">
+             Resource types table
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9d949c13b5">
+              <thead>
+               <tr>
+                <th>
+                 Resource types
+                </th>
+                <th>
+                 ARN
+                </th>
+                <th>
+                 Condition keys
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="amazonlexv2-bot" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/dg/how-it-works.html">
+                 bot
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:lex:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:bot/$
+                 <span>
+                  {
+                 </span>
+                 BotId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-botalias" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/dg/how-it-works.html">
+                 bot alias
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:lex:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:bot-alias/$
+                 <span>
+                  {
+                 </span>
+                 BotId}/$
+                 <span>
+                  {
+                 </span>
+                 BotAliasId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-testset" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/lexv2/latest/dg/test-workbench.html">
+                 test set
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:lex:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:test-set/$
+                 <span>
+                  {
+                 </span>
+                 TestSetId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonlexv2-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <h2 id="amazonlexv2-policy-keys">
+            Condition keys for        Amazon Lex V2
+           </h2>
+           <p>
+            Amazon Lex V2 defines the following condition keys that can be used in the
+            <code class="code">
+             Condition
+            </code>
+            element of an IAM policy. You can use these keys to further refine      the conditions under which the policy statement applies. For details about the columns in the      following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#context_keys_table" rel="noopener noreferrer" target="_blank">
+             Condition keys table
+            </a>
+            .
+           </p>
+           <p>
+            To view the global condition keys that are available to all services, see
+            <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#AvailableKeys">
+             Available global condition keys
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9d949c15b7">
+              <thead>
+               <tr>
+                <th>
+                 Condition keys
+                </th>
+                <th>
+                 Description
+                </th>
+                <th>
+                 Type
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="amazonlexv2-aws_RequestTag___TagKey_" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-requesttag">
+                 aws:RequestTag/${TagKey}
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the tags in the request
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-aws_ResourceTag___TagKey_" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-resourcetag">
+                 aws:ResourceTag/${TagKey}
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the tags attached to a Lex resource
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonlexv2-aws_TagKeys" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-tagkeys">
+                 aws:TagKeys
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the set of tag keys in the request
+               </td>
+               <td tabindex="-1">
+                ArrayOfString
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <awsdocs-copyright class="copyright-print">
+           </awsdocs-copyright>
+           <awsdocs-thumb-feedback right-edge="{{$ctrl.thumbFeedbackRightEdge}}">
+           </awsdocs-thumb-feedback>
+          </div>
+          <noscript>
+           <div>
+            <div>
+             <div>
+              <div id="js_error_message">
+               <p>
+                <img alt="Warning" src="https://d1ge0kk1l5kms0.cloudfront.net/images/G/01/webservices/console/warning.png"/>
+                <strong>
+                 Javascript is disabled or is unavailable in your browser.
+                </strong>
+               </p>
+               <p>
+                To use the Amazon Web Services Documentation, Javascript must be enabled. Please refer to your browser's Help pages for instructions.
+               </p>
+              </div>
+             </div>
+            </div>
+           </div>
+          </noscript>
+          <div class="awsui-util-font-size-0" id="main-col-footer">
+           <div id="doc-conventions">
+            <a href="/general/latest/gr/docconventions.html" target="_top">
+             Document Conventions
+            </a>
+           </div>
+           <div class="prev-next">
+            <div accesskey="p" class="prev-link" href="./list_amazonlex.html" id="previous">
+             Amazon Lex
+            </div>
+            <div accesskey="n" class="next-link" href="./list_awslicensemanager.html" id="next">
+             AWS License Manager
+            </div>
+           </div>
+          </div>
+          <awsdocs-page-utilities>
+          </awsdocs-page-utilities>
+         </div>
+         <div id="quick-feedback-yes" style="display: none;">
+          <div class="title">
+           Did this page help you? - Yes
+          </div>
+          <div class="content">
+           <p>
+            Thanks for letting us know we're doing a good job!
+           </p>
+           <p>
+            If you've got a moment, please tell us what we did right so we can do more of it.
+           </p>
+           <p>
+            <awsui-button click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service Authorization Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazonlexv2.html" id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback">
+            </awsui-button>
+           </p>
+          </div>
+         </div>
+         <div id="quick-feedback-no" style="display: none;">
+          <div class="title">
+           Did this page help you? - No
+          </div>
+          <div class="content">
+           <p>
+            Thanks for letting us know this page needs work. We're sorry we let you down.
+           </p>
+           <p>
+            If you've got a moment, please tell us how we can make the documentation better.
+           </p>
+           <p>
+            <awsui-button click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service Authorization Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazonlexv2.html" id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback">
+            </awsui-button>
+           </p>
+          </div>
+         </div>
+        </div>
+       </body>
+      </div>
+     </awsdocs-view>
+     <div class="page-loading-indicator" id="page-loading-indicator">
+      <awsui-spinner size="large">
+      </awsui-spinner>
+     </div>
+    </div>
+    <div dom-region="tools" id="tools-panel">
+     <awsdocs-tools-panel id="awsdocs-tools-panel">
+     </awsdocs-tools-panel>
+    </div>
+   </awsui-app-layout>
+   <awsdocs-cookie-banner class="doc-cookie-banner">
+   </awsdocs-cookie-banner>
+  </div>
+ </body>
+</html>

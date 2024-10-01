@@ -1,0 +1,3269 @@
+<!DOCTYPE html>
+<html lang="en-US" xmlns="http://www.w3.org/1999/xhtml">
+ <head>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+  <title>
+   Actions, resources, and condition keys for AWS CloudFormation - Service Authorization Reference
+  </title>
+  <meta content="width=device-width,initial-scale=1" name="viewport"/>
+  <meta content="/assets" name="assets_root"/>
+  <meta content="list_awscloudformation" name="target_state"/>
+  <meta content="list_awscloudformation" name="default_state"/>
+  <link href="https://docs.aws.amazon.com/assets/images/favicon.ico" rel="icon" type="image/ico"/>
+  <link href="https://docs.aws.amazon.com/assets/images/favicon.ico" rel="shortcut icon" type="image/ico"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awscloudformation.html" rel="canonical"/>
+  <meta content="Lists all of the available service-specific resources, actions, and condition keys that can be used in IAM policies to control access to AWS CloudFormation." name="description"/>
+  <meta content="IAD" name="deployment_region"/>
+  <meta content="Service Authorization Reference" name="product"/>
+  <meta content="Service Authorization Reference" name="guide"/>
+  <meta content="Provides a list of the actions, resources, and condition keys supported by each AWS service that can be used in an IAM policy." name="abstract"/>
+  <meta content="en_us" name="guide-locale"/>
+  <meta content="toc-contents.json" name="tocs"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awscloudformation.html" rel="canonical"/>
+  <link href="https://docs.aws.amazon.com/id_id/service-authorization/latest/reference/list_awscloudformation.html" hreflang="id-id" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/id_id/service-authorization/latest/reference/list_awscloudformation.html" hreflang="id" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/de_de/service-authorization/latest/reference/list_awscloudformation.html" hreflang="de-de" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/de_de/service-authorization/latest/reference/list_awscloudformation.html" hreflang="de" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awscloudformation.html" hreflang="en-us" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awscloudformation.html" hreflang="en" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/es_es/service-authorization/latest/reference/list_awscloudformation.html" hreflang="es-es" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/es_es/service-authorization/latest/reference/list_awscloudformation.html" hreflang="es" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/fr_fr/service-authorization/latest/reference/list_awscloudformation.html" hreflang="fr-fr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/fr_fr/service-authorization/latest/reference/list_awscloudformation.html" hreflang="fr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/it_it/service-authorization/latest/reference/list_awscloudformation.html" hreflang="it-it" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/it_it/service-authorization/latest/reference/list_awscloudformation.html" hreflang="it" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ja_jp/service-authorization/latest/reference/list_awscloudformation.html" hreflang="ja-jp" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ja_jp/service-authorization/latest/reference/list_awscloudformation.html" hreflang="ja" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ko_kr/service-authorization/latest/reference/list_awscloudformation.html" hreflang="ko-kr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ko_kr/service-authorization/latest/reference/list_awscloudformation.html" hreflang="ko" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/pt_br/service-authorization/latest/reference/list_awscloudformation.html" hreflang="pt-br" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/pt_br/service-authorization/latest/reference/list_awscloudformation.html" hreflang="pt" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/zh_cn/service-authorization/latest/reference/list_awscloudformation.html" hreflang="zh-cn" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/zh_tw/service-authorization/latest/reference/list_awscloudformation.html" hreflang="zh-tw" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awscloudformation.html" hreflang="x-default" rel="alternative"/>
+  <meta content="Service Authorization Docs" name="feedback-item"/>
+  <meta content="Service Authorization Reference" name="this_doc_product"/>
+  <meta content="Service Authorization Reference" name="this_doc_guide"/>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor4.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor3.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor1.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/awsdocs-common.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/awsdocs-doc-page.js?version=2021.12.02">
+  </script>
+  <link href="https://docs.aws.amazon.com/assets/r/vendor4.css?version=2021.12.02" rel="stylesheet"/>
+  <link href="https://docs.aws.amazon.com/assets/r/awsdocs-common.css?version=2021.12.02" rel="stylesheet"/>
+  <link href="https://docs.aws.amazon.com/assets/r/awsdocs-doc-page.css?version=2021.12.02" rel="stylesheet"/>
+  <script async="" data-config="{'appEntity':'aws-documentation','region':'us-east-1','service':'iam'}" id="awsc-panorama-bundle" src="https://prod.pa.cdn.uis.awsstatic.com/panorama-nav-init.js" type="text/javascript">
+  </script>
+  <meta id="panorama-serviceSubSection" value="Service Authorization Reference"/>
+  <meta id="panorama-serviceConsolePage" value="Actions, resources, and condition keys for AWS CloudFormation"/>
+ </head>
+ <body class="awsdocs awsui">
+  <div class="awsdocs-container">
+   <awsdocs-header>
+   </awsdocs-header>
+   <awsui-app-layout class="awsui-util-no-gutters" header-selector="awsdocs-header" id="app-layout" navigation-change="$ctrl.onNavChange($event)" navigation-hide="false" navigation-open="$ctrl.navOpen" navigation-width="$ctrl.navWidth" ng-controller="ContentController as $ctrl" tools-change="$ctrl.onToolsChange($event)" tools-hide="$ctrl.hideTools" tools-open="$ctrl.toolsOpen" tools-width="$ctrl.toolsWidth">
+    <div dom-region="navigation" id="guide-toc">
+     <awsdocs-toc>
+     </awsdocs-toc>
+    </div>
+    <div dom-region="content" id="main-column" tabindex="-1">
+     <awsdocs-view class="awsdocs-view">
+      <div id="awsdocs-content">
+       <head>
+        <title>
+         Actions, resources, and condition keys for AWS CloudFormation - Service Authorization Reference
+        </title>
+        <meta content="/pdfs/service-authorization/latest/reference/service-authorization.pdf#list_awscloudformation" name="pdf"/>
+        <meta content="https://repost.aws/tags/TAO7Z4bI5hQVWMiYFs34QhIA" name="forums"/>
+        <meta content="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service%20Authorization%20Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awscloudformation.html" name="feedback"/>
+        <meta content="feedbackyes.html?topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awscloudformation.html" name="feedback-yes"/>
+        <meta content="feedbackno.html?topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awscloudformation.html" name="feedback-no"/>
+        <script type="application/ld+json">
+         {
+    "@context" : "https://schema.org",
+    "@type" : "BreadcrumbList",
+    "itemListElement" : [
+      {
+        "@type" : "ListItem",
+        "position" : 1,
+        "name" : "AWS",
+        "item" : "https://aws.amazon.com"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 2,
+        "name" : "Service Authorization Reference",
+        "item" : "https://docs.aws.amazon.com/iam/index.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 3,
+        "name" : "Service Authorization Reference",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 4,
+        "name" : "Reference",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 5,
+        "name" : "Actions, resources, and condition keys for AWS services",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference_policies_actions-resources-contextkeys.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 6,
+        "name" : "Actions, resources, and condition keys for AWS CloudFormation",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference_policies_actions-resources-contextkeys.html"
+      }
+    ]
+}
+        </script>
+       </head>
+       <body>
+        <div id="main">
+         <div style="display: none">
+          <a href="/pdfs/service-authorization/latest/reference/service-authorization.pdf#list_awscloudformation" rel="noopener noreferrer" target="_blank" title="Open PDF">
+          </a>
+         </div>
+         <div class="breadcrumb" id="breadcrumbs">
+          <a href="https://aws.amazon.com">
+           AWS
+          </a>
+          <a href="/index.html">
+           Documentation
+          </a>
+          <a href="/iam/index.html">
+           Service Authorization Reference
+          </a>
+          <a href="reference.html">
+           Service Authorization Reference
+          </a>
+         </div>
+         <div id="page-toc-src">
+          <a href="#awscloudformation-actions-as-permissions">
+           Actions
+          </a>
+          <a href="#awscloudformation-resources-for-iam-policies">
+           Resource types
+          </a>
+          <a href="#awscloudformation-policy-keys">
+           Condition keys
+          </a>
+         </div>
+         <div class="awsui-util-container" id="main-content">
+          <div id="main-col-body">
+           <awsdocs-language-banner data-service="$ctrl.pageService">
+           </awsdocs-language-banner>
+           <h1 class="topictitle" id="list_awscloudformation">
+            Actions, resources, and condition keys for      AWS CloudFormation
+           </h1>
+           <div class="awsdocs-page-header-container">
+            <awsdocs-page-header>
+            </awsdocs-page-header>
+            <awsdocs-filter-selector id="awsdocs-filter-selector">
+            </awsdocs-filter-selector>
+           </div>
+           <p>
+            AWS CloudFormation (service prefix:
+            <code class="code">
+             cloudformation
+            </code>
+            ) provides the following    service-specific resources, actions, and condition context keys for use in IAM permission    policies.
+           </p>
+           <p>
+            References:
+           </p>
+           <div class="itemizedlist">
+            <ul class="itemizedlist">
+             <li class="listitem">
+              <p>
+               Learn how to
+               <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/">
+                configure this service
+               </a>
+               .
+              </p>
+             </li>
+             <li class="listitem">
+              <p>
+               View a list of the
+               <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/">
+                API operations available for this          service
+               </a>
+               .
+              </p>
+             </li>
+             <li class="listitem">
+              <p>
+               Learn how to secure this service and its resources by
+               <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-iam-template.html">
+                using          IAM
+               </a>
+               permission policies.
+              </p>
+             </li>
+            </ul>
+           </div>
+           <div class="highlights" id="inline-topiclist">
+            <h6>
+             Topics
+            </h6>
+            <ul>
+             <li>
+              <a href="#awscloudformation-actions-as-permissions">
+               Actions defined by        AWS CloudFormation
+              </a>
+             </li>
+             <li>
+              <a href="#awscloudformation-resources-for-iam-policies">
+               Resource types defined by        AWS CloudFormation
+              </a>
+             </li>
+             <li>
+              <a href="#awscloudformation-policy-keys">
+               Condition keys for        AWS CloudFormation
+              </a>
+             </li>
+            </ul>
+           </div>
+           <h2 id="awscloudformation-actions-as-permissions">
+            Actions defined by        AWS CloudFormation
+           </h2>
+           <p>
+            You can specify the following actions in the
+            <code class="code">
+             Action
+            </code>
+            element of an IAM      policy statement. Use policies to grant permissions to perform an operation in AWS. When you      use an action in a policy, you usually allow or deny access to the API operation or CLI      command with the same name. However, in some cases, a single action controls access to more      than one operation. Alternatively, some operations require several different actions.
+           </p>
+           <p>
+            The
+            <b>
+             Resource types
+            </b>
+            column of the Actions table indicates whether each      action supports resource-level permissions. If there is no value for this column, you must      specify all resources ("*") to which the policy applies in the
+            <code class="code">
+             Resource
+            </code>
+            element      of your policy statement. If the column includes a resource type, then you can specify an ARN      of that type in a statement with that action. If the action has one or more required      resources, the caller must have permission to use the action with those resources. Required      resources are indicated in the table with an asterisk (*). If you limit resource access with      the
+            <code class="code">
+             Resource
+            </code>
+            element in an IAM policy, you must include an ARN or pattern for      each required resource type. Some actions support multiple resource types. If the resource      type is optional (not indicated as required), then you can choose to use one of the optional      resource types.
+           </p>
+           <p>
+            The
+            <b>
+             Condition keys
+            </b>
+            column of the Actions table includes keys that you      can specify in a policy statement's
+            <code class="code">
+             Condition
+            </code>
+            element. For more information on      the condition keys that are associated with resources for the service, see the
+            <b>
+             Condition keys
+            </b>
+            column of the Resource types table.
+           </p>
+           <div class="awsdocs-note">
+            <div class="awsdocs-note-title">
+             <awsui-icon name="status-info" variant="link">
+             </awsui-icon>
+             <h6>
+              Note
+             </h6>
+            </div>
+            <div class="awsdocs-note-text">
+             <p>
+              Resource condition keys are listed in the
+              <a href="#awscloudformation-resources-for-iam-policies">
+               Resource types
+              </a>
+              table. You        can find a link to the resource type that applies to an action in the
+              <b>
+               Resource          types (*required)
+              </b>
+              column of the Actions table. The resource type in the        Resource types table includes the
+              <b>
+               Condition keys
+              </b>
+              column, which are the        resource condition keys that apply to an action in the Actions table.
+             </p>
+            </div>
+           </div>
+           <p>
+            For details about the columns in the following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#actions_table" rel="noopener noreferrer" target="_blank">
+             Actions table
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9d234c11c13">
+              <thead>
+               <tr>
+                <th>
+                 Actions
+                </th>
+                <th>
+                 Description
+                </th>
+                <th>
+                 Access level
+                </th>
+                <th>
+                 Resource types (*required)
+                </th>
+                <th>
+                 Condition keys
+                </th>
+                <th>
+                 Dependent actions
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="awscloudformation-ActivateOrganizationsAccess" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_ActivateOrganizationsAccess.html">
+                 ActivateOrganizationsAccess
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to activate trusted access between StackSets and Organizations. With trusted access between StackSets and Organizations activated, the management account has permissions to create and manage StackSets for your organization
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-ActivateType" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_ActivateType.html">
+                 ActivateType
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to activate a public third-party extension, making it available for use in stack templates
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-BatchDescribeTypeConfigurations" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_BatchDescribeTypeConfigurations.html">
+                 BatchDescribeTypeConfigurations
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return configuration data for the specified CloudFormation extensions
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-CancelUpdateStack" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_CancelUpdateStack.html">
+                 CancelUpdateStack
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to cancel an update on the specified stack
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-stack">
+                  stack*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-ContinueUpdateRollback" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_ContinueUpdateRollback.html">
+                 ContinueUpdateRollback
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to continue rolling back a stack that is in the UPDATE_ROLLBACK_FAILED state to the UPDATE_ROLLBACK_COMPLETE state
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-stack">
+                  stack*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-cloudformation_RoleArn">
+                  cloudformation:RoleArn
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-CreateChangeSet" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_CreateChangeSet.html">
+                 CreateChangeSet
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to create a list of changes for a stack
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-stack">
+                  stack*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-cloudformation_ChangeSetName">
+                  cloudformation:ChangeSetName
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscloudformation-cloudformation_ResourceTypes">
+                  cloudformation:ResourceTypes
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscloudformation-cloudformation_ImportResourceTypes">
+                  cloudformation:ImportResourceTypes
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscloudformation-cloudformation_RoleArn">
+                  cloudformation:RoleArn
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscloudformation-cloudformation_StackPolicyUrl">
+                  cloudformation:StackPolicyUrl
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscloudformation-cloudformation_TemplateUrl">
+                  cloudformation:TemplateUrl
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscloudformation-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscloudformation-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-CreateGeneratedTemplate" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_CreateGeneratedTemplate.html">
+                 CreateGeneratedTemplate
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a template from existing resources that are not already managed with CloudFormation
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-CreateStack" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_CreateStack.html">
+                 CreateStack
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to create a stack as specified in the template
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-stack">
+                  stack*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-cloudformation_ResourceTypes">
+                  cloudformation:ResourceTypes
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscloudformation-cloudformation_RoleArn">
+                  cloudformation:RoleArn
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscloudformation-cloudformation_StackPolicyUrl">
+                  cloudformation:StackPolicyUrl
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscloudformation-cloudformation_TemplateUrl">
+                  cloudformation:TemplateUrl
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscloudformation-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscloudformation-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-CreateStackInstances" rowspan="4" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_CreateStackInstances.html">
+                 CreateStackInstances
+                </a>
+               </td>
+               <td rowspan="4" tabindex="-1">
+                Grants permission to create stack instances for the specified accounts, within the specified regions
+               </td>
+               <td rowspan="4" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-stackset">
+                  stackset*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-stackset-target">
+                  stackset-target
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-type">
+                  type
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscloudformation-cloudformation_TargetRegion">
+                  cloudformation:TargetRegion
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-CreateStackSet" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_CreateStackSet.html">
+                 CreateStackSet
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a stackset as specified in the template
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-cloudformation_RoleArn">
+                  cloudformation:RoleArn
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscloudformation-cloudformation_TemplateUrl">
+                  cloudformation:TemplateUrl
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscloudformation-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscloudformation-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-CreateUploadBucket" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-iam-template.html">
+                 CreateUploadBucket
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to upload templates to Amazon S3 buckets. Used only by the AWS CloudFormation console and is not documented in the API reference
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-DeactivateOrganizationsAccess" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_DeactivateOrganizationsAccess.html">
+                 DeactivateOrganizationsAccess
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to deactivate trusted access between StackSets and Organizations. If trusted access is deactivated, the management account does not have permissions to create and manage service-managed StackSets for your organization
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-DeactivateType" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_DeactivateType.html">
+                 DeactivateType
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to deactivate a public extension that was previously activated in this account and region
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-DeleteChangeSet" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_DeleteChangeSet.html">
+                 DeleteChangeSet
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to delete the specified change set. Deleting change sets ensures that no one executes the wrong change set
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-stack">
+                  stack*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-cloudformation_ChangeSetName">
+                  cloudformation:ChangeSetName
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-DeleteGeneratedTemplate" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_DeleteGeneratedTemplate.html">
+                 DeleteGeneratedTemplate
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a generated template
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-DeleteStack" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_DeleteStack.html">
+                 DeleteStack
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to delete a specified stack
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-stack">
+                  stack*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-cloudformation_RoleArn">
+                  cloudformation:RoleArn
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-DeleteStackInstances" rowspan="4" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_DeleteStackInstances.html">
+                 DeleteStackInstances
+                </a>
+               </td>
+               <td rowspan="4" tabindex="-1">
+                Grants permission to delete stack instances for the specified accounts, in the specified regions
+               </td>
+               <td rowspan="4" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-stackset">
+                  stackset*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-stackset-target">
+                  stackset-target
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-type">
+                  type
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-cloudformation_TargetRegion">
+                  cloudformation:TargetRegion
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-DeleteStackSet" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_DeleteStackSet.html">
+                 DeleteStackSet
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a specified stackset
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-stackset">
+                  stackset*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-DeregisterType" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_DeregisterType.html">
+                 DeregisterType
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to deregister an existing CloudFormation type or type version
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-DescribeAccountLimits" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_DescribeAccountLimits.html">
+                 DescribeAccountLimits
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retrieve your account's AWS CloudFormation limits
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-DescribeChangeSet" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_DescribeChangeSet.html">
+                 DescribeChangeSet
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to return the description for the specified change set
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-stack">
+                  stack*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-cloudformation_ChangeSetName">
+                  cloudformation:ChangeSetName
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-DescribeChangeSetHooks" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_DescribeChangeSetHooks.html">
+                 DescribeChangeSetHooks
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to return the Hook invocation information for the specified change set
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-stack">
+                  stack*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-cloudformation_ChangeSetName">
+                  cloudformation:ChangeSetName
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-DescribeGeneratedTemplate" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_DescribeGeneratedTemplate.html">
+                 DescribeGeneratedTemplate
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to describe a generated template. The output includes details about the progress of the creation of a generated template
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-DescribeOrganizationsAccess" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_DescribeOrganizationsAccess.html">
+                 DescribeOrganizationsAccess
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return information about the account's OrganizationAccess status
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-DescribePublisher" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_DescribePublisher.html">
+                 DescribePublisher
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return information about a CloudFormation extension publisher
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-DescribeResourceScan" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_DescribeResourceScan.html">
+                 DescribeResourceScan
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to describe details of a resource scan
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-DescribeStackDriftDetectionStatus" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_DescribeStackDriftDetectionStatus.html">
+                 DescribeStackDriftDetectionStatus
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return information about a stack drift detection operation
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-DescribeStackEvents" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_DescribeStackEvents.html">
+                 DescribeStackEvents
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return all stack related events for a specified stack
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-stack">
+                  stack*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-DescribeStackInstance" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_DescribeStackInstance.html">
+                 DescribeStackInstance
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return the stack instance that's associated with the specified stack set, AWS account, and region
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-stackset">
+                  stackset*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-DescribeStackResource" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_DescribeStackResource.html">
+                 DescribeStackResource
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return a description of the specified resource in the specified stack
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-stack">
+                  stack*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-DescribeStackResourceDrifts" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_DescribeStackResourceDrifts.html">
+                 DescribeStackResourceDrifts
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return drift information for the resources that have been checked for drift in the specified stack
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-stack">
+                  stack*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-DescribeStackResources" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_DescribeStackResources.html">
+                 DescribeStackResources
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return AWS resource descriptions for running and deleted stacks
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-stack">
+                  stack*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-DescribeStackSet" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_DescribeStackSet.html">
+                 DescribeStackSet
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return the description of the specified stack set
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-stackset">
+                  stackset*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-DescribeStackSetOperation" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_DescribeStackSetOperation.html">
+                 DescribeStackSetOperation
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return the description of the specified stack set operation
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-stackset">
+                  stackset*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-DescribeStacks" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_DescribeStacks.html">
+                 DescribeStacks
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return the description for the specified stack, and to all stacks when used in combination with the ListStacks action
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-stack">
+                  stack
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 cloudformation:ListStacks
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-DescribeType" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_DescribeType.html">
+                 DescribeType
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return information about the CloudFormation type requested
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-DescribeTypeRegistration" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_DescribeTypeRegistration.html">
+                 DescribeTypeRegistration
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return information about the registration process for a CloudFormation type
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-DetectStackDrift" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_DetectStackDrift.html">
+                 DetectStackDrift
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to detects whether a stack's actual configuration differs, or has drifted, from it's expected configuration, as defined in the stack template and any values specified as template parameters
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-stack">
+                  stack*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-DetectStackResourceDrift" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_DetectStackResourceDrift.html">
+                 DetectStackResourceDrift
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return information about whether a resource's actual configuration differs, or has drifted, from it's expected configuration, as defined in the stack template and any values specified as template parameters
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-stack">
+                  stack*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-DetectStackSetDrift" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_DetectStackSetDrift.html">
+                 DetectStackSetDrift
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to enable users to detect drift on a stack set and the stack instances that belong to that stack set
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-stackset">
+                  stackset*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-EstimateTemplateCost" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_EstimateTemplateCost.html">
+                 EstimateTemplateCost
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return the estimated monthly cost of a template
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-cloudformation_TemplateUrl">
+                  cloudformation:TemplateUrl
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-ExecuteChangeSet" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_ExecuteChangeSet.html">
+                 ExecuteChangeSet
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to update a stack using the input information that was provided when the specified change set was created
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-stack">
+                  stack*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-cloudformation_ChangeSetName">
+                  cloudformation:ChangeSetName
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-GetGeneratedTemplate" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_GetGeneratedTemplate.html">
+                 GetGeneratedTemplate
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retrieve a generated template
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-GetStackPolicy" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_GetStackPolicy.html">
+                 GetStackPolicy
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return the stack policy for a specified stack
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-stack">
+                  stack*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-GetTemplate" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_GetTemplate.html">
+                 GetTemplate
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return the template body for a specified stack
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-stack">
+                  stack*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-GetTemplateSummary" rowspan="3" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_GetTemplateSummary.html">
+                 GetTemplateSummary
+                </a>
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Grants permission to return information about a new or existing template
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-stack">
+                  stack
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-stackset">
+                  stackset
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-cloudformation_TemplateUrl">
+                  cloudformation:TemplateUrl
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-ImportStacksToStackSet" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_ImportStacksToStackSet.html">
+                 ImportStacksToStackSet
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to enable users to import existing stacks to a new or existing stackset
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-stackset">
+                  stackset*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-ListChangeSets" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_ListChangeSets.html">
+                 ListChangeSets
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return the ID and status of each active change set for a stack. For example, AWS CloudFormation lists change sets that are in the CREATE_IN_PROGRESS or CREATE_PENDING state
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-stack">
+                  stack*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-ListExports" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_ListExports.html">
+                 ListExports
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list all exported output values in the account and region in which you call this action
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-ListGeneratedTemplates" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_ListGeneratedTemplates.html">
+                 ListGeneratedTemplates
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list your generated templates in this Region
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-ListImports" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_ListImports.html">
+                 ListImports
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list all stacks that are importing an exported output value
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-ListResourceScanRelatedResources" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_ListResourceScanRelatedResources.html">
+                 ListResourceScanRelatedResources
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list the related resources for a list of resources from a resource scan. The response indicates whether each returned resource is already managed by CloudFormation
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-ListResourceScanResources" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_ListResourceScanResources.html">
+                 ListResourceScanResources
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list the resources from a resource scan. The results can be filtered by resource identifier, resource type prefix, tag key, and tag value
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-ListResourceScans" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_ListResourceScans.html">
+                 ListResourceScans
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list the resource scans from newest to oldest. By default it will return up to 10 resource scans
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-ListStackInstanceResourceDrifts" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_ListStackInstanceResourceDrifts.html">
+                 ListStackInstanceResourceDrifts
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return drift information for the resources that have been checked for drift in the specified stack instance
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-stackset">
+                  stackset*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-ListStackInstances" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_ListStackSets.html">
+                 ListStackInstances
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return summary information about stack instances that are associated with the specified stack set
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-stackset">
+                  stackset*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-ListStackResources" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_ListStackResources.html">
+                 ListStackResources
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return descriptions of all resources of the specified stack
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-stack">
+                  stack*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-ListStackSetAutoDeploymentTargets" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_ListStackSetAutoDeploymentTargets.html">
+                 ListStackSetAutoDeploymentTargets
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return summary information about StackSet Auto Deployment Targets
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-stackset">
+                  stackset*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-ListStackSetOperationResults" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_ListStackSetOperationResults.html">
+                 ListStackSetOperationResults
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return summary information about the results of a stack set operation
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-stackset">
+                  stackset*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-ListStackSetOperations" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_ListStackSetOperations.html">
+                 ListStackSetOperations
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return summary information about operations performed on a stack set
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-stackset">
+                  stackset*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-ListStackSets" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_ListStackSets.html">
+                 ListStackSets
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return summary information about stack sets that are associated with the user
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-ListStacks" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_ListStacks.html">
+                 ListStacks
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return the summary information for stacks whose status matches the specified StackStatusFilter. In combination with the DescribeStacks action, grants permission to list descriptions for stacks
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-ListTypeRegistrations" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_ListTypeRegistrations.html">
+                 ListTypeRegistrations
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list CloudFormation type registration attempts
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-ListTypeVersions" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_ListTypeVersions.html">
+                 ListTypeVersions
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list versions of a particular CloudFormation type
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-ListTypes" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_ListTypes.html">
+                 ListTypes
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list available CloudFormation types
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-PublishType" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_PublishType.html">
+                 PublishType
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to publish the specified extension to the CloudFormation registry as a public extension in this region
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-RecordHandlerProgress" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_RecordHandlerProgress.html">
+                 RecordHandlerProgress
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to record the handler progress
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-stack">
+                  stack*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-RegisterPublisher" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_RegisterPublisher.html">
+                 RegisterPublisher
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to register account as a publisher of public extensions in the CloudFormation registry
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-RegisterType" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_RegisterType.html">
+                 RegisterType
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to register a new CloudFormation type
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-RollbackStack" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_RollbackStack.html">
+                 RollbackStack
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to rollback the stack to the last stable state
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-stack">
+                  stack*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-cloudformation_RoleArn">
+                  cloudformation:RoleArn
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-SetStackPolicy" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_SetStackPolicy.html">
+                 SetStackPolicy
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to set a stack policy for a specified stack
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Permissions management
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-stack">
+                  stack*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-cloudformation_StackPolicyUrl">
+                  cloudformation:StackPolicyUrl
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-SetTypeConfiguration" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_SetTypeConfiguration.html">
+                 SetTypeConfiguration
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to set the configuration data for a registered CloudFormation extension, in the given account and region
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-SetTypeDefaultVersion" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_SetTypeDefaultVersion.html">
+                 SetTypeDefaultVersion
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to set which version of a CloudFormation type applies to CloudFormation operations
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-SignalResource" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_SignalResource.html">
+                 SignalResource
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to send a signal to the specified resource with a success or failure status
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-stack">
+                  stack*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-StartResourceScan" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_StartResourceScan.html">
+                 StartResourceScan
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to start a scan of the resources in this account in this Region
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-StopStackSetOperation" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_StopStackSetOperation.html">
+                 StopStackSetOperation
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to stop an in-progress operation on a stack set and its associated stack instances
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-stackset">
+                  stackset*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-TagResource" rowspan="4" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_TagResource.html">
+                 TagResource
+                </a>
+               </td>
+               <td rowspan="4" tabindex="-1">
+                Grants permission to tag cloudformation resources
+               </td>
+               <td rowspan="4" tabindex="-1">
+                Tagging
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-changeset">
+                  changeset
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-stack">
+                  stack
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-stackset">
+                  stackset
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscloudformation-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-TestType" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_TestType.html">
+                 TestType
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to test a registered extension to make sure it meets all necessary requirements for being published in the CloudFormation registry
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-UntagResource" rowspan="4" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_UntagResource.html">
+                 UntagResource
+                </a>
+               </td>
+               <td rowspan="4" tabindex="-1">
+                Grants permission to untag cloudformation resources
+               </td>
+               <td rowspan="4" tabindex="-1">
+                Tagging
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-changeset">
+                  changeset
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-stack">
+                  stack
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-stackset">
+                  stackset
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-UpdateGeneratedTemplate" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_UpdateGeneratedTemplate.html">
+                 UpdateGeneratedTemplate
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update a generated template. This can be used to change the name, add and remove resources, refresh resources, and change the DeletionPolicy and UpdateReplacePolicy settings
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-UpdateStack" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_UpdateStack.html">
+                 UpdateStack
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to update a stack as specified in the template
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-stack">
+                  stack*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-cloudformation_ResourceTypes">
+                  cloudformation:ResourceTypes
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscloudformation-cloudformation_RoleArn">
+                  cloudformation:RoleArn
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscloudformation-cloudformation_StackPolicyUrl">
+                  cloudformation:StackPolicyUrl
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscloudformation-cloudformation_TemplateUrl">
+                  cloudformation:TemplateUrl
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscloudformation-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscloudformation-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-UpdateStackInstances" rowspan="4" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_UpdateStackInstances.html">
+                 UpdateStackInstances
+                </a>
+               </td>
+               <td rowspan="4" tabindex="-1">
+                Grants permission to update the parameter values for stack instances for the specified accounts, within the specified regions
+               </td>
+               <td rowspan="4" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-stackset">
+                  stackset*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-stackset-target">
+                  stackset-target
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-type">
+                  type
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-cloudformation_TargetRegion">
+                  cloudformation:TargetRegion
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-UpdateStackSet" rowspan="4" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_UpdateStackSet.html">
+                 UpdateStackSet
+                </a>
+               </td>
+               <td rowspan="4" tabindex="-1">
+                Grants permission to update a stackset as specified in the template
+               </td>
+               <td rowspan="4" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-stackset">
+                  stackset*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-stackset-target">
+                  stackset-target
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-type">
+                  type
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-cloudformation_RoleArn">
+                  cloudformation:RoleArn
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscloudformation-cloudformation_TemplateUrl">
+                  cloudformation:TemplateUrl
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscloudformation-cloudformation_TargetRegion">
+                  cloudformation:TargetRegion
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscloudformation-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscloudformation-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-UpdateTerminationProtection" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_UpdateTerminationProtection.html">
+                 UpdateTerminationProtection
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update termination protection for the specified stack
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-stack">
+                  stack*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-ValidateTemplate" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_ValidateTemplate.html">
+                 ValidateTemplate
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to validate a specified template
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-cloudformation_TemplateUrl">
+                  cloudformation:TemplateUrl
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <h2 id="awscloudformation-resources-for-iam-policies">
+            Resource types defined by        AWS CloudFormation
+           </h2>
+           <p>
+            The following resource types are defined by this service and can be used in the
+            <code class="code">
+             Resource
+            </code>
+            element of IAM permission policy statements. Each action in the
+            <a href="#awscloudformation-actions-as-permissions">
+             Actions table
+            </a>
+            identifies the      resource types that can be specified with that action. A resource type can also define which      condition keys you can include in a policy. These keys are displayed in the last column of the      Resource types table. For details about the columns in the following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#resources_table" rel="noopener noreferrer" target="_blank">
+             Resource types table
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9d234c13b5">
+              <thead>
+               <tr>
+                <th>
+                 Resource types
+                </th>
+                <th>
+                 ARN
+                </th>
+                <th>
+                 Condition keys
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="awscloudformation-changeset" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-whatis-concepts.html#w2ab1b5c15c11">
+                 changeset
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:cloudformation:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:changeSet/$
+                 <span>
+                  {
+                 </span>
+                 ChangeSetName}/$
+                 <span>
+                  {
+                 </span>
+                 Id}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-stack" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-whatis-concepts.html#w2ab1b5c15b9">
+                 stack
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:cloudformation:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:stack/$
+                 <span>
+                  {
+                 </span>
+                 StackName}/$
+                 <span>
+                  {
+                 </span>
+                 Id}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-stackset" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/stacksets-concepts.html#stacksets-concepts-stackset">
+                 stackset
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:cloudformation:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:stackset/$
+                 <span>
+                  {
+                 </span>
+                 StackSetName}:$
+                 <span>
+                  {
+                 </span>
+                 Id}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscloudformation-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-stackset-target" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-iam-template.html">
+                 stackset-target
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:cloudformation:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:stackset-target/$
+                 <span>
+                  {
+                 </span>
+                 StackSetTarget}
+                </code>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-type" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-iam-template.html">
+                 type
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:cloudformation:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:type/resource/$
+                 <span>
+                  {
+                 </span>
+                 Type}
+                </code>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-generatedtemplate" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/generate-IaC.html">
+                 generatedtemplate
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:cloudformation:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:generatedTemplate/$
+                 <span>
+                  {
+                 </span>
+                 Id}
+                </code>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-resourcescan" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/generate-IaC.html">
+                 resourcescan
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:cloudformation:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:resourceScan/$
+                 <span>
+                  {
+                 </span>
+                 Id}
+                </code>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <h2 id="awscloudformation-policy-keys">
+            Condition keys for        AWS CloudFormation
+           </h2>
+           <p>
+            AWS CloudFormation defines the following condition keys that can be used in the
+            <code class="code">
+             Condition
+            </code>
+            element of an IAM policy. You can use these keys to further refine      the conditions under which the policy statement applies. For details about the columns in the      following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#context_keys_table" rel="noopener noreferrer" target="_blank">
+             Condition keys table
+            </a>
+            .
+           </p>
+           <p>
+            To view the global condition keys that are available to all services, see
+            <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#AvailableKeys">
+             Available global condition keys
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9d234c15b7">
+              <thead>
+               <tr>
+                <th>
+                 Condition keys
+                </th>
+                <th>
+                 Description
+                </th>
+                <th>
+                 Type
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="awscloudformation-aws_RequestTag___TagKey_" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-iam-template.html#using-iam-template-conditions">
+                 aws:RequestTag/${TagKey}
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the tags that are passed in the request
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-aws_ResourceTag___TagKey_" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-iam-template.html#using-iam-template-conditions">
+                 aws:ResourceTag/${TagKey}
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the tags associated with the resource
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-aws_TagKeys" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-iam-template.html#using-iam-template-conditions">
+                 aws:TagKeys
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the tag keys that are passed in the request
+               </td>
+               <td tabindex="-1">
+                ArrayOfString
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-cloudformation_ChangeSetName" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-iam-template.html#using-iam-template-conditions">
+                 cloudformation:ChangeSetName
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by an AWS CloudFormation change set name. Use to control which change sets IAM users can execute or delete
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-cloudformation_ImportResourceTypes" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-iam-template.html#using-iam-template-conditions">
+                 cloudformation:ImportResourceTypes
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the template resource types, such as AWS::EC2::Instance. Use to control which resource types IAM users can work with when they want to import a resource into a stack
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-cloudformation_ResourceTypes" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-iam-template.html#using-iam-template-conditions">
+                 cloudformation:ResourceTypes
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the template resource types, such as AWS::EC2::Instance. Use to control which resource types IAM users can work with when they create or update a stack
+               </td>
+               <td tabindex="-1">
+                ArrayOfString
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-cloudformation_RoleArn" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-iam-template.html#using-iam-template-conditions">
+                 cloudformation:RoleArn
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the ARN of an IAM service role. Use to control which service role IAM users can use to work with stacks or change sets
+               </td>
+               <td tabindex="-1">
+                ARN
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-cloudformation_StackPolicyUrl" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-iam-template.html#using-iam-template-conditions">
+                 cloudformation:StackPolicyUrl
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by an Amazon S3 stack policy URL. Use to control which stack policies IAM users can associate with a stack during a create or update stack action
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-cloudformation_TargetRegion" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-iam-template.html#using-iam-template-conditions">
+                 cloudformation:TargetRegion
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by stack set target region. Use to control which regions IAM users can use when they create or update stack sets
+               </td>
+               <td tabindex="-1">
+                ArrayOfString
+               </td>
+              </tr>
+              <tr>
+               <td id="awscloudformation-cloudformation_TemplateUrl" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-iam-template.html#using-iam-template-conditions">
+                 cloudformation:TemplateUrl
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by an Amazon S3 template URL. Use to control which templates IAM users can use when they create or update stacks
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <awsdocs-copyright class="copyright-print">
+           </awsdocs-copyright>
+           <awsdocs-thumb-feedback right-edge="{{$ctrl.thumbFeedbackRightEdge}}">
+           </awsdocs-thumb-feedback>
+          </div>
+          <noscript>
+           <div>
+            <div>
+             <div>
+              <div id="js_error_message">
+               <p>
+                <img alt="Warning" src="https://d1ge0kk1l5kms0.cloudfront.net/images/G/01/webservices/console/warning.png"/>
+                <strong>
+                 Javascript is disabled or is unavailable in your browser.
+                </strong>
+               </p>
+               <p>
+                To use the Amazon Web Services Documentation, Javascript must be enabled. Please refer to your browser's Help pages for instructions.
+               </p>
+              </div>
+             </div>
+            </div>
+           </div>
+          </noscript>
+          <div class="awsui-util-font-size-0" id="main-col-footer">
+           <div id="doc-conventions">
+            <a href="/general/latest/gr/docconventions.html" target="_top">
+             Document Conventions
+            </a>
+           </div>
+           <div class="prev-next">
+            <div accesskey="p" class="prev-link" href="./list_awscloud9.html" id="previous">
+             AWS Cloud9
+            </div>
+            <div accesskey="n" class="next-link" href="./list_amazoncloudfront.html" id="next">
+             Amazon CloudFront
+            </div>
+           </div>
+          </div>
+          <awsdocs-page-utilities>
+          </awsdocs-page-utilities>
+         </div>
+         <div id="quick-feedback-yes" style="display: none;">
+          <div class="title">
+           Did this page help you? - Yes
+          </div>
+          <div class="content">
+           <p>
+            Thanks for letting us know we're doing a good job!
+           </p>
+           <p>
+            If you've got a moment, please tell us what we did right so we can do more of it.
+           </p>
+           <p>
+            <awsui-button click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service Authorization Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awscloudformation.html" id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback">
+            </awsui-button>
+           </p>
+          </div>
+         </div>
+         <div id="quick-feedback-no" style="display: none;">
+          <div class="title">
+           Did this page help you? - No
+          </div>
+          <div class="content">
+           <p>
+            Thanks for letting us know this page needs work. We're sorry we let you down.
+           </p>
+           <p>
+            If you've got a moment, please tell us how we can make the documentation better.
+           </p>
+           <p>
+            <awsui-button click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service Authorization Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awscloudformation.html" id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback">
+            </awsui-button>
+           </p>
+          </div>
+         </div>
+        </div>
+       </body>
+      </div>
+     </awsdocs-view>
+     <div class="page-loading-indicator" id="page-loading-indicator">
+      <awsui-spinner size="large">
+      </awsui-spinner>
+     </div>
+    </div>
+    <div dom-region="tools" id="tools-panel">
+     <awsdocs-tools-panel id="awsdocs-tools-panel">
+     </awsdocs-tools-panel>
+    </div>
+   </awsui-app-layout>
+   <awsdocs-cookie-banner class="doc-cookie-banner">
+   </awsdocs-cookie-banner>
+  </div>
+ </body>
+</html>

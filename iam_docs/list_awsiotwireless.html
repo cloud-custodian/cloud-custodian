@@ -1,0 +1,4490 @@
+<!DOCTYPE html>
+<html lang="en-US" xmlns="http://www.w3.org/1999/xhtml">
+ <head>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+  <title>
+   Actions, resources, and condition keys for AWS IoT Wireless - Service Authorization Reference
+  </title>
+  <meta content="width=device-width,initial-scale=1" name="viewport"/>
+  <meta content="/assets" name="assets_root"/>
+  <meta content="list_awsiotwireless" name="target_state"/>
+  <meta content="list_awsiotwireless" name="default_state"/>
+  <link href="https://docs.aws.amazon.com/assets/images/favicon.ico" rel="icon" type="image/ico"/>
+  <link href="https://docs.aws.amazon.com/assets/images/favicon.ico" rel="shortcut icon" type="image/ico"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiotwireless.html" rel="canonical"/>
+  <meta content="Lists all of the available service-specific resources, actions, and condition keys that can be used in IAM policies to control access to AWS IoT Wireless." name="description"/>
+  <meta content="IAD" name="deployment_region"/>
+  <meta content="Service Authorization Reference" name="product"/>
+  <meta content="Service Authorization Reference" name="guide"/>
+  <meta content="Provides a list of the actions, resources, and condition keys supported by each AWS service that can be used in an IAM policy." name="abstract"/>
+  <meta content="en_us" name="guide-locale"/>
+  <meta content="toc-contents.json" name="tocs"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiotwireless.html" rel="canonical"/>
+  <link href="https://docs.aws.amazon.com/id_id/service-authorization/latest/reference/list_awsiotwireless.html" hreflang="id-id" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/id_id/service-authorization/latest/reference/list_awsiotwireless.html" hreflang="id" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/de_de/service-authorization/latest/reference/list_awsiotwireless.html" hreflang="de-de" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/de_de/service-authorization/latest/reference/list_awsiotwireless.html" hreflang="de" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiotwireless.html" hreflang="en-us" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiotwireless.html" hreflang="en" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/es_es/service-authorization/latest/reference/list_awsiotwireless.html" hreflang="es-es" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/es_es/service-authorization/latest/reference/list_awsiotwireless.html" hreflang="es" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/fr_fr/service-authorization/latest/reference/list_awsiotwireless.html" hreflang="fr-fr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/fr_fr/service-authorization/latest/reference/list_awsiotwireless.html" hreflang="fr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/it_it/service-authorization/latest/reference/list_awsiotwireless.html" hreflang="it-it" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/it_it/service-authorization/latest/reference/list_awsiotwireless.html" hreflang="it" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ja_jp/service-authorization/latest/reference/list_awsiotwireless.html" hreflang="ja-jp" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ja_jp/service-authorization/latest/reference/list_awsiotwireless.html" hreflang="ja" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ko_kr/service-authorization/latest/reference/list_awsiotwireless.html" hreflang="ko-kr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ko_kr/service-authorization/latest/reference/list_awsiotwireless.html" hreflang="ko" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/pt_br/service-authorization/latest/reference/list_awsiotwireless.html" hreflang="pt-br" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/pt_br/service-authorization/latest/reference/list_awsiotwireless.html" hreflang="pt" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/zh_cn/service-authorization/latest/reference/list_awsiotwireless.html" hreflang="zh-cn" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/zh_tw/service-authorization/latest/reference/list_awsiotwireless.html" hreflang="zh-tw" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiotwireless.html" hreflang="x-default" rel="alternative"/>
+  <meta content="Service Authorization Docs" name="feedback-item"/>
+  <meta content="Service Authorization Reference" name="this_doc_product"/>
+  <meta content="Service Authorization Reference" name="this_doc_guide"/>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor4.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor3.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor1.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/awsdocs-common.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/awsdocs-doc-page.js?version=2021.12.02">
+  </script>
+  <link href="https://docs.aws.amazon.com/assets/r/vendor4.css?version=2021.12.02" rel="stylesheet"/>
+  <link href="https://docs.aws.amazon.com/assets/r/awsdocs-common.css?version=2021.12.02" rel="stylesheet"/>
+  <link href="https://docs.aws.amazon.com/assets/r/awsdocs-doc-page.css?version=2021.12.02" rel="stylesheet"/>
+  <script async="" data-config="{'appEntity':'aws-documentation','region':'us-east-1','service':'iam'}" id="awsc-panorama-bundle" src="https://prod.pa.cdn.uis.awsstatic.com/panorama-nav-init.js" type="text/javascript">
+  </script>
+  <meta id="panorama-serviceSubSection" value="Service Authorization Reference"/>
+  <meta id="panorama-serviceConsolePage" value="Actions, resources, and condition keys for AWS IoT Wireless"/>
+ </head>
+ <body class="awsdocs awsui">
+  <div class="awsdocs-container">
+   <awsdocs-header>
+   </awsdocs-header>
+   <awsui-app-layout class="awsui-util-no-gutters" header-selector="awsdocs-header" id="app-layout" navigation-change="$ctrl.onNavChange($event)" navigation-hide="false" navigation-open="$ctrl.navOpen" navigation-width="$ctrl.navWidth" ng-controller="ContentController as $ctrl" tools-change="$ctrl.onToolsChange($event)" tools-hide="$ctrl.hideTools" tools-open="$ctrl.toolsOpen" tools-width="$ctrl.toolsWidth">
+    <div dom-region="navigation" id="guide-toc">
+     <awsdocs-toc>
+     </awsdocs-toc>
+    </div>
+    <div dom-region="content" id="main-column" tabindex="-1">
+     <awsdocs-view class="awsdocs-view">
+      <div id="awsdocs-content">
+       <head>
+        <title>
+         Actions, resources, and condition keys for AWS IoT Wireless - Service Authorization Reference
+        </title>
+        <meta content="/pdfs/service-authorization/latest/reference/service-authorization.pdf#list_awsiotwireless" name="pdf"/>
+        <meta content="https://repost.aws/tags/TAO7Z4bI5hQVWMiYFs34QhIA" name="forums"/>
+        <meta content="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service%20Authorization%20Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awsiotwireless.html" name="feedback"/>
+        <meta content="feedbackyes.html?topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awsiotwireless.html" name="feedback-yes"/>
+        <meta content="feedbackno.html?topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awsiotwireless.html" name="feedback-no"/>
+        <script type="application/ld+json">
+         {
+    "@context" : "https://schema.org",
+    "@type" : "BreadcrumbList",
+    "itemListElement" : [
+      {
+        "@type" : "ListItem",
+        "position" : 1,
+        "name" : "AWS",
+        "item" : "https://aws.amazon.com"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 2,
+        "name" : "Service Authorization Reference",
+        "item" : "https://docs.aws.amazon.com/iam/index.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 3,
+        "name" : "Service Authorization Reference",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 4,
+        "name" : "Reference",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 5,
+        "name" : "Actions, resources, and condition keys for AWS services",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference_policies_actions-resources-contextkeys.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 6,
+        "name" : "Actions, resources, and condition keys for AWS IoT Wireless",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference_policies_actions-resources-contextkeys.html"
+      }
+    ]
+}
+        </script>
+       </head>
+       <body>
+        <div id="main">
+         <div style="display: none">
+          <a href="/pdfs/service-authorization/latest/reference/service-authorization.pdf#list_awsiotwireless" rel="noopener noreferrer" target="_blank" title="Open PDF">
+          </a>
+         </div>
+         <div class="breadcrumb" id="breadcrumbs">
+          <a href="https://aws.amazon.com">
+           AWS
+          </a>
+          <a href="/index.html">
+           Documentation
+          </a>
+          <a href="/iam/index.html">
+           Service Authorization Reference
+          </a>
+          <a href="reference.html">
+           Service Authorization Reference
+          </a>
+         </div>
+         <div id="page-toc-src">
+          <a href="#awsiotwireless-actions-as-permissions">
+           Actions
+          </a>
+          <a href="#awsiotwireless-resources-for-iam-policies">
+           Resource types
+          </a>
+          <a href="#awsiotwireless-policy-keys">
+           Condition keys
+          </a>
+         </div>
+         <div class="awsui-util-container" id="main-content">
+          <div id="main-col-body">
+           <awsdocs-language-banner data-service="$ctrl.pageService">
+           </awsdocs-language-banner>
+           <h1 class="topictitle" id="list_awsiotwireless">
+            Actions, resources, and condition keys for      AWS IoT Wireless
+           </h1>
+           <div class="awsdocs-page-header-container">
+            <awsdocs-page-header>
+            </awsdocs-page-header>
+            <awsdocs-filter-selector id="awsdocs-filter-selector">
+            </awsdocs-filter-selector>
+           </div>
+           <p>
+            AWS IoT Wireless (service prefix:
+            <code class="code">
+             iotwireless
+            </code>
+            ) provides the following    service-specific resources, actions, and condition context keys for use in IAM permission    policies.
+           </p>
+           <p>
+            References:
+           </p>
+           <div class="itemizedlist">
+            <ul class="itemizedlist">
+             <li class="listitem">
+              <p>
+               Learn how to
+               <a href="https://docs.aws.amazon.com/iot/latest/developerguide/what-is-aws-iot.html">
+                configure this service
+               </a>
+               .
+              </p>
+             </li>
+             <li class="listitem">
+              <p>
+               View a list of the
+               <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/Welcome.html">
+                API operations available for this          service
+               </a>
+               .
+              </p>
+             </li>
+             <li class="listitem">
+              <p>
+               Learn how to secure this service and its resources by
+               <a href="https://docs.aws.amazon.com/iot/latest/developerguide/iot-authorization.html">
+                using          IAM
+               </a>
+               permission policies.
+              </p>
+             </li>
+            </ul>
+           </div>
+           <div class="highlights" id="inline-topiclist">
+            <h6>
+             Topics
+            </h6>
+            <ul>
+             <li>
+              <a href="#awsiotwireless-actions-as-permissions">
+               Actions defined by        AWS IoT Wireless
+              </a>
+             </li>
+             <li>
+              <a href="#awsiotwireless-resources-for-iam-policies">
+               Resource types defined by        AWS IoT Wireless
+              </a>
+             </li>
+             <li>
+              <a href="#awsiotwireless-policy-keys">
+               Condition keys for        AWS IoT Wireless
+              </a>
+             </li>
+            </ul>
+           </div>
+           <h2 id="awsiotwireless-actions-as-permissions">
+            Actions defined by        AWS IoT Wireless
+           </h2>
+           <p>
+            You can specify the following actions in the
+            <code class="code">
+             Action
+            </code>
+            element of an IAM      policy statement. Use policies to grant permissions to perform an operation in AWS. When you      use an action in a policy, you usually allow or deny access to the API operation or CLI      command with the same name. However, in some cases, a single action controls access to more      than one operation. Alternatively, some operations require several different actions.
+           </p>
+           <p>
+            The
+            <b>
+             Resource types
+            </b>
+            column of the Actions table indicates whether each      action supports resource-level permissions. If there is no value for this column, you must      specify all resources ("*") to which the policy applies in the
+            <code class="code">
+             Resource
+            </code>
+            element      of your policy statement. If the column includes a resource type, then you can specify an ARN      of that type in a statement with that action. If the action has one or more required      resources, the caller must have permission to use the action with those resources. Required      resources are indicated in the table with an asterisk (*). If you limit resource access with      the
+            <code class="code">
+             Resource
+            </code>
+            element in an IAM policy, you must include an ARN or pattern for      each required resource type. Some actions support multiple resource types. If the resource      type is optional (not indicated as required), then you can choose to use one of the optional      resource types.
+           </p>
+           <p>
+            The
+            <b>
+             Condition keys
+            </b>
+            column of the Actions table includes keys that you      can specify in a policy statement's
+            <code class="code">
+             Condition
+            </code>
+            element. For more information on      the condition keys that are associated with resources for the service, see the
+            <b>
+             Condition keys
+            </b>
+            column of the Resource types table.
+           </p>
+           <div class="awsdocs-note">
+            <div class="awsdocs-note-title">
+             <awsui-icon name="status-info" variant="link">
+             </awsui-icon>
+             <h6>
+              Note
+             </h6>
+            </div>
+            <div class="awsdocs-note-text">
+             <p>
+              Resource condition keys are listed in the
+              <a href="#awsiotwireless-resources-for-iam-policies">
+               Resource types
+              </a>
+              table. You        can find a link to the resource type that applies to an action in the
+              <b>
+               Resource          types (*required)
+              </b>
+              column of the Actions table. The resource type in the        Resource types table includes the
+              <b>
+               Condition keys
+              </b>
+              column, which are the        resource condition keys that apply to an action in the Actions table.
+             </p>
+            </div>
+           </div>
+           <p>
+            For details about the columns in the following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#actions_table" rel="noopener noreferrer" target="_blank">
+             Actions table
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9d887c11c13">
+              <thead>
+               <tr>
+                <th>
+                 Actions
+                </th>
+                <th>
+                 Description
+                </th>
+                <th>
+                 Access level
+                </th>
+                <th>
+                 Resource types (*required)
+                </th>
+                <th>
+                 Condition keys
+                </th>
+                <th>
+                 Dependent actions
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="awsiotwireless-AssociateAwsAccountWithPartnerAccount" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_AssociateAwsAccountWithPartnerAccount.html">
+                 AssociateAwsAccountWithPartnerAccount
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to link partner accounts with AWS account
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsiotwireless-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-AssociateMulticastGroupWithFuotaTask" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_AssociateMulticastGroupWithFuotaTask.html">
+                 AssociateMulticastGroupWithFuotaTask
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to associate the MulticastGroup with FuotaTask
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-FuotaTask">
+                  FuotaTask*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-MulticastGroup">
+                  MulticastGroup*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-AssociateWirelessDeviceWithFuotaTask" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_AssociateWirelessDeviceWithFuotaTask.html">
+                 AssociateWirelessDeviceWithFuotaTask
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to associate the wireless device with FuotaTask
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-FuotaTask">
+                  FuotaTask*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessDevice">
+                  WirelessDevice*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-AssociateWirelessDeviceWithMulticastGroup" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_AssociateWirelessDeviceWithMulticastGroup.html">
+                 AssociateWirelessDeviceWithMulticastGroup
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to associate the WirelessDevice with MulticastGroup
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-MulticastGroup">
+                  MulticastGroup*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessDevice">
+                  WirelessDevice*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-AssociateWirelessDeviceWithThing" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_AssociateWirelessDeviceWithThing.html">
+                 AssociateWirelessDeviceWithThing
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to associate the wireless device with AWS IoT thing for a given wirelessDeviceId
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessDevice">
+                  WirelessDevice*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 iot:DescribeThing
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-thing">
+                  thing*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-AssociateWirelessGatewayWithCertificate" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_AssociateWirelessGatewayWithCertificate.html">
+                 AssociateWirelessGatewayWithCertificate
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to associate a WirelessGateway with the IoT Core Identity certificate
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessGateway">
+                  WirelessGateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-cert">
+                  cert*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-AssociateWirelessGatewayWithThing" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_AssociateWirelessGatewayWithThing.html">
+                 AssociateWirelessGatewayWithThing
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to associate the wireless gateway with AWS IoT thing for a given wirelessGatewayId
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessGateway">
+                  WirelessGateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 iot:DescribeThing
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-thing">
+                  thing*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-CancelMulticastGroupSession" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_CancelMulticastGroupSession.html">
+                 CancelMulticastGroupSession
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to cancel the MulticastGroup session
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-MulticastGroup">
+                  MulticastGroup*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-CreateDestination" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_CreateDestination.html">
+                 CreateDestination
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a Destination resource
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsiotwireless-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-CreateDeviceProfile" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_CreateDeviceProfile.html">
+                 CreateDeviceProfile
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a DeviceProfile resource
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsiotwireless-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-CreateFuotaTask" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_CreateFuotaTask.html">
+                 CreateFuotaTask
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a FuotaTask resource
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsiotwireless-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-CreateMulticastGroup" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_CreateMulticastGroup.html">
+                 CreateMulticastGroup
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a MulticastGroup resource
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsiotwireless-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-CreateNetworkAnalyzerConfiguration" rowspan="4" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_CreateNetworkAnalyzerConfiguration.html">
+                 CreateNetworkAnalyzerConfiguration
+                </a>
+               </td>
+               <td rowspan="4" tabindex="-1">
+                Grants permission to create a NetworkAnalyzerConfiguration resource
+               </td>
+               <td rowspan="4" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-MulticastGroup">
+                  MulticastGroup*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessDevice">
+                  WirelessDevice*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessGateway">
+                  WirelessGateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsiotwireless-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-CreateServiceProfile" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_CreateServiceProfile.html">
+                 CreateServiceProfile
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a ServiceProfile resource
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsiotwireless-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-CreateWirelessDevice" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_CreateWirelessDevice.html">
+                 CreateWirelessDevice
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a WirelessDevice resource with given Destination
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsiotwireless-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-CreateWirelessGateway" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_CreateWirelessGateway.html">
+                 CreateWirelessGateway
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a WirelessGateway resource
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsiotwireless-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-CreateWirelessGatewayTask" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_CreateWirelessGatewayTask.html">
+                 CreateWirelessGatewayTask
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a task for a given WirelessGateway
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessGateway">
+                  WirelessGateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-CreateWirelessGatewayTaskDefinition" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_CreateWirelessGatewayTaskDefinition.html">
+                 CreateWirelessGatewayTaskDefinition
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a WirelessGateway task definition
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsiotwireless-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-DeleteDestination" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_DeleteDestination.html">
+                 DeleteDestination
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a Destination
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-Destination">
+                  Destination*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-DeleteDeviceProfile" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_DeleteDeviceProfile.html">
+                 DeleteDeviceProfile
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a DeviceProfile
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-DeviceProfile">
+                  DeviceProfile*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-DeleteFuotaTask" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_DeleteFuotaTask.html">
+                 DeleteFuotaTask
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete the FuotaTask
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-FuotaTask">
+                  FuotaTask*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-DeleteMulticastGroup" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_DeleteMulticastGroup.html">
+                 DeleteMulticastGroup
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete the MulticastGroup
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-MulticastGroup">
+                  MulticastGroup*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-DeleteNetworkAnalyzerConfiguration" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_DeleteNetworkAnalyzerConfiguration.html">
+                 DeleteNetworkAnalyzerConfiguration
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete the NetworkAnalyzerConfiguration
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-NetworkAnalyzerConfiguration">
+                  NetworkAnalyzerConfiguration*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-DeleteQueuedMessages" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_DeleteQueuedMessages.html">
+                 DeleteQueuedMessages
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete QueuedMessages
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-DeleteServiceProfile" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_DeleteServiceProfile.html">
+                 DeleteServiceProfile
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a ServiceProfile
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-ServiceProfile">
+                  ServiceProfile*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-DeleteWirelessDevice" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_DeleteWirelessDevice.html">
+                 DeleteWirelessDevice
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a WirelessDevice
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessDevice">
+                  WirelessDevice*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-DeleteWirelessDeviceImportTask" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_DeleteWirelessDeviceImportTask.html">
+                 DeleteWirelessDeviceImportTask
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete the wireless device import task
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-ImportTask">
+                  ImportTask*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-DeleteWirelessGateway" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_DeleteWirelessGateway.html">
+                 DeleteWirelessGateway
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a WirelessGateway
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessGateway">
+                  WirelessGateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-DeleteWirelessGatewayTask" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_DeleteWirelessGatewayTask.html">
+                 DeleteWirelessGatewayTask
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete task for a given WirelessGateway
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessGateway">
+                  WirelessGateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-DeleteWirelessGatewayTaskDefinition" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_DeleteWirelessGatewayTaskDefinition.html">
+                 DeleteWirelessGatewayTaskDefinition
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a WirelessGateway task definition
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessGatewayTaskDefinition">
+                  WirelessGatewayTaskDefinition*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-DeregisterWirelessDevice" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_DeregisterWirelessDevice.html">
+                 DeregisterWirelessDevice
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to deregister wireless device
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessDevice">
+                  WirelessDevice*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-DisassociateAwsAccountFromPartnerAccount" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_DisassociateAwsAccountFromPartnerAccount.html">
+                 DisassociateAwsAccountFromPartnerAccount
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to disassociate an AWS account from a partner account
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-SidewalkAccount">
+                  SidewalkAccount*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-DisassociateMulticastGroupFromFuotaTask" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_DisassociateMulticastGroupFromFuotaTask.html">
+                 DisassociateMulticastGroupFromFuotaTask
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to disassociate the MulticastGroup from FuotaTask
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-FuotaTask">
+                  FuotaTask*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-MulticastGroup">
+                  MulticastGroup*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-DisassociateWirelessDeviceFromFuotaTask" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_DisassociateWirelessDeviceFromFuotaTask.html">
+                 DisassociateWirelessDeviceFromFuotaTask
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to disassociate the wireless device from FuotaTask
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-FuotaTask">
+                  FuotaTask*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessDevice">
+                  WirelessDevice*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-DisassociateWirelessDeviceFromMulticastGroup" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_DisassociateWirelessDeviceFromMulticastGroup.html">
+                 DisassociateWirelessDeviceFromMulticastGroup
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to disassociate the wireless device from MulticastGroup
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-MulticastGroup">
+                  MulticastGroup*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessDevice">
+                  WirelessDevice*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-DisassociateWirelessDeviceFromThing" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_DisassociateWirelessDeviceFromThing.html">
+                 DisassociateWirelessDeviceFromThing
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to disassociate a wireless device from a AWS IoT thing
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessDevice">
+                  WirelessDevice*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 iot:DescribeThing
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-thing">
+                  thing*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-DisassociateWirelessGatewayFromCertificate" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_DisassociateWirelessGatewayFromCertificate.html">
+                 DisassociateWirelessGatewayFromCertificate
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to disassociate a WirelessGateway from a IoT Core Identity certificate
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessGateway">
+                  WirelessGateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-cert">
+                  cert*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-DisassociateWirelessGatewayFromThing" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_DisassociateWirelessGatewayFromThing.html">
+                 DisassociateWirelessGatewayFromThing
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to disassociate a WirelessGateway from a IoT Core thing
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessGateway">
+                  WirelessGateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 iot:DescribeThing
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-thing">
+                  thing*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-GetDestination" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_GetDestination.html">
+                 GetDestination
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get the Destination
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-Destination">
+                  Destination*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-GetDeviceProfile" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_GetDeviceProfile.html">
+                 GetDeviceProfile
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get the DeviceProfile
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-DeviceProfile">
+                  DeviceProfile*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-GetEventConfigurationByResourceTypes" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_GetEventConfigurationByResourceTypes.html">
+                 GetEventConfigurationByResourceTypes
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get event configuration by resource types
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-GetFuotaTask" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_GetFuotaTask.html">
+                 GetFuotaTask
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get the FuotaTask
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-FuotaTask">
+                  FuotaTask*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-GetLogLevelsByResourceTypes" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_GetLogLevelsByResourceTypes.html">
+                 GetLogLevelsByResourceTypes
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get log levels by resource types
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-GetMetricConfiguration" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_GetMetricConfiguration.html">
+                 GetMetricConfiguration
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get metric configuration
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-GetMetrics" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_GetMetrics.html">
+                 GetMetrics
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get metrics
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-GetMulticastGroup" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_GetMulticastGroup.html">
+                 GetMulticastGroup
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get the MulticastGroup
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-MulticastGroup">
+                  MulticastGroup*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-GetMulticastGroupSession" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_GetMulticastGroupSession.html">
+                 GetMulticastGroupSession
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get the MulticastGroup session
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-MulticastGroup">
+                  MulticastGroup*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-GetNetworkAnalyzerConfiguration" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_GetNetworkAnalyzerConfiguration.html">
+                 GetNetworkAnalyzerConfiguration
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get the NetworkAnalyzerConfiguration
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-NetworkAnalyzerConfiguration">
+                  NetworkAnalyzerConfiguration*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-GetPartnerAccount" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_GetPartnerAccount.html">
+                 GetPartnerAccount
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get the associated PartnerAccount
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-SidewalkAccount">
+                  SidewalkAccount*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-GetPosition" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_GetPosition.html">
+                 GetPosition
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to get position for a given resource
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessDevice">
+                  WirelessDevice
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessGateway">
+                  WirelessGateway
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-GetPositionConfiguration" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_GetPositionConfiguration.html">
+                 GetPositionConfiguration
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to get position configuration for a given resource
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessDevice">
+                  WirelessDevice
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessGateway">
+                  WirelessGateway
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-GetPositionEstimate" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_GetPositionEstimate.html">
+                 GetPositionEstimate
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get position estimate
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-GetResourceEventConfiguration" rowspan="3" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_GetResourceEventConfiguration.html">
+                 GetResourceEventConfiguration
+                </a>
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Grants permission to get an event configuration for an identifier
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-SidewalkAccount">
+                  SidewalkAccount
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessDevice">
+                  WirelessDevice
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessGateway">
+                  WirelessGateway
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-GetResourceLogLevel" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_GetResourceLogLevel.html">
+                 GetResourceLogLevel
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to get resource log level
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessDevice">
+                  WirelessDevice
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessGateway">
+                  WirelessGateway
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-GetResourcePosition" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_GetResourcePosition.html">
+                 GetResourcePosition
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to get position for a given resource
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessDevice">
+                  WirelessDevice
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessGateway">
+                  WirelessGateway
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-GetServiceEndpoint" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_GetServiceEndpoint.html">
+                 GetServiceEndpoint
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retrieve the customer account specific endpoint for CUPS protocol connection or LoRaWAN Network Server (LNS) protocol connection, and optionally server trust certificate in PEM format
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-GetServiceProfile" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_GetServiceProfile.html">
+                 GetServiceProfile
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get the ServiceProfile
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-ServiceProfile">
+                  ServiceProfile*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-GetWirelessDevice" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_GetWirelessDevice.html">
+                 GetWirelessDevice
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get the WirelessDevice
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessDevice">
+                  WirelessDevice*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-GetWirelessDeviceImportTask" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_GetWirelessDeviceImportTask.html">
+                 GetWirelessDeviceImportTask
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get the wireless device import task
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-ImportTask">
+                  ImportTask*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-GetWirelessDeviceStatistics" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_GetWirelessDeviceStatistics.html">
+                 GetWirelessDeviceStatistics
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get statistics info for a given WirelessDevice
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessDevice">
+                  WirelessDevice*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-GetWirelessGateway" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_GetWirelessGateway.html">
+                 GetWirelessGateway
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get the WirelessGateway
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessGateway">
+                  WirelessGateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-GetWirelessGatewayCertificate" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_GetWirelessGatewayCertificate.html">
+                 GetWirelessGatewayCertificate
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get the IoT Core Identity certificate id associated with the WirelessGateway
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessGateway">
+                  WirelessGateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-GetWirelessGatewayFirmwareInformation" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_GetWirelessGatewayFirmwareInformation.html">
+                 GetWirelessGatewayFirmwareInformation
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get Current firmware version and other information for the WirelessGateway
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessGateway">
+                  WirelessGateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-GetWirelessGatewayStatistics" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_GetWirelessGatewayStatistics.html">
+                 GetWirelessGatewayStatistics
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get statistics info for a given WirelessGateway
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessGateway">
+                  WirelessGateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-GetWirelessGatewayTask" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_GetWirelessGatewayTask.html">
+                 GetWirelessGatewayTask
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get the task for a given WirelessGateway
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessGateway">
+                  WirelessGateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-GetWirelessGatewayTaskDefinition" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_GetWirelessGatewayTaskDefinition.html">
+                 GetWirelessGatewayTaskDefinition
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get the given WirelessGateway task definition
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessGatewayTaskDefinition">
+                  WirelessGatewayTaskDefinition*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-ListDestinations" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_ListDestinations.html">
+                 ListDestinations
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list information of available Destinations based on the AWS account
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-ListDeviceProfiles" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_ListDeviceProfiles.html">
+                 ListDeviceProfiles
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list information of available DeviceProfiles based on the AWS account
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-ListDevicesForWirelessDeviceImportTask" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_ListDevicesForWirelessDeviceImportTask.html">
+                 ListDevicesForWirelessDeviceImportTask
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list information of devices by wireless device import task based on the AWS account
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-ImportTask">
+                  ImportTask*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-ListEventConfigurations" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_ListEventConfigurations.html">
+                 ListEventConfigurations
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list information of available event configurations based on the AWS account
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-ListFuotaTasks" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_ListFuotaTasks.html">
+                 ListFuotaTasks
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list information of available FuotaTasks based on the AWS account
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-ListMulticastGroups" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_ListMulticastGroups.html">
+                 ListMulticastGroups
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list information of available MulticastGroups based on the AWS account
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-ListMulticastGroupsByFuotaTask" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_ListMulticastGroupsByFuotaTask.html">
+                 ListMulticastGroupsByFuotaTask
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list information of available MulticastGroups by FuotaTask based on the AWS account
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-FuotaTask">
+                  FuotaTask*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-ListNetworkAnalyzerConfigurations" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_ListNetworkAnalyzerConfigurations.html">
+                 ListNetworkAnalyzerConfigurations
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list information of available NetworkAnalyzerConfigurations based on the AWS account
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-ListPartnerAccounts" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_ListPartnerAccounts.html">
+                 ListPartnerAccounts
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list the available partner accounts
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-ListPositionConfigurations" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_ListPositionConfigurations.html">
+                 ListPositionConfigurations
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list information of available position configurations based on the AWS account
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-ListQueuedMessages" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_ListQueuedMessages.html">
+                 ListQueuedMessages
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list the Queued Messages
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-ListServiceProfiles" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_ListServiceProfiles.html">
+                 ListServiceProfiles
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list information of available ServiceProfiles based on the AWS account
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-ListTagsForResource" rowspan="11" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_ListTagsForResource.html">
+                 ListTagsForResource
+                </a>
+               </td>
+               <td rowspan="11" tabindex="-1">
+                Grants permission to list all tags for a given resource
+               </td>
+               <td rowspan="11" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-Destination">
+                  Destination
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-DeviceProfile">
+                  DeviceProfile
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-FuotaTask">
+                  FuotaTask
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-ImportTask">
+                  ImportTask
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-MulticastGroup">
+                  MulticastGroup
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-NetworkAnalyzerConfiguration">
+                  NetworkAnalyzerConfiguration
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-ServiceProfile">
+                  ServiceProfile
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-SidewalkAccount">
+                  SidewalkAccount
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessDevice">
+                  WirelessDevice
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessGateway">
+                  WirelessGateway
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessGatewayTaskDefinition">
+                  WirelessGatewayTaskDefinition
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-ListWirelessDeviceImportTasks" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_ListWirelessDeviceImportTasks.html">
+                 ListWirelessDeviceImportTasks
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list wireless device import tasks information of based on the AWS account
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-ListWirelessDevices" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_ListWirelessDevices.html">
+                 ListWirelessDevices
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list information of available WirelessDevices based on the AWS account
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-ListWirelessGatewayTaskDefinitions" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_ListWirelessGatewayTaskDefinitions.html">
+                 ListWirelessGatewayTaskDefinitions
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list information of available WirelessGateway task definitions based on the AWS account
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-ListWirelessGateways" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_ListWirelessGateways.html">
+                 ListWirelessGateways
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list information of available WirelessGateways based on the AWS account
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-PutPositionConfiguration" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_PutPositionConfiguration.html">
+                 PutPositionConfiguration
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to put position configuration for a given resource
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessDevice">
+                  WirelessDevice
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessGateway">
+                  WirelessGateway
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-PutResourceLogLevel" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_PutResourceLogLevel.html">
+                 PutResourceLogLevel
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to put resource log level
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessDevice">
+                  WirelessDevice
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessGateway">
+                  WirelessGateway
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-ResetAllResourceLogLevels" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_ResetAllResourceLogLevels.html">
+                 ResetAllResourceLogLevels
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to reset all resource log levels
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-ResetResourceLogLevel" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_ResetResourceLogLevel.html">
+                 ResetResourceLogLevel
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to reset resource log level
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessDevice">
+                  WirelessDevice
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessGateway">
+                  WirelessGateway
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-SendDataToMulticastGroup" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_SendDataToMulticastGroup.html">
+                 SendDataToMulticastGroup
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to send data to the MulticastGroup
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-MulticastGroup">
+                  MulticastGroup*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-SendDataToWirelessDevice" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_SendDataToWirelessDevice.html">
+                 SendDataToWirelessDevice
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to send the decrypted application data frame to the target device
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessDevice">
+                  WirelessDevice*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-StartBulkAssociateWirelessDeviceWithMulticastGroup" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_StartBulkAssociateWirelessDeviceWithMulticastGroup.html">
+                 StartBulkAssociateWirelessDeviceWithMulticastGroup
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to associate the WirelessDevices with MulticastGroup
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-MulticastGroup">
+                  MulticastGroup*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-StartBulkDisassociateWirelessDeviceFromMulticastGroup" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_StartBulkDisassociateWirelessDeviceFromMulticastGroup.html">
+                 StartBulkDisassociateWirelessDeviceFromMulticastGroup
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to bulk disassociate the WirelessDevices from MulticastGroup
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-MulticastGroup">
+                  MulticastGroup*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-StartFuotaTask" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_StartFuotaTask.html">
+                 StartFuotaTask
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to start the FuotaTask
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-FuotaTask">
+                  FuotaTask*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-StartMulticastGroupSession" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_StartMulticastGroupSession.html">
+                 StartMulticastGroupSession
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to start the MulticastGroup session
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-MulticastGroup">
+                  MulticastGroup*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-StartNetworkAnalyzerStream" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot/latest/developerguide/connect-iot-lorawan-network-analyzer-api.html">
+                 StartNetworkAnalyzerStream
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to start NetworkAnalyzer stream
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-NetworkAnalyzerConfiguration">
+                  NetworkAnalyzerConfiguration*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-StartSingleWirelessDeviceImportTask" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_StartSingleWirelessDeviceImportTask.html">
+                 StartSingleWirelessDeviceImportTask
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to start the single wireless device import task
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsiotwireless-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-StartWirelessDeviceImportTask" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_StartWirelessDeviceImportTask.html">
+                 StartWirelessDeviceImportTask
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to start the wireless device import task
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-ImportTask">
+                  ImportTask*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsiotwireless-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-TagResource" rowspan="12" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_TagResource.html">
+                 TagResource
+                </a>
+               </td>
+               <td rowspan="12" tabindex="-1">
+                Grants permission to tag a given resource
+               </td>
+               <td rowspan="12" tabindex="-1">
+                Tagging
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-Destination">
+                  Destination
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-DeviceProfile">
+                  DeviceProfile
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-FuotaTask">
+                  FuotaTask
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-ImportTask">
+                  ImportTask
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-MulticastGroup">
+                  MulticastGroup
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-NetworkAnalyzerConfiguration">
+                  NetworkAnalyzerConfiguration
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-ServiceProfile">
+                  ServiceProfile
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-SidewalkAccount">
+                  SidewalkAccount
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessDevice">
+                  WirelessDevice
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessGateway">
+                  WirelessGateway
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessGatewayTaskDefinition">
+                  WirelessGatewayTaskDefinition
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsiotwireless-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-TestWirelessDevice" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_TestWirelessDevice.html">
+                 TestWirelessDevice
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to simulate a provisioned device to send an uplink data with payload of 'Hello'
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessDevice">
+                  WirelessDevice*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-UntagResource" rowspan="12" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_UntagResource.html">
+                 UntagResource
+                </a>
+               </td>
+               <td rowspan="12" tabindex="-1">
+                Grants permission to remove the given tags from the resource
+               </td>
+               <td rowspan="12" tabindex="-1">
+                Tagging
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-Destination">
+                  Destination
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-DeviceProfile">
+                  DeviceProfile
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-FuotaTask">
+                  FuotaTask
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-ImportTask">
+                  ImportTask
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-MulticastGroup">
+                  MulticastGroup
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-NetworkAnalyzerConfiguration">
+                  NetworkAnalyzerConfiguration
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-ServiceProfile">
+                  ServiceProfile
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-SidewalkAccount">
+                  SidewalkAccount
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessDevice">
+                  WirelessDevice
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessGateway">
+                  WirelessGateway
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessGatewayTaskDefinition">
+                  WirelessGatewayTaskDefinition
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-UpdateDestination" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_UpdateDestination.html">
+                 UpdateDestination
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update a Destination resource
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-Destination">
+                  Destination*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-UpdateEventConfigurationByResourceTypes" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_UpdateEventConfigurationByResourceTypes.html">
+                 UpdateEventConfigurationByResourceTypes
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update event configuration by resource types
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-UpdateFuotaTask" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_UpdateFuotaTask.html">
+                 UpdateFuotaTask
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update the FuotaTask
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-FuotaTask">
+                  FuotaTask*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-UpdateLogLevelsByResourceTypes" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_UpdateLogLevelsByResourceTypes.html">
+                 UpdateLogLevelsByResourceTypes
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update log levels by resource types
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-UpdateMetricConfiguration" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_UpdateMetricConfiguration.html">
+                 UpdateMetricConfiguration
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update metric configuration
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-UpdateMulticastGroup" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_UpdateMulticastGroup.html">
+                 UpdateMulticastGroup
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update the MulticastGroup
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-MulticastGroup">
+                  MulticastGroup*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-UpdateNetworkAnalyzerConfiguration" rowspan="4" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_UpdateNetworkAnalyzerConfiguration.html">
+                 UpdateNetworkAnalyzerConfiguration
+                </a>
+               </td>
+               <td rowspan="4" tabindex="-1">
+                Grants permission to update the NetworkAnalyzerConfiguration
+               </td>
+               <td rowspan="4" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-MulticastGroup">
+                  MulticastGroup*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-NetworkAnalyzerConfiguration">
+                  NetworkAnalyzerConfiguration*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessDevice">
+                  WirelessDevice*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessGateway">
+                  WirelessGateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-UpdatePartnerAccount" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_UpdatePartnerAccount.html">
+                 UpdatePartnerAccount
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update a partner account
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-SidewalkAccount">
+                  SidewalkAccount*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-UpdatePosition" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_UpdatePosition.html">
+                 UpdatePosition
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to update position for a given resource
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessDevice">
+                  WirelessDevice
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessGateway">
+                  WirelessGateway
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-UpdateResourceEventConfiguration" rowspan="3" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_UpdateResourceEventConfiguration.html">
+                 UpdateResourceEventConfiguration
+                </a>
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Grants permission to update an event configuration for an identifier
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-SidewalkAccount">
+                  SidewalkAccount
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessDevice">
+                  WirelessDevice
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessGateway">
+                  WirelessGateway
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-UpdateResourcePosition" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_UpdateResourcePosition.html">
+                 UpdateResourcePosition
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to update position for a given resource
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessDevice">
+                  WirelessDevice
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessGateway">
+                  WirelessGateway
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-UpdateWirelessDevice" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_UpdateWirelessDevice.html">
+                 UpdateWirelessDevice
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update a WirelessDevice resource
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessDevice">
+                  WirelessDevice*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-UpdateWirelessDeviceImportTask" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_UpdateWirelessDeviceImportTask.html">
+                 UpdateWirelessDeviceImportTask
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update a wireless device import task
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-ImportTask">
+                  ImportTask*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-UpdateWirelessGateway" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_UpdateWirelessGateway.html">
+                 UpdateWirelessGateway
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update a WirelessGateway resource
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-WirelessGateway">
+                  WirelessGateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <h2 id="awsiotwireless-resources-for-iam-policies">
+            Resource types defined by        AWS IoT Wireless
+           </h2>
+           <p>
+            The following resource types are defined by this service and can be used in the
+            <code class="code">
+             Resource
+            </code>
+            element of IAM permission policy statements. Each action in the
+            <a href="#awsiotwireless-actions-as-permissions">
+             Actions table
+            </a>
+            identifies the      resource types that can be specified with that action. A resource type can also define which      condition keys you can include in a policy. These keys are displayed in the last column of the      Resource types table. For details about the columns in the following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#resources_table" rel="noopener noreferrer" target="_blank">
+             Resource types table
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9d887c13b5">
+              <thead>
+               <tr>
+                <th>
+                 Resource types
+                </th>
+                <th>
+                 ARN
+                </th>
+                <th>
+                 Condition keys
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="awsiotwireless-WirelessDevice" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_CreateWirelessDevice.html">
+                 WirelessDevice
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:iotwireless:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:WirelessDevice/$
+                 <span>
+                  {
+                 </span>
+                 WirelessDeviceId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-WirelessGateway" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_CreateWirelessGateway.html">
+                 WirelessGateway
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:iotwireless:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:WirelessGateway/$
+                 <span>
+                  {
+                 </span>
+                 WirelessGatewayId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-DeviceProfile" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_CreateDeviceProfile.html">
+                 DeviceProfile
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:iotwireless:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:DeviceProfile/$
+                 <span>
+                  {
+                 </span>
+                 DeviceProfileId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-ServiceProfile" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_CreateServiceProfile.html">
+                 ServiceProfile
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:iotwireless:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:ServiceProfile/$
+                 <span>
+                  {
+                 </span>
+                 ServiceProfileId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-Destination" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_CreateDestination.html">
+                 Destination
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:iotwireless:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:Destination/$
+                 <span>
+                  {
+                 </span>
+                 DestinationName}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-SidewalkAccount" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_AssociateAwsAccountWithPartnerAccount.html">
+                 SidewalkAccount
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:iotwireless:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:SidewalkAccount/$
+                 <span>
+                  {
+                 </span>
+                 SidewalkAccountId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-WirelessGatewayTaskDefinition" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_CreateWirelessGatewayTaskDefinition.html">
+                 WirelessGatewayTaskDefinition
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:iotwireless:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:WirelessGatewayTaskDefinition/$
+                 <span>
+                  {
+                 </span>
+                 WirelessGatewayTaskDefinitionId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-FuotaTask" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_CreateFuotaTask.html">
+                 FuotaTask
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:iotwireless:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:FuotaTask/$
+                 <span>
+                  {
+                 </span>
+                 FuotaTaskId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-MulticastGroup" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_CreateMulticastGroup.html">
+                 MulticastGroup
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:iotwireless:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:MulticastGroup/$
+                 <span>
+                  {
+                 </span>
+                 MulticastGroupId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-NetworkAnalyzerConfiguration" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_CreateNetworkAnalyzerConfiguration.html">
+                 NetworkAnalyzerConfiguration
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:iotwireless:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:NetworkAnalyzerConfiguration/$
+                 <span>
+                  {
+                 </span>
+                 NetworkAnalyzerConfigurationName}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-thing" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot/latest/developerguide/thing-registry.html">
+                 thing
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:iot:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:thing/$
+                 <span>
+                  {
+                 </span>
+                 ThingName}
+                </code>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-cert" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot/latest/developerguide/x509-client-certs.html">
+                 cert
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:iot:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:cert/$
+                 <span>
+                  {
+                 </span>
+                 Certificate}
+                </code>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-ImportTask" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot-wireless/2020-11-22/apireference/API_StartWirelessDeviceImportTask.html">
+                 ImportTask
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:iotwireless:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:ImportTask/$
+                 <span>
+                  {
+                 </span>
+                 ImportTaskId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsiotwireless-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <h2 id="awsiotwireless-policy-keys">
+            Condition keys for        AWS IoT Wireless
+           </h2>
+           <p>
+            AWS IoT Wireless defines the following condition keys that can be used in the
+            <code class="code">
+             Condition
+            </code>
+            element of an IAM policy. You can use these keys to further refine      the conditions under which the policy statement applies. For details about the columns in the      following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#context_keys_table" rel="noopener noreferrer" target="_blank">
+             Condition keys table
+            </a>
+            .
+           </p>
+           <p>
+            To view the global condition keys that are available to all services, see
+            <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#AvailableKeys">
+             Available global condition keys
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9d887c15b7">
+              <thead>
+               <tr>
+                <th>
+                 Condition keys
+                </th>
+                <th>
+                 Description
+                </th>
+                <th>
+                 Type
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="awsiotwireless-aws_RequestTag___TagKey_" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot/latest/developerguide/tagging-iot-iam.html/">
+                 aws:RequestTag/${TagKey}
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by a tag key that is present in the request that the user makes to IoT Wireless
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-aws_ResourceTag___TagKey_" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot/latest/developerguide/tagging-iot-iam.html/">
+                 aws:ResourceTag/${TagKey}
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by tag key component of a tag attached to an IoT Wireless resource
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awsiotwireless-aws_TagKeys" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/iot/latest/developerguide/tagging-iot-iam.html/">
+                 aws:TagKeys
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the list of all the tag key names associated with the resource in the request
+               </td>
+               <td tabindex="-1">
+                ArrayOfString
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <awsdocs-copyright class="copyright-print">
+           </awsdocs-copyright>
+           <awsdocs-thumb-feedback right-edge="{{$ctrl.thumbFeedbackRightEdge}}">
+           </awsdocs-thumb-feedback>
+          </div>
+          <noscript>
+           <div>
+            <div>
+             <div>
+              <div id="js_error_message">
+               <p>
+                <img alt="Warning" src="https://d1ge0kk1l5kms0.cloudfront.net/images/G/01/webservices/console/warning.png"/>
+                <strong>
+                 Javascript is disabled or is unavailable in your browser.
+                </strong>
+               </p>
+               <p>
+                To use the Amazon Web Services Documentation, Javascript must be enabled. Please refer to your browser's Help pages for instructions.
+               </p>
+              </div>
+             </div>
+            </div>
+           </div>
+          </noscript>
+          <div class="awsui-util-font-size-0" id="main-col-footer">
+           <div id="doc-conventions">
+            <a href="/general/latest/gr/docconventions.html" target="_top">
+             Document Conventions
+            </a>
+           </div>
+           <div class="prev-next">
+            <div accesskey="p" class="prev-link" href="./list_awsiottwinmaker.html" id="previous">
+             AWS IoT TwinMaker
+            </div>
+            <div accesskey="n" class="next-link" href="./list_awsiq.html" id="next">
+             AWS IQ
+            </div>
+           </div>
+          </div>
+          <awsdocs-page-utilities>
+          </awsdocs-page-utilities>
+         </div>
+         <div id="quick-feedback-yes" style="display: none;">
+          <div class="title">
+           Did this page help you? - Yes
+          </div>
+          <div class="content">
+           <p>
+            Thanks for letting us know we're doing a good job!
+           </p>
+           <p>
+            If you've got a moment, please tell us what we did right so we can do more of it.
+           </p>
+           <p>
+            <awsui-button click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service Authorization Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awsiotwireless.html" id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback">
+            </awsui-button>
+           </p>
+          </div>
+         </div>
+         <div id="quick-feedback-no" style="display: none;">
+          <div class="title">
+           Did this page help you? - No
+          </div>
+          <div class="content">
+           <p>
+            Thanks for letting us know this page needs work. We're sorry we let you down.
+           </p>
+           <p>
+            If you've got a moment, please tell us how we can make the documentation better.
+           </p>
+           <p>
+            <awsui-button click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service Authorization Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awsiotwireless.html" id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback">
+            </awsui-button>
+           </p>
+          </div>
+         </div>
+        </div>
+       </body>
+      </div>
+     </awsdocs-view>
+     <div class="page-loading-indicator" id="page-loading-indicator">
+      <awsui-spinner size="large">
+      </awsui-spinner>
+     </div>
+    </div>
+    <div dom-region="tools" id="tools-panel">
+     <awsdocs-tools-panel id="awsdocs-tools-panel">
+     </awsdocs-tools-panel>
+    </div>
+   </awsui-app-layout>
+   <awsdocs-cookie-banner class="doc-cookie-banner">
+   </awsdocs-cookie-banner>
+  </div>
+ </body>
+</html>

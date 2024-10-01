@@ -1,0 +1,2813 @@
+<!DOCTYPE html>
+<html lang="en-US" xmlns="http://www.w3.org/1999/xhtml">
+ <head>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+  <title>
+   Actions, resources, and condition keys for Amazon OpenSearch Service - Service Authorization Reference
+  </title>
+  <meta content="width=device-width,initial-scale=1" name="viewport"/>
+  <meta content="/assets" name="assets_root"/>
+  <meta content="list_amazonopensearchservice" name="target_state"/>
+  <meta content="list_amazonopensearchservice" name="default_state"/>
+  <link href="https://docs.aws.amazon.com/assets/images/favicon.ico" rel="icon" type="image/ico"/>
+  <link href="https://docs.aws.amazon.com/assets/images/favicon.ico" rel="shortcut icon" type="image/ico"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonopensearchservice.html" rel="canonical"/>
+  <meta content="Lists all of the available service-specific resources, actions, and condition keys that can be used in IAM policies to control access to Amazon OpenSearch Service." name="description"/>
+  <meta content="IAD" name="deployment_region"/>
+  <meta content="Service Authorization Reference" name="product"/>
+  <meta content="Service Authorization Reference" name="guide"/>
+  <meta content="Provides a list of the actions, resources, and condition keys supported by each AWS service that can be used in an IAM policy." name="abstract"/>
+  <meta content="en_us" name="guide-locale"/>
+  <meta content="toc-contents.json" name="tocs"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonopensearchservice.html" rel="canonical"/>
+  <link href="https://docs.aws.amazon.com/id_id/service-authorization/latest/reference/list_amazonopensearchservice.html" hreflang="id-id" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/id_id/service-authorization/latest/reference/list_amazonopensearchservice.html" hreflang="id" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/de_de/service-authorization/latest/reference/list_amazonopensearchservice.html" hreflang="de-de" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/de_de/service-authorization/latest/reference/list_amazonopensearchservice.html" hreflang="de" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonopensearchservice.html" hreflang="en-us" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonopensearchservice.html" hreflang="en" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/es_es/service-authorization/latest/reference/list_amazonopensearchservice.html" hreflang="es-es" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/es_es/service-authorization/latest/reference/list_amazonopensearchservice.html" hreflang="es" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/fr_fr/service-authorization/latest/reference/list_amazonopensearchservice.html" hreflang="fr-fr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/fr_fr/service-authorization/latest/reference/list_amazonopensearchservice.html" hreflang="fr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/it_it/service-authorization/latest/reference/list_amazonopensearchservice.html" hreflang="it-it" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/it_it/service-authorization/latest/reference/list_amazonopensearchservice.html" hreflang="it" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ja_jp/service-authorization/latest/reference/list_amazonopensearchservice.html" hreflang="ja-jp" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ja_jp/service-authorization/latest/reference/list_amazonopensearchservice.html" hreflang="ja" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ko_kr/service-authorization/latest/reference/list_amazonopensearchservice.html" hreflang="ko-kr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ko_kr/service-authorization/latest/reference/list_amazonopensearchservice.html" hreflang="ko" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/pt_br/service-authorization/latest/reference/list_amazonopensearchservice.html" hreflang="pt-br" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/pt_br/service-authorization/latest/reference/list_amazonopensearchservice.html" hreflang="pt" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/zh_cn/service-authorization/latest/reference/list_amazonopensearchservice.html" hreflang="zh-cn" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/zh_tw/service-authorization/latest/reference/list_amazonopensearchservice.html" hreflang="zh-tw" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonopensearchservice.html" hreflang="x-default" rel="alternative"/>
+  <meta content="Service Authorization Docs" name="feedback-item"/>
+  <meta content="Service Authorization Reference" name="this_doc_product"/>
+  <meta content="Service Authorization Reference" name="this_doc_guide"/>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor4.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor3.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor1.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/awsdocs-common.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/awsdocs-doc-page.js?version=2021.12.02">
+  </script>
+  <link href="https://docs.aws.amazon.com/assets/r/vendor4.css?version=2021.12.02" rel="stylesheet"/>
+  <link href="https://docs.aws.amazon.com/assets/r/awsdocs-common.css?version=2021.12.02" rel="stylesheet"/>
+  <link href="https://docs.aws.amazon.com/assets/r/awsdocs-doc-page.css?version=2021.12.02" rel="stylesheet"/>
+  <script async="" data-config="{'appEntity':'aws-documentation','region':'us-east-1','service':'iam'}" id="awsc-panorama-bundle" src="https://prod.pa.cdn.uis.awsstatic.com/panorama-nav-init.js" type="text/javascript">
+  </script>
+  <meta id="panorama-serviceSubSection" value="Service Authorization Reference"/>
+  <meta id="panorama-serviceConsolePage" value="Actions, resources, and condition keys for Amazon OpenSearch Service"/>
+ </head>
+ <body class="awsdocs awsui">
+  <div class="awsdocs-container">
+   <awsdocs-header>
+   </awsdocs-header>
+   <awsui-app-layout class="awsui-util-no-gutters" header-selector="awsdocs-header" id="app-layout" navigation-change="$ctrl.onNavChange($event)" navigation-hide="false" navigation-open="$ctrl.navOpen" navigation-width="$ctrl.navWidth" ng-controller="ContentController as $ctrl" tools-change="$ctrl.onToolsChange($event)" tools-hide="$ctrl.hideTools" tools-open="$ctrl.toolsOpen" tools-width="$ctrl.toolsWidth">
+    <div dom-region="navigation" id="guide-toc">
+     <awsdocs-toc>
+     </awsdocs-toc>
+    </div>
+    <div dom-region="content" id="main-column" tabindex="-1">
+     <awsdocs-view class="awsdocs-view">
+      <div id="awsdocs-content">
+       <head>
+        <title>
+         Actions, resources, and condition keys for Amazon OpenSearch Service - Service Authorization Reference
+        </title>
+        <meta content="/pdfs/service-authorization/latest/reference/service-authorization.pdf#list_amazonopensearchservice" name="pdf"/>
+        <meta content="https://repost.aws/tags/TAO7Z4bI5hQVWMiYFs34QhIA" name="forums"/>
+        <meta content="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service%20Authorization%20Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazonopensearchservice.html" name="feedback"/>
+        <meta content="feedbackyes.html?topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazonopensearchservice.html" name="feedback-yes"/>
+        <meta content="feedbackno.html?topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazonopensearchservice.html" name="feedback-no"/>
+        <script type="application/ld+json">
+         {
+    "@context" : "https://schema.org",
+    "@type" : "BreadcrumbList",
+    "itemListElement" : [
+      {
+        "@type" : "ListItem",
+        "position" : 1,
+        "name" : "AWS",
+        "item" : "https://aws.amazon.com"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 2,
+        "name" : "Service Authorization Reference",
+        "item" : "https://docs.aws.amazon.com/iam/index.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 3,
+        "name" : "Service Authorization Reference",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 4,
+        "name" : "Reference",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 5,
+        "name" : "Actions, resources, and condition keys for AWS services",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference_policies_actions-resources-contextkeys.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 6,
+        "name" : "Actions, resources, and condition keys for Amazon OpenSearch Service",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference_policies_actions-resources-contextkeys.html"
+      }
+    ]
+}
+        </script>
+       </head>
+       <body>
+        <div id="main">
+         <div style="display: none">
+          <a href="/pdfs/service-authorization/latest/reference/service-authorization.pdf#list_amazonopensearchservice" rel="noopener noreferrer" target="_blank" title="Open PDF">
+          </a>
+         </div>
+         <div class="breadcrumb" id="breadcrumbs">
+          <a href="https://aws.amazon.com">
+           AWS
+          </a>
+          <a href="/index.html">
+           Documentation
+          </a>
+          <a href="/iam/index.html">
+           Service Authorization Reference
+          </a>
+          <a href="reference.html">
+           Service Authorization Reference
+          </a>
+         </div>
+         <div id="page-toc-src">
+          <a href="#amazonopensearchservice-actions-as-permissions">
+           Actions
+          </a>
+          <a href="#amazonopensearchservice-resources-for-iam-policies">
+           Resource types
+          </a>
+          <a href="#amazonopensearchservice-policy-keys">
+           Condition keys
+          </a>
+         </div>
+         <div class="awsui-util-container" id="main-content">
+          <div id="main-col-body">
+           <awsdocs-language-banner data-service="$ctrl.pageService">
+           </awsdocs-language-banner>
+           <h1 class="topictitle" id="list_amazonopensearchservice">
+            Actions, resources, and condition keys for      Amazon OpenSearch Service
+           </h1>
+           <div class="awsdocs-page-header-container">
+            <awsdocs-page-header>
+            </awsdocs-page-header>
+            <awsdocs-filter-selector id="awsdocs-filter-selector">
+            </awsdocs-filter-selector>
+           </div>
+           <p>
+            Amazon OpenSearch Service (service prefix:
+            <code class="code">
+             es
+            </code>
+            ) provides the following    service-specific resources, actions, and condition context keys for use in IAM permission    policies.
+           </p>
+           <p>
+            References:
+           </p>
+           <div class="itemizedlist">
+            <ul class="itemizedlist">
+             <li class="listitem">
+              <p>
+               Learn how to
+               <a href="https://docs.aws.amazon.com/opensearch-service/latest/developerguide/what-is.html">
+                configure this service
+               </a>
+               .
+              </p>
+             </li>
+             <li class="listitem">
+              <p>
+               View a list of the
+               <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/">
+                API operations available for this          service
+               </a>
+               .
+              </p>
+             </li>
+             <li class="listitem">
+              <p>
+               Learn how to secure this service and its resources by
+               <a href="https://docs.aws.amazon.com/opensearch-service/latest/developerguide/ac.html">
+                using          IAM
+               </a>
+               permission policies.
+              </p>
+             </li>
+            </ul>
+           </div>
+           <div class="highlights" id="inline-topiclist">
+            <h6>
+             Topics
+            </h6>
+            <ul>
+             <li>
+              <a href="#amazonopensearchservice-actions-as-permissions">
+               Actions defined by        Amazon OpenSearch Service
+              </a>
+             </li>
+             <li>
+              <a href="#amazonopensearchservice-resources-for-iam-policies">
+               Resource types defined by        Amazon OpenSearch Service
+              </a>
+             </li>
+             <li>
+              <a href="#amazonopensearchservice-policy-keys">
+               Condition keys for        Amazon OpenSearch Service
+              </a>
+             </li>
+            </ul>
+           </div>
+           <h2 id="amazonopensearchservice-actions-as-permissions">
+            Actions defined by        Amazon OpenSearch Service
+           </h2>
+           <p>
+            You can specify the following actions in the
+            <code class="code">
+             Action
+            </code>
+            element of an IAM      policy statement. Use policies to grant permissions to perform an operation in AWS. When you      use an action in a policy, you usually allow or deny access to the API operation or CLI      command with the same name. However, in some cases, a single action controls access to more      than one operation. Alternatively, some operations require several different actions.
+           </p>
+           <p>
+            The
+            <b>
+             Resource types
+            </b>
+            column of the Actions table indicates whether each      action supports resource-level permissions. If there is no value for this column, you must      specify all resources ("*") to which the policy applies in the
+            <code class="code">
+             Resource
+            </code>
+            element      of your policy statement. If the column includes a resource type, then you can specify an ARN      of that type in a statement with that action. If the action has one or more required      resources, the caller must have permission to use the action with those resources. Required      resources are indicated in the table with an asterisk (*). If you limit resource access with      the
+            <code class="code">
+             Resource
+            </code>
+            element in an IAM policy, you must include an ARN or pattern for      each required resource type. Some actions support multiple resource types. If the resource      type is optional (not indicated as required), then you can choose to use one of the optional      resource types.
+           </p>
+           <p>
+            The
+            <b>
+             Condition keys
+            </b>
+            column of the Actions table includes keys that you      can specify in a policy statement's
+            <code class="code">
+             Condition
+            </code>
+            element. For more information on      the condition keys that are associated with resources for the service, see the
+            <b>
+             Condition keys
+            </b>
+            column of the Resource types table.
+           </p>
+           <div class="awsdocs-note">
+            <div class="awsdocs-note-title">
+             <awsui-icon name="status-info" variant="link">
+             </awsui-icon>
+             <h6>
+              Note
+             </h6>
+            </div>
+            <div class="awsdocs-note-text">
+             <p>
+              Resource condition keys are listed in the
+              <a href="#amazonopensearchservice-resources-for-iam-policies">
+               Resource types
+              </a>
+              table. You        can find a link to the resource type that applies to an action in the
+              <b>
+               Resource          types (*required)
+              </b>
+              column of the Actions table. The resource type in the        Resource types table includes the
+              <b>
+               Condition keys
+              </b>
+              column, which are the        resource condition keys that apply to an action in the Actions table.
+             </p>
+            </div>
+           </div>
+           <p>
+            For details about the columns in the following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#actions_table" rel="noopener noreferrer" target="_blank">
+             Actions table
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9e1169c11c13">
+              <thead>
+               <tr>
+                <th>
+                 Actions
+                </th>
+                <th>
+                 Description
+                </th>
+                <th>
+                 Access level
+                </th>
+                <th>
+                 Resource types (*required)
+                </th>
+                <th>
+                 Condition keys
+                </th>
+                <th>
+                 Dependent actions
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="amazonopensearchservice-AcceptInboundConnection" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_AcceptInboundConnection.html">
+                 AcceptInboundConnection
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to the destination domain owner to accept an inbound cross-cluster search connection request
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-AcceptInboundCrossClusterSearchConnection" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_AcceptInboundConnection.html">
+                 AcceptInboundCrossClusterSearchConnection
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to the destination domain owner to accept an inbound cross-cluster search connection request. This permission is deprecated. Use AcceptInboundConnection instead
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-AddDataSource" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_AddDataSource.html">
+                 AddDataSource
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to add the data source for the OpenSearch Service domain
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-domain">
+                  domain*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-AddTags" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_AddTags.html">
+                 AddTags
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to attach resource tags to an OpenSearch Service domain
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Tagging
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-domain">
+                  domain*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonopensearchservice-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-AssociatePackage" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_AssociatePackage.html">
+                 AssociatePackage
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to associate a package with an OpenSearch Service domain
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-domain">
+                  domain*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-AuthorizeVpcEndpointAccess" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_AuthorizeVpcEndpointAccess.html">
+                 AuthorizeVpcEndpointAccess
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to provide access to an Amazon OpenSearch Service domain through the use of an interface VPC endpoint
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-CancelDomainConfigChange" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_CancelDomainConfigChange.html">
+                 CancelDomainConfigChange
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to cancel a change on an OpenSearch Service domain
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-domain">
+                  domain*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-CancelElasticsearchServiceSoftwareUpdate" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_CancelServiceSoftwareUpdate.html">
+                 CancelElasticsearchServiceSoftwareUpdate
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to cancel a service software update of a domain. This permission is deprecated. Use CancelServiceSoftwareUpdate instead
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-domain">
+                  domain*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-CancelServiceSoftwareUpdate" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_CancelServiceSoftwareUpdate.html">
+                 CancelServiceSoftwareUpdate
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to cancel a service software update of a domain
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-domain">
+                  domain*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-CreateDomain" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_CreateDomain.html">
+                 CreateDomain
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to create an Amazon OpenSearch Service domain
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-domain">
+                  domain
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonopensearchservice-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-CreateElasticsearchDomain" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_CreateDomain.html">
+                 CreateElasticsearchDomain
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to create an OpenSearch Service domain. This permission is deprecated. Use CreateDomain instead
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-domain">
+                  domain
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonopensearchservice-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-CreateElasticsearchServiceRole" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/Welcome.html">
+                 CreateElasticsearchServiceRole
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create the service-linked role required for OpenSearch Service domains that use VPC access. This permission is deprecated. OpenSearch Service creates the service-linked role for you
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-CreateOutboundConnection" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_CreateOutboundConnection.html">
+                 CreateOutboundConnection
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a new cross-cluster search connection from a source domain to a destination domain
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-domain">
+                  domain*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-CreateOutboundCrossClusterSearchConnection" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_CreateOutboundConnection.html">
+                 CreateOutboundCrossClusterSearchConnection
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a new cross-cluster search connection from a source domain to a destination domain. This permission is deprecated. Use CreateOutboundConnection instead
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-domain">
+                  domain*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-CreatePackage" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_CreatePackage.html">
+                 CreatePackage
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to add a package for use with OpenSearch Service domains
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-CreateServiceRole" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/Welcome.html">
+                 CreateServiceRole
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create the service-linked role required for Amazon OpenSearch Service domains that use VPC access
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-CreateVpcEndpoint" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_CreateVpcEndpoint.html">
+                 CreateVpcEndpoint
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create an Amazon OpenSearch Service-managed VPC endpoint
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-DeleteDataSource" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_DeleteDataSource.html">
+                 DeleteDataSource
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete the data source for the OpenSearch Service domain
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-domain">
+                  domain*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-DeleteDomain" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_DeleteDomain.html">
+                 DeleteDomain
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete an Amazon OpenSearch Service domain and all of its data
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-domain">
+                  domain*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-DeleteElasticsearchDomain" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_DeleteDomain.html">
+                 DeleteElasticsearchDomain
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete an OpenSearch Service domain and all of its data. This permission is deprecated. Use DeleteDomain instead
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-domain">
+                  domain*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-DeleteElasticsearchServiceRole" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_Welcome.html">
+                 DeleteElasticsearchServiceRole
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete the service-linked role required for OpenSearch Service domains that use VPC access. This permission is deprecated. Use the IAM API to delete service-linked roles
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-DeleteInboundConnection" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_DeleteInboundConnection.html">
+                 DeleteInboundConnection
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to the destination domain owner to delete an existing inbound cross-cluster search connection
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-DeleteInboundCrossClusterSearchConnection" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_DeleteInboundConnection.html">
+                 DeleteInboundCrossClusterSearchConnection
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to the destination domain owner to delete an existing inbound cross-cluster search connection. This permission is deprecated. Use DeleteInboundConnection instead
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-DeleteOutboundConnection" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_DeleteOutboundConnection.html">
+                 DeleteOutboundConnection
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to the source domain owner to delete an existing outbound cross-cluster search connection
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-DeleteOutboundCrossClusterSearchConnection" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_DeleteOutboundConnection.html">
+                 DeleteOutboundCrossClusterSearchConnection
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to the source domain owner to delete an existing outbound cross-cluster search connection. This permission is deprecated. Use DeleteOutboundConnection instead
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-DeletePackage" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_DeletePackage.html">
+                 DeletePackage
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a package from OpenSearch Service. The package cannot be associated with any domains
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-DeleteVpcEndpoint" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_DeleteVpcEndpoint.html">
+                 DeleteVpcEndpoint
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete an Amazon OpenSearch Service-managed interface VPC endpoint
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-DescribeDomain" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_DescribeDomain.html">
+                 DescribeDomain
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to view a description of the domain configuration for the specified OpenSearch Service domain, including the domain ID, service endpoint, and ARN
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-domain">
+                  domain*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-DescribeDomainAutoTunes" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_DescribeDomainAutoTunes.html">
+                 DescribeDomainAutoTunes
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to view the Auto-Tune configuration of the domain for the specified OpenSearch Service domain, including the Auto-Tune state and maintenance schedules
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-domain">
+                  domain*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-DescribeDomainChangeProgress" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_DescribeDomainChangeProgress.html">
+                 DescribeDomainChangeProgress
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to view detail stage progress of an OpenSearch Service domain
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-domain">
+                  domain*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-DescribeDomainConfig" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_DescribeDomainConfig.html">
+                 DescribeDomainConfig
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to view a description of the configuration options and status of an OpenSearch Service domain
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-domain">
+                  domain*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-DescribeDomainHealth" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_DescribeDomainHealth.html">
+                 DescribeDomainHealth
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to view information about domain and node health, the standby Availability Zone, number of nodes per Availability Zone, and shard count per node
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-domain">
+                  domain*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-DescribeDomainNodes" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_DescribeDomainNodes.html">
+                 DescribeDomainNodes
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to view information about nodes configured for the domain and their configurations- the node id, type of node, status of node, Availability Zone, instance type and storage
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-domain">
+                  domain*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-DescribeDomains" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_DescribeDomains.html">
+                 DescribeDomains
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to view a description of the domain configuration for up to five specified OpenSearch Service domains
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-domain">
+                  domain*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-DescribeDryRunProgress" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_DescribeDryRunProgress.html">
+                 DescribeDryRunProgress
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to describe the status of a pre-update validation check on an OpenSearch Service domain
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-domain">
+                  domain*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-DescribeElasticsearchDomain" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_DescribeDomain.html">
+                 DescribeElasticsearchDomain
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to view a description of the domain configuration for the specified OpenSearch Service domain, including the domain ID, service endpoint, and ARN. This permission is deprecated. Use DescribeDomain instead
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-domain">
+                  domain*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-DescribeElasticsearchDomainConfig" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_DescribeDomainConfig.html">
+                 DescribeElasticsearchDomainConfig
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to view a description of the configuration and status of an OpenSearch Service domain. This permission is deprecated. Use DescribeDomainConfig instead
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-domain">
+                  domain*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-DescribeElasticsearchDomains" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_DescribeDomains.html">
+                 DescribeElasticsearchDomains
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to view a description of the domain configuration for up to five specified Amazon OpenSearch domains. This permission is deprecated. Use DescribeDomains instead
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-domain">
+                  domain*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-DescribeElasticsearchInstanceTypeLimits" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_DescribeInstanceTypeLimits.html">
+                 DescribeElasticsearchInstanceTypeLimits
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to view the instance count, storage, and master node limits for a given OpenSearch version and instance type. This permission is deprecated. Use DescribeInstanceTypeLimits instead
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-DescribeInboundConnections" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_DescribeInboundConnections.html">
+                 DescribeInboundConnections
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list all the inbound cross-cluster search connections for a destination domain
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-DescribeInboundCrossClusterSearchConnections" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_DescribeInboundConnections.html">
+                 DescribeInboundCrossClusterSearchConnections
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list all the inbound cross-cluster search connections for a destination domain. This permission is deprecated. Use DescribeInboundConnections instead
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-DescribeInstanceTypeLimits" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_DescribeInstanceTypeLimits.html">
+                 DescribeInstanceTypeLimits
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to view the instance count, storage, and master node limits for a given engine version and instance type
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-DescribeOutboundConnections" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_DescribeOutboundConnections.html">
+                 DescribeOutboundConnections
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list all the outbound cross-cluster search connections for a source domain
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-DescribeOutboundCrossClusterSearchConnections" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_DescribeOutboundConnections.html">
+                 DescribeOutboundCrossClusterSearchConnections
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list all the outbound cross-cluster search connections for a source domain. This permission is deprecated. Use DescribeOutboundConnections instead
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-DescribePackages" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_DescribePackages.html">
+                 DescribePackages
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to describe all packages available to OpenSearch Service domains
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-DescribeReservedElasticsearchInstanceOfferings" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_DescribeReservedInstanceOfferings.html">
+                 DescribeReservedElasticsearchInstanceOfferings
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to fetch Reserved Instance offerings for Amazon OpenSearch Service. This permission is deprecated. Use DescribeReservedInstanceOfferings instead
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-DescribeReservedElasticsearchInstances" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_DescribeReservedInstances.html">
+                 DescribeReservedElasticsearchInstances
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to fetch OpenSearch Service Reserved Instances that have already been purchased. This permission is deprecated. Use DescribeReservedInstances instead
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-DescribeReservedInstanceOfferings" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_DescribeReservedInstanceOfferings.html">
+                 DescribeReservedInstanceOfferings
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to fetch Reserved Instance offerings for OpenSearch Service
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-DescribeReservedInstances" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_DescribeReservedInstances.html">
+                 DescribeReservedInstances
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to fetch OpenSearch Service Reserved Instances that have already been purchased
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-DescribeVpcEndpoints" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_DescribeVpcEndpoints.html">
+                 DescribeVpcEndpoints
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to describe one or more Amazon OpenSearch Service-managed VPC endpoints
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-DissociatePackage" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_DissociatePackage.html">
+                 DissociatePackage
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to disassociate a package from the specified OpenSearch Service domain
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-domain">
+                  domain*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-ESCrossClusterGet" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/Welcome.html">
+                 ESCrossClusterGet
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to send cross-cluster requests to a destination domain
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-domain">
+                  domain
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-ESHttpDelete" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/Welcome.html">
+                 ESHttpDelete
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to send HTTP DELETE requests to the OpenSearch APIs
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-domain">
+                  domain
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-ESHttpGet" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/Welcome.html">
+                 ESHttpGet
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to send HTTP GET requests to the OpenSearch APIs
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-domain">
+                  domain
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-ESHttpHead" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/Welcome.html">
+                 ESHttpHead
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to send HTTP HEAD requests to the OpenSearch APIs
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-domain">
+                  domain
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-ESHttpPatch" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/Welcome.html">
+                 ESHttpPatch
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to send HTTP PATCH requests to the OpenSearch APIs
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-domain">
+                  domain
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-ESHttpPost" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/Welcome.html">
+                 ESHttpPost
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to send HTTP POST requests to the OpenSearch APIs
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-domain">
+                  domain
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-ESHttpPut" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/Welcome.html">
+                 ESHttpPut
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to send HTTP PUT requests to the OpenSearch APIs
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-domain">
+                  domain
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-GetCompatibleElasticsearchVersions" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_GetCompatibleVersions.html">
+                 GetCompatibleElasticsearchVersions
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to fetch a list of compatible OpenSearch and Elasticsearch versions to which an OpenSearch Service domain can be upgraded. This permission is deprecated. Use GetCompatibleVersions instead
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-domain">
+                  domain*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-GetCompatibleVersions" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_GetCompatibleVersions.html">
+                 GetCompatibleVersions
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to fetch list of compatible engine versions to which an OpenSearch Service domain can be upgraded
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-domain">
+                  domain*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-GetDataSource" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_GetDataSource.html">
+                 GetDataSource
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get the data source for the OpenSearch Service domain
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-domain">
+                  domain*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-GetDomainMaintenanceStatus" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_GetDomainMaintenanceStatus.html">
+                 GetDomainMaintenanceStatus
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retrieve the status of maintenance action for the node
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-domain">
+                  domain*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-GetPackageVersionHistory" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_GetPackageVersionHistory.html">
+                 GetPackageVersionHistory
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to fetch the version history for a package
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-GetUpgradeHistory" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_GetUpgradeHistory.html">
+                 GetUpgradeHistory
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to fetch the upgrade history of a given OpenSearch Service domain
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-domain">
+                  domain*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-GetUpgradeStatus" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_GetUpgradeStatus.html">
+                 GetUpgradeStatus
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to fetch the upgrade status of a given OpenSearch Service domain
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-domain">
+                  domain*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-ListDataSources" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_ListDataSources.html">
+                 ListDataSources
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retrieve a list of data source for the OpenSearch Service domain
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-domain">
+                  domain*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-ListDomainMaintenances" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_ListDomainMaintenances.html">
+                 ListDomainMaintenances
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retrieve a list of maintenance actions for the OpenSearch Service domain
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-domain">
+                  domain*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-ListDomainNames" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_ListDomainNames.html">
+                 ListDomainNames
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to display the names of all OpenSearch Service domains that the current user owns
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-ListDomainsForPackage" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_ListDomainsForPackage.html">
+                 ListDomainsForPackage
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list all OpenSearch Service domains that a package is associated with
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-ListElasticsearchInstanceTypeDetails" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_ListInstanceTypeDetails.html">
+                 ListElasticsearchInstanceTypeDetails
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list all instance types and available features for a given OpenSearch version. This permission is deprecated. Use ListInstanceTypeDetails instead
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-ListElasticsearchInstanceTypes" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_ListInstanceTypeDetails.html">
+                 ListElasticsearchInstanceTypes
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list all EC2 instance types that are supported for a given OpenSearch version
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-ListElasticsearchVersions" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_ListVersions.html">
+                 ListElasticsearchVersions
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list all supported OpenSearch versions on Amazon OpenSearch Service. This permission is deprecated. Use ListVersions instead
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-ListInstanceTypeDetails" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_ListInstanceTypeDetails.html">
+                 ListInstanceTypeDetails
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list all instance types and available features for a given OpenSearch or Elasticsearch version
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-ListPackagesForDomain" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_ListPackagesForDomain.html">
+                 ListPackagesForDomain
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list all packages associated with the OpenSearch Service domain
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-domain">
+                  domain*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-ListScheduledActions" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_ListScheduledActions.html">
+                 ListScheduledActions
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retrieve a list of configuration changes that are scheduled for a OpenSearch Service domain
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-domain">
+                  domain*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-ListTags" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_ListTags.html">
+                 ListTags
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to display all resource tags for an OpenSearch Service domain
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-domain">
+                  domain*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-ListVersions" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_ListVersions.html">
+                 ListVersions
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list all supported OpenSearch and Elasticsearch versions in Amazon OpenSearch Service
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-ListVpcEndpointAccess" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_ListVpcEndpointAccess.html">
+                 ListVpcEndpointAccess
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retrieve information about each AWS principal that is allowed to access a given Amazon OpenSearch Service domain through the use of an interface VPC endpoint
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-ListVpcEndpoints" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_ListVpcEndpoints.html">
+                 ListVpcEndpoints
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retrieve all Amazon OpenSearch Service-managed VPC endpoints in the current AWS account and Region
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-ListVpcEndpointsForDomain" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_ListVpcEndpointsForDomain.html">
+                 ListVpcEndpointsForDomain
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retrieve all Amazon OpenSearch Service-managed VPC endpoints associated with a particular domain
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-PurchaseReservedElasticsearchInstanceOffering" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_PurchaseReservedInstanceOffering.html">
+                 PurchaseReservedElasticsearchInstanceOffering
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to purchase OpenSearch Service Reserved Instances. This permission is deprecated. Use PurchaseReservedInstanceOffering instead
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-PurchaseReservedInstanceOffering" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_PurchaseReservedInstanceOffering.html">
+                 PurchaseReservedInstanceOffering
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to purchase OpenSearch reserved instances
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-RejectInboundConnection" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_RejectInboundConnection.html">
+                 RejectInboundConnection
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to the destination domain owner to reject an inbound cross-cluster search connection request
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-RejectInboundCrossClusterSearchConnection" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_RejectInboundConnection.html">
+                 RejectInboundCrossClusterSearchConnection
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to the destination domain owner to reject an inbound cross-cluster search connection request. This permission is deprecated. Use RejectInboundConnection instead
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-RemoveTags" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_RemoveTags.html">
+                 RemoveTags
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to remove resource tags from an OpenSearch Service domain
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Tagging
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-domain">
+                  domain*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-RevokeVpcEndpointAccess" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_RevokeVpcEndpointAccess.html">
+                 RevokeVpcEndpointAccess
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to revoke access to an Amazon OpenSearch Service domain that was provided through an interface VPC endpoint
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-StartDomainMaintenance" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_StartDomainMaintenance.html">
+                 StartDomainMaintenance
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to initiate the maintenance on the node
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-domain">
+                  domain*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-StartElasticsearchServiceSoftwareUpdate" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_StartServiceSoftwareUpdate.html">
+                 StartElasticsearchServiceSoftwareUpdate
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to start a service software update of a domain. This permission is deprecated. Use StartServiceSoftwareUpdate instead
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-domain">
+                  domain*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-StartServiceSoftwareUpdate" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_StartServiceSoftwareUpdate.html">
+                 StartServiceSoftwareUpdate
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to start a service software update of a domain
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-domain">
+                  domain*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-UpdateDataSource" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_UpdateDataSource.html">
+                 UpdateDataSource
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update the data source for the OpenSearch Service domain
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-domain">
+                  domain*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-UpdateDomainConfig" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_UpdateDomainConfig.html">
+                 UpdateDomainConfig
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to modify the configuration of an OpenSearch Service domain, such as the instance type or number of instances
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-domain">
+                  domain*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-UpdateElasticsearchDomainConfig" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_UpdateDomainConfig.html">
+                 UpdateElasticsearchDomainConfig
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to modify the configuration of an OpenSearch Service domain, such as the instance type or number of instances. This permission is deprecated. Use UpdateDomainConfig instead
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-domain">
+                  domain*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-UpdatePackage" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_UpdatePackage.html">
+                 UpdatePackage
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update a package for use with OpenSearch Service domains
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-UpdateScheduledAction" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_UpdateScheduledAction.html">
+                 UpdateScheduledAction
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to reschedule a planned OpenSearch Service domain configuration change for a later time
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-domain">
+                  domain*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-UpdateVpcEndpoint" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_UpdateVpcEndpoint.html">
+                 UpdateVpcEndpoint
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to modify an Amazon OpenSearch Service-managed interface VPC endpoint
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-UpgradeDomain" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_UpgradeDomain.html">
+                 UpgradeDomain
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to initiate upgrade of an OpenSearch Service domain to a given version
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-domain">
+                  domain*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-UpgradeElasticsearchDomain" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/APIReference/API_UpgradeDomain.html">
+                 UpgradeElasticsearchDomain
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to initiate upgrade of an OpenSearch Service domain to a specified version. This permission is deprecated. Use UpgradeDomain instead
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-domain">
+                  domain*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <h2 id="amazonopensearchservice-resources-for-iam-policies">
+            Resource types defined by        Amazon OpenSearch Service
+           </h2>
+           <p>
+            The following resource types are defined by this service and can be used in the
+            <code class="code">
+             Resource
+            </code>
+            element of IAM permission policy statements. Each action in the
+            <a href="#amazonopensearchservice-actions-as-permissions">
+             Actions table
+            </a>
+            identifies the      resource types that can be specified with that action. A resource type can also define which      condition keys you can include in a policy. These keys are displayed in the last column of the      Resource types table. For details about the columns in the following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#resources_table" rel="noopener noreferrer" target="_blank">
+             Resource types table
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9e1169c13b5">
+              <thead>
+               <tr>
+                <th>
+                 Resource types
+                </th>
+                <th>
+                 ARN
+                </th>
+                <th>
+                 Condition keys
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="amazonopensearchservice-domain" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/developerguide/ac.html">
+                 domain
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:es:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:domain/$
+                 <span>
+                  {
+                 </span>
+                 DomainName}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-es_role" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/developerguide/slr.html">
+                 es_role
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:iam::$
+                 <span>
+                  {
+                 </span>
+                 Account}:role/aws-service-role/es.amazonaws.com/AWSServiceRoleForAmazonOpenSearchService
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-opensearchservice_role" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/opensearch-service/latest/developerguide/slr.html">
+                 opensearchservice_role
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:iam::$
+                 <span>
+                  {
+                 </span>
+                 Account}:role/aws-service-role/opensearchservice.amazonaws.com/AWSServiceRoleForAmazonOpenSearchService
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonopensearchservice-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <h2 id="amazonopensearchservice-policy-keys">
+            Condition keys for        Amazon OpenSearch Service
+           </h2>
+           <p>
+            Amazon OpenSearch Service defines the following condition keys that can be used in the
+            <code class="code">
+             Condition
+            </code>
+            element of an IAM policy. You can use these keys to further refine      the conditions under which the policy statement applies. For details about the columns in the      following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#context_keys_table" rel="noopener noreferrer" target="_blank">
+             Condition keys table
+            </a>
+            .
+           </p>
+           <p>
+            To view the global condition keys that are available to all services, see
+            <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#AvailableKeys">
+             Available global condition keys
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9e1169c15b7">
+              <thead>
+               <tr>
+                <th>
+                 Condition keys
+                </th>
+                <th>
+                 Description
+                </th>
+                <th>
+                 Type
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="amazonopensearchservice-aws_RequestTag___TagKey_" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-requesttag">
+                 aws:RequestTag/${TagKey}
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access based on the tags that are passed in the request
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-aws_ResourceTag___TagKey_" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-resourcetag">
+                 aws:ResourceTag/${TagKey}
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access based on the tags associated with the resource
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonopensearchservice-aws_TagKeys" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-tagkeys">
+                 aws:TagKeys
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access based on the tag keys that are passed in the request
+               </td>
+               <td tabindex="-1">
+                ArrayOfString
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <awsdocs-copyright class="copyright-print">
+           </awsdocs-copyright>
+           <awsdocs-thumb-feedback right-edge="{{$ctrl.thumbFeedbackRightEdge}}">
+           </awsdocs-thumb-feedback>
+          </div>
+          <noscript>
+           <div>
+            <div>
+             <div>
+              <div id="js_error_message">
+               <p>
+                <img alt="Warning" src="https://d1ge0kk1l5kms0.cloudfront.net/images/G/01/webservices/console/warning.png"/>
+                <strong>
+                 Javascript is disabled or is unavailable in your browser.
+                </strong>
+               </p>
+               <p>
+                To use the Amazon Web Services Documentation, Javascript must be enabled. Please refer to your browser's Help pages for instructions.
+               </p>
+              </div>
+             </div>
+            </div>
+           </div>
+          </noscript>
+          <div class="awsui-util-font-size-0" id="main-col-footer">
+           <div id="doc-conventions">
+            <a href="/general/latest/gr/docconventions.html" target="_top">
+             Document Conventions
+            </a>
+           </div>
+           <div class="prev-next">
+            <div accesskey="p" class="prev-link" href="./list_amazonopensearchserverless.html" id="previous">
+             Amazon OpenSearch Serverless
+            </div>
+            <div accesskey="n" class="next-link" href="./list_awsopsworks.html" id="next">
+             AWS OpsWorks
+            </div>
+           </div>
+          </div>
+          <awsdocs-page-utilities>
+          </awsdocs-page-utilities>
+         </div>
+         <div id="quick-feedback-yes" style="display: none;">
+          <div class="title">
+           Did this page help you? - Yes
+          </div>
+          <div class="content">
+           <p>
+            Thanks for letting us know we're doing a good job!
+           </p>
+           <p>
+            If you've got a moment, please tell us what we did right so we can do more of it.
+           </p>
+           <p>
+            <awsui-button click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service Authorization Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazonopensearchservice.html" id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback">
+            </awsui-button>
+           </p>
+          </div>
+         </div>
+         <div id="quick-feedback-no" style="display: none;">
+          <div class="title">
+           Did this page help you? - No
+          </div>
+          <div class="content">
+           <p>
+            Thanks for letting us know this page needs work. We're sorry we let you down.
+           </p>
+           <p>
+            If you've got a moment, please tell us how we can make the documentation better.
+           </p>
+           <p>
+            <awsui-button click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service Authorization Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazonopensearchservice.html" id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback">
+            </awsui-button>
+           </p>
+          </div>
+         </div>
+        </div>
+       </body>
+      </div>
+     </awsdocs-view>
+     <div class="page-loading-indicator" id="page-loading-indicator">
+      <awsui-spinner size="large">
+      </awsui-spinner>
+     </div>
+    </div>
+    <div dom-region="tools" id="tools-panel">
+     <awsdocs-tools-panel id="awsdocs-tools-panel">
+     </awsdocs-tools-panel>
+    </div>
+   </awsui-app-layout>
+   <awsdocs-cookie-banner class="doc-cookie-banner">
+   </awsdocs-cookie-banner>
+  </div>
+ </body>
+</html>

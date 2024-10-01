@@ -1,0 +1,3813 @@
+<!DOCTYPE html>
+<html lang="en-US" xmlns="http://www.w3.org/1999/xhtml">
+ <head>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+  <title>
+   Actions, resources, and condition keys for Amazon DataZone - Service Authorization Reference
+  </title>
+  <meta content="width=device-width,initial-scale=1" name="viewport"/>
+  <meta content="/assets" name="assets_root"/>
+  <meta content="list_amazondatazone" name="target_state"/>
+  <meta content="list_amazondatazone" name="default_state"/>
+  <link href="https://docs.aws.amazon.com/assets/images/favicon.ico" rel="icon" type="image/ico"/>
+  <link href="https://docs.aws.amazon.com/assets/images/favicon.ico" rel="shortcut icon" type="image/ico"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazondatazone.html" rel="canonical"/>
+  <meta content="Lists all of the available service-specific resources, actions, and condition keys that can be used in IAM policies to control access to Amazon DataZone." name="description"/>
+  <meta content="IAD" name="deployment_region"/>
+  <meta content="Service Authorization Reference" name="product"/>
+  <meta content="Service Authorization Reference" name="guide"/>
+  <meta content="Provides a list of the actions, resources, and condition keys supported by each AWS service that can be used in an IAM policy." name="abstract"/>
+  <meta content="en_us" name="guide-locale"/>
+  <meta content="toc-contents.json" name="tocs"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazondatazone.html" rel="canonical"/>
+  <link href="https://docs.aws.amazon.com/id_id/service-authorization/latest/reference/list_amazondatazone.html" hreflang="id-id" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/id_id/service-authorization/latest/reference/list_amazondatazone.html" hreflang="id" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/de_de/service-authorization/latest/reference/list_amazondatazone.html" hreflang="de-de" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/de_de/service-authorization/latest/reference/list_amazondatazone.html" hreflang="de" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazondatazone.html" hreflang="en-us" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazondatazone.html" hreflang="en" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/es_es/service-authorization/latest/reference/list_amazondatazone.html" hreflang="es-es" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/es_es/service-authorization/latest/reference/list_amazondatazone.html" hreflang="es" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/fr_fr/service-authorization/latest/reference/list_amazondatazone.html" hreflang="fr-fr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/fr_fr/service-authorization/latest/reference/list_amazondatazone.html" hreflang="fr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/it_it/service-authorization/latest/reference/list_amazondatazone.html" hreflang="it-it" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/it_it/service-authorization/latest/reference/list_amazondatazone.html" hreflang="it" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ja_jp/service-authorization/latest/reference/list_amazondatazone.html" hreflang="ja-jp" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ja_jp/service-authorization/latest/reference/list_amazondatazone.html" hreflang="ja" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ko_kr/service-authorization/latest/reference/list_amazondatazone.html" hreflang="ko-kr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ko_kr/service-authorization/latest/reference/list_amazondatazone.html" hreflang="ko" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/pt_br/service-authorization/latest/reference/list_amazondatazone.html" hreflang="pt-br" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/pt_br/service-authorization/latest/reference/list_amazondatazone.html" hreflang="pt" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/zh_cn/service-authorization/latest/reference/list_amazondatazone.html" hreflang="zh-cn" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/zh_tw/service-authorization/latest/reference/list_amazondatazone.html" hreflang="zh-tw" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazondatazone.html" hreflang="x-default" rel="alternative"/>
+  <meta content="Service Authorization Docs" name="feedback-item"/>
+  <meta content="Service Authorization Reference" name="this_doc_product"/>
+  <meta content="Service Authorization Reference" name="this_doc_guide"/>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor4.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor3.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor1.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/awsdocs-common.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/awsdocs-doc-page.js?version=2021.12.02">
+  </script>
+  <link href="https://docs.aws.amazon.com/assets/r/vendor4.css?version=2021.12.02" rel="stylesheet"/>
+  <link href="https://docs.aws.amazon.com/assets/r/awsdocs-common.css?version=2021.12.02" rel="stylesheet"/>
+  <link href="https://docs.aws.amazon.com/assets/r/awsdocs-doc-page.css?version=2021.12.02" rel="stylesheet"/>
+  <script async="" data-config="{'appEntity':'aws-documentation','region':'us-east-1','service':'iam'}" id="awsc-panorama-bundle" src="https://prod.pa.cdn.uis.awsstatic.com/panorama-nav-init.js" type="text/javascript">
+  </script>
+  <meta id="panorama-serviceSubSection" value="Service Authorization Reference"/>
+  <meta id="panorama-serviceConsolePage" value="Actions, resources, and condition keys for Amazon DataZone"/>
+ </head>
+ <body class="awsdocs awsui">
+  <div class="awsdocs-container">
+   <awsdocs-header>
+   </awsdocs-header>
+   <awsui-app-layout class="awsui-util-no-gutters" header-selector="awsdocs-header" id="app-layout" navigation-change="$ctrl.onNavChange($event)" navigation-hide="false" navigation-open="$ctrl.navOpen" navigation-width="$ctrl.navWidth" ng-controller="ContentController as $ctrl" tools-change="$ctrl.onToolsChange($event)" tools-hide="$ctrl.hideTools" tools-open="$ctrl.toolsOpen" tools-width="$ctrl.toolsWidth">
+    <div dom-region="navigation" id="guide-toc">
+     <awsdocs-toc>
+     </awsdocs-toc>
+    </div>
+    <div dom-region="content" id="main-column" tabindex="-1">
+     <awsdocs-view class="awsdocs-view">
+      <div id="awsdocs-content">
+       <head>
+        <title>
+         Actions, resources, and condition keys for Amazon DataZone - Service Authorization Reference
+        </title>
+        <meta content="/pdfs/service-authorization/latest/reference/service-authorization.pdf#list_amazondatazone" name="pdf"/>
+        <meta content="https://repost.aws/tags/TAO7Z4bI5hQVWMiYFs34QhIA" name="forums"/>
+        <meta content="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service%20Authorization%20Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazondatazone.html" name="feedback"/>
+        <meta content="feedbackyes.html?topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazondatazone.html" name="feedback-yes"/>
+        <meta content="feedbackno.html?topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazondatazone.html" name="feedback-no"/>
+        <script type="application/ld+json">
+         {
+    "@context" : "https://schema.org",
+    "@type" : "BreadcrumbList",
+    "itemListElement" : [
+      {
+        "@type" : "ListItem",
+        "position" : 1,
+        "name" : "AWS",
+        "item" : "https://aws.amazon.com"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 2,
+        "name" : "Service Authorization Reference",
+        "item" : "https://docs.aws.amazon.com/iam/index.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 3,
+        "name" : "Service Authorization Reference",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 4,
+        "name" : "Reference",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 5,
+        "name" : "Actions, resources, and condition keys for AWS services",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference_policies_actions-resources-contextkeys.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 6,
+        "name" : "Actions, resources, and condition keys for Amazon DataZone",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference_policies_actions-resources-contextkeys.html"
+      }
+    ]
+}
+        </script>
+       </head>
+       <body>
+        <div id="main">
+         <div style="display: none">
+          <a href="/pdfs/service-authorization/latest/reference/service-authorization.pdf#list_amazondatazone" rel="noopener noreferrer" target="_blank" title="Open PDF">
+          </a>
+         </div>
+         <div class="breadcrumb" id="breadcrumbs">
+          <a href="https://aws.amazon.com">
+           AWS
+          </a>
+          <a href="/index.html">
+           Documentation
+          </a>
+          <a href="/iam/index.html">
+           Service Authorization Reference
+          </a>
+          <a href="reference.html">
+           Service Authorization Reference
+          </a>
+         </div>
+         <div id="page-toc-src">
+          <a href="#amazondatazone-actions-as-permissions">
+           Actions
+          </a>
+          <a href="#amazondatazone-resources-for-iam-policies">
+           Resource types
+          </a>
+          <a href="#amazondatazone-policy-keys">
+           Condition keys
+          </a>
+         </div>
+         <div class="awsui-util-container" id="main-content">
+          <div id="main-col-body">
+           <awsdocs-language-banner data-service="$ctrl.pageService">
+           </awsdocs-language-banner>
+           <h1 class="topictitle" id="list_amazondatazone">
+            Actions, resources, and condition keys for      Amazon DataZone
+           </h1>
+           <div class="awsdocs-page-header-container">
+            <awsdocs-page-header>
+            </awsdocs-page-header>
+            <awsdocs-filter-selector id="awsdocs-filter-selector">
+            </awsdocs-filter-selector>
+           </div>
+           <p>
+            Amazon DataZone (service prefix:
+            <code class="code">
+             datazone
+            </code>
+            ) provides the following    service-specific resources, actions, and condition context keys for use in IAM permission    policies.
+           </p>
+           <p>
+            References:
+           </p>
+           <div class="itemizedlist">
+            <ul class="itemizedlist">
+             <li class="listitem">
+              <p>
+               Learn how to
+               <a href="https://docs.aws.amazon.com/datazone/latest/userguide/">
+                configure this service
+               </a>
+               .
+              </p>
+             </li>
+             <li class="listitem">
+              <p>
+               View a list of the
+               <a href="https://docs.aws.amazon.com/datazone/latest/APIReference/">
+                API operations available for this          service
+               </a>
+               .
+              </p>
+             </li>
+             <li class="listitem">
+              <p>
+               Learn how to secure this service and its resources by
+               <a href="https://docs.aws.amazon.com/datazone/latest/userguide/security-iam.html">
+                using          IAM
+               </a>
+               permission policies.
+              </p>
+             </li>
+            </ul>
+           </div>
+           <div class="highlights" id="inline-topiclist">
+            <h6>
+             Topics
+            </h6>
+            <ul>
+             <li>
+              <a href="#amazondatazone-actions-as-permissions">
+               Actions defined by        Amazon DataZone
+              </a>
+             </li>
+             <li>
+              <a href="#amazondatazone-resources-for-iam-policies">
+               Resource types defined by        Amazon DataZone
+              </a>
+             </li>
+             <li>
+              <a href="#amazondatazone-policy-keys">
+               Condition keys for        Amazon DataZone
+              </a>
+             </li>
+            </ul>
+           </div>
+           <h2 id="amazondatazone-actions-as-permissions">
+            Actions defined by        Amazon DataZone
+           </h2>
+           <p>
+            You can specify the following actions in the
+            <code class="code">
+             Action
+            </code>
+            element of an IAM      policy statement. Use policies to grant permissions to perform an operation in AWS. When you      use an action in a policy, you usually allow or deny access to the API operation or CLI      command with the same name. However, in some cases, a single action controls access to more      than one operation. Alternatively, some operations require several different actions.
+           </p>
+           <p>
+            The
+            <b>
+             Resource types
+            </b>
+            column of the Actions table indicates whether each      action supports resource-level permissions. If there is no value for this column, you must      specify all resources ("*") to which the policy applies in the
+            <code class="code">
+             Resource
+            </code>
+            element      of your policy statement. If the column includes a resource type, then you can specify an ARN      of that type in a statement with that action. If the action has one or more required      resources, the caller must have permission to use the action with those resources. Required      resources are indicated in the table with an asterisk (*). If you limit resource access with      the
+            <code class="code">
+             Resource
+            </code>
+            element in an IAM policy, you must include an ARN or pattern for      each required resource type. Some actions support multiple resource types. If the resource      type is optional (not indicated as required), then you can choose to use one of the optional      resource types.
+           </p>
+           <p>
+            The
+            <b>
+             Condition keys
+            </b>
+            column of the Actions table includes keys that you      can specify in a policy statement's
+            <code class="code">
+             Condition
+            </code>
+            element. For more information on      the condition keys that are associated with resources for the service, see the
+            <b>
+             Condition keys
+            </b>
+            column of the Resource types table.
+           </p>
+           <div class="awsdocs-note">
+            <div class="awsdocs-note-title">
+             <awsui-icon name="status-info" variant="link">
+             </awsui-icon>
+             <h6>
+              Note
+             </h6>
+            </div>
+            <div class="awsdocs-note-text">
+             <p>
+              Resource condition keys are listed in the
+              <a href="#amazondatazone-resources-for-iam-policies">
+               Resource types
+              </a>
+              table. You        can find a link to the resource type that applies to an action in the
+              <b>
+               Resource          types (*required)
+              </b>
+              column of the Actions table. The resource type in the        Resource types table includes the
+              <b>
+               Condition keys
+              </b>
+              column, which are the        resource condition keys that apply to an action in the Actions table.
+             </p>
+            </div>
+           </div>
+           <p>
+            For details about the columns in the following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#actions_table" rel="noopener noreferrer" target="_blank">
+             Actions table
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9d472c11c13">
+              <thead>
+               <tr>
+                <th>
+                 Actions
+                </th>
+                <th>
+                 Description
+                </th>
+                <th>
+                 Access level
+                </th>
+                <th>
+                 Resource types (*required)
+                </th>
+                <th>
+                 Condition keys
+                </th>
+                <th>
+                 Dependent actions
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="amazondatazone-AcceptPredictions" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_AcceptPredictions.html" rel="noopener noreferrer" target="_blank">
+                 AcceptPredictions
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to accept prediction
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-AcceptSubscriptionRequest" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_AcceptSubscriptionRequest.html" rel="noopener noreferrer" target="_blank">
+                 AcceptSubscriptionRequest
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to approve a subscription request for a Data Asset
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-AddEntityOwner" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_AddEntityOwner.html" rel="noopener noreferrer" target="_blank">
+                 AddEntityOwner
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to add an owner to an entity like domain unit
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-AddPolicyGrant" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_AddPolicyGrant.html" rel="noopener noreferrer" target="_blank">
+                 AddPolicyGrant
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to add a policy grant
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-AssociateEnvironmentRole" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_AssociateEnvironmentRole.html" rel="noopener noreferrer" target="_blank">
+                 AssociateEnvironmentRole
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to associate a role in a default service blueprint environment
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-CancelMetadataGenerationRun" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_CancelMetadataGenerationRun.html" rel="noopener noreferrer" target="_blank">
+                 CancelMetadataGenerationRun
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to cancel metadata generation run
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-CancelSubscription" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_CancelSubscription.html" rel="noopener noreferrer" target="_blank">
+                 CancelSubscription
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to revoke or unsubscribe an approved subscription to Data Asset
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-CreateAsset" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_CreateAsset.html" rel="noopener noreferrer" target="_blank">
+                 CreateAsset
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create asset
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-CreateAssetFilter" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_CreateAssetFilter.html" rel="noopener noreferrer" target="_blank">
+                 CreateAssetFilter
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create asset filter
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-CreateAssetRevision" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_CreateAssetRevision.html" rel="noopener noreferrer" target="_blank">
+                 CreateAssetRevision
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create new revision of an asset
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-CreateAssetType" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_CreateAssetType.html" rel="noopener noreferrer" target="_blank">
+                 CreateAssetType
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create an asset type
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-CreateDataProduct" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_CreateDataProduct.html" rel="noopener noreferrer" target="_blank">
+                 CreateDataProduct
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create data product
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-CreateDataProductRevision" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_CreateDataProductRevision.html" rel="noopener noreferrer" target="_blank">
+                 CreateDataProductRevision
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create data product revision
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-CreateDataSource" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_CreateDataSource.html" rel="noopener noreferrer" target="_blank">
+                 CreateDataSource
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a new DataSource
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-CreateDomain" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_CreateDomain.html" rel="noopener noreferrer" target="_blank">
+                 CreateDomain
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to provision a domain which is a top level entity that contains other Amazon DataZone resources
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazondatazone-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazondatazone-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-CreateDomainUnit" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_CreateDomainUnit.html" rel="noopener noreferrer" target="_blank">
+                 CreateDomainUnit
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a domain unit
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-CreateEnvironment" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_CreateEnvironment.html" rel="noopener noreferrer" target="_blank">
+                 CreateEnvironment
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a collection of configurated resources used to publish and subscribe to data
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-CreateEnvironmentAction" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_CreateEnvironmentAction.html" rel="noopener noreferrer" target="_blank">
+                 CreateEnvironmentAction
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create an environment action in a default service blueprint environment
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-CreateEnvironmentBlueprint" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_CreateEnvironmentBlueprint.html" rel="noopener noreferrer" target="_blank">
+                 CreateEnvironmentBlueprint
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a custom Environment Blueprint that allow user to add Environments to their Project
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-CreateEnvironmentProfile" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_CreateEnvironmentProfile.html" rel="noopener noreferrer" target="_blank">
+                 CreateEnvironmentProfile
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a template from a Blueprint that can be used to create a Environment
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-CreateFormType" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_CreateFormType.html" rel="noopener noreferrer" target="_blank">
+                 CreateFormType
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a form type or a new revision of it
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-CreateGlossary" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_CreateGlossary.html" rel="noopener noreferrer" target="_blank">
+                 CreateGlossary
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a business glossary
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-CreateGlossaryTerm" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_CreateGlossaryTerm.html" rel="noopener noreferrer" target="_blank">
+                 CreateGlossaryTerm
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a glossary term
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-CreateGroupProfile" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_CreateGroupProfile.html" rel="noopener noreferrer" target="_blank">
+                 CreateGroupProfile
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a DataZone group profile for an IAM Identity Center group
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-CreateListingChangeSet" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_CreateListingChangeSet.html" rel="noopener noreferrer" target="_blank">
+                 CreateListingChangeSet
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create listing change set
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-CreateProject" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_CreateProject.html" rel="noopener noreferrer" target="_blank">
+                 CreateProject
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a Project to enable your team to publish and subscribe to data
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-CreateProjectMembership" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_CreateProjectMembership.html" rel="noopener noreferrer" target="_blank">
+                 CreateProjectMembership
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to add a user to a Project
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-CreateProjectProfile" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_CreateProjectProfile.html" rel="noopener noreferrer" target="_blank">
+                 CreateProjectProfile
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a project profile
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-CreateSubscriptionGrant" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_CreateSubscriptionGrant.html" rel="noopener noreferrer" target="_blank">
+                 CreateSubscriptionGrant
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a grant for an approved subscription on a subscription target
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-CreateSubscriptionRequest" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_CreateSubscriptionRequest.html" rel="noopener noreferrer" target="_blank">
+                 CreateSubscriptionRequest
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a subscription request for a Data Asset
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-CreateSubscriptionTarget" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_CreateSubscriptionTarget.html" rel="noopener noreferrer" target="_blank">
+                 CreateSubscriptionTarget
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a subscription target for a Environment in the project
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-CreateUserProfile" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_CreateUserProfile.html" rel="noopener noreferrer" target="_blank">
+                 CreateUserProfile
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a user profile for an existing user in the customers IAM Identity Center
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-DeleteAsset" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_DeleteAsset.html" rel="noopener noreferrer" target="_blank">
+                 DeleteAsset
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete an asset
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-DeleteAssetFilter" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_DeleteAssetFilter.html" rel="noopener noreferrer" target="_blank">
+                 DeleteAssetFilter
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete asset filter
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-DeleteAssetType" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_DeleteAssetType.html" rel="noopener noreferrer" target="_blank">
+                 DeleteAssetType
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete an asset type
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-DeleteDataProduct" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_DeleteDataProduct.html" rel="noopener noreferrer" target="_blank">
+                 DeleteDataProduct
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete data product
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-DeleteDataSource" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_DeleteDataSource.html" rel="noopener noreferrer" target="_blank">
+                 DeleteDataSource
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update existing DataSource
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-DeleteDomain" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_DeleteDomain.html" rel="noopener noreferrer" target="_blank">
+                 DeleteDomain
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a provisioned domain
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazondatazone-domain">
+                  domain*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-DeleteDomainSharingPolicy" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_DeleteDomainSharingPolicy.html" rel="noopener noreferrer" target="_blank">
+                 DeleteDomainSharingPolicy
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a resource policy for a DataZone Domain
+               </td>
+               <td tabindex="-1">
+                Permissions management
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-DeleteDomainUnit" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_DeleteDomainUnit.html" rel="noopener noreferrer" target="_blank">
+                 DeleteDomainUnit
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete an existing domain unit
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-DeleteEnvironment" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_DeleteEnvironment.html" rel="noopener noreferrer" target="_blank">
+                 DeleteEnvironment
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to Delete Environment
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-DeleteEnvironmentAction" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_DeleteEnvironmentAction.html" rel="noopener noreferrer" target="_blank">
+                 DeleteEnvironmentAction
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete an environment action in a default service blueprint environment
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-DeleteEnvironmentBlueprint" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_DeleteEnvironmentBlueprint.html" rel="noopener noreferrer" target="_blank">
+                 DeleteEnvironmentBlueprint
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete Environment Blueprint
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-DeleteEnvironmentBlueprintConfiguration" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_DeleteEnvironmentBlueprintConfiguration.html" rel="noopener noreferrer" target="_blank">
+                 DeleteEnvironmentBlueprintConfiguration
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete environment blueprint configuration
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-DeleteEnvironmentProfile" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_DeleteEnvironmentProfile.html" rel="noopener noreferrer" target="_blank">
+                 DeleteEnvironmentProfile
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete Environment Profile
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-DeleteFormType" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_DeleteFormType.html" rel="noopener noreferrer" target="_blank">
+                 DeleteFormType
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a form type
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-DeleteGlossary" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_DeleteGlossary.html" rel="noopener noreferrer" target="_blank">
+                 DeleteGlossary
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a business glossary
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-DeleteGlossaryTerm" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_DeleteGlossaryTerm.html" rel="noopener noreferrer" target="_blank">
+                 DeleteGlossaryTerm
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a glossary term
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-DeleteListing" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_DeleteListing.html" rel="noopener noreferrer" target="_blank">
+                 DeleteListing
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete listing
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-DeleteProject" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_DeleteProject.html" rel="noopener noreferrer" target="_blank">
+                 DeleteProject
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a Project that enables your team to publish and subscribe to data
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-DeleteProjectMembership" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_DeleteProjectMembership.html" rel="noopener noreferrer" target="_blank">
+                 DeleteProjectMembership
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to remove a user from a project
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-DeleteProjectProfile" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_DeleteProjectProfile.html" rel="noopener noreferrer" target="_blank">
+                 DeleteProjectProfile
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a project profile
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-DeleteSubscriptionGrant" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_DeleteSubscriptionGrant.html" rel="noopener noreferrer" target="_blank">
+                 DeleteSubscriptionGrant
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a subscription grant from a subscription target
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-DeleteSubscriptionRequest" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_DeleteSubscriptionRequest.html" rel="noopener noreferrer" target="_blank">
+                 DeleteSubscriptionRequest
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a pending subscription request for a Data Asset
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-DeleteSubscriptionTarget" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_DeleteSubscriptionTarget.html" rel="noopener noreferrer" target="_blank">
+                 DeleteSubscriptionTarget
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a subscription target from a Environment in the project
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-DeleteTimeSeriesDataPoints" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_DeleteTimeSeriesDataPoints.html" rel="noopener noreferrer" target="_blank">
+                 DeleteTimeSeriesDataPoints
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete existing TimeSeriesDataPoints
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-DisassociateEnvironmentRole" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_AssociateEnvironmentRole.html" rel="noopener noreferrer" target="_blank">
+                 DisassociateEnvironmentRole
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to disassociate a role in a default service blueprint environment
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-GetAsset" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_GetAsset.html" rel="noopener noreferrer" target="_blank">
+                 GetAsset
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retrieve an asset
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-GetAssetFilter" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_GetAssetFilter.html" rel="noopener noreferrer" target="_blank">
+                 GetAssetFilter
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get asset filter
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-GetAssetType" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_GetAssetType.html" rel="noopener noreferrer" target="_blank">
+                 GetAssetType
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get an asset type
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-GetDataProduct" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_GetDataProduct.html" rel="noopener noreferrer" target="_blank">
+                 GetDataProduct
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get data product
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-GetDataSource" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_GetDataSource.html" rel="noopener noreferrer" target="_blank">
+                 GetDataSource
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to Get a existing DataSource in Amazon DataZone using its identifier
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-GetDataSourceRun" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_GetDataSourceRun.html" rel="noopener noreferrer" target="_blank">
+                 GetDataSourceRun
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get DataSource run job in Amazon DataZone using it's identifier
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-GetDomain" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_GetDomain.html" rel="noopener noreferrer" target="_blank">
+                 GetDomain
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retrieve information about a domain
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazondatazone-domain">
+                  domain*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-GetDomainSharingPolicy" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_GetDomainSharingPolicy.html" rel="noopener noreferrer" target="_blank">
+                 GetDomainSharingPolicy
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to retrieve a resource policy for a DataZone Domain
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-GetDomainUnit" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_GetDomainUnit.html" rel="noopener noreferrer" target="_blank">
+                 GetDomainUnit
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get an existing domain unit
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-GetEnvironment" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_GetEnvironment.html" rel="noopener noreferrer" target="_blank">
+                 GetEnvironment
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get Environment details
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-GetEnvironmentAction" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_GetEnvironmentAction.html" rel="noopener noreferrer" target="_blank">
+                 GetEnvironmentAction
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get an environment action in a default service blueprint environment
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-GetEnvironmentActionLink" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_GetEnvironmentActionLink.html" rel="noopener noreferrer" target="_blank">
+                 GetEnvironmentActionLink
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to get environment action link
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-GetEnvironmentBlueprint" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_GetEnvironmentBlueprint.html" rel="noopener noreferrer" target="_blank">
+                 GetEnvironmentBlueprint
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get Environment Blueprint details
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-GetEnvironmentBlueprintConfiguration" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_GetEnvironmentBlueprintConfiguration.html" rel="noopener noreferrer" target="_blank">
+                 GetEnvironmentBlueprintConfiguration
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get environment blueprint configuration
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-GetEnvironmentCredentials" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_GetEnvironmentCredentials.html" rel="noopener noreferrer" target="_blank">
+                 GetEnvironmentCredentials
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get short term credentials that assume the Environment user role
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-GetEnvironmentProfile" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_GetEnvironmentProfile.html" rel="noopener noreferrer" target="_blank">
+                 GetEnvironmentProfile
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get Environment Profile details
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-GetFormType" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_GetFormType.html" rel="noopener noreferrer" target="_blank">
+                 GetFormType
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get a form type
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-GetGlossary" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_GetGlossary.html" rel="noopener noreferrer" target="_blank">
+                 GetGlossary
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get a business glossary
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-GetGlossaryTerm" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_GetGlossaryTerm.html" rel="noopener noreferrer" target="_blank">
+                 GetGlossaryTerm
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get a glossary term
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-GetGroupProfile" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_GetGroupProfile.html" rel="noopener noreferrer" target="_blank">
+                 GetGroupProfile
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retrieve an existing DataZone group profile
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-GetIamPortalLoginUrl" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_GetIamPortalLoginUrl.html" rel="noopener noreferrer" target="_blank">
+                 GetIamPortalLoginUrl
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to an IAM principal to log into the DataZone Portal
+               </td>
+               <td tabindex="-1">
+                Permissions management
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-GetLineageNode" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_GetLineageNode.html" rel="noopener noreferrer" target="_blank">
+                 GetLineageNode
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get the lineage node
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-GetListing" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_GetListing.html" rel="noopener noreferrer" target="_blank">
+                 GetListing
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get listing
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-GetMetadataGenerationRun" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_GetMetadataGenerationRun.html" rel="noopener noreferrer" target="_blank">
+                 GetMetadataGenerationRun
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get metadata generation run
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-GetProject" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_GetProject.html" rel="noopener noreferrer" target="_blank">
+                 GetProject
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get Project details
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-GetProjectProfile" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_GetProjectProfile.html" rel="noopener noreferrer" target="_blank">
+                 GetProjectProfile
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to get project profile details
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-GetSubscription" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_GetSubscription.html" rel="noopener noreferrer" target="_blank">
+                 GetSubscription
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retrieve a subscription
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-GetSubscriptionEligibility" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_GetSubscriptionEligibility.html" rel="noopener noreferrer" target="_blank">
+                 GetSubscriptionEligibility
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to get subscription eligibilty
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-GetSubscriptionGrant" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_GetSubscriptionGrant.html" rel="noopener noreferrer" target="_blank">
+                 GetSubscriptionGrant
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retireve a subscription grant
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-GetSubscriptionRequestDetails" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_GetSubscriptionRequestDetails.html" rel="noopener noreferrer" target="_blank">
+                 GetSubscriptionRequestDetails
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to reject a subscription request for a Data Asset
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-GetSubscriptionTarget" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_GetSubscriptionTarget.html" rel="noopener noreferrer" target="_blank">
+                 GetSubscriptionTarget
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retireve details of subscription target
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-GetTimeSeriesDataPoint" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_GetTimeSeriesDataPoint.html" rel="noopener noreferrer" target="_blank">
+                 GetTimeSeriesDataPoint
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get an existing TimeSeriesDataPoints in Amazon DataZone using its identifier
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-GetUserProfile" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_GetUserProfile.html" rel="noopener noreferrer" target="_blank">
+                 GetUserProfile
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retrieve a user profile for an existing user in the DataZone Domain
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-ListAccountEnvironments" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_ListAccountEnvironments.html" rel="noopener noreferrer" target="_blank">
+                 ListAccountEnvironments
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list Environments across all domains in an AWS Account
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-ListAssetFilters" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_ListAssetFilters.html" rel="noopener noreferrer" target="_blank">
+                 ListAssetFilters
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list asset filters
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-ListAssetRevisions" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_ListAssetRevisions.html" rel="noopener noreferrer" target="_blank">
+                 ListAssetRevisions
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list revisions of an asset
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-ListDataProductRevisions" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_ListDataProductRevisions.html" rel="noopener noreferrer" target="_blank">
+                 ListDataProductRevisions
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list data product revisions
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-ListDataSourceRunActivities" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_ListDataSourceRunActivities.html" rel="noopener noreferrer" target="_blank">
+                 ListDataSourceRunActivities
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list DataSource runs job's activities on Asset
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-ListDataSourceRuns" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_ListDataSourceRuns.html" rel="noopener noreferrer" target="_blank">
+                 ListDataSourceRuns
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list DataSource runs job
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-ListDataSources" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_ListDataSources.html" rel="noopener noreferrer" target="_blank">
+                 ListDataSources
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list existing DataSources
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-ListDomainUnitsForParent" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_ListDomainUnitsForParent.html" rel="noopener noreferrer" target="_blank">
+                 ListDomainUnitsForParent
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list child domain units for a given parent domain unit
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-ListDomains" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_ListDomains.html" rel="noopener noreferrer" target="_blank">
+                 ListDomains
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retrieve all domains
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-ListEntityOwners" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_ListEntityOwners.html" rel="noopener noreferrer" target="_blank">
+                 ListEntityOwners
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list owners of an entity like domain unit
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-ListEnvironmentActions" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_ListEnvironmentActions.html" rel="noopener noreferrer" target="_blank">
+                 ListEnvironmentActions
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list environment actions in a default service blueprint environment
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-ListEnvironmentBlueprintConfigurationSummaries" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_ListEnvironmentBlueprintConfigurationSummaries.html" rel="noopener noreferrer" target="_blank">
+                 ListEnvironmentBlueprintConfigurationSummaries
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to list environment blueprint configuration summaries
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-ListEnvironmentBlueprintConfigurations" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_ListEnvironmentBlueprintConfigurations.html" rel="noopener noreferrer" target="_blank">
+                 ListEnvironmentBlueprintConfigurations
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list environment blueprint configurations
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-ListEnvironmentBlueprints" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_ListEnvironmentBlueprints.html" rel="noopener noreferrer" target="_blank">
+                 ListEnvironmentBlueprints
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list Domain for Environment Blueprints
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-ListEnvironmentProfiles" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_ListEnvironmentProfiles.html" rel="noopener noreferrer" target="_blank">
+                 ListEnvironmentProfiles
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list Domain for Environment Profiles
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-ListEnvironments" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_ListEnvironments.html" rel="noopener noreferrer" target="_blank">
+                 ListEnvironments
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to show Environments in the Domain
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-ListGroupsForUser" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_ListGroupsForUser.html" rel="noopener noreferrer" target="_blank">
+                 ListGroupsForUser
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list all the DataZone group profiles that the DataZone user profile is a member of
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-ListLineageNodeHistory" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_ListLineageNodeHistory.html" rel="noopener noreferrer" target="_blank">
+                 ListLineageNodeHistory
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list historical versions of lineage node
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-ListMetadataGenerationRuns" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_ListMetadataGenerationRuns.html" rel="noopener noreferrer" target="_blank">
+                 ListMetadataGenerationRuns
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list metadata generation runs
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-ListNotifications" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_ListNotifications.html" rel="noopener noreferrer" target="_blank">
+                 ListNotifications
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list notifications and events for a datazone user
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-ListPolicyGrants" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_ListPolicyGrants.html" rel="noopener noreferrer" target="_blank">
+                 ListPolicyGrants
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list policy grants
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-ListProjectMemberships" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_ListProjectMemberships.html" rel="noopener noreferrer" target="_blank">
+                 ListProjectMemberships
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list Project Members
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-ListProjectProfiles" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_ListProjectProfiles.html" rel="noopener noreferrer" target="_blank">
+                 ListProjectProfiles
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to list project profiles
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-ListProjects" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_ListProjects.html" rel="noopener noreferrer" target="_blank">
+                 ListProjects
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list Projects
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-ListSubscriptionGrants" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_ListSubscriptionGrants.html" rel="noopener noreferrer" target="_blank">
+                 ListSubscriptionGrants
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to List subscription grants for a subscribed principal
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-ListSubscriptionRequests" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_ListSubscriptionRequests.html" rel="noopener noreferrer" target="_blank">
+                 ListSubscriptionRequests
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list subscription requests
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-ListSubscriptionTargets" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_ListSubscriptionTargets.html" rel="noopener noreferrer" target="_blank">
+                 ListSubscriptionTargets
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list subscription targets
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-ListSubscriptions" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_ListSubscriptions.html" rel="noopener noreferrer" target="_blank">
+                 ListSubscriptions
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list subscriptions
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-ListTagsForResource" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_ListTagsForResource.html" rel="noopener noreferrer" target="_blank">
+                 ListTagsForResource
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retrieve all tags associated with a resource
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazondatazone-domain">
+                  domain
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-ListTimeSeriesDataPoints" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_ListTimeSeriesDataPoints.html" rel="noopener noreferrer" target="_blank">
+                 ListTimeSeriesDataPoints
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list existing TimeSeriesDataPoints
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-ListWarehouseMetadata" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_ListWarehouseMetadata.html" rel="noopener noreferrer" target="_blank">
+                 ListWarehouseMetadata
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to list available Manager Secrets
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-PostLineageEvent" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_PostLineageEvent.html" rel="noopener noreferrer" target="_blank">
+                 PostLineageEvent
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to post lineage events
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-PostTimeSeriesDataPoints" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_PostTimeSeriesDataPoints.html" rel="noopener noreferrer" target="_blank">
+                 PostTimeSeriesDataPoints
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to post a new TimeSeriesDataPoints
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-ProvisionDomain" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_ProvisionDomain.html" rel="noopener noreferrer" target="_blank">
+                 ProvisionDomain
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to provision domain with default project setup
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-PutDomainSharingPolicy" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_PutDomainSharingPolicy.html" rel="noopener noreferrer" target="_blank">
+                 PutDomainSharingPolicy
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to add a resource policy for a DataZone Domain
+               </td>
+               <td tabindex="-1">
+                Permissions management
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-PutEnvironmentBlueprintConfiguration" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_PutEnvironmentBlueprintConfiguration.html" rel="noopener noreferrer" target="_blank">
+                 PutEnvironmentBlueprintConfiguration
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to put environment blueprint configuration
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-RefreshToken" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_RefreshToken.html" rel="noopener noreferrer" target="_blank">
+                 RefreshToken
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to refresh token
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-RejectPredictions" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_RejectPredictions.html" rel="noopener noreferrer" target="_blank">
+                 RejectPredictions
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to reject prediction
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-RejectSubscriptionRequest" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_RejectSubscriptionRequest.html" rel="noopener noreferrer" target="_blank">
+                 RejectSubscriptionRequest
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to reject a subscription request for a Data Asset
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-RemoveEntityOwner" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_RemoveEntityOwner.html" rel="noopener noreferrer" target="_blank">
+                 RemoveEntityOwner
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to remove an existing owner of an entity like domain unit
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-RemovePolicyGrant" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_RemovePolicyGrant.html" rel="noopener noreferrer" target="_blank">
+                 RemovePolicyGrant
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to remove a policy grant
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-RevokeSubscription" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_RevokeSubscription.html" rel="noopener noreferrer" target="_blank">
+                 RevokeSubscription
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to revoke a subscription
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-Search" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_Search.html" rel="noopener noreferrer" target="_blank">
+                 Search
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to search datazone entities
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-SearchGroupProfiles" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_SearchGroupProfiles.html" rel="noopener noreferrer" target="_blank">
+                 SearchGroupProfiles
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to search DataZone group profiles and IAM Identity Center groups
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-SearchListings" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_SearchListings.html" rel="noopener noreferrer" target="_blank">
+                 SearchListings
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to search listings
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-SearchTypes" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_SearchTypes.html" rel="noopener noreferrer" target="_blank">
+                 SearchTypes
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to search types such asset types and form types in a domain
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-SearchUserProfiles" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_SearchUserProfiles.html" rel="noopener noreferrer" target="_blank">
+                 SearchUserProfiles
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to search DataZone user profiles, IAM Identity Center users, and DataZone IAM principal profiles
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-SsoLogin" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_SsoLogin.html" rel="noopener noreferrer" target="_blank">
+                 SsoLogin
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to login using SSO
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-SsoLogout" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_SsoLogout.html" rel="noopener noreferrer" target="_blank">
+                 SsoLogout
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to logout as SSO user
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-StartDataSourceRun" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_StartDataSourceRun.html" rel="noopener noreferrer" target="_blank">
+                 StartDataSourceRun
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to start a DataSource run job
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-StartMetadataGenerationRun" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_StartMetadataGenerationRun.html" rel="noopener noreferrer" target="_blank">
+                 StartMetadataGenerationRun
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to start metadata generation run
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-StopMetadataGenerationRun" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_StopMetadataGenerationRun.html" rel="noopener noreferrer" target="_blank">
+                 StopMetadataGenerationRun
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to stop metadata generation run
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-TagResource" rowspan="2" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_TagResource.html" rel="noopener noreferrer" target="_blank">
+                 TagResource
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to add or update tags to a resource
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Tagging
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazondatazone-domain">
+                  domain*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazondatazone-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazondatazone-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-UntagResource" rowspan="2" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_UntagResource.html" rel="noopener noreferrer" target="_blank">
+                 UntagResource
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to remove tags associated with a resource
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Tagging
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazondatazone-domain">
+                  domain*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazondatazone-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-UpdateAssetFilter" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_UpdateAssetFilter.html" rel="noopener noreferrer" target="_blank">
+                 UpdateAssetFilter
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update asset filter
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-UpdateDataSource" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_UpdateDataSource.html" rel="noopener noreferrer" target="_blank">
+                 UpdateDataSource
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update existing DataSource
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-UpdateDataSourceRunActivities" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_UpdateDataSourceRunActivities.html" rel="noopener noreferrer" target="_blank">
+                 UpdateDataSourceRunActivities
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to update data source run activities
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-UpdateDomain" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_UpdateDomain.html" rel="noopener noreferrer" target="_blank">
+                 UpdateDomain
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update information for a domain
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazondatazone-domain">
+                  domain*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-UpdateDomainUnit" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_UpdateDomainUnit.html" rel="noopener noreferrer" target="_blank">
+                 UpdateDomainUnit
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update an existing domain unit
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-UpdateEnvironment" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_UpdateEnvironment.html" rel="noopener noreferrer" target="_blank">
+                 UpdateEnvironment
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update Environment settings
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-UpdateEnvironmentAction" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_UpdateEnvironmentAction.html" rel="noopener noreferrer" target="_blank">
+                 UpdateEnvironmentAction
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update an environment action in a default service blueprint environment
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-UpdateEnvironmentBlueprint" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_UpdateEnvironmentBlueprint.html" rel="noopener noreferrer" target="_blank">
+                 UpdateEnvironmentBlueprint
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to update Environment Blueprint settings
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-UpdateEnvironmentConfiguration" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_UpdateEnvironmentConfiguration.html" rel="noopener noreferrer" target="_blank">
+                 UpdateEnvironmentConfiguration
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to update environment configuration
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-UpdateEnvironmentDeploymentStatus" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_UpdateEnvironmentDeploymentStatus.html" rel="noopener noreferrer" target="_blank">
+                 UpdateEnvironmentDeploymentStatus
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to update status of the Environment deployment
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-UpdateEnvironmentProfile" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_UpdateEnvironmentProfile.html" rel="noopener noreferrer" target="_blank">
+                 UpdateEnvironmentProfile
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update EnvironmentProfile configuration
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-UpdateGlossary" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_UpdateGlossary.html" rel="noopener noreferrer" target="_blank">
+                 UpdateGlossary
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update a business glossary
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-UpdateGlossaryTerm" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_UpdateGlossaryTerm.html" rel="noopener noreferrer" target="_blank">
+                 UpdateGlossaryTerm
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update a glossary term
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-UpdateGroupProfile" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_UpdateGroupProfile.html" rel="noopener noreferrer" target="_blank">
+                 UpdateGroupProfile
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update a DataZone group profile
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-UpdateProject" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_UpdateProject.html" rel="noopener noreferrer" target="_blank">
+                 UpdateProject
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update a Project that enables your team to publish and subscribe to data
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-UpdateProjectProfile" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_UpdateProjectProfile.html" rel="noopener noreferrer" target="_blank">
+                 UpdateProjectProfile
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to update a project profile
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-UpdateSubscriptionGrantStatus" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_UpdateSubscriptionGrantStatus.html" rel="noopener noreferrer" target="_blank">
+                 UpdateSubscriptionGrantStatus
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update a subscription grant status for custom grants
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-UpdateSubscriptionRequest" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_UpdateSubscriptionRequest.html" rel="noopener noreferrer" target="_blank">
+                 UpdateSubscriptionRequest
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update business reason for subscription request for a Data Asset
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-UpdateSubscriptionTarget" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_UpdateSubscriptionTarget.html" rel="noopener noreferrer" target="_blank">
+                 UpdateSubscriptionTarget
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update a subscription target
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-UpdateUserProfile" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_UpdateUserProfile.html" rel="noopener noreferrer" target="_blank">
+                 UpdateUserProfile
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update a DataZone user profile
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-ValidatePassRole" tabindex="-1">
+                <a href="${APIReferenceDocPage}API_ValidatePassRole.html" rel="noopener noreferrer" target="_blank">
+                 ValidatePassRole
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to validate pass role
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <h2 id="amazondatazone-resources-for-iam-policies">
+            Resource types defined by        Amazon DataZone
+           </h2>
+           <p>
+            The following resource types are defined by this service and can be used in the
+            <code class="code">
+             Resource
+            </code>
+            element of IAM permission policy statements. Each action in the
+            <a href="#amazondatazone-actions-as-permissions">
+             Actions table
+            </a>
+            identifies the      resource types that can be specified with that action. A resource type can also define which      condition keys you can include in a policy. These keys are displayed in the last column of the      Resource types table. For details about the columns in the following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#resources_table" rel="noopener noreferrer" target="_blank">
+             Resource types table
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9d472c13b5">
+              <thead>
+               <tr>
+                <th>
+                 Resource types
+                </th>
+                <th>
+                 ARN
+                </th>
+                <th>
+                 Condition keys
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="amazondatazone-domain" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/datazone/latest/userguide/create-domain.html">
+                 domain
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:datazone:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:domain/$
+                 <span>
+                  {
+                 </span>
+                 DomainId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazondatazone-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <h2 id="amazondatazone-policy-keys">
+            Condition keys for        Amazon DataZone
+           </h2>
+           <p>
+            Amazon DataZone defines the following condition keys that can be used in the
+            <code class="code">
+             Condition
+            </code>
+            element of an IAM policy. You can use these keys to further refine      the conditions under which the policy statement applies. For details about the columns in the      following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#context_keys_table" rel="noopener noreferrer" target="_blank">
+             Condition keys table
+            </a>
+            .
+           </p>
+           <p>
+            To view the global condition keys that are available to all services, see
+            <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#AvailableKeys">
+             Available global condition keys
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9d472c15b7">
+              <thead>
+               <tr>
+                <th>
+                 Condition keys
+                </th>
+                <th>
+                 Description
+                </th>
+                <th>
+                 Type
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="amazondatazone-aws_RequestTag___TagKey_" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-requesttag">
+                 aws:RequestTag/${TagKey}
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the tags that are passed in the request
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-aws_ResourceTag___TagKey_" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-resourcetag">
+                 aws:ResourceTag/${TagKey}
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the tags associated with the resource
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="amazondatazone-aws_TagKeys" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-tagkeys">
+                 aws:TagKeys
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the tag keys that are passed in the request
+               </td>
+               <td tabindex="-1">
+                ArrayOfString
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <awsdocs-copyright class="copyright-print">
+           </awsdocs-copyright>
+           <awsdocs-thumb-feedback right-edge="{{$ctrl.thumbFeedbackRightEdge}}">
+           </awsdocs-thumb-feedback>
+          </div>
+          <noscript>
+           <div>
+            <div>
+             <div>
+              <div id="js_error_message">
+               <p>
+                <img alt="Warning" src="https://d1ge0kk1l5kms0.cloudfront.net/images/G/01/webservices/console/warning.png"/>
+                <strong>
+                 Javascript is disabled or is unavailable in your browser.
+                </strong>
+               </p>
+               <p>
+                To use the Amazon Web Services Documentation, Javascript must be enabled. Please refer to your browser's Help pages for instructions.
+               </p>
+              </div>
+             </div>
+            </div>
+           </div>
+          </noscript>
+          <div class="awsui-util-font-size-0" id="main-col-footer">
+           <div id="doc-conventions">
+            <a href="/general/latest/gr/docconventions.html" target="_top">
+             Document Conventions
+            </a>
+           </div>
+           <div class="prev-next">
+            <div accesskey="p" class="prev-link" href="./list_awsdatasync.html" id="previous">
+             AWS DataSync
+            </div>
+            <div accesskey="n" class="next-link" href="./list_awsdeadlinecloud.html" id="next">
+             AWS Deadline Cloud
+            </div>
+           </div>
+          </div>
+          <awsdocs-page-utilities>
+          </awsdocs-page-utilities>
+         </div>
+         <div id="quick-feedback-yes" style="display: none;">
+          <div class="title">
+           Did this page help you? - Yes
+          </div>
+          <div class="content">
+           <p>
+            Thanks for letting us know we're doing a good job!
+           </p>
+           <p>
+            If you've got a moment, please tell us what we did right so we can do more of it.
+           </p>
+           <p>
+            <awsui-button click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service Authorization Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazondatazone.html" id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback">
+            </awsui-button>
+           </p>
+          </div>
+         </div>
+         <div id="quick-feedback-no" style="display: none;">
+          <div class="title">
+           Did this page help you? - No
+          </div>
+          <div class="content">
+           <p>
+            Thanks for letting us know this page needs work. We're sorry we let you down.
+           </p>
+           <p>
+            If you've got a moment, please tell us how we can make the documentation better.
+           </p>
+           <p>
+            <awsui-button click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service Authorization Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazondatazone.html" id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback">
+            </awsui-button>
+           </p>
+          </div>
+         </div>
+        </div>
+       </body>
+      </div>
+     </awsdocs-view>
+     <div class="page-loading-indicator" id="page-loading-indicator">
+      <awsui-spinner size="large">
+      </awsui-spinner>
+     </div>
+    </div>
+    <div dom-region="tools" id="tools-panel">
+     <awsdocs-tools-panel id="awsdocs-tools-panel">
+     </awsdocs-tools-panel>
+    </div>
+   </awsui-app-layout>
+   <awsdocs-cookie-banner class="doc-cookie-banner">
+   </awsdocs-cookie-banner>
+  </div>
+ </body>
+</html>

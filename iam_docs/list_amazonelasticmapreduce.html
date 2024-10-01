@@ -1,0 +1,2889 @@
+<!DOCTYPE html>
+<html lang="en-US" xmlns="http://www.w3.org/1999/xhtml">
+ <head>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+  <title>
+   Actions, resources, and condition keys for Amazon Elastic MapReduce - Service Authorization Reference
+  </title>
+  <meta content="width=device-width,initial-scale=1" name="viewport"/>
+  <meta content="/assets" name="assets_root"/>
+  <meta content="list_amazonelasticmapreduce" name="target_state"/>
+  <meta content="list_amazonelasticmapreduce" name="default_state"/>
+  <link href="https://docs.aws.amazon.com/assets/images/favicon.ico" rel="icon" type="image/ico"/>
+  <link href="https://docs.aws.amazon.com/assets/images/favicon.ico" rel="shortcut icon" type="image/ico"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonelasticmapreduce.html" rel="canonical"/>
+  <meta content="Lists all of the available service-specific resources, actions, and condition keys that can be used in IAM policies to control access to Amazon Elastic MapReduce." name="description"/>
+  <meta content="IAD" name="deployment_region"/>
+  <meta content="Service Authorization Reference" name="product"/>
+  <meta content="Service Authorization Reference" name="guide"/>
+  <meta content="Provides a list of the actions, resources, and condition keys supported by each AWS service that can be used in an IAM policy." name="abstract"/>
+  <meta content="en_us" name="guide-locale"/>
+  <meta content="toc-contents.json" name="tocs"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonelasticmapreduce.html" rel="canonical"/>
+  <link href="https://docs.aws.amazon.com/id_id/service-authorization/latest/reference/list_amazonelasticmapreduce.html" hreflang="id-id" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/id_id/service-authorization/latest/reference/list_amazonelasticmapreduce.html" hreflang="id" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/de_de/service-authorization/latest/reference/list_amazonelasticmapreduce.html" hreflang="de-de" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/de_de/service-authorization/latest/reference/list_amazonelasticmapreduce.html" hreflang="de" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonelasticmapreduce.html" hreflang="en-us" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonelasticmapreduce.html" hreflang="en" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/es_es/service-authorization/latest/reference/list_amazonelasticmapreduce.html" hreflang="es-es" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/es_es/service-authorization/latest/reference/list_amazonelasticmapreduce.html" hreflang="es" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/fr_fr/service-authorization/latest/reference/list_amazonelasticmapreduce.html" hreflang="fr-fr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/fr_fr/service-authorization/latest/reference/list_amazonelasticmapreduce.html" hreflang="fr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/it_it/service-authorization/latest/reference/list_amazonelasticmapreduce.html" hreflang="it-it" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/it_it/service-authorization/latest/reference/list_amazonelasticmapreduce.html" hreflang="it" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ja_jp/service-authorization/latest/reference/list_amazonelasticmapreduce.html" hreflang="ja-jp" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ja_jp/service-authorization/latest/reference/list_amazonelasticmapreduce.html" hreflang="ja" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ko_kr/service-authorization/latest/reference/list_amazonelasticmapreduce.html" hreflang="ko-kr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ko_kr/service-authorization/latest/reference/list_amazonelasticmapreduce.html" hreflang="ko" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/pt_br/service-authorization/latest/reference/list_amazonelasticmapreduce.html" hreflang="pt-br" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/pt_br/service-authorization/latest/reference/list_amazonelasticmapreduce.html" hreflang="pt" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/zh_cn/service-authorization/latest/reference/list_amazonelasticmapreduce.html" hreflang="zh-cn" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/zh_tw/service-authorization/latest/reference/list_amazonelasticmapreduce.html" hreflang="zh-tw" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonelasticmapreduce.html" hreflang="x-default" rel="alternative"/>
+  <meta content="Service Authorization Docs" name="feedback-item"/>
+  <meta content="Service Authorization Reference" name="this_doc_product"/>
+  <meta content="Service Authorization Reference" name="this_doc_guide"/>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor4.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor3.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor1.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/awsdocs-common.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/awsdocs-doc-page.js?version=2021.12.02">
+  </script>
+  <link href="https://docs.aws.amazon.com/assets/r/vendor4.css?version=2021.12.02" rel="stylesheet"/>
+  <link href="https://docs.aws.amazon.com/assets/r/awsdocs-common.css?version=2021.12.02" rel="stylesheet"/>
+  <link href="https://docs.aws.amazon.com/assets/r/awsdocs-doc-page.css?version=2021.12.02" rel="stylesheet"/>
+  <script async="" data-config="{'appEntity':'aws-documentation','region':'us-east-1','service':'iam'}" id="awsc-panorama-bundle" src="https://prod.pa.cdn.uis.awsstatic.com/panorama-nav-init.js" type="text/javascript">
+  </script>
+  <meta id="panorama-serviceSubSection" value="Service Authorization Reference"/>
+  <meta id="panorama-serviceConsolePage" value="Actions, resources, and condition keys for Amazon Elastic MapReduce"/>
+ </head>
+ <body class="awsdocs awsui">
+  <div class="awsdocs-container">
+   <awsdocs-header>
+   </awsdocs-header>
+   <awsui-app-layout class="awsui-util-no-gutters" header-selector="awsdocs-header" id="app-layout" navigation-change="$ctrl.onNavChange($event)" navigation-hide="false" navigation-open="$ctrl.navOpen" navigation-width="$ctrl.navWidth" ng-controller="ContentController as $ctrl" tools-change="$ctrl.onToolsChange($event)" tools-hide="$ctrl.hideTools" tools-open="$ctrl.toolsOpen" tools-width="$ctrl.toolsWidth">
+    <div dom-region="navigation" id="guide-toc">
+     <awsdocs-toc>
+     </awsdocs-toc>
+    </div>
+    <div dom-region="content" id="main-column" tabindex="-1">
+     <awsdocs-view class="awsdocs-view">
+      <div id="awsdocs-content">
+       <head>
+        <title>
+         Actions, resources, and condition keys for Amazon Elastic MapReduce - Service Authorization Reference
+        </title>
+        <meta content="/pdfs/service-authorization/latest/reference/service-authorization.pdf#list_amazonelasticmapreduce" name="pdf"/>
+        <meta content="https://repost.aws/tags/TAO7Z4bI5hQVWMiYFs34QhIA" name="forums"/>
+        <meta content="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service%20Authorization%20Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazonelasticmapreduce.html" name="feedback"/>
+        <meta content="feedbackyes.html?topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazonelasticmapreduce.html" name="feedback-yes"/>
+        <meta content="feedbackno.html?topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazonelasticmapreduce.html" name="feedback-no"/>
+        <script type="application/ld+json">
+         {
+    "@context" : "https://schema.org",
+    "@type" : "BreadcrumbList",
+    "itemListElement" : [
+      {
+        "@type" : "ListItem",
+        "position" : 1,
+        "name" : "AWS",
+        "item" : "https://aws.amazon.com"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 2,
+        "name" : "Service Authorization Reference",
+        "item" : "https://docs.aws.amazon.com/iam/index.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 3,
+        "name" : "Service Authorization Reference",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 4,
+        "name" : "Reference",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 5,
+        "name" : "Actions, resources, and condition keys for AWS services",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference_policies_actions-resources-contextkeys.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 6,
+        "name" : "Actions, resources, and condition keys for Amazon Elastic MapReduce",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference_policies_actions-resources-contextkeys.html"
+      }
+    ]
+}
+        </script>
+       </head>
+       <body>
+        <div id="main">
+         <div style="display: none">
+          <a href="/pdfs/service-authorization/latest/reference/service-authorization.pdf#list_amazonelasticmapreduce" rel="noopener noreferrer" target="_blank" title="Open PDF">
+          </a>
+         </div>
+         <div class="breadcrumb" id="breadcrumbs">
+          <a href="https://aws.amazon.com">
+           AWS
+          </a>
+          <a href="/index.html">
+           Documentation
+          </a>
+          <a href="/iam/index.html">
+           Service Authorization Reference
+          </a>
+          <a href="reference.html">
+           Service Authorization Reference
+          </a>
+         </div>
+         <div id="page-toc-src">
+          <a href="#amazonelasticmapreduce-actions-as-permissions">
+           Actions
+          </a>
+          <a href="#amazonelasticmapreduce-resources-for-iam-policies">
+           Resource types
+          </a>
+          <a href="#amazonelasticmapreduce-policy-keys">
+           Condition keys
+          </a>
+         </div>
+         <div class="awsui-util-container" id="main-content">
+          <div id="main-col-body">
+           <awsdocs-language-banner data-service="$ctrl.pageService">
+           </awsdocs-language-banner>
+           <h1 class="topictitle" id="list_amazonelasticmapreduce">
+            Actions, resources, and condition keys for      Amazon Elastic MapReduce
+           </h1>
+           <div class="awsdocs-page-header-container">
+            <awsdocs-page-header>
+            </awsdocs-page-header>
+            <awsdocs-filter-selector id="awsdocs-filter-selector">
+            </awsdocs-filter-selector>
+           </div>
+           <p>
+            Amazon Elastic MapReduce (service prefix:
+            <code class="code">
+             elasticmapreduce
+            </code>
+            ) provides the following    service-specific resources, actions, and condition context keys for use in IAM permission    policies.
+           </p>
+           <p>
+            References:
+           </p>
+           <div class="itemizedlist">
+            <ul class="itemizedlist">
+             <li class="listitem">
+              <p>
+               Learn how to
+               <a href="https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-what-is-emr.html">
+                configure this service
+               </a>
+               .
+              </p>
+             </li>
+             <li class="listitem">
+              <p>
+               View a list of the
+               <a href="https://docs.aws.amazon.com/emr/latest/APIReference/Welcome.html">
+                API operations available for this          service
+               </a>
+               .
+              </p>
+             </li>
+             <li class="listitem">
+              <p>
+               Learn how to secure this service and its resources by
+               <a href="https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-plan-access.html">
+                using          IAM
+               </a>
+               permission policies.
+              </p>
+             </li>
+            </ul>
+           </div>
+           <div class="highlights" id="inline-topiclist">
+            <h6>
+             Topics
+            </h6>
+            <ul>
+             <li>
+              <a href="#amazonelasticmapreduce-actions-as-permissions">
+               Actions defined by        Amazon Elastic MapReduce
+              </a>
+             </li>
+             <li>
+              <a href="#amazonelasticmapreduce-resources-for-iam-policies">
+               Resource types defined by        Amazon Elastic MapReduce
+              </a>
+             </li>
+             <li>
+              <a href="#amazonelasticmapreduce-policy-keys">
+               Condition keys for        Amazon Elastic MapReduce
+              </a>
+             </li>
+            </ul>
+           </div>
+           <h2 id="amazonelasticmapreduce-actions-as-permissions">
+            Actions defined by        Amazon Elastic MapReduce
+           </h2>
+           <p>
+            You can specify the following actions in the
+            <code class="code">
+             Action
+            </code>
+            element of an IAM      policy statement. Use policies to grant permissions to perform an operation in AWS. When you      use an action in a policy, you usually allow or deny access to the API operation or CLI      command with the same name. However, in some cases, a single action controls access to more      than one operation. Alternatively, some operations require several different actions.
+           </p>
+           <p>
+            The
+            <b>
+             Resource types
+            </b>
+            column of the Actions table indicates whether each      action supports resource-level permissions. If there is no value for this column, you must      specify all resources ("*") to which the policy applies in the
+            <code class="code">
+             Resource
+            </code>
+            element      of your policy statement. If the column includes a resource type, then you can specify an ARN      of that type in a statement with that action. If the action has one or more required      resources, the caller must have permission to use the action with those resources. Required      resources are indicated in the table with an asterisk (*). If you limit resource access with      the
+            <code class="code">
+             Resource
+            </code>
+            element in an IAM policy, you must include an ARN or pattern for      each required resource type. Some actions support multiple resource types. If the resource      type is optional (not indicated as required), then you can choose to use one of the optional      resource types.
+           </p>
+           <p>
+            The
+            <b>
+             Condition keys
+            </b>
+            column of the Actions table includes keys that you      can specify in a policy statement's
+            <code class="code">
+             Condition
+            </code>
+            element. For more information on      the condition keys that are associated with resources for the service, see the
+            <b>
+             Condition keys
+            </b>
+            column of the Resource types table.
+           </p>
+           <div class="awsdocs-note">
+            <div class="awsdocs-note-title">
+             <awsui-icon name="status-info" variant="link">
+             </awsui-icon>
+             <h6>
+              Note
+             </h6>
+            </div>
+            <div class="awsdocs-note-text">
+             <p>
+              Resource condition keys are listed in the
+              <a href="#amazonelasticmapreduce-resources-for-iam-policies">
+               Resource types
+              </a>
+              table. You        can find a link to the resource type that applies to an action in the
+              <b>
+               Resource          types (*required)
+              </b>
+              column of the Actions table. The resource type in the        Resource types table includes the
+              <b>
+               Condition keys
+              </b>
+              column, which are the        resource condition keys that apply to an action in the Actions table.
+             </p>
+            </div>
+           </div>
+           <p>
+            For details about the columns in the following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#actions_table" rel="noopener noreferrer" target="_blank">
+             Actions table
+            </a>
+            .
+           </p>
+           <div class="awsdocs-note">
+            <div class="awsdocs-note-title">
+             <awsui-icon name="status-info" variant="link">
+             </awsui-icon>
+             <h6>
+              Note
+             </h6>
+            </div>
+            <div class="awsdocs-note-text">
+             <p>
+              The DescribeJobFlows API is deprecated and will eventually be removed. We recommend you use ListClusters, DescribeCluster, ListSteps, ListInstanceGroups and ListBootstrapActions instead
+             </p>
+            </div>
+           </div>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9d594c11c15">
+              <thead>
+               <tr>
+                <th>
+                 Actions
+                </th>
+                <th>
+                 Description
+                </th>
+                <th>
+                 Access level
+                </th>
+                <th>
+                 Resource types (*required)
+                </th>
+                <th>
+                 Condition keys
+                </th>
+                <th>
+                 Dependent actions
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="amazonelasticmapreduce-AddInstanceFleet" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/APIReference/API_AddInstanceFleet.html">
+                 AddInstanceFleet
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to add an instance fleet to a running cluster
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-cluster">
+                  cluster*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-AddInstanceGroups" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/APIReference/API_AddInstanceGroups.html">
+                 AddInstanceGroups
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to add instance groups to a running cluster
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-cluster">
+                  cluster*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-AddJobFlowSteps" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/APIReference/API_AddJobFlowSteps.html">
+                 AddJobFlowSteps
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to add new steps to a running cluster
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-cluster">
+                  cluster*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-elasticmapreduce_ExecutionRoleArn">
+                  elasticmapreduce:ExecutionRoleArn
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-AddTags" rowspan="5" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/APIReference/API_AddTags.html">
+                 AddTags
+                </a>
+               </td>
+               <td rowspan="5" tabindex="-1">
+                Grants permission to add tags to an Amazon EMR resource
+               </td>
+               <td rowspan="5" tabindex="-1">
+                Tagging
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-cluster">
+                  cluster
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-editor">
+                  editor
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-notebook-execution">
+                  notebook-execution
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-studio">
+                  studio
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticmapreduce-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticmapreduce-elasticmapreduce_RequestTag___TagKey_">
+                  elasticmapreduce:RequestTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-AttachEditor" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-managed-notebooks-working-with.html">
+                 AttachEditor
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to attach an EMR notebook to a compute engine
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-editor">
+                  editor*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-CancelSteps" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/APIReference/API_CancelSteps.html">
+                 CancelSteps
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to cancel a pending step or steps in a running cluster
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-cluster">
+                  cluster*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-CreateEditor" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-managed-notebooks-create.html">
+                 CreateEditor
+                </a>
+                [permission only]
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to create an EMR notebook
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-cluster">
+                  cluster
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticmapreduce-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticmapreduce-elasticmapreduce_RequestTag___TagKey_">
+                  elasticmapreduce:RequestTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-CreatePersistentAppUI" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-studio-debug.html">
+                 CreatePersistentAppUI
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a persistent application history server
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-cluster">
+                  cluster*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-CreateRepository" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-managed-notebooks.html#emr-managed-notebooks-editor">
+                 CreateRepository
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to create an EMR notebook repository
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-CreateSecurityConfiguration" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/APIReference/API_CreateSecurityConfiguration.html">
+                 CreateSecurityConfiguration
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a security configuration
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-CreateStudio" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-studio.html">
+                 CreateStudio
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create an EMR Studio
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticmapreduce-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticmapreduce-elasticmapreduce_RequestTag___TagKey_">
+                  elasticmapreduce:RequestTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-CreateStudioPresignedUrl" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-studio.html">
+                 CreateStudioPresignedUrl
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to launch an EMR Studio using IAM authentication mode
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-studio">
+                  studio*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-CreateStudioSessionMapping" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-studio.html">
+                 CreateStudioSessionMapping
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create an EMR Studio session mapping
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-studio">
+                  studio*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-DeleteEditor" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-managed-notebooks.html#emr-managed-notebooks-deleting">
+                 DeleteEditor
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete an EMR notebook
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-editor">
+                  editor*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-DeleteRepository" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-managed-notebooks.html#emr-managed-notebooks-editor">
+                 DeleteRepository
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete an EMR notebook repository
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-DeleteSecurityConfiguration" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/APIReference/API_DeleteSecurityConfiguration.html">
+                 DeleteSecurityConfiguration
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a security configuration
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-DeleteStudio" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-studio.html">
+                 DeleteStudio
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete an EMR Studio
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-studio">
+                  studio*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-DeleteStudioSessionMapping" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-studio.html">
+                 DeleteStudioSessionMapping
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete an EMR Studio session mapping
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-studio">
+                  studio*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-DeleteWorkspaceAccess" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-managed-notebooks-working-with.html">
+                 DeleteWorkspaceAccess
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to block an identity from opening a collaborative workspace
+               </td>
+               <td tabindex="-1">
+                Permissions management
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-editor">
+                  editor*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-DescribeCluster" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/APIReference/API_DescribeCluster.html">
+                 DescribeCluster
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get details about a cluster, including status, hardware and software configuration, VPC settings, and so on
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-cluster">
+                  cluster*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-DescribeEditor" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-managed-notebooks-working-with.html">
+                 DescribeEditor
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to view information about a notebook, including status, user, role, tags, location, and more
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-editor">
+                  editor*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-DescribeJobFlows" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/APIReference/API_DescribeJobFlows.html">
+                 DescribeJobFlows
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to describe details of clusters (job flows). This API is deprecated and will eventually be removed. We recommend you use ListClusters, DescribeCluster, ListSteps, ListInstanceGroups and ListBootstrapActions instead
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-cluster">
+                  cluster*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-DescribeNotebookExecution" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-managed-notebooks-headless.html">
+                 DescribeNotebookExecution
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to view information about a notebook execution
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-notebook-execution">
+                  notebook-execution*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-DescribePersistentAppUI" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-studio-debug.html">
+                 DescribePersistentAppUI
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to describe a persistent application history server
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-cluster">
+                  cluster*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-DescribeReleaseLabel" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/APIReference/API_DescribeReleaseLabel.html">
+                 DescribeReleaseLabel
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to view information about an EMR release, such as which applications are supported
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-DescribeRepository" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-managed-notebooks.html#emr-managed-notebooks-editor">
+                 DescribeRepository
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to describe an EMR notebook repository
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-DescribeSecurityConfiguration" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/APIReference/API_DescribeSecurityConfiguration.html">
+                 DescribeSecurityConfiguration
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get details of a security configuration
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-DescribeStep" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/APIReference/API_DescribeStep.html">
+                 DescribeStep
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get details about a cluster step
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-cluster">
+                  cluster*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-DescribeStudio" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-studio.html">
+                 DescribeStudio
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to view information about an EMR Studio
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-studio">
+                  studio*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-DetachEditor" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-managed-notebooks-working-with.html">
+                 DetachEditor
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to detach an EMR notebook from a compute engine
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-editor">
+                  editor*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-GetAutoTerminationPolicy" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/APIReference/API_GetAutoTerminationPolicy.html">
+                 GetAutoTerminationPolicy
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retrieve the auto-termination policy associated with a cluster
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-cluster">
+                  cluster*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-GetBlockPublicAccessConfiguration" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/APIReference/API_GetBlockPublicAccessConfiguration.html">
+                 GetBlockPublicAccessConfiguration
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retrieve the EMR block public access configuration for the AWS account in the Region
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-GetClusterSessionCredentials" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-steps-runtime-roles.html">
+                 GetClusterSessionCredentials
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to retrieve HTTP basic credentials associated with a given execution IAM Role for a fine-grained access control enabled EMR Cluster
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-cluster">
+                  cluster*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-elasticmapreduce_ExecutionRoleArn">
+                  elasticmapreduce:ExecutionRoleArn
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-GetManagedScalingPolicy" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/APIReference/API_GetManagedScalingPolicy.html">
+                 GetManagedScalingPolicy
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retrieve the managed scaling policy associated with a cluster
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-cluster">
+                  cluster*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-GetOnClusterAppUIPresignedURL" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-studio-debug.html">
+                 GetOnClusterAppUIPresignedURL
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get a presigned URL for an application history server running on the cluster
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-cluster">
+                  cluster*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-GetPersistentAppUIPresignedURL" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-studio-debug.html">
+                 GetPersistentAppUIPresignedURL
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get a presigned URL for a persistent application history server
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-cluster">
+                  cluster*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-GetStudioSessionMapping" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-studio.html">
+                 GetStudioSessionMapping
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to view information about an EMR Studio session mapping
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-studio">
+                  studio*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-LinkRepository" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-managed-notebooks.html#emr-managed-notebooks-editor">
+                 LinkRepository
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to link an EMR notebook repository to EMR notebooks
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-ListBootstrapActions" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/APIReference/API_ListBootstrapActions.html">
+                 ListBootstrapActions
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get details about the bootstrap actions associated with a cluster
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-cluster">
+                  cluster*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-ListClusters" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/APIReference/API_ListClusters.html">
+                 ListClusters
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get the status of accessible clusters
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-ListEditors" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-managed-notebooks-working-with.html">
+                 ListEditors
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to list summary information for accessible EMR notebooks
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-ListInstanceFleets" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/APIReference/API_ListInstanceFleets.html">
+                 ListInstanceFleets
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get details of instance fleets in a cluster
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-cluster">
+                  cluster*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-ListInstanceGroups" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/APIReference/API_ListInstanceGroups.html">
+                 ListInstanceGroups
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get details of instance groups in a cluster
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-cluster">
+                  cluster*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-ListInstances" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/APIReference/API_ListInstances.html">
+                 ListInstances
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get details about the Amazon EC2 instances in a cluster
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-cluster">
+                  cluster*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-ListNotebookExecutions" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-managed-notebooks-headless.html">
+                 ListNotebookExecutions
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list summary information for notebook executions
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-ListReleaseLabels" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/APIReference/API_ListReleaseLabels.html">
+                 ListReleaseLabels
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list and filter the available EMR releases in the current region
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-ListRepositories" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-managed-notebooks.html#emr-managed-notebooks-editor">
+                 ListRepositories
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to list existing EMR notebook repositories
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-ListSecurityConfigurations" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/APIReference/API_ListSecurityConfigurations.html">
+                 ListSecurityConfigurations
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list available security configurations in this account by name, along with creation dates and times
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-ListSteps" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/APIReference/API_ListSteps.html">
+                 ListSteps
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list steps associated with a cluster
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-cluster">
+                  cluster*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-ListStudioSessionMappings" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-studio.html">
+                 ListStudioSessionMappings
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list summary information about EMR Studio session mappings
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-ListStudios" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-studio.html">
+                 ListStudios
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list summary information about EMR Studios
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-ListSupportedInstanceTypes" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/APIReference/API_ListSupportedInstanceTypes.html">
+                 ListSupportedInstanceTypes
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list the Amazon EC2 instance types that an Amazon EMR release supports
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-ListWorkspaceAccessIdentities" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-managed-notebooks-working-with.html">
+                 ListWorkspaceAccessIdentities
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to list identities that are granted access to a workspace
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-editor">
+                  editor*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-ModifyCluster" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/APIReference/API_ModifyCluster.html">
+                 ModifyCluster
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to change cluster settings such as number of steps that can be executed concurrently for a cluster
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-cluster">
+                  cluster*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-ModifyInstanceFleet" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/APIReference/API_ModifyInstanceFleet.html">
+                 ModifyInstanceFleet
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to change the target On-Demand and target Spot capacities for a instance fleet
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-cluster">
+                  cluster*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-ModifyInstanceGroups" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/APIReference/API_ModifyInstanceGroups.html">
+                 ModifyInstanceGroups
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to change the number and configuration of EC2 instances for an instance group
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-cluster">
+                  cluster
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-OpenEditorInConsole" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-managed-notebooks.html#emr-managed-notebooks-editor">
+                 OpenEditorInConsole
+                </a>
+                [permission only]
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to launch the Jupyter notebook editor for an EMR notebook from within the console
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-editor">
+                  editor*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-cluster">
+                  cluster
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-PutAutoScalingPolicy" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/APIReference/API_PutAutoScalingPolicy.html">
+                 PutAutoScalingPolicy
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create or update an automatic scaling policy for a core instance group or task instance group
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-cluster">
+                  cluster*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-PutAutoTerminationPolicy" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/APIReference/API_PutAutoTerminationPolicy.html">
+                 PutAutoTerminationPolicy
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create or update the auto-termination policy associated with a cluster
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-cluster">
+                  cluster*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-PutBlockPublicAccessConfiguration" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/APIReference/API_PutBlockPublicAccessConfiguration.html">
+                 PutBlockPublicAccessConfiguration
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create or update the EMR block public access configuration for the AWS account in the Region
+               </td>
+               <td tabindex="-1">
+                Permissions management
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-PutManagedScalingPolicy" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/APIReference/API_PutManagedScalingPolicy.html">
+                 PutManagedScalingPolicy
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create or update the managed scaling policy associated with a cluster
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-cluster">
+                  cluster*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-PutWorkspaceAccess" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-managed-notebooks-working-with.html">
+                 PutWorkspaceAccess
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to allow an identity to open a collaborative workspace
+               </td>
+               <td tabindex="-1">
+                Permissions management
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-editor">
+                  editor*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-RemoveAutoScalingPolicy" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/APIReference/API_RemoveAutoScalingPolicy.html">
+                 RemoveAutoScalingPolicy
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to remove an automatic scaling policy from an instance group
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-cluster">
+                  cluster*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-RemoveAutoTerminationPolicy" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/APIReference/API_RemoveAutoTerminationPolicy.html">
+                 RemoveAutoTerminationPolicy
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to remove the auto-termination policy associated with a cluster
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-cluster">
+                  cluster*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-RemoveManagedScalingPolicy" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/APIReference/API_RemoveManagedScalingPolicy.html">
+                 RemoveManagedScalingPolicy
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to remove the managed scaling policy associated with a cluster
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-cluster">
+                  cluster*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-RemoveTags" rowspan="5" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/APIReference/API_RemoveTags.html">
+                 RemoveTags
+                </a>
+               </td>
+               <td rowspan="5" tabindex="-1">
+                Grants permission to remove tags from an Amazon EMR resource
+               </td>
+               <td rowspan="5" tabindex="-1">
+                Tagging
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-cluster">
+                  cluster
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-editor">
+                  editor
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-notebook-execution">
+                  notebook-execution
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-studio">
+                  studio
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-RunJobFlow" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/APIReference/API_RunJobFlow.html">
+                 RunJobFlow
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create and launch a cluster (job flow)
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticmapreduce-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticmapreduce-elasticmapreduce_RequestTag___TagKey_">
+                  elasticmapreduce:RequestTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 iam:PassRole
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-SetKeepJobFlowAliveWhenNoSteps" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/APIReference/API_SetKeepJobFlowAliveWhenNoSteps.html">
+                 SetKeepJobFlowAliveWhenNoSteps
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to add and remove auto terminate after step execution for a cluster
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-cluster">
+                  cluster*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-SetTerminationProtection" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/APIReference/API_SetTerminationProtection.html">
+                 SetTerminationProtection
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to add and remove termination protection for a cluster
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-cluster">
+                  cluster*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-SetUnhealthyNodeReplacement" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/APIReference/API_SetUnhealthyNodeReplacement.html">
+                 SetUnhealthyNodeReplacement
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to enable or disable unhealthy node replacement for a cluster
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-cluster">
+                  cluster*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-SetVisibleToAllUsers" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/APIReference/API_SetVisibleToAllUsers.html">
+                 SetVisibleToAllUsers
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to set whether all AWS Identity and Access Management (IAM) users in the AWS account can view a cluster. This API is deprecated and your cluster may be visible to all users in your account. To restrict cluster access using an IAM policy, see AWS Identity and Access Management for Amazon EMR (https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-plan-access-iam.html)
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-cluster">
+                  cluster*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-StartEditor" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-managed-notebooks-working-with.html">
+                 StartEditor
+                </a>
+                [permission only]
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to start an EMR notebook
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-editor">
+                  editor*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-cluster">
+                  cluster
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-StartNotebookExecution" rowspan="3" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-managed-notebooks-headless.html">
+                 StartNotebookExecution
+                </a>
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Grants permission to start an EMR notebook execution
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-cluster">
+                  cluster*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-editor">
+                  editor*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticmapreduce-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticmapreduce-elasticmapreduce_RequestTag___TagKey_">
+                  elasticmapreduce:RequestTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-StopEditor" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-managed-notebooks.html">
+                 StopEditor
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to shut down an EMR notebook
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-editor">
+                  editor*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-StopNotebookExecution" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-managed-notebooks-headless.html">
+                 StopNotebookExecution
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to stop notebook execution
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-notebook-execution">
+                  notebook-execution*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-TerminateJobFlows" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/APIReference/API_TerminateJobFlows.html">
+                 TerminateJobFlows
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to terminate a cluster (job flow)
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-cluster">
+                  cluster*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-UnlinkRepository" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-managed-notebooks.html#emr-managed-notebooks-editor">
+                 UnlinkRepository
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to unlink an EMR notebook repository from EMR notebooks
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-UpdateEditor" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-managed-notebooks-working-with.html">
+                 UpdateEditor
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to update an EMR notebook
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-editor">
+                  editor*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-UpdateRepository" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-managed-notebooks.html#emr-managed-notebooks-editor">
+                 UpdateRepository
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to update an EMR notebook repository
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-UpdateStudio" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-studio.html">
+                 UpdateStudio
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update information about an EMR Studio
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-studio">
+                  studio*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-UpdateStudioSessionMapping" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-studio.html">
+                 UpdateStudioSessionMapping
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update an EMR Studio session mapping
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-studio">
+                  studio*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-ViewEventsFromAllClustersInConsole" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonelasticmapreduce.html">
+                 ViewEventsFromAllClustersInConsole
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to use the EMR console to view events from all clusters
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <h2 id="amazonelasticmapreduce-resources-for-iam-policies">
+            Resource types defined by        Amazon Elastic MapReduce
+           </h2>
+           <p>
+            The following resource types are defined by this service and can be used in the
+            <code class="code">
+             Resource
+            </code>
+            element of IAM permission policy statements. Each action in the
+            <a href="#amazonelasticmapreduce-actions-as-permissions">
+             Actions table
+            </a>
+            identifies the      resource types that can be specified with that action. A resource type can also define which      condition keys you can include in a policy. These keys are displayed in the last column of the      Resource types table. For details about the columns in the following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#resources_table" rel="noopener noreferrer" target="_blank">
+             Resource types table
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9d594c13b5">
+              <thead>
+               <tr>
+                <th>
+                 Resource types
+                </th>
+                <th>
+                 ARN
+                </th>
+                <th>
+                 Condition keys
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="amazonelasticmapreduce-cluster" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-overview.html">
+                 cluster
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:elasticmapreduce:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:cluster/$
+                 <span>
+                  {
+                 </span>
+                 ClusterId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticmapreduce-elasticmapreduce_ResourceTag___TagKey_">
+                  elasticmapreduce:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-editor" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-managed-notebooks.html">
+                 editor
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:elasticmapreduce:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:editor/$
+                 <span>
+                  {
+                 </span>
+                 EditorId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticmapreduce-elasticmapreduce_ResourceTag___TagKey_">
+                  elasticmapreduce:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-notebook-execution" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-managed-notebooks-headless.html">
+                 notebook-execution
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:elasticmapreduce:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:notebook-execution/$
+                 <span>
+                  {
+                 </span>
+                 NotebookExecutionId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticmapreduce-elasticmapreduce_ResourceTag___TagKey_">
+                  elasticmapreduce:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-studio" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-studio.html">
+                 studio
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:elasticmapreduce:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:studio/$
+                 <span>
+                  {
+                 </span>
+                 StudioId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticmapreduce-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticmapreduce-elasticmapreduce_ResourceTag___TagKey_">
+                  elasticmapreduce:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <h2 id="amazonelasticmapreduce-policy-keys">
+            Condition keys for        Amazon Elastic MapReduce
+           </h2>
+           <p>
+            Amazon Elastic MapReduce defines the following condition keys that can be used in the
+            <code class="code">
+             Condition
+            </code>
+            element of an IAM policy. You can use these keys to further refine      the conditions under which the policy statement applies. For details about the columns in the      following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#context_keys_table" rel="noopener noreferrer" target="_blank">
+             Condition keys table
+            </a>
+            .
+           </p>
+           <p>
+            To view the global condition keys that are available to all services, see
+            <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#AvailableKeys">
+             Available global condition keys
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9d594c15b7">
+              <thead>
+               <tr>
+                <th>
+                 Condition keys
+                </th>
+                <th>
+                 Description
+                </th>
+                <th>
+                 Type
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="amazonelasticmapreduce-aws_RequestTag___TagKey_" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-plan-access-iam.html#emr-fine-grained-cluster-access">
+                 aws:RequestTag/${TagKey}
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by whether the tag and value pair is provided with the action
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-aws_ResourceTag___TagKey_" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-plan-access-iam.html#emr-fine-grained-cluster-access">
+                 aws:ResourceTag/${TagKey}
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the tag and value pair associated with an Amazon EMR resource
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-aws_TagKeys" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-plan-access-iam.html#emr-fine-grained-cluster-access">
+                 aws:TagKeys
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by whether the tag keys are provided with the action regardless of tag value
+               </td>
+               <td tabindex="-1">
+                ArrayOfString
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-elasticmapreduce_ExecutionRoleArn" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-plan-access-iam.html#emr-security">
+                 elasticmapreduce:ExecutionRoleArn
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by whether the execution role ARN is provided with the action
+               </td>
+               <td tabindex="-1">
+                ARN
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-elasticmapreduce_RequestTag___TagKey_" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-plan-access-iam.html#emr-fine-grained-cluster-access">
+                 elasticmapreduce:RequestTag/${TagKey}
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by whether the tag and value pair is provided with the action
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticmapreduce-elasticmapreduce_ResourceTag___TagKey_" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-plan-access-iam.html#emr-fine-grained-cluster-access">
+                 elasticmapreduce:ResourceTag/${TagKey}
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the tag and value pair associated with an Amazon EMR resource
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <awsdocs-copyright class="copyright-print">
+           </awsdocs-copyright>
+           <awsdocs-thumb-feedback right-edge="{{$ctrl.thumbFeedbackRightEdge}}">
+           </awsdocs-thumb-feedback>
+          </div>
+          <noscript>
+           <div>
+            <div>
+             <div>
+              <div id="js_error_message">
+               <p>
+                <img alt="Warning" src="https://d1ge0kk1l5kms0.cloudfront.net/images/G/01/webservices/console/warning.png"/>
+                <strong>
+                 Javascript is disabled or is unavailable in your browser.
+                </strong>
+               </p>
+               <p>
+                To use the Amazon Web Services Documentation, Javascript must be enabled. Please refer to your browser's Help pages for instructions.
+               </p>
+              </div>
+             </div>
+            </div>
+           </div>
+          </noscript>
+          <div class="awsui-util-font-size-0" id="main-col-footer">
+           <div id="doc-conventions">
+            <a href="/general/latest/gr/docconventions.html" target="_top">
+             Document Conventions
+            </a>
+           </div>
+           <div class="prev-next">
+            <div accesskey="p" class="prev-link" href="./list_awselasticloadbalancingv2.html" id="previous">
+             AWS Elastic Load Balancing V2
+            </div>
+            <div accesskey="n" class="next-link" href="./list_amazonelastictranscoder.html" id="next">
+             Amazon Elastic Transcoder
+            </div>
+           </div>
+          </div>
+          <awsdocs-page-utilities>
+          </awsdocs-page-utilities>
+         </div>
+         <div id="quick-feedback-yes" style="display: none;">
+          <div class="title">
+           Did this page help you? - Yes
+          </div>
+          <div class="content">
+           <p>
+            Thanks for letting us know we're doing a good job!
+           </p>
+           <p>
+            If you've got a moment, please tell us what we did right so we can do more of it.
+           </p>
+           <p>
+            <awsui-button click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service Authorization Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazonelasticmapreduce.html" id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback">
+            </awsui-button>
+           </p>
+          </div>
+         </div>
+         <div id="quick-feedback-no" style="display: none;">
+          <div class="title">
+           Did this page help you? - No
+          </div>
+          <div class="content">
+           <p>
+            Thanks for letting us know this page needs work. We're sorry we let you down.
+           </p>
+           <p>
+            If you've got a moment, please tell us how we can make the documentation better.
+           </p>
+           <p>
+            <awsui-button click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service Authorization Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazonelasticmapreduce.html" id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback">
+            </awsui-button>
+           </p>
+          </div>
+         </div>
+        </div>
+       </body>
+      </div>
+     </awsdocs-view>
+     <div class="page-loading-indicator" id="page-loading-indicator">
+      <awsui-spinner size="large">
+      </awsui-spinner>
+     </div>
+    </div>
+    <div dom-region="tools" id="tools-panel">
+     <awsdocs-tools-panel id="awsdocs-tools-panel">
+     </awsdocs-tools-panel>
+    </div>
+   </awsui-app-layout>
+   <awsdocs-cookie-banner class="doc-cookie-banner">
+   </awsdocs-cookie-banner>
+  </div>
+ </body>
+</html>

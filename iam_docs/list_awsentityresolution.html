@@ -1,0 +1,1764 @@
+<!DOCTYPE html>
+<html lang="en-US" xmlns="http://www.w3.org/1999/xhtml">
+ <head>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+  <title>
+   Actions, resources, and condition keys for AWS Entity Resolution - Service Authorization Reference
+  </title>
+  <meta content="width=device-width,initial-scale=1" name="viewport"/>
+  <meta content="/assets" name="assets_root"/>
+  <meta content="list_awsentityresolution" name="target_state"/>
+  <meta content="list_awsentityresolution" name="default_state"/>
+  <link href="https://docs.aws.amazon.com/assets/images/favicon.ico" rel="icon" type="image/ico"/>
+  <link href="https://docs.aws.amazon.com/assets/images/favicon.ico" rel="shortcut icon" type="image/ico"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsentityresolution.html" rel="canonical"/>
+  <meta content="Lists all of the available service-specific resources, actions, and condition keys that can be used in IAM policies to control access to AWS Entity Resolution." name="description"/>
+  <meta content="IAD" name="deployment_region"/>
+  <meta content="Service Authorization Reference" name="product"/>
+  <meta content="Service Authorization Reference" name="guide"/>
+  <meta content="Provides a list of the actions, resources, and condition keys supported by each AWS service that can be used in an IAM policy." name="abstract"/>
+  <meta content="en_us" name="guide-locale"/>
+  <meta content="toc-contents.json" name="tocs"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsentityresolution.html" rel="canonical"/>
+  <link href="https://docs.aws.amazon.com/id_id/service-authorization/latest/reference/list_awsentityresolution.html" hreflang="id-id" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/id_id/service-authorization/latest/reference/list_awsentityresolution.html" hreflang="id" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/de_de/service-authorization/latest/reference/list_awsentityresolution.html" hreflang="de-de" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/de_de/service-authorization/latest/reference/list_awsentityresolution.html" hreflang="de" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsentityresolution.html" hreflang="en-us" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsentityresolution.html" hreflang="en" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/es_es/service-authorization/latest/reference/list_awsentityresolution.html" hreflang="es-es" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/es_es/service-authorization/latest/reference/list_awsentityresolution.html" hreflang="es" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/fr_fr/service-authorization/latest/reference/list_awsentityresolution.html" hreflang="fr-fr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/fr_fr/service-authorization/latest/reference/list_awsentityresolution.html" hreflang="fr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/it_it/service-authorization/latest/reference/list_awsentityresolution.html" hreflang="it-it" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/it_it/service-authorization/latest/reference/list_awsentityresolution.html" hreflang="it" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ja_jp/service-authorization/latest/reference/list_awsentityresolution.html" hreflang="ja-jp" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ja_jp/service-authorization/latest/reference/list_awsentityresolution.html" hreflang="ja" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ko_kr/service-authorization/latest/reference/list_awsentityresolution.html" hreflang="ko-kr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ko_kr/service-authorization/latest/reference/list_awsentityresolution.html" hreflang="ko" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/pt_br/service-authorization/latest/reference/list_awsentityresolution.html" hreflang="pt-br" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/pt_br/service-authorization/latest/reference/list_awsentityresolution.html" hreflang="pt" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/zh_cn/service-authorization/latest/reference/list_awsentityresolution.html" hreflang="zh-cn" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/zh_tw/service-authorization/latest/reference/list_awsentityresolution.html" hreflang="zh-tw" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsentityresolution.html" hreflang="x-default" rel="alternative"/>
+  <meta content="Service Authorization Docs" name="feedback-item"/>
+  <meta content="Service Authorization Reference" name="this_doc_product"/>
+  <meta content="Service Authorization Reference" name="this_doc_guide"/>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor4.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor3.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor1.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/awsdocs-common.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/awsdocs-doc-page.js?version=2021.12.02">
+  </script>
+  <link href="https://docs.aws.amazon.com/assets/r/vendor4.css?version=2021.12.02" rel="stylesheet"/>
+  <link href="https://docs.aws.amazon.com/assets/r/awsdocs-common.css?version=2021.12.02" rel="stylesheet"/>
+  <link href="https://docs.aws.amazon.com/assets/r/awsdocs-doc-page.css?version=2021.12.02" rel="stylesheet"/>
+  <script async="" data-config="{'appEntity':'aws-documentation','region':'us-east-1','service':'iam'}" id="awsc-panorama-bundle" src="https://prod.pa.cdn.uis.awsstatic.com/panorama-nav-init.js" type="text/javascript">
+  </script>
+  <meta id="panorama-serviceSubSection" value="Service Authorization Reference"/>
+  <meta id="panorama-serviceConsolePage" value="Actions, resources, and condition keys for AWS Entity Resolution"/>
+ </head>
+ <body class="awsdocs awsui">
+  <div class="awsdocs-container">
+   <awsdocs-header>
+   </awsdocs-header>
+   <awsui-app-layout class="awsui-util-no-gutters" header-selector="awsdocs-header" id="app-layout" navigation-change="$ctrl.onNavChange($event)" navigation-hide="false" navigation-open="$ctrl.navOpen" navigation-width="$ctrl.navWidth" ng-controller="ContentController as $ctrl" tools-change="$ctrl.onToolsChange($event)" tools-hide="$ctrl.hideTools" tools-open="$ctrl.toolsOpen" tools-width="$ctrl.toolsWidth">
+    <div dom-region="navigation" id="guide-toc">
+     <awsdocs-toc>
+     </awsdocs-toc>
+    </div>
+    <div dom-region="content" id="main-column" tabindex="-1">
+     <awsdocs-view class="awsdocs-view">
+      <div id="awsdocs-content">
+       <head>
+        <title>
+         Actions, resources, and condition keys for AWS Entity Resolution - Service Authorization Reference
+        </title>
+        <meta content="/pdfs/service-authorization/latest/reference/service-authorization.pdf#list_awsentityresolution" name="pdf"/>
+        <meta content="https://repost.aws/tags/TAO7Z4bI5hQVWMiYFs34QhIA" name="forums"/>
+        <meta content="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service%20Authorization%20Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awsentityresolution.html" name="feedback"/>
+        <meta content="feedbackyes.html?topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awsentityresolution.html" name="feedback-yes"/>
+        <meta content="feedbackno.html?topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awsentityresolution.html" name="feedback-no"/>
+        <script type="application/ld+json">
+         {
+    "@context" : "https://schema.org",
+    "@type" : "BreadcrumbList",
+    "itemListElement" : [
+      {
+        "@type" : "ListItem",
+        "position" : 1,
+        "name" : "AWS",
+        "item" : "https://aws.amazon.com"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 2,
+        "name" : "Service Authorization Reference",
+        "item" : "https://docs.aws.amazon.com/iam/index.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 3,
+        "name" : "Service Authorization Reference",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 4,
+        "name" : "Reference",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 5,
+        "name" : "Actions, resources, and condition keys for AWS services",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference_policies_actions-resources-contextkeys.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 6,
+        "name" : "Actions, resources, and condition keys for AWS Entity Resolution",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference_policies_actions-resources-contextkeys.html"
+      }
+    ]
+}
+        </script>
+       </head>
+       <body>
+        <div id="main">
+         <div style="display: none">
+          <a href="/pdfs/service-authorization/latest/reference/service-authorization.pdf#list_awsentityresolution" rel="noopener noreferrer" target="_blank" title="Open PDF">
+          </a>
+         </div>
+         <div class="breadcrumb" id="breadcrumbs">
+          <a href="https://aws.amazon.com">
+           AWS
+          </a>
+          <a href="/index.html">
+           Documentation
+          </a>
+          <a href="/iam/index.html">
+           Service Authorization Reference
+          </a>
+          <a href="reference.html">
+           Service Authorization Reference
+          </a>
+         </div>
+         <div id="page-toc-src">
+          <a href="#awsentityresolution-actions-as-permissions">
+           Actions
+          </a>
+          <a href="#awsentityresolution-resources-for-iam-policies">
+           Resource types
+          </a>
+          <a href="#awsentityresolution-policy-keys">
+           Condition keys
+          </a>
+         </div>
+         <div class="awsui-util-container" id="main-content">
+          <div id="main-col-body">
+           <awsdocs-language-banner data-service="$ctrl.pageService">
+           </awsdocs-language-banner>
+           <h1 class="topictitle" id="list_awsentityresolution">
+            Actions, resources, and condition keys for      AWS Entity Resolution
+           </h1>
+           <div class="awsdocs-page-header-container">
+            <awsdocs-page-header>
+            </awsdocs-page-header>
+            <awsdocs-filter-selector id="awsdocs-filter-selector">
+            </awsdocs-filter-selector>
+           </div>
+           <p>
+            AWS Entity Resolution (service prefix:
+            <code class="code">
+             entityresolution
+            </code>
+            ) provides the following    service-specific resources, actions, and condition context keys for use in IAM permission    policies.
+           </p>
+           <p>
+            References:
+           </p>
+           <div class="itemizedlist">
+            <ul class="itemizedlist">
+             <li class="listitem">
+              <p>
+               Learn how to
+               <a href="https://docs.aws.amazon.com/entityresolution/latest/userguide/">
+                configure this service
+               </a>
+               .
+              </p>
+             </li>
+             <li class="listitem">
+              <p>
+               View a list of the
+               <a href="https://docs.aws.amazon.com/entityresolution/latest/apireference/">
+                API operations available for this          service
+               </a>
+               .
+              </p>
+             </li>
+             <li class="listitem">
+              <p>
+               Learn how to secure this service and its resources by
+               <a href="https://docs.aws.amazon.com/entityresolution/latest/userguide/what-is-service.html">
+                using          IAM
+               </a>
+               permission policies.
+              </p>
+             </li>
+            </ul>
+           </div>
+           <div class="highlights" id="inline-topiclist">
+            <h6>
+             Topics
+            </h6>
+            <ul>
+             <li>
+              <a href="#awsentityresolution-actions-as-permissions">
+               Actions defined by        AWS Entity Resolution
+              </a>
+             </li>
+             <li>
+              <a href="#awsentityresolution-resources-for-iam-policies">
+               Resource types defined by        AWS Entity Resolution
+              </a>
+             </li>
+             <li>
+              <a href="#awsentityresolution-policy-keys">
+               Condition keys for        AWS Entity Resolution
+              </a>
+             </li>
+            </ul>
+           </div>
+           <h2 id="awsentityresolution-actions-as-permissions">
+            Actions defined by        AWS Entity Resolution
+           </h2>
+           <p>
+            You can specify the following actions in the
+            <code class="code">
+             Action
+            </code>
+            element of an IAM      policy statement. Use policies to grant permissions to perform an operation in AWS. When you      use an action in a policy, you usually allow or deny access to the API operation or CLI      command with the same name. However, in some cases, a single action controls access to more      than one operation. Alternatively, some operations require several different actions.
+           </p>
+           <p>
+            The
+            <b>
+             Resource types
+            </b>
+            column of the Actions table indicates whether each      action supports resource-level permissions. If there is no value for this column, you must      specify all resources ("*") to which the policy applies in the
+            <code class="code">
+             Resource
+            </code>
+            element      of your policy statement. If the column includes a resource type, then you can specify an ARN      of that type in a statement with that action. If the action has one or more required      resources, the caller must have permission to use the action with those resources. Required      resources are indicated in the table with an asterisk (*). If you limit resource access with      the
+            <code class="code">
+             Resource
+            </code>
+            element in an IAM policy, you must include an ARN or pattern for      each required resource type. Some actions support multiple resource types. If the resource      type is optional (not indicated as required), then you can choose to use one of the optional      resource types.
+           </p>
+           <p>
+            The
+            <b>
+             Condition keys
+            </b>
+            column of the Actions table includes keys that you      can specify in a policy statement's
+            <code class="code">
+             Condition
+            </code>
+            element. For more information on      the condition keys that are associated with resources for the service, see the
+            <b>
+             Condition keys
+            </b>
+            column of the Resource types table.
+           </p>
+           <div class="awsdocs-note">
+            <div class="awsdocs-note-title">
+             <awsui-icon name="status-info" variant="link">
+             </awsui-icon>
+             <h6>
+              Note
+             </h6>
+            </div>
+            <div class="awsdocs-note-text">
+             <p>
+              Resource condition keys are listed in the
+              <a href="#awsentityresolution-resources-for-iam-policies">
+               Resource types
+              </a>
+              table. You        can find a link to the resource type that applies to an action in the
+              <b>
+               Resource          types (*required)
+              </b>
+              column of the Actions table. The resource type in the        Resource types table includes the
+              <b>
+               Condition keys
+              </b>
+              column, which are the        resource condition keys that apply to an action in the Actions table.
+             </p>
+            </div>
+           </div>
+           <p>
+            For details about the columns in the following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#actions_table" rel="noopener noreferrer" target="_blank">
+             Actions table
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9d662c11c13">
+              <thead>
+               <tr>
+                <th>
+                 Actions
+                </th>
+                <th>
+                 Description
+                </th>
+                <th>
+                 Access level
+                </th>
+                <th>
+                 Resource types (*required)
+                </th>
+                <th>
+                 Condition keys
+                </th>
+                <th>
+                 Dependent actions
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="awsentityresolution-AddPolicyStatement" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/entityresolution/latest/apireference/API_AddPolicyStatement.html">
+                 AddPolicyStatement
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to give an AWS service or another account permission to use an AWS Entity Resolution resources
+               </td>
+               <td tabindex="-1">
+                Permissions management
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsentityresolution-BatchDeleteUniqueId" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/entityresolution/latest/apireference/API_BatchDeleteUniqueId.html">
+                 BatchDeleteUniqueId
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to batch delete unique Id
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsentityresolution-MatchingWorkflow">
+                  MatchingWorkflow*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsentityresolution-CreateIdMappingWorkflow" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/entityresolution/latest/apireference/API_CreateIdMappingWorkflow.html">
+                 CreateIdMappingWorkflow
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a idmapping workflow
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsentityresolution-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsentityresolution-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsentityresolution-CreateIdNamespace" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/entityresolution/latest/apireference/API_CreateIdNamespace.html">
+                 CreateIdNamespace
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a IdNamespace
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsentityresolution-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsentityresolution-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsentityresolution-CreateMatchingWorkflow" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/entityresolution/latest/apireference/API_CreateMatchingWorkflow.html">
+                 CreateMatchingWorkflow
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a matching workflow
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsentityresolution-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsentityresolution-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsentityresolution-CreateSchemaMapping" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/entityresolution/latest/apireference/API_CreateSchemaMapping.html">
+                 CreateSchemaMapping
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a schema mapping
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsentityresolution-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsentityresolution-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsentityresolution-DeleteIdMappingWorkflow" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/entityresolution/latest/apireference/API_DeleteIdMappingWorkflow.html">
+                 DeleteIdMappingWorkflow
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a idmapping workflow
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsentityresolution-IdMappingWorkflow">
+                  IdMappingWorkflow*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsentityresolution-DeleteIdNamespace" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/entityresolution/latest/apireference/API_DeleteIdNamespace.html">
+                 DeleteIdNamespace
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a IdNamespace
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsentityresolution-IdNamespace">
+                  IdNamespace*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsentityresolution-DeleteMatchingWorkflow" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/entityresolution/latest/apireference/API_DeleteMatchingWorkflow.html">
+                 DeleteMatchingWorkflow
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a matching workflow
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsentityresolution-MatchingWorkflow">
+                  MatchingWorkflow*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsentityresolution-DeletePolicyStatement" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/entityresolution/latest/apireference/API_DeletePolicyStatement.html">
+                 DeletePolicyStatement
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete permission given to an AWS service or another account permission to use an AWS Entity Resolution resources
+               </td>
+               <td tabindex="-1">
+                Permissions management
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsentityresolution-DeleteSchemaMapping" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/entityresolution/latest/apireference/API_DeleteSchemaMapping.html">
+                 DeleteSchemaMapping
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a schema mapping
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsentityresolution-SchemaMapping">
+                  SchemaMapping*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsentityresolution-GetIdMappingJob" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/entityresolution/latest/apireference/API_GetIdMappingJob.html">
+                 GetIdMappingJob
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get a idmapping job
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsentityresolution-IdMappingWorkflow">
+                  IdMappingWorkflow*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsentityresolution-GetIdMappingWorkflow" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/entityresolution/latest/apireference/API_GetIdMappingWorkflow.html">
+                 GetIdMappingWorkflow
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get a idmapping workflow
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsentityresolution-IdMappingWorkflow">
+                  IdMappingWorkflow*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsentityresolution-GetIdNamespace" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/entityresolution/latest/apireference/API_GetIdNamespace.html">
+                 GetIdNamespace
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get a IdNamespace
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsentityresolution-IdNamespace">
+                  IdNamespace*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsentityresolution-GetMatchId" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/entityresolution/latest/apireference/API_GetMatchId.html">
+                 GetMatchId
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get match Id
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsentityresolution-MatchingWorkflow">
+                  MatchingWorkflow*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsentityresolution-GetMatchingJob" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/entityresolution/latest/apireference/API_GetMatchingJob.html">
+                 GetMatchingJob
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get a matching job
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsentityresolution-MatchingWorkflow">
+                  MatchingWorkflow*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsentityresolution-GetMatchingWorkflow" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/entityresolution/latest/apireference/API_GetMatchingWorkflow.html">
+                 GetMatchingWorkflow
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get a matching workflow
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsentityresolution-MatchingWorkflow">
+                  MatchingWorkflow*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsentityresolution-GetPolicy" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/entityresolution/latest/apireference/API_GetPolicy.html">
+                 GetPolicy
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get a resource policy for an AWS Entity Resolution resources
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsentityresolution-GetProviderService" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/entityresolution/latest/apireference/API_GetProviderService.html">
+                 GetProviderService
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get provider service
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsentityresolution-ProviderService">
+                  ProviderService*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsentityresolution-GetSchemaMapping" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/entityresolution/latest/apireference/API_GetSchemaMapping.html">
+                 GetSchemaMapping
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get a schema mapping
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsentityresolution-SchemaMapping">
+                  SchemaMapping*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsentityresolution-ListIdMappingJobs" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/entityresolution/latest/apireference/API_ListIdMappingJobs.html">
+                 ListIdMappingJobs
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list idmapping jobs
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsentityresolution-IdMappingWorkflow">
+                  IdMappingWorkflow*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsentityresolution-ListIdMappingWorkflows" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/entityresolution/latest/apireference/API_ListIdMappingWorkflows.html">
+                 ListIdMappingWorkflows
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list idmapping workflows
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsentityresolution-ListIdNamespaces" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/entityresolution/latest/apireference/API_ListIdNamespaces.html">
+                 ListIdNamespaces
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list IdNamespaces
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsentityresolution-ListMatchingJobs" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/entityresolution/latest/apireference/API_ListMatchingJobs.html">
+                 ListMatchingJobs
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list matching jobs
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsentityresolution-MatchingWorkflow">
+                  MatchingWorkflow*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsentityresolution-ListMatchingWorkflows" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/entityresolution/latest/apireference/API_ListMatchingWorkflows.html">
+                 ListMatchingWorkflows
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list matching workflows
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsentityresolution-ListProviderServices" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/entityresolution/latest/apireference/API_ListProviderServices.html">
+                 ListProviderServices
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list provider service
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsentityresolution-ProviderService">
+                  ProviderService*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsentityresolution-ListSchemaMappings" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/entityresolution/latest/apireference/API_ListSchemaMappings.html">
+                 ListSchemaMappings
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list schema mappings
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsentityresolution-ListTagsForResource" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/entityresolution/latest/apireference/API_ListTagsForResource.html">
+                 ListTagsForResource
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to List tags for a resource
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsentityresolution-PutPolicy" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/entityresolution/latest/apireference/API_PutPolicy.html">
+                 PutPolicy
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to put a resource policy for an AWS Entity Resolution resources
+               </td>
+               <td tabindex="-1">
+                Permissions management
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsentityresolution-StartIdMappingJob" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/entityresolution/latest/apireference/API_StartIdMappingJob.html">
+                 StartIdMappingJob
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to start a idmapping job
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsentityresolution-IdMappingWorkflow">
+                  IdMappingWorkflow*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsentityresolution-StartMatchingJob" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/entityresolution/latest/apireference/API_StartMatchingJob.html">
+                 StartMatchingJob
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to start a matching job
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsentityresolution-MatchingWorkflow">
+                  MatchingWorkflow*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsentityresolution-TagResource" rowspan="6" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/entityresolution/latest/apireference/API_TagResource.html">
+                 TagResource
+                </a>
+               </td>
+               <td rowspan="6" tabindex="-1">
+                Grants permission to adds tags to a resource
+               </td>
+               <td rowspan="6" tabindex="-1">
+                Tagging
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsentityresolution-IdMappingWorkflow">
+                  IdMappingWorkflow
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsentityresolution-IdNamespace">
+                  IdNamespace
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsentityresolution-MatchingWorkflow">
+                  MatchingWorkflow
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsentityresolution-ProviderService">
+                  ProviderService
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsentityresolution-SchemaMapping">
+                  SchemaMapping
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsentityresolution-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsentityresolution-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsentityresolution-UntagResource" rowspan="6" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/entityresolution/latest/apireference/API_UntagResource.html">
+                 UntagResource
+                </a>
+               </td>
+               <td rowspan="6" tabindex="-1">
+                Grants permission to untag a resource
+               </td>
+               <td rowspan="6" tabindex="-1">
+                Tagging
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsentityresolution-IdMappingWorkflow">
+                  IdMappingWorkflow
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsentityresolution-IdNamespace">
+                  IdNamespace
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsentityresolution-MatchingWorkflow">
+                  MatchingWorkflow
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsentityresolution-ProviderService">
+                  ProviderService
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsentityresolution-SchemaMapping">
+                  SchemaMapping
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsentityresolution-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsentityresolution-UpdateIdMappingWorkflow" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/entityresolution/latest/apireference/API_UpdateIdMappingWorkflow.html">
+                 UpdateIdMappingWorkflow
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update a idmapping workflow
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsentityresolution-IdMappingWorkflow">
+                  IdMappingWorkflow*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsentityresolution-UpdateIdNamespace" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/entityresolution/latest/apireference/API_UpdateIdNamespace.html">
+                 UpdateIdNamespace
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update a IdNamespace
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsentityresolution-IdNamespace">
+                  IdNamespace*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsentityresolution-UpdateMatchingWorkflow" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/entityresolution/latest/apireference/API_UpdateMatchingWorkflow.html">
+                 UpdateMatchingWorkflow
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update a matching workflow
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsentityresolution-MatchingWorkflow">
+                  MatchingWorkflow*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsentityresolution-UpdateSchemaMapping" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/entityresolution/latest/apireference/API_UpdateSchemaMapping.html">
+                 UpdateSchemaMapping
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update a schema mapping
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsentityresolution-SchemaMapping">
+                  SchemaMapping*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsentityresolution-UseIdNamespace" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/entityresolution/latest/apireference/API_UseIdNamespace.html">
+                 UseIdNamespace
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to give an AWS service or another account permission to use IdNamespace within a workflow
+               </td>
+               <td tabindex="-1">
+                Permissions management
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsentityresolution-UseWorkflow" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/entityresolution/latest/apireference/API_UseWorkflow.html">
+                 UseWorkflow
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to give an AWS service or another account permission to use workflow within a IdNamespace
+               </td>
+               <td tabindex="-1">
+                Permissions management
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <h2 id="awsentityresolution-resources-for-iam-policies">
+            Resource types defined by        AWS Entity Resolution
+           </h2>
+           <p>
+            The following resource types are defined by this service and can be used in the
+            <code class="code">
+             Resource
+            </code>
+            element of IAM permission policy statements. Each action in the
+            <a href="#awsentityresolution-actions-as-permissions">
+             Actions table
+            </a>
+            identifies the      resource types that can be specified with that action. A resource type can also define which      condition keys you can include in a policy. These keys are displayed in the last column of the      Resource types table. For details about the columns in the following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#resources_table" rel="noopener noreferrer" target="_blank">
+             Resource types table
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9d662c13b5">
+              <thead>
+               <tr>
+                <th>
+                 Resource types
+                </th>
+                <th>
+                 ARN
+                </th>
+                <th>
+                 Condition keys
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="awsentityresolution-MatchingWorkflow" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/entityresolution/latest/userguide/">
+                 MatchingWorkflow
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:entityresolution:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:matchingworkflow/$
+                 <span>
+                  {
+                 </span>
+                 WorkflowName}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsentityresolution-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsentityresolution-SchemaMapping" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/entityresolution/latest/userguide/">
+                 SchemaMapping
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:entityresolution:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:schemamapping/$
+                 <span>
+                  {
+                 </span>
+                 SchemaName}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsentityresolution-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsentityresolution-IdMappingWorkflow" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/entityresolution/latest/userguide/">
+                 IdMappingWorkflow
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:entityresolution:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:idmappingworkflow/$
+                 <span>
+                  {
+                 </span>
+                 WorkflowName}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsentityresolution-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsentityresolution-ProviderService" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/entityresolution/latest/userguide/">
+                 ProviderService
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:entityresolution:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:providerservice/$
+                 <span>
+                  {
+                 </span>
+                 ProviderName}/$
+                 <span>
+                  {
+                 </span>
+                 ProviderServiceName}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsentityresolution-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsentityresolution-IdNamespace" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/entityresolution/latest/userguide/">
+                 IdNamespace
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:entityresolution:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:idnamespace/$
+                 <span>
+                  {
+                 </span>
+                 IdNamespaceName}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsentityresolution-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <h2 id="awsentityresolution-policy-keys">
+            Condition keys for        AWS Entity Resolution
+           </h2>
+           <p>
+            AWS Entity Resolution defines the following condition keys that can be used in the
+            <code class="code">
+             Condition
+            </code>
+            element of an IAM policy. You can use these keys to further refine      the conditions under which the policy statement applies. For details about the columns in the      following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#context_keys_table" rel="noopener noreferrer" target="_blank">
+             Condition keys table
+            </a>
+            .
+           </p>
+           <p>
+            To view the global condition keys that are available to all services, see
+            <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#AvailableKeys">
+             Available global condition keys
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9d662c15b7">
+              <thead>
+               <tr>
+                <th>
+                 Condition keys
+                </th>
+                <th>
+                 Description
+                </th>
+                <th>
+                 Type
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="awsentityresolution-aws_RequestTag___TagKey_" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_iam-permissions.html#iam-contextkeys">
+                 aws:RequestTag/${TagKey}
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by a key that is present in the request the user makes to the entity resolution service
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awsentityresolution-aws_ResourceTag___TagKey_" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_iam-permissions.html#iam-contextkeys">
+                 aws:ResourceTag/${TagKey}
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by a tag key and value pair
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awsentityresolution-aws_TagKeys" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_iam-permissions.html#iam-contextkeys">
+                 aws:TagKeys
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the list of all the tag key names present in the request the user makes to the entity resolution service
+               </td>
+               <td tabindex="-1">
+                ArrayOfString
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <awsdocs-copyright class="copyright-print">
+           </awsdocs-copyright>
+           <awsdocs-thumb-feedback right-edge="{{$ctrl.thumbFeedbackRightEdge}}">
+           </awsdocs-thumb-feedback>
+          </div>
+          <noscript>
+           <div>
+            <div>
+             <div>
+              <div id="js_error_message">
+               <p>
+                <img alt="Warning" src="https://d1ge0kk1l5kms0.cloudfront.net/images/G/01/webservices/console/warning.png"/>
+                <strong>
+                 Javascript is disabled or is unavailable in your browser.
+                </strong>
+               </p>
+               <p>
+                To use the Amazon Web Services Documentation, Javascript must be enabled. Please refer to your browser's Help pages for instructions.
+               </p>
+              </div>
+             </div>
+            </div>
+           </div>
+          </noscript>
+          <div class="awsui-util-font-size-0" id="main-col-footer">
+           <div id="doc-conventions">
+            <a href="/general/latest/gr/docconventions.html" target="_top">
+             Document Conventions
+            </a>
+           </div>
+           <div class="prev-next">
+            <div accesskey="p" class="prev-link" href="./list_amazonemrserverless.html" id="previous">
+             Amazon EMR Serverless
+            </div>
+            <div accesskey="n" class="next-link" href="./list_amazoneventbridge.html" id="next">
+             Amazon EventBridge
+            </div>
+           </div>
+          </div>
+          <awsdocs-page-utilities>
+          </awsdocs-page-utilities>
+         </div>
+         <div id="quick-feedback-yes" style="display: none;">
+          <div class="title">
+           Did this page help you? - Yes
+          </div>
+          <div class="content">
+           <p>
+            Thanks for letting us know we're doing a good job!
+           </p>
+           <p>
+            If you've got a moment, please tell us what we did right so we can do more of it.
+           </p>
+           <p>
+            <awsui-button click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service Authorization Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awsentityresolution.html" id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback">
+            </awsui-button>
+           </p>
+          </div>
+         </div>
+         <div id="quick-feedback-no" style="display: none;">
+          <div class="title">
+           Did this page help you? - No
+          </div>
+          <div class="content">
+           <p>
+            Thanks for letting us know this page needs work. We're sorry we let you down.
+           </p>
+           <p>
+            If you've got a moment, please tell us how we can make the documentation better.
+           </p>
+           <p>
+            <awsui-button click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service Authorization Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awsentityresolution.html" id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback">
+            </awsui-button>
+           </p>
+          </div>
+         </div>
+        </div>
+       </body>
+      </div>
+     </awsdocs-view>
+     <div class="page-loading-indicator" id="page-loading-indicator">
+      <awsui-spinner size="large">
+      </awsui-spinner>
+     </div>
+    </div>
+    <div dom-region="tools" id="tools-panel">
+     <awsdocs-tools-panel id="awsdocs-tools-panel">
+     </awsdocs-tools-panel>
+    </div>
+   </awsui-app-layout>
+   <awsdocs-cookie-banner class="doc-cookie-banner">
+   </awsdocs-cookie-banner>
+  </div>
+ </body>
+</html>

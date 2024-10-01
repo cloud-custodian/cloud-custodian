@@ -1,0 +1,4021 @@
+<!DOCTYPE html>
+<html lang="en-US" xmlns="http://www.w3.org/1999/xhtml">
+ <head>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+  <title>
+   Actions, resources, and condition keys for AWS Clean Rooms - Service Authorization Reference
+  </title>
+  <meta content="width=device-width,initial-scale=1" name="viewport"/>
+  <meta content="/assets" name="assets_root"/>
+  <meta content="list_awscleanrooms" name="target_state"/>
+  <meta content="list_awscleanrooms" name="default_state"/>
+  <link href="https://docs.aws.amazon.com/assets/images/favicon.ico" rel="icon" type="image/ico"/>
+  <link href="https://docs.aws.amazon.com/assets/images/favicon.ico" rel="shortcut icon" type="image/ico"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awscleanrooms.html" rel="canonical"/>
+  <meta content="Lists all of the available service-specific resources, actions, and condition keys that can be used in IAM policies to control access to AWS Clean Rooms." name="description"/>
+  <meta content="IAD" name="deployment_region"/>
+  <meta content="Service Authorization Reference" name="product"/>
+  <meta content="Service Authorization Reference" name="guide"/>
+  <meta content="Provides a list of the actions, resources, and condition keys supported by each AWS service that can be used in an IAM policy." name="abstract"/>
+  <meta content="en_us" name="guide-locale"/>
+  <meta content="toc-contents.json" name="tocs"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awscleanrooms.html" rel="canonical"/>
+  <link href="https://docs.aws.amazon.com/id_id/service-authorization/latest/reference/list_awscleanrooms.html" hreflang="id-id" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/id_id/service-authorization/latest/reference/list_awscleanrooms.html" hreflang="id" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/de_de/service-authorization/latest/reference/list_awscleanrooms.html" hreflang="de-de" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/de_de/service-authorization/latest/reference/list_awscleanrooms.html" hreflang="de" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awscleanrooms.html" hreflang="en-us" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awscleanrooms.html" hreflang="en" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/es_es/service-authorization/latest/reference/list_awscleanrooms.html" hreflang="es-es" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/es_es/service-authorization/latest/reference/list_awscleanrooms.html" hreflang="es" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/fr_fr/service-authorization/latest/reference/list_awscleanrooms.html" hreflang="fr-fr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/fr_fr/service-authorization/latest/reference/list_awscleanrooms.html" hreflang="fr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/it_it/service-authorization/latest/reference/list_awscleanrooms.html" hreflang="it-it" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/it_it/service-authorization/latest/reference/list_awscleanrooms.html" hreflang="it" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ja_jp/service-authorization/latest/reference/list_awscleanrooms.html" hreflang="ja-jp" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ja_jp/service-authorization/latest/reference/list_awscleanrooms.html" hreflang="ja" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ko_kr/service-authorization/latest/reference/list_awscleanrooms.html" hreflang="ko-kr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ko_kr/service-authorization/latest/reference/list_awscleanrooms.html" hreflang="ko" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/pt_br/service-authorization/latest/reference/list_awscleanrooms.html" hreflang="pt-br" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/pt_br/service-authorization/latest/reference/list_awscleanrooms.html" hreflang="pt" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/zh_cn/service-authorization/latest/reference/list_awscleanrooms.html" hreflang="zh-cn" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/zh_tw/service-authorization/latest/reference/list_awscleanrooms.html" hreflang="zh-tw" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awscleanrooms.html" hreflang="x-default" rel="alternative"/>
+  <meta content="Service Authorization Docs" name="feedback-item"/>
+  <meta content="Service Authorization Reference" name="this_doc_product"/>
+  <meta content="Service Authorization Reference" name="this_doc_guide"/>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor4.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor3.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor1.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/awsdocs-common.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/awsdocs-doc-page.js?version=2021.12.02">
+  </script>
+  <link href="https://docs.aws.amazon.com/assets/r/vendor4.css?version=2021.12.02" rel="stylesheet"/>
+  <link href="https://docs.aws.amazon.com/assets/r/awsdocs-common.css?version=2021.12.02" rel="stylesheet"/>
+  <link href="https://docs.aws.amazon.com/assets/r/awsdocs-doc-page.css?version=2021.12.02" rel="stylesheet"/>
+  <script async="" data-config="{'appEntity':'aws-documentation','region':'us-east-1','service':'iam'}" id="awsc-panorama-bundle" src="https://prod.pa.cdn.uis.awsstatic.com/panorama-nav-init.js" type="text/javascript">
+  </script>
+  <meta id="panorama-serviceSubSection" value="Service Authorization Reference"/>
+  <meta id="panorama-serviceConsolePage" value="Actions, resources, and condition keys for AWS Clean Rooms"/>
+ </head>
+ <body class="awsdocs awsui">
+  <div class="awsdocs-container">
+   <awsdocs-header>
+   </awsdocs-header>
+   <awsui-app-layout class="awsui-util-no-gutters" header-selector="awsdocs-header" id="app-layout" navigation-change="$ctrl.onNavChange($event)" navigation-hide="false" navigation-open="$ctrl.navOpen" navigation-width="$ctrl.navWidth" ng-controller="ContentController as $ctrl" tools-change="$ctrl.onToolsChange($event)" tools-hide="$ctrl.hideTools" tools-open="$ctrl.toolsOpen" tools-width="$ctrl.toolsWidth">
+    <div dom-region="navigation" id="guide-toc">
+     <awsdocs-toc>
+     </awsdocs-toc>
+    </div>
+    <div dom-region="content" id="main-column" tabindex="-1">
+     <awsdocs-view class="awsdocs-view">
+      <div id="awsdocs-content">
+       <head>
+        <title>
+         Actions, resources, and condition keys for AWS Clean Rooms - Service Authorization Reference
+        </title>
+        <meta content="/pdfs/service-authorization/latest/reference/service-authorization.pdf#list_awscleanrooms" name="pdf"/>
+        <meta content="https://repost.aws/tags/TAO7Z4bI5hQVWMiYFs34QhIA" name="forums"/>
+        <meta content="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service%20Authorization%20Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awscleanrooms.html" name="feedback"/>
+        <meta content="feedbackyes.html?topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awscleanrooms.html" name="feedback-yes"/>
+        <meta content="feedbackno.html?topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awscleanrooms.html" name="feedback-no"/>
+        <script type="application/ld+json">
+         {
+    "@context" : "https://schema.org",
+    "@type" : "BreadcrumbList",
+    "itemListElement" : [
+      {
+        "@type" : "ListItem",
+        "position" : 1,
+        "name" : "AWS",
+        "item" : "https://aws.amazon.com"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 2,
+        "name" : "Service Authorization Reference",
+        "item" : "https://docs.aws.amazon.com/iam/index.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 3,
+        "name" : "Service Authorization Reference",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 4,
+        "name" : "Reference",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 5,
+        "name" : "Actions, resources, and condition keys for AWS services",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference_policies_actions-resources-contextkeys.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 6,
+        "name" : "Actions, resources, and condition keys for AWS Clean Rooms",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference_policies_actions-resources-contextkeys.html"
+      }
+    ]
+}
+        </script>
+       </head>
+       <body>
+        <div id="main">
+         <div style="display: none">
+          <a href="/pdfs/service-authorization/latest/reference/service-authorization.pdf#list_awscleanrooms" rel="noopener noreferrer" target="_blank" title="Open PDF">
+          </a>
+         </div>
+         <div class="breadcrumb" id="breadcrumbs">
+          <a href="https://aws.amazon.com">
+           AWS
+          </a>
+          <a href="/index.html">
+           Documentation
+          </a>
+          <a href="/iam/index.html">
+           Service Authorization Reference
+          </a>
+          <a href="reference.html">
+           Service Authorization Reference
+          </a>
+         </div>
+         <div id="page-toc-src">
+          <a href="#awscleanrooms-actions-as-permissions">
+           Actions
+          </a>
+          <a href="#awscleanrooms-resources-for-iam-policies">
+           Resource types
+          </a>
+          <a href="#awscleanrooms-policy-keys">
+           Condition keys
+          </a>
+         </div>
+         <div class="awsui-util-container" id="main-content">
+          <div id="main-col-body">
+           <awsdocs-language-banner data-service="$ctrl.pageService">
+           </awsdocs-language-banner>
+           <h1 class="topictitle" id="list_awscleanrooms">
+            Actions, resources, and condition keys for      AWS Clean Rooms
+           </h1>
+           <div class="awsdocs-page-header-container">
+            <awsdocs-page-header>
+            </awsdocs-page-header>
+            <awsdocs-filter-selector id="awsdocs-filter-selector">
+            </awsdocs-filter-selector>
+           </div>
+           <p>
+            AWS Clean Rooms (service prefix:
+            <code class="code">
+             cleanrooms
+            </code>
+            ) provides the following    service-specific resources, actions, and condition context keys for use in IAM permission    policies.
+           </p>
+           <p>
+            References:
+           </p>
+           <div class="itemizedlist">
+            <ul class="itemizedlist">
+             <li class="listitem">
+              <p>
+               Learn how to
+               <a href="https://docs.aws.amazon.com/clean-rooms/latest/userguide/what-is.html">
+                configure this service
+               </a>
+               .
+              </p>
+             </li>
+             <li class="listitem">
+              <p>
+               View a list of the
+               <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/Welcome.html">
+                API operations available for this          service
+               </a>
+               .
+              </p>
+             </li>
+             <li class="listitem">
+              <p>
+               Learn how to secure this service and its resources by
+               <a href="https://docs.aws.amazon.com/clean-rooms/latest/userguide/security-iam.html">
+                using          IAM
+               </a>
+               permission policies.
+              </p>
+             </li>
+            </ul>
+           </div>
+           <div class="highlights" id="inline-topiclist">
+            <h6>
+             Topics
+            </h6>
+            <ul>
+             <li>
+              <a href="#awscleanrooms-actions-as-permissions">
+               Actions defined by        AWS Clean Rooms
+              </a>
+             </li>
+             <li>
+              <a href="#awscleanrooms-resources-for-iam-policies">
+               Resource types defined by        AWS Clean Rooms
+              </a>
+             </li>
+             <li>
+              <a href="#awscleanrooms-policy-keys">
+               Condition keys for        AWS Clean Rooms
+              </a>
+             </li>
+            </ul>
+           </div>
+           <h2 id="awscleanrooms-actions-as-permissions">
+            Actions defined by        AWS Clean Rooms
+           </h2>
+           <p>
+            You can specify the following actions in the
+            <code class="code">
+             Action
+            </code>
+            element of an IAM      policy statement. Use policies to grant permissions to perform an operation in AWS. When you      use an action in a policy, you usually allow or deny access to the API operation or CLI      command with the same name. However, in some cases, a single action controls access to more      than one operation. Alternatively, some operations require several different actions.
+           </p>
+           <p>
+            The
+            <b>
+             Resource types
+            </b>
+            column of the Actions table indicates whether each      action supports resource-level permissions. If there is no value for this column, you must      specify all resources ("*") to which the policy applies in the
+            <code class="code">
+             Resource
+            </code>
+            element      of your policy statement. If the column includes a resource type, then you can specify an ARN      of that type in a statement with that action. If the action has one or more required      resources, the caller must have permission to use the action with those resources. Required      resources are indicated in the table with an asterisk (*). If you limit resource access with      the
+            <code class="code">
+             Resource
+            </code>
+            element in an IAM policy, you must include an ARN or pattern for      each required resource type. Some actions support multiple resource types. If the resource      type is optional (not indicated as required), then you can choose to use one of the optional      resource types.
+           </p>
+           <p>
+            The
+            <b>
+             Condition keys
+            </b>
+            column of the Actions table includes keys that you      can specify in a policy statement's
+            <code class="code">
+             Condition
+            </code>
+            element. For more information on      the condition keys that are associated with resources for the service, see the
+            <b>
+             Condition keys
+            </b>
+            column of the Resource types table.
+           </p>
+           <div class="awsdocs-note">
+            <div class="awsdocs-note-title">
+             <awsui-icon name="status-info" variant="link">
+             </awsui-icon>
+             <h6>
+              Note
+             </h6>
+            </div>
+            <div class="awsdocs-note-text">
+             <p>
+              Resource condition keys are listed in the
+              <a href="#awscleanrooms-resources-for-iam-policies">
+               Resource types
+              </a>
+              table. You        can find a link to the resource type that applies to an action in the
+              <b>
+               Resource          types (*required)
+              </b>
+              column of the Actions table. The resource type in the        Resource types table includes the
+              <b>
+               Condition keys
+              </b>
+              column, which are the        resource condition keys that apply to an action in the Actions table.
+             </p>
+            </div>
+           </div>
+           <p>
+            For details about the columns in the following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#actions_table" rel="noopener noreferrer" target="_blank">
+             Actions table
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9d207c11c13">
+              <thead>
+               <tr>
+                <th>
+                 Actions
+                </th>
+                <th>
+                 Description
+                </th>
+                <th>
+                 Access level
+                </th>
+                <th>
+                 Resource types (*required)
+                </th>
+                <th>
+                 Condition keys
+                </th>
+                <th>
+                 Dependent actions
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="awscleanrooms-BatchGetCollaborationAnalysisTemplate" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_BatchGetCollaborationAnalysisTemplate.html">
+                 BatchGetCollaborationAnalysisTemplate
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to view details of analysisTemplates associated to the collaboration
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-analysistemplate">
+                  analysistemplate*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 cleanrooms:GetCollaborationAnalysisTemplate
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-collaboration">
+                  collaboration*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-BatchGetSchema" rowspan="3" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_BatchGetSchema.html">
+                 BatchGetSchema
+                </a>
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Grants permission to view details for schemas
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-collaboration">
+                  collaboration*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 cleanrooms:GetSchema
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-configuredtableassociation">
+                  configuredtableassociation
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-idmappingtable">
+                  idmappingtable
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-BatchGetSchemaAnalysisRule" rowspan="3" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_BatchGetSchemaAnalysisRule.html">
+                 BatchGetSchemaAnalysisRule
+                </a>
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Grants permission to view analysis rules associated with schemas
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-collaboration">
+                  collaboration*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 cleanrooms:GetSchema
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-configuredtableassociation">
+                  configuredtableassociation
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-idmappingtable">
+                  idmappingtable
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-CreateAnalysisTemplate" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_CreateAnalysisTemplate.html">
+                 CreateAnalysisTemplate
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to create a new analysis template
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-analysistemplate">
+                  analysistemplate*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscleanrooms-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscleanrooms-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-membership">
+                  membership*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscleanrooms-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscleanrooms-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-CreateCollaboration" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_CreateCollaboration.html">
+                 CreateCollaboration
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a new collaboration, a shared data collaboration environment
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-collaboration">
+                  collaboration*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscleanrooms-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscleanrooms-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-CreateConfiguredAudienceModelAssociation" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_CreateConfiguredAudienceModelAssociation.html">
+                 CreateConfiguredAudienceModelAssociation
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to link a Cleanrooms ML configured audience model with a collaboration by creating a new association
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-configuredaudiencemodelassociation">
+                  configuredaudiencemodelassociation*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscleanrooms-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscleanrooms-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 cleanrooms-ml:GetConfiguredAudienceModel
+                </p>
+                <p>
+                 cleanrooms-ml:GetConfiguredAudienceModelPolicy
+                </p>
+                <p>
+                 cleanrooms-ml:PutConfiguredAudienceModelPolicy
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-membership">
+                  membership*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscleanrooms-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscleanrooms-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-CreateConfiguredTable" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_CreateConfiguredTable.html">
+                 CreateConfiguredTable
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a new configured table
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-configuredtable">
+                  configuredtable*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscleanrooms-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscleanrooms-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 glue:BatchGetPartition
+                </p>
+                <p>
+                 glue:GetDatabase
+                </p>
+                <p>
+                 glue:GetDatabases
+                </p>
+                <p>
+                 glue:GetPartition
+                </p>
+                <p>
+                 glue:GetPartitions
+                </p>
+                <p>
+                 glue:GetSchemaVersion
+                </p>
+                <p>
+                 glue:GetTable
+                </p>
+                <p>
+                 glue:GetTables
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-CreateConfiguredTableAnalysisRule" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_CreateConfiguredTableAnalysisRule.html">
+                 CreateConfiguredTableAnalysisRule
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a analysis rule for a configured table
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-configuredtable">
+                  configuredtable*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-CreateConfiguredTableAssociation" rowspan="3" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_CreateConfiguredTableAssociation.html">
+                 CreateConfiguredTableAssociation
+                </a>
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Grants permission to link a configured table with a collaboration by creating a new association
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-configuredtable">
+                  configuredtable*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscleanrooms-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscleanrooms-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 iam:PassRole
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-configuredtableassociation">
+                  configuredtableassociation*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscleanrooms-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscleanrooms-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-membership">
+                  membership*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscleanrooms-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscleanrooms-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-CreateConfiguredTableAssociationAnalysisRule" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_CreateConfiguredTableAssociationAnalysisRule.html">
+                 CreateConfiguredTableAssociationAnalysisRule
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create an analysis rule for a configured table association
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-configuredtableassociation">
+                  configuredtableassociation*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscleanrooms-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscleanrooms-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-CreateIdMappingTable" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_CreateIdMappingTable.html">
+                 CreateIdMappingTable
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to link an id mapping workflow with a collaboration by creating a new id mapping table
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-idmappingtable">
+                  idmappingtable*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscleanrooms-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscleanrooms-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 entityresolution:AddPolicyStatement
+                </p>
+                <p>
+                 entityresolution:GetIdMappingWorkflow
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-membership">
+                  membership*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscleanrooms-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscleanrooms-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-CreateIdNamespaceAssociation" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_CreateIdNamespaceAssociation.html">
+                 CreateIdNamespaceAssociation
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to link an AWS Entity Resolution Id Namespace with a collaboration by creating a new association
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-idnamespaceassociation">
+                  idnamespaceassociation*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscleanrooms-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscleanrooms-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 entityresolution:AddPolicyStatement
+                </p>
+                <p>
+                 entityresolution:GetIdNamespace
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-membership">
+                  membership*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscleanrooms-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscleanrooms-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-CreateMembership" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_CreateMembership.html">
+                 CreateMembership
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to join collaborations by creating a membership
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-collaboration">
+                  collaboration*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscleanrooms-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscleanrooms-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 iam:PassRole
+                </p>
+                <p>
+                 logs:CreateLogDelivery
+                </p>
+                <p>
+                 logs:CreateLogGroup
+                </p>
+                <p>
+                 logs:DeleteLogDelivery
+                </p>
+                <p>
+                 logs:DescribeLogGroups
+                </p>
+                <p>
+                 logs:DescribeResourcePolicies
+                </p>
+                <p>
+                 logs:GetLogDelivery
+                </p>
+                <p>
+                 logs:ListLogDeliveries
+                </p>
+                <p>
+                 logs:PutResourcePolicy
+                </p>
+                <p>
+                 logs:UpdateLogDelivery
+                </p>
+                <p>
+                 s3:GetBucketLocation
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-membership">
+                  membership*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscleanrooms-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscleanrooms-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-CreatePrivacyBudgetTemplate" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_CreatePrivacyBudgetTemplate.html">
+                 CreatePrivacyBudgetTemplate
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to create a new privacy budget template
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-membership">
+                  membership*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscleanrooms-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscleanrooms-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-privacybudgettemplate">
+                  privacybudgettemplate*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscleanrooms-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscleanrooms-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-DeleteAnalysisTemplate" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_DeleteAnalysisTemplate.html">
+                 DeleteAnalysisTemplate
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete an existing analysis template
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-analysistemplate">
+                  analysistemplate*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-DeleteCollaboration" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_DeleteCollaboration.html">
+                 DeleteCollaboration
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete an existing collaboration
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-collaboration">
+                  collaboration*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 cleanrooms-ml:DeleteConfiguredAudienceModelPolicy
+                </p>
+                <p>
+                 cleanrooms-ml:GetConfiguredAudienceModelPolicy
+                </p>
+                <p>
+                 cleanrooms-ml:PutConfiguredAudienceModelPolicy
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-DeleteConfiguredAudienceModelAssociation" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_DeleteConfiguredAudienceModelAssociation.html">
+                 DeleteConfiguredAudienceModelAssociation
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete an existing configured audience model association
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-configuredaudiencemodelassociation">
+                  configuredaudiencemodelassociation*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 cleanrooms-ml:DeleteConfiguredAudienceModelPolicy
+                </p>
+                <p>
+                 cleanrooms-ml:GetConfiguredAudienceModelPolicy
+                </p>
+                <p>
+                 cleanrooms-ml:PutConfiguredAudienceModelPolicy
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-DeleteConfiguredTable" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_DeleteConfiguredTable.html">
+                 DeleteConfiguredTable
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a configured table
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-configuredtable">
+                  configuredtable*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-DeleteConfiguredTableAnalysisRule" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_DeleteConfiguredTableAnalysisRule.html">
+                 DeleteConfiguredTableAnalysisRule
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete an existing analysis rule
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-configuredtable">
+                  configuredtable*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-DeleteConfiguredTableAssociation" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_DeleteConfiguredTableAssociation.html">
+                 DeleteConfiguredTableAssociation
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to remove a configured table association from a collaboration
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-configuredtableassociation">
+                  configuredtableassociation*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-DeleteConfiguredTableAssociationAnalysisRule" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_DeleteConfiguredTableAssociationAnalysisRule.html">
+                 DeleteConfiguredTableAssociationAnalysisRule
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete an existing configured table association analysis rule
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-configuredtableassociation">
+                  configuredtableassociation*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-DeleteIdMappingTable" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_DeleteIdMappingTable.html">
+                 DeleteIdMappingTable
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to remove an id mapping table from a collaboration
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-idmappingtable">
+                  idmappingtable*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 entityresolution:DeletePolicyStatement
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-membership">
+                  membership*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-DeleteIdNamespaceAssociation" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_DeleteIdNamespaceAssociation.html">
+                 DeleteIdNamespaceAssociation
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to remove an Id Namespace Association from a collaboration
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-idnamespaceassociation">
+                  idnamespaceassociation*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 entityresolution:DeletePolicyStatement
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-membership">
+                  membership*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-DeleteMember" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_DeleteMember.html">
+                 DeleteMember
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete members from a collaboration
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-collaboration">
+                  collaboration*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 cleanrooms-ml:DeleteConfiguredAudienceModelPolicy
+                </p>
+                <p>
+                 cleanrooms-ml:GetConfiguredAudienceModelPolicy
+                </p>
+                <p>
+                 cleanrooms-ml:PutConfiguredAudienceModelPolicy
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-DeleteMembership" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_DeleteMembership.html">
+                 DeleteMembership
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to leave collaborations by deleting a membership
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-membership">
+                  membership*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-DeletePrivacyBudgetTemplate" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_DeletePrivacyBudgetTemplate.html">
+                 DeletePrivacyBudgetTemplate
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete an existing privacy budget template
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-privacybudgettemplate">
+                  privacybudgettemplate*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-GetAnalysisTemplate" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_GetAnalysisTemplate.html">
+                 GetAnalysisTemplate
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to view details for an analysis template
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-analysistemplate">
+                  analysistemplate*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-GetCollaboration" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_GetCollaboration.html">
+                 GetCollaboration
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to view details for a collaboration
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-collaboration">
+                  collaboration*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-GetCollaborationAnalysisTemplate" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_GetCollaborationAnalysisTemplate.html">
+                 GetCollaborationAnalysisTemplate
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to view details for an analysis template within a collaboration
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-analysistemplate">
+                  analysistemplate*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-collaboration">
+                  collaboration*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-GetCollaborationConfiguredAudienceModelAssociation" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_GetCollaborationConfiguredAudienceModelAssociation.html">
+                 GetCollaborationConfiguredAudienceModelAssociation
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to view details for a configured audience model association within a collaboration
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-collaboration">
+                  collaboration*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-configuredaudiencemodelassociation">
+                  configuredaudiencemodelassociation*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-GetCollaborationIdNamespaceAssociation" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_GetCollaborationIdNamespaceAssociation.html">
+                 GetCollaborationIdNamespaceAssociation
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to get id namespace association within a collaboration
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-collaboration">
+                  collaboration*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-idnamespaceassociation">
+                  idnamespaceassociation*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-GetCollaborationPrivacyBudgetTemplate" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_GetCollaborationPrivacyBudgetTemplate.html">
+                 GetCollaborationPrivacyBudgetTemplate
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to view details for a privacy budget template within a collaboration
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-collaboration">
+                  collaboration*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-privacybudgettemplate">
+                  privacybudgettemplate*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-GetConfiguredAudienceModelAssociation" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_GetConfiguredAudienceModelAssociation.html">
+                 GetConfiguredAudienceModelAssociation
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to view details for a configured audience model association
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-configuredaudiencemodelassociation">
+                  configuredaudiencemodelassociation*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-GetConfiguredTable" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_GetConfiguredTable.html">
+                 GetConfiguredTable
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to view details for a configured table
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-configuredtable">
+                  configuredtable*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-GetConfiguredTableAnalysisRule" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_GetConfiguredTableAnalysisRule.html">
+                 GetConfiguredTableAnalysisRule
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to view analysis rules for a configured table
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-configuredtable">
+                  configuredtable*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-GetConfiguredTableAssociation" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_GetConfiguredTableAssociation.html">
+                 GetConfiguredTableAssociation
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to view details for a configured table association
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-configuredtableassociation">
+                  configuredtableassociation*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-GetConfiguredTableAssociationAnalysisRule" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_GetConfiguredTableAssociationAnalysisRule.html">
+                 GetConfiguredTableAssociationAnalysisRule
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to view analysis rules for a configured table association
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-configuredtableassociation">
+                  configuredtableassociation*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-GetIdMappingTable" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_GetIdMappingTable.html">
+                 GetIdMappingTable
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to view details of an id mapping table
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-idmappingtable">
+                  idmappingtable*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-membership">
+                  membership*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-GetIdNamespaceAssociation" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_GetIdNamespaceAssociation.html">
+                 GetIdNamespaceAssociation
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to view details of an id namespace association
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-idnamespaceassociation">
+                  idnamespaceassociation*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 entityresolution:GetIdNamespace
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-membership">
+                  membership*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-GetMembership" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_GetMembership.html">
+                 GetMembership
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to view details about a membership
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-membership">
+                  membership*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-GetPrivacyBudgetTemplate" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_GetPrivacyBudgetTemplate.html">
+                 GetPrivacyBudgetTemplate
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to view details for a privacy budget template
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-privacybudgettemplate">
+                  privacybudgettemplate*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-GetProtectedQuery" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_GetProtectedQuery.html">
+                 GetProtectedQuery
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to view a protected query
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-membership">
+                  membership*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-GetSchema" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_GetSchema.html">
+                 GetSchema
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to view details for a schema
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-collaboration">
+                  collaboration*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-configuredtableassociation">
+                  configuredtableassociation*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-GetSchemaAnalysisRule" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_GetSchemaAnalysisRule.html">
+                 GetSchemaAnalysisRule
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to view analysis rules associated with a schema
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-collaboration">
+                  collaboration*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 cleanrooms:GetSchema
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-configuredtableassociation">
+                  configuredtableassociation*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-ListAnalysisTemplates" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_ListAnalysisTemplates.html">
+                 ListAnalysisTemplates
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to list available analysis templates
+               </td>
+               <td rowspan="2" tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-analysistemplate">
+                  analysistemplate*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-membership">
+                  membership*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-ListCollaborationAnalysisTemplates" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_ListCollaborationAnalysisTemplates.html">
+                 ListCollaborationAnalysisTemplates
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list available analysis templates within a collaboration
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-collaboration">
+                  collaboration*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-ListCollaborationConfiguredAudienceModelAssociations" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_ListCollaborationConfiguredAudienceModelAssociations.html">
+                 ListCollaborationConfiguredAudienceModelAssociations
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list available configured audience model association within a collaboration
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-collaboration">
+                  collaboration*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-ListCollaborationIdNamespaceAssociations" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_ListCollaborationIdNamespaceAssociations.html">
+                 ListCollaborationIdNamespaceAssociations
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list id namespace within a collaboration
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-collaboration">
+                  collaboration*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-ListCollaborationPrivacyBudgetTemplates" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_ListCollaborationPrivacyBudgetTemplates.html">
+                 ListCollaborationPrivacyBudgetTemplates
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list available privacy budget templates within a collaboration
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-collaboration">
+                  collaboration*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-ListCollaborationPrivacyBudgets" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_ListCollaborationPrivacyBudgets.html">
+                 ListCollaborationPrivacyBudgets
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list privacy budgets within a collaboration
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-collaboration">
+                  collaboration*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-ListCollaborations" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_ListCollaborations.html">
+                 ListCollaborations
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list available collaborations
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-ListConfiguredAudienceModelAssociations" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_ListConfiguredAudienceModelAssociations.html">
+                 ListConfiguredAudienceModelAssociations
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to list available configured audience model associations for a membership
+               </td>
+               <td rowspan="2" tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-configuredaudiencemodelassociation">
+                  configuredaudiencemodelassociation*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-membership">
+                  membership*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-ListConfiguredTableAssociations" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_ListConfiguredTableAssociations.html">
+                 ListConfiguredTableAssociations
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to list available configured table associations for a membership
+               </td>
+               <td rowspan="2" tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-configuredtableassociation">
+                  configuredtableassociation*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-membership">
+                  membership*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-ListConfiguredTables" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_ListConfiguredTables.html">
+                 ListConfiguredTables
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list available configured tables
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-ListIdMappingTables" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_ListIdMappingTables.html">
+                 ListIdMappingTables
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to list available id mapping tables for a membership
+               </td>
+               <td rowspan="2" tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-idmappingtable">
+                  idmappingtable*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-membership">
+                  membership*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-ListIdNamespaceAssociations" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_ListIdNamespaceAssociations.html">
+                 ListIdNamespaceAssociations
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to list entity resolution data associations for a membership
+               </td>
+               <td rowspan="2" tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-idnamespaceassociation">
+                  idnamespaceassociation*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-membership">
+                  membership*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-ListMembers" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_ListMembers.html">
+                 ListMembers
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list the members of a collaboration
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-collaboration">
+                  collaboration*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-ListMemberships" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_ListMemberships.html">
+                 ListMemberships
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list available memberships
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-ListPrivacyBudgetTemplates" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_ListPrivacyBudgetTemplates.html">
+                 ListPrivacyBudgetTemplates
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to list available privacy budget templates
+               </td>
+               <td rowspan="2" tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-membership">
+                  membership*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-privacybudgettemplate">
+                  privacybudgettemplate*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-ListPrivacyBudgets" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_ListPrivacyBudgets.html">
+                 ListPrivacyBudgets
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list available privacy budgets
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-membership">
+                  membership*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-ListProtectedQueries" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_ListProtectedQueries.html">
+                 ListProtectedQueries
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list protected queries
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-membership">
+                  membership*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-ListSchemas" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_ListSchemas.html">
+                 ListSchemas
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to view available schemas for a collaboration
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-collaboration">
+                  collaboration*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-ListTagsForResource" rowspan="7" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_ListTagsForResource.html">
+                 ListTagsForResource
+                </a>
+               </td>
+               <td rowspan="7" tabindex="-1">
+                Grants permission to list tags for a resource
+               </td>
+               <td rowspan="7" tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-analysistemplate">
+                  analysistemplate
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-collaboration">
+                  collaboration
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-configuredaudiencemodelassociation">
+                  configuredaudiencemodelassociation
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-configuredtable">
+                  configuredtable
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-configuredtableassociation">
+                  configuredtableassociation
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-membership">
+                  membership
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-privacybudgettemplate">
+                  privacybudgettemplate
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-PopulateIdMappingTable" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_PopulateIdMappingTable.html">
+                 PopulateIdMappingTable
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to start an Id Mapping Job in AWS Entity Resolution to generate id mapping results in cleanrooms collaboration.
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-idmappingtable">
+                  idmappingtable*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 entityresolution:GetIdMappingWorkflow
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-membership">
+                  membership*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-PreviewPrivacyImpact" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_PreviewPrivacyImpact.html">
+                 PreviewPrivacyImpact
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to preview privacy budget template settings
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-membership">
+                  membership*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-StartProtectedQuery" rowspan="4" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_StartProtectedQuery.html">
+                 StartProtectedQuery
+                </a>
+               </td>
+               <td rowspan="4" tabindex="-1">
+                Grants permission to start protected queries
+               </td>
+               <td rowspan="4" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-membership">
+                  membership*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 cleanrooms:GetCollaborationAnalysisTemplate
+                </p>
+                <p>
+                 cleanrooms:GetSchema
+                </p>
+                <p>
+                 s3:GetBucketLocation
+                </p>
+                <p>
+                 s3:ListBucket
+                </p>
+                <p>
+                 s3:PutObject
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-analysistemplate">
+                  analysistemplate
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-configuredtableassociation">
+                  configuredtableassociation
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-idmappingtable">
+                  idmappingtable
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-TagResource" rowspan="10" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_TagResource.html">
+                 TagResource
+                </a>
+               </td>
+               <td rowspan="10" tabindex="-1">
+                Grants permission to tag a resource
+               </td>
+               <td rowspan="10" tabindex="-1">
+                Tagging
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-analysistemplate">
+                  analysistemplate
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-collaboration">
+                  collaboration
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-configuredaudiencemodelassociation">
+                  configuredaudiencemodelassociation
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-configuredtable">
+                  configuredtable
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-configuredtableassociation">
+                  configuredtableassociation
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-idmappingtable">
+                  idmappingtable
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-idnamespaceassociation">
+                  idnamespaceassociation
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-membership">
+                  membership
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-privacybudgettemplate">
+                  privacybudgettemplate
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscleanrooms-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-UntagResource" rowspan="10" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_UntagResource.html">
+                 UntagResource
+                </a>
+               </td>
+               <td rowspan="10" tabindex="-1">
+                Grants permission to untag a resource
+               </td>
+               <td rowspan="10" tabindex="-1">
+                Tagging
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-analysistemplate">
+                  analysistemplate
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-collaboration">
+                  collaboration
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-configuredaudiencemodelassociation">
+                  configuredaudiencemodelassociation
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-configuredtable">
+                  configuredtable
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-configuredtableassociation">
+                  configuredtableassociation
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-idmappingtable">
+                  idmappingtable
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-idnamespaceassociation">
+                  idnamespaceassociation
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-membership">
+                  membership
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-privacybudgettemplate">
+                  privacybudgettemplate
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-UpdateAnalysisTemplate" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_UpdateAnalysisTemplate.html">
+                 UpdateAnalysisTemplate
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update details of the analysis template
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-analysistemplate">
+                  analysistemplate*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-UpdateCollaboration" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_UpdateCollaboration.html">
+                 UpdateCollaboration
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update details of the collaboration
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-collaboration">
+                  collaboration*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-UpdateConfiguredAudienceModelAssociation" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_UpdateConfiguredAudienceModelAssociation.html">
+                 UpdateConfiguredAudienceModelAssociation
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update a configured audience model association
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-configuredaudiencemodelassociation">
+                  configuredaudiencemodelassociation*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-UpdateConfiguredTable" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_UpdateConfiguredTable.html">
+                 UpdateConfiguredTable
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update an existing configured table
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-configuredtable">
+                  configuredtable*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-UpdateConfiguredTableAnalysisRule" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_UpdateConfiguredTableAnalysisRule.html">
+                 UpdateConfiguredTableAnalysisRule
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update analysis rules for a configured table
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-configuredtable">
+                  configuredtable*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-UpdateConfiguredTableAssociation" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_UpdateConfiguredTableAssociation.html">
+                 UpdateConfiguredTableAssociation
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update a configured table association
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-configuredtableassociation">
+                  configuredtableassociation*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 iam:PassRole
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-UpdateConfiguredTableAssociationAnalysisRule" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_UpdateConfiguredTableAssociationAnalysisRule.html">
+                 UpdateConfiguredTableAssociationAnalysisRule
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update analysis rules for a configured table association
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-configuredtableassociation">
+                  configuredtableassociation*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-UpdateIdMappingTable" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_UpdateIdMappingTable.html">
+                 UpdateIdMappingTable
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to update an id mapping table
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-idmappingtable">
+                  idmappingtable*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-membership">
+                  membership*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-UpdateIdNamespaceAssociation" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_UpdateIdNamespaceAssociation.html">
+                 UpdateIdNamespaceAssociation
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to update a entity resolution input association
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-idnamespaceassociation">
+                  idnamespaceassociation*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 entityresolution:GetIdNamespace
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-membership">
+                  membership*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-UpdateMembership" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_UpdateMembership.html">
+                 UpdateMembership
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update details of a membership
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-membership">
+                  membership*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 iam:PassRole
+                </p>
+                <p>
+                 logs:CreateLogDelivery
+                </p>
+                <p>
+                 logs:CreateLogGroup
+                </p>
+                <p>
+                 logs:DeleteLogDelivery
+                </p>
+                <p>
+                 logs:DescribeLogGroups
+                </p>
+                <p>
+                 logs:DescribeResourcePolicies
+                </p>
+                <p>
+                 logs:GetLogDelivery
+                </p>
+                <p>
+                 logs:ListLogDeliveries
+                </p>
+                <p>
+                 logs:PutResourcePolicy
+                </p>
+                <p>
+                 logs:UpdateLogDelivery
+                </p>
+                <p>
+                 s3:GetBucketLocation
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-UpdatePrivacyBudgetTemplate" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_UpdatePrivacyBudgetTemplate.html">
+                 UpdatePrivacyBudgetTemplate
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update details of the privacy budget template
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-privacybudgettemplate">
+                  privacybudgettemplate*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-UpdateProtectedQuery" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/apireference/API_UpdateProtectedQuery.html">
+                 UpdateProtectedQuery
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update protected queries
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-membership">
+                  membership*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <h2 id="awscleanrooms-resources-for-iam-policies">
+            Resource types defined by        AWS Clean Rooms
+           </h2>
+           <p>
+            The following resource types are defined by this service and can be used in the
+            <code class="code">
+             Resource
+            </code>
+            element of IAM permission policy statements. Each action in the
+            <a href="#awscleanrooms-actions-as-permissions">
+             Actions table
+            </a>
+            identifies the      resource types that can be specified with that action. A resource type can also define which      condition keys you can include in a policy. These keys are displayed in the last column of the      Resource types table. For details about the columns in the following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#resources_table" rel="noopener noreferrer" target="_blank">
+             Resource types table
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9d207c13b5">
+              <thead>
+               <tr>
+                <th>
+                 Resource types
+                </th>
+                <th>
+                 ARN
+                </th>
+                <th>
+                 Condition keys
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="awscleanrooms-analysistemplate" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/userguide/security-iam.html">
+                 analysistemplate
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:cleanrooms:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:membership/$
+                 <span>
+                  {
+                 </span>
+                 MembershipId}/analysistemplate/$
+                 <span>
+                  {
+                 </span>
+                 AnalysisTemplateId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-collaboration" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/userguide/security-iam.html">
+                 collaboration
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:cleanrooms:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:collaboration/$
+                 <span>
+                  {
+                 </span>
+                 CollaborationId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-configuredaudiencemodelassociation" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/userguide/security-iam.html">
+                 configuredaudiencemodelassociation
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:cleanrooms:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:membership/$
+                 <span>
+                  {
+                 </span>
+                 MembershipId}/configuredaudiencemodelassociation/$
+                 <span>
+                  {
+                 </span>
+                 ConfiguredAudienceModelAssociationId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-configuredtable" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/userguide/security-iam.html">
+                 configuredtable
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:cleanrooms:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:configuredtable/$
+                 <span>
+                  {
+                 </span>
+                 ConfiguredTableId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-configuredtableassociation" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/userguide/security-iam.html">
+                 configuredtableassociation
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:cleanrooms:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:membership/$
+                 <span>
+                  {
+                 </span>
+                 MembershipId}/configuredtableassociation/$
+                 <span>
+                  {
+                 </span>
+                 ConfiguredTableAssociationId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-idmappingtable" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/userguide/security-iam.html">
+                 idmappingtable
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:cleanrooms:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:membership/$
+                 <span>
+                  {
+                 </span>
+                 MembershipId}/idmappingtable/$
+                 <span>
+                  {
+                 </span>
+                 IdMappingTableId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-idnamespaceassociation" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/userguide/security-iam.html">
+                 idnamespaceassociation
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:cleanrooms:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:membership/$
+                 <span>
+                  {
+                 </span>
+                 MembershipId}/idnamespaceassociation/$
+                 <span>
+                  {
+                 </span>
+                 IdNamespaceAssociationId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-membership" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/userguide/security-iam.html">
+                 membership
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:cleanrooms:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:membership/$
+                 <span>
+                  {
+                 </span>
+                 MembershipId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-privacybudgettemplate" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/clean-rooms/latest/userguide/security-iam.html">
+                 privacybudgettemplate
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:cleanrooms:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:membership/$
+                 <span>
+                  {
+                 </span>
+                 MembershipId}/privacybudgettemplate/$
+                 <span>
+                  {
+                 </span>
+                 PrivacyBudgetTemplateId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscleanrooms-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <h2 id="awscleanrooms-policy-keys">
+            Condition keys for        AWS Clean Rooms
+           </h2>
+           <p>
+            AWS Clean Rooms defines the following condition keys that can be used in the
+            <code class="code">
+             Condition
+            </code>
+            element of an IAM policy. You can use these keys to further refine      the conditions under which the policy statement applies. For details about the columns in the      following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#context_keys_table" rel="noopener noreferrer" target="_blank">
+             Condition keys table
+            </a>
+            .
+           </p>
+           <p>
+            To view the global condition keys that are available to all services, see
+            <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#AvailableKeys">
+             Available global condition keys
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9d207c15b7">
+              <thead>
+               <tr>
+                <th>
+                 Condition keys
+                </th>
+                <th>
+                 Description
+                </th>
+                <th>
+                 Type
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="awscleanrooms-aws_RequestTag___TagKey_" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-requesttag">
+                 aws:RequestTag/${TagKey}
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the tags that are passed in the request
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-aws_ResourceTag___TagKey_" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-resourcetag">
+                 aws:ResourceTag/${TagKey}
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the tags associated with the resource
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awscleanrooms-aws_TagKeys" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-tagkeys">
+                 aws:TagKeys
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the tag keys that are passed in the request
+               </td>
+               <td tabindex="-1">
+                ArrayOfString
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <awsdocs-copyright class="copyright-print">
+           </awsdocs-copyright>
+           <awsdocs-thumb-feedback right-edge="{{$ctrl.thumbFeedbackRightEdge}}">
+           </awsdocs-thumb-feedback>
+          </div>
+          <noscript>
+           <div>
+            <div>
+             <div>
+              <div id="js_error_message">
+               <p>
+                <img alt="Warning" src="https://d1ge0kk1l5kms0.cloudfront.net/images/G/01/webservices/console/warning.png"/>
+                <strong>
+                 Javascript is disabled or is unavailable in your browser.
+                </strong>
+               </p>
+               <p>
+                To use the Amazon Web Services Documentation, Javascript must be enabled. Please refer to your browser's Help pages for instructions.
+               </p>
+              </div>
+             </div>
+            </div>
+           </div>
+          </noscript>
+          <div class="awsui-util-font-size-0" id="main-col-footer">
+           <div id="doc-conventions">
+            <a href="/general/latest/gr/docconventions.html" target="_top">
+             Document Conventions
+            </a>
+           </div>
+           <div class="prev-next">
+            <div accesskey="p" class="prev-link" href="./list_amazonchime.html" id="previous">
+             Amazon Chime
+            </div>
+            <div accesskey="n" class="next-link" href="./list_awscleanroomsml.html" id="next">
+             AWS Clean Rooms ML
+            </div>
+           </div>
+          </div>
+          <awsdocs-page-utilities>
+          </awsdocs-page-utilities>
+         </div>
+         <div id="quick-feedback-yes" style="display: none;">
+          <div class="title">
+           Did this page help you? - Yes
+          </div>
+          <div class="content">
+           <p>
+            Thanks for letting us know we're doing a good job!
+           </p>
+           <p>
+            If you've got a moment, please tell us what we did right so we can do more of it.
+           </p>
+           <p>
+            <awsui-button click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service Authorization Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awscleanrooms.html" id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback">
+            </awsui-button>
+           </p>
+          </div>
+         </div>
+         <div id="quick-feedback-no" style="display: none;">
+          <div class="title">
+           Did this page help you? - No
+          </div>
+          <div class="content">
+           <p>
+            Thanks for letting us know this page needs work. We're sorry we let you down.
+           </p>
+           <p>
+            If you've got a moment, please tell us how we can make the documentation better.
+           </p>
+           <p>
+            <awsui-button click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service Authorization Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awscleanrooms.html" id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback">
+            </awsui-button>
+           </p>
+          </div>
+         </div>
+        </div>
+       </body>
+      </div>
+     </awsdocs-view>
+     <div class="page-loading-indicator" id="page-loading-indicator">
+      <awsui-spinner size="large">
+      </awsui-spinner>
+     </div>
+    </div>
+    <div dom-region="tools" id="tools-panel">
+     <awsdocs-tools-panel id="awsdocs-tools-panel">
+     </awsdocs-tools-panel>
+    </div>
+   </awsui-app-layout>
+   <awsdocs-cookie-banner class="doc-cookie-banner">
+   </awsdocs-cookie-banner>
+  </div>
+ </body>
+</html>

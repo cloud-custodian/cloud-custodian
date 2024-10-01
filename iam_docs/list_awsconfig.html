@@ -1,0 +1,3201 @@
+<!DOCTYPE html>
+<html lang="en-US" xmlns="http://www.w3.org/1999/xhtml">
+ <head>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+  <title>
+   Actions, resources, and condition keys for AWS Config - Service Authorization Reference
+  </title>
+  <meta content="width=device-width,initial-scale=1" name="viewport"/>
+  <meta content="/assets" name="assets_root"/>
+  <meta content="list_awsconfig" name="target_state"/>
+  <meta content="list_awsconfig" name="default_state"/>
+  <link href="https://docs.aws.amazon.com/assets/images/favicon.ico" rel="icon" type="image/ico"/>
+  <link href="https://docs.aws.amazon.com/assets/images/favicon.ico" rel="shortcut icon" type="image/ico"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsconfig.html" rel="canonical"/>
+  <meta content="Lists all of the available service-specific resources, actions, and condition keys that can be used in IAM policies to control access to AWS Config." name="description"/>
+  <meta content="IAD" name="deployment_region"/>
+  <meta content="Service Authorization Reference" name="product"/>
+  <meta content="Service Authorization Reference" name="guide"/>
+  <meta content="Provides a list of the actions, resources, and condition keys supported by each AWS service that can be used in an IAM policy." name="abstract"/>
+  <meta content="en_us" name="guide-locale"/>
+  <meta content="toc-contents.json" name="tocs"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsconfig.html" rel="canonical"/>
+  <link href="https://docs.aws.amazon.com/id_id/service-authorization/latest/reference/list_awsconfig.html" hreflang="id-id" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/id_id/service-authorization/latest/reference/list_awsconfig.html" hreflang="id" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/de_de/service-authorization/latest/reference/list_awsconfig.html" hreflang="de-de" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/de_de/service-authorization/latest/reference/list_awsconfig.html" hreflang="de" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsconfig.html" hreflang="en-us" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsconfig.html" hreflang="en" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/es_es/service-authorization/latest/reference/list_awsconfig.html" hreflang="es-es" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/es_es/service-authorization/latest/reference/list_awsconfig.html" hreflang="es" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/fr_fr/service-authorization/latest/reference/list_awsconfig.html" hreflang="fr-fr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/fr_fr/service-authorization/latest/reference/list_awsconfig.html" hreflang="fr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/it_it/service-authorization/latest/reference/list_awsconfig.html" hreflang="it-it" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/it_it/service-authorization/latest/reference/list_awsconfig.html" hreflang="it" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ja_jp/service-authorization/latest/reference/list_awsconfig.html" hreflang="ja-jp" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ja_jp/service-authorization/latest/reference/list_awsconfig.html" hreflang="ja" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ko_kr/service-authorization/latest/reference/list_awsconfig.html" hreflang="ko-kr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ko_kr/service-authorization/latest/reference/list_awsconfig.html" hreflang="ko" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/pt_br/service-authorization/latest/reference/list_awsconfig.html" hreflang="pt-br" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/pt_br/service-authorization/latest/reference/list_awsconfig.html" hreflang="pt" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/zh_cn/service-authorization/latest/reference/list_awsconfig.html" hreflang="zh-cn" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/zh_tw/service-authorization/latest/reference/list_awsconfig.html" hreflang="zh-tw" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsconfig.html" hreflang="x-default" rel="alternative"/>
+  <meta content="Service Authorization Docs" name="feedback-item"/>
+  <meta content="Service Authorization Reference" name="this_doc_product"/>
+  <meta content="Service Authorization Reference" name="this_doc_guide"/>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor4.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor3.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor1.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/awsdocs-common.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/awsdocs-doc-page.js?version=2021.12.02">
+  </script>
+  <link href="https://docs.aws.amazon.com/assets/r/vendor4.css?version=2021.12.02" rel="stylesheet"/>
+  <link href="https://docs.aws.amazon.com/assets/r/awsdocs-common.css?version=2021.12.02" rel="stylesheet"/>
+  <link href="https://docs.aws.amazon.com/assets/r/awsdocs-doc-page.css?version=2021.12.02" rel="stylesheet"/>
+  <script async="" data-config="{'appEntity':'aws-documentation','region':'us-east-1','service':'iam'}" id="awsc-panorama-bundle" src="https://prod.pa.cdn.uis.awsstatic.com/panorama-nav-init.js" type="text/javascript">
+  </script>
+  <meta id="panorama-serviceSubSection" value="Service Authorization Reference"/>
+  <meta id="panorama-serviceConsolePage" value="Actions, resources, and condition keys for AWS Config"/>
+ </head>
+ <body class="awsdocs awsui">
+  <div class="awsdocs-container">
+   <awsdocs-header>
+   </awsdocs-header>
+   <awsui-app-layout class="awsui-util-no-gutters" header-selector="awsdocs-header" id="app-layout" navigation-change="$ctrl.onNavChange($event)" navigation-hide="false" navigation-open="$ctrl.navOpen" navigation-width="$ctrl.navWidth" ng-controller="ContentController as $ctrl" tools-change="$ctrl.onToolsChange($event)" tools-hide="$ctrl.hideTools" tools-open="$ctrl.toolsOpen" tools-width="$ctrl.toolsWidth">
+    <div dom-region="navigation" id="guide-toc">
+     <awsdocs-toc>
+     </awsdocs-toc>
+    </div>
+    <div dom-region="content" id="main-column" tabindex="-1">
+     <awsdocs-view class="awsdocs-view">
+      <div id="awsdocs-content">
+       <head>
+        <title>
+         Actions, resources, and condition keys for AWS Config - Service Authorization Reference
+        </title>
+        <meta content="/pdfs/service-authorization/latest/reference/service-authorization.pdf#list_awsconfig" name="pdf"/>
+        <meta content="https://repost.aws/tags/TAO7Z4bI5hQVWMiYFs34QhIA" name="forums"/>
+        <meta content="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service%20Authorization%20Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awsconfig.html" name="feedback"/>
+        <meta content="feedbackyes.html?topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awsconfig.html" name="feedback-yes"/>
+        <meta content="feedbackno.html?topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awsconfig.html" name="feedback-no"/>
+        <script type="application/ld+json">
+         {
+    "@context" : "https://schema.org",
+    "@type" : "BreadcrumbList",
+    "itemListElement" : [
+      {
+        "@type" : "ListItem",
+        "position" : 1,
+        "name" : "AWS",
+        "item" : "https://aws.amazon.com"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 2,
+        "name" : "Service Authorization Reference",
+        "item" : "https://docs.aws.amazon.com/iam/index.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 3,
+        "name" : "Service Authorization Reference",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 4,
+        "name" : "Reference",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 5,
+        "name" : "Actions, resources, and condition keys for AWS services",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference_policies_actions-resources-contextkeys.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 6,
+        "name" : "Actions, resources, and condition keys for AWS Config",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference_policies_actions-resources-contextkeys.html"
+      }
+    ]
+}
+        </script>
+       </head>
+       <body>
+        <div id="main">
+         <div style="display: none">
+          <a href="/pdfs/service-authorization/latest/reference/service-authorization.pdf#list_awsconfig" rel="noopener noreferrer" target="_blank" title="Open PDF">
+          </a>
+         </div>
+         <div class="breadcrumb" id="breadcrumbs">
+          <a href="https://aws.amazon.com">
+           AWS
+          </a>
+          <a href="/index.html">
+           Documentation
+          </a>
+          <a href="/iam/index.html">
+           Service Authorization Reference
+          </a>
+          <a href="reference.html">
+           Service Authorization Reference
+          </a>
+         </div>
+         <div id="page-toc-src">
+          <a href="#awsconfig-actions-as-permissions">
+           Actions
+          </a>
+          <a href="#awsconfig-resources-for-iam-policies">
+           Resource types
+          </a>
+          <a href="#awsconfig-policy-keys">
+           Condition keys
+          </a>
+         </div>
+         <div class="awsui-util-container" id="main-content">
+          <div id="main-col-body">
+           <awsdocs-language-banner data-service="$ctrl.pageService">
+           </awsdocs-language-banner>
+           <h1 class="topictitle" id="list_awsconfig">
+            Actions, resources, and condition keys for      AWS Config
+           </h1>
+           <div class="awsdocs-page-header-container">
+            <awsdocs-page-header>
+            </awsdocs-page-header>
+            <awsdocs-filter-selector id="awsdocs-filter-selector">
+            </awsdocs-filter-selector>
+           </div>
+           <p>
+            AWS Config (service prefix:
+            <code class="code">
+             config
+            </code>
+            ) provides the following    service-specific resources, actions, and condition context keys for use in IAM permission    policies.
+           </p>
+           <p>
+            References:
+           </p>
+           <div class="itemizedlist">
+            <ul class="itemizedlist">
+             <li class="listitem">
+              <p>
+               Learn how to
+               <a href="https://docs.aws.amazon.com/config/latest/developerguide/">
+                configure this service
+               </a>
+               .
+              </p>
+             </li>
+             <li class="listitem">
+              <p>
+               View a list of the
+               <a href="https://docs.aws.amazon.com/config/latest/APIReference/">
+                API operations available for this          service
+               </a>
+               .
+              </p>
+             </li>
+             <li class="listitem">
+              <p>
+               Learn how to secure this service and its resources by
+               <a href="https://docs.aws.amazon.com/config/latest/developerguide/example-policies.html">
+                using          IAM
+               </a>
+               permission policies.
+              </p>
+             </li>
+            </ul>
+           </div>
+           <div class="highlights" id="inline-topiclist">
+            <h6>
+             Topics
+            </h6>
+            <ul>
+             <li>
+              <a href="#awsconfig-actions-as-permissions">
+               Actions defined by        AWS Config
+              </a>
+             </li>
+             <li>
+              <a href="#awsconfig-resources-for-iam-policies">
+               Resource types defined by        AWS Config
+              </a>
+             </li>
+             <li>
+              <a href="#awsconfig-policy-keys">
+               Condition keys for        AWS Config
+              </a>
+             </li>
+            </ul>
+           </div>
+           <h2 id="awsconfig-actions-as-permissions">
+            Actions defined by        AWS Config
+           </h2>
+           <p>
+            You can specify the following actions in the
+            <code class="code">
+             Action
+            </code>
+            element of an IAM      policy statement. Use policies to grant permissions to perform an operation in AWS. When you      use an action in a policy, you usually allow or deny access to the API operation or CLI      command with the same name. However, in some cases, a single action controls access to more      than one operation. Alternatively, some operations require several different actions.
+           </p>
+           <p>
+            The
+            <b>
+             Resource types
+            </b>
+            column of the Actions table indicates whether each      action supports resource-level permissions. If there is no value for this column, you must      specify all resources ("*") to which the policy applies in the
+            <code class="code">
+             Resource
+            </code>
+            element      of your policy statement. If the column includes a resource type, then you can specify an ARN      of that type in a statement with that action. If the action has one or more required      resources, the caller must have permission to use the action with those resources. Required      resources are indicated in the table with an asterisk (*). If you limit resource access with      the
+            <code class="code">
+             Resource
+            </code>
+            element in an IAM policy, you must include an ARN or pattern for      each required resource type. Some actions support multiple resource types. If the resource      type is optional (not indicated as required), then you can choose to use one of the optional      resource types.
+           </p>
+           <p>
+            The
+            <b>
+             Condition keys
+            </b>
+            column of the Actions table includes keys that you      can specify in a policy statement's
+            <code class="code">
+             Condition
+            </code>
+            element. For more information on      the condition keys that are associated with resources for the service, see the
+            <b>
+             Condition keys
+            </b>
+            column of the Resource types table.
+           </p>
+           <div class="awsdocs-note">
+            <div class="awsdocs-note-title">
+             <awsui-icon name="status-info" variant="link">
+             </awsui-icon>
+             <h6>
+              Note
+             </h6>
+            </div>
+            <div class="awsdocs-note-text">
+             <p>
+              Resource condition keys are listed in the
+              <a href="#awsconfig-resources-for-iam-policies">
+               Resource types
+              </a>
+              table. You        can find a link to the resource type that applies to an action in the
+              <b>
+               Resource          types (*required)
+              </b>
+              column of the Actions table. The resource type in the        Resource types table includes the
+              <b>
+               Condition keys
+              </b>
+              column, which are the        resource condition keys that apply to an action in the Actions table.
+             </p>
+            </div>
+           </div>
+           <p>
+            For details about the columns in the following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#actions_table" rel="noopener noreferrer" target="_blank">
+             Actions table
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9d394c11c13">
+              <thead>
+               <tr>
+                <th>
+                 Actions
+                </th>
+                <th>
+                 Description
+                </th>
+                <th>
+                 Access level
+                </th>
+                <th>
+                 Resource types (*required)
+                </th>
+                <th>
+                 Condition keys
+                </th>
+                <th>
+                 Dependent actions
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="awsconfig-BatchGetAggregateResourceConfig" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_BatchGetAggregateResourceConfig.html">
+                 BatchGetAggregateResourceConfig
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return the current configuration items for resources that are present in your AWS Config aggregator
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-ConfigurationAggregator">
+                  ConfigurationAggregator*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-BatchGetResourceConfig" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_BatchGetResourceConfig.html">
+                 BatchGetResourceConfig
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return the current configuration for one or more requested resources
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-DeleteAggregationAuthorization" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_DeleteAggregationAuthorization.html">
+                 DeleteAggregationAuthorization
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete the authorization granted to the specified configuration aggregator account in a specified region
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-AggregationAuthorization">
+                  AggregationAuthorization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-DeleteConfigRule" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_DeleteConfigRule.html">
+                 DeleteConfigRule
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete the specified AWS Config rule and all of its evaluation results
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-ConfigRule">
+                  ConfigRule*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-DeleteConfigurationAggregator" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_DeleteConfigurationAggregator.html">
+                 DeleteConfigurationAggregator
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete the specified configuration aggregator and the aggregated data associated with the aggregator
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-ConfigurationAggregator">
+                  ConfigurationAggregator*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-DeleteConfigurationRecorder" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_DeleteConfigurationRecorder.html">
+                 DeleteConfigurationRecorder
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete the configuration recorder
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-DeleteConformancePack" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_DeleteConformancePack.html">
+                 DeleteConformancePack
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete the specified conformance pack and all the AWS Config rules and all evaluation results within that conformance pack
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-ConformancePack">
+                  ConformancePack*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-DeleteDeliveryChannel" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_DeleteDeliveryChannel.html">
+                 DeleteDeliveryChannel
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete the delivery channel
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-DeleteEvaluationResults" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_DeleteEvaluationResults.html">
+                 DeleteEvaluationResults
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete the evaluation results for the specified Config rule
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-ConfigRule">
+                  ConfigRule*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-DeleteOrganizationConfigRule" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_DeleteOrganizationConfigRule.html">
+                 DeleteOrganizationConfigRule
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete the specified organization config rule and all of its evaluation results from all member accounts in that organization
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-OrganizationConfigRule">
+                  OrganizationConfigRule*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-DeleteOrganizationConformancePack" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_DeleteOrganizationConformancePack.html">
+                 DeleteOrganizationConformancePack
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete the specified organization conformance pack and all of its evaluation results from all member accounts in that organization
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-OrganizationConformancePack">
+                  OrganizationConformancePack*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-DeletePendingAggregationRequest" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_DeletePendingAggregationRequest.html">
+                 DeletePendingAggregationRequest
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete pending authorization requests for a specified aggregator account in a specified region
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-DeleteRemediationConfiguration" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_DeleteRemediationConfiguration.html">
+                 DeleteRemediationConfiguration
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete the remediation configuration
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-RemediationConfiguration">
+                  RemediationConfiguration*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-DeleteRemediationExceptions" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_DeleteRemediationExceptions.html">
+                 DeleteRemediationExceptions
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete one or more remediation exceptions for specific resource keys for a specific AWS Config Rule
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-DeleteResourceConfig" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_DeleteResourceConfig.html">
+                 DeleteResourceConfig
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to record the configuration state for a custom resource that has been deleted
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-DeleteRetentionConfiguration" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_DeleteRetentionConfiguration.html">
+                 DeleteRetentionConfiguration
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete the retention configuration
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-DeleteStoredQuery" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_DeleteStoredQuery.html">
+                 DeleteStoredQuery
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete the stored query for an AWS account in an AWS Region
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-StoredQuery">
+                  StoredQuery*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-DeliverConfigSnapshot" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_DeliverConfigSnapshot.html">
+                 DeliverConfigSnapshot
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to schedule delivery of a configuration snapshot to the Amazon S3 bucket in the specified delivery channel
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-DescribeAggregateComplianceByConfigRules" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_DescribeAggregateComplianceByConfigRules.html">
+                 DescribeAggregateComplianceByConfigRules
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return a list of compliant and noncompliant rules with the number of resources for compliant and noncompliant rules
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-ConfigurationAggregator">
+                  ConfigurationAggregator*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-DescribeAggregateComplianceByConformancePacks" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_DescribeAggregateComplianceByConformancePacks.html">
+                 DescribeAggregateComplianceByConformancePacks
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return a list of compliant and noncompliant conformance packs along with count of compliant, non-compliant and total rules within each conformance pack
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-ConfigurationAggregator">
+                  ConfigurationAggregator*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-DescribeAggregationAuthorizations" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_DescribeAggregationAuthorizations.html">
+                 DescribeAggregationAuthorizations
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return a list of authorizations granted to various aggregator accounts and regions
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-DescribeComplianceByConfigRule" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_DescribeComplianceByConfigRule.html">
+                 DescribeComplianceByConfigRule
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to indicate whether the specified AWS Config rules are compliant
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-DescribeComplianceByResource" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_DescribeComplianceByResource.html">
+                 DescribeComplianceByResource
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to indicate whether the specified AWS resources are compliant
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-DescribeConfigRuleEvaluationStatus" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_DescribeConfigRuleEvaluationStatus.html">
+                 DescribeConfigRuleEvaluationStatus
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return status information for each of your AWS managed Config rules
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-DescribeConfigRules" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_DescribeConfigRules.html">
+                 DescribeConfigRules
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return details about your AWS Config rules
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-DescribeConfigurationAggregatorSourcesStatus" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_DescribeConfigurationAggregatorSourcesStatus.html">
+                 DescribeConfigurationAggregatorSourcesStatus
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return status information for sources within an aggregator
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-ConfigurationAggregator">
+                  ConfigurationAggregator*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-DescribeConfigurationAggregators" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_DescribeConfigurationAggregators.html">
+                 DescribeConfigurationAggregators
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return the details of one or more configuration aggregators
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-DescribeConfigurationRecorderStatus" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_DescribeConfigurationRecorderStatus.html">
+                 DescribeConfigurationRecorderStatus
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return the current status of the specified configuration recorder
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-DescribeConfigurationRecorders" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_DescribeConfigurationRecorders.html">
+                 DescribeConfigurationRecorders
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return the names of one or more specified configuration recorders
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-DescribeConformancePackCompliance" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_DescribeConformancePackCompliance.html">
+                 DescribeConformancePackCompliance
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return compliance information for each rule in that conformance pack
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-ConformancePack">
+                  ConformancePack*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-DescribeConformancePackStatus" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_DescribeConformancePackStatus.html">
+                 DescribeConformancePackStatus
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to provide one or more conformance packs deployment status
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-DescribeConformancePacks" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_DescribeConformancePacks.html">
+                 DescribeConformancePacks
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return a list of one or more conformance packs
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-DescribeDeliveryChannelStatus" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_DescribeDeliveryChannelStatus.html">
+                 DescribeDeliveryChannelStatus
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return the current status of the specified delivery channel
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-DescribeDeliveryChannels" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_DescribeDeliveryChannels.html">
+                 DescribeDeliveryChannels
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return details about the specified delivery channel
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-DescribeOrganizationConfigRuleStatuses" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_DescribeOrganizationConfigRuleStatuses.html">
+                 DescribeOrganizationConfigRuleStatuses
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to provide organization config rule deployment status for an organization
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-DescribeOrganizationConfigRules" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_DescribeOrganizationConfigRules.html">
+                 DescribeOrganizationConfigRules
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return a list of organization config rules
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-DescribeOrganizationConformancePackStatuses" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_DescribeOrganizationConformancePackStatuses.html">
+                 DescribeOrganizationConformancePackStatuses
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to provide organization conformance pack deployment status for an organization
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-DescribeOrganizationConformancePacks" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_DescribeOrganizationConformancePacks.html">
+                 DescribeOrganizationConformancePacks
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return a list of organization conformance packs
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-DescribePendingAggregationRequests" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_DescribePendingAggregationRequests.html">
+                 DescribePendingAggregationRequests
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return a list of all pending aggregation requests
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-DescribeRemediationConfigurations" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_DescribeRemediationConfigurations.html">
+                 DescribeRemediationConfigurations
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return the details of one or more remediation configurations
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-RemediationConfiguration">
+                  RemediationConfiguration*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-DescribeRemediationExceptions" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_DescribeRemediationExceptions.html">
+                 DescribeRemediationExceptions
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return the details of one or more remediation exceptions
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-DescribeRemediationExecutionStatus" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_DescribeRemediationExecutionStatus.html">
+                 DescribeRemediationExecutionStatus
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to provide a detailed view of a Remediation Execution for a set of resources including state, timestamps and any error messages for steps that have failed
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-RemediationConfiguration">
+                  RemediationConfiguration*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-DescribeRetentionConfigurations" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_DescribeRetentionConfigurations.html">
+                 DescribeRetentionConfigurations
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return the details of one or more retention configurations
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-GetAggregateComplianceDetailsByConfigRule" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_GetAggregateComplianceDetailsByConfigRule.html">
+                 GetAggregateComplianceDetailsByConfigRule
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return the evaluation results for the specified AWS Config rule for a specific resource in a rule
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-ConfigurationAggregator">
+                  ConfigurationAggregator*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-GetAggregateConfigRuleComplianceSummary" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_GetAggregateConfigRuleComplianceSummary.html">
+                 GetAggregateConfigRuleComplianceSummary
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return the number of compliant and noncompliant rules for one or more accounts and regions in an aggregator
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-ConfigurationAggregator">
+                  ConfigurationAggregator*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-GetAggregateConformancePackComplianceSummary" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_GetAggregateConformancePackComplianceSummary.html">
+                 GetAggregateConformancePackComplianceSummary
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return the number of compliant and noncompliant conformance packs for one or more accounts and regions in an aggregator
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-ConfigurationAggregator">
+                  ConfigurationAggregator*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-GetAggregateDiscoveredResourceCounts" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_GetAggregateDiscoveredResourceCounts.html">
+                 GetAggregateDiscoveredResourceCounts
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return the resource counts across accounts and regions that are present in your AWS Config aggregator
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-ConfigurationAggregator">
+                  ConfigurationAggregator*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-GetAggregateResourceConfig" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_GetAggregateResourceConfig.html">
+                 GetAggregateResourceConfig
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return configuration item that is aggregated for your specific resource in a specific source account and region
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-ConfigurationAggregator">
+                  ConfigurationAggregator*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-GetComplianceDetailsByConfigRule" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_GetComplianceDetailsByConfigRule.html">
+                 GetComplianceDetailsByConfigRule
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return the evaluation results for the specified AWS Config rule
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-ConfigRule">
+                  ConfigRule*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-GetComplianceDetailsByResource" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_GetComplianceDetailsByResource.html">
+                 GetComplianceDetailsByResource
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return the evaluation results for the specified AWS resource
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-GetComplianceSummaryByConfigRule" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_GetComplianceSummaryByConfigRule.html">
+                 GetComplianceSummaryByConfigRule
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return the number of AWS Config rules that are compliant and noncompliant, up to a maximum of 25 for each
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-GetComplianceSummaryByResourceType" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_GetComplianceSummaryByResourceType.html">
+                 GetComplianceSummaryByResourceType
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return the number of resources that are compliant and the number that are noncompliant
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-GetConformancePackComplianceDetails" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_GetConformancePackComplianceDetails.html">
+                 GetConformancePackComplianceDetails
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return compliance details of a conformance pack for all AWS resources that are monitered by conformance pack
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-ConformancePack">
+                  ConformancePack*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-GetConformancePackComplianceSummary" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_GetConformancePackComplianceSummary.html">
+                 GetConformancePackComplianceSummary
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to provide compliance summary for one or more conformance packs
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-ConformancePack">
+                  ConformancePack*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-GetCustomRulePolicy" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_GetCustomRulePolicy.html">
+                 GetCustomRulePolicy
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return the policy definition containing the logic for your AWS Config Custom Policy rule
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-ConfigRule">
+                  ConfigRule*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-GetDiscoveredResourceCounts" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_GetDiscoveredResourceCounts.html">
+                 GetDiscoveredResourceCounts
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return the resource types, the number of each resource type, and the total number of resources that AWS Config is recording in this region for your AWS account
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-GetOrganizationConfigRuleDetailedStatus" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_GetOrganizationConfigRuleDetailedStatus.html">
+                 GetOrganizationConfigRuleDetailedStatus
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return detailed status for each member account within an organization for a given organization config rule
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-OrganizationConfigRule">
+                  OrganizationConfigRule*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-GetOrganizationConformancePackDetailedStatus" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_GetOrganizationConformancePackDetailedStatus.html">
+                 GetOrganizationConformancePackDetailedStatus
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return detailed status for each member account within an organization for a given organization conformance pack
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-OrganizationConformancePack">
+                  OrganizationConformancePack*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-GetOrganizationCustomRulePolicy" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_GetOrganizationCustomRulePolicy.html">
+                 GetOrganizationCustomRulePolicy
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return the policy definition containing the logic for your organization AWS Config Custom Policy rule
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-OrganizationConfigRule">
+                  OrganizationConfigRule*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-GetResourceConfigHistory" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_GetResourceConfigHistory.html">
+                 GetResourceConfigHistory
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return a list of configuration items for the specified resource
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-GetResourceEvaluationSummary" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_GetResourceEvaluationSummary.html">
+                 GetResourceEvaluationSummary
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return the summary of resource evaluations for a specific resource evaluation ID
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-GetStoredQuery" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_GetStoredQuery.html">
+                 GetStoredQuery
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return the details of a specific stored query
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-StoredQuery">
+                  StoredQuery*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-ListAggregateDiscoveredResources" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_ListAggregateDiscoveredResources.html">
+                 ListAggregateDiscoveredResources
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to accept a resource type and returns a list of resource identifiers that are aggregated for a specific resource type across accounts and regions
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-ConfigurationAggregator">
+                  ConfigurationAggregator*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-ListConformancePackComplianceScores" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_ListConformancePackComplianceScores.html">
+                 ListConformancePackComplianceScores
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return the percentage of compliant rule-resource combinations in a conformance pack compared to the number of total possible rule-resource combinations
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-ListDiscoveredResources" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_ListDiscoveredResources.html">
+                 ListDiscoveredResources
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to accept a resource type and returns a list of resource identifiers for the resources of that type
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-ListResourceEvaluations" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_ListResourceEvaluations.html">
+                 ListResourceEvaluations
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list the resource evaluation summaries for an AWS account in an AWS Region
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-ListStoredQueries" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_ListStoredQueries.html">
+                 ListStoredQueries
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list the stored queries for an AWS account in an AWS Region
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-ListTagsForResource" rowspan="7" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_ListTagsForResource.html">
+                 ListTagsForResource
+                </a>
+               </td>
+               <td rowspan="7" tabindex="-1">
+                Grants permission to list the tags for AWS Config resource
+               </td>
+               <td rowspan="7" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-AggregationAuthorization">
+                  AggregationAuthorization
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-ConfigRule">
+                  ConfigRule
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-ConfigurationAggregator">
+                  ConfigurationAggregator
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-ConformancePack">
+                  ConformancePack
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-OrganizationConfigRule">
+                  OrganizationConfigRule
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-OrganizationConformancePack">
+                  OrganizationConformancePack
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-StoredQuery">
+                  StoredQuery
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-PutAggregationAuthorization" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_PutAggregationAuthorization.html">
+                 PutAggregationAuthorization
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to authorize the aggregator account and region to collect data from the source account and region
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-AggregationAuthorization">
+                  AggregationAuthorization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsconfig-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-PutConfigRule" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_PutConfigRule.html">
+                 PutConfigRule
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to add or update an AWS Config rule for evaluating whether your AWS resources comply with your desired configurations
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-ConfigRule">
+                  ConfigRule*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsconfig-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-PutConfigurationAggregator" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_PutConfigurationAggregator.html">
+                 PutConfigurationAggregator
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to create and update the configuration aggregator with the selected source accounts and regions
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-ConfigurationAggregator">
+                  ConfigurationAggregator*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 iam:PassRole
+                </p>
+                <p>
+                 organizations:EnableAWSServiceAccess
+                </p>
+                <p>
+                 organizations:ListDelegatedAdministrators
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsconfig-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-PutConfigurationRecorder" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_PutConfigurationRecorder.html">
+                 PutConfigurationRecorder
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a new configuration recorder to record the selected resource configurations
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-PutConformancePack" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_PutConformancePack.html">
+                 PutConformancePack
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create or update a conformance pack
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-ConformancePack">
+                  ConformancePack*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 iam:CreateServiceLinkedRole
+                </p>
+                <p>
+                 iam:PassRole
+                </p>
+                <p>
+                 s3:GetObject
+                </p>
+                <p>
+                 s3:ListBucket
+                </p>
+                <p>
+                 ssm:GetDocument
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-PutDeliveryChannel" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_PutDeliveryChannel.html">
+                 PutDeliveryChannel
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a delivery channel object to deliver configuration information to an Amazon S3 bucket and Amazon SNS topic
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-PutEvaluations" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_PutEvaluations.html">
+                 PutEvaluations
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to be used by an AWS Lambda function to deliver evaluation results to AWS Config
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-PutExternalEvaluation" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_PutExternalEvaluation.html">
+                 PutExternalEvaluation
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to deliver evaluation result to AWS Config
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-ConfigRule">
+                  ConfigRule*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-PutOrganizationConfigRule" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_PutOrganizationConfigRule.html">
+                 PutOrganizationConfigRule
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to add or update organization config rule for your entire organization evaluating whether your AWS resources comply with your desired configurations
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-OrganizationConfigRule">
+                  OrganizationConfigRule*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 iam:CreateServiceLinkedRole
+                </p>
+                <p>
+                 iam:PassRole
+                </p>
+                <p>
+                 organizations:EnableAWSServiceAccess
+                </p>
+                <p>
+                 organizations:ListDelegatedAdministrators
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-PutOrganizationConformancePack" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_PutOrganizationConformancePack.html">
+                 PutOrganizationConformancePack
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to add or update organization conformance pack for your entire organization evaluating whether your AWS resources comply with your desired configurations
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-OrganizationConformancePack">
+                  OrganizationConformancePack*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 iam:CreateServiceLinkedRole
+                </p>
+                <p>
+                 iam:PassRole
+                </p>
+                <p>
+                 organizations:EnableAWSServiceAccess
+                </p>
+                <p>
+                 organizations:ListDelegatedAdministrators
+                </p>
+                <p>
+                 s3:GetObject
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-PutRemediationConfigurations" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_PutRemediationConfigurations.html">
+                 PutRemediationConfigurations
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to add or update the remediation configuration with a specific AWS Config rule with the selected target or action
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-RemediationConfiguration">
+                  RemediationConfiguration*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 iam:PassRole
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-PutRemediationExceptions" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_PutRemediationExceptions.html">
+                 PutRemediationExceptions
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to add or update remediation exceptions for specific resources for a specific AWS Config rule
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-PutResourceConfig" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_PutResourceConfig.html">
+                 PutResourceConfig
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to record the configuration state for the resource provided in the request
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-PutRetentionConfiguration" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_PutRetentionConfiguration.html">
+                 PutRetentionConfiguration
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create and update the retention configuration with details about retention period (number of days) that AWS Config stores your historical information
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-PutStoredQuery" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_PutStoredQuery.html">
+                 PutStoredQuery
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to save a new query or updates an existing saved query
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-StoredQuery">
+                  StoredQuery*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsconfig-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-SelectAggregateResourceConfig" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_SelectAggregateResourceConfig.html">
+                 SelectAggregateResourceConfig
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to accept a structured query language (SQL) SELECT command and an aggregator to query configuration state of AWS resources across multiple accounts and regions, performs the corresponding search, and returns resource configurations matching the properties
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-ConfigurationAggregator">
+                  ConfigurationAggregator*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-SelectResourceConfig" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_SelectResourceConfig.html">
+                 SelectResourceConfig
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to accept a structured query language (SQL) SELECT command, performs the corresponding search, and returns resource configurations matching the properties
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-StartConfigRulesEvaluation" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_StartConfigRulesEvaluation.html">
+                 StartConfigRulesEvaluation
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to evaluate your resources against the specified Config rules
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-ConfigRule">
+                  ConfigRule*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-StartConfigurationRecorder" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_StartConfigurationRecorder.html">
+                 StartConfigurationRecorder
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to start recording configurations of the AWS resources you have selected to record in your AWS account
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-StartRemediationExecution" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_StartRemediationExecution.html">
+                 StartRemediationExecution
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to run an on-demand remediation for the specified AWS Config rules against the last known remediation configuration
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 iam:PassRole
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-StartResourceEvaluation" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_StartResourceEvaluation.html">
+                 StartResourceEvaluation
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to evaluate your resource details against the AWS Config rules in your account
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 cloudformation:DescribeType
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-StopConfigurationRecorder" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_StopConfigurationRecorder.html">
+                 StopConfigurationRecorder
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to stop recording configurations of the AWS resources you have selected to record in your AWS account
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-TagResource" rowspan="8" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_TagResource.html">
+                 TagResource
+                </a>
+               </td>
+               <td rowspan="8" tabindex="-1">
+                Grants permission to associate the specified tags to a resource with the specified resourceArn
+               </td>
+               <td rowspan="8" tabindex="-1">
+                Tagging
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-AggregationAuthorization">
+                  AggregationAuthorization
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-ConfigRule">
+                  ConfigRule
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-ConfigurationAggregator">
+                  ConfigurationAggregator
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-ConformancePack">
+                  ConformancePack
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-OrganizationConfigRule">
+                  OrganizationConfigRule
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-OrganizationConformancePack">
+                  OrganizationConformancePack
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-StoredQuery">
+                  StoredQuery
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsconfig-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-UntagResource" rowspan="8" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_UntagResource.html">
+                 UntagResource
+                </a>
+               </td>
+               <td rowspan="8" tabindex="-1">
+                Grants permission to delete specified tags from a resource
+               </td>
+               <td rowspan="8" tabindex="-1">
+                Tagging
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-AggregationAuthorization">
+                  AggregationAuthorization
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-ConfigRule">
+                  ConfigRule
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-ConfigurationAggregator">
+                  ConfigurationAggregator
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-ConformancePack">
+                  ConformancePack
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-OrganizationConfigRule">
+                  OrganizationConfigRule
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-OrganizationConformancePack">
+                  OrganizationConformancePack
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-StoredQuery">
+                  StoredQuery
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <h2 id="awsconfig-resources-for-iam-policies">
+            Resource types defined by        AWS Config
+           </h2>
+           <p>
+            The following resource types are defined by this service and can be used in the
+            <code class="code">
+             Resource
+            </code>
+            element of IAM permission policy statements. Each action in the
+            <a href="#awsconfig-actions-as-permissions">
+             Actions table
+            </a>
+            identifies the      resource types that can be specified with that action. A resource type can also define which      condition keys you can include in a policy. These keys are displayed in the last column of the      Resource types table. For details about the columns in the following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#resources_table" rel="noopener noreferrer" target="_blank">
+             Resource types table
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9d394c13b5">
+              <thead>
+               <tr>
+                <th>
+                 Resource types
+                </th>
+                <th>
+                 ARN
+                </th>
+                <th>
+                 Condition keys
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="awsconfig-AggregationAuthorization" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_AggregationAuthorization.html">
+                 AggregationAuthorization
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:config:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:aggregation-authorization/$
+                 <span>
+                  {
+                 </span>
+                 AggregatorAccount}/$
+                 <span>
+                  {
+                 </span>
+                 AggregatorRegion}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-ConfigurationAggregator" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_ConfigurationAggregator.html">
+                 ConfigurationAggregator
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:config:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:config-aggregator/$
+                 <span>
+                  {
+                 </span>
+                 AggregatorId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-ConfigRule" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_ConfigRule.html">
+                 ConfigRule
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:config:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:config-rule/$
+                 <span>
+                  {
+                 </span>
+                 ConfigRuleId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-ConformancePack" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_ConformancePackDetail.html">
+                 ConformancePack
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:config:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:conformance-pack/$
+                 <span>
+                  {
+                 </span>
+                 ConformancePackName}/$
+                 <span>
+                  {
+                 </span>
+                 ConformancePackId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-OrganizationConfigRule" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_OrganizationConfigRule.html">
+                 OrganizationConfigRule
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:config:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:organization-config-rule/$
+                 <span>
+                  {
+                 </span>
+                 OrganizationConfigRuleId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-OrganizationConformancePack" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_OrganizationConformancePack.html">
+                 OrganizationConformancePack
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:config:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:organization-conformance-pack/$
+                 <span>
+                  {
+                 </span>
+                 OrganizationConformancePackId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-RemediationConfiguration" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_RemediationConfiguration.html">
+                 RemediationConfiguration
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:config:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:remediation-configuration/$
+                 <span>
+                  {
+                 </span>
+                 RemediationConfigurationId}
+                </code>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-StoredQuery" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/config/latest/APIReference/API_StoredQuery.html">
+                 StoredQuery
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:config:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:stored-query/$
+                 <span>
+                  {
+                 </span>
+                 StoredQueryName}/$
+                 <span>
+                  {
+                 </span>
+                 StoredQueryId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsconfig-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <h2 id="awsconfig-policy-keys">
+            Condition keys for        AWS Config
+           </h2>
+           <p>
+            AWS Config defines the following condition keys that can be used in the
+            <code class="code">
+             Condition
+            </code>
+            element of an IAM policy. You can use these keys to further refine      the conditions under which the policy statement applies. For details about the columns in the      following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#context_keys_table" rel="noopener noreferrer" target="_blank">
+             Condition keys table
+            </a>
+            .
+           </p>
+           <p>
+            To view the global condition keys that are available to all services, see
+            <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#AvailableKeys">
+             Available global condition keys
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9d394c15b7">
+              <thead>
+               <tr>
+                <th>
+                 Condition keys
+                </th>
+                <th>
+                 Description
+                </th>
+                <th>
+                 Type
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="awsconfig-aws_RequestTag___TagKey_" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-requesttag">
+                 aws:RequestTag/${TagKey}
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the allowed set of values for each of the tags
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-aws_ResourceTag___TagKey_" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-resourcetag">
+                 aws:ResourceTag/${TagKey}
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by tag-value associated with the resource
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awsconfig-aws_TagKeys" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-tagkeys">
+                 aws:TagKeys
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the presence of mandatory tags in the request
+               </td>
+               <td tabindex="-1">
+                ArrayOfString
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <awsdocs-copyright class="copyright-print">
+           </awsdocs-copyright>
+           <awsdocs-thumb-feedback right-edge="{{$ctrl.thumbFeedbackRightEdge}}">
+           </awsdocs-thumb-feedback>
+          </div>
+          <noscript>
+           <div>
+            <div>
+             <div>
+              <div id="js_error_message">
+               <p>
+                <img alt="Warning" src="https://d1ge0kk1l5kms0.cloudfront.net/images/G/01/webservices/console/warning.png"/>
+                <strong>
+                 Javascript is disabled or is unavailable in your browser.
+                </strong>
+               </p>
+               <p>
+                To use the Amazon Web Services Documentation, Javascript must be enabled. Please refer to your browser's Help pages for instructions.
+               </p>
+              </div>
+             </div>
+            </div>
+           </div>
+          </noscript>
+          <div class="awsui-util-font-size-0" id="main-col-footer">
+           <div id="doc-conventions">
+            <a href="/general/latest/gr/docconventions.html" target="_top">
+             Document Conventions
+            </a>
+           </div>
+           <div class="prev-next">
+            <div accesskey="p" class="prev-link" href="./list_awscomputeoptimizer.html" id="previous">
+             AWS Compute Optimizer
+            </div>
+            <div accesskey="n" class="next-link" href="./list_amazonconnect.html" id="next">
+             Amazon Connect
+            </div>
+           </div>
+          </div>
+          <awsdocs-page-utilities>
+          </awsdocs-page-utilities>
+         </div>
+         <div id="quick-feedback-yes" style="display: none;">
+          <div class="title">
+           Did this page help you? - Yes
+          </div>
+          <div class="content">
+           <p>
+            Thanks for letting us know we're doing a good job!
+           </p>
+           <p>
+            If you've got a moment, please tell us what we did right so we can do more of it.
+           </p>
+           <p>
+            <awsui-button click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service Authorization Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awsconfig.html" id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback">
+            </awsui-button>
+           </p>
+          </div>
+         </div>
+         <div id="quick-feedback-no" style="display: none;">
+          <div class="title">
+           Did this page help you? - No
+          </div>
+          <div class="content">
+           <p>
+            Thanks for letting us know this page needs work. We're sorry we let you down.
+           </p>
+           <p>
+            If you've got a moment, please tell us how we can make the documentation better.
+           </p>
+           <p>
+            <awsui-button click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service Authorization Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awsconfig.html" id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback">
+            </awsui-button>
+           </p>
+          </div>
+         </div>
+        </div>
+       </body>
+      </div>
+     </awsdocs-view>
+     <div class="page-loading-indicator" id="page-loading-indicator">
+      <awsui-spinner size="large">
+      </awsui-spinner>
+     </div>
+    </div>
+    <div dom-region="tools" id="tools-panel">
+     <awsdocs-tools-panel id="awsdocs-tools-panel">
+     </awsdocs-tools-panel>
+    </div>
+   </awsui-app-layout>
+   <awsdocs-cookie-banner class="doc-cookie-banner">
+   </awsdocs-cookie-banner>
+  </div>
+ </body>
+</html>

@@ -1,0 +1,3490 @@
+<!DOCTYPE html>
+<html lang="en-US" xmlns="http://www.w3.org/1999/xhtml">
+ <head>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+  <title>
+   Actions, resources, and condition keys for AWS Storage Gateway - Service Authorization Reference
+  </title>
+  <meta content="width=device-width,initial-scale=1" name="viewport"/>
+  <meta content="/assets" name="assets_root"/>
+  <meta content="list_awsstoragegateway" name="target_state"/>
+  <meta content="list_awsstoragegateway" name="default_state"/>
+  <link href="https://docs.aws.amazon.com/assets/images/favicon.ico" rel="icon" type="image/ico"/>
+  <link href="https://docs.aws.amazon.com/assets/images/favicon.ico" rel="shortcut icon" type="image/ico"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsstoragegateway.html" rel="canonical"/>
+  <meta content="Lists all of the available service-specific resources, actions, and condition keys that can be used in IAM policies to control access to AWS Storage Gateway." name="description"/>
+  <meta content="IAD" name="deployment_region"/>
+  <meta content="Service Authorization Reference" name="product"/>
+  <meta content="Service Authorization Reference" name="guide"/>
+  <meta content="Provides a list of the actions, resources, and condition keys supported by each AWS service that can be used in an IAM policy." name="abstract"/>
+  <meta content="en_us" name="guide-locale"/>
+  <meta content="toc-contents.json" name="tocs"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsstoragegateway.html" rel="canonical"/>
+  <link href="https://docs.aws.amazon.com/id_id/service-authorization/latest/reference/list_awsstoragegateway.html" hreflang="id-id" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/id_id/service-authorization/latest/reference/list_awsstoragegateway.html" hreflang="id" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/de_de/service-authorization/latest/reference/list_awsstoragegateway.html" hreflang="de-de" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/de_de/service-authorization/latest/reference/list_awsstoragegateway.html" hreflang="de" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsstoragegateway.html" hreflang="en-us" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsstoragegateway.html" hreflang="en" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/es_es/service-authorization/latest/reference/list_awsstoragegateway.html" hreflang="es-es" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/es_es/service-authorization/latest/reference/list_awsstoragegateway.html" hreflang="es" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/fr_fr/service-authorization/latest/reference/list_awsstoragegateway.html" hreflang="fr-fr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/fr_fr/service-authorization/latest/reference/list_awsstoragegateway.html" hreflang="fr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/it_it/service-authorization/latest/reference/list_awsstoragegateway.html" hreflang="it-it" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/it_it/service-authorization/latest/reference/list_awsstoragegateway.html" hreflang="it" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ja_jp/service-authorization/latest/reference/list_awsstoragegateway.html" hreflang="ja-jp" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ja_jp/service-authorization/latest/reference/list_awsstoragegateway.html" hreflang="ja" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ko_kr/service-authorization/latest/reference/list_awsstoragegateway.html" hreflang="ko-kr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ko_kr/service-authorization/latest/reference/list_awsstoragegateway.html" hreflang="ko" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/pt_br/service-authorization/latest/reference/list_awsstoragegateway.html" hreflang="pt-br" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/pt_br/service-authorization/latest/reference/list_awsstoragegateway.html" hreflang="pt" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/zh_cn/service-authorization/latest/reference/list_awsstoragegateway.html" hreflang="zh-cn" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/zh_tw/service-authorization/latest/reference/list_awsstoragegateway.html" hreflang="zh-tw" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsstoragegateway.html" hreflang="x-default" rel="alternative"/>
+  <meta content="Service Authorization Docs" name="feedback-item"/>
+  <meta content="Service Authorization Reference" name="this_doc_product"/>
+  <meta content="Service Authorization Reference" name="this_doc_guide"/>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor4.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor3.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor1.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/awsdocs-common.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/awsdocs-doc-page.js?version=2021.12.02">
+  </script>
+  <link href="https://docs.aws.amazon.com/assets/r/vendor4.css?version=2021.12.02" rel="stylesheet"/>
+  <link href="https://docs.aws.amazon.com/assets/r/awsdocs-common.css?version=2021.12.02" rel="stylesheet"/>
+  <link href="https://docs.aws.amazon.com/assets/r/awsdocs-doc-page.css?version=2021.12.02" rel="stylesheet"/>
+  <script async="" data-config="{'appEntity':'aws-documentation','region':'us-east-1','service':'iam'}" id="awsc-panorama-bundle" src="https://prod.pa.cdn.uis.awsstatic.com/panorama-nav-init.js" type="text/javascript">
+  </script>
+  <meta id="panorama-serviceSubSection" value="Service Authorization Reference"/>
+  <meta id="panorama-serviceConsolePage" value="Actions, resources, and condition keys for AWS Storage Gateway"/>
+ </head>
+ <body class="awsdocs awsui">
+  <div class="awsdocs-container">
+   <awsdocs-header>
+   </awsdocs-header>
+   <awsui-app-layout class="awsui-util-no-gutters" header-selector="awsdocs-header" id="app-layout" navigation-change="$ctrl.onNavChange($event)" navigation-hide="false" navigation-open="$ctrl.navOpen" navigation-width="$ctrl.navWidth" ng-controller="ContentController as $ctrl" tools-change="$ctrl.onToolsChange($event)" tools-hide="$ctrl.hideTools" tools-open="$ctrl.toolsOpen" tools-width="$ctrl.toolsWidth">
+    <div dom-region="navigation" id="guide-toc">
+     <awsdocs-toc>
+     </awsdocs-toc>
+    </div>
+    <div dom-region="content" id="main-column" tabindex="-1">
+     <awsdocs-view class="awsdocs-view">
+      <div id="awsdocs-content">
+       <head>
+        <title>
+         Actions, resources, and condition keys for AWS Storage Gateway - Service Authorization Reference
+        </title>
+        <meta content="/pdfs/service-authorization/latest/reference/service-authorization.pdf#list_awsstoragegateway" name="pdf"/>
+        <meta content="https://repost.aws/tags/TAO7Z4bI5hQVWMiYFs34QhIA" name="forums"/>
+        <meta content="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service%20Authorization%20Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awsstoragegateway.html" name="feedback"/>
+        <meta content="feedbackyes.html?topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awsstoragegateway.html" name="feedback-yes"/>
+        <meta content="feedbackno.html?topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awsstoragegateway.html" name="feedback-no"/>
+        <script type="application/ld+json">
+         {
+    "@context" : "https://schema.org",
+    "@type" : "BreadcrumbList",
+    "itemListElement" : [
+      {
+        "@type" : "ListItem",
+        "position" : 1,
+        "name" : "AWS",
+        "item" : "https://aws.amazon.com"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 2,
+        "name" : "Service Authorization Reference",
+        "item" : "https://docs.aws.amazon.com/iam/index.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 3,
+        "name" : "Service Authorization Reference",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 4,
+        "name" : "Reference",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 5,
+        "name" : "Actions, resources, and condition keys for AWS services",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference_policies_actions-resources-contextkeys.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 6,
+        "name" : "Actions, resources, and condition keys for AWS Storage Gateway",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference_policies_actions-resources-contextkeys.html"
+      }
+    ]
+}
+        </script>
+       </head>
+       <body>
+        <div id="main">
+         <div style="display: none">
+          <a href="/pdfs/service-authorization/latest/reference/service-authorization.pdf#list_awsstoragegateway" rel="noopener noreferrer" target="_blank" title="Open PDF">
+          </a>
+         </div>
+         <div class="breadcrumb" id="breadcrumbs">
+          <a href="https://aws.amazon.com">
+           AWS
+          </a>
+          <a href="/index.html">
+           Documentation
+          </a>
+          <a href="/iam/index.html">
+           Service Authorization Reference
+          </a>
+          <a href="reference.html">
+           Service Authorization Reference
+          </a>
+         </div>
+         <div id="page-toc-src">
+          <a href="#awsstoragegateway-actions-as-permissions">
+           Actions
+          </a>
+          <a href="#awsstoragegateway-resources-for-iam-policies">
+           Resource types
+          </a>
+          <a href="#awsstoragegateway-policy-keys">
+           Condition keys
+          </a>
+         </div>
+         <div class="awsui-util-container" id="main-content">
+          <div id="main-col-body">
+           <awsdocs-language-banner data-service="$ctrl.pageService">
+           </awsdocs-language-banner>
+           <h1 class="topictitle" id="list_awsstoragegateway">
+            Actions, resources, and condition keys for      AWS Storage Gateway
+           </h1>
+           <div class="awsdocs-page-header-container">
+            <awsdocs-page-header>
+            </awsdocs-page-header>
+            <awsdocs-filter-selector id="awsdocs-filter-selector">
+            </awsdocs-filter-selector>
+           </div>
+           <p>
+            AWS Storage Gateway (service prefix:
+            <code class="code">
+             storagegateway
+            </code>
+            ) provides the following    service-specific resources, actions, and condition context keys for use in IAM permission    policies.
+           </p>
+           <p>
+            References:
+           </p>
+           <div class="itemizedlist">
+            <ul class="itemizedlist">
+             <li class="listitem">
+              <p>
+               Learn how to
+               <a href="https://docs.aws.amazon.com/storagegateway/latest/userguide/">
+                configure this service
+               </a>
+               .
+              </p>
+             </li>
+             <li class="listitem">
+              <p>
+               View a list of the
+               <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/">
+                API operations available for this          service
+               </a>
+               .
+              </p>
+             </li>
+             <li class="listitem">
+              <p>
+               Learn how to secure this service and its resources by
+               <a href="https://docs.aws.amazon.com/storagegateway/latest/userguide/UsingIAMWithStorageGateway.html">
+                using          IAM
+               </a>
+               permission policies.
+              </p>
+             </li>
+            </ul>
+           </div>
+           <div class="highlights" id="inline-topiclist">
+            <h6>
+             Topics
+            </h6>
+            <ul>
+             <li>
+              <a href="#awsstoragegateway-actions-as-permissions">
+               Actions defined by        AWS Storage Gateway
+              </a>
+             </li>
+             <li>
+              <a href="#awsstoragegateway-resources-for-iam-policies">
+               Resource types defined by        AWS Storage Gateway
+              </a>
+             </li>
+             <li>
+              <a href="#awsstoragegateway-policy-keys">
+               Condition keys for        AWS Storage Gateway
+              </a>
+             </li>
+            </ul>
+           </div>
+           <h2 id="awsstoragegateway-actions-as-permissions">
+            Actions defined by        AWS Storage Gateway
+           </h2>
+           <p>
+            You can specify the following actions in the
+            <code class="code">
+             Action
+            </code>
+            element of an IAM      policy statement. Use policies to grant permissions to perform an operation in AWS. When you      use an action in a policy, you usually allow or deny access to the API operation or CLI      command with the same name. However, in some cases, a single action controls access to more      than one operation. Alternatively, some operations require several different actions.
+           </p>
+           <p>
+            The
+            <b>
+             Resource types
+            </b>
+            column of the Actions table indicates whether each      action supports resource-level permissions. If there is no value for this column, you must      specify all resources ("*") to which the policy applies in the
+            <code class="code">
+             Resource
+            </code>
+            element      of your policy statement. If the column includes a resource type, then you can specify an ARN      of that type in a statement with that action. If the action has one or more required      resources, the caller must have permission to use the action with those resources. Required      resources are indicated in the table with an asterisk (*). If you limit resource access with      the
+            <code class="code">
+             Resource
+            </code>
+            element in an IAM policy, you must include an ARN or pattern for      each required resource type. Some actions support multiple resource types. If the resource      type is optional (not indicated as required), then you can choose to use one of the optional      resource types.
+           </p>
+           <p>
+            The
+            <b>
+             Condition keys
+            </b>
+            column of the Actions table includes keys that you      can specify in a policy statement's
+            <code class="code">
+             Condition
+            </code>
+            element. For more information on      the condition keys that are associated with resources for the service, see the
+            <b>
+             Condition keys
+            </b>
+            column of the Resource types table.
+           </p>
+           <div class="awsdocs-note">
+            <div class="awsdocs-note-title">
+             <awsui-icon name="status-info" variant="link">
+             </awsui-icon>
+             <h6>
+              Note
+             </h6>
+            </div>
+            <div class="awsdocs-note-text">
+             <p>
+              Resource condition keys are listed in the
+              <a href="#awsstoragegateway-resources-for-iam-policies">
+               Resource types
+              </a>
+              table. You        can find a link to the resource type that applies to an action in the
+              <b>
+               Resource          types (*required)
+              </b>
+              column of the Actions table. The resource type in the        Resource types table includes the
+              <b>
+               Condition keys
+              </b>
+              column, which are the        resource condition keys that apply to an action in the Actions table.
+             </p>
+            </div>
+           </div>
+           <p>
+            For details about the columns in the following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#actions_table" rel="noopener noreferrer" target="_blank">
+             Actions table
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9e1509c11c13">
+              <thead>
+               <tr>
+                <th>
+                 Actions
+                </th>
+                <th>
+                 Description
+                </th>
+                <th>
+                 Access level
+                </th>
+                <th>
+                 Resource types (*required)
+                </th>
+                <th>
+                 Condition keys
+                </th>
+                <th>
+                 Dependent actions
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="awsstoragegateway-ActivateGateway" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_ActivateGateway.html">
+                 ActivateGateway
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to activate the gateway you previously deployed on your host
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsstoragegateway-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-AddCache" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_AddCache.html">
+                 AddCache
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to configure one or more gateway local disks as cache for a cached-volume gateway
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-gateway">
+                  gateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-AddTagsToResource" rowspan="5" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_AddTagsToResource.html">
+                 AddTagsToResource
+                </a>
+               </td>
+               <td rowspan="5" tabindex="-1">
+                Grants permission to add one or more tags to the specified resource
+               </td>
+               <td rowspan="5" tabindex="-1">
+                Tagging
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-gateway">
+                  gateway
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-share">
+                  share
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-tape">
+                  tape
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-volume">
+                  volume
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsstoragegateway-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-AddUploadBuffer" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_AddUploadBuffer.html">
+                 AddUploadBuffer
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to configure one or more gateway local disks as upload buffer for a specified gateway
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-gateway">
+                  gateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-AddWorkingStorage" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_AddWorkingStorage.html">
+                 AddWorkingStorage
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to configure one or more gateway local disks as working storage for a gateway
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-gateway">
+                  gateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-AssignTapePool" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_AssignTapePool.html">
+                 AssignTapePool
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to move a tape to the target pool specified
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-tape">
+                  tape*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-tapepool">
+                  tapepool*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-AssociateFileSystem" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_AssociateFileSystem.html">
+                 AssociateFileSystem
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to associate an Amazon FSx file system with the Amazon FSx file gateway
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-gateway">
+                  gateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 ds:DescribeDirectories
+                </p>
+                <p>
+                 ec2:DescribeNetworkInterfaces
+                </p>
+                <p>
+                 fsx:DescribeFileSystems
+                </p>
+                <p>
+                 iam:CreateServiceLinkedRole
+                </p>
+                <p>
+                 logs:CreateLogDelivery
+                </p>
+                <p>
+                 logs:GetLogDelivery
+                </p>
+                <p>
+                 logs:ListLogDeliveries
+                </p>
+                <p>
+                 logs:UpdateLogDelivery
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsstoragegateway-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-AttachVolume" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_AttachVolume.html">
+                 AttachVolume
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to connect a volume to an iSCSI connection and then attaches the volume to the specified gateway
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-gateway">
+                  gateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-volume">
+                  volume*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-BypassGovernanceRetention" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/userguide/CreatingCustomTapePool.html#TapeRetentionLock">
+                 BypassGovernanceRetention
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to allow the governance retention lock on a pool to be bypassed
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-tapepool">
+                  tapepool*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-CancelArchival" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_CancelArchival.html">
+                 CancelArchival
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to cancel archiving of a virtual tape to the virtual tape shelf (VTS) after the archiving process is initiated
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-gateway">
+                  gateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-tape">
+                  tape*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-CancelRetrieval" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_CancelRetrieval.html">
+                 CancelRetrieval
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to cancel retrieval of a virtual tape from the virtual tape shelf (VTS) to a gateway after the retrieval process is initiated
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-gateway">
+                  gateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-tape">
+                  tape*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-CreateCachediSCSIVolume" rowspan="3" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_CreateCachediSCSIVolume.html">
+                 CreateCachediSCSIVolume
+                </a>
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Grants permission to create a cached volume on a specified cached gateway. This operation is supported only for the gateway-cached volume architecture
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-gateway">
+                  gateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-volume">
+                  volume*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsstoragegateway-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-CreateNFSFileShare" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_CreateNFSFileShare.html">
+                 CreateNFSFileShare
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to create a NFS file share on an existing file gateway
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-gateway">
+                  gateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsstoragegateway-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-CreateSMBFileShare" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_CreateSMBFileShare.html">
+                 CreateSMBFileShare
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to create a SMB file share on an existing file gateway
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-gateway">
+                  gateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsstoragegateway-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-CreateSnapshot" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_CreateSnapshot.html">
+                 CreateSnapshot
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to initiate a snapshot of a volume
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-volume">
+                  volume*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsstoragegateway-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-CreateSnapshotFromVolumeRecoveryPoint" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_CreateSnapshotFromVolumeRecoveryPoint.html">
+                 CreateSnapshotFromVolumeRecoveryPoint
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to initiate a snapshot of a gateway from a volume recovery point
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-volume">
+                  volume*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsstoragegateway-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-CreateStorediSCSIVolume" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_CreateStorediSCSIVolume.html">
+                 CreateStorediSCSIVolume
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to create a volume on a specified gateway
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-gateway">
+                  gateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsstoragegateway-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-CreateTapePool" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_CreateTapePool.html">
+                 CreateTapePool
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a tape pool
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsstoragegateway-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-CreateTapeWithBarcode" rowspan="3" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_CreateTapeWithBarcode.html">
+                 CreateTapeWithBarcode
+                </a>
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Grants permission to create a virtual tape by using your own barcode
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-gateway">
+                  gateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-tapepool">
+                  tapepool*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsstoragegateway-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-CreateTapes" rowspan="3" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_CreateTapes.html">
+                 CreateTapes
+                </a>
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Grants permission to create one or more virtual tapes. You write data to the virtual tapes and then archive the tapes
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-gateway">
+                  gateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-tapepool">
+                  tapepool*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsstoragegateway-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-DeleteAutomaticTapeCreationPolicy" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_DeleteAutomaticTapeCreationPolicy.html">
+                 DeleteAutomaticTapeCreationPolicy
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete the automatic tape creation policy configured on a gateway-VTL
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-gateway">
+                  gateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-DeleteBandwidthRateLimit" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_DeleteBandwidthRateLimit.html">
+                 DeleteBandwidthRateLimit
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete the bandwidth rate limits of a gateway
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-gateway">
+                  gateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-DeleteChapCredentials" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_DeleteChapCredentials.html">
+                 DeleteChapCredentials
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete Challenge-Handshake Authentication Protocol (CHAP) credentials for a specified iSCSI target and initiator pair
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-target">
+                  target*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-DeleteFileShare" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_DeleteFileShare.html">
+                 DeleteFileShare
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a file share from a file gateway
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-share">
+                  share*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-DeleteGateway" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_DeleteGateway.html">
+                 DeleteGateway
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a gateway
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-gateway">
+                  gateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-DeleteSnapshotSchedule" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_DeleteSnapshotSchedule.html">
+                 DeleteSnapshotSchedule
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a snapshot of a volume
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-volume">
+                  volume*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-DeleteTape" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_DeleteTape.html">
+                 DeleteTape
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to delete the specified virtual tape
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-gateway">
+                  gateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-tape">
+                  tape*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-DeleteTapeArchive" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_DeleteTapeArchive.html">
+                 DeleteTapeArchive
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete the specified virtual tape from the virtual tape shelf (VTS)
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-DeleteTapePool" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_DeleteTapePool.html">
+                 DeleteTapePool
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete the specified tape pool
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-tapepool">
+                  tapepool*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-DeleteVolume" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_DeleteVolume.html">
+                 DeleteVolume
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete the specified gateway volume that you previously created using the CreateCachediSCSIVolume or CreateStorediSCSIVolume API
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-volume">
+                  volume*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-DescribeAvailabilityMonitorTest" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_DescribeAvailabilityMonitorTest.html">
+                 DescribeAvailabilityMonitorTest
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get the information about the most recent high availability monitoring test that was performed on the gateway
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-gateway">
+                  gateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-DescribeBandwidthRateLimit" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_DescribeBandwidthRateLimit.html">
+                 DescribeBandwidthRateLimit
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get the bandwidth rate limits of a gateway
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-gateway">
+                  gateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-DescribeBandwidthRateLimitSchedule" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_DescribeBandwidthRateLimitSchedule.html">
+                 DescribeBandwidthRateLimitSchedule
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get the bandwidth rate limit schedule of a gateway
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-gateway">
+                  gateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-DescribeCache" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_DescribeCache.html">
+                 DescribeCache
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get information about the cache of a gateway. This operation is supported only for the gateway-cached volume architecture
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-gateway">
+                  gateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-DescribeCachediSCSIVolumes" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_DescribeCachediSCSIVolumes.html">
+                 DescribeCachediSCSIVolumes
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get a description of the gateway volumes specified in the request. This operation is supported only for the gateway-cached volume architecture
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-volume">
+                  volume*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-DescribeChapCredentials" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_DescribeChapCredentials.html">
+                 DescribeChapCredentials
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get an array of Challenge-Handshake Authentication Protocol (CHAP) credentials information for a specified iSCSI target, one for each target-initiator pair
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-target">
+                  target*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-DescribeFileSystemAssociations" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_DescribeFileSystemAssociations.html">
+                 DescribeFileSystemAssociations
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get a description for one or more file system associations
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-fs-association">
+                  fs-association*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-DescribeGatewayInformation" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_DescribeGatewayInformation.html">
+                 DescribeGatewayInformation
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get metadata about a gateway such as its name, network interfaces, configured time zone, and the state (whether the gateway is running or not)
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-gateway">
+                  gateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-DescribeMaintenanceStartTime" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_DescribeMaintenanceStartTime.html">
+                 DescribeMaintenanceStartTime
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get your gateway's weekly maintenance start time including the day and time of the week
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-gateway">
+                  gateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-DescribeNFSFileShares" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_DescribeNFSFileShares.html">
+                 DescribeNFSFileShares
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get a description for one or more file shares from a file gateway
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-share">
+                  share*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-DescribeSMBFileShares" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_DescribeSMBFileShares.html">
+                 DescribeSMBFileShares
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get a description for one or more file shares from a file gateway
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-share">
+                  share*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-DescribeSMBSettings" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_DescribeSMBSettings.html">
+                 DescribeSMBSettings
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get a description of a Server Message Block (SMB) file share settings from a file gateway
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-gateway">
+                  gateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-DescribeSnapshotSchedule" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_DescribeSnapshotSchedule.html">
+                 DescribeSnapshotSchedule
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to describe the snapshot schedule for the specified gateway volume
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-volume">
+                  volume*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-DescribeStorediSCSIVolumes" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_DescribeStorediSCSIVolumes.html">
+                 DescribeStorediSCSIVolumes
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get the description of the gateway volumes specified in the request
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-volume">
+                  volume*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-DescribeTapeArchives" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_DescribeTapeArchives.html">
+                 DescribeTapeArchives
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get a description of specified virtual tapes in the virtual tape shelf (VTS)
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-DescribeTapeRecoveryPoints" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_DescribeTapeRecoveryPoints.html">
+                 DescribeTapeRecoveryPoints
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get a list of virtual tape recovery points that are available for the specified gateway-VTL
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-gateway">
+                  gateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-DescribeTapes" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_DescribeTapes.html">
+                 DescribeTapes
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get a description of the specified Amazon Resource Name (ARN) of virtual tapes
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-gateway">
+                  gateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-DescribeUploadBuffer" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_DescribeUploadBuffer.html">
+                 DescribeUploadBuffer
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get information about the upload buffer of a gateway
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-gateway">
+                  gateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-DescribeVTLDevices" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_DescribeVTLDevices.html">
+                 DescribeVTLDevices
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get a description of virtual tape library (VTL) devices for the specified gateway
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-gateway">
+                  gateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-DescribeWorkingStorage" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_DescribeWorkingStorage.html">
+                 DescribeWorkingStorage
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get information about the working storage of a gateway
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-gateway">
+                  gateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-DetachVolume" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_DetachVolume.html">
+                 DetachVolume
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to disconnect a volume from an iSCSI connection and then detaches the volume from the specified gateway
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-volume">
+                  volume*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-DisableGateway" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_DisableGateway.html">
+                 DisableGateway
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to disable a gateway when the gateway is no longer functioning
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-gateway">
+                  gateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-DisassociateFileSystem" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_DisassociateFileSystem.html">
+                 DisassociateFileSystem
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to disassociate an Amazon FSx file system from an Amazon FSx file gateway
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-fs-association">
+                  fs-association*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-JoinDomain" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_JoinDomain.html">
+                 JoinDomain
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to enable you to join an Active Directory Domain
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-gateway">
+                  gateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-ListAutomaticTapeCreationPolicies" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_ListAutomaticTapeCreationPolicies.html">
+                 ListAutomaticTapeCreationPolicies
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list the automatic tape creation policies configured on the specified gateway-VTL or all gateway-VTLs owned by your AWS account
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-ListFileShares" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_ListFileShares.html">
+                 ListFileShares
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get a list of the file shares for a specific file gateway, or the list of file shares owned by your AWS account
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-ListFileSystemAssociations" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_ListFileSystemAssociations.html">
+                 ListFileSystemAssociations
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get a list of the file system associations for the specified gateway
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-ListGateways" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_ListGateways.html">
+                 ListGateways
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list gateways owned by an AWS account in a region specified in the request. The returned list is ordered by gateway Amazon Resource Name (ARN)
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-ListLocalDisks" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_ListLocalDisks.html">
+                 ListLocalDisks
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get a list of the gateway's local disks
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-gateway">
+                  gateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-ListTagsForResource" rowspan="4" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_ListTagsForResource.html">
+                 ListTagsForResource
+                </a>
+               </td>
+               <td rowspan="4" tabindex="-1">
+                Grants permission to get the tags that have been added to the specified resource
+               </td>
+               <td rowspan="4" tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-gateway">
+                  gateway
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-share">
+                  share
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-tape">
+                  tape
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-volume">
+                  volume
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-ListTapePools" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_ListTapePools.html">
+                 ListTapePools
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list tape pools owned by your AWS account
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-ListTapes" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_ListTapes.html">
+                 ListTapes
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list virtual tapes in your virtual tape library (VTL) and your virtual tape shelf (VTS)
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-ListVolumeInitiators" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_ListVolumeInitiators.html">
+                 ListVolumeInitiators
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list iSCSI initiators that are connected to a volume
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-volume">
+                  volume*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-ListVolumeRecoveryPoints" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_ListVolumeRecoveryPoints.html">
+                 ListVolumeRecoveryPoints
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list the recovery points for a specified gateway
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-gateway">
+                  gateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-ListVolumes" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_ListVolumes.html">
+                 ListVolumes
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list the iSCSI stored volumes of a gateway
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-NotifyWhenUploaded" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_NotifyWhenUploaded.html">
+                 NotifyWhenUploaded
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to send you a notification through CloudWatch Events when all files written to your NFS file share have been uploaded to Amazon S3
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-share">
+                  share*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-RefreshCache" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_RefreshCache.html">
+                 RefreshCache
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to refresh the cache for the specified file share
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-share">
+                  share*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-RemoveTagsFromResource" rowspan="5" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_RemoveTagsFromResource.html">
+                 RemoveTagsFromResource
+                </a>
+               </td>
+               <td rowspan="5" tabindex="-1">
+                Grants permission to remove one or more tags from the specified resource
+               </td>
+               <td rowspan="5" tabindex="-1">
+                Tagging
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-gateway">
+                  gateway
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-share">
+                  share
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-tape">
+                  tape
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-volume">
+                  volume
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-ResetCache" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_ResetCache.html">
+                 ResetCache
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to reset all cache disks that have encountered a error and makes the disks available for reconfiguration as cache storage
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-gateway">
+                  gateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-RetrieveTapeArchive" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_RetrieveTapeArchive.html">
+                 RetrieveTapeArchive
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to retrieve an archived virtual tape from the virtual tape shelf (VTS) to a gateway-VTL
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-gateway">
+                  gateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-tape">
+                  tape*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-RetrieveTapeRecoveryPoint" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_RetrieveTapeRecoveryPoint.html">
+                 RetrieveTapeRecoveryPoint
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to retrieve the recovery point for the specified virtual tape
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-gateway">
+                  gateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-tape">
+                  tape*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-SetLocalConsolePassword" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_SetLocalConsolePassword.html">
+                 SetLocalConsolePassword
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to set the password for your VM local console
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-gateway">
+                  gateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-SetSMBGuestPassword" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_SetSMBGuestPassword.html">
+                 SetSMBGuestPassword
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to set the password for SMB Guest user
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-gateway">
+                  gateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-ShutdownGateway" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_ShutdownGateway.html">
+                 ShutdownGateway
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to shut down a gateway
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-gateway">
+                  gateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-StartAvailabilityMonitorTest" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_StartAvailabilityMonitorTest.html">
+                 StartAvailabilityMonitorTest
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to start a test that verifies that the specified gateway is configured for High Availability monitoring in your host environment
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-gateway">
+                  gateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-StartGateway" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_StartGateway.html">
+                 StartGateway
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to start a gateway that you previously shut down
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-gateway">
+                  gateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-UpdateAutomaticTapeCreationPolicy" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_UpdateAutomaticTapeCreationPolicy.html">
+                 UpdateAutomaticTapeCreationPolicy
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to update the automatic tape creation policy configured on a gateway-VTL
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-gateway">
+                  gateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-tapepool">
+                  tapepool*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-UpdateBandwidthRateLimit" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_UpdateBandwidthRateLimit.html">
+                 UpdateBandwidthRateLimit
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update the bandwidth rate limits of a gateway
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-gateway">
+                  gateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-UpdateBandwidthRateLimitSchedule" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_UpdateBandwidthRateLimitSchedule.html">
+                 UpdateBandwidthRateLimitSchedule
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update the bandwidth rate limit schedule of a gateway
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-gateway">
+                  gateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-UpdateChapCredentials" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_UpdateChapCredentials.html">
+                 UpdateChapCredentials
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update the Challenge-Handshake Authentication Protocol (CHAP) credentials for a specified iSCSI target
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-target">
+                  target*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-UpdateFileSystemAssociation" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_UpdateFileSystemAssociation.html">
+                 UpdateFileSystemAssociation
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update a file system association
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-fs-association">
+                  fs-association*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 logs:CreateLogDelivery
+                </p>
+                <p>
+                 logs:DeleteLogDelivery
+                </p>
+                <p>
+                 logs:GetLogDelivery
+                </p>
+                <p>
+                 logs:ListLogDeliveries
+                </p>
+                <p>
+                 logs:UpdateLogDelivery
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-UpdateGatewayInformation" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_UpdateGatewayInformation.html">
+                 UpdateGatewayInformation
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update a gateway's metadata, which includes the gateway's name and time zone
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-gateway">
+                  gateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-UpdateGatewaySoftwareNow" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_UpdateGatewaySoftwareNow.html">
+                 UpdateGatewaySoftwareNow
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update the gateway virtual machine (VM) software
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-gateway">
+                  gateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-UpdateMaintenanceStartTime" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_UpdateMaintenanceStartTime.html">
+                 UpdateMaintenanceStartTime
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update a gateway's weekly maintenance start time information, including day and time of the week. The maintenance time is the time in your gateway's time zone
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-gateway">
+                  gateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-UpdateNFSFileShare" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_UpdateNFSFileShare.html">
+                 UpdateNFSFileShare
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update a NFS file share
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-share">
+                  share*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-UpdateSMBFileShare" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_UpdateSMBFileShare.html">
+                 UpdateSMBFileShare
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update a SMB file share
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-share">
+                  share*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-UpdateSMBFileShareVisibility" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_UpdateSMBFileShareVisibility.html">
+                 UpdateSMBFileShareVisibility
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update whether the shares on a gateway are visible in a net view or browse list
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-gateway">
+                  gateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-UpdateSMBLocalGroups" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_UpdateSMBLocalGroups.html">
+                 UpdateSMBLocalGroups
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update the list of Active Directory users and groups that have special permissions for SMB file shares on the gateway
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-gateway">
+                  gateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-UpdateSMBSecurityStrategy" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_UpdateSMBSecurityStrategy.html">
+                 UpdateSMBSecurityStrategy
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update the SMB security strategy on a file gateway
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-gateway">
+                  gateway*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-UpdateSnapshotSchedule" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_UpdateSnapshotSchedule.html">
+                 UpdateSnapshotSchedule
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to update a snapshot schedule configured for a gateway volume
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-volume">
+                  volume*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsstoragegateway-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-UpdateVTLDeviceType" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/APIReference/API_UpdateVTLDeviceType.html">
+                 UpdateVTLDeviceType
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update the type of medium changer in a gateway-VTL
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-device">
+                  device*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <h2 id="awsstoragegateway-resources-for-iam-policies">
+            Resource types defined by        AWS Storage Gateway
+           </h2>
+           <p>
+            The following resource types are defined by this service and can be used in the
+            <code class="code">
+             Resource
+            </code>
+            element of IAM permission policy statements. Each action in the
+            <a href="#awsstoragegateway-actions-as-permissions">
+             Actions table
+            </a>
+            identifies the      resource types that can be specified with that action. A resource type can also define which      condition keys you can include in a policy. These keys are displayed in the last column of the      Resource types table. For details about the columns in the following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#resources_table" rel="noopener noreferrer" target="_blank">
+             Resource types table
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9e1509c13b5">
+              <thead>
+               <tr>
+                <th>
+                 Resource types
+                </th>
+                <th>
+                 ARN
+                </th>
+                <th>
+                 Condition keys
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="awsstoragegateway-device" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/userguide/resource_vtl-devices.html">
+                 device
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:storagegateway:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:gateway/$
+                 <span>
+                  {
+                 </span>
+                 GatewayId}/device/$
+                 <span>
+                  {
+                 </span>
+                 Vtldevice}
+                </code>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-fs-association" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/userguide/API_AssociateFileSystem.html">
+                 fs-association
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:storagegateway:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:fs-association/$
+                 <span>
+                  {
+                 </span>
+                 FsaId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-gateway" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/userguide/StorageGatewayConcepts.html">
+                 gateway
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:storagegateway:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:gateway/$
+                 <span>
+                  {
+                 </span>
+                 GatewayId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-share" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/userguide/GettingStartedCreateFileShare.html">
+                 share
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:storagegateway:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:share/$
+                 <span>
+                  {
+                 </span>
+                 ShareId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-tape" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/userguide/StorageGatewayConcepts.html#storage-gateway-vtl-concepts">
+                 tape
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:storagegateway:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:tape/$
+                 <span>
+                  {
+                 </span>
+                 TapeBarcode}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-tapepool" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/userguide/CreatingCustomTapePool.html">
+                 tapepool
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:storagegateway:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:tapepool/$
+                 <span>
+                  {
+                 </span>
+                 PoolId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-target" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/userguide/GettingStartedCreateVolumes.html">
+                 target
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:storagegateway:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:gateway/$
+                 <span>
+                  {
+                 </span>
+                 GatewayId}/target/$
+                 <span>
+                  {
+                 </span>
+                 IscsiTarget}
+                </code>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-volume" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/storagegateway/latest/userguide/StorageGatewayConcepts.html#volume-gateway-concepts">
+                 volume
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:storagegateway:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:gateway/$
+                 <span>
+                  {
+                 </span>
+                 GatewayId}/volume/$
+                 <span>
+                  {
+                 </span>
+                 VolumeId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstoragegateway-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <h2 id="awsstoragegateway-policy-keys">
+            Condition keys for        AWS Storage Gateway
+           </h2>
+           <p>
+            AWS Storage Gateway defines the following condition keys that can be used in the
+            <code class="code">
+             Condition
+            </code>
+            element of an IAM policy. You can use these keys to further refine      the conditions under which the policy statement applies. For details about the columns in the      following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#context_keys_table" rel="noopener noreferrer" target="_blank">
+             Condition keys table
+            </a>
+            .
+           </p>
+           <p>
+            To view the global condition keys that are available to all services, see
+            <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#AvailableKeys">
+             Available global condition keys
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9e1509c15b7">
+              <thead>
+               <tr>
+                <th>
+                 Condition keys
+                </th>
+                <th>
+                 Description
+                </th>
+                <th>
+                 Type
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="awsstoragegateway-aws_RequestTag___TagKey_" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-requesttag">
+                 aws:RequestTag/${TagKey}
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the allowed set of values for each of the tags
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-aws_ResourceTag___TagKey_" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-resourcetag">
+                 aws:ResourceTag/${TagKey}
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by tag-value associated with the resource
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstoragegateway-aws_TagKeys" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-tagkeys">
+                 aws:TagKeys
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the presence of mandatory tags in the request
+               </td>
+               <td tabindex="-1">
+                ArrayOfString
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <awsdocs-copyright class="copyright-print">
+           </awsdocs-copyright>
+           <awsdocs-thumb-feedback right-edge="{{$ctrl.thumbFeedbackRightEdge}}">
+           </awsdocs-thumb-feedback>
+          </div>
+          <noscript>
+           <div>
+            <div>
+             <div>
+              <div id="js_error_message">
+               <p>
+                <img alt="Warning" src="https://d1ge0kk1l5kms0.cloudfront.net/images/G/01/webservices/console/warning.png"/>
+                <strong>
+                 Javascript is disabled or is unavailable in your browser.
+                </strong>
+               </p>
+               <p>
+                To use the Amazon Web Services Documentation, Javascript must be enabled. Please refer to your browser's Help pages for instructions.
+               </p>
+              </div>
+             </div>
+            </div>
+           </div>
+          </noscript>
+          <div class="awsui-util-font-size-0" id="main-col-footer">
+           <div id="doc-conventions">
+            <a href="/general/latest/gr/docconventions.html" target="_top">
+             Document Conventions
+            </a>
+           </div>
+           <div class="prev-next">
+            <div accesskey="p" class="prev-link" href="./list_awsstepfunctions.html" id="previous">
+             AWS Step Functions
+            </div>
+            <div accesskey="n" class="next-link" href="./list_awssupplychain.html" id="next">
+             AWS Supply Chain
+            </div>
+           </div>
+          </div>
+          <awsdocs-page-utilities>
+          </awsdocs-page-utilities>
+         </div>
+         <div id="quick-feedback-yes" style="display: none;">
+          <div class="title">
+           Did this page help you? - Yes
+          </div>
+          <div class="content">
+           <p>
+            Thanks for letting us know we're doing a good job!
+           </p>
+           <p>
+            If you've got a moment, please tell us what we did right so we can do more of it.
+           </p>
+           <p>
+            <awsui-button click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service Authorization Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awsstoragegateway.html" id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback">
+            </awsui-button>
+           </p>
+          </div>
+         </div>
+         <div id="quick-feedback-no" style="display: none;">
+          <div class="title">
+           Did this page help you? - No
+          </div>
+          <div class="content">
+           <p>
+            Thanks for letting us know this page needs work. We're sorry we let you down.
+           </p>
+           <p>
+            If you've got a moment, please tell us how we can make the documentation better.
+           </p>
+           <p>
+            <awsui-button click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service Authorization Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awsstoragegateway.html" id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback">
+            </awsui-button>
+           </p>
+          </div>
+         </div>
+        </div>
+       </body>
+      </div>
+     </awsdocs-view>
+     <div class="page-loading-indicator" id="page-loading-indicator">
+      <awsui-spinner size="large">
+      </awsui-spinner>
+     </div>
+    </div>
+    <div dom-region="tools" id="tools-panel">
+     <awsdocs-tools-panel id="awsdocs-tools-panel">
+     </awsdocs-tools-panel>
+    </div>
+   </awsui-app-layout>
+   <awsdocs-cookie-banner class="doc-cookie-banner">
+   </awsdocs-cookie-banner>
+  </div>
+ </body>
+</html>

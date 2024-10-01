@@ -1,0 +1,1961 @@
+<!DOCTYPE html>
+<html lang="en-US" xmlns="http://www.w3.org/1999/xhtml">
+ <head>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+  <title>
+   Actions, resources, and condition keys for Amazon Security Lake - Service Authorization Reference
+  </title>
+  <meta content="width=device-width,initial-scale=1" name="viewport"/>
+  <meta content="/assets" name="assets_root"/>
+  <meta content="list_amazonsecuritylake" name="target_state"/>
+  <meta content="list_amazonsecuritylake" name="default_state"/>
+  <link href="https://docs.aws.amazon.com/assets/images/favicon.ico" rel="icon" type="image/ico"/>
+  <link href="https://docs.aws.amazon.com/assets/images/favicon.ico" rel="shortcut icon" type="image/ico"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonsecuritylake.html" rel="canonical"/>
+  <meta content="Lists all of the available service-specific resources, actions, and condition keys that can be used in IAM policies to control access to Amazon Security Lake." name="description"/>
+  <meta content="IAD" name="deployment_region"/>
+  <meta content="Service Authorization Reference" name="product"/>
+  <meta content="Service Authorization Reference" name="guide"/>
+  <meta content="Provides a list of the actions, resources, and condition keys supported by each AWS service that can be used in an IAM policy." name="abstract"/>
+  <meta content="en_us" name="guide-locale"/>
+  <meta content="toc-contents.json" name="tocs"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonsecuritylake.html" rel="canonical"/>
+  <link href="https://docs.aws.amazon.com/id_id/service-authorization/latest/reference/list_amazonsecuritylake.html" hreflang="id-id" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/id_id/service-authorization/latest/reference/list_amazonsecuritylake.html" hreflang="id" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/de_de/service-authorization/latest/reference/list_amazonsecuritylake.html" hreflang="de-de" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/de_de/service-authorization/latest/reference/list_amazonsecuritylake.html" hreflang="de" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonsecuritylake.html" hreflang="en-us" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonsecuritylake.html" hreflang="en" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/es_es/service-authorization/latest/reference/list_amazonsecuritylake.html" hreflang="es-es" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/es_es/service-authorization/latest/reference/list_amazonsecuritylake.html" hreflang="es" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/fr_fr/service-authorization/latest/reference/list_amazonsecuritylake.html" hreflang="fr-fr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/fr_fr/service-authorization/latest/reference/list_amazonsecuritylake.html" hreflang="fr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/it_it/service-authorization/latest/reference/list_amazonsecuritylake.html" hreflang="it-it" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/it_it/service-authorization/latest/reference/list_amazonsecuritylake.html" hreflang="it" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ja_jp/service-authorization/latest/reference/list_amazonsecuritylake.html" hreflang="ja-jp" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ja_jp/service-authorization/latest/reference/list_amazonsecuritylake.html" hreflang="ja" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ko_kr/service-authorization/latest/reference/list_amazonsecuritylake.html" hreflang="ko-kr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ko_kr/service-authorization/latest/reference/list_amazonsecuritylake.html" hreflang="ko" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/pt_br/service-authorization/latest/reference/list_amazonsecuritylake.html" hreflang="pt-br" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/pt_br/service-authorization/latest/reference/list_amazonsecuritylake.html" hreflang="pt" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/zh_cn/service-authorization/latest/reference/list_amazonsecuritylake.html" hreflang="zh-cn" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/zh_tw/service-authorization/latest/reference/list_amazonsecuritylake.html" hreflang="zh-tw" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonsecuritylake.html" hreflang="x-default" rel="alternative"/>
+  <meta content="Service Authorization Docs" name="feedback-item"/>
+  <meta content="Service Authorization Reference" name="this_doc_product"/>
+  <meta content="Service Authorization Reference" name="this_doc_guide"/>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor4.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor3.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor1.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/awsdocs-common.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/awsdocs-doc-page.js?version=2021.12.02">
+  </script>
+  <link href="https://docs.aws.amazon.com/assets/r/vendor4.css?version=2021.12.02" rel="stylesheet"/>
+  <link href="https://docs.aws.amazon.com/assets/r/awsdocs-common.css?version=2021.12.02" rel="stylesheet"/>
+  <link href="https://docs.aws.amazon.com/assets/r/awsdocs-doc-page.css?version=2021.12.02" rel="stylesheet"/>
+  <script async="" data-config="{'appEntity':'aws-documentation','region':'us-east-1','service':'iam'}" id="awsc-panorama-bundle" src="https://prod.pa.cdn.uis.awsstatic.com/panorama-nav-init.js" type="text/javascript">
+  </script>
+  <meta id="panorama-serviceSubSection" value="Service Authorization Reference"/>
+  <meta id="panorama-serviceConsolePage" value="Actions, resources, and condition keys for Amazon Security Lake"/>
+ </head>
+ <body class="awsdocs awsui">
+  <div class="awsdocs-container">
+   <awsdocs-header>
+   </awsdocs-header>
+   <awsui-app-layout class="awsui-util-no-gutters" header-selector="awsdocs-header" id="app-layout" navigation-change="$ctrl.onNavChange($event)" navigation-hide="false" navigation-open="$ctrl.navOpen" navigation-width="$ctrl.navWidth" ng-controller="ContentController as $ctrl" tools-change="$ctrl.onToolsChange($event)" tools-hide="$ctrl.hideTools" tools-open="$ctrl.toolsOpen" tools-width="$ctrl.toolsWidth">
+    <div dom-region="navigation" id="guide-toc">
+     <awsdocs-toc>
+     </awsdocs-toc>
+    </div>
+    <div dom-region="content" id="main-column" tabindex="-1">
+     <awsdocs-view class="awsdocs-view">
+      <div id="awsdocs-content">
+       <head>
+        <title>
+         Actions, resources, and condition keys for Amazon Security Lake - Service Authorization Reference
+        </title>
+        <meta content="/pdfs/service-authorization/latest/reference/service-authorization.pdf#list_amazonsecuritylake" name="pdf"/>
+        <meta content="https://repost.aws/tags/TAO7Z4bI5hQVWMiYFs34QhIA" name="forums"/>
+        <meta content="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service%20Authorization%20Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazonsecuritylake.html" name="feedback"/>
+        <meta content="feedbackyes.html?topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazonsecuritylake.html" name="feedback-yes"/>
+        <meta content="feedbackno.html?topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazonsecuritylake.html" name="feedback-no"/>
+        <script type="application/ld+json">
+         {
+    "@context" : "https://schema.org",
+    "@type" : "BreadcrumbList",
+    "itemListElement" : [
+      {
+        "@type" : "ListItem",
+        "position" : 1,
+        "name" : "AWS",
+        "item" : "https://aws.amazon.com"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 2,
+        "name" : "Service Authorization Reference",
+        "item" : "https://docs.aws.amazon.com/iam/index.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 3,
+        "name" : "Service Authorization Reference",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 4,
+        "name" : "Reference",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 5,
+        "name" : "Actions, resources, and condition keys for AWS services",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference_policies_actions-resources-contextkeys.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 6,
+        "name" : "Actions, resources, and condition keys for Amazon Security Lake",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference_policies_actions-resources-contextkeys.html"
+      }
+    ]
+}
+        </script>
+       </head>
+       <body>
+        <div id="main">
+         <div style="display: none">
+          <a href="/pdfs/service-authorization/latest/reference/service-authorization.pdf#list_amazonsecuritylake" rel="noopener noreferrer" target="_blank" title="Open PDF">
+          </a>
+         </div>
+         <div class="breadcrumb" id="breadcrumbs">
+          <a href="https://aws.amazon.com">
+           AWS
+          </a>
+          <a href="/index.html">
+           Documentation
+          </a>
+          <a href="/iam/index.html">
+           Service Authorization Reference
+          </a>
+          <a href="reference.html">
+           Service Authorization Reference
+          </a>
+         </div>
+         <div id="page-toc-src">
+          <a href="#amazonsecuritylake-actions-as-permissions">
+           Actions
+          </a>
+          <a href="#amazonsecuritylake-resources-for-iam-policies">
+           Resource types
+          </a>
+          <a href="#amazonsecuritylake-policy-keys">
+           Condition keys
+          </a>
+         </div>
+         <div class="awsui-util-container" id="main-content">
+          <div id="main-col-body">
+           <awsdocs-language-banner data-service="$ctrl.pageService">
+           </awsdocs-language-banner>
+           <h1 class="topictitle" id="list_amazonsecuritylake">
+            Actions, resources, and condition keys for      Amazon Security Lake
+           </h1>
+           <div class="awsdocs-page-header-container">
+            <awsdocs-page-header>
+            </awsdocs-page-header>
+            <awsdocs-filter-selector id="awsdocs-filter-selector">
+            </awsdocs-filter-selector>
+           </div>
+           <p>
+            Amazon Security Lake (service prefix:
+            <code class="code">
+             securitylake
+            </code>
+            ) provides the following    service-specific resources, actions, and condition context keys for use in IAM permission    policies.
+           </p>
+           <p>
+            References:
+           </p>
+           <div class="itemizedlist">
+            <ul class="itemizedlist">
+             <li class="listitem">
+              <p>
+               Learn how to
+               <a href="https://docs.aws.amazon.com/security-lake/latest/userguide/what-is-security-lake.html">
+                configure this service
+               </a>
+               .
+              </p>
+             </li>
+             <li class="listitem">
+              <p>
+               View a list of the
+               <a href="https://docs.aws.amazon.com/security-lake/latest/APIReference/">
+                API operations available for this          service
+               </a>
+               .
+              </p>
+             </li>
+             <li class="listitem">
+              <p>
+               Learn how to secure this service and its resources by
+               <a href="https://docs.aws.amazon.com/security-lake/latest/userguide/security-iam.html">
+                using          IAM
+               </a>
+               permission policies.
+              </p>
+             </li>
+            </ul>
+           </div>
+           <div class="highlights" id="inline-topiclist">
+            <h6>
+             Topics
+            </h6>
+            <ul>
+             <li>
+              <a href="#amazonsecuritylake-actions-as-permissions">
+               Actions defined by        Amazon Security Lake
+              </a>
+             </li>
+             <li>
+              <a href="#amazonsecuritylake-resources-for-iam-policies">
+               Resource types defined by        Amazon Security Lake
+              </a>
+             </li>
+             <li>
+              <a href="#amazonsecuritylake-policy-keys">
+               Condition keys for        Amazon Security Lake
+              </a>
+             </li>
+            </ul>
+           </div>
+           <h2 id="amazonsecuritylake-actions-as-permissions">
+            Actions defined by        Amazon Security Lake
+           </h2>
+           <p>
+            You can specify the following actions in the
+            <code class="code">
+             Action
+            </code>
+            element of an IAM      policy statement. Use policies to grant permissions to perform an operation in AWS. When you      use an action in a policy, you usually allow or deny access to the API operation or CLI      command with the same name. However, in some cases, a single action controls access to more      than one operation. Alternatively, some operations require several different actions.
+           </p>
+           <p>
+            The
+            <b>
+             Resource types
+            </b>
+            column of the Actions table indicates whether each      action supports resource-level permissions. If there is no value for this column, you must      specify all resources ("*") to which the policy applies in the
+            <code class="code">
+             Resource
+            </code>
+            element      of your policy statement. If the column includes a resource type, then you can specify an ARN      of that type in a statement with that action. If the action has one or more required      resources, the caller must have permission to use the action with those resources. Required      resources are indicated in the table with an asterisk (*). If you limit resource access with      the
+            <code class="code">
+             Resource
+            </code>
+            element in an IAM policy, you must include an ARN or pattern for      each required resource type. Some actions support multiple resource types. If the resource      type is optional (not indicated as required), then you can choose to use one of the optional      resource types.
+           </p>
+           <p>
+            The
+            <b>
+             Condition keys
+            </b>
+            column of the Actions table includes keys that you      can specify in a policy statement's
+            <code class="code">
+             Condition
+            </code>
+            element. For more information on      the condition keys that are associated with resources for the service, see the
+            <b>
+             Condition keys
+            </b>
+            column of the Resource types table.
+           </p>
+           <div class="awsdocs-note">
+            <div class="awsdocs-note-title">
+             <awsui-icon name="status-info" variant="link">
+             </awsui-icon>
+             <h6>
+              Note
+             </h6>
+            </div>
+            <div class="awsdocs-note-text">
+             <p>
+              Resource condition keys are listed in the
+              <a href="#amazonsecuritylake-resources-for-iam-policies">
+               Resource types
+              </a>
+              table. You        can find a link to the resource type that applies to an action in the
+              <b>
+               Resource          types (*required)
+              </b>
+              column of the Actions table. The resource type in the        Resource types table includes the
+              <b>
+               Condition keys
+              </b>
+              column, which are the        resource condition keys that apply to an action in the Actions table.
+             </p>
+            </div>
+           </div>
+           <p>
+            For details about the columns in the following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#actions_table" rel="noopener noreferrer" target="_blank">
+             Actions table
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9e1423c11c13">
+              <thead>
+               <tr>
+                <th>
+                 Actions
+                </th>
+                <th>
+                 Description
+                </th>
+                <th>
+                 Access level
+                </th>
+                <th>
+                 Resource types (*required)
+                </th>
+                <th>
+                 Condition keys
+                </th>
+                <th>
+                 Dependent actions
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="amazonsecuritylake-CreateAwsLogSource" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/security-lake/latest/APIReference/API_CreateAwsLogSource.html">
+                 CreateAwsLogSource
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to enable any source type in any region for accounts that are either part of a trusted organization or standalone account
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonsecuritylake-data-lake">
+                  data-lake*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 glue:CreateDatabase
+                </p>
+                <p>
+                 glue:CreateTable
+                </p>
+                <p>
+                 glue:GetDatabase
+                </p>
+                <p>
+                 glue:GetTable
+                </p>
+                <p>
+                 iam:CreateServiceLinkedRole
+                </p>
+                <p>
+                 kms:CreateGrant
+                </p>
+                <p>
+                 kms:DescribeKey
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonsecuritylake-CreateCustomLogSource" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/security-lake/latest/APIReference/API_CreateCustomLogSource.html">
+                 CreateCustomLogSource
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to add a custom source
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonsecuritylake-data-lake">
+                  data-lake*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 glue:CreateCrawler
+                </p>
+                <p>
+                 glue:CreateDatabase
+                </p>
+                <p>
+                 glue:CreateTable
+                </p>
+                <p>
+                 glue:StartCrawlerSchedule
+                </p>
+                <p>
+                 iam:DeleteRolePolicy
+                </p>
+                <p>
+                 iam:GetRole
+                </p>
+                <p>
+                 iam:PassRole
+                </p>
+                <p>
+                 iam:PutRolePolicy
+                </p>
+                <p>
+                 kms:CreateGrant
+                </p>
+                <p>
+                 kms:DescribeKey
+                </p>
+                <p>
+                 kms:GenerateDataKey
+                </p>
+                <p>
+                 lakeformation:GrantPermissions
+                </p>
+                <p>
+                 lakeformation:RegisterResource
+                </p>
+                <p>
+                 s3:ListBucket
+                </p>
+                <p>
+                 s3:PutObject
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonsecuritylake-CreateDataLake" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/security-lake/latest/APIReference/API_CreateDataLake.html">
+                 CreateDataLake
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to create a new security data lake
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonsecuritylake-data-lake">
+                  data-lake*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 events:PutRule
+                </p>
+                <p>
+                 events:PutTargets
+                </p>
+                <p>
+                 iam:CreateServiceLinkedRole
+                </p>
+                <p>
+                 iam:DeleteRolePolicy
+                </p>
+                <p>
+                 iam:GetRole
+                </p>
+                <p>
+                 iam:ListAttachedRolePolicies
+                </p>
+                <p>
+                 iam:PassRole
+                </p>
+                <p>
+                 iam:PutRolePolicy
+                </p>
+                <p>
+                 kms:CreateGrant
+                </p>
+                <p>
+                 kms:DescribeKey
+                </p>
+                <p>
+                 lakeformation:GetDataLakeSettings
+                </p>
+                <p>
+                 lakeformation:PutDataLakeSettings
+                </p>
+                <p>
+                 lambda:AddPermission
+                </p>
+                <p>
+                 lambda:CreateEventSourceMapping
+                </p>
+                <p>
+                 lambda:CreateFunction
+                </p>
+                <p>
+                 organizations:DescribeOrganization
+                </p>
+                <p>
+                 organizations:ListAccounts
+                </p>
+                <p>
+                 organizations:ListDelegatedServicesForAccount
+                </p>
+                <p>
+                 s3:CreateBucket
+                </p>
+                <p>
+                 s3:GetObject
+                </p>
+                <p>
+                 s3:GetObjectVersion
+                </p>
+                <p>
+                 s3:ListBucket
+                </p>
+                <p>
+                 s3:PutBucketPolicy
+                </p>
+                <p>
+                 s3:PutBucketPublicAccessBlock
+                </p>
+                <p>
+                 s3:PutBucketVersioning
+                </p>
+                <p>
+                 sqs:CreateQueue
+                </p>
+                <p>
+                 sqs:GetQueueAttributes
+                </p>
+                <p>
+                 sqs:SetQueueAttributes
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonsecuritylake-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonsecuritylake-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonsecuritylake-CreateDataLakeExceptionSubscription" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/security-lake/latest/APIReference/API_CreateDataLakeExceptionSubscription.html">
+                 CreateDataLakeExceptionSubscription
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get instant notifications about exceptions. Subscribes to the SNS topics for exception notifications
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonsecuritylake-CreateDataLakeOrganizationConfiguration" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/security-lake/latest/APIReference/API_CreateDataLakeOrganizationConfiguration.html">
+                 CreateDataLakeOrganizationConfiguration
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to automatically enable Amazon Security Lake for new member accounts in your organization
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonsecuritylake-data-lake">
+                  data-lake*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonsecuritylake-CreateSubscriber" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/security-lake/latest/APIReference/API_CreateSubscriber.html">
+                 CreateSubscriber
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a subscriber
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonsecuritylake-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonsecuritylake-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 iam:CreateRole
+                </p>
+                <p>
+                 iam:DeleteRolePolicy
+                </p>
+                <p>
+                 iam:GetRole
+                </p>
+                <p>
+                 iam:PutRolePolicy
+                </p>
+                <p>
+                 lakeformation:GrantPermissions
+                </p>
+                <p>
+                 lakeformation:ListPermissions
+                </p>
+                <p>
+                 lakeformation:RegisterResource
+                </p>
+                <p>
+                 lakeformation:RevokePermissions
+                </p>
+                <p>
+                 ram:GetResourceShareAssociations
+                </p>
+                <p>
+                 ram:GetResourceShares
+                </p>
+                <p>
+                 ram:UpdateResourceShare
+                </p>
+                <p>
+                 s3:PutObject
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonsecuritylake-CreateSubscriberNotification" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/security-lake/latest/APIReference/API_CreateSubscriberNotification.html">
+                 CreateSubscriberNotification
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a webhook invocation to notify a client when there is new data in the data lake
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonsecuritylake-subscriber">
+                  subscriber*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 events:CreateApiDestination
+                </p>
+                <p>
+                 events:CreateConnection
+                </p>
+                <p>
+                 events:DescribeRule
+                </p>
+                <p>
+                 events:ListApiDestinations
+                </p>
+                <p>
+                 events:ListConnections
+                </p>
+                <p>
+                 events:PutRule
+                </p>
+                <p>
+                 events:PutTargets
+                </p>
+                <p>
+                 iam:DeleteRolePolicy
+                </p>
+                <p>
+                 iam:GetRole
+                </p>
+                <p>
+                 iam:PassRole
+                </p>
+                <p>
+                 s3:GetBucketNotification
+                </p>
+                <p>
+                 s3:PutBucketNotification
+                </p>
+                <p>
+                 sqs:CreateQueue
+                </p>
+                <p>
+                 sqs:DeleteQueue
+                </p>
+                <p>
+                 sqs:GetQueueAttributes
+                </p>
+                <p>
+                 sqs:GetQueueUrl
+                </p>
+                <p>
+                 sqs:SetQueueAttributes
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonsecuritylake-DeleteAwsLogSource" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/security-lake/latest/APIReference/API_DeleteAwsLogSource.html">
+                 DeleteAwsLogSource
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to disable any source type in any region for accounts that are part of a trusted organization or standalone accounts
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonsecuritylake-data-lake">
+                  data-lake*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonsecuritylake-DeleteCustomLogSource" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/security-lake/latest/APIReference/API_DeleteCustomLogSource.html">
+                 DeleteCustomLogSource
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to remove a custom source
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonsecuritylake-data-lake">
+                  data-lake*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 glue:StopCrawlerSchedule
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonsecuritylake-DeleteDataLake" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/security-lake/latest/APIReference/API_DeleteDataLake.html">
+                 DeleteDataLake
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete security data lake
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonsecuritylake-data-lake">
+                  data-lake*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 organizations:DescribeOrganization
+                </p>
+                <p>
+                 organizations:ListDelegatedAdministrators
+                </p>
+                <p>
+                 organizations:ListDelegatedServicesForAccount
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonsecuritylake-DeleteDataLakeExceptionSubscription" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/security-lake/latest/APIReference/API_DeleteDataLakeExceptionSubscription.html">
+                 DeleteDataLakeExceptionSubscription
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to unsubscribe from SNS topics for exception notifications. Removes exception notifications for the SNS topic
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonsecuritylake-DeleteDataLakeOrganizationConfiguration" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/security-lake/latest/APIReference/API_DeleteDataLakeOrganizationConfiguration.html">
+                 DeleteDataLakeOrganizationConfiguration
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to remove the automatic enablement of Amazon Security Lake access for new organization accounts
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonsecuritylake-data-lake">
+                  data-lake*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonsecuritylake-DeleteSubscriber" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/security-lake/latest/APIReference/API_DeleteSubscriber.html">
+                 DeleteSubscriber
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete the specified subscriber
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonsecuritylake-subscriber">
+                  subscriber*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 events:DeleteApiDestination
+                </p>
+                <p>
+                 events:DeleteConnection
+                </p>
+                <p>
+                 events:DeleteRule
+                </p>
+                <p>
+                 events:DescribeRule
+                </p>
+                <p>
+                 events:ListApiDestinations
+                </p>
+                <p>
+                 events:ListTargetsByRule
+                </p>
+                <p>
+                 events:RemoveTargets
+                </p>
+                <p>
+                 iam:DeleteRole
+                </p>
+                <p>
+                 iam:DeleteRolePolicy
+                </p>
+                <p>
+                 iam:GetRole
+                </p>
+                <p>
+                 iam:ListRolePolicies
+                </p>
+                <p>
+                 lakeformation:ListPermissions
+                </p>
+                <p>
+                 lakeformation:RevokePermissions
+                </p>
+                <p>
+                 sqs:DeleteQueue
+                </p>
+                <p>
+                 sqs:GetQueueUrl
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonsecuritylake-DeleteSubscriberNotification" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/security-lake/latest/APIReference/API_DeleteSubscriberNotification.html">
+                 DeleteSubscriberNotification
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to remove a webhook invocation to notify a client when there is new data in the data lake
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonsecuritylake-subscriber">
+                  subscriber*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 events:DeleteApiDestination
+                </p>
+                <p>
+                 events:DeleteConnection
+                </p>
+                <p>
+                 events:DeleteRule
+                </p>
+                <p>
+                 events:DescribeRule
+                </p>
+                <p>
+                 events:ListApiDestinations
+                </p>
+                <p>
+                 events:ListTargetsByRule
+                </p>
+                <p>
+                 events:RemoveTargets
+                </p>
+                <p>
+                 iam:DeleteRole
+                </p>
+                <p>
+                 iam:DeleteRolePolicy
+                </p>
+                <p>
+                 iam:GetRole
+                </p>
+                <p>
+                 iam:ListRolePolicies
+                </p>
+                <p>
+                 lakeformation:RevokePermissions
+                </p>
+                <p>
+                 sqs:DeleteQueue
+                </p>
+                <p>
+                 sqs:GetQueueUrl
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonsecuritylake-DeregisterDataLakeDelegatedAdministrator" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/security-lake/latest/APIReference/API_DeregisterDataLakeDelegatedAdministrator.html">
+                 DeregisterDataLakeDelegatedAdministrator
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to remove the Delegated Administrator account and disable Amazon Security Lake as a service for this organization
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 organizations:DeregisterDelegatedAdministrator
+                </p>
+                <p>
+                 organizations:DescribeOrganization
+                </p>
+                <p>
+                 organizations:ListDelegatedServicesForAccount
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonsecuritylake-GetDataLakeExceptionSubscription" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/security-lake/latest/APIReference/API_GetDataLakeExceptionSubscription.html">
+                 GetDataLakeExceptionSubscription
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to query the protocol and endpoint that were provided when subscribing to SNS topics for exception notifications
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonsecuritylake-GetDataLakeOrganizationConfiguration" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/security-lake/latest/APIReference/API_GetDataLakeOrganizationConfiguration.html">
+                 GetDataLakeOrganizationConfiguration
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get an organization's configuration setting for automatically enabling Amazon Security Lake access for new organization accounts
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonsecuritylake-data-lake">
+                  data-lake*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 organizations:DescribeOrganization
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonsecuritylake-GetDataLakeSources" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/security-lake/latest/APIReference/API_GetDataLakeSources.html">
+                 GetDataLakeSources
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get a static snapshot of the security data lake in the current region. The snapshot includes enabled accounts and log sources
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonsecuritylake-data-lake">
+                  data-lake*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonsecuritylake-GetSubscriber" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/security-lake/latest/APIReference/API_GetSubscriber.html">
+                 GetSubscriber
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get information about subscriber that is already created
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonsecuritylake-subscriber">
+                  subscriber*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonsecuritylake-ListDataLakeExceptions" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/security-lake/latest/APIReference/API_ListDataLakeExceptions.html">
+                 ListDataLakeExceptions
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get the list of all non-retryable failures
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonsecuritylake-ListDataLakes" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/security-lake/latest/APIReference/API_ListDataLakes.html">
+                 ListDataLakes
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list information about the security data lakes
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonsecuritylake-ListLogSources" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/security-lake/latest/APIReference/API_ListLogSources.html">
+                 ListLogSources
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to view the enabled accounts. You can view the enabled sources in the enabled regions
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonsecuritylake-ListSubscribers" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/security-lake/latest/APIReference/API_ListSubscribers.html">
+                 ListSubscribers
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list all subscribers
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonsecuritylake-ListTagsForResource" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/security-lake/latest/APIReference/API_ListTagsForResource.html">
+                 ListTagsForResource
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to list all tags for the resource
+               </td>
+               <td rowspan="2" tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonsecuritylake-data-lake">
+                  data-lake
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonsecuritylake-subscriber">
+                  subscriber
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonsecuritylake-RegisterDataLakeDelegatedAdministrator" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/security-lake/latest/APIReference/API_RegisterDataLakeDelegatedAdministrator.html">
+                 RegisterDataLakeDelegatedAdministrator
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to designate an account as the Amazon Security Lake administrator account for the organization
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 iam:CreateServiceLinkedRole
+                </p>
+                <p>
+                 organizations:DescribeOrganization
+                </p>
+                <p>
+                 organizations:EnableAWSServiceAccess
+                </p>
+                <p>
+                 organizations:ListDelegatedAdministrators
+                </p>
+                <p>
+                 organizations:ListDelegatedServicesForAccount
+                </p>
+                <p>
+                 organizations:RegisterDelegatedAdministrator
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonsecuritylake-TagResource" rowspan="3" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/security-lake/latest/APIReference/API_TagResource.html">
+                 TagResource
+                </a>
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Grants permission to add tags to the resource
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Tagging
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonsecuritylake-data-lake">
+                  data-lake
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonsecuritylake-subscriber">
+                  subscriber
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonsecuritylake-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonsecuritylake-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonsecuritylake-UntagResource" rowspan="3" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/security-lake/latest/APIReference/API_UntagResource.html">
+                 UntagResource
+                </a>
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Grants permission to remove tags from the resource
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Tagging
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonsecuritylake-data-lake">
+                  data-lake
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonsecuritylake-subscriber">
+                  subscriber
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonsecuritylake-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonsecuritylake-UpdateDataLake" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/security-lake/latest/APIReference/API_UpdateDataLake.html">
+                 UpdateDataLake
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update a security data lake
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonsecuritylake-data-lake">
+                  data-lake*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 events:PutRule
+                </p>
+                <p>
+                 events:PutTargets
+                </p>
+                <p>
+                 iam:CreateServiceLinkedRole
+                </p>
+                <p>
+                 iam:DeleteRolePolicy
+                </p>
+                <p>
+                 iam:GetRole
+                </p>
+                <p>
+                 iam:ListAttachedRolePolicies
+                </p>
+                <p>
+                 iam:PutRolePolicy
+                </p>
+                <p>
+                 kms:CreateGrant
+                </p>
+                <p>
+                 kms:DescribeKey
+                </p>
+                <p>
+                 lakeformation:GetDataLakeSettings
+                </p>
+                <p>
+                 lakeformation:PutDataLakeSettings
+                </p>
+                <p>
+                 lambda:AddPermission
+                </p>
+                <p>
+                 lambda:CreateEventSourceMapping
+                </p>
+                <p>
+                 lambda:CreateFunction
+                </p>
+                <p>
+                 organizations:DescribeOrganization
+                </p>
+                <p>
+                 organizations:ListDelegatedServicesForAccount
+                </p>
+                <p>
+                 s3:CreateBucket
+                </p>
+                <p>
+                 s3:GetObject
+                </p>
+                <p>
+                 s3:GetObjectVersion
+                </p>
+                <p>
+                 s3:ListBucket
+                </p>
+                <p>
+                 s3:PutBucketPolicy
+                </p>
+                <p>
+                 s3:PutBucketPublicAccessBlock
+                </p>
+                <p>
+                 s3:PutBucketVersioning
+                </p>
+                <p>
+                 sqs:CreateQueue
+                </p>
+                <p>
+                 sqs:GetQueueAttributes
+                </p>
+                <p>
+                 sqs:SetQueueAttributes
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonsecuritylake-UpdateDataLakeExceptionSubscription" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/security-lake/latest/APIReference/API_UpdateDataLakeExceptionSubscription.html">
+                 UpdateDataLakeExceptionSubscription
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update subscriptions to the SNS topics for exception notifications
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonsecuritylake-UpdateSubscriber" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/security-lake/latest/APIReference/API_UpdateSubscriber.html">
+                 UpdateSubscriber
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update subscriber
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonsecuritylake-subscriber">
+                  subscriber*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 events:CreateApiDestination
+                </p>
+                <p>
+                 events:CreateConnection
+                </p>
+                <p>
+                 events:DescribeRule
+                </p>
+                <p>
+                 events:ListApiDestinations
+                </p>
+                <p>
+                 events:ListConnections
+                </p>
+                <p>
+                 events:PutRule
+                </p>
+                <p>
+                 events:PutTargets
+                </p>
+                <p>
+                 iam:DeleteRolePolicy
+                </p>
+                <p>
+                 iam:GetRole
+                </p>
+                <p>
+                 iam:PutRolePolicy
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonsecuritylake-UpdateSubscriberNotification" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/security-lake/latest/APIReference/API_UpdateSubscriberNotification.html">
+                 UpdateSubscriberNotification
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update a webhook invocation to notify a client when there is new data in the data lake
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonsecuritylake-subscriber">
+                  subscriber*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 events:CreateApiDestination
+                </p>
+                <p>
+                 events:CreateConnection
+                </p>
+                <p>
+                 events:DescribeRule
+                </p>
+                <p>
+                 events:ListApiDestinations
+                </p>
+                <p>
+                 events:ListConnections
+                </p>
+                <p>
+                 events:PutRule
+                </p>
+                <p>
+                 events:PutTargets
+                </p>
+                <p>
+                 iam:CreateServiceLinkedRole
+                </p>
+                <p>
+                 iam:DeleteRolePolicy
+                </p>
+                <p>
+                 iam:GetRole
+                </p>
+                <p>
+                 iam:PassRole
+                </p>
+                <p>
+                 iam:PutRolePolicy
+                </p>
+                <p>
+                 s3:CreateBucket
+                </p>
+                <p>
+                 s3:GetBucketNotification
+                </p>
+                <p>
+                 s3:ListBucket
+                </p>
+                <p>
+                 s3:PutBucketNotification
+                </p>
+                <p>
+                 s3:PutBucketPolicy
+                </p>
+                <p>
+                 s3:PutBucketPublicAccessBlock
+                </p>
+                <p>
+                 s3:PutBucketVersioning
+                </p>
+                <p>
+                 s3:PutLifecycleConfiguration
+                </p>
+                <p>
+                 sqs:CreateQueue
+                </p>
+                <p>
+                 sqs:DeleteQueue
+                </p>
+                <p>
+                 sqs:GetQueueAttributes
+                </p>
+                <p>
+                 sqs:GetQueueUrl
+                </p>
+                <p>
+                 sqs:SetQueueAttributes
+                </p>
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <h2 id="amazonsecuritylake-resources-for-iam-policies">
+            Resource types defined by        Amazon Security Lake
+           </h2>
+           <p>
+            The following resource types are defined by this service and can be used in the
+            <code class="code">
+             Resource
+            </code>
+            element of IAM permission policy statements. Each action in the
+            <a href="#amazonsecuritylake-actions-as-permissions">
+             Actions table
+            </a>
+            identifies the      resource types that can be specified with that action. A resource type can also define which      condition keys you can include in a policy. These keys are displayed in the last column of the      Resource types table. For details about the columns in the following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#resources_table" rel="noopener noreferrer" target="_blank">
+             Resource types table
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9e1423c13b5">
+              <thead>
+               <tr>
+                <th>
+                 Resource types
+                </th>
+                <th>
+                 ARN
+                </th>
+                <th>
+                 Condition keys
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="amazonsecuritylake-data-lake" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/security-lake/latest/APIReference/API_DataLakeResource.html">
+                 data-lake
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:securitylake:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:data-lake/default
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonsecuritylake-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonsecuritylake-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonsecuritylake-subscriber" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/security-lake/latest/APIReference/API_SubscriberResource.html">
+                 subscriber
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:securitylake:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:subscriber/$
+                 <span>
+                  {
+                 </span>
+                 SubscriberId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonsecuritylake-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonsecuritylake-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <h2 id="amazonsecuritylake-policy-keys">
+            Condition keys for        Amazon Security Lake
+           </h2>
+           <p>
+            Amazon Security Lake defines the following condition keys that can be used in the
+            <code class="code">
+             Condition
+            </code>
+            element of an IAM policy. You can use these keys to further refine      the conditions under which the policy statement applies. For details about the columns in the      following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#context_keys_table" rel="noopener noreferrer" target="_blank">
+             Condition keys table
+            </a>
+            .
+           </p>
+           <p>
+            To view the global condition keys that are available to all services, see
+            <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#AvailableKeys">
+             Available global condition keys
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9e1423c15b7">
+              <thead>
+               <tr>
+                <th>
+                 Condition keys
+                </th>
+                <th>
+                 Description
+                </th>
+                <th>
+                 Type
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="amazonsecuritylake-aws_RequestTag___TagKey_" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-requesttag">
+                 aws:RequestTag/${TagKey}
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by tags that are passed in the request
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonsecuritylake-aws_ResourceTag___TagKey_" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-resourcetag">
+                 aws:ResourceTag/${TagKey}
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by a tag key and value pair of a resource
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonsecuritylake-aws_TagKeys" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-tagkeys">
+                 aws:TagKeys
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by tag keys that are passed in the request
+               </td>
+               <td tabindex="-1">
+                ArrayOfString
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <awsdocs-copyright class="copyright-print">
+           </awsdocs-copyright>
+           <awsdocs-thumb-feedback right-edge="{{$ctrl.thumbFeedbackRightEdge}}">
+           </awsdocs-thumb-feedback>
+          </div>
+          <noscript>
+           <div>
+            <div>
+             <div>
+              <div id="js_error_message">
+               <p>
+                <img alt="Warning" src="https://d1ge0kk1l5kms0.cloudfront.net/images/G/01/webservices/console/warning.png"/>
+                <strong>
+                 Javascript is disabled or is unavailable in your browser.
+                </strong>
+               </p>
+               <p>
+                To use the Amazon Web Services Documentation, Javascript must be enabled. Please refer to your browser's Help pages for instructions.
+               </p>
+              </div>
+             </div>
+            </div>
+           </div>
+          </noscript>
+          <div class="awsui-util-font-size-0" id="main-col-footer">
+           <div id="doc-conventions">
+            <a href="/general/latest/gr/docconventions.html" target="_top">
+             Document Conventions
+            </a>
+           </div>
+           <div class="prev-next">
+            <div accesskey="p" class="prev-link" href="./list_awssecurityhub.html" id="previous">
+             AWS Security Hub
+            </div>
+            <div accesskey="n" class="next-link" href="./list_awssecuritytokenservice.html" id="next">
+             AWS Security Token Service
+            </div>
+           </div>
+          </div>
+          <awsdocs-page-utilities>
+          </awsdocs-page-utilities>
+         </div>
+         <div id="quick-feedback-yes" style="display: none;">
+          <div class="title">
+           Did this page help you? - Yes
+          </div>
+          <div class="content">
+           <p>
+            Thanks for letting us know we're doing a good job!
+           </p>
+           <p>
+            If you've got a moment, please tell us what we did right so we can do more of it.
+           </p>
+           <p>
+            <awsui-button click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service Authorization Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazonsecuritylake.html" id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback">
+            </awsui-button>
+           </p>
+          </div>
+         </div>
+         <div id="quick-feedback-no" style="display: none;">
+          <div class="title">
+           Did this page help you? - No
+          </div>
+          <div class="content">
+           <p>
+            Thanks for letting us know this page needs work. We're sorry we let you down.
+           </p>
+           <p>
+            If you've got a moment, please tell us how we can make the documentation better.
+           </p>
+           <p>
+            <awsui-button click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service Authorization Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazonsecuritylake.html" id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback">
+            </awsui-button>
+           </p>
+          </div>
+         </div>
+        </div>
+       </body>
+      </div>
+     </awsdocs-view>
+     <div class="page-loading-indicator" id="page-loading-indicator">
+      <awsui-spinner size="large">
+      </awsui-spinner>
+     </div>
+    </div>
+    <div dom-region="tools" id="tools-panel">
+     <awsdocs-tools-panel id="awsdocs-tools-panel">
+     </awsdocs-tools-panel>
+    </div>
+   </awsui-app-layout>
+   <awsdocs-cookie-banner class="doc-cookie-banner">
+   </awsdocs-cookie-banner>
+  </div>
+ </body>
+</html>

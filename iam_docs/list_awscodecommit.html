@@ -1,0 +1,2964 @@
+<!DOCTYPE html>
+<html lang="en-US" xmlns="http://www.w3.org/1999/xhtml">
+ <head>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+  <title>
+   Actions, resources, and condition keys for AWS CodeCommit - Service Authorization Reference
+  </title>
+  <meta content="width=device-width,initial-scale=1" name="viewport"/>
+  <meta content="/assets" name="assets_root"/>
+  <meta content="list_awscodecommit" name="target_state"/>
+  <meta content="list_awscodecommit" name="default_state"/>
+  <link href="https://docs.aws.amazon.com/assets/images/favicon.ico" rel="icon" type="image/ico"/>
+  <link href="https://docs.aws.amazon.com/assets/images/favicon.ico" rel="shortcut icon" type="image/ico"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awscodecommit.html" rel="canonical"/>
+  <meta content="Lists all of the available service-specific resources, actions, and condition keys that can be used in IAM policies to control access to AWS CodeCommit." name="description"/>
+  <meta content="IAD" name="deployment_region"/>
+  <meta content="Service Authorization Reference" name="product"/>
+  <meta content="Service Authorization Reference" name="guide"/>
+  <meta content="Provides a list of the actions, resources, and condition keys supported by each AWS service that can be used in an IAM policy." name="abstract"/>
+  <meta content="en_us" name="guide-locale"/>
+  <meta content="toc-contents.json" name="tocs"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awscodecommit.html" rel="canonical"/>
+  <link href="https://docs.aws.amazon.com/id_id/service-authorization/latest/reference/list_awscodecommit.html" hreflang="id-id" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/id_id/service-authorization/latest/reference/list_awscodecommit.html" hreflang="id" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/de_de/service-authorization/latest/reference/list_awscodecommit.html" hreflang="de-de" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/de_de/service-authorization/latest/reference/list_awscodecommit.html" hreflang="de" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awscodecommit.html" hreflang="en-us" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awscodecommit.html" hreflang="en" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/es_es/service-authorization/latest/reference/list_awscodecommit.html" hreflang="es-es" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/es_es/service-authorization/latest/reference/list_awscodecommit.html" hreflang="es" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/fr_fr/service-authorization/latest/reference/list_awscodecommit.html" hreflang="fr-fr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/fr_fr/service-authorization/latest/reference/list_awscodecommit.html" hreflang="fr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/it_it/service-authorization/latest/reference/list_awscodecommit.html" hreflang="it-it" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/it_it/service-authorization/latest/reference/list_awscodecommit.html" hreflang="it" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ja_jp/service-authorization/latest/reference/list_awscodecommit.html" hreflang="ja-jp" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ja_jp/service-authorization/latest/reference/list_awscodecommit.html" hreflang="ja" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ko_kr/service-authorization/latest/reference/list_awscodecommit.html" hreflang="ko-kr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ko_kr/service-authorization/latest/reference/list_awscodecommit.html" hreflang="ko" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/pt_br/service-authorization/latest/reference/list_awscodecommit.html" hreflang="pt-br" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/pt_br/service-authorization/latest/reference/list_awscodecommit.html" hreflang="pt" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/zh_cn/service-authorization/latest/reference/list_awscodecommit.html" hreflang="zh-cn" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/zh_tw/service-authorization/latest/reference/list_awscodecommit.html" hreflang="zh-tw" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awscodecommit.html" hreflang="x-default" rel="alternative"/>
+  <meta content="Service Authorization Docs" name="feedback-item"/>
+  <meta content="Service Authorization Reference" name="this_doc_product"/>
+  <meta content="Service Authorization Reference" name="this_doc_guide"/>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor4.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor3.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor1.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/awsdocs-common.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/awsdocs-doc-page.js?version=2021.12.02">
+  </script>
+  <link href="https://docs.aws.amazon.com/assets/r/vendor4.css?version=2021.12.02" rel="stylesheet"/>
+  <link href="https://docs.aws.amazon.com/assets/r/awsdocs-common.css?version=2021.12.02" rel="stylesheet"/>
+  <link href="https://docs.aws.amazon.com/assets/r/awsdocs-doc-page.css?version=2021.12.02" rel="stylesheet"/>
+  <script async="" data-config="{'appEntity':'aws-documentation','region':'us-east-1','service':'iam'}" id="awsc-panorama-bundle" src="https://prod.pa.cdn.uis.awsstatic.com/panorama-nav-init.js" type="text/javascript">
+  </script>
+  <meta id="panorama-serviceSubSection" value="Service Authorization Reference"/>
+  <meta id="panorama-serviceConsolePage" value="Actions, resources, and condition keys for AWS CodeCommit"/>
+ </head>
+ <body class="awsdocs awsui">
+  <div class="awsdocs-container">
+   <awsdocs-header>
+   </awsdocs-header>
+   <awsui-app-layout class="awsui-util-no-gutters" header-selector="awsdocs-header" id="app-layout" navigation-change="$ctrl.onNavChange($event)" navigation-hide="false" navigation-open="$ctrl.navOpen" navigation-width="$ctrl.navWidth" ng-controller="ContentController as $ctrl" tools-change="$ctrl.onToolsChange($event)" tools-hide="$ctrl.hideTools" tools-open="$ctrl.toolsOpen" tools-width="$ctrl.toolsWidth">
+    <div dom-region="navigation" id="guide-toc">
+     <awsdocs-toc>
+     </awsdocs-toc>
+    </div>
+    <div dom-region="content" id="main-column" tabindex="-1">
+     <awsdocs-view class="awsdocs-view">
+      <div id="awsdocs-content">
+       <head>
+        <title>
+         Actions, resources, and condition keys for AWS CodeCommit - Service Authorization Reference
+        </title>
+        <meta content="/pdfs/service-authorization/latest/reference/service-authorization.pdf#list_awscodecommit" name="pdf"/>
+        <meta content="https://repost.aws/tags/TAO7Z4bI5hQVWMiYFs34QhIA" name="forums"/>
+        <meta content="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service%20Authorization%20Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awscodecommit.html" name="feedback"/>
+        <meta content="feedbackyes.html?topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awscodecommit.html" name="feedback-yes"/>
+        <meta content="feedbackno.html?topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awscodecommit.html" name="feedback-no"/>
+        <script type="application/ld+json">
+         {
+    "@context" : "https://schema.org",
+    "@type" : "BreadcrumbList",
+    "itemListElement" : [
+      {
+        "@type" : "ListItem",
+        "position" : 1,
+        "name" : "AWS",
+        "item" : "https://aws.amazon.com"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 2,
+        "name" : "Service Authorization Reference",
+        "item" : "https://docs.aws.amazon.com/iam/index.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 3,
+        "name" : "Service Authorization Reference",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 4,
+        "name" : "Reference",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 5,
+        "name" : "Actions, resources, and condition keys for AWS services",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference_policies_actions-resources-contextkeys.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 6,
+        "name" : "Actions, resources, and condition keys for AWS CodeCommit",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference_policies_actions-resources-contextkeys.html"
+      }
+    ]
+}
+        </script>
+       </head>
+       <body>
+        <div id="main">
+         <div style="display: none">
+          <a href="/pdfs/service-authorization/latest/reference/service-authorization.pdf#list_awscodecommit" rel="noopener noreferrer" target="_blank" title="Open PDF">
+          </a>
+         </div>
+         <div class="breadcrumb" id="breadcrumbs">
+          <a href="https://aws.amazon.com">
+           AWS
+          </a>
+          <a href="/index.html">
+           Documentation
+          </a>
+          <a href="/iam/index.html">
+           Service Authorization Reference
+          </a>
+          <a href="reference.html">
+           Service Authorization Reference
+          </a>
+         </div>
+         <div id="page-toc-src">
+          <a href="#awscodecommit-actions-as-permissions">
+           Actions
+          </a>
+          <a href="#awscodecommit-resources-for-iam-policies">
+           Resource types
+          </a>
+          <a href="#awscodecommit-policy-keys">
+           Condition keys
+          </a>
+         </div>
+         <div class="awsui-util-container" id="main-content">
+          <div id="main-col-body">
+           <awsdocs-language-banner data-service="$ctrl.pageService">
+           </awsdocs-language-banner>
+           <h1 class="topictitle" id="list_awscodecommit">
+            Actions, resources, and condition keys for      AWS CodeCommit
+           </h1>
+           <div class="awsdocs-page-header-container">
+            <awsdocs-page-header>
+            </awsdocs-page-header>
+            <awsdocs-filter-selector id="awsdocs-filter-selector">
+            </awsdocs-filter-selector>
+           </div>
+           <p>
+            AWS CodeCommit (service prefix:
+            <code class="code">
+             codecommit
+            </code>
+            ) provides the following    service-specific resources, actions, and condition context keys for use in IAM permission    policies.
+           </p>
+           <p>
+            References:
+           </p>
+           <div class="itemizedlist">
+            <ul class="itemizedlist">
+             <li class="listitem">
+              <p>
+               Learn how to
+               <a href="https://docs.aws.amazon.com/codecommit/latest/userguide/welcome.html">
+                configure this service
+               </a>
+               .
+              </p>
+             </li>
+             <li class="listitem">
+              <p>
+               View a list of the
+               <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/Welcome.html">
+                API operations available for this          service
+               </a>
+               .
+              </p>
+             </li>
+             <li class="listitem">
+              <p>
+               Learn how to secure this service and its resources by
+               <a href="https://docs.aws.amazon.com/codecommit/latest/userguide/auth-and-access-control-permissions-reference.html">
+                using          IAM
+               </a>
+               permission policies.
+              </p>
+             </li>
+            </ul>
+           </div>
+           <div class="highlights" id="inline-topiclist">
+            <h6>
+             Topics
+            </h6>
+            <ul>
+             <li>
+              <a href="#awscodecommit-actions-as-permissions">
+               Actions defined by        AWS CodeCommit
+              </a>
+             </li>
+             <li>
+              <a href="#awscodecommit-resources-for-iam-policies">
+               Resource types defined by        AWS CodeCommit
+              </a>
+             </li>
+             <li>
+              <a href="#awscodecommit-policy-keys">
+               Condition keys for        AWS CodeCommit
+              </a>
+             </li>
+            </ul>
+           </div>
+           <h2 id="awscodecommit-actions-as-permissions">
+            Actions defined by        AWS CodeCommit
+           </h2>
+           <p>
+            You can specify the following actions in the
+            <code class="code">
+             Action
+            </code>
+            element of an IAM      policy statement. Use policies to grant permissions to perform an operation in AWS. When you      use an action in a policy, you usually allow or deny access to the API operation or CLI      command with the same name. However, in some cases, a single action controls access to more      than one operation. Alternatively, some operations require several different actions.
+           </p>
+           <p>
+            The
+            <b>
+             Resource types
+            </b>
+            column of the Actions table indicates whether each      action supports resource-level permissions. If there is no value for this column, you must      specify all resources ("*") to which the policy applies in the
+            <code class="code">
+             Resource
+            </code>
+            element      of your policy statement. If the column includes a resource type, then you can specify an ARN      of that type in a statement with that action. If the action has one or more required      resources, the caller must have permission to use the action with those resources. Required      resources are indicated in the table with an asterisk (*). If you limit resource access with      the
+            <code class="code">
+             Resource
+            </code>
+            element in an IAM policy, you must include an ARN or pattern for      each required resource type. Some actions support multiple resource types. If the resource      type is optional (not indicated as required), then you can choose to use one of the optional      resource types.
+           </p>
+           <p>
+            The
+            <b>
+             Condition keys
+            </b>
+            column of the Actions table includes keys that you      can specify in a policy statement's
+            <code class="code">
+             Condition
+            </code>
+            element. For more information on      the condition keys that are associated with resources for the service, see the
+            <b>
+             Condition keys
+            </b>
+            column of the Resource types table.
+           </p>
+           <div class="awsdocs-note">
+            <div class="awsdocs-note-title">
+             <awsui-icon name="status-info" variant="link">
+             </awsui-icon>
+             <h6>
+              Note
+             </h6>
+            </div>
+            <div class="awsdocs-note-text">
+             <p>
+              Resource condition keys are listed in the
+              <a href="#awscodecommit-resources-for-iam-policies">
+               Resource types
+              </a>
+              table. You        can find a link to the resource type that applies to an action in the
+              <b>
+               Resource          types (*required)
+              </b>
+              column of the Actions table. The resource type in the        Resource types table includes the
+              <b>
+               Condition keys
+              </b>
+              column, which are the        resource condition keys that apply to an action in the Actions table.
+             </p>
+            </div>
+           </div>
+           <p>
+            For details about the columns in the following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#actions_table" rel="noopener noreferrer" target="_blank">
+             Actions table
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9d318c11c13">
+              <thead>
+               <tr>
+                <th>
+                 Actions
+                </th>
+                <th>
+                 Description
+                </th>
+                <th>
+                 Access level
+                </th>
+                <th>
+                 Resource types (*required)
+                </th>
+                <th>
+                 Condition keys
+                </th>
+                <th>
+                 Dependent actions
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="awscodecommit-AssociateApprovalRuleTemplateWithRepository" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_AssociateApprovalRuleTemplateWithRepository.html">
+                 AssociateApprovalRuleTemplateWithRepository
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to associate an approval rule template with a repository
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-BatchAssociateApprovalRuleTemplateWithRepositories" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_BatchAssociateApprovalRuleTemplateWithRepositories.html">
+                 BatchAssociateApprovalRuleTemplateWithRepositories
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to associate an approval rule template with multiple repositories in a single operation
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-BatchDescribeMergeConflicts" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_BatchDescribeMergeConflicts.html">
+                 BatchDescribeMergeConflicts
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get information about multiple merge conflicts when attempting to merge two commits using either the three-way merge or the squash merge option
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-BatchDisassociateApprovalRuleTemplateFromRepositories" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_BatchDisassociateApprovalRuleTemplateFromRepositories.html">
+                 BatchDisassociateApprovalRuleTemplateFromRepositories
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to remove the association between an approval rule template and multiple repositories in a single operation
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-BatchGetCommits" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_BatchGetCommits.html">
+                 BatchGetCommits
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return information about one or more commits in an AWS CodeCommit repository
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-BatchGetPullRequests" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/userguide/auth-and-access-control-permissions-reference.html#aa-pr">
+                 BatchGetPullRequests
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to return information about one or more pull requests in an AWS CodeCommit repository
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-BatchGetRepositories" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_BatchGetRepositories.html">
+                 BatchGetRepositories
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get information about multiple repositories
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-CancelUploadArchive" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/userguide/auth-and-access-control-permissions-reference.html#aa-acp">
+                 CancelUploadArchive
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to cancel the uploading of an archive to a pipeline in AWS CodePipeline
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-CreateApprovalRuleTemplate" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_CreateApprovalRuleTemplate.html">
+                 CreateApprovalRuleTemplate
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create an approval rule template that will automatically create approval rules in pull requests that match the conditions defined in the template; does not grant permission to create approval rules for individual pull requests
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-CreateBranch" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_CreateBranch.html">
+                 CreateBranch
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to create a branch in an AWS CodeCommit repository with this API; does not control Git create branch actions
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-codecommit_References">
+                  codecommit:References
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-CreateCommit" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_CreateCommit.html">
+                 CreateCommit
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to add, copy, move or update single or multiple files in a branch in an AWS CodeCommit repository, and generate a commit for the changes in the specified branch
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-codecommit_References">
+                  codecommit:References
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-CreatePullRequest" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_CreatePullRequest.html">
+                 CreatePullRequest
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a pull request in the specified repository
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-CreatePullRequestApprovalRule" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_CreatePullRequestApprovalRule.html">
+                 CreatePullRequestApprovalRule
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create an approval rule specific to an individual pull request; does not grant permission to create approval rule templates
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-CreateRepository" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_CreateRepository.html">
+                 CreateRepository
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to create an AWS CodeCommit repository
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscodecommit-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-CreateUnreferencedMergeCommit" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_CreateUnreferencedMergeCommit.html">
+                 CreateUnreferencedMergeCommit
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to create an unreferenced commit that contains the result of merging two commits using either the three-way or the squash merge option; does not control Git merge actions
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-codecommit_References">
+                  codecommit:References
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-DeleteApprovalRuleTemplate" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_DeleteApprovalRuleTemplate.html">
+                 DeleteApprovalRuleTemplate
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete an approval rule template
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-DeleteBranch" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_DeleteBranch.html">
+                 DeleteBranch
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to delete a branch in an AWS CodeCommit repository with this API; does not control Git delete branch actions
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-codecommit_References">
+                  codecommit:References
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-DeleteCommentContent" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_DeleteCommentContent.html">
+                 DeleteCommentContent
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete the content of a comment made on a change, file, or commit in a repository
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-DeleteFile" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_DeleteFile.html">
+                 DeleteFile
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to delete a specified file from a specified branch
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-codecommit_References">
+                  codecommit:References
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-DeletePullRequestApprovalRule" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_DeletePullRequestApprovalRule.html">
+                 DeletePullRequestApprovalRule
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete approval rule created for a pull request if the rule was not created by an approval rule template
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-DeleteRepository" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_DeleteRepository.html">
+                 DeleteRepository
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete an AWS CodeCommit repository
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-DescribeMergeConflicts" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_DescribeMergeConflicts.html">
+                 DescribeMergeConflicts
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get information about specific merge conflicts when attempting to merge two commits using either the three-way or the squash merge option
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-DescribePullRequestEvents" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_DescribePullRequestEvents.html">
+                 DescribePullRequestEvents
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return information about one or more pull request events
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-DisassociateApprovalRuleTemplateFromRepository" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_DisassociateApprovalRuleTemplateFromRepository.html">
+                 DisassociateApprovalRuleTemplateFromRepository
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to remove the association between an approval rule template and a repository
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-EvaluatePullRequestApprovalRules" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_EvaluatePullRequestApprovalRules.html">
+                 EvaluatePullRequestApprovalRules
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to evaluate whether a pull request is mergable based on its current approval state and approval rule requirements
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-GetApprovalRuleTemplate" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_GetApprovalRuleTemplate.html">
+                 GetApprovalRuleTemplate
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return information about an approval rule template
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-GetBlob" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_GetBlob.html">
+                 GetBlob
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to view the encoded content of an individual file in an AWS CodeCommit repository from the AWS CodeCommit console
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-GetBranch" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_GetBranch.html">
+                 GetBranch
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get details about a branch in an AWS CodeCommit repository with this API; does not control Git branch actions
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-GetComment" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_GetComment.html">
+                 GetComment
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get the content of a comment made on a change, file, or commit in a repository
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-GetCommentReactions" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_GetCommentReactions.html">
+                 GetCommentReactions
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get the reactions on a comment
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-GetCommentsForComparedCommit" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_GetCommentsForComparedCommit.html">
+                 GetCommentsForComparedCommit
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get information about comments made on the comparison between two commits
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-GetCommentsForPullRequest" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_GetCommentsForPullRequest.html">
+                 GetCommentsForPullRequest
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get comments made on a pull request
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-GetCommit" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_GetCommit.html">
+                 GetCommit
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return information about a commit, including commit message and committer information, with this API; does not control Git log actions
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-GetCommitHistory" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/userguide/auth-and-access-control-permissions-reference.html#aa-code">
+                 GetCommitHistory
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to get information about the history of commits in a repository
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-GetCommitsFromMergeBase" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/userguide/auth-and-access-control-permissions-reference.html#aa-pr">
+                 GetCommitsFromMergeBase
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to get information about the difference between commits in the context of a potential merge
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-GetDifferences" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_GetDifferences.html">
+                 GetDifferences
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to view information about the differences between valid commit specifiers such as a branch, tag, HEAD, commit ID, or other fully qualified reference
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-GetFile" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_GetFile.html">
+                 GetFile
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return the base-64 encoded contents of a specified file and its metadata
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-GetFolder" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_GetFolder.html">
+                 GetFolder
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return the contents of a specified folder in a repository
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-GetMergeCommit" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_GetMergeCommit.html">
+                 GetMergeCommit
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to get information about a merge commit created by one of the merge options for pull requests that creates merge commits. Not all merge options create merge commits. This permission does not control Git merge actions
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-codecommit_References">
+                  codecommit:References
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-GetMergeConflicts" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_GetMergeConflicts.html">
+                 GetMergeConflicts
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get information about merge conflicts between the before and after commit IDs for a pull request in a repository
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-GetMergeOptions" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_GetMergeOptions.html">
+                 GetMergeOptions
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get information about merge options for pull requests that can be used to merge two commits; does not control Git merge actions
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-GetObjectIdentifier" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/userguide/auth-and-access-control-permissions-reference.html#aa-code">
+                 GetObjectIdentifier
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to resolve blobs, trees, and commits to their identifier
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-GetPullRequest" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_GetPullRequest.html">
+                 GetPullRequest
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get information about a pull request in a specified repository
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-GetPullRequestApprovalStates" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_GetPullRequestApprovalStates.html">
+                 GetPullRequestApprovalStates
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retrieve the current approvals on an inputted pull request
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-GetPullRequestOverrideState" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_GetPullRequestOverrideState.html">
+                 GetPullRequestOverrideState
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retrieve the current override state of a given pull request
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-GetReferences" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/userguide/auth-and-access-control-permissions-reference.html#aa-code">
+                 GetReferences
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to get details about references in an AWS CodeCommit repository; does not control Git reference actions
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-GetRepository" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_GetRepository.html">
+                 GetRepository
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get information about an AWS CodeCommit repository
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-GetRepositoryTriggers" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_GetRepositoryTriggers.html">
+                 GetRepositoryTriggers
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get information about triggers configured for a repository
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-GetTree" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/userguide/auth-and-access-control-permissions-reference.html#aa-code">
+                 GetTree
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to view the contents of a specified tree in an AWS CodeCommit repository from the AWS CodeCommit console
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-GetUploadArchiveStatus" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/userguide/auth-and-access-control-permissions-reference.html#aa-acp">
+                 GetUploadArchiveStatus
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to get status information about an archive upload to a pipeline in AWS CodePipeline
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-GitPull" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/userguide/auth-and-access-control-permissions-reference.html#aa-git">
+                 GitPull
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to pull information from an AWS CodeCommit repository to a local repo
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-GitPush" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/userguide/auth-and-access-control-permissions-reference.html#aa-git">
+                 GitPush
+                </a>
+                [permission only]
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to push information from a local repo to an AWS CodeCommit repository
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-codecommit_References">
+                  codecommit:References
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-ListApprovalRuleTemplates" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_ListApprovalRuleTemplates.html">
+                 ListApprovalRuleTemplates
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list all approval rule templates in an AWS Region for the AWS account
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-ListAssociatedApprovalRuleTemplatesForRepository" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_ListAssociatedApprovalRuleTemplatesForRepository.html">
+                 ListAssociatedApprovalRuleTemplatesForRepository
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list approval rule templates that are associated with a repository
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-ListBranches" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_ListBranches.html">
+                 ListBranches
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list branches for an AWS CodeCommit repository with this API; does not control Git branch actions
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-ListFileCommitHistory" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_ListFileCommitHistory.html">
+                 ListFileCommitHistory
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list commits and changes to a specified file
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-ListPullRequests" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_ListPullRequests.html">
+                 ListPullRequests
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list pull requests for a specified repository
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-ListRepositories" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_ListRepositories.html">
+                 ListRepositories
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list information about AWS CodeCommit repositories in the current Region for your AWS account
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-ListRepositoriesForApprovalRuleTemplate" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_ListRepositoriesForApprovalRuleTemplate.html">
+                 ListRepositoriesForApprovalRuleTemplate
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list repositories that are associated with an approval rule template
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-ListTagsForResource" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_ListTagsForResource.html">
+                 ListTagsForResource
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list the resource attached to a CodeCommit resource ARN
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-MergeBranchesByFastForward" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_MergeBranchesByFastForward.html">
+                 MergeBranchesByFastForward
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to merge two commits into the specified destination branch using the fast-forward merge option
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-codecommit_References">
+                  codecommit:References
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-MergeBranchesBySquash" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_MergeBranchesBySquash.html">
+                 MergeBranchesBySquash
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to merge two commits into the specified destination branch using the squash merge option
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-codecommit_References">
+                  codecommit:References
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-MergeBranchesByThreeWay" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_MergeBranchesByThreeWay.html">
+                 MergeBranchesByThreeWay
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to merge two commits into the specified destination branch using the three-way merge option
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-codecommit_References">
+                  codecommit:References
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-MergePullRequestByFastForward" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_MergePullRequestByFastForward.html">
+                 MergePullRequestByFastForward
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to close a pull request and attempt to merge it into the specified destination branch for that pull request at the specified commit using the fast-forward merge option
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-codecommit_References">
+                  codecommit:References
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-MergePullRequestBySquash" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_MergePullRequestBySquash.html">
+                 MergePullRequestBySquash
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to close a pull request and attempt to merge it into the specified destination branch for that pull request at the specified commit using the squash merge option
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-codecommit_References">
+                  codecommit:References
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-MergePullRequestByThreeWay" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_MergePullRequestByThreeWay.html">
+                 MergePullRequestByThreeWay
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to close a pull request and attempt to merge it into the specified destination branch for that pull request at the specified commit using the three-way merge option
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-codecommit_References">
+                  codecommit:References
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-OverridePullRequestApprovalRules" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_OverridePullRequestApprovalRules.html">
+                 OverridePullRequestApprovalRules
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to override all approval rules for a pull request, including approval rules created by a template
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-PostCommentForComparedCommit" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_PostCommentForComparedCommit.html">
+                 PostCommentForComparedCommit
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to post a comment on the comparison between two commits
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-PostCommentForPullRequest" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_PostCommentForPullRequest.html">
+                 PostCommentForPullRequest
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to post a comment on a pull request
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-PostCommentReply" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_PostCommentReply.html">
+                 PostCommentReply
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to post a comment in reply to a comment on a comparison between commits or a pull request
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-PutCommentReaction" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_PutCommentReaction.html">
+                 PutCommentReaction
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to post a reaction on a comment
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-PutFile" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_PutFile.html">
+                 PutFile
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to add or update a file in a branch in an AWS CodeCommit repository, and generate a commit for the addition in the specified branch
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-codecommit_References">
+                  codecommit:References
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-PutRepositoryTriggers" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_PutRepositoryTriggers.html">
+                 PutRepositoryTriggers
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create, update, or delete triggers for a repository
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-TagResource" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_TagResource.html">
+                 TagResource
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to attach resource tags to a CodeCommit resource ARN
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Tagging
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscodecommit-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscodecommit-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-TestRepositoryTriggers" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_TestRepositoryTriggers.html">
+                 TestRepositoryTriggers
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to test the functionality of repository triggers by sending information to the trigger target
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-UntagResource" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_UntagResource.html">
+                 UntagResource
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to disassociate resource tags from a CodeCommit resource ARN
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Tagging
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#awscodecommit-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-UpdateApprovalRuleTemplateContent" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_UpdateApprovalRuleTemplateContent.html">
+                 UpdateApprovalRuleTemplateContent
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update the content of approval rule templates; does not grant permission to update content of approval rules created specifically for pull requests
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-UpdateApprovalRuleTemplateDescription" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_UpdateApprovalRuleTemplateDescription.html">
+                 UpdateApprovalRuleTemplateDescription
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update the description of approval rule templates
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-UpdateApprovalRuleTemplateName" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_UpdateApprovalRuleTemplateName.html">
+                 UpdateApprovalRuleTemplateName
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update the name of approval rule templates
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-UpdateComment" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_UpdateComment.html">
+                 UpdateComment
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update the contents of a comment if the identity matches the identity used to create the comment
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-UpdateDefaultBranch" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_UpdateDefaultBranch.html">
+                 UpdateDefaultBranch
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to change the default branch in an AWS CodeCommit repository
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-UpdatePullRequestApprovalRuleContent" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_UpdatePullRequestApprovalRuleContent.html">
+                 UpdatePullRequestApprovalRuleContent
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update the content for approval rules created for a specific pull requests; does not grant permission to update approval rule content for rules created with an approval rule template
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-UpdatePullRequestApprovalState" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_UpdatePullRequestApprovalState.html">
+                 UpdatePullRequestApprovalState
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update the approval state for pull requests
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-UpdatePullRequestDescription" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_UpdatePullRequestDescription.html">
+                 UpdatePullRequestDescription
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update the description of a pull request
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-UpdatePullRequestStatus" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_UpdatePullRequestStatus.html">
+                 UpdatePullRequestStatus
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update the status of a pull request
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-UpdatePullRequestTitle" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_UpdatePullRequestTitle.html">
+                 UpdatePullRequestTitle
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update the title of a pull request
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-UpdateRepositoryDescription" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_UpdateRepositoryDescription.html">
+                 UpdateRepositoryDescription
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to change the description of an AWS CodeCommit repository
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-UpdateRepositoryEncryptionKey" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_UpdateRepositoryEncryptionKey.html">
+                 UpdateRepositoryEncryptionKey
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to change the AWS KMS encryption key used to encrypt and decrypt an AWS CodeCommit repository
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-UpdateRepositoryName" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/APIReference/API_UpdateRepositoryName.html">
+                 UpdateRepositoryName
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to change the name of an AWS CodeCommit repository
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-UploadArchive" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/userguide/auth-and-access-control-permissions-reference.html#aa-acp">
+                 UploadArchive
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to the service role for AWS CodePipeline to upload repository changes into a pipeline
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <h2 id="awscodecommit-resources-for-iam-policies">
+            Resource types defined by        AWS CodeCommit
+           </h2>
+           <p>
+            The following resource types are defined by this service and can be used in the
+            <code class="code">
+             Resource
+            </code>
+            element of IAM permission policy statements. Each action in the
+            <a href="#awscodecommit-actions-as-permissions">
+             Actions table
+            </a>
+            identifies the      resource types that can be specified with that action. A resource type can also define which      condition keys you can include in a policy. These keys are displayed in the last column of the      Resource types table. For details about the columns in the following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#resources_table" rel="noopener noreferrer" target="_blank">
+             Resource types table
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9d318c13b5">
+              <thead>
+               <tr>
+                <th>
+                 Resource types
+                </th>
+                <th>
+                 ARN
+                </th>
+                <th>
+                 Condition keys
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="awscodecommit-repository" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/userguide/auth-and-access-control.html#arn-formats">
+                 repository
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:codecommit:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:$
+                 <span>
+                  {
+                 </span>
+                 RepositoryName}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awscodecommit-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <h2 id="awscodecommit-policy-keys">
+            Condition keys for        AWS CodeCommit
+           </h2>
+           <p>
+            AWS CodeCommit defines the following condition keys that can be used in the
+            <code class="code">
+             Condition
+            </code>
+            element of an IAM policy. You can use these keys to further refine      the conditions under which the policy statement applies. For details about the columns in the      following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#context_keys_table" rel="noopener noreferrer" target="_blank">
+             Condition keys table
+            </a>
+            .
+           </p>
+           <p>
+            To view the global condition keys that are available to all services, see
+            <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#AvailableKeys">
+             Available global condition keys
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9d318c15b7">
+              <thead>
+               <tr>
+                <th>
+                 Condition keys
+                </th>
+                <th>
+                 Description
+                </th>
+                <th>
+                 Type
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="awscodecommit-aws_RequestTag___TagKey_" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-requesttag">
+                 aws:RequestTag/${TagKey}
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the presence of tag key-value pairs in the request
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-aws_ResourceTag___TagKey_" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-resourcetag">
+                 aws:ResourceTag/${TagKey}
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by tag key-value pairs attached to the resource
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-aws_TagKeys" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-tagkeys">
+                 aws:TagKeys
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the presence of tag keys in the request
+               </td>
+               <td tabindex="-1">
+                ArrayOfString
+               </td>
+              </tr>
+              <tr>
+               <td id="awscodecommit-codecommit_References" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/codecommit/latest/userguide/how-to-conditional-branch.html">
+                 codecommit:References
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by Git reference to specified AWS CodeCommit actions
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <awsdocs-copyright class="copyright-print">
+           </awsdocs-copyright>
+           <awsdocs-thumb-feedback right-edge="{{$ctrl.thumbFeedbackRightEdge}}">
+           </awsdocs-thumb-feedback>
+          </div>
+          <noscript>
+           <div>
+            <div>
+             <div>
+              <div id="js_error_message">
+               <p>
+                <img alt="Warning" src="https://d1ge0kk1l5kms0.cloudfront.net/images/G/01/webservices/console/warning.png"/>
+                <strong>
+                 Javascript is disabled or is unavailable in your browser.
+                </strong>
+               </p>
+               <p>
+                To use the Amazon Web Services Documentation, Javascript must be enabled. Please refer to your browser's Help pages for instructions.
+               </p>
+              </div>
+             </div>
+            </div>
+           </div>
+          </noscript>
+          <div class="awsui-util-font-size-0" id="main-col-footer">
+           <div id="doc-conventions">
+            <a href="/general/latest/gr/docconventions.html" target="_top">
+             Document Conventions
+            </a>
+           </div>
+           <div class="prev-next">
+            <div accesskey="p" class="prev-link" href="./list_amazoncodecatalyst.html" id="previous">
+             Amazon CodeCatalyst
+            </div>
+            <div accesskey="n" class="next-link" href="./list_awscodeconnections.html" id="next">
+             AWS CodeConnections
+            </div>
+           </div>
+          </div>
+          <awsdocs-page-utilities>
+          </awsdocs-page-utilities>
+         </div>
+         <div id="quick-feedback-yes" style="display: none;">
+          <div class="title">
+           Did this page help you? - Yes
+          </div>
+          <div class="content">
+           <p>
+            Thanks for letting us know we're doing a good job!
+           </p>
+           <p>
+            If you've got a moment, please tell us what we did right so we can do more of it.
+           </p>
+           <p>
+            <awsui-button click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service Authorization Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awscodecommit.html" id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback">
+            </awsui-button>
+           </p>
+          </div>
+         </div>
+         <div id="quick-feedback-no" style="display: none;">
+          <div class="title">
+           Did this page help you? - No
+          </div>
+          <div class="content">
+           <p>
+            Thanks for letting us know this page needs work. We're sorry we let you down.
+           </p>
+           <p>
+            If you've got a moment, please tell us how we can make the documentation better.
+           </p>
+           <p>
+            <awsui-button click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service Authorization Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awscodecommit.html" id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback">
+            </awsui-button>
+           </p>
+          </div>
+         </div>
+        </div>
+       </body>
+      </div>
+     </awsdocs-view>
+     <div class="page-loading-indicator" id="page-loading-indicator">
+      <awsui-spinner size="large">
+      </awsui-spinner>
+     </div>
+    </div>
+    <div dom-region="tools" id="tools-panel">
+     <awsdocs-tools-panel id="awsdocs-tools-panel">
+     </awsdocs-tools-panel>
+    </div>
+   </awsui-app-layout>
+   <awsdocs-cookie-banner class="doc-cookie-banner">
+   </awsdocs-cookie-banner>
+  </div>
+ </body>
+</html>

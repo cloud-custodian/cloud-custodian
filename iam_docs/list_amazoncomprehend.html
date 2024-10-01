@@ -1,0 +1,4407 @@
+<!DOCTYPE html>
+<html lang="en-US" xmlns="http://www.w3.org/1999/xhtml">
+ <head>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+  <title>
+   Actions, resources, and condition keys for Amazon Comprehend - Service Authorization Reference
+  </title>
+  <meta content="width=device-width,initial-scale=1" name="viewport"/>
+  <meta content="/assets" name="assets_root"/>
+  <meta content="list_amazoncomprehend" name="target_state"/>
+  <meta content="list_amazoncomprehend" name="default_state"/>
+  <link href="https://docs.aws.amazon.com/assets/images/favicon.ico" rel="icon" type="image/ico"/>
+  <link href="https://docs.aws.amazon.com/assets/images/favicon.ico" rel="shortcut icon" type="image/ico"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazoncomprehend.html" rel="canonical"/>
+  <meta content="Lists all of the available service-specific resources, actions, and condition keys that can be used in IAM policies to control access to Amazon Comprehend." name="description"/>
+  <meta content="IAD" name="deployment_region"/>
+  <meta content="Service Authorization Reference" name="product"/>
+  <meta content="Service Authorization Reference" name="guide"/>
+  <meta content="Provides a list of the actions, resources, and condition keys supported by each AWS service that can be used in an IAM policy." name="abstract"/>
+  <meta content="en_us" name="guide-locale"/>
+  <meta content="toc-contents.json" name="tocs"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazoncomprehend.html" rel="canonical"/>
+  <link href="https://docs.aws.amazon.com/id_id/service-authorization/latest/reference/list_amazoncomprehend.html" hreflang="id-id" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/id_id/service-authorization/latest/reference/list_amazoncomprehend.html" hreflang="id" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/de_de/service-authorization/latest/reference/list_amazoncomprehend.html" hreflang="de-de" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/de_de/service-authorization/latest/reference/list_amazoncomprehend.html" hreflang="de" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazoncomprehend.html" hreflang="en-us" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazoncomprehend.html" hreflang="en" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/es_es/service-authorization/latest/reference/list_amazoncomprehend.html" hreflang="es-es" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/es_es/service-authorization/latest/reference/list_amazoncomprehend.html" hreflang="es" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/fr_fr/service-authorization/latest/reference/list_amazoncomprehend.html" hreflang="fr-fr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/fr_fr/service-authorization/latest/reference/list_amazoncomprehend.html" hreflang="fr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/it_it/service-authorization/latest/reference/list_amazoncomprehend.html" hreflang="it-it" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/it_it/service-authorization/latest/reference/list_amazoncomprehend.html" hreflang="it" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ja_jp/service-authorization/latest/reference/list_amazoncomprehend.html" hreflang="ja-jp" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ja_jp/service-authorization/latest/reference/list_amazoncomprehend.html" hreflang="ja" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ko_kr/service-authorization/latest/reference/list_amazoncomprehend.html" hreflang="ko-kr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ko_kr/service-authorization/latest/reference/list_amazoncomprehend.html" hreflang="ko" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/pt_br/service-authorization/latest/reference/list_amazoncomprehend.html" hreflang="pt-br" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/pt_br/service-authorization/latest/reference/list_amazoncomprehend.html" hreflang="pt" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/zh_cn/service-authorization/latest/reference/list_amazoncomprehend.html" hreflang="zh-cn" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/zh_tw/service-authorization/latest/reference/list_amazoncomprehend.html" hreflang="zh-tw" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazoncomprehend.html" hreflang="x-default" rel="alternative"/>
+  <meta content="Service Authorization Docs" name="feedback-item"/>
+  <meta content="Service Authorization Reference" name="this_doc_product"/>
+  <meta content="Service Authorization Reference" name="this_doc_guide"/>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor4.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor3.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor1.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/awsdocs-common.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/awsdocs-doc-page.js?version=2021.12.02">
+  </script>
+  <link href="https://docs.aws.amazon.com/assets/r/vendor4.css?version=2021.12.02" rel="stylesheet"/>
+  <link href="https://docs.aws.amazon.com/assets/r/awsdocs-common.css?version=2021.12.02" rel="stylesheet"/>
+  <link href="https://docs.aws.amazon.com/assets/r/awsdocs-doc-page.css?version=2021.12.02" rel="stylesheet"/>
+  <script async="" data-config="{'appEntity':'aws-documentation','region':'us-east-1','service':'iam'}" id="awsc-panorama-bundle" src="https://prod.pa.cdn.uis.awsstatic.com/panorama-nav-init.js" type="text/javascript">
+  </script>
+  <meta id="panorama-serviceSubSection" value="Service Authorization Reference"/>
+  <meta id="panorama-serviceConsolePage" value="Actions, resources, and condition keys for Amazon Comprehend"/>
+ </head>
+ <body class="awsdocs awsui">
+  <div class="awsdocs-container">
+   <awsdocs-header>
+   </awsdocs-header>
+   <awsui-app-layout class="awsui-util-no-gutters" header-selector="awsdocs-header" id="app-layout" navigation-change="$ctrl.onNavChange($event)" navigation-hide="false" navigation-open="$ctrl.navOpen" navigation-width="$ctrl.navWidth" ng-controller="ContentController as $ctrl" tools-change="$ctrl.onToolsChange($event)" tools-hide="$ctrl.hideTools" tools-open="$ctrl.toolsOpen" tools-width="$ctrl.toolsWidth">
+    <div dom-region="navigation" id="guide-toc">
+     <awsdocs-toc>
+     </awsdocs-toc>
+    </div>
+    <div dom-region="content" id="main-column" tabindex="-1">
+     <awsdocs-view class="awsdocs-view">
+      <div id="awsdocs-content">
+       <head>
+        <title>
+         Actions, resources, and condition keys for Amazon Comprehend - Service Authorization Reference
+        </title>
+        <meta content="/pdfs/service-authorization/latest/reference/service-authorization.pdf#list_amazoncomprehend" name="pdf"/>
+        <meta content="https://repost.aws/tags/TAO7Z4bI5hQVWMiYFs34QhIA" name="forums"/>
+        <meta content="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service%20Authorization%20Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazoncomprehend.html" name="feedback"/>
+        <meta content="feedbackyes.html?topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazoncomprehend.html" name="feedback-yes"/>
+        <meta content="feedbackno.html?topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazoncomprehend.html" name="feedback-no"/>
+        <script type="application/ld+json">
+         {
+    "@context" : "https://schema.org",
+    "@type" : "BreadcrumbList",
+    "itemListElement" : [
+      {
+        "@type" : "ListItem",
+        "position" : 1,
+        "name" : "AWS",
+        "item" : "https://aws.amazon.com"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 2,
+        "name" : "Service Authorization Reference",
+        "item" : "https://docs.aws.amazon.com/iam/index.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 3,
+        "name" : "Service Authorization Reference",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 4,
+        "name" : "Reference",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 5,
+        "name" : "Actions, resources, and condition keys for AWS services",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference_policies_actions-resources-contextkeys.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 6,
+        "name" : "Actions, resources, and condition keys for Amazon Comprehend",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference_policies_actions-resources-contextkeys.html"
+      }
+    ]
+}
+        </script>
+       </head>
+       <body>
+        <div id="main">
+         <div style="display: none">
+          <a href="/pdfs/service-authorization/latest/reference/service-authorization.pdf#list_amazoncomprehend" rel="noopener noreferrer" target="_blank" title="Open PDF">
+          </a>
+         </div>
+         <div class="breadcrumb" id="breadcrumbs">
+          <a href="https://aws.amazon.com">
+           AWS
+          </a>
+          <a href="/index.html">
+           Documentation
+          </a>
+          <a href="/iam/index.html">
+           Service Authorization Reference
+          </a>
+          <a href="reference.html">
+           Service Authorization Reference
+          </a>
+         </div>
+         <div id="page-toc-src">
+          <a href="#amazoncomprehend-actions-as-permissions">
+           Actions
+          </a>
+          <a href="#amazoncomprehend-resources-for-iam-policies">
+           Resource types
+          </a>
+          <a href="#amazoncomprehend-policy-keys">
+           Condition keys
+          </a>
+         </div>
+         <div class="awsui-util-container" id="main-content">
+          <div id="main-col-body">
+           <awsdocs-language-banner data-service="$ctrl.pageService">
+           </awsdocs-language-banner>
+           <h1 class="topictitle" id="list_amazoncomprehend">
+            Actions, resources, and condition keys for      Amazon Comprehend
+           </h1>
+           <div class="awsdocs-page-header-container">
+            <awsdocs-page-header>
+            </awsdocs-page-header>
+            <awsdocs-filter-selector id="awsdocs-filter-selector">
+            </awsdocs-filter-selector>
+           </div>
+           <p>
+            Amazon Comprehend (service prefix:
+            <code class="code">
+             comprehend
+            </code>
+            ) provides the following    service-specific resources, actions, and condition context keys for use in IAM permission    policies.
+           </p>
+           <p>
+            References:
+           </p>
+           <div class="itemizedlist">
+            <ul class="itemizedlist">
+             <li class="listitem">
+              <p>
+               Learn how to
+               <a href="https://docs.aws.amazon.com/comprehend/latest/dg/">
+                configure this service
+               </a>
+               .
+              </p>
+             </li>
+             <li class="listitem">
+              <p>
+               View a list of the
+               <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/welcome.html">
+                API operations available for this          service
+               </a>
+               .
+              </p>
+             </li>
+             <li class="listitem">
+              <p>
+               Learn how to secure this service and its resources by
+               <a href="https://docs.aws.amazon.com/comprehend/latest/dg/auth-and-access-control.html">
+                using          IAM
+               </a>
+               permission policies.
+              </p>
+             </li>
+            </ul>
+           </div>
+           <div class="highlights" id="inline-topiclist">
+            <h6>
+             Topics
+            </h6>
+            <ul>
+             <li>
+              <a href="#amazoncomprehend-actions-as-permissions">
+               Actions defined by        Amazon Comprehend
+              </a>
+             </li>
+             <li>
+              <a href="#amazoncomprehend-resources-for-iam-policies">
+               Resource types defined by        Amazon Comprehend
+              </a>
+             </li>
+             <li>
+              <a href="#amazoncomprehend-policy-keys">
+               Condition keys for        Amazon Comprehend
+              </a>
+             </li>
+            </ul>
+           </div>
+           <h2 id="amazoncomprehend-actions-as-permissions">
+            Actions defined by        Amazon Comprehend
+           </h2>
+           <p>
+            You can specify the following actions in the
+            <code class="code">
+             Action
+            </code>
+            element of an IAM      policy statement. Use policies to grant permissions to perform an operation in AWS. When you      use an action in a policy, you usually allow or deny access to the API operation or CLI      command with the same name. However, in some cases, a single action controls access to more      than one operation. Alternatively, some operations require several different actions.
+           </p>
+           <p>
+            The
+            <b>
+             Resource types
+            </b>
+            column of the Actions table indicates whether each      action supports resource-level permissions. If there is no value for this column, you must      specify all resources ("*") to which the policy applies in the
+            <code class="code">
+             Resource
+            </code>
+            element      of your policy statement. If the column includes a resource type, then you can specify an ARN      of that type in a statement with that action. If the action has one or more required      resources, the caller must have permission to use the action with those resources. Required      resources are indicated in the table with an asterisk (*). If you limit resource access with      the
+            <code class="code">
+             Resource
+            </code>
+            element in an IAM policy, you must include an ARN or pattern for      each required resource type. Some actions support multiple resource types. If the resource      type is optional (not indicated as required), then you can choose to use one of the optional      resource types.
+           </p>
+           <p>
+            The
+            <b>
+             Condition keys
+            </b>
+            column of the Actions table includes keys that you      can specify in a policy statement's
+            <code class="code">
+             Condition
+            </code>
+            element. For more information on      the condition keys that are associated with resources for the service, see the
+            <b>
+             Condition keys
+            </b>
+            column of the Resource types table.
+           </p>
+           <div class="awsdocs-note">
+            <div class="awsdocs-note-title">
+             <awsui-icon name="status-info" variant="link">
+             </awsui-icon>
+             <h6>
+              Note
+             </h6>
+            </div>
+            <div class="awsdocs-note-text">
+             <p>
+              Resource condition keys are listed in the
+              <a href="#amazoncomprehend-resources-for-iam-policies">
+               Resource types
+              </a>
+              table. You        can find a link to the resource type that applies to an action in the
+              <b>
+               Resource          types (*required)
+              </b>
+              column of the Actions table. The resource type in the        Resource types table includes the
+              <b>
+               Condition keys
+              </b>
+              column, which are the        resource condition keys that apply to an action in the Actions table.
+             </p>
+            </div>
+           </div>
+           <p>
+            For details about the columns in the following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#actions_table" rel="noopener noreferrer" target="_blank">
+             Actions table
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9d382c11c13">
+              <thead>
+               <tr>
+                <th>
+                 Actions
+                </th>
+                <th>
+                 Description
+                </th>
+                <th>
+                 Access level
+                </th>
+                <th>
+                 Resource types (*required)
+                </th>
+                <th>
+                 Condition keys
+                </th>
+                <th>
+                 Dependent actions
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="amazoncomprehend-BatchDetectDominantLanguage" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_BatchDetectDominantLanguage.html">
+                 BatchDetectDominantLanguage
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to detect the language or languages present in the list of text documents
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-BatchDetectEntities" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_BatchDetectEntities.html">
+                 BatchDetectEntities
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to detect the named entities ("People", "Places", "Locations", etc) within the given list of text documents
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-BatchDetectKeyPhrases" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_BatchDetectKeyPhrases.html">
+                 BatchDetectKeyPhrases
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to detect the phrases in the list of text documents that are most indicative of the content
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-BatchDetectSentiment" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_BatchDetectSentiment.html">
+                 BatchDetectSentiment
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to detect the sentiment of a text in the list of documents (Positive, Negative, Neutral, or Mixed)
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-BatchDetectSyntax" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_BatchDetectSyntax.html">
+                 BatchDetectSyntax
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to detect syntactic information (like Part of Speech, Tokens) in a list of text documents
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-BatchDetectTargetedSentiment" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_BatchDetectTargetedSentiment.html">
+                 BatchDetectTargetedSentiment
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to detect the sentiments associated with specific entities (such as brands or products) within the given list of text documents
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-ClassifyDocument" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_ClassifyDocument.html">
+                 ClassifyDocument
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a new document classification request to analyze a single document in real-time, using a previously created and trained custom model and an endpoint
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-document-classifier-endpoint">
+                  document-classifier-endpoint*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-ContainsPiiEntities" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_ContainsPiiEntities.html">
+                 ContainsPiiEntities
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to classify the personally identifiable information within given documents in real-time
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-CreateDataset" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_CreateDataset.html">
+                 CreateDataset
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to create a new dataset within a flywheel
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-flywheel">
+                  flywheel*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-CreateDocumentClassifier" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_CreateDocumentClassifier.html">
+                 CreateDocumentClassifier
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to create a new document classifier that you can use to categorize documents
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-document-classifier">
+                  document-classifier*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-comprehend_VolumeKmsKey">
+                  comprehend:VolumeKmsKey
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-comprehend_ModelKmsKey">
+                  comprehend:ModelKmsKey
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-comprehend_OutputKmsKey">
+                  comprehend:OutputKmsKey
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-comprehend_VpcSecurityGroupIds">
+                  comprehend:VpcSecurityGroupIds
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-comprehend_VpcSubnets">
+                  comprehend:VpcSubnets
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-CreateEndpoint" rowspan="5" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_CreateEndpoint.html">
+                 CreateEndpoint
+                </a>
+               </td>
+               <td rowspan="5" tabindex="-1">
+                Grants permission to create a model-specific endpoint for synchronous inference for a previously trained custom model
+               </td>
+               <td rowspan="5" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-document-classifier">
+                  document-classifier*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-document-classifier-endpoint">
+                  document-classifier-endpoint*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-entity-recognizer">
+                  entity-recognizer*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-entity-recognizer-endpoint">
+                  entity-recognizer-endpoint*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-flywheel">
+                  flywheel
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-CreateEntityRecognizer" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_CreateEntityRecognizer.html">
+                 CreateEntityRecognizer
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to create an entity recognizer using submitted files
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-entity-recognizer">
+                  entity-recognizer*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-comprehend_VolumeKmsKey">
+                  comprehend:VolumeKmsKey
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-comprehend_ModelKmsKey">
+                  comprehend:ModelKmsKey
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-comprehend_VpcSecurityGroupIds">
+                  comprehend:VpcSecurityGroupIds
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-comprehend_VpcSubnets">
+                  comprehend:VpcSubnets
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-CreateFlywheel" rowspan="3" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_CreateFlywheel.html">
+                 CreateFlywheel
+                </a>
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Grants permission to create a new flywheel that you can use to train model versions
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-flywheel">
+                  flywheel*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-comprehend_VolumeKmsKey">
+                  comprehend:VolumeKmsKey
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-comprehend_ModelKmsKey">
+                  comprehend:ModelKmsKey
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-comprehend_DataLakeKmsKey">
+                  comprehend:DataLakeKmsKey
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-comprehend_VpcSecurityGroupIds">
+                  comprehend:VpcSecurityGroupIds
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-comprehend_VpcSubnets">
+                  comprehend:VpcSubnets
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-document-classifier">
+                  document-classifier
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-entity-recognizer">
+                  entity-recognizer
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-DeleteDocumentClassifier" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_DeleteDocumentClassifier.html">
+                 DeleteDocumentClassifier
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a previously created document classifier
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-document-classifier">
+                  document-classifier*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-DeleteEndpoint" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_DeleteEndpoint.html">
+                 DeleteEndpoint
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to delete a model-specific endpoint for a previously-trained custom model. All endpoints must be deleted in order for the model to be deleted
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-document-classifier-endpoint">
+                  document-classifier-endpoint*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-entity-recognizer-endpoint">
+                  entity-recognizer-endpoint*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-DeleteEntityRecognizer" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_DeleteEntityRecognizer.html">
+                 DeleteEntityRecognizer
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a submitted entity recognizer
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-entity-recognizer">
+                  entity-recognizer*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-DeleteFlywheel" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_DeleteFlywheel.html">
+                 DeleteFlywheel
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to Delete a flywheel
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-flywheel">
+                  flywheel*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-DeleteResourcePolicy" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_DeleteResourcePolicy.html">
+                 DeleteResourcePolicy
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to remove policy on resource
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-document-classifier">
+                  document-classifier*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-entity-recognizer">
+                  entity-recognizer*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-DescribeDataset" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_DescribeDataset.html">
+                 DescribeDataset
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get the properties associated with a dataset
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-flywheel-dataset">
+                  flywheel-dataset*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-DescribeDocumentClassificationJob" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_DescribeDocumentClassificationJob.html">
+                 DescribeDocumentClassificationJob
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get the properties associated with a document classification job
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-document-classification-job">
+                  document-classification-job*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-DescribeDocumentClassifier" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_DescribeDocumentClassifier.html">
+                 DescribeDocumentClassifier
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get the properties associated with a document classifier
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-document-classifier">
+                  document-classifier*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-DescribeDominantLanguageDetectionJob" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_DescribeDominantLanguageDetectionJob.html">
+                 DescribeDominantLanguageDetectionJob
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get the properties associated with a dominant language detection job
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-dominant-language-detection-job">
+                  dominant-language-detection-job*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-DescribeEndpoint" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_DescribeEndpoint.html">
+                 DescribeEndpoint
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to get the properties associated with a specific endpoint. Use this operation to get the status of an endpoint
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-document-classifier-endpoint">
+                  document-classifier-endpoint*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-entity-recognizer-endpoint">
+                  entity-recognizer-endpoint*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-DescribeEntitiesDetectionJob" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_DescribeEntitiesDetectionJob.html">
+                 DescribeEntitiesDetectionJob
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get the properties associated with an entities detection job
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-entities-detection-job">
+                  entities-detection-job*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-DescribeEntityRecognizer" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_DescribeEntityRecognizer.html">
+                 DescribeEntityRecognizer
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to provide details about an entity recognizer including status, S3 buckets containing training data, recognizer metadata, metrics, and so on
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-entity-recognizer">
+                  entity-recognizer*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-DescribeEventsDetectionJob" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_DescribeEventsDetectionJob.html">
+                 DescribeEventsDetectionJob
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get the properties associated with an Events detection job
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-events-detection-job">
+                  events-detection-job*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-DescribeFlywheel" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_DescribeFlywheel.html">
+                 DescribeFlywheel
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get the properties associated with a flywheel
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-flywheel">
+                  flywheel*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-DescribeFlywheelIteration" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_DescribeFlywheelIteration.html">
+                 DescribeFlywheelIteration
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to get the properties associated with a flywheel iteration for a flywheel
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-flywheel">
+                  flywheel*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-comprehend_FlywheelIterationId">
+                  comprehend:FlywheelIterationId
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-DescribeKeyPhrasesDetectionJob" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_DescribeKeyPhrasesDetectionJob.html">
+                 DescribeKeyPhrasesDetectionJob
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get the properties associated with a key phrases detection job
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-key-phrases-detection-job">
+                  key-phrases-detection-job*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-DescribePiiEntitiesDetectionJob" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_DescribePiiEntitiesDetectionJob.html">
+                 DescribePiiEntitiesDetectionJob
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get the properties associated with a PII entities detection job
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-pii-entities-detection-job">
+                  pii-entities-detection-job*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-DescribeResourcePolicy" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_DescribeResourcePolicy.html">
+                 DescribeResourcePolicy
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to read attached policy on resource
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-document-classifier">
+                  document-classifier*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-entity-recognizer">
+                  entity-recognizer*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-DescribeSentimentDetectionJob" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_DescribeSentimentDetectionJob.html">
+                 DescribeSentimentDetectionJob
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get the properties associated with a sentiment detection job
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-sentiment-detection-job">
+                  sentiment-detection-job*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-DescribeTargetedSentimentDetectionJob" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_DescribeTargetedSentimentDetectionJob.html">
+                 DescribeTargetedSentimentDetectionJob
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get the properties associated with a targeted sentiment detection job
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-targeted-sentiment-detection-job">
+                  targeted-sentiment-detection-job*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-DescribeTopicsDetectionJob" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_DescribeTopicsDetectionJob.html">
+                 DescribeTopicsDetectionJob
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get the properties associated with a topic detection job
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-topics-detection-job">
+                  topics-detection-job*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-DetectDominantLanguage" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_DetectDominantLanguage.html">
+                 DetectDominantLanguage
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to detect the language or languages present in the text
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-DetectEntities" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_DetectEntities.html">
+                 DetectEntities
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to detect the named entities ("People", "Places", "Locations", etc) within the given text document
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-entity-recognizer-endpoint">
+                  entity-recognizer-endpoint
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-DetectKeyPhrases" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_DetectKeyPhrases.html">
+                 DetectKeyPhrases
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to detect the phrases in the text that are most indicative of the content
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-DetectPiiEntities" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_DetectPiiEntities.html">
+                 DetectPiiEntities
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to detect the personally identifiable information entities ("Name", "SSN", "PIN", etc) within the given text document
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-DetectSentiment" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_DetectSentiment.html">
+                 DetectSentiment
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to detect the sentiment of a text in a document (Positive, Negative, Neutral, or Mixed)
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-DetectSyntax" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_DetectSyntax.html">
+                 DetectSyntax
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to detect syntactic information (like Part of Speech, Tokens) in a text document
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-DetectTargetedSentiment" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_DetectTargetedSentiment.html">
+                 DetectTargetedSentiment
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to detect the sentiments associated with specific entities (such as brands or products) in a document
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-DetectToxicContent" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_DetectToxicContent.html">
+                 DetectToxicContent
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to detect toxic content within the given list of text segments
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-ImportModel" rowspan="3" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_ImportModel.html">
+                 ImportModel
+                </a>
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Grants permission to import a trained Comprehend model
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-document-classifier">
+                  document-classifier*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-entity-recognizer">
+                  entity-recognizer*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-comprehend_ModelKmsKey">
+                  comprehend:ModelKmsKey
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-ListDatasets" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_ListDatasets.html">
+                 ListDatasets
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get a list of the Datasets associated with a flywheel
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-flywheel">
+                  flywheel*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-ListDocumentClassificationJobs" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_ListDocumentClassificationJobs.html">
+                 ListDocumentClassificationJobs
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get a list of the document classification jobs that you have submitted
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-ListDocumentClassifierSummaries" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_ListDocumentClassifierSummaries.html">
+                 ListDocumentClassifierSummaries
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get a list of summaries of the document classifiers that you have created
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-ListDocumentClassifiers" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_ListDocumentClassifiers.html">
+                 ListDocumentClassifiers
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get a list of the document classifiers that you have created
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-ListDominantLanguageDetectionJobs" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_ListDominantLanguageDetectionJobs.html">
+                 ListDominantLanguageDetectionJobs
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get a list of the dominant language detection jobs that you have submitted
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-ListEndpoints" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_ListEndpoints.html">
+                 ListEndpoints
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get a list of all existing endpoints that you've created
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-ListEntitiesDetectionJobs" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_ListEntitiesDetectionJobs.html">
+                 ListEntitiesDetectionJobs
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get a list of the entity detection jobs that you have submitted
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-ListEntityRecognizerSummaries" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_ListEntityRecognizerSummaries.html">
+                 ListEntityRecognizerSummaries
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get a list of summaries for the entity recognizers that you have created
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-ListEntityRecognizers" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_ListEntityRecognizers.html">
+                 ListEntityRecognizers
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get a list of the properties of all entity recognizers that you created, including recognizers currently in training
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-ListEventsDetectionJobs" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_ListEventsDetectionJobs.html">
+                 ListEventsDetectionJobs
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get a list of Events detection jobs that you have submitted
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-ListFlywheelIterationHistory" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_ListFlywheelIterationHistory.html">
+                 ListFlywheelIterationHistory
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get a list of iterations associated for a flywheel
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-flywheel">
+                  flywheel*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-ListFlywheels" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_ListFlywheels.html">
+                 ListFlywheels
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get a list of the flywheels that you have created
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-ListKeyPhrasesDetectionJobs" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_ListKeyPhrasesDetectionJobs.html">
+                 ListKeyPhrasesDetectionJobs
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get a list of key phrase detection jobs that you have submitted
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-ListPiiEntitiesDetectionJobs" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_ListPiiEntitiesDetectionJobs.html">
+                 ListPiiEntitiesDetectionJobs
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get a list of PII entities detection jobs that you have submitted
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-ListSentimentDetectionJobs" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_ListSentimentDetectionJobs.html">
+                 ListSentimentDetectionJobs
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get a list of sentiment detection jobs that you have submitted
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-ListTagsForResource" rowspan="15" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_ListTagsForResource.html">
+                 ListTagsForResource
+                </a>
+               </td>
+               <td rowspan="15" tabindex="-1">
+                Grants permission to list tags for a resource
+               </td>
+               <td rowspan="15" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-document-classification-job">
+                  document-classification-job
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-document-classifier">
+                  document-classifier
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-document-classifier-endpoint">
+                  document-classifier-endpoint
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-dominant-language-detection-job">
+                  dominant-language-detection-job
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-entities-detection-job">
+                  entities-detection-job
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-entity-recognizer">
+                  entity-recognizer
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-entity-recognizer-endpoint">
+                  entity-recognizer-endpoint
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-events-detection-job">
+                  events-detection-job
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-flywheel">
+                  flywheel
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-flywheel-dataset">
+                  flywheel-dataset
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-key-phrases-detection-job">
+                  key-phrases-detection-job
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-pii-entities-detection-job">
+                  pii-entities-detection-job
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-sentiment-detection-job">
+                  sentiment-detection-job
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-targeted-sentiment-detection-job">
+                  targeted-sentiment-detection-job
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-topics-detection-job">
+                  topics-detection-job
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-ListTargetedSentimentDetectionJobs" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_ListTargetedSentimentDetectionJobs.html">
+                 ListTargetedSentimentDetectionJobs
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get a list of targeted sentiment detection jobs that you have submitted
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-ListTopicsDetectionJobs" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_ListTopicsDetectionJobs.html">
+                 ListTopicsDetectionJobs
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get a list of the topic detection jobs that you have submitted
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-PutResourcePolicy" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_PutResourcePolicy.html">
+                 PutResourcePolicy
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to attach policy to resource
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-document-classifier">
+                  document-classifier*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-entity-recognizer">
+                  entity-recognizer*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-StartDocumentClassificationJob" rowspan="3" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_StartDocumentClassificationJob.html">
+                 StartDocumentClassificationJob
+                </a>
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Grants permission to start an asynchronous document classification job
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-document-classification-job">
+                  document-classification-job*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-comprehend_VolumeKmsKey">
+                  comprehend:VolumeKmsKey
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-comprehend_OutputKmsKey">
+                  comprehend:OutputKmsKey
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-comprehend_VpcSecurityGroupIds">
+                  comprehend:VpcSecurityGroupIds
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-comprehend_VpcSubnets">
+                  comprehend:VpcSubnets
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-document-classifier">
+                  document-classifier
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-flywheel">
+                  flywheel
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-StartDominantLanguageDetectionJob" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_StartDominantLanguageDetectionJob.html">
+                 StartDominantLanguageDetectionJob
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to start an asynchronous dominant language detection job for a collection of documents
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-dominant-language-detection-job">
+                  dominant-language-detection-job*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-comprehend_VolumeKmsKey">
+                  comprehend:VolumeKmsKey
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-comprehend_OutputKmsKey">
+                  comprehend:OutputKmsKey
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-comprehend_VpcSecurityGroupIds">
+                  comprehend:VpcSecurityGroupIds
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-comprehend_VpcSubnets">
+                  comprehend:VpcSubnets
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-StartEntitiesDetectionJob" rowspan="3" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_StartEntitiesDetectionJob.html">
+                 StartEntitiesDetectionJob
+                </a>
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Grants permission to start an asynchronous entity detection job for a collection of documents
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-entities-detection-job">
+                  entities-detection-job*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-comprehend_VolumeKmsKey">
+                  comprehend:VolumeKmsKey
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-comprehend_OutputKmsKey">
+                  comprehend:OutputKmsKey
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-comprehend_VpcSecurityGroupIds">
+                  comprehend:VpcSecurityGroupIds
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-comprehend_VpcSubnets">
+                  comprehend:VpcSubnets
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-entity-recognizer">
+                  entity-recognizer
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-flywheel">
+                  flywheel
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-StartEventsDetectionJob" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_StartEventsDetectionJob.html">
+                 StartEventsDetectionJob
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to start an asynchronous Events detection job for a collection of documents
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-events-detection-job">
+                  events-detection-job*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-comprehend_OutputKmsKey">
+                  comprehend:OutputKmsKey
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-StartFlywheelIteration" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_StartFlywheelIteration.html">
+                 StartFlywheelIteration
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to start a flywheel iteration for a flywheel
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-flywheel">
+                  flywheel*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-StartKeyPhrasesDetectionJob" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_StartKeyPhrasesDetectionJob.html">
+                 StartKeyPhrasesDetectionJob
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to start an asynchronous key phrase detection job for a collection of documents
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-key-phrases-detection-job">
+                  key-phrases-detection-job*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-comprehend_VolumeKmsKey">
+                  comprehend:VolumeKmsKey
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-comprehend_OutputKmsKey">
+                  comprehend:OutputKmsKey
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-comprehend_VpcSecurityGroupIds">
+                  comprehend:VpcSecurityGroupIds
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-comprehend_VpcSubnets">
+                  comprehend:VpcSubnets
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-StartPiiEntitiesDetectionJob" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_StartPiiEntitiesDetectionJob.html">
+                 StartPiiEntitiesDetectionJob
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to start an asynchronous PII entities detection job for a collection of documents
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-pii-entities-detection-job">
+                  pii-entities-detection-job*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-comprehend_OutputKmsKey">
+                  comprehend:OutputKmsKey
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-StartSentimentDetectionJob" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_StartSentimentDetectionJob.html">
+                 StartSentimentDetectionJob
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to start an asynchronous sentiment detection job for a collection of documents
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-sentiment-detection-job">
+                  sentiment-detection-job*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-comprehend_VolumeKmsKey">
+                  comprehend:VolumeKmsKey
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-comprehend_OutputKmsKey">
+                  comprehend:OutputKmsKey
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-comprehend_VpcSecurityGroupIds">
+                  comprehend:VpcSecurityGroupIds
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-comprehend_VpcSubnets">
+                  comprehend:VpcSubnets
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-StartTargetedSentimentDetectionJob" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_StartTargetedSentimentDetectionJob.html">
+                 StartTargetedSentimentDetectionJob
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to start an asynchronous targeted sentiment detection job for a collection of documents
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-targeted-sentiment-detection-job">
+                  targeted-sentiment-detection-job*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-comprehend_VolumeKmsKey">
+                  comprehend:VolumeKmsKey
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-comprehend_OutputKmsKey">
+                  comprehend:OutputKmsKey
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-comprehend_VpcSecurityGroupIds">
+                  comprehend:VpcSecurityGroupIds
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-comprehend_VpcSubnets">
+                  comprehend:VpcSubnets
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-StartTopicsDetectionJob" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_StartTopicsDetectionJob.html">
+                 StartTopicsDetectionJob
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to start an asynchronous job to detect the most common topics in the collection of documents and the phrases associated with each topic
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-topics-detection-job">
+                  topics-detection-job*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-comprehend_VolumeKmsKey">
+                  comprehend:VolumeKmsKey
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-comprehend_OutputKmsKey">
+                  comprehend:OutputKmsKey
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-comprehend_VpcSecurityGroupIds">
+                  comprehend:VpcSecurityGroupIds
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-comprehend_VpcSubnets">
+                  comprehend:VpcSubnets
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-StopDominantLanguageDetectionJob" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_StopDominantLanguageDetectionJob.html">
+                 StopDominantLanguageDetectionJob
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to stop a dominant language detection job
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-dominant-language-detection-job">
+                  dominant-language-detection-job*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-StopEntitiesDetectionJob" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_StopEntitiesDetectionJob.html">
+                 StopEntitiesDetectionJob
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to stop an entity detection job
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-entities-detection-job">
+                  entities-detection-job*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-StopEventsDetectionJob" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_StopEventsDetectionJob.html">
+                 StopEventsDetectionJob
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to stop an Events detection job
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-events-detection-job">
+                  events-detection-job*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-StopKeyPhrasesDetectionJob" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_StopKeyPhrasesDetectionJob.html">
+                 StopKeyPhrasesDetectionJob
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to stop a key phrase detection job
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-key-phrases-detection-job">
+                  key-phrases-detection-job*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-StopPiiEntitiesDetectionJob" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_StopPiiEntitiesDetectionJob.html">
+                 StopPiiEntitiesDetectionJob
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to stop a PII entities detection job
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-pii-entities-detection-job">
+                  pii-entities-detection-job*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-StopSentimentDetectionJob" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_StopSentimentDetectionJob.html">
+                 StopSentimentDetectionJob
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to stop a sentiment detection job
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-sentiment-detection-job">
+                  sentiment-detection-job*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-StopTargetedSentimentDetectionJob" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_StopTargetedSentimentDetectionJob.html">
+                 StopTargetedSentimentDetectionJob
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to stop a targeted sentiment detection job
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-targeted-sentiment-detection-job">
+                  targeted-sentiment-detection-job*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-StopTrainingDocumentClassifier" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_StopTrainingDocumentClassifier.html">
+                 StopTrainingDocumentClassifier
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to stop a previously created document classifier training job
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-document-classifier">
+                  document-classifier*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-StopTrainingEntityRecognizer" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_StopTrainingEntityRecognizer.html">
+                 StopTrainingEntityRecognizer
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to stop a previously created entity recognizer training job
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-entity-recognizer">
+                  entity-recognizer*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-TagResource" rowspan="16" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_TagResource.html">
+                 TagResource
+                </a>
+               </td>
+               <td rowspan="16" tabindex="-1">
+                Grants permission to tag a resource with given key value pairs
+               </td>
+               <td rowspan="16" tabindex="-1">
+                Tagging
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-document-classification-job">
+                  document-classification-job
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-document-classifier">
+                  document-classifier
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-document-classifier-endpoint">
+                  document-classifier-endpoint
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-dominant-language-detection-job">
+                  dominant-language-detection-job
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-entities-detection-job">
+                  entities-detection-job
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-entity-recognizer">
+                  entity-recognizer
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-entity-recognizer-endpoint">
+                  entity-recognizer-endpoint
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-events-detection-job">
+                  events-detection-job
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-flywheel">
+                  flywheel
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-flywheel-dataset">
+                  flywheel-dataset
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-key-phrases-detection-job">
+                  key-phrases-detection-job
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-pii-entities-detection-job">
+                  pii-entities-detection-job
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-sentiment-detection-job">
+                  sentiment-detection-job
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-targeted-sentiment-detection-job">
+                  targeted-sentiment-detection-job
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-topics-detection-job">
+                  topics-detection-job
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-UntagResource" rowspan="16" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_UntagResource.html">
+                 UntagResource
+                </a>
+               </td>
+               <td rowspan="16" tabindex="-1">
+                Grants permission to untag a resource with given key
+               </td>
+               <td rowspan="16" tabindex="-1">
+                Tagging
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-document-classification-job">
+                  document-classification-job
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-document-classifier">
+                  document-classifier
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-document-classifier-endpoint">
+                  document-classifier-endpoint
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-dominant-language-detection-job">
+                  dominant-language-detection-job
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-entities-detection-job">
+                  entities-detection-job
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-entity-recognizer">
+                  entity-recognizer
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-entity-recognizer-endpoint">
+                  entity-recognizer-endpoint
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-events-detection-job">
+                  events-detection-job
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-flywheel">
+                  flywheel
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-flywheel-dataset">
+                  flywheel-dataset
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-key-phrases-detection-job">
+                  key-phrases-detection-job
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-pii-entities-detection-job">
+                  pii-entities-detection-job
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-sentiment-detection-job">
+                  sentiment-detection-job
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-targeted-sentiment-detection-job">
+                  targeted-sentiment-detection-job
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-topics-detection-job">
+                  topics-detection-job
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-UpdateEndpoint" rowspan="3" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_UpdateEndpoint.html">
+                 UpdateEndpoint
+                </a>
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Grants permission to update information about the specified endpoint
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-document-classifier-endpoint">
+                  document-classifier-endpoint*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-entity-recognizer-endpoint">
+                  entity-recognizer-endpoint*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-flywheel">
+                  flywheel
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-UpdateFlywheel" rowspan="3" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_UpdateFlywheel.html">
+                 UpdateFlywheel
+                </a>
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Grants permission to Update a flywheel's configuration
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-flywheel">
+                  flywheel*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-comprehend_VolumeKmsKey">
+                  comprehend:VolumeKmsKey
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-comprehend_ModelKmsKey">
+                  comprehend:ModelKmsKey
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-comprehend_VpcSecurityGroupIds">
+                  comprehend:VpcSecurityGroupIds
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazoncomprehend-comprehend_VpcSubnets">
+                  comprehend:VpcSubnets
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-document-classifier">
+                  document-classifier
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-entity-recognizer">
+                  entity-recognizer
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <h2 id="amazoncomprehend-resources-for-iam-policies">
+            Resource types defined by        Amazon Comprehend
+           </h2>
+           <p>
+            The following resource types are defined by this service and can be used in the
+            <code class="code">
+             Resource
+            </code>
+            element of IAM permission policy statements. Each action in the
+            <a href="#amazoncomprehend-actions-as-permissions">
+             Actions table
+            </a>
+            identifies the      resource types that can be specified with that action. A resource type can also define which      condition keys you can include in a policy. These keys are displayed in the last column of the      Resource types table. For details about the columns in the following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#resources_table" rel="noopener noreferrer" target="_blank">
+             Resource types table
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9d382c13b5">
+              <thead>
+               <tr>
+                <th>
+                 Resource types
+                </th>
+                <th>
+                 ARN
+                </th>
+                <th>
+                 Condition keys
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="amazoncomprehend-targeted-sentiment-detection-job" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_StartTargetedSentimentDetectionJob.html">
+                 targeted-sentiment-detection-job
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:comprehend:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:targeted-sentiment-detection-job/$
+                 <span>
+                  {
+                 </span>
+                 JobId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-document-classifier" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/dg/how-document-classification-training.html">
+                 document-classifier
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:comprehend:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:document-classifier/$
+                 <span>
+                  {
+                 </span>
+                 DocumentClassifierName}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-document-classifier-endpoint" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/dg/manage-endpoints.html">
+                 document-classifier-endpoint
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:comprehend:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:document-classifier-endpoint/$
+                 <span>
+                  {
+                 </span>
+                 DocumentClassifierEndpointName}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-entity-recognizer" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/dg/training-recognizers.html">
+                 entity-recognizer
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:comprehend:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:entity-recognizer/$
+                 <span>
+                  {
+                 </span>
+                 EntityRecognizerName}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-entity-recognizer-endpoint" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/dg/manage-endpoints.html">
+                 entity-recognizer-endpoint
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:comprehend:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:entity-recognizer-endpoint/$
+                 <span>
+                  {
+                 </span>
+                 EntityRecognizerEndpointName}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-dominant-language-detection-job" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_StartDominantLanguageDetectionJob.html">
+                 dominant-language-detection-job
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:comprehend:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:dominant-language-detection-job/$
+                 <span>
+                  {
+                 </span>
+                 JobId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-entities-detection-job" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_StartEntitiesDetectionJob.html">
+                 entities-detection-job
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:comprehend:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:entities-detection-job/$
+                 <span>
+                  {
+                 </span>
+                 JobId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-pii-entities-detection-job" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_StartPiiEntitiesDetectionJob.html">
+                 pii-entities-detection-job
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:comprehend:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:pii-entities-detection-job/$
+                 <span>
+                  {
+                 </span>
+                 JobId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-events-detection-job" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_StartEventsDetectionJob.html">
+                 events-detection-job
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:comprehend:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:events-detection-job/$
+                 <span>
+                  {
+                 </span>
+                 JobId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-key-phrases-detection-job" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_StartKeyPhrasesDetectionJob.html">
+                 key-phrases-detection-job
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:comprehend:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:key-phrases-detection-job/$
+                 <span>
+                  {
+                 </span>
+                 JobId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-sentiment-detection-job" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_StartSentimentDetectionJob.html">
+                 sentiment-detection-job
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:comprehend:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:sentiment-detection-job/$
+                 <span>
+                  {
+                 </span>
+                 JobId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-topics-detection-job" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_StartTopicsDetectionJob.html">
+                 topics-detection-job
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:comprehend:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:topics-detection-job/$
+                 <span>
+                  {
+                 </span>
+                 JobId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-document-classification-job" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_StartDocumentClassificationJob.html">
+                 document-classification-job
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:comprehend:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:document-classification-job/$
+                 <span>
+                  {
+                 </span>
+                 JobId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-flywheel" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_CreateFlywheel.html">
+                 flywheel
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:comprehend:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:flywheel/$
+                 <span>
+                  {
+                 </span>
+                 FlywheelName}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-flywheel-dataset" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/comprehend/latest/APIReference/API_CreateDataset.html">
+                 flywheel-dataset
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:comprehend:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:flywheel/$
+                 <span>
+                  {
+                 </span>
+                 FlywheelName}/dataset/$
+                 <span>
+                  {
+                 </span>
+                 DatasetName}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazoncomprehend-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <h2 id="amazoncomprehend-policy-keys">
+            Condition keys for        Amazon Comprehend
+           </h2>
+           <p>
+            Amazon Comprehend defines the following condition keys that can be used in the
+            <code class="code">
+             Condition
+            </code>
+            element of an IAM policy. You can use these keys to further refine      the conditions under which the policy statement applies. For details about the columns in the      following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#context_keys_table" rel="noopener noreferrer" target="_blank">
+             Condition keys table
+            </a>
+            .
+           </p>
+           <p>
+            To view the global condition keys that are available to all services, see
+            <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#AvailableKeys">
+             Available global condition keys
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9d382c15b7">
+              <thead>
+               <tr>
+                <th>
+                 Condition keys
+                </th>
+                <th>
+                 Description
+                </th>
+                <th>
+                 Type
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="amazoncomprehend-aws_RequestTag___TagKey_" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-globally-available">
+                 aws:RequestTag/${TagKey}
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by requiring tag values present in a resource creation request
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-aws_ResourceTag___TagKey_" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-globally-available">
+                 aws:ResourceTag/${TagKey}
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by requiring tag value associated with the resource
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-aws_TagKeys" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-globally-available">
+                 aws:TagKeys
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by requiring the presence of mandatory tags in the request
+               </td>
+               <td tabindex="-1">
+                ArrayOfString
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-comprehend_DataLakeKmsKey" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/list_amazoncomprehend.html#amazoncomprehend-policy-keys">
+                 comprehend:DataLakeKmsKey
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the DataLake Kms Key associated with the flywheel resource in the request
+               </td>
+               <td tabindex="-1">
+                ARN
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-comprehend_FlywheelIterationId" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/list_amazoncomprehend.html#amazoncomprehend-policy-keys">
+                 comprehend:FlywheelIterationId
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by particular Iteration Id for a flywheel
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-comprehend_ModelKmsKey" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/list_amazoncomprehend.html#amazoncomprehend-policy-keys">
+                 comprehend:ModelKmsKey
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the model KMS key associated with the resource in the request
+               </td>
+               <td tabindex="-1">
+                ARN
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-comprehend_OutputKmsKey" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/list_amazoncomprehend.html#amazoncomprehend-policy-keys">
+                 comprehend:OutputKmsKey
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the output KMS key associated with the resource in the request
+               </td>
+               <td tabindex="-1">
+                ARN
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-comprehend_VolumeKmsKey" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/list_amazoncomprehend.html#amazoncomprehend-policy-keys">
+                 comprehend:VolumeKmsKey
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the volume KMS key associated with the resource in the request
+               </td>
+               <td tabindex="-1">
+                ARN
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-comprehend_VpcSecurityGroupIds" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/list_amazoncomprehend.html#amazoncomprehend-policy-keys">
+                 comprehend:VpcSecurityGroupIds
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the list of all VPC security group ids associated with the resource in the request
+               </td>
+               <td tabindex="-1">
+                ArrayOfString
+               </td>
+              </tr>
+              <tr>
+               <td id="amazoncomprehend-comprehend_VpcSubnets" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/list_amazoncomprehend.html#amazoncomprehend-policy-keys">
+                 comprehend:VpcSubnets
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the list of all VPC subnets associated with the resource in the request
+               </td>
+               <td tabindex="-1">
+                ArrayOfString
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <awsdocs-copyright class="copyright-print">
+           </awsdocs-copyright>
+           <awsdocs-thumb-feedback right-edge="{{$ctrl.thumbFeedbackRightEdge}}">
+           </awsdocs-thumb-feedback>
+          </div>
+          <noscript>
+           <div>
+            <div>
+             <div>
+              <div id="js_error_message">
+               <p>
+                <img alt="Warning" src="https://d1ge0kk1l5kms0.cloudfront.net/images/G/01/webservices/console/warning.png"/>
+                <strong>
+                 Javascript is disabled or is unavailable in your browser.
+                </strong>
+               </p>
+               <p>
+                To use the Amazon Web Services Documentation, Javascript must be enabled. Please refer to your browser's Help pages for instructions.
+               </p>
+              </div>
+             </div>
+            </div>
+           </div>
+          </noscript>
+          <div class="awsui-util-font-size-0" id="main-col-footer">
+           <div id="doc-conventions">
+            <a href="/general/latest/gr/docconventions.html" target="_top">
+             Document Conventions
+            </a>
+           </div>
+           <div class="prev-next">
+            <div accesskey="p" class="prev-link" href="./list_amazoncognitouserpools.html" id="previous">
+             Amazon Cognito User Pools
+            </div>
+            <div accesskey="n" class="next-link" href="./list_amazoncomprehendmedical.html" id="next">
+             Amazon Comprehend Medical
+            </div>
+           </div>
+          </div>
+          <awsdocs-page-utilities>
+          </awsdocs-page-utilities>
+         </div>
+         <div id="quick-feedback-yes" style="display: none;">
+          <div class="title">
+           Did this page help you? - Yes
+          </div>
+          <div class="content">
+           <p>
+            Thanks for letting us know we're doing a good job!
+           </p>
+           <p>
+            If you've got a moment, please tell us what we did right so we can do more of it.
+           </p>
+           <p>
+            <awsui-button click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service Authorization Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazoncomprehend.html" id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback">
+            </awsui-button>
+           </p>
+          </div>
+         </div>
+         <div id="quick-feedback-no" style="display: none;">
+          <div class="title">
+           Did this page help you? - No
+          </div>
+          <div class="content">
+           <p>
+            Thanks for letting us know this page needs work. We're sorry we let you down.
+           </p>
+           <p>
+            If you've got a moment, please tell us how we can make the documentation better.
+           </p>
+           <p>
+            <awsui-button click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service Authorization Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazoncomprehend.html" id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback">
+            </awsui-button>
+           </p>
+          </div>
+         </div>
+        </div>
+       </body>
+      </div>
+     </awsdocs-view>
+     <div class="page-loading-indicator" id="page-loading-indicator">
+      <awsui-spinner size="large">
+      </awsui-spinner>
+     </div>
+    </div>
+    <div dom-region="tools" id="tools-panel">
+     <awsdocs-tools-panel id="awsdocs-tools-panel">
+     </awsdocs-tools-panel>
+    </div>
+   </awsui-app-layout>
+   <awsdocs-cookie-banner class="doc-cookie-banner">
+   </awsdocs-cookie-banner>
+  </div>
+ </body>
+</html>

@@ -1,0 +1,3838 @@
+<!DOCTYPE html>
+<html lang="en-US" xmlns="http://www.w3.org/1999/xhtml">
+ <head>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+  <title>
+   Actions, resources, and condition keys for AWS Elastic Disaster Recovery - Service Authorization Reference
+  </title>
+  <meta content="width=device-width,initial-scale=1" name="viewport"/>
+  <meta content="/assets" name="assets_root"/>
+  <meta content="list_awselasticdisasterrecovery" name="target_state"/>
+  <meta content="list_awselasticdisasterrecovery" name="default_state"/>
+  <link href="https://docs.aws.amazon.com/assets/images/favicon.ico" rel="icon" type="image/ico"/>
+  <link href="https://docs.aws.amazon.com/assets/images/favicon.ico" rel="shortcut icon" type="image/ico"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awselasticdisasterrecovery.html" rel="canonical"/>
+  <meta content="Lists all of the available service-specific resources, actions, and condition keys that can be used in IAM policies to control access to AWS Elastic Disaster Recovery." name="description"/>
+  <meta content="IAD" name="deployment_region"/>
+  <meta content="Service Authorization Reference" name="product"/>
+  <meta content="Service Authorization Reference" name="guide"/>
+  <meta content="Provides a list of the actions, resources, and condition keys supported by each AWS service that can be used in an IAM policy." name="abstract"/>
+  <meta content="en_us" name="guide-locale"/>
+  <meta content="toc-contents.json" name="tocs"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awselasticdisasterrecovery.html" rel="canonical"/>
+  <link href="https://docs.aws.amazon.com/id_id/service-authorization/latest/reference/list_awselasticdisasterrecovery.html" hreflang="id-id" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/id_id/service-authorization/latest/reference/list_awselasticdisasterrecovery.html" hreflang="id" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/de_de/service-authorization/latest/reference/list_awselasticdisasterrecovery.html" hreflang="de-de" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/de_de/service-authorization/latest/reference/list_awselasticdisasterrecovery.html" hreflang="de" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awselasticdisasterrecovery.html" hreflang="en-us" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awselasticdisasterrecovery.html" hreflang="en" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/es_es/service-authorization/latest/reference/list_awselasticdisasterrecovery.html" hreflang="es-es" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/es_es/service-authorization/latest/reference/list_awselasticdisasterrecovery.html" hreflang="es" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/fr_fr/service-authorization/latest/reference/list_awselasticdisasterrecovery.html" hreflang="fr-fr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/fr_fr/service-authorization/latest/reference/list_awselasticdisasterrecovery.html" hreflang="fr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/it_it/service-authorization/latest/reference/list_awselasticdisasterrecovery.html" hreflang="it-it" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/it_it/service-authorization/latest/reference/list_awselasticdisasterrecovery.html" hreflang="it" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ja_jp/service-authorization/latest/reference/list_awselasticdisasterrecovery.html" hreflang="ja-jp" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ja_jp/service-authorization/latest/reference/list_awselasticdisasterrecovery.html" hreflang="ja" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ko_kr/service-authorization/latest/reference/list_awselasticdisasterrecovery.html" hreflang="ko-kr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ko_kr/service-authorization/latest/reference/list_awselasticdisasterrecovery.html" hreflang="ko" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/pt_br/service-authorization/latest/reference/list_awselasticdisasterrecovery.html" hreflang="pt-br" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/pt_br/service-authorization/latest/reference/list_awselasticdisasterrecovery.html" hreflang="pt" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/zh_cn/service-authorization/latest/reference/list_awselasticdisasterrecovery.html" hreflang="zh-cn" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/zh_tw/service-authorization/latest/reference/list_awselasticdisasterrecovery.html" hreflang="zh-tw" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awselasticdisasterrecovery.html" hreflang="x-default" rel="alternative"/>
+  <meta content="Service Authorization Docs" name="feedback-item"/>
+  <meta content="Service Authorization Reference" name="this_doc_product"/>
+  <meta content="Service Authorization Reference" name="this_doc_guide"/>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor4.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor3.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor1.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/awsdocs-common.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/awsdocs-doc-page.js?version=2021.12.02">
+  </script>
+  <link href="https://docs.aws.amazon.com/assets/r/vendor4.css?version=2021.12.02" rel="stylesheet"/>
+  <link href="https://docs.aws.amazon.com/assets/r/awsdocs-common.css?version=2021.12.02" rel="stylesheet"/>
+  <link href="https://docs.aws.amazon.com/assets/r/awsdocs-doc-page.css?version=2021.12.02" rel="stylesheet"/>
+  <script async="" data-config="{'appEntity':'aws-documentation','region':'us-east-1','service':'iam'}" id="awsc-panorama-bundle" src="https://prod.pa.cdn.uis.awsstatic.com/panorama-nav-init.js" type="text/javascript">
+  </script>
+  <meta id="panorama-serviceSubSection" value="Service Authorization Reference"/>
+  <meta id="panorama-serviceConsolePage" value="Actions, resources, and condition keys for AWS Elastic Disaster Recovery"/>
+ </head>
+ <body class="awsdocs awsui">
+  <div class="awsdocs-container">
+   <awsdocs-header>
+   </awsdocs-header>
+   <awsui-app-layout class="awsui-util-no-gutters" header-selector="awsdocs-header" id="app-layout" navigation-change="$ctrl.onNavChange($event)" navigation-hide="false" navigation-open="$ctrl.navOpen" navigation-width="$ctrl.navWidth" ng-controller="ContentController as $ctrl" tools-change="$ctrl.onToolsChange($event)" tools-hide="$ctrl.hideTools" tools-open="$ctrl.toolsOpen" tools-width="$ctrl.toolsWidth">
+    <div dom-region="navigation" id="guide-toc">
+     <awsdocs-toc>
+     </awsdocs-toc>
+    </div>
+    <div dom-region="content" id="main-column" tabindex="-1">
+     <awsdocs-view class="awsdocs-view">
+      <div id="awsdocs-content">
+       <head>
+        <title>
+         Actions, resources, and condition keys for AWS Elastic Disaster Recovery - Service Authorization Reference
+        </title>
+        <meta content="/pdfs/service-authorization/latest/reference/service-authorization.pdf#list_awselasticdisasterrecovery" name="pdf"/>
+        <meta content="https://repost.aws/tags/TAO7Z4bI5hQVWMiYFs34QhIA" name="forums"/>
+        <meta content="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service%20Authorization%20Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awselasticdisasterrecovery.html" name="feedback"/>
+        <meta content="feedbackyes.html?topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awselasticdisasterrecovery.html" name="feedback-yes"/>
+        <meta content="feedbackno.html?topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awselasticdisasterrecovery.html" name="feedback-no"/>
+        <script type="application/ld+json">
+         {
+    "@context" : "https://schema.org",
+    "@type" : "BreadcrumbList",
+    "itemListElement" : [
+      {
+        "@type" : "ListItem",
+        "position" : 1,
+        "name" : "AWS",
+        "item" : "https://aws.amazon.com"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 2,
+        "name" : "Service Authorization Reference",
+        "item" : "https://docs.aws.amazon.com/iam/index.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 3,
+        "name" : "Service Authorization Reference",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 4,
+        "name" : "Reference",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 5,
+        "name" : "Actions, resources, and condition keys for AWS services",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference_policies_actions-resources-contextkeys.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 6,
+        "name" : "Actions, resources, and condition keys for AWS Elastic Disaster Recovery",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference_policies_actions-resources-contextkeys.html"
+      }
+    ]
+}
+        </script>
+       </head>
+       <body>
+        <div id="main">
+         <div style="display: none">
+          <a href="/pdfs/service-authorization/latest/reference/service-authorization.pdf#list_awselasticdisasterrecovery" rel="noopener noreferrer" target="_blank" title="Open PDF">
+          </a>
+         </div>
+         <div class="breadcrumb" id="breadcrumbs">
+          <a href="https://aws.amazon.com">
+           AWS
+          </a>
+          <a href="/index.html">
+           Documentation
+          </a>
+          <a href="/iam/index.html">
+           Service Authorization Reference
+          </a>
+          <a href="reference.html">
+           Service Authorization Reference
+          </a>
+         </div>
+         <div id="page-toc-src">
+          <a href="#awselasticdisasterrecovery-actions-as-permissions">
+           Actions
+          </a>
+          <a href="#awselasticdisasterrecovery-resources-for-iam-policies">
+           Resource types
+          </a>
+          <a href="#awselasticdisasterrecovery-policy-keys">
+           Condition keys
+          </a>
+         </div>
+         <div class="awsui-util-container" id="main-content">
+          <div id="main-col-body">
+           <awsdocs-language-banner data-service="$ctrl.pageService">
+           </awsdocs-language-banner>
+           <h1 class="topictitle" id="list_awselasticdisasterrecovery">
+            Actions, resources, and condition keys for      AWS Elastic Disaster Recovery
+           </h1>
+           <div class="awsdocs-page-header-container">
+            <awsdocs-page-header>
+            </awsdocs-page-header>
+            <awsdocs-filter-selector id="awsdocs-filter-selector">
+            </awsdocs-filter-selector>
+           </div>
+           <p>
+            AWS Elastic Disaster Recovery (service prefix:
+            <code class="code">
+             drs
+            </code>
+            ) provides the following    service-specific resources, actions, and condition context keys for use in IAM permission    policies.
+           </p>
+           <p>
+            References:
+           </p>
+           <div class="itemizedlist">
+            <ul class="itemizedlist">
+             <li class="listitem">
+              <p>
+               Learn how to
+               <a href="https://docs.aws.amazon.com/drs/latest/userguide/">
+                configure this service
+               </a>
+               .
+              </p>
+             </li>
+             <li class="listitem">
+              <p>
+               View a list of the
+               <a href="https://docs.aws.amazon.com/drs/latest/APIReference/">
+                API operations available for this          service
+               </a>
+               .
+              </p>
+             </li>
+             <li class="listitem">
+              <p>
+               Learn how to secure this service and its resources by
+               <a href="https://docs.aws.amazon.com/drs/latest/userguide/security_iam_authentication.html">
+                using          IAM
+               </a>
+               permission policies.
+              </p>
+             </li>
+            </ul>
+           </div>
+           <div class="highlights" id="inline-topiclist">
+            <h6>
+             Topics
+            </h6>
+            <ul>
+             <li>
+              <a href="#awselasticdisasterrecovery-actions-as-permissions">
+               Actions defined by        AWS Elastic Disaster Recovery
+              </a>
+             </li>
+             <li>
+              <a href="#awselasticdisasterrecovery-resources-for-iam-policies">
+               Resource types defined by        AWS Elastic Disaster Recovery
+              </a>
+             </li>
+             <li>
+              <a href="#awselasticdisasterrecovery-policy-keys">
+               Condition keys for        AWS Elastic Disaster Recovery
+              </a>
+             </li>
+            </ul>
+           </div>
+           <h2 id="awselasticdisasterrecovery-actions-as-permissions">
+            Actions defined by        AWS Elastic Disaster Recovery
+           </h2>
+           <p>
+            You can specify the following actions in the
+            <code class="code">
+             Action
+            </code>
+            element of an IAM      policy statement. Use policies to grant permissions to perform an operation in AWS. When you      use an action in a policy, you usually allow or deny access to the API operation or CLI      command with the same name. However, in some cases, a single action controls access to more      than one operation. Alternatively, some operations require several different actions.
+           </p>
+           <p>
+            The
+            <b>
+             Resource types
+            </b>
+            column of the Actions table indicates whether each      action supports resource-level permissions. If there is no value for this column, you must      specify all resources ("*") to which the policy applies in the
+            <code class="code">
+             Resource
+            </code>
+            element      of your policy statement. If the column includes a resource type, then you can specify an ARN      of that type in a statement with that action. If the action has one or more required      resources, the caller must have permission to use the action with those resources. Required      resources are indicated in the table with an asterisk (*). If you limit resource access with      the
+            <code class="code">
+             Resource
+            </code>
+            element in an IAM policy, you must include an ARN or pattern for      each required resource type. Some actions support multiple resource types. If the resource      type is optional (not indicated as required), then you can choose to use one of the optional      resource types.
+           </p>
+           <p>
+            The
+            <b>
+             Condition keys
+            </b>
+            column of the Actions table includes keys that you      can specify in a policy statement's
+            <code class="code">
+             Condition
+            </code>
+            element. For more information on      the condition keys that are associated with resources for the service, see the
+            <b>
+             Condition keys
+            </b>
+            column of the Resource types table.
+           </p>
+           <div class="awsdocs-note">
+            <div class="awsdocs-note-title">
+             <awsui-icon name="status-info" variant="link">
+             </awsui-icon>
+             <h6>
+              Note
+             </h6>
+            </div>
+            <div class="awsdocs-note-text">
+             <p>
+              Resource condition keys are listed in the
+              <a href="#awselasticdisasterrecovery-resources-for-iam-policies">
+               Resource types
+              </a>
+              table. You        can find a link to the resource type that applies to an action in the
+              <b>
+               Resource          types (*required)
+              </b>
+              column of the Actions table. The resource type in the        Resource types table includes the
+              <b>
+               Condition keys
+              </b>
+              column, which are the        resource condition keys that apply to an action in the Actions table.
+             </p>
+            </div>
+           </div>
+           <p>
+            For details about the columns in the following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#actions_table" rel="noopener noreferrer" target="_blank">
+             Actions table
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9d570c11c13">
+              <thead>
+               <tr>
+                <th>
+                 Actions
+                </th>
+                <th>
+                 Description
+                </th>
+                <th>
+                 Access level
+                </th>
+                <th>
+                 Resource types (*required)
+                </th>
+                <th>
+                 Condition keys
+                </th>
+                <th>
+                 Dependent actions
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="awselasticdisasterrecovery-AssociateFailbackClientToRecoveryInstanceForDrs" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/userguide/drs-apis.html">
+                 AssociateFailbackClientToRecoveryInstanceForDrs
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to get associate failback client to recovery instance
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-RecoveryInstanceResource">
+                  RecoveryInstanceResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-AssociateSourceNetworkStack" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/APIReference/API_AssociateSourceNetworkStack.html">
+                 AssociateSourceNetworkStack
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to associate CloudFormation stack with source network
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-SourceNetworkResource">
+                  SourceNetworkResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 cloudformation:DescribeStackResource
+                </p>
+                <p>
+                 cloudformation:DescribeStacks
+                </p>
+                <p>
+                 drs:GetLaunchConfiguration
+                </p>
+                <p>
+                 ec2:CreateLaunchTemplateVersion
+                </p>
+                <p>
+                 ec2:DescribeLaunchTemplateVersions
+                </p>
+                <p>
+                 ec2:DescribeLaunchTemplates
+                </p>
+                <p>
+                 ec2:DescribeSecurityGroups
+                </p>
+                <p>
+                 ec2:DescribeSubnets
+                </p>
+                <p>
+                 ec2:DescribeVpcs
+                </p>
+                <p>
+                 ec2:ModifyLaunchTemplate
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awselasticdisasterrecovery-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-BatchCreateVolumeSnapshotGroupForDrs" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/userguide/drs-apis.html">
+                 BatchCreateVolumeSnapshotGroupForDrs
+                </a>
+                [permission only]
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to batch create volume snapshot group
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-RecoveryInstanceResource">
+                  RecoveryInstanceResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-SourceServerResource">
+                  SourceServerResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-BatchDeleteSnapshotRequestForDrs" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/userguide/drs-apis.html">
+                 BatchDeleteSnapshotRequestForDrs
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to batch delete snapshot request
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-CreateConvertedSnapshotForDrs" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/userguide/drs-apis.html">
+                 CreateConvertedSnapshotForDrs
+                </a>
+                [permission only]
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to create converted snapshot
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-SourceServerResource">
+                  SourceServerResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awselasticdisasterrecovery-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-CreateExtendedSourceServer" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/APIReference/API_CreateExtendedSourceServer.html">
+                 CreateExtendedSourceServer
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to extend a source server
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awselasticdisasterrecovery-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 drs:DescribeSourceServers
+                </p>
+                <p>
+                 drs:GetReplicationConfiguration
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-CreateLaunchConfigurationTemplate" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/APIReference/API_CreateLaunchConfigurationTemplate.html">
+                 CreateLaunchConfigurationTemplate
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create launch configuration template
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awselasticdisasterrecovery-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-CreateRecoveryInstanceForDrs" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/userguide/drs-apis.html">
+                 CreateRecoveryInstanceForDrs
+                </a>
+                [permission only]
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to create recovery instance
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-SourceServerResource">
+                  SourceServerResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awselasticdisasterrecovery-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-CreateReplicationConfigurationTemplate" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/APIReference/API_CreateReplicationConfigurationTemplate.html">
+                 CreateReplicationConfigurationTemplate
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create replication configuration template
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awselasticdisasterrecovery-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 ec2:CreateSecurityGroup
+                </p>
+                <p>
+                 ec2:DescribeSecurityGroups
+                </p>
+                <p>
+                 ec2:DescribeSubnets
+                </p>
+                <p>
+                 ec2:GetEbsDefaultKmsKeyId
+                </p>
+                <p>
+                 ec2:GetEbsEncryptionByDefault
+                </p>
+                <p>
+                 kms:CreateGrant
+                </p>
+                <p>
+                 kms:DescribeKey
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-CreateSourceNetwork" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/APIReference/API_CreateSourceNetwork.html">
+                 CreateSourceNetwork
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a source network
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awselasticdisasterrecovery-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 ec2:DescribeInstances
+                </p>
+                <p>
+                 ec2:DescribeVpcs
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-CreateSourceServerForDrs" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/userguide/drs-apis.html">
+                 CreateSourceServerForDrs
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a source server
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awselasticdisasterrecovery-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-DeleteJob" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/APIReference/API_DeleteJob.html">
+                 DeleteJob
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a job
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-JobResource">
+                  JobResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-DeleteLaunchAction" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/APIReference/API_DeleteLaunchAction.html">
+                 DeleteLaunchAction
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to delete a launch action
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-LaunchConfigurationTemplateResource">
+                  LaunchConfigurationTemplateResource
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-SourceServerResource">
+                  SourceServerResource
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-DeleteLaunchConfigurationTemplate" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/APIReference/API_DeleteLaunchConfigurationTemplate.html">
+                 DeleteLaunchConfigurationTemplate
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete launch configuration template
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-LaunchConfigurationTemplateResource">
+                  LaunchConfigurationTemplateResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-DeleteRecoveryInstance" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/APIReference/API_DeleteRecoveryInstance.html">
+                 DeleteRecoveryInstance
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete recovery instance
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-RecoveryInstanceResource">
+                  RecoveryInstanceResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-DeleteReplicationConfigurationTemplate" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/APIReference/API_DeleteReplicationConfigurationTemplate.html">
+                 DeleteReplicationConfigurationTemplate
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete replication configuration template
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-ReplicationConfigurationTemplateResource">
+                  ReplicationConfigurationTemplateResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-DeleteSourceNetwork" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/APIReference/API_DeleteSourceNetwork.html">
+                 DeleteSourceNetwork
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete source network
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-SourceNetworkResource">
+                  SourceNetworkResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-DeleteSourceServer" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/APIReference/API_DeleteSourceServer.html">
+                 DeleteSourceServer
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete source server
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-SourceServerResource">
+                  SourceServerResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-DescribeJobLogItems" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/APIReference/API_DescribeJobLogItems.html">
+                 DescribeJobLogItems
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to describe job log items
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-JobResource">
+                  JobResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-DescribeJobs" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/APIReference/API_DescribeJobs.html">
+                 DescribeJobs
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to describe jobs
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-DescribeLaunchConfigurationTemplates" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/APIReference/API_DescribeLaunchConfigurationTemplates.html">
+                 DescribeLaunchConfigurationTemplates
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to describe launch configuration template
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-DescribeRecoveryInstances" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/APIReference/API_DescribeRecoveryInstances.html">
+                 DescribeRecoveryInstances
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to describe recovery instances
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 drs:DescribeSourceServers
+                </p>
+                <p>
+                 ec2:DescribeInstances
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-DescribeRecoverySnapshots" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/APIReference/API_DescribeRecoverySnapshots.html">
+                 DescribeRecoverySnapshots
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to describe recovery snapshots
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-SourceServerResource">
+                  SourceServerResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-DescribeReplicationConfigurationTemplates" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/APIReference/API_DescribeReplicationConfigurationTemplates.html">
+                 DescribeReplicationConfigurationTemplates
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to describe replication configuration template
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-DescribeReplicationServerAssociationsForDrs" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/userguide/drs-apis.html">
+                 DescribeReplicationServerAssociationsForDrs
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to describe replication server associations
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-DescribeSnapshotRequestsForDrs" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/userguide/drs-apis.html">
+                 DescribeSnapshotRequestsForDrs
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to describe snapshot requests
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-DescribeSourceNetworks" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/APIReference/API_DescribeSourceNetworks.html">
+                 DescribeSourceNetworks
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to describe source networks
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-DescribeSourceServers" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/APIReference/API_DescribeSourceServers.html">
+                 DescribeSourceServers
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to describe source servers
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-DisconnectRecoveryInstance" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/APIReference/API_DisconnectRecoveryInstance.html">
+                 DisconnectRecoveryInstance
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to disconnect recovery instance
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-RecoveryInstanceResource">
+                  RecoveryInstanceResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-DisconnectSourceServer" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/APIReference/API_DisconnectSourceServer.html">
+                 DisconnectSourceServer
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to disconnect source server
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-SourceServerResource">
+                  SourceServerResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-ExportSourceNetworkCfnTemplate" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/APIReference/API_ExportSourceNetworkCfnTemplate.html">
+                 ExportSourceNetworkCfnTemplate
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to export CloudFormation template which contains source network resources
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-SourceNetworkResource">
+                  SourceNetworkResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 s3:GetBucketLocation
+                </p>
+                <p>
+                 s3:GetObject
+                </p>
+                <p>
+                 s3:PutObject
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awselasticdisasterrecovery-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-GetAgentCommandForDrs" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/userguide/drs-apis.html">
+                 GetAgentCommandForDrs
+                </a>
+                [permission only]
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to get agent command
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-RecoveryInstanceResource">
+                  RecoveryInstanceResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-SourceServerResource">
+                  SourceServerResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-GetAgentConfirmedResumeInfoForDrs" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/userguide/drs-apis.html">
+                 GetAgentConfirmedResumeInfoForDrs
+                </a>
+                [permission only]
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to get agent confirmed resume info
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-RecoveryInstanceResource">
+                  RecoveryInstanceResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-SourceServerResource">
+                  SourceServerResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-GetAgentInstallationAssetsForDrs" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/userguide/drs-apis.html">
+                 GetAgentInstallationAssetsForDrs
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to get agent installation assets
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-GetAgentReplicationInfoForDrs" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/userguide/drs-apis.html">
+                 GetAgentReplicationInfoForDrs
+                </a>
+                [permission only]
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to get agent replication info
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-RecoveryInstanceResource">
+                  RecoveryInstanceResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-SourceServerResource">
+                  SourceServerResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-GetAgentRuntimeConfigurationForDrs" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/userguide/drs-apis.html">
+                 GetAgentRuntimeConfigurationForDrs
+                </a>
+                [permission only]
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to get agent runtime configuration
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-RecoveryInstanceResource">
+                  RecoveryInstanceResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-SourceServerResource">
+                  SourceServerResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-GetAgentSnapshotCreditsForDrs" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/userguide/drs-apis.html">
+                 GetAgentSnapshotCreditsForDrs
+                </a>
+                [permission only]
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to get agent snapshot credits
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-RecoveryInstanceResource">
+                  RecoveryInstanceResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-SourceServerResource">
+                  SourceServerResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-GetChannelCommandsForDrs" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/userguide/drs-apis.html">
+                 GetChannelCommandsForDrs
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to get channel commands
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-GetFailbackCommandForDrs" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/userguide/drs-apis.html">
+                 GetFailbackCommandForDrs
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to get failback command
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-RecoveryInstanceResource">
+                  RecoveryInstanceResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-GetFailbackLaunchRequestedForDrs" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/userguide/drs-apis.html">
+                 GetFailbackLaunchRequestedForDrs
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to get failback launch requested
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-RecoveryInstanceResource">
+                  RecoveryInstanceResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-GetFailbackReplicationConfiguration" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/APIReference/API_GetFailbackReplicationConfiguration.html">
+                 GetFailbackReplicationConfiguration
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get failback replication configuration
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-RecoveryInstanceResource">
+                  RecoveryInstanceResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-GetLaunchConfiguration" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/APIReference/API_GetLaunchConfiguration.html">
+                 GetLaunchConfiguration
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get launch configuration
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-SourceServerResource">
+                  SourceServerResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-GetReplicationConfiguration" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/APIReference/API_GetReplicationConfiguration.html">
+                 GetReplicationConfiguration
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get replication configuration
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-SourceServerResource">
+                  SourceServerResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-GetSuggestedFailbackClientDeviceMappingForDrs" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/userguide/drs-apis.html">
+                 GetSuggestedFailbackClientDeviceMappingForDrs
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to get suggested failback client device mapping
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-RecoveryInstanceResource">
+                  RecoveryInstanceResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-InitializeService" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/APIReference/API_InitializeService.html">
+                 InitializeService
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to initialize service
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 iam:AddRoleToInstanceProfile
+                </p>
+                <p>
+                 iam:CreateInstanceProfile
+                </p>
+                <p>
+                 iam:CreateServiceLinkedRole
+                </p>
+                <p>
+                 iam:GetInstanceProfile
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-IssueAgentCertificateForDrs" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/userguide/drs-apis.html">
+                 IssueAgentCertificateForDrs
+                </a>
+                [permission only]
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to issue an agent certificate
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-RecoveryInstanceResource">
+                  RecoveryInstanceResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-SourceServerResource">
+                  SourceServerResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-ListExtensibleSourceServers" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/APIReference/API_ListExtensibleSourceServers.html">
+                 ListExtensibleSourceServers
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list extensible source servers
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 drs:DescribeSourceServers
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-ListLaunchActions" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/APIReference/API_ListLaunchActions.html">
+                 ListLaunchActions
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to list launch actions
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-LaunchConfigurationTemplateResource">
+                  LaunchConfigurationTemplateResource
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-SourceServerResource">
+                  SourceServerResource
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-ListStagingAccounts" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/APIReference/API_ListStagingAccounts.html">
+                 ListStagingAccounts
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list staging accounts
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-ListTagsForResource" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/APIReference/API_ListTagsForResource.html">
+                 ListTagsForResource
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list tags for a resource
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-NotifyAgentAuthenticationForDrs" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/userguide/drs-apis.html">
+                 NotifyAgentAuthenticationForDrs
+                </a>
+                [permission only]
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to notify agent authentication
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-RecoveryInstanceResource">
+                  RecoveryInstanceResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-SourceServerResource">
+                  SourceServerResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-NotifyAgentConnectedForDrs" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/userguide/drs-apis.html">
+                 NotifyAgentConnectedForDrs
+                </a>
+                [permission only]
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to notify agent is connected
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-RecoveryInstanceResource">
+                  RecoveryInstanceResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-SourceServerResource">
+                  SourceServerResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-NotifyAgentDisconnectedForDrs" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/userguide/drs-apis.html">
+                 NotifyAgentDisconnectedForDrs
+                </a>
+                [permission only]
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to notify agent is disconnected
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-RecoveryInstanceResource">
+                  RecoveryInstanceResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-SourceServerResource">
+                  SourceServerResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-NotifyAgentReplicationProgressForDrs" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/userguide/drs-apis.html">
+                 NotifyAgentReplicationProgressForDrs
+                </a>
+                [permission only]
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to notify agent replication progress
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-RecoveryInstanceResource">
+                  RecoveryInstanceResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-SourceServerResource">
+                  SourceServerResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-NotifyConsistencyAttainedForDrs" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/userguide/drs-apis.html">
+                 NotifyConsistencyAttainedForDrs
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to notify consistency attained
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-RecoveryInstanceResource">
+                  RecoveryInstanceResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-NotifyReplicationServerAuthenticationForDrs" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/userguide/drs-apis.html">
+                 NotifyReplicationServerAuthenticationForDrs
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to notify replication server authentication
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-RecoveryInstanceResource">
+                  RecoveryInstanceResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-NotifyVolumeEventForDrs" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/userguide/drs-apis.html">
+                 NotifyVolumeEventForDrs
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to notify replicator volume events
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-SourceServerResource">
+                  SourceServerResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-PutLaunchAction" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/APIReference/API_PutLaunchAction.html">
+                 PutLaunchAction
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to put a launch action
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-LaunchConfigurationTemplateResource">
+                  LaunchConfigurationTemplateResource
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 ssm:DescribeDocument
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-SourceServerResource">
+                  SourceServerResource
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-RetryDataReplication" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/APIReference/API_RetryDataReplication.html">
+                 RetryDataReplication
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retry data replication
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-SourceServerResource">
+                  SourceServerResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-ReverseReplication" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/APIReference/API_ReverseReplication.html">
+                 ReverseReplication
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to reverse replication
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-RecoveryInstanceResource">
+                  RecoveryInstanceResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 drs:DescribeReplicationConfigurationTemplates
+                </p>
+                <p>
+                 drs:DescribeSourceServers
+                </p>
+                <p>
+                 ec2:DescribeInstances
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awselasticdisasterrecovery-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-SendAgentLogsForDrs" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/userguide/drs-apis.html">
+                 SendAgentLogsForDrs
+                </a>
+                [permission only]
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to send agent logs
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-RecoveryInstanceResource">
+                  RecoveryInstanceResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-SourceServerResource">
+                  SourceServerResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-SendAgentMetricsForDrs" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/userguide/drs-apis.html">
+                 SendAgentMetricsForDrs
+                </a>
+                [permission only]
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to send agent metrics
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-RecoveryInstanceResource">
+                  RecoveryInstanceResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-SourceServerResource">
+                  SourceServerResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-SendChannelCommandResultForDrs" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/userguide/drs-apis.html">
+                 SendChannelCommandResultForDrs
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to send channel command result
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-SendClientLogsForDrs" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/userguide/drs-apis.html">
+                 SendClientLogsForDrs
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to send client logs
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-SendClientMetricsForDrs" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/userguide/drs-apis.html">
+                 SendClientMetricsForDrs
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to send client metrics
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-SendVolumeStatsForDrs" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/userguide/drs-apis.html">
+                 SendVolumeStatsForDrs
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to send volume throughput statistics
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-SourceServerResource">
+                  SourceServerResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-StartFailbackLaunch" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/APIReference/API_StartFailbackLaunch.html">
+                 StartFailbackLaunch
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to start failback launch
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-RecoveryInstanceResource">
+                  RecoveryInstanceResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awselasticdisasterrecovery-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-StartRecovery" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/APIReference/API_StartRecovery.html">
+                 StartRecovery
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to start recovery
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-SourceServerResource">
+                  SourceServerResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 drs:CreateRecoveryInstanceForDrs
+                </p>
+                <p>
+                 drs:ListTagsForResource
+                </p>
+                <p>
+                 ec2:AttachVolume
+                </p>
+                <p>
+                 ec2:AuthorizeSecurityGroupEgress
+                </p>
+                <p>
+                 ec2:AuthorizeSecurityGroupIngress
+                </p>
+                <p>
+                 ec2:CreateLaunchTemplate
+                </p>
+                <p>
+                 ec2:CreateLaunchTemplateVersion
+                </p>
+                <p>
+                 ec2:CreateSnapshot
+                </p>
+                <p>
+                 ec2:CreateTags
+                </p>
+                <p>
+                 ec2:CreateVolume
+                </p>
+                <p>
+                 ec2:DeleteLaunchTemplateVersions
+                </p>
+                <p>
+                 ec2:DeleteSnapshot
+                </p>
+                <p>
+                 ec2:DeleteVolume
+                </p>
+                <p>
+                 ec2:DescribeAccountAttributes
+                </p>
+                <p>
+                 ec2:DescribeAvailabilityZones
+                </p>
+                <p>
+                 ec2:DescribeImages
+                </p>
+                <p>
+                 ec2:DescribeInstanceAttribute
+                </p>
+                <p>
+                 ec2:DescribeInstanceStatus
+                </p>
+                <p>
+                 ec2:DescribeInstanceTypes
+                </p>
+                <p>
+                 ec2:DescribeInstances
+                </p>
+                <p>
+                 ec2:DescribeLaunchTemplateVersions
+                </p>
+                <p>
+                 ec2:DescribeLaunchTemplates
+                </p>
+                <p>
+                 ec2:DescribeSecurityGroups
+                </p>
+                <p>
+                 ec2:DescribeSnapshots
+                </p>
+                <p>
+                 ec2:DescribeSubnets
+                </p>
+                <p>
+                 ec2:DescribeVolumes
+                </p>
+                <p>
+                 ec2:DetachVolume
+                </p>
+                <p>
+                 ec2:ModifyInstanceAttribute
+                </p>
+                <p>
+                 ec2:ModifyLaunchTemplate
+                </p>
+                <p>
+                 ec2:RevokeSecurityGroupEgress
+                </p>
+                <p>
+                 ec2:RunInstances
+                </p>
+                <p>
+                 ec2:StartInstances
+                </p>
+                <p>
+                 ec2:StopInstances
+                </p>
+                <p>
+                 ec2:TerminateInstances
+                </p>
+                <p>
+                 iam:PassRole
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awselasticdisasterrecovery-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-StartReplication" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/APIReference/API_StartReplication.html">
+                 StartReplication
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to start replication
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-SourceServerResource">
+                  SourceServerResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-StartSourceNetworkRecovery" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/APIReference/API_StartSourceNetworkRecovery.html">
+                 StartSourceNetworkRecovery
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to start network recovery
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-SourceNetworkResource">
+                  SourceNetworkResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 cloudformation:CreateStack
+                </p>
+                <p>
+                 cloudformation:DescribeStackResource
+                </p>
+                <p>
+                 cloudformation:DescribeStacks
+                </p>
+                <p>
+                 cloudformation:UpdateStack
+                </p>
+                <p>
+                 drs:GetLaunchConfiguration
+                </p>
+                <p>
+                 ec2:CreateLaunchTemplateVersion
+                </p>
+                <p>
+                 ec2:DescribeLaunchTemplateVersions
+                </p>
+                <p>
+                 ec2:DescribeLaunchTemplates
+                </p>
+                <p>
+                 ec2:DescribeSecurityGroups
+                </p>
+                <p>
+                 ec2:DescribeSubnets
+                </p>
+                <p>
+                 ec2:DescribeVpcs
+                </p>
+                <p>
+                 ec2:ModifyLaunchTemplate
+                </p>
+                <p>
+                 s3:GetObject
+                </p>
+                <p>
+                 s3:PutObject
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awselasticdisasterrecovery-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-StartSourceNetworkReplication" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/APIReference/API_StartSourceNetworkReplication.html">
+                 StartSourceNetworkReplication
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to start network replication
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-SourceNetworkResource">
+                  SourceNetworkResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-StopFailback" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/APIReference/API_StopFailback.html">
+                 StopFailback
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to stop failback
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-RecoveryInstanceResource">
+                  RecoveryInstanceResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-StopReplication" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/APIReference/API_StopReplication.html">
+                 StopReplication
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to stop replication
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-SourceServerResource">
+                  SourceServerResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-StopSourceNetworkReplication" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/APIReference/API_StopSourceNetworkReplication.html">
+                 StopSourceNetworkReplication
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to stop network replication
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-SourceNetworkResource">
+                  SourceNetworkResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-TagResource" rowspan="7" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/APIReference/API_TagResource.html">
+                 TagResource
+                </a>
+               </td>
+               <td rowspan="7" tabindex="-1">
+                Grants permission to assign a resource tag
+               </td>
+               <td rowspan="7" tabindex="-1">
+                Tagging
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-JobResource">
+                  JobResource
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-LaunchConfigurationTemplateResource">
+                  LaunchConfigurationTemplateResource
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-RecoveryInstanceResource">
+                  RecoveryInstanceResource
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-ReplicationConfigurationTemplateResource">
+                  ReplicationConfigurationTemplateResource
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-SourceNetworkResource">
+                  SourceNetworkResource
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-SourceServerResource">
+                  SourceServerResource
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awselasticdisasterrecovery-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#awselasticdisasterrecovery-drs_CreateAction">
+                  drs:CreateAction
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-TerminateRecoveryInstances" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/APIReference/API_TerminateRecoveryInstances.html">
+                 TerminateRecoveryInstances
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to terminate recovery instances
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-RecoveryInstanceResource">
+                  RecoveryInstanceResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 drs:DescribeSourceServers
+                </p>
+                <p>
+                 ec2:DeleteVolume
+                </p>
+                <p>
+                 ec2:DescribeInstances
+                </p>
+                <p>
+                 ec2:DescribeVolumes
+                </p>
+                <p>
+                 ec2:TerminateInstances
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awselasticdisasterrecovery-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-UntagResource" rowspan="7" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/APIReference/API_UntagResource.html">
+                 UntagResource
+                </a>
+               </td>
+               <td rowspan="7" tabindex="-1">
+                Grants permission to untag a resource
+               </td>
+               <td rowspan="7" tabindex="-1">
+                Tagging
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-JobResource">
+                  JobResource
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-LaunchConfigurationTemplateResource">
+                  LaunchConfigurationTemplateResource
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-RecoveryInstanceResource">
+                  RecoveryInstanceResource
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-ReplicationConfigurationTemplateResource">
+                  ReplicationConfigurationTemplateResource
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-SourceNetworkResource">
+                  SourceNetworkResource
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-SourceServerResource">
+                  SourceServerResource
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-UpdateAgentBacklogForDrs" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/userguide/drs-apis.html">
+                 UpdateAgentBacklogForDrs
+                </a>
+                [permission only]
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to update agent backlog
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-RecoveryInstanceResource">
+                  RecoveryInstanceResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-SourceServerResource">
+                  SourceServerResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-UpdateAgentConversionInfoForDrs" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/userguide/drs-apis.html">
+                 UpdateAgentConversionInfoForDrs
+                </a>
+                [permission only]
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to update agent conversion info
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-RecoveryInstanceResource">
+                  RecoveryInstanceResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-SourceServerResource">
+                  SourceServerResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-UpdateAgentReplicationInfoForDrs" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/userguide/drs-apis.html">
+                 UpdateAgentReplicationInfoForDrs
+                </a>
+                [permission only]
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to update agent replication info
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-RecoveryInstanceResource">
+                  RecoveryInstanceResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-SourceServerResource">
+                  SourceServerResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-UpdateAgentReplicationProcessStateForDrs" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/userguide/drs-apis.html">
+                 UpdateAgentReplicationProcessStateForDrs
+                </a>
+                [permission only]
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to update agent replication process state
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-RecoveryInstanceResource">
+                  RecoveryInstanceResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-SourceServerResource">
+                  SourceServerResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-UpdateAgentSourcePropertiesForDrs" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/userguide/drs-apis.html">
+                 UpdateAgentSourcePropertiesForDrs
+                </a>
+                [permission only]
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to update agent source properties
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-RecoveryInstanceResource">
+                  RecoveryInstanceResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-SourceServerResource">
+                  SourceServerResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-UpdateFailbackClientDeviceMappingForDrs" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/userguide/drs-apis.html">
+                 UpdateFailbackClientDeviceMappingForDrs
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to update failback client device mapping
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-RecoveryInstanceResource">
+                  RecoveryInstanceResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-UpdateFailbackClientLastSeenForDrs" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/userguide/drs-apis.html">
+                 UpdateFailbackClientLastSeenForDrs
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to update failback client last seen
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-RecoveryInstanceResource">
+                  RecoveryInstanceResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-UpdateFailbackReplicationConfiguration" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/APIReference/API_UpdateFailbackReplicationConfiguration.html">
+                 UpdateFailbackReplicationConfiguration
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update failback replication configuration
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-RecoveryInstanceResource">
+                  RecoveryInstanceResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-UpdateLaunchConfiguration" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/APIReference/API_UpdateLaunchConfiguration.html">
+                 UpdateLaunchConfiguration
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update launch configuration
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-SourceServerResource">
+                  SourceServerResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 ec2:DescribeInstances
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-UpdateLaunchConfigurationTemplate" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/APIReference/API_UpdateLaunchConfigurationTemplate.html">
+                 UpdateLaunchConfigurationTemplate
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update launch configuration
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-LaunchConfigurationTemplateResource">
+                  LaunchConfigurationTemplateResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-UpdateReplicationCertificateForDrs" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/userguide/drs-apis.html">
+                 UpdateReplicationCertificateForDrs
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to update a replication certificate
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-RecoveryInstanceResource">
+                  RecoveryInstanceResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-UpdateReplicationConfiguration" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/APIReference/API_UpdateReplicationConfiguration.html">
+                 UpdateReplicationConfiguration
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update replication configuration
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-SourceServerResource">
+                  SourceServerResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 ec2:CreateSecurityGroup
+                </p>
+                <p>
+                 ec2:DescribeSecurityGroups
+                </p>
+                <p>
+                 ec2:DescribeSubnets
+                </p>
+                <p>
+                 ec2:GetEbsDefaultKmsKeyId
+                </p>
+                <p>
+                 ec2:GetEbsEncryptionByDefault
+                </p>
+                <p>
+                 kms:CreateGrant
+                </p>
+                <p>
+                 kms:DescribeKey
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-UpdateReplicationConfigurationTemplate" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/APIReference/API_UpdateReplicationConfigurationTemplate.html">
+                 UpdateReplicationConfigurationTemplate
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update replication configuration template
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-ReplicationConfigurationTemplateResource">
+                  ReplicationConfigurationTemplateResource*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 ec2:CreateSecurityGroup
+                </p>
+                <p>
+                 ec2:DescribeSecurityGroups
+                </p>
+                <p>
+                 ec2:DescribeSubnets
+                </p>
+                <p>
+                 ec2:GetEbsDefaultKmsKeyId
+                </p>
+                <p>
+                 ec2:GetEbsEncryptionByDefault
+                </p>
+                <p>
+                 kms:CreateGrant
+                </p>
+                <p>
+                 kms:DescribeKey
+                </p>
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <h2 id="awselasticdisasterrecovery-resources-for-iam-policies">
+            Resource types defined by        AWS Elastic Disaster Recovery
+           </h2>
+           <p>
+            The following resource types are defined by this service and can be used in the
+            <code class="code">
+             Resource
+            </code>
+            element of IAM permission policy statements. Each action in the
+            <a href="#awselasticdisasterrecovery-actions-as-permissions">
+             Actions table
+            </a>
+            identifies the      resource types that can be specified with that action. A resource type can also define which      condition keys you can include in a policy. These keys are displayed in the last column of the      Resource types table. For details about the columns in the following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#resources_table" rel="noopener noreferrer" target="_blank">
+             Resource types table
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9d570c13b5">
+              <thead>
+               <tr>
+                <th>
+                 Resource types
+                </th>
+                <th>
+                 ARN
+                </th>
+                <th>
+                 Condition keys
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="awselasticdisasterrecovery-JobResource" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/userguide/failback-overview.html">
+                 JobResource
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:drs:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:job/$
+                 <span>
+                  {
+                 </span>
+                 JobID}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-RecoveryInstanceResource" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/userguide/recovery-instances.html">
+                 RecoveryInstanceResource
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:drs:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:recovery-instance/$
+                 <span>
+                  {
+                 </span>
+                 RecoveryInstanceID}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awselasticdisasterrecovery-drs_EC2InstanceARN">
+                  drs:EC2InstanceARN
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-ReplicationConfigurationTemplateResource" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/userguide/replication-settings-template.html">
+                 ReplicationConfigurationTemplateResource
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:drs:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:replication-configuration-template/$
+                 <span>
+                  {
+                 </span>
+                 ReplicationConfigurationTemplateID}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-LaunchConfigurationTemplateResource" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/userguide/default-drs-launch-settings.html">
+                 LaunchConfigurationTemplateResource
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:drs:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:launch-configuration-template/$
+                 <span>
+                  {
+                 </span>
+                 LaunchConfigurationTemplateID}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-SourceServerResource" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/userguide/source-servers.html">
+                 SourceServerResource
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:drs:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:source-server/$
+                 <span>
+                  {
+                 </span>
+                 SourceServerID}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-SourceNetworkResource" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/userguide/source-networks.html">
+                 SourceNetworkResource
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:drs:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:source-network/$
+                 <span>
+                  {
+                 </span>
+                 SourceNetworkID}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awselasticdisasterrecovery-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <h2 id="awselasticdisasterrecovery-policy-keys">
+            Condition keys for        AWS Elastic Disaster Recovery
+           </h2>
+           <p>
+            AWS Elastic Disaster Recovery defines the following condition keys that can be used in the
+            <code class="code">
+             Condition
+            </code>
+            element of an IAM policy. You can use these keys to further refine      the conditions under which the policy statement applies. For details about the columns in the      following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#context_keys_table" rel="noopener noreferrer" target="_blank">
+             Condition keys table
+            </a>
+            .
+           </p>
+           <p>
+            To view the global condition keys that are available to all services, see
+            <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#AvailableKeys">
+             Available global condition keys
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9d570c15b7">
+              <thead>
+               <tr>
+                <th>
+                 Condition keys
+                </th>
+                <th>
+                 Description
+                </th>
+                <th>
+                 Type
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="awselasticdisasterrecovery-aws_RequestTag___TagKey_" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-requesttag">
+                 aws:RequestTag/${TagKey}
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the presence of tag key-value pairs in the request
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-aws_ResourceTag___TagKey_" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-resourcetag">
+                 aws:ResourceTag/${TagKey}
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by tag key-value pairs attached to the resource
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-aws_TagKeys" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-tagkeys">
+                 aws:TagKeys
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the presence of tag keys in the request
+               </td>
+               <td tabindex="-1">
+                ArrayOfString
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-drs_CreateAction" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/userguide/supported-iam-actions-tagging.html">
+                 drs:CreateAction
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the name of a resource-creating API action
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awselasticdisasterrecovery-drs_EC2InstanceARN" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/drs/latest/userguide/security_iam_authentication.html">
+                 drs:EC2InstanceARN
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the EC2 instance the request originated from
+               </td>
+               <td tabindex="-1">
+                ARN
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <awsdocs-copyright class="copyright-print">
+           </awsdocs-copyright>
+           <awsdocs-thumb-feedback right-edge="{{$ctrl.thumbFeedbackRightEdge}}">
+           </awsdocs-thumb-feedback>
+          </div>
+          <noscript>
+           <div>
+            <div>
+             <div>
+              <div id="js_error_message">
+               <p>
+                <img alt="Warning" src="https://d1ge0kk1l5kms0.cloudfront.net/images/G/01/webservices/console/warning.png"/>
+                <strong>
+                 Javascript is disabled or is unavailable in your browser.
+                </strong>
+               </p>
+               <p>
+                To use the Amazon Web Services Documentation, Javascript must be enabled. Please refer to your browser's Help pages for instructions.
+               </p>
+              </div>
+             </div>
+            </div>
+           </div>
+          </noscript>
+          <div class="awsui-util-font-size-0" id="main-col-footer">
+           <div id="doc-conventions">
+            <a href="/general/latest/gr/docconventions.html" target="_top">
+             Document Conventions
+            </a>
+           </div>
+           <div class="prev-next">
+            <div accesskey="p" class="prev-link" href="./list_amazonelasticcontainerservice.html" id="previous">
+             Amazon Elastic Container Service
+            </div>
+            <div accesskey="n" class="next-link" href="./list_amazonelasticfilesystem.html" id="next">
+             Amazon Elastic File System
+            </div>
+           </div>
+          </div>
+          <awsdocs-page-utilities>
+          </awsdocs-page-utilities>
+         </div>
+         <div id="quick-feedback-yes" style="display: none;">
+          <div class="title">
+           Did this page help you? - Yes
+          </div>
+          <div class="content">
+           <p>
+            Thanks for letting us know we're doing a good job!
+           </p>
+           <p>
+            If you've got a moment, please tell us what we did right so we can do more of it.
+           </p>
+           <p>
+            <awsui-button click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service Authorization Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awselasticdisasterrecovery.html" id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback">
+            </awsui-button>
+           </p>
+          </div>
+         </div>
+         <div id="quick-feedback-no" style="display: none;">
+          <div class="title">
+           Did this page help you? - No
+          </div>
+          <div class="content">
+           <p>
+            Thanks for letting us know this page needs work. We're sorry we let you down.
+           </p>
+           <p>
+            If you've got a moment, please tell us how we can make the documentation better.
+           </p>
+           <p>
+            <awsui-button click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service Authorization Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awselasticdisasterrecovery.html" id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback">
+            </awsui-button>
+           </p>
+          </div>
+         </div>
+        </div>
+       </body>
+      </div>
+     </awsdocs-view>
+     <div class="page-loading-indicator" id="page-loading-indicator">
+      <awsui-spinner size="large">
+      </awsui-spinner>
+     </div>
+    </div>
+    <div dom-region="tools" id="tools-panel">
+     <awsdocs-tools-panel id="awsdocs-tools-panel">
+     </awsdocs-tools-panel>
+    </div>
+   </awsui-app-layout>
+   <awsdocs-cookie-banner class="doc-cookie-banner">
+   </awsdocs-cookie-banner>
+  </div>
+ </body>
+</html>

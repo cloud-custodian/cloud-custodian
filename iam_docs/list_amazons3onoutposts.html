@@ -1,0 +1,3741 @@
+<!DOCTYPE html>
+<html lang="en-US" xmlns="http://www.w3.org/1999/xhtml">
+ <head>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+  <title>
+   Actions, resources, and condition keys for Amazon S3 on Outposts - Service Authorization Reference
+  </title>
+  <meta content="width=device-width,initial-scale=1" name="viewport"/>
+  <meta content="/assets" name="assets_root"/>
+  <meta content="list_amazons3onoutposts" name="target_state"/>
+  <meta content="list_amazons3onoutposts" name="default_state"/>
+  <link href="https://docs.aws.amazon.com/assets/images/favicon.ico" rel="icon" type="image/ico"/>
+  <link href="https://docs.aws.amazon.com/assets/images/favicon.ico" rel="shortcut icon" type="image/ico"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazons3onoutposts.html" rel="canonical"/>
+  <meta content="Lists all of the available service-specific resources, actions, and condition keys that can be used in IAM policies to control access to Amazon S3 on Outposts." name="description"/>
+  <meta content="IAD" name="deployment_region"/>
+  <meta content="Service Authorization Reference" name="product"/>
+  <meta content="Service Authorization Reference" name="guide"/>
+  <meta content="Provides a list of the actions, resources, and condition keys supported by each AWS service that can be used in an IAM policy." name="abstract"/>
+  <meta content="en_us" name="guide-locale"/>
+  <meta content="toc-contents.json" name="tocs"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazons3onoutposts.html" rel="canonical"/>
+  <link href="https://docs.aws.amazon.com/id_id/service-authorization/latest/reference/list_amazons3onoutposts.html" hreflang="id-id" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/id_id/service-authorization/latest/reference/list_amazons3onoutposts.html" hreflang="id" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/de_de/service-authorization/latest/reference/list_amazons3onoutposts.html" hreflang="de-de" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/de_de/service-authorization/latest/reference/list_amazons3onoutposts.html" hreflang="de" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazons3onoutposts.html" hreflang="en-us" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazons3onoutposts.html" hreflang="en" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/es_es/service-authorization/latest/reference/list_amazons3onoutposts.html" hreflang="es-es" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/es_es/service-authorization/latest/reference/list_amazons3onoutposts.html" hreflang="es" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/fr_fr/service-authorization/latest/reference/list_amazons3onoutposts.html" hreflang="fr-fr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/fr_fr/service-authorization/latest/reference/list_amazons3onoutposts.html" hreflang="fr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/it_it/service-authorization/latest/reference/list_amazons3onoutposts.html" hreflang="it-it" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/it_it/service-authorization/latest/reference/list_amazons3onoutposts.html" hreflang="it" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ja_jp/service-authorization/latest/reference/list_amazons3onoutposts.html" hreflang="ja-jp" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ja_jp/service-authorization/latest/reference/list_amazons3onoutposts.html" hreflang="ja" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ko_kr/service-authorization/latest/reference/list_amazons3onoutposts.html" hreflang="ko-kr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ko_kr/service-authorization/latest/reference/list_amazons3onoutposts.html" hreflang="ko" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/pt_br/service-authorization/latest/reference/list_amazons3onoutposts.html" hreflang="pt-br" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/pt_br/service-authorization/latest/reference/list_amazons3onoutposts.html" hreflang="pt" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/zh_cn/service-authorization/latest/reference/list_amazons3onoutposts.html" hreflang="zh-cn" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/zh_tw/service-authorization/latest/reference/list_amazons3onoutposts.html" hreflang="zh-tw" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazons3onoutposts.html" hreflang="x-default" rel="alternative"/>
+  <meta content="Service Authorization Docs" name="feedback-item"/>
+  <meta content="Service Authorization Reference" name="this_doc_product"/>
+  <meta content="Service Authorization Reference" name="this_doc_guide"/>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor4.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor3.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor1.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/awsdocs-common.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/awsdocs-doc-page.js?version=2021.12.02">
+  </script>
+  <link href="https://docs.aws.amazon.com/assets/r/vendor4.css?version=2021.12.02" rel="stylesheet"/>
+  <link href="https://docs.aws.amazon.com/assets/r/awsdocs-common.css?version=2021.12.02" rel="stylesheet"/>
+  <link href="https://docs.aws.amazon.com/assets/r/awsdocs-doc-page.css?version=2021.12.02" rel="stylesheet"/>
+  <script async="" data-config="{'appEntity':'aws-documentation','region':'us-east-1','service':'iam'}" id="awsc-panorama-bundle" src="https://prod.pa.cdn.uis.awsstatic.com/panorama-nav-init.js" type="text/javascript">
+  </script>
+  <meta id="panorama-serviceSubSection" value="Service Authorization Reference"/>
+  <meta id="panorama-serviceConsolePage" value="Actions, resources, and condition keys for Amazon S3 on Outposts"/>
+ </head>
+ <body class="awsdocs awsui">
+  <div class="awsdocs-container">
+   <awsdocs-header>
+   </awsdocs-header>
+   <awsui-app-layout class="awsui-util-no-gutters" header-selector="awsdocs-header" id="app-layout" navigation-change="$ctrl.onNavChange($event)" navigation-hide="false" navigation-open="$ctrl.navOpen" navigation-width="$ctrl.navWidth" ng-controller="ContentController as $ctrl" tools-change="$ctrl.onToolsChange($event)" tools-hide="$ctrl.hideTools" tools-open="$ctrl.toolsOpen" tools-width="$ctrl.toolsWidth">
+    <div dom-region="navigation" id="guide-toc">
+     <awsdocs-toc>
+     </awsdocs-toc>
+    </div>
+    <div dom-region="content" id="main-column" tabindex="-1">
+     <awsdocs-view class="awsdocs-view">
+      <div id="awsdocs-content">
+       <head>
+        <title>
+         Actions, resources, and condition keys for Amazon S3 on Outposts - Service Authorization Reference
+        </title>
+        <meta content="/pdfs/service-authorization/latest/reference/service-authorization.pdf#list_amazons3onoutposts" name="pdf"/>
+        <meta content="https://repost.aws/tags/TAO7Z4bI5hQVWMiYFs34QhIA" name="forums"/>
+        <meta content="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service%20Authorization%20Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazons3onoutposts.html" name="feedback"/>
+        <meta content="feedbackyes.html?topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazons3onoutposts.html" name="feedback-yes"/>
+        <meta content="feedbackno.html?topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazons3onoutposts.html" name="feedback-no"/>
+        <script type="application/ld+json">
+         {
+    "@context" : "https://schema.org",
+    "@type" : "BreadcrumbList",
+    "itemListElement" : [
+      {
+        "@type" : "ListItem",
+        "position" : 1,
+        "name" : "AWS",
+        "item" : "https://aws.amazon.com"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 2,
+        "name" : "Service Authorization Reference",
+        "item" : "https://docs.aws.amazon.com/iam/index.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 3,
+        "name" : "Service Authorization Reference",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 4,
+        "name" : "Reference",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 5,
+        "name" : "Actions, resources, and condition keys for AWS services",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference_policies_actions-resources-contextkeys.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 6,
+        "name" : "Actions, resources, and condition keys for Amazon S3 on Outposts",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference_policies_actions-resources-contextkeys.html"
+      }
+    ]
+}
+        </script>
+       </head>
+       <body>
+        <div id="main">
+         <div style="display: none">
+          <a href="/pdfs/service-authorization/latest/reference/service-authorization.pdf#list_amazons3onoutposts" rel="noopener noreferrer" target="_blank" title="Open PDF">
+          </a>
+         </div>
+         <div class="breadcrumb" id="breadcrumbs">
+          <a href="https://aws.amazon.com">
+           AWS
+          </a>
+          <a href="/index.html">
+           Documentation
+          </a>
+          <a href="/iam/index.html">
+           Service Authorization Reference
+          </a>
+          <a href="reference.html">
+           Service Authorization Reference
+          </a>
+         </div>
+         <div id="page-toc-src">
+          <a href="#amazons3onoutposts-actions-as-permissions">
+           Actions
+          </a>
+          <a href="#amazons3onoutposts-resources-for-iam-policies">
+           Resource types
+          </a>
+          <a href="#amazons3onoutposts-policy-keys">
+           Condition keys
+          </a>
+         </div>
+         <div class="awsui-util-container" id="main-content">
+          <div id="main-col-body">
+           <awsdocs-language-banner data-service="$ctrl.pageService">
+           </awsdocs-language-banner>
+           <h1 class="topictitle" id="list_amazons3onoutposts">
+            Actions, resources, and condition keys for      Amazon S3 on Outposts
+           </h1>
+           <div class="awsdocs-page-header-container">
+            <awsdocs-page-header>
+            </awsdocs-page-header>
+            <awsdocs-filter-selector id="awsdocs-filter-selector">
+            </awsdocs-filter-selector>
+           </div>
+           <p>
+            Amazon S3 on Outposts (service prefix:
+            <code class="code">
+             s3-outposts
+            </code>
+            ) provides the following    service-specific resources, actions, and condition context keys for use in IAM permission    policies.
+           </p>
+           <p>
+            References:
+           </p>
+           <div class="itemizedlist">
+            <ul class="itemizedlist">
+             <li class="listitem">
+              <p>
+               Learn how to
+               <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html">
+                configure this service
+               </a>
+               .
+              </p>
+             </li>
+             <li class="listitem">
+              <p>
+               View a list of the
+               <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/Type_API_Reference.html">
+                API operations available for this          service
+               </a>
+               .
+              </p>
+             </li>
+             <li class="listitem">
+              <p>
+               Learn how to secure this service and its resources by
+               <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-overview.html">
+                using          IAM
+               </a>
+               permission policies.
+              </p>
+             </li>
+            </ul>
+           </div>
+           <div class="highlights" id="inline-topiclist">
+            <h6>
+             Topics
+            </h6>
+            <ul>
+             <li>
+              <a href="#amazons3onoutposts-actions-as-permissions">
+               Actions defined by        Amazon S3 on Outposts
+              </a>
+             </li>
+             <li>
+              <a href="#amazons3onoutposts-resources-for-iam-policies">
+               Resource types defined by        Amazon S3 on Outposts
+              </a>
+             </li>
+             <li>
+              <a href="#amazons3onoutposts-policy-keys">
+               Condition keys for        Amazon S3 on Outposts
+              </a>
+             </li>
+            </ul>
+           </div>
+           <h2 id="amazons3onoutposts-actions-as-permissions">
+            Actions defined by        Amazon S3 on Outposts
+           </h2>
+           <p>
+            You can specify the following actions in the
+            <code class="code">
+             Action
+            </code>
+            element of an IAM      policy statement. Use policies to grant permissions to perform an operation in AWS. When you      use an action in a policy, you usually allow or deny access to the API operation or CLI      command with the same name. However, in some cases, a single action controls access to more      than one operation. Alternatively, some operations require several different actions.
+           </p>
+           <p>
+            The
+            <b>
+             Resource types
+            </b>
+            column of the Actions table indicates whether each      action supports resource-level permissions. If there is no value for this column, you must      specify all resources ("*") to which the policy applies in the
+            <code class="code">
+             Resource
+            </code>
+            element      of your policy statement. If the column includes a resource type, then you can specify an ARN      of that type in a statement with that action. If the action has one or more required      resources, the caller must have permission to use the action with those resources. Required      resources are indicated in the table with an asterisk (*). If you limit resource access with      the
+            <code class="code">
+             Resource
+            </code>
+            element in an IAM policy, you must include an ARN or pattern for      each required resource type. Some actions support multiple resource types. If the resource      type is optional (not indicated as required), then you can choose to use one of the optional      resource types.
+           </p>
+           <p>
+            The
+            <b>
+             Condition keys
+            </b>
+            column of the Actions table includes keys that you      can specify in a policy statement's
+            <code class="code">
+             Condition
+            </code>
+            element. For more information on      the condition keys that are associated with resources for the service, see the
+            <b>
+             Condition keys
+            </b>
+            column of the Resource types table.
+           </p>
+           <div class="awsdocs-note">
+            <div class="awsdocs-note-title">
+             <awsui-icon name="status-info" variant="link">
+             </awsui-icon>
+             <h6>
+              Note
+             </h6>
+            </div>
+            <div class="awsdocs-note-text">
+             <p>
+              Resource condition keys are listed in the
+              <a href="#amazons3onoutposts-resources-for-iam-policies">
+               Resource types
+              </a>
+              table. You        can find a link to the resource type that applies to an action in the
+              <b>
+               Resource          types (*required)
+              </b>
+              column of the Actions table. The resource type in the        Resource types table includes the
+              <b>
+               Condition keys
+              </b>
+              column, which are the        resource condition keys that apply to an action in the Actions table.
+             </p>
+            </div>
+           </div>
+           <p>
+            For details about the columns in the following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#actions_table" rel="noopener noreferrer" target="_blank">
+             Actions table
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9e1393c11c13">
+              <thead>
+               <tr>
+                <th>
+                 Actions
+                </th>
+                <th>
+                 Description
+                </th>
+                <th>
+                 Access level
+                </th>
+                <th>
+                 Resource types (*required)
+                </th>
+                <th>
+                 Condition keys
+                </th>
+                <th>
+                 Dependent actions
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="amazons3onoutposts-AbortMultipartUpload" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_AbortMultipartUpload.html">
+                 AbortMultipartUpload
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to abort a multipart upload
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-object">
+                  object*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_DataAccessPointArn">
+                  s3-outposts:DataAccessPointArn
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_DataAccessPointAccount">
+                  s3-outposts:DataAccessPointAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_AccessPointNetworkOrigin">
+                  s3-outposts:AccessPointNetworkOrigin
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_authType">
+                  s3-outposts:authType
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureAge">
+                  s3-outposts:signatureAge
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureversion">
+                  s3-outposts:signatureversion
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_x-amz-content-sha256">
+                  s3-outposts:x-amz-content-sha256
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-CreateAccessPoint" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_control_CreateAccessPoint.html">
+                 CreateAccessPoint
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to create a new access point
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-accesspoint">
+                  accesspoint*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_DataAccessPointAccount">
+                  s3-outposts:DataAccessPointAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_DataAccessPointArn">
+                  s3-outposts:DataAccessPointArn
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_AccessPointNetworkOrigin">
+                  s3-outposts:AccessPointNetworkOrigin
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_authType">
+                  s3-outposts:authType
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureAge">
+                  s3-outposts:signatureAge
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureversion">
+                  s3-outposts:signatureversion
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_x-amz-content-sha256">
+                  s3-outposts:x-amz-content-sha256
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-CreateBucket" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_control_CreateBucket.html">
+                 CreateBucket
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to create a new bucket
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-bucket">
+                  bucket*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_authType">
+                  s3-outposts:authType
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureAge">
+                  s3-outposts:signatureAge
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureversion">
+                  s3-outposts:signatureversion
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_x-amz-content-sha256">
+                  s3-outposts:x-amz-content-sha256
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-CreateEndpoint" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_s3outposts_CreateEndpoint.html">
+                 CreateEndpoint
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a new endpoint
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-endpoint">
+                  endpoint*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-DeleteAccessPoint" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_control_DeleteAccessPoint.html">
+                 DeleteAccessPoint
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to delete the access point named in the URI
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-accesspoint">
+                  accesspoint*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_DataAccessPointArn">
+                  s3-outposts:DataAccessPointArn
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_DataAccessPointAccount">
+                  s3-outposts:DataAccessPointAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_AccessPointNetworkOrigin">
+                  s3-outposts:AccessPointNetworkOrigin
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_authType">
+                  s3-outposts:authType
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureAge">
+                  s3-outposts:signatureAge
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureversion">
+                  s3-outposts:signatureversion
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_x-amz-content-sha256">
+                  s3-outposts:x-amz-content-sha256
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-DeleteAccessPointPolicy" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_control_DeleteAccessPointPolicy.html">
+                 DeleteAccessPointPolicy
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to delete the policy on a specified access point
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Permissions management
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-accesspoint">
+                  accesspoint*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_DataAccessPointArn">
+                  s3-outposts:DataAccessPointArn
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_DataAccessPointAccount">
+                  s3-outposts:DataAccessPointAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_AccessPointNetworkOrigin">
+                  s3-outposts:AccessPointNetworkOrigin
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_authType">
+                  s3-outposts:authType
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureAge">
+                  s3-outposts:signatureAge
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureversion">
+                  s3-outposts:signatureversion
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_x-amz-content-sha256">
+                  s3-outposts:x-amz-content-sha256
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-DeleteBucket" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_control_DeleteBucket.html">
+                 DeleteBucket
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to delete the bucket named in the URI
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-bucket">
+                  bucket*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_authType">
+                  s3-outposts:authType
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureAge">
+                  s3-outposts:signatureAge
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureversion">
+                  s3-outposts:signatureversion
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_x-amz-content-sha256">
+                  s3-outposts:x-amz-content-sha256
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-DeleteBucketPolicy" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_control_DeleteBucketPolicy.html">
+                 DeleteBucketPolicy
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to delete the policy on a specified bucket
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Permissions management
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-bucket">
+                  bucket*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_authType">
+                  s3-outposts:authType
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureAge">
+                  s3-outposts:signatureAge
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureversion">
+                  s3-outposts:signatureversion
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_x-amz-content-sha256">
+                  s3-outposts:x-amz-content-sha256
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-DeleteEndpoint" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_s3outposts_DeleteEndpoint.html">
+                 DeleteEndpoint
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete the endpoint named in the URI
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-endpoint">
+                  endpoint*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-DeleteObject" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_DeleteObject.html">
+                 DeleteObject
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to remove the null version of an object and insert a delete marker, which becomes the current version of the object
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-object">
+                  object*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_DataAccessPointAccount">
+                  s3-outposts:DataAccessPointAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_DataAccessPointArn">
+                  s3-outposts:DataAccessPointArn
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_AccessPointNetworkOrigin">
+                  s3-outposts:AccessPointNetworkOrigin
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_authType">
+                  s3-outposts:authType
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureAge">
+                  s3-outposts:signatureAge
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureversion">
+                  s3-outposts:signatureversion
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_x-amz-content-sha256">
+                  s3-outposts:x-amz-content-sha256
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-DeleteObjectTagging" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_DeleteObjectTagging.html">
+                 DeleteObjectTagging
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to use the tagging subresource to remove the entire tag set from the specified object
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Tagging
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-object">
+                  object*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_DataAccessPointAccount">
+                  s3-outposts:DataAccessPointAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_DataAccessPointArn">
+                  s3-outposts:DataAccessPointArn
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_AccessPointNetworkOrigin">
+                  s3-outposts:AccessPointNetworkOrigin
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_ExistingObjectTag_key">
+                  s3-outposts:ExistingObjectTag/&lt;key&gt;
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_authType">
+                  s3-outposts:authType
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureAge">
+                  s3-outposts:signatureAge
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureversion">
+                  s3-outposts:signatureversion
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_x-amz-content-sha256">
+                  s3-outposts:x-amz-content-sha256
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-DeleteObjectVersion" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_DeleteObject.html">
+                 DeleteObjectVersion
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to remove a specific version of an object
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-object">
+                  object*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_DataAccessPointAccount">
+                  s3-outposts:DataAccessPointAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_DataAccessPointArn">
+                  s3-outposts:DataAccessPointArn
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_AccessPointNetworkOrigin">
+                  s3-outposts:AccessPointNetworkOrigin
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_authType">
+                  s3-outposts:authType
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureAge">
+                  s3-outposts:signatureAge
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureversion">
+                  s3-outposts:signatureversion
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_versionid">
+                  s3-outposts:versionid
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_x-amz-content-sha256">
+                  s3-outposts:x-amz-content-sha256
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-DeleteObjectVersionTagging" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_DeleteObjectTagging.html">
+                 DeleteObjectVersionTagging
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to remove the entire tag set for a specific version of the object
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Tagging
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-object">
+                  object*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_DataAccessPointAccount">
+                  s3-outposts:DataAccessPointAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_DataAccessPointArn">
+                  s3-outposts:DataAccessPointArn
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_AccessPointNetworkOrigin">
+                  s3-outposts:AccessPointNetworkOrigin
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_ExistingObjectTag_key">
+                  s3-outposts:ExistingObjectTag/&lt;key&gt;
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_authType">
+                  s3-outposts:authType
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureAge">
+                  s3-outposts:signatureAge
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureversion">
+                  s3-outposts:signatureversion
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_versionid">
+                  s3-outposts:versionid
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_x-amz-content-sha256">
+                  s3-outposts:x-amz-content-sha256
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-GetAccessPoint" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_control_GetAccessPoint.html">
+                 GetAccessPoint
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return configuration information about the specified access point
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_DataAccessPointAccount">
+                  s3-outposts:DataAccessPointAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_DataAccessPointArn">
+                  s3-outposts:DataAccessPointArn
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_AccessPointNetworkOrigin">
+                  s3-outposts:AccessPointNetworkOrigin
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_authType">
+                  s3-outposts:authType
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureAge">
+                  s3-outposts:signatureAge
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureversion">
+                  s3-outposts:signatureversion
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_x-amz-content-sha256">
+                  s3-outposts:x-amz-content-sha256
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-GetAccessPointPolicy" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_control_GetAccessPointPolicy.html">
+                 GetAccessPointPolicy
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to returns the access point policy associated with the specified access point
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-accesspoint">
+                  accesspoint*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_DataAccessPointAccount">
+                  s3-outposts:DataAccessPointAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_DataAccessPointArn">
+                  s3-outposts:DataAccessPointArn
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_AccessPointNetworkOrigin">
+                  s3-outposts:AccessPointNetworkOrigin
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_authType">
+                  s3-outposts:authType
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureAge">
+                  s3-outposts:signatureAge
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureversion">
+                  s3-outposts:signatureversion
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_x-amz-content-sha256">
+                  s3-outposts:x-amz-content-sha256
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-GetBucket" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_control_GetBucket.html">
+                 GetBucket
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to return the bucket configuration associated with an Amazon S3 bucket
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-bucket">
+                  bucket*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_authType">
+                  s3-outposts:authType
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureAge">
+                  s3-outposts:signatureAge
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureversion">
+                  s3-outposts:signatureversion
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_x-amz-content-sha256">
+                  s3-outposts:x-amz-content-sha256
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-GetBucketPolicy" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_control_GetBucketPolicy.html">
+                 GetBucketPolicy
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to return the policy of the specified bucket
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-bucket">
+                  bucket*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_authType">
+                  s3-outposts:authType
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureAge">
+                  s3-outposts:signatureAge
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureversion">
+                  s3-outposts:signatureversion
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_x-amz-content-sha256">
+                  s3-outposts:x-amz-content-sha256
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-GetBucketTagging" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_control_GetBucketTagging.html">
+                 GetBucketTagging
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to return the tag set associated with an Amazon S3 bucket
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-bucket">
+                  bucket*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_authType">
+                  s3-outposts:authType
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureAge">
+                  s3-outposts:signatureAge
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureversion">
+                  s3-outposts:signatureversion
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_x-amz-content-sha256">
+                  s3-outposts:x-amz-content-sha256
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-GetBucketVersioning" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetBucketVersioning.html">
+                 GetBucketVersioning
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to return the versioning state of an Amazon S3 bucket
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-bucket">
+                  bucket*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_authType">
+                  s3-outposts:authType
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureAge">
+                  s3-outposts:signatureAge
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureversion">
+                  s3-outposts:signatureversion
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_x-amz-content-sha256">
+                  s3-outposts:x-amz-content-sha256
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-GetLifecycleConfiguration" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_control_GetBucketLifecycleConfiguration.html">
+                 GetLifecycleConfiguration
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to return the lifecycle configuration information set on an Amazon S3 bucket
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-bucket">
+                  bucket*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_authType">
+                  s3-outposts:authType
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureAge">
+                  s3-outposts:signatureAge
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureversion">
+                  s3-outposts:signatureversion
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_x-amz-content-sha256">
+                  s3-outposts:x-amz-content-sha256
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-GetObject" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetObject.html">
+                 GetObject
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to retrieve objects from Amazon S3
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-object">
+                  object*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_DataAccessPointAccount">
+                  s3-outposts:DataAccessPointAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_DataAccessPointArn">
+                  s3-outposts:DataAccessPointArn
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_AccessPointNetworkOrigin">
+                  s3-outposts:AccessPointNetworkOrigin
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_ExistingObjectTag_key">
+                  s3-outposts:ExistingObjectTag/&lt;key&gt;
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_authType">
+                  s3-outposts:authType
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureAge">
+                  s3-outposts:signatureAge
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureversion">
+                  s3-outposts:signatureversion
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_x-amz-content-sha256">
+                  s3-outposts:x-amz-content-sha256
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-GetObjectTagging" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetObjectTagging.html">
+                 GetObjectTagging
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to return the tag set of an object
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-object">
+                  object*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_DataAccessPointAccount">
+                  s3-outposts:DataAccessPointAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_DataAccessPointArn">
+                  s3-outposts:DataAccessPointArn
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_AccessPointNetworkOrigin">
+                  s3-outposts:AccessPointNetworkOrigin
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_ExistingObjectTag_key">
+                  s3-outposts:ExistingObjectTag/&lt;key&gt;
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_authType">
+                  s3-outposts:authType
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureAge">
+                  s3-outposts:signatureAge
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureversion">
+                  s3-outposts:signatureversion
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_x-amz-content-sha256">
+                  s3-outposts:x-amz-content-sha256
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-GetObjectVersion" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetObject.html">
+                 GetObjectVersion
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to retrieve a specific version of an object
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-object">
+                  object*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_DataAccessPointAccount">
+                  s3-outposts:DataAccessPointAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_DataAccessPointArn">
+                  s3-outposts:DataAccessPointArn
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_AccessPointNetworkOrigin">
+                  s3-outposts:AccessPointNetworkOrigin
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_ExistingObjectTag_key">
+                  s3-outposts:ExistingObjectTag/&lt;key&gt;
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_authType">
+                  s3-outposts:authType
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureAge">
+                  s3-outposts:signatureAge
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureversion">
+                  s3-outposts:signatureversion
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_versionid">
+                  s3-outposts:versionid
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_x-amz-content-sha256">
+                  s3-outposts:x-amz-content-sha256
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-GetObjectVersionForReplication" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetObject.html">
+                 GetObjectVersionForReplication
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to replicate both unencrypted objects and objects encrypted with SSE-KMS
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-object">
+                  object*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_authType">
+                  s3-outposts:authType
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureAge">
+                  s3-outposts:signatureAge
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureversion">
+                  s3-outposts:signatureversion
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_x-amz-content-sha256">
+                  s3-outposts:x-amz-content-sha256
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-GetObjectVersionTagging" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetObject.html">
+                 GetObjectVersionTagging
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to return the tag set for a specific version of the object
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-object">
+                  object*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_DataAccessPointAccount">
+                  s3-outposts:DataAccessPointAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_DataAccessPointArn">
+                  s3-outposts:DataAccessPointArn
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_AccessPointNetworkOrigin">
+                  s3-outposts:AccessPointNetworkOrigin
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_ExistingObjectTag_key">
+                  s3-outposts:ExistingObjectTag/&lt;key&gt;
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_authType">
+                  s3-outposts:authType
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureAge">
+                  s3-outposts:signatureAge
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureversion">
+                  s3-outposts:signatureversion
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_versionid">
+                  s3-outposts:versionid
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_x-amz-content-sha256">
+                  s3-outposts:x-amz-content-sha256
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-GetReplicationConfiguration" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_control_GetBucketReplication.html">
+                 GetReplicationConfiguration
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to get the replication configuration information set on an Amazon S3 bucket
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-bucket">
+                  bucket*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_authType">
+                  s3-outposts:authType
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureAge">
+                  s3-outposts:signatureAge
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureversion">
+                  s3-outposts:signatureversion
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_x-amz-content-sha256">
+                  s3-outposts:x-amz-content-sha256
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-ListAccessPoints" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_control_ListAccessPoints.html">
+                 ListAccessPoints
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list access points
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_authType">
+                  s3-outposts:authType
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureAge">
+                  s3-outposts:signatureAge
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureversion">
+                  s3-outposts:signatureversion
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_x-amz-content-sha256">
+                  s3-outposts:x-amz-content-sha256
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-ListBucket" rowspan="3" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_ListObjectsV2.html">
+                 ListBucket
+                </a>
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Grants permission to list some or all of the objects in an Amazon S3 bucket (up to 1000)
+               </td>
+               <td rowspan="3" tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-accesspoint">
+                  accesspoint*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-bucket">
+                  bucket*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_DataAccessPointAccount">
+                  s3-outposts:DataAccessPointAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_DataAccessPointArn">
+                  s3-outposts:DataAccessPointArn
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_AccessPointNetworkOrigin">
+                  s3-outposts:AccessPointNetworkOrigin
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_authType">
+                  s3-outposts:authType
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_delimiter">
+                  s3-outposts:delimiter
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_max-keys">
+                  s3-outposts:max-keys
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_prefix">
+                  s3-outposts:prefix
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureAge">
+                  s3-outposts:signatureAge
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureversion">
+                  s3-outposts:signatureversion
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_x-amz-content-sha256">
+                  s3-outposts:x-amz-content-sha256
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-ListBucketMultipartUploads" rowspan="3" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_ListMultipartUploads.html">
+                 ListBucketMultipartUploads
+                </a>
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Grants permission to list in-progress multipart uploads
+               </td>
+               <td rowspan="3" tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-accesspoint">
+                  accesspoint*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-bucket">
+                  bucket*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_DataAccessPointAccount">
+                  s3-outposts:DataAccessPointAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_DataAccessPointArn">
+                  s3-outposts:DataAccessPointArn
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_AccessPointNetworkOrigin">
+                  s3-outposts:AccessPointNetworkOrigin
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_authType">
+                  s3-outposts:authType
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureAge">
+                  s3-outposts:signatureAge
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureversion">
+                  s3-outposts:signatureversion
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_x-amz-content-sha256">
+                  s3-outposts:x-amz-content-sha256
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-ListBucketVersions" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_ListObjectVersions.html">
+                 ListBucketVersions
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to list metadata about all the versions of objects in an Amazon S3 bucket
+               </td>
+               <td rowspan="2" tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-bucket">
+                  bucket*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_DataAccessPointAccount">
+                  s3-outposts:DataAccessPointAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_DataAccessPointArn">
+                  s3-outposts:DataAccessPointArn
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_AccessPointNetworkOrigin">
+                  s3-outposts:AccessPointNetworkOrigin
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_authType">
+                  s3-outposts:authType
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_delimiter">
+                  s3-outposts:delimiter
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_max-keys">
+                  s3-outposts:max-keys
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_prefix">
+                  s3-outposts:prefix
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureAge">
+                  s3-outposts:signatureAge
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureversion">
+                  s3-outposts:signatureversion
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_x-amz-content-sha256">
+                  s3-outposts:x-amz-content-sha256
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-ListEndpoints" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_s3outposts_ListEndpoints.html">
+                 ListEndpoints
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list endpoints
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-ListMultipartUploadParts" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_ListParts.html">
+                 ListMultipartUploadParts
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to list the parts that have been uploaded for a specific multipart upload
+               </td>
+               <td rowspan="2" tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-object">
+                  object*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_DataAccessPointAccount">
+                  s3-outposts:DataAccessPointAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_DataAccessPointArn">
+                  s3-outposts:DataAccessPointArn
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_AccessPointNetworkOrigin">
+                  s3-outposts:AccessPointNetworkOrigin
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_authType">
+                  s3-outposts:authType
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureAge">
+                  s3-outposts:signatureAge
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureversion">
+                  s3-outposts:signatureversion
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_x-amz-content-sha256">
+                  s3-outposts:x-amz-content-sha256
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-ListOutpostsWithS3" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_s3outposts_ListOutpostsWithS3.html">
+                 ListOutpostsWithS3
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list outposts with S3 capacity
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-ListRegionalBuckets" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_control_ListRegionalBuckets.html">
+                 ListRegionalBuckets
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list all buckets owned by the authenticated sender of the request
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_authType">
+                  s3-outposts:authType
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureAge">
+                  s3-outposts:signatureAge
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureversion">
+                  s3-outposts:signatureversion
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_x-amz-content-sha256">
+                  s3-outposts:x-amz-content-sha256
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-ListSharedEndpoints" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_s3outposts_ListSharedEndpoints.html">
+                 ListSharedEndpoints
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list shared endpoints
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-PutAccessPointPolicy" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_control_PutAccessPointPolicy.html">
+                 PutAccessPointPolicy
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to associate an access policy with a specified access point
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Permissions management
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-accesspoint">
+                  accesspoint*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_DataAccessPointAccount">
+                  s3-outposts:DataAccessPointAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_DataAccessPointArn">
+                  s3-outposts:DataAccessPointArn
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_AccessPointNetworkOrigin">
+                  s3-outposts:AccessPointNetworkOrigin
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_authType">
+                  s3-outposts:authType
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureAge">
+                  s3-outposts:signatureAge
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureversion">
+                  s3-outposts:signatureversion
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_x-amz-content-sha256">
+                  s3-outposts:x-amz-content-sha256
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-PutBucketPolicy" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_control_PutBucketPolicy.html">
+                 PutBucketPolicy
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to add or replace a bucket policy on a bucket
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Permissions management
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-bucket">
+                  bucket*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_authType">
+                  s3-outposts:authType
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureAge">
+                  s3-outposts:signatureAge
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureversion">
+                  s3-outposts:signatureversion
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_x-amz-content-sha256">
+                  s3-outposts:x-amz-content-sha256
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-PutBucketTagging" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_control_PutBucketTagging.html">
+                 PutBucketTagging
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to add a set of tags to an existing Amazon S3 bucket
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Tagging
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-bucket">
+                  bucket*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_authType">
+                  s3-outposts:authType
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureAge">
+                  s3-outposts:signatureAge
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureversion">
+                  s3-outposts:signatureversion
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_x-amz-content-sha256">
+                  s3-outposts:x-amz-content-sha256
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-PutBucketVersioning" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_PutBucketVersioning.html">
+                 PutBucketVersioning
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to set the versioning state of an existing Amazon S3 bucket
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-bucket">
+                  bucket*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_authType">
+                  s3-outposts:authType
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureAge">
+                  s3-outposts:signatureAge
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureversion">
+                  s3-outposts:signatureversion
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_x-amz-content-sha256">
+                  s3-outposts:x-amz-content-sha256
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-PutLifecycleConfiguration" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_control_PutBucketLifecycleConfiguration.html">
+                 PutLifecycleConfiguration
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to create a new lifecycle configuration for the bucket or replace an existing lifecycle configuration
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-bucket">
+                  bucket*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_authType">
+                  s3-outposts:authType
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureAge">
+                  s3-outposts:signatureAge
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureversion">
+                  s3-outposts:signatureversion
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_x-amz-content-sha256">
+                  s3-outposts:x-amz-content-sha256
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-PutObject" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_PutObject.html">
+                 PutObject
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to add an object to a bucket
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-object">
+                  object*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_DataAccessPointAccount">
+                  s3-outposts:DataAccessPointAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_DataAccessPointArn">
+                  s3-outposts:DataAccessPointArn
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_AccessPointNetworkOrigin">
+                  s3-outposts:AccessPointNetworkOrigin
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_RequestObjectTag_key">
+                  s3-outposts:RequestObjectTag/&lt;key&gt;
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_RequestObjectTagKeys">
+                  s3-outposts:RequestObjectTagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_authType">
+                  s3-outposts:authType
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureAge">
+                  s3-outposts:signatureAge
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureversion">
+                  s3-outposts:signatureversion
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_x-amz-acl">
+                  s3-outposts:x-amz-acl
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_x-amz-content-sha256">
+                  s3-outposts:x-amz-content-sha256
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_x-amz-copy-source">
+                  s3-outposts:x-amz-copy-source
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_x-amz-metadata-directive">
+                  s3-outposts:x-amz-metadata-directive
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_x-amz-server-side-encryption">
+                  s3-outposts:x-amz-server-side-encryption
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_x-amz-storage-class">
+                  s3-outposts:x-amz-storage-class
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-PutObjectAcl" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_PutObjectAcl.html">
+                 PutObjectAcl
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to set the access control list (ACL) permissions for an object that already exists in a bucket
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Permissions management
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-object">
+                  object*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_DataAccessPointAccount">
+                  s3-outposts:DataAccessPointAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_DataAccessPointArn">
+                  s3-outposts:DataAccessPointArn
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_AccessPointNetworkOrigin">
+                  s3-outposts:AccessPointNetworkOrigin
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_ExistingObjectTag_key">
+                  s3-outposts:ExistingObjectTag/&lt;key&gt;
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_authType">
+                  s3-outposts:authType
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureAge">
+                  s3-outposts:signatureAge
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureversion">
+                  s3-outposts:signatureversion
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_x-amz-acl">
+                  s3-outposts:x-amz-acl
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_x-amz-content-sha256">
+                  s3-outposts:x-amz-content-sha256
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_x-amz-storage-class">
+                  s3-outposts:x-amz-storage-class
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-PutObjectTagging" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_PutObjectTagging.html">
+                 PutObjectTagging
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to set the supplied tag-set to an object that already exists in a bucket
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Tagging
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-object">
+                  object*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_DataAccessPointAccount">
+                  s3-outposts:DataAccessPointAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_DataAccessPointArn">
+                  s3-outposts:DataAccessPointArn
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_AccessPointNetworkOrigin">
+                  s3-outposts:AccessPointNetworkOrigin
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_ExistingObjectTag_key">
+                  s3-outposts:ExistingObjectTag/&lt;key&gt;
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_RequestObjectTag_key">
+                  s3-outposts:RequestObjectTag/&lt;key&gt;
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_RequestObjectTagKeys">
+                  s3-outposts:RequestObjectTagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_authType">
+                  s3-outposts:authType
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureAge">
+                  s3-outposts:signatureAge
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureversion">
+                  s3-outposts:signatureversion
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_x-amz-content-sha256">
+                  s3-outposts:x-amz-content-sha256
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-PutObjectVersionTagging" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_PutObjectTagging.html">
+                 PutObjectVersionTagging
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to set the supplied tag-set for a specific version of an object
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Tagging
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-object">
+                  object*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_DataAccessPointAccount">
+                  s3-outposts:DataAccessPointAccount
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_DataAccessPointArn">
+                  s3-outposts:DataAccessPointArn
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_AccessPointNetworkOrigin">
+                  s3-outposts:AccessPointNetworkOrigin
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_ExistingObjectTag_key">
+                  s3-outposts:ExistingObjectTag/&lt;key&gt;
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_RequestObjectTag_key">
+                  s3-outposts:RequestObjectTag/&lt;key&gt;
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_RequestObjectTagKeys">
+                  s3-outposts:RequestObjectTagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_authType">
+                  s3-outposts:authType
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureAge">
+                  s3-outposts:signatureAge
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureversion">
+                  s3-outposts:signatureversion
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_versionid">
+                  s3-outposts:versionid
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_x-amz-content-sha256">
+                  s3-outposts:x-amz-content-sha256
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-PutReplicationConfiguration" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_control_PutBucketReplication.html">
+                 PutReplicationConfiguration
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to create a new replication configuration or replace an existing one
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-bucket">
+                  bucket*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 iam:PassRole
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_authType">
+                  s3-outposts:authType
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureAge">
+                  s3-outposts:signatureAge
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureversion">
+                  s3-outposts:signatureversion
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_x-amz-content-sha256">
+                  s3-outposts:x-amz-content-sha256
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-ReplicateDelete" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_DeleteObject.html">
+                 ReplicateDelete
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to replicate delete markers to the destination bucket
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-object">
+                  object*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_authType">
+                  s3-outposts:authType
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureAge">
+                  s3-outposts:signatureAge
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureversion">
+                  s3-outposts:signatureversion
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_x-amz-content-sha256">
+                  s3-outposts:x-amz-content-sha256
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-ReplicateObject" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_PutObject.html">
+                 ReplicateObject
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to replicate objects and object tags to the destination bucket
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-object">
+                  object*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_authType">
+                  s3-outposts:authType
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureAge">
+                  s3-outposts:signatureAge
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureversion">
+                  s3-outposts:signatureversion
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_x-amz-content-sha256">
+                  s3-outposts:x-amz-content-sha256
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_x-amz-server-side-encryption">
+                  s3-outposts:x-amz-server-side-encryption
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-ReplicateTags" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_PutObjectTagging.html">
+                 ReplicateTags
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to replicate object tags to the destination bucket
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Tagging
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-object">
+                  object*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_authType">
+                  s3-outposts:authType
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureAge">
+                  s3-outposts:signatureAge
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_signatureversion">
+                  s3-outposts:signatureversion
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazons3onoutposts-s3-outposts_x-amz-content-sha256">
+                  s3-outposts:x-amz-content-sha256
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <h2 id="amazons3onoutposts-resources-for-iam-policies">
+            Resource types defined by        Amazon S3 on Outposts
+           </h2>
+           <p>
+            The following resource types are defined by this service and can be used in the
+            <code class="code">
+             Resource
+            </code>
+            element of IAM permission policy statements. Each action in the
+            <a href="#amazons3onoutposts-actions-as-permissions">
+             Actions table
+            </a>
+            identifies the      resource types that can be specified with that action. A resource type can also define which      condition keys you can include in a policy. These keys are displayed in the last column of the      Resource types table. For details about the columns in the following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#resources_table" rel="noopener noreferrer" target="_blank">
+             Resource types table
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9e1393c13b5">
+              <thead>
+               <tr>
+                <th>
+                 Resource types
+                </th>
+                <th>
+                 ARN
+                </th>
+                <th>
+                 Condition keys
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="amazons3onoutposts-accesspoint" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-points.html">
+                 accesspoint
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:s3-outposts:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:outpost/$
+                 <span>
+                  {
+                 </span>
+                 OutpostId}/accesspoint/$
+                 <span>
+                  {
+                 </span>
+                 AccessPointName}
+                </code>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-bucket" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingBucket.html">
+                 bucket
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:s3-outposts:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:outpost/$
+                 <span>
+                  {
+                 </span>
+                 OutpostId}/bucket/$
+                 <span>
+                  {
+                 </span>
+                 BucketName}
+                </code>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-endpoint" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/outposts-endpoints.html">
+                 endpoint
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:s3-outposts:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:outpost/$
+                 <span>
+                  {
+                 </span>
+                 OutpostId}/endpoint/$
+                 <span>
+                  {
+                 </span>
+                 EndpointId}
+                </code>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-object" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingObjects.html">
+                 object
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:s3-outposts:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:outpost/$
+                 <span>
+                  {
+                 </span>
+                 OutpostId}/bucket/$
+                 <span>
+                  {
+                 </span>
+                 BucketName}/object/$
+                 <span>
+                  {
+                 </span>
+                 ObjectName}
+                </code>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <h2 id="amazons3onoutposts-policy-keys">
+            Condition keys for        Amazon S3 on Outposts
+           </h2>
+           <p>
+            Amazon S3 on Outposts defines the following condition keys that can be used in the
+            <code class="code">
+             Condition
+            </code>
+            element of an IAM policy. You can use these keys to further refine      the conditions under which the policy statement applies. For details about the columns in the      following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#context_keys_table" rel="noopener noreferrer" target="_blank">
+             Condition keys table
+            </a>
+            .
+           </p>
+           <p>
+            To view the global condition keys that are available to all services, see
+            <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#AvailableKeys">
+             Available global condition keys
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9e1393c15b7">
+              <thead>
+               <tr>
+                <th>
+                 Condition keys
+                </th>
+                <th>
+                 Description
+                </th>
+                <th>
+                 Type
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="amazons3onoutposts-s3-outposts_AccessPointNetworkOrigin" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/creating-access-points.html#access-points-policies">
+                 s3-outposts:AccessPointNetworkOrigin
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the network origin (Internet or VPC)
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-s3-outposts_DataAccessPointAccount" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/creating-access-points.html#access-points-policies">
+                 s3-outposts:DataAccessPointAccount
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the AWS Account ID that owns the access point
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-s3-outposts_DataAccessPointArn" tabindex="-1">
+                s3-outposts:DataAccessPointArn
+               </td>
+               <td tabindex="-1">
+                Filters access by an access point Amazon Resource Name (ARN)
+               </td>
+               <td tabindex="-1">
+                ARN
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-s3-outposts_ExistingObjectTag_key" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-tagging.html#tagging-and-policies">
+                 s3-outposts:ExistingObjectTag/&lt;key&gt;
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by requiring that an existing object tag has a specific tag key and value
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-s3-outposts_RequestObjectTag_key" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-tagging.html#tagging-and-policies">
+                 s3-outposts:RequestObjectTag/&lt;key&gt;
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by restricting the tag keys and values allowed on objects
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-s3-outposts_RequestObjectTagKeys" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-tagging.html#tagging-and-policies">
+                 s3-outposts:RequestObjectTagKeys
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by restricting the tag keys allowed on objects
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-s3-outposts_authType" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/bucket-policy-s3-sigv4-conditions.html">
+                 s3-outposts:authType
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by restricting incoming requests to a specific authentication method
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-s3-outposts_delimiter" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/walkthrough1.html">
+                 s3-outposts:delimiter
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by requiring the delimiter parameter
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-s3-outposts_max-keys" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/amazon-s3-policy-keys.html#example-numeric-condition-operators">
+                 s3-outposts:max-keys
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by limiting the maximum number of keys returned in a ListBucket request
+               </td>
+               <td tabindex="-1">
+                Numeric
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-s3-outposts_prefix" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/amazon-s3-policy-keys.html#condition-key-bucket-ops-2">
+                 s3-outposts:prefix
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by key name prefix
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-s3-outposts_signatureAge" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/bucket-policy-s3-sigv4-conditions.html">
+                 s3-outposts:signatureAge
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by identifying the length of time, in milliseconds, that a signature is valid in an authenticated request
+               </td>
+               <td tabindex="-1">
+                Numeric
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-s3-outposts_signatureversion" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/bucket-policy-s3-sigv4-conditions.html">
+                 s3-outposts:signatureversion
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by identifying the version of AWS Signature that is supported for authenticated requests
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-s3-outposts_versionid" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/amazon-s3-policy-keys.html#getobjectversion-limit-access-to-specific-version-3">
+                 s3-outposts:versionid
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by a specific object version
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-s3-outposts_x-amz-acl" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/acl-overview.html#permissions">
+                 s3-outposts:x-amz-acl
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by requiring the x-amz-acl header with a specific canned ACL in a request
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-s3-outposts_x-amz-content-sha256" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/bucket-policy-s3-sigv4-conditions.html">
+                 s3-outposts:x-amz-content-sha256
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by disallowing unsigned content in your bucket
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-s3-outposts_x-amz-copy-source" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/amazon-s3-policy-keys.html#putobject-limit-copy-source-3">
+                 s3-outposts:x-amz-copy-source
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by restricting the copy source to a specific bucket, prefix, or object
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-s3-outposts_x-amz-metadata-directive" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_CopyObject.html">
+                 s3-outposts:x-amz-metadata-directive
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by enabling enforcement of object metadata behavior (COPY or REPLACE) when objects are copied
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-s3-outposts_x-amz-server-side-encryption" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingServerSideEncryption.html">
+                 s3-outposts:x-amz-server-side-encryption
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by requiring server-side encryption
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="amazons3onoutposts-s3-outposts_x-amz-storage-class" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/storage-class-intro.html#sc-howtoset">
+                 s3-outposts:x-amz-storage-class
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by storage class
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <awsdocs-copyright class="copyright-print">
+           </awsdocs-copyright>
+           <awsdocs-thumb-feedback right-edge="{{$ctrl.thumbFeedbackRightEdge}}">
+           </awsdocs-thumb-feedback>
+          </div>
+          <noscript>
+           <div>
+            <div>
+             <div>
+              <div id="js_error_message">
+               <p>
+                <img alt="Warning" src="https://d1ge0kk1l5kms0.cloudfront.net/images/G/01/webservices/console/warning.png"/>
+                <strong>
+                 Javascript is disabled or is unavailable in your browser.
+                </strong>
+               </p>
+               <p>
+                To use the Amazon Web Services Documentation, Javascript must be enabled. Please refer to your browser's Help pages for instructions.
+               </p>
+              </div>
+             </div>
+            </div>
+           </div>
+          </noscript>
+          <div class="awsui-util-font-size-0" id="main-col-footer">
+           <div id="doc-conventions">
+            <a href="/general/latest/gr/docconventions.html" target="_top">
+             Document Conventions
+            </a>
+           </div>
+           <div class="prev-next">
+            <div accesskey="p" class="prev-link" href="./list_amazons3objectlambda.html" id="previous">
+             Amazon S3 Object Lambda
+            </div>
+            <div accesskey="n" class="next-link" href="./list_amazonsagemaker.html" id="next">
+             Amazon SageMaker
+            </div>
+           </div>
+          </div>
+          <awsdocs-page-utilities>
+          </awsdocs-page-utilities>
+         </div>
+         <div id="quick-feedback-yes" style="display: none;">
+          <div class="title">
+           Did this page help you? - Yes
+          </div>
+          <div class="content">
+           <p>
+            Thanks for letting us know we're doing a good job!
+           </p>
+           <p>
+            If you've got a moment, please tell us what we did right so we can do more of it.
+           </p>
+           <p>
+            <awsui-button click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service Authorization Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazons3onoutposts.html" id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback">
+            </awsui-button>
+           </p>
+          </div>
+         </div>
+         <div id="quick-feedback-no" style="display: none;">
+          <div class="title">
+           Did this page help you? - No
+          </div>
+          <div class="content">
+           <p>
+            Thanks for letting us know this page needs work. We're sorry we let you down.
+           </p>
+           <p>
+            If you've got a moment, please tell us how we can make the documentation better.
+           </p>
+           <p>
+            <awsui-button click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service Authorization Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazons3onoutposts.html" id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback">
+            </awsui-button>
+           </p>
+          </div>
+         </div>
+        </div>
+       </body>
+      </div>
+     </awsdocs-view>
+     <div class="page-loading-indicator" id="page-loading-indicator">
+      <awsui-spinner size="large">
+      </awsui-spinner>
+     </div>
+    </div>
+    <div dom-region="tools" id="tools-panel">
+     <awsdocs-tools-panel id="awsdocs-tools-panel">
+     </awsdocs-tools-panel>
+    </div>
+   </awsui-app-layout>
+   <awsdocs-cookie-banner class="doc-cookie-banner">
+   </awsdocs-cookie-banner>
+  </div>
+ </body>
+</html>

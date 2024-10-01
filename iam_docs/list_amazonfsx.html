@@ -1,0 +1,3062 @@
+<!DOCTYPE html>
+<html lang="en-US" xmlns="http://www.w3.org/1999/xhtml">
+ <head>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+  <title>
+   Actions, resources, and condition keys for Amazon FSx - Service Authorization Reference
+  </title>
+  <meta content="width=device-width,initial-scale=1" name="viewport"/>
+  <meta content="/assets" name="assets_root"/>
+  <meta content="list_amazonfsx" name="target_state"/>
+  <meta content="list_amazonfsx" name="default_state"/>
+  <link href="https://docs.aws.amazon.com/assets/images/favicon.ico" rel="icon" type="image/ico"/>
+  <link href="https://docs.aws.amazon.com/assets/images/favicon.ico" rel="shortcut icon" type="image/ico"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonfsx.html" rel="canonical"/>
+  <meta content="Lists all of the available service-specific resources, actions, and condition keys that can be used in IAM policies to control access to Amazon FSx." name="description"/>
+  <meta content="IAD" name="deployment_region"/>
+  <meta content="Service Authorization Reference" name="product"/>
+  <meta content="Service Authorization Reference" name="guide"/>
+  <meta content="Provides a list of the actions, resources, and condition keys supported by each AWS service that can be used in an IAM policy." name="abstract"/>
+  <meta content="en_us" name="guide-locale"/>
+  <meta content="toc-contents.json" name="tocs"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonfsx.html" rel="canonical"/>
+  <link href="https://docs.aws.amazon.com/id_id/service-authorization/latest/reference/list_amazonfsx.html" hreflang="id-id" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/id_id/service-authorization/latest/reference/list_amazonfsx.html" hreflang="id" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/de_de/service-authorization/latest/reference/list_amazonfsx.html" hreflang="de-de" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/de_de/service-authorization/latest/reference/list_amazonfsx.html" hreflang="de" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonfsx.html" hreflang="en-us" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonfsx.html" hreflang="en" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/es_es/service-authorization/latest/reference/list_amazonfsx.html" hreflang="es-es" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/es_es/service-authorization/latest/reference/list_amazonfsx.html" hreflang="es" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/fr_fr/service-authorization/latest/reference/list_amazonfsx.html" hreflang="fr-fr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/fr_fr/service-authorization/latest/reference/list_amazonfsx.html" hreflang="fr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/it_it/service-authorization/latest/reference/list_amazonfsx.html" hreflang="it-it" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/it_it/service-authorization/latest/reference/list_amazonfsx.html" hreflang="it" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ja_jp/service-authorization/latest/reference/list_amazonfsx.html" hreflang="ja-jp" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ja_jp/service-authorization/latest/reference/list_amazonfsx.html" hreflang="ja" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ko_kr/service-authorization/latest/reference/list_amazonfsx.html" hreflang="ko-kr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ko_kr/service-authorization/latest/reference/list_amazonfsx.html" hreflang="ko" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/pt_br/service-authorization/latest/reference/list_amazonfsx.html" hreflang="pt-br" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/pt_br/service-authorization/latest/reference/list_amazonfsx.html" hreflang="pt" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/zh_cn/service-authorization/latest/reference/list_amazonfsx.html" hreflang="zh-cn" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/zh_tw/service-authorization/latest/reference/list_amazonfsx.html" hreflang="zh-tw" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonfsx.html" hreflang="x-default" rel="alternative"/>
+  <meta content="Service Authorization Docs" name="feedback-item"/>
+  <meta content="Service Authorization Reference" name="this_doc_product"/>
+  <meta content="Service Authorization Reference" name="this_doc_guide"/>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor4.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor3.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor1.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/awsdocs-common.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/awsdocs-doc-page.js?version=2021.12.02">
+  </script>
+  <link href="https://docs.aws.amazon.com/assets/r/vendor4.css?version=2021.12.02" rel="stylesheet"/>
+  <link href="https://docs.aws.amazon.com/assets/r/awsdocs-common.css?version=2021.12.02" rel="stylesheet"/>
+  <link href="https://docs.aws.amazon.com/assets/r/awsdocs-doc-page.css?version=2021.12.02" rel="stylesheet"/>
+  <script async="" data-config="{'appEntity':'aws-documentation','region':'us-east-1','service':'iam'}" id="awsc-panorama-bundle" src="https://prod.pa.cdn.uis.awsstatic.com/panorama-nav-init.js" type="text/javascript">
+  </script>
+  <meta id="panorama-serviceSubSection" value="Service Authorization Reference"/>
+  <meta id="panorama-serviceConsolePage" value="Actions, resources, and condition keys for Amazon FSx"/>
+ </head>
+ <body class="awsdocs awsui">
+  <div class="awsdocs-container">
+   <awsdocs-header>
+   </awsdocs-header>
+   <awsui-app-layout class="awsui-util-no-gutters" header-selector="awsdocs-header" id="app-layout" navigation-change="$ctrl.onNavChange($event)" navigation-hide="false" navigation-open="$ctrl.navOpen" navigation-width="$ctrl.navWidth" ng-controller="ContentController as $ctrl" tools-change="$ctrl.onToolsChange($event)" tools-hide="$ctrl.hideTools" tools-open="$ctrl.toolsOpen" tools-width="$ctrl.toolsWidth">
+    <div dom-region="navigation" id="guide-toc">
+     <awsdocs-toc>
+     </awsdocs-toc>
+    </div>
+    <div dom-region="content" id="main-column" tabindex="-1">
+     <awsdocs-view class="awsdocs-view">
+      <div id="awsdocs-content">
+       <head>
+        <title>
+         Actions, resources, and condition keys for Amazon FSx - Service Authorization Reference
+        </title>
+        <meta content="/pdfs/service-authorization/latest/reference/service-authorization.pdf#list_amazonfsx" name="pdf"/>
+        <meta content="https://repost.aws/tags/TAO7Z4bI5hQVWMiYFs34QhIA" name="forums"/>
+        <meta content="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service%20Authorization%20Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazonfsx.html" name="feedback"/>
+        <meta content="feedbackyes.html?topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazonfsx.html" name="feedback-yes"/>
+        <meta content="feedbackno.html?topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazonfsx.html" name="feedback-no"/>
+        <script type="application/ld+json">
+         {
+    "@context" : "https://schema.org",
+    "@type" : "BreadcrumbList",
+    "itemListElement" : [
+      {
+        "@type" : "ListItem",
+        "position" : 1,
+        "name" : "AWS",
+        "item" : "https://aws.amazon.com"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 2,
+        "name" : "Service Authorization Reference",
+        "item" : "https://docs.aws.amazon.com/iam/index.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 3,
+        "name" : "Service Authorization Reference",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 4,
+        "name" : "Reference",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 5,
+        "name" : "Actions, resources, and condition keys for AWS services",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference_policies_actions-resources-contextkeys.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 6,
+        "name" : "Actions, resources, and condition keys for Amazon FSx",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference_policies_actions-resources-contextkeys.html"
+      }
+    ]
+}
+        </script>
+       </head>
+       <body>
+        <div id="main">
+         <div style="display: none">
+          <a href="/pdfs/service-authorization/latest/reference/service-authorization.pdf#list_amazonfsx" rel="noopener noreferrer" target="_blank" title="Open PDF">
+          </a>
+         </div>
+         <div class="breadcrumb" id="breadcrumbs">
+          <a href="https://aws.amazon.com">
+           AWS
+          </a>
+          <a href="/index.html">
+           Documentation
+          </a>
+          <a href="/iam/index.html">
+           Service Authorization Reference
+          </a>
+          <a href="reference.html">
+           Service Authorization Reference
+          </a>
+         </div>
+         <div id="page-toc-src">
+          <a href="#amazonfsx-actions-as-permissions">
+           Actions
+          </a>
+          <a href="#amazonfsx-resources-for-iam-policies">
+           Resource types
+          </a>
+          <a href="#amazonfsx-policy-keys">
+           Condition keys
+          </a>
+         </div>
+         <div class="awsui-util-container" id="main-content">
+          <div id="main-col-body">
+           <awsdocs-language-banner data-service="$ctrl.pageService">
+           </awsdocs-language-banner>
+           <h1 class="topictitle" id="list_amazonfsx">
+            Actions, resources, and condition keys for      Amazon FSx
+           </h1>
+           <div class="awsdocs-page-header-container">
+            <awsdocs-page-header>
+            </awsdocs-page-header>
+            <awsdocs-filter-selector id="awsdocs-filter-selector">
+            </awsdocs-filter-selector>
+           </div>
+           <p>
+            Amazon FSx (service prefix:
+            <code class="code">
+             fsx
+            </code>
+            ) provides the following    service-specific resources, actions, and condition context keys for use in IAM permission    policies.
+           </p>
+           <p>
+            References:
+           </p>
+           <div class="itemizedlist">
+            <ul class="itemizedlist">
+             <li class="listitem">
+              <p>
+               Learn how to
+               <a href="https://docs.aws.amazon.com/fsx/latest/WindowsGuide/what-is.html">
+                configure this service
+               </a>
+               .
+              </p>
+             </li>
+             <li class="listitem">
+              <p>
+               View a list of the
+               <a href="https://docs.aws.amazon.com/fsx/latest/APIReference/welcome.html">
+                API operations available for this          service
+               </a>
+               .
+              </p>
+             </li>
+             <li class="listitem">
+              <p>
+               Learn how to secure this service and its resources by
+               <a href="https://docs.aws.amazon.com/fsx/latest/WindowsGuide/access-control-overview.html">
+                using          IAM
+               </a>
+               permission policies.
+              </p>
+             </li>
+            </ul>
+           </div>
+           <div class="highlights" id="inline-topiclist">
+            <h6>
+             Topics
+            </h6>
+            <ul>
+             <li>
+              <a href="#amazonfsx-actions-as-permissions">
+               Actions defined by        Amazon FSx
+              </a>
+             </li>
+             <li>
+              <a href="#amazonfsx-resources-for-iam-policies">
+               Resource types defined by        Amazon FSx
+              </a>
+             </li>
+             <li>
+              <a href="#amazonfsx-policy-keys">
+               Condition keys for        Amazon FSx
+              </a>
+             </li>
+            </ul>
+           </div>
+           <h2 id="amazonfsx-actions-as-permissions">
+            Actions defined by        Amazon FSx
+           </h2>
+           <p>
+            You can specify the following actions in the
+            <code class="code">
+             Action
+            </code>
+            element of an IAM      policy statement. Use policies to grant permissions to perform an operation in AWS. When you      use an action in a policy, you usually allow or deny access to the API operation or CLI      command with the same name. However, in some cases, a single action controls access to more      than one operation. Alternatively, some operations require several different actions.
+           </p>
+           <p>
+            The
+            <b>
+             Resource types
+            </b>
+            column of the Actions table indicates whether each      action supports resource-level permissions. If there is no value for this column, you must      specify all resources ("*") to which the policy applies in the
+            <code class="code">
+             Resource
+            </code>
+            element      of your policy statement. If the column includes a resource type, then you can specify an ARN      of that type in a statement with that action. If the action has one or more required      resources, the caller must have permission to use the action with those resources. Required      resources are indicated in the table with an asterisk (*). If you limit resource access with      the
+            <code class="code">
+             Resource
+            </code>
+            element in an IAM policy, you must include an ARN or pattern for      each required resource type. Some actions support multiple resource types. If the resource      type is optional (not indicated as required), then you can choose to use one of the optional      resource types.
+           </p>
+           <p>
+            The
+            <b>
+             Condition keys
+            </b>
+            column of the Actions table includes keys that you      can specify in a policy statement's
+            <code class="code">
+             Condition
+            </code>
+            element. For more information on      the condition keys that are associated with resources for the service, see the
+            <b>
+             Condition keys
+            </b>
+            column of the Resource types table.
+           </p>
+           <div class="awsdocs-note">
+            <div class="awsdocs-note-title">
+             <awsui-icon name="status-info" variant="link">
+             </awsui-icon>
+             <h6>
+              Note
+             </h6>
+            </div>
+            <div class="awsdocs-note-text">
+             <p>
+              Resource condition keys are listed in the
+              <a href="#amazonfsx-resources-for-iam-policies">
+               Resource types
+              </a>
+              table. You        can find a link to the resource type that applies to an action in the
+              <b>
+               Resource          types (*required)
+              </b>
+              column of the Actions table. The resource type in the        Resource types table includes the
+              <b>
+               Condition keys
+              </b>
+              column, which are the        resource condition keys that apply to an action in the Actions table.
+             </p>
+            </div>
+           </div>
+           <p>
+            For details about the columns in the following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#actions_table" rel="noopener noreferrer" target="_blank">
+             Actions table
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9d717c11c13">
+              <thead>
+               <tr>
+                <th>
+                 Actions
+                </th>
+                <th>
+                 Description
+                </th>
+                <th>
+                 Access level
+                </th>
+                <th>
+                 Resource types (*required)
+                </th>
+                <th>
+                 Condition keys
+                </th>
+                <th>
+                 Dependent actions
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="amazonfsx-AssociateFileGateway" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/filegateway/latest/filefsxw/what-is-file-fsxw.html">
+                 AssociateFileGateway
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to associate a File Gateway instance with an Amazon FSx for Windows File Server file system
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-file-system">
+                  file-system*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-AssociateFileSystemAliases" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/APIReference/API_AssociateFileSystemAliases.html">
+                 AssociateFileSystemAliases
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to associate DNS aliases with an Amazon FSx for Windows File Server file system
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-file-system">
+                  file-system*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-BypassSnaplockEnterpriseRetention" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/ONTAPGuide/snaplock-enterprise.html#bypass-enterprise">
+                 BypassSnaplockEnterpriseRetention
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to allow deletion of an FSx for ONTAP SnapLock Enterprise volume that contains WORM (write once, read many) files with active retention periods
+               </td>
+               <td tabindex="-1">
+                Permissions management
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-volume">
+                  volume*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-CancelDataRepositoryTask" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/APIReference/API_CancelDataRepositoryTask.html">
+                 CancelDataRepositoryTask
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to cancel a data repository task
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-task">
+                  task*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-CopyBackup" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/APIReference/API_CopyBackup.html">
+                 CopyBackup
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to copy a backup
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-backup">
+                  backup*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 fsx:TagResource
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonfsx-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-CopySnapshotAndUpdateVolume" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/APIReference/API_CopySnapshotAndUpdateVolume.html">
+                 CopySnapshotAndUpdateVolume
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to update an existing volume by using a snapshot from another Amazon FSx for OpenZFS file system
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-snapshot">
+                  snapshot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-volume">
+                  volume*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-CreateBackup" rowspan="4" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/APIReference/API_CreateBackup.html">
+                 CreateBackup
+                </a>
+               </td>
+               <td rowspan="4" tabindex="-1">
+                Grants permission to create a new backup of an Amazon FSx file system or an Amazon FSx volume
+               </td>
+               <td rowspan="4" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-backup">
+                  backup*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 fsx:TagResource
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-file-system">
+                  file-system
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-volume">
+                  volume
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonfsx-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-CreateDataRepositoryAssociation" rowspan="3" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/APIReference/API_CreateDataRepositoryAssociation.html">
+                 CreateDataRepositoryAssociation
+                </a>
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Grants permission to create a new data respository association for an Amazon FSx for Lustre file system
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-association">
+                  association*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 fsx:TagResource
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-file-system">
+                  file-system*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonfsx-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-CreateDataRepositoryTask" rowspan="3" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/APIReference/API_CreateDataRepositoryTask.html">
+                 CreateDataRepositoryTask
+                </a>
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Grants permission to create a new data respository task for an Amazon FSx for Lustre file system
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-file-system">
+                  file-system*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 fsx:TagResource
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-task">
+                  task*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonfsx-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-CreateFileCache" rowspan="3" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/APIReference/API_CreateFileCache.html">
+                 CreateFileCache
+                </a>
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Grants permission to create a new, empty, Amazon file cache
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-file-cache">
+                  file-cache*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 ec2:DescribeSecurityGroups
+                </p>
+                <p>
+                 ec2:DescribeSubnets
+                </p>
+                <p>
+                 ec2:DescribeVpcs
+                </p>
+                <p>
+                 ec2:GetSecurityGroupsForVpc
+                </p>
+                <p>
+                 fsx:CreateDataRepositoryAssociation
+                </p>
+                <p>
+                 fsx:TagResource
+                </p>
+                <p>
+                 logs:CreateLogGroup
+                </p>
+                <p>
+                 logs:CreateLogStream
+                </p>
+                <p>
+                 logs:PutLogEvents
+                </p>
+                <p>
+                 s3:ListBucket
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-association">
+                  association
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-fsx_NfsDataRepositoryEncryptionInTransitEnabled">
+                  fsx:NfsDataRepositoryEncryptionInTransitEnabled
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonfsx-fsx_NfsDataRepositoryAuthenticationEnabled">
+                  fsx:NfsDataRepositoryAuthenticationEnabled
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonfsx-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-CreateFileSystem" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/APIReference/API_CreateFileSystem.html">
+                 CreateFileSystem
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to create a new, empty, Amazon FSx file system
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-file-system">
+                  file-system*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 ec2:GetSecurityGroupsForVpc
+                </p>
+                <p>
+                 fsx:TagResource
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonfsx-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-CreateFileSystemFromBackup" rowspan="3" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/APIReference/API_CreateFileSystemFromBackup.html">
+                 CreateFileSystemFromBackup
+                </a>
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Grants permission to create a new Amazon FSx file system from an existing backup
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-backup">
+                  backup*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 ec2:GetSecurityGroupsForVpc
+                </p>
+                <p>
+                 fsx:TagResource
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-file-system">
+                  file-system*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonfsx-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-CreateSnapshot" rowspan="3" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/APIReference/API_CreateSnapshot.html">
+                 CreateSnapshot
+                </a>
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Grants permission to create a new snapshot on a volume
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-snapshot">
+                  snapshot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 fsx:TagResource
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-volume">
+                  volume*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonfsx-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-CreateStorageVirtualMachine" rowspan="3" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/APIReference/API_CreateStorageVirtualMachine.html">
+                 CreateStorageVirtualMachine
+                </a>
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Grants permission to create a new storage virtual machine in an Amazon FSx for Ontap file system
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-file-system">
+                  file-system*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 fsx:TagResource
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-storage-virtual-machine">
+                  storage-virtual-machine*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonfsx-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-CreateVolume" rowspan="3" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/APIReference/API_CreateVolume.html">
+                 CreateVolume
+                </a>
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Grants permission to create a new volume
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-volume">
+                  volume*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 fsx:TagResource
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-snapshot">
+                  snapshot
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonfsx-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonfsx-fsx_StorageVirtualMachineId">
+                  fsx:StorageVirtualMachineId
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonfsx-fsx_ParentVolumeId">
+                  fsx:ParentVolumeId
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-CreateVolumeFromBackup" rowspan="4" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/APIReference/API_CreateVolumeFromBackup.html">
+                 CreateVolumeFromBackup
+                </a>
+               </td>
+               <td rowspan="4" tabindex="-1">
+                Grants permission to create a new volume from backup
+               </td>
+               <td rowspan="4" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-backup">
+                  backup*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 fsx:TagResource
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-storage-virtual-machine">
+                  storage-virtual-machine*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-volume">
+                  volume*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonfsx-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonfsx-fsx_StorageVirtualMachineId">
+                  fsx:StorageVirtualMachineId
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-DeleteBackup" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/APIReference/API_DeleteBackup.html">
+                 DeleteBackup
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a backup, deleting its contents. After deletion, the backup no longer exists, and its data is no longer available
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-backup">
+                  backup*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-DeleteDataRepositoryAssociation" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/APIReference/API_DeleteDataRepositoryAssociation.html">
+                 DeleteDataRepositoryAssociation
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a data repository association
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-association">
+                  association*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-DeleteFileCache" rowspan="3" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/APIReference/API_DeleteFileCache.html">
+                 DeleteFileCache
+                </a>
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Grants permission to delete a file cache, deleting its contents
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-file-cache">
+                  file-cache*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 fsx:DeleteDataRepositoryAssociation
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-association">
+                  association
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonfsx-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-DeleteFileSystem" rowspan="3" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/APIReference/API_DeleteFileSystem.html">
+                 DeleteFileSystem
+                </a>
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Grants permission to delete a file system, deleting its contents and any existing automatic backups of the file system
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-file-system">
+                  file-system*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 fsx:CreateBackup
+                </p>
+                <p>
+                 fsx:TagResource
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-backup">
+                  backup
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonfsx-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-DeleteResourcePolicy" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/OpenZFSGuide/on-demand-replication.html">
+                 DeleteResourcePolicy
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Required to manage cross-account sharing of FSx volumes through AWS Resource Access Manager (RAM). PutResourcePolicy and GetResourcePolicy are also required
+               </td>
+               <td tabindex="-1">
+                Permissions management
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-volume">
+                  volume*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-DeleteSnapshot" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/APIReference/API_DeleteSnapshot.html">
+                 DeleteSnapshot
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a snapshot on a volume
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-snapshot">
+                  snapshot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-DeleteStorageVirtualMachine" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/APIReference/API_DeleteStorageVirtualMachine.html">
+                 DeleteStorageVirtualMachine
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a storage virtual machine, deleting its contents
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-storage-virtual-machine">
+                  storage-virtual-machine*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-DeleteVolume" rowspan="3" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/APIReference/API_DeleteVolume.html">
+                 DeleteVolume
+                </a>
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Grants permission to delete a volume, deleting its contents and any existing automatic backups of the volume
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-volume">
+                  volume*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 fsx:TagResource
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-backup">
+                  backup
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonfsx-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonfsx-fsx_StorageVirtualMachineId">
+                  fsx:StorageVirtualMachineId
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonfsx-fsx_ParentVolumeId">
+                  fsx:ParentVolumeId
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-DescribeAssociatedFileGateways" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/filegateway/latest/filefsxw/what-is-file-fsxw.html">
+                 DescribeAssociatedFileGateways
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to describe the File Gateway instances associated with an Amazon FSx for Windows File Server file system
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-file-system">
+                  file-system*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-DescribeBackups" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/APIReference/API_DescribeBackups.html">
+                 DescribeBackups
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return the descriptions of all backups owned by your AWS account in the AWS Region of the endpoint that you're calling
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-DescribeDataRepositoryAssociations" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/APIReference/API_DescribeDataRepositoryAssociations.html">
+                 DescribeDataRepositoryAssociations
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return the descriptions of all data repository associations owned by your AWS account in the AWS Region of the endpoint that you're calling
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-DescribeDataRepositoryTasks" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/APIReference/API_DescribeDataRepositoryTasks.html">
+                 DescribeDataRepositoryTasks
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return the descriptions of all data repository tasks owned by your AWS account in the AWS Region of the endpoint that you're calling
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-DescribeFileCaches" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/APIReference/API_DescribeFileCaches.html">
+                 DescribeFileCaches
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return the descriptions of all file caches owned by your AWS account in the AWS Region of the endpoint that you're calling
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-DescribeFileSystemAliases" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/APIReference/API_DescribeFileSystemAliases.html">
+                 DescribeFileSystemAliases
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return the description of all DNS aliases owned by your Amazon FSx for Windows File Server file system
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-file-system">
+                  file-system*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-DescribeFileSystems" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/APIReference/API_DescribeFileSystems.html">
+                 DescribeFileSystems
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return the descriptions of all file systems owned by your AWS account in the AWS Region of the endpoint that you're calling
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-DescribeSharedVpcConfiguration" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/APIReference/API_DescribeSharedVpcConfiguration.html">
+                 DescribeSharedVpcConfiguration
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return the descriptions of whether FSx route table updates from participant accounts are allowed in your account
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-DescribeSnapshots" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/APIReference/API_DescribeSnapshots.html">
+                 DescribeSnapshots
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return the descriptions of all snapshots owned by your AWS account in the AWS Region of the endpoint you're calling
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-DescribeStorageVirtualMachines" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/APIReference/API_DescribeStorageVirtualMachines.html">
+                 DescribeStorageVirtualMachines
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return the descriptions of all storage virtual machines owned by your AWS account in the AWS Region of the endpoint that you're calling
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-DescribeVolumes" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/APIReference/API_DescribeVolumes.html">
+                 DescribeVolumes
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return the descriptions of all volumes owned by your AWS account in the AWS Region of the endpoint that you're calling
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-DisassociateFileGateway" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/filegateway/latest/filefsxw/what-is-file-fsxw.html">
+                 DisassociateFileGateway
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to disassociate a File Gateway instance from an Amazon FSx for Windows File Server file system
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-file-system">
+                  file-system*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-DisassociateFileSystemAliases" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/APIReference/API_DisassociateFileSystemAliases.html">
+                 DisassociateFileSystemAliases
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to disassociate file system aliases with an Amazon FSx for Windows File Server file system
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-file-system">
+                  file-system*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-GetResourcePolicy" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/OpenZFSGuide/on-demand-replication.html">
+                 GetResourcePolicy
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Required to manage cross-account sharing of FSx volumes through AWS Resource Access Manager (RAM). PutResourcePolicy and DeleteResourcePolicy are also required
+               </td>
+               <td tabindex="-1">
+                Permissions management
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-volume">
+                  volume*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-ListTagsForResource" rowspan="8" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/APIReference/API_ListTagsForResource.html">
+                 ListTagsForResource
+                </a>
+               </td>
+               <td rowspan="8" tabindex="-1">
+                Grants permission to list tags for an Amazon FSx resource
+               </td>
+               <td rowspan="8" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-association">
+                  association
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-backup">
+                  backup
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-file-cache">
+                  file-cache
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-file-system">
+                  file-system
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-snapshot">
+                  snapshot
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-storage-virtual-machine">
+                  storage-virtual-machine
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-task">
+                  task
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-volume">
+                  volume
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-ManageBackupPrincipalAssociations" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/APIReference/API_CopyBackup.html">
+                 ManageBackupPrincipalAssociations
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to manage backup principal associations through AWS Backup
+               </td>
+               <td tabindex="-1">
+                Permissions management
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-backup">
+                  backup*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-PutResourcePolicy" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/OpenZFSGuide/on-demand-replication.html">
+                 PutResourcePolicy
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Required to manage cross-account sharing of FSx volumes through AWS Resource Access Manager (RAM). DeleteResourcePolicy and GetResourcePolicy are also required
+               </td>
+               <td tabindex="-1">
+                Permissions management
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-volume">
+                  volume*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-ReleaseFileSystemNfsV3Locks" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/APIReference/API_ReleaseFileSystemNfsV3Locks.html">
+                 ReleaseFileSystemNfsV3Locks
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to release file system NFS V3 locks
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-file-system">
+                  file-system*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-RestoreVolumeFromSnapshot" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/APIReference/API_RestoreVolumeFromSnapshot.html">
+                 RestoreVolumeFromSnapshot
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to restore volume state from a snapshot
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-snapshot">
+                  snapshot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-volume">
+                  volume*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-StartMisconfiguredStateRecovery" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/APIReference/API_StartMisconfiguredStateRecovery.html">
+                 StartMisconfiguredStateRecovery
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to start misconfigured state recovery
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-file-system">
+                  file-system*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-TagResource" rowspan="9" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/APIReference/API_TagResource.html">
+                 TagResource
+                </a>
+               </td>
+               <td rowspan="9" tabindex="-1">
+                Grants permission to tag an Amazon FSx resource
+               </td>
+               <td rowspan="9" tabindex="-1">
+                Tagging
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-association">
+                  association
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-backup">
+                  backup
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-file-cache">
+                  file-cache
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-file-system">
+                  file-system
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-snapshot">
+                  snapshot
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-storage-virtual-machine">
+                  storage-virtual-machine
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-task">
+                  task
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-volume">
+                  volume
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonfsx-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-UntagResource" rowspan="9" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/APIReference/API_UntagResource.html">
+                 UntagResource
+                </a>
+               </td>
+               <td rowspan="9" tabindex="-1">
+                Grants permission to remove a tag from an Amazon FSx resource
+               </td>
+               <td rowspan="9" tabindex="-1">
+                Tagging
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-association">
+                  association
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-backup">
+                  backup
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-file-cache">
+                  file-cache
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-file-system">
+                  file-system
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-snapshot">
+                  snapshot
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-storage-virtual-machine">
+                  storage-virtual-machine
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-task">
+                  task
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-volume">
+                  volume
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-UpdateDataRepositoryAssociation" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/APIReference/API_UpdateDataRepositoryAssociation.html">
+                 UpdateDataRepositoryAssociation
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update data repository association configuration
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-association">
+                  association*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-UpdateFileCache" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/APIReference/API_UpdateFileCache.html">
+                 UpdateFileCache
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update file cache configuration
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-file-cache">
+                  file-cache*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-UpdateFileSystem" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/APIReference/API_UpdateFileSystem.html">
+                 UpdateFileSystem
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update file system configuration
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-file-system">
+                  file-system*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-UpdateSharedVpcConfiguration" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/APIReference/API_UpdateSharedVpcConfiguration.html">
+                 UpdateSharedVpcConfiguration
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to enable or disable FSx route table updates from participant accounts in your account
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-UpdateSnapshot" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/APIReference/API_UpdateSnapshot.html">
+                 UpdateSnapshot
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update snapshot configuration
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-snapshot">
+                  snapshot*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-UpdateStorageVirtualMachine" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/APIReference/API_UpdateStorageVirtualMachine.html">
+                 UpdateStorageVirtualMachine
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update storage virtual machine configuration
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-storage-virtual-machine">
+                  storage-virtual-machine*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-UpdateVolume" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/APIReference/API_UpdateVolume.html">
+                 UpdateVolume
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to update volume configuration
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-volume">
+                  volume*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-fsx_StorageVirtualMachineId">
+                  fsx:StorageVirtualMachineId
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonfsx-fsx_ParentVolumeId">
+                  fsx:ParentVolumeId
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <h2 id="amazonfsx-resources-for-iam-policies">
+            Resource types defined by        Amazon FSx
+           </h2>
+           <p>
+            The following resource types are defined by this service and can be used in the
+            <code class="code">
+             Resource
+            </code>
+            element of IAM permission policy statements. Each action in the
+            <a href="#amazonfsx-actions-as-permissions">
+             Actions table
+            </a>
+            identifies the      resource types that can be specified with that action. A resource type can also define which      condition keys you can include in a policy. These keys are displayed in the last column of the      Resource types table. For details about the columns in the following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#resources_table" rel="noopener noreferrer" target="_blank">
+             Resource types table
+            </a>
+            .
+           </p>
+           <div class="awsdocs-note">
+            <div class="awsdocs-note-title">
+             <awsui-icon name="status-info" variant="link">
+             </awsui-icon>
+             <h6>
+              Note
+             </h6>
+            </div>
+            <div class="awsdocs-note-text">
+             <p>
+              Amazon FSx for Windows File Server, Lustre, and Ontap share some of the same resource types, with the same ARN format for each.
+             </p>
+            </div>
+           </div>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9d717c13b7">
+              <thead>
+               <tr>
+                <th>
+                 Resource types
+                </th>
+                <th>
+                 ARN
+                </th>
+                <th>
+                 Condition keys
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="amazonfsx-file-system" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/WindowsGuide/access-control-overview.html#access-control-resources">
+                 file-system
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:fsx:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:file-system/$
+                 <span>
+                  {
+                 </span>
+                 FileSystemId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-file-cache" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/FileCacheGuide/security-iam.html">
+                 file-cache
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:fsx:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:file-cache/$
+                 <span>
+                  {
+                 </span>
+                 FileCacheId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-backup" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/WindowsGuide/access-control-overview.html#access-control-resources">
+                 backup
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:fsx:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:backup/$
+                 <span>
+                  {
+                 </span>
+                 BackupId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-storage-virtual-machine" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/ONTAPGuide/security-iam.html">
+                 storage-virtual-machine
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:fsx:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:storage-virtual-machine/$
+                 <span>
+                  {
+                 </span>
+                 FileSystemId}/$
+                 <span>
+                  {
+                 </span>
+                 StorageVirtualMachineId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-task" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/LustreGuide/access-control-overview.html#access-control-resources">
+                 task
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:fsx:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:task/$
+                 <span>
+                  {
+                 </span>
+                 TaskId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-association" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/LustreGuide/access-control-overview.html#access-control-resources">
+                 association
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:fsx:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:association/$
+                 <span>
+                  {
+                 </span>
+                 FileSystemIdOrFileCacheId}/$
+                 <span>
+                  {
+                 </span>
+                 DataRepositoryAssociationId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-volume" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/ONTAPGuide/security-iam.html">
+                 volume
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:fsx:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:volume/$
+                 <span>
+                  {
+                 </span>
+                 FileSystemId}/$
+                 <span>
+                  {
+                 </span>
+                 VolumeId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-snapshot" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/OpenZFSGuide/access-control-overview.html#access-control-resources">
+                 snapshot
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:fsx:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:snapshot/$
+                 <span>
+                  {
+                 </span>
+                 VolumeId}/$
+                 <span>
+                  {
+                 </span>
+                 SnapshotId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonfsx-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <h2 id="amazonfsx-policy-keys">
+            Condition keys for        Amazon FSx
+           </h2>
+           <p>
+            Amazon FSx defines the following condition keys that can be used in the
+            <code class="code">
+             Condition
+            </code>
+            element of an IAM policy. You can use these keys to further refine      the conditions under which the policy statement applies. For details about the columns in the      following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#context_keys_table" rel="noopener noreferrer" target="_blank">
+             Condition keys table
+            </a>
+            .
+           </p>
+           <p>
+            To view the global condition keys that are available to all services, see
+            <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#AvailableKeys">
+             Available global condition keys
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9d717c15b7">
+              <thead>
+               <tr>
+                <th>
+                 Condition keys
+                </th>
+                <th>
+                 Description
+                </th>
+                <th>
+                 Type
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="amazonfsx-aws_RequestTag___TagKey_" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-requesttag">
+                 aws:RequestTag/${TagKey}
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the tags that are passed in the request
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-aws_ResourceTag___TagKey_" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-resourcetag">
+                 aws:ResourceTag/${TagKey}
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the tags associated with the resource
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-aws_TagKeys" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-tagkeys">
+                 aws:TagKeys
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the tag keys that are passed in the request
+               </td>
+               <td tabindex="-1">
+                ArrayOfString
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-fsx_IsBackupCopyDestination" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/WindowsGuide/using-backups.html#copy-backups">
+                 fsx:IsBackupCopyDestination
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by whether the backup is a destination backup for a CopyBackup operation
+               </td>
+               <td tabindex="-1">
+                Bool
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-fsx_IsBackupCopySource" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/WindowsGuide/using-backups.html#copy-backups">
+                 fsx:IsBackupCopySource
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by whether the backup is a source backup for a CopyBackup operation
+               </td>
+               <td tabindex="-1">
+                Bool
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-fsx_NfsDataRepositoryAuthenticationEnabled" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/FileCacheGuide/encryption-in-transit.html">
+                 fsx:NfsDataRepositoryAuthenticationEnabled
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by NFS data repositories which support authentication
+               </td>
+               <td tabindex="-1">
+                Bool
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-fsx_NfsDataRepositoryEncryptionInTransitEnabled" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/FileCacheGuide/encryption-in-transit.html">
+                 fsx:NfsDataRepositoryEncryptionInTransitEnabled
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by NFS data repositories which support encryption-in-transit
+               </td>
+               <td tabindex="-1">
+                Bool
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-fsx_ParentVolumeId" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/OpenZFSGuide/creating-volumes.html">
+                 fsx:ParentVolumeId
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the containing parent volume for mutating volume operations
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonfsx-fsx_StorageVirtualMachineId" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/fsx/latest/ONTAPGuide/creating-volumes.html">
+                 fsx:StorageVirtualMachineId
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the containing storage virtual machine for a volume for mutating volume operations
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <awsdocs-copyright class="copyright-print">
+           </awsdocs-copyright>
+           <awsdocs-thumb-feedback right-edge="{{$ctrl.thumbFeedbackRightEdge}}">
+           </awsdocs-thumb-feedback>
+          </div>
+          <noscript>
+           <div>
+            <div>
+             <div>
+              <div id="js_error_message">
+               <p>
+                <img alt="Warning" src="https://d1ge0kk1l5kms0.cloudfront.net/images/G/01/webservices/console/warning.png"/>
+                <strong>
+                 Javascript is disabled or is unavailable in your browser.
+                </strong>
+               </p>
+               <p>
+                To use the Amazon Web Services Documentation, Javascript must be enabled. Please refer to your browser's Help pages for instructions.
+               </p>
+              </div>
+             </div>
+            </div>
+           </div>
+          </noscript>
+          <div class="awsui-util-font-size-0" id="main-col-footer">
+           <div id="doc-conventions">
+            <a href="/general/latest/gr/docconventions.html" target="_top">
+             Document Conventions
+            </a>
+           </div>
+           <div class="prev-next">
+            <div accesskey="p" class="prev-link" href="./list_amazonfreertos.html" id="previous">
+             Amazon FreeRTOS
+            </div>
+            <div accesskey="n" class="next-link" href="./list_amazongamelift.html" id="next">
+             Amazon GameLift
+            </div>
+           </div>
+          </div>
+          <awsdocs-page-utilities>
+          </awsdocs-page-utilities>
+         </div>
+         <div id="quick-feedback-yes" style="display: none;">
+          <div class="title">
+           Did this page help you? - Yes
+          </div>
+          <div class="content">
+           <p>
+            Thanks for letting us know we're doing a good job!
+           </p>
+           <p>
+            If you've got a moment, please tell us what we did right so we can do more of it.
+           </p>
+           <p>
+            <awsui-button click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service Authorization Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazonfsx.html" id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback">
+            </awsui-button>
+           </p>
+          </div>
+         </div>
+         <div id="quick-feedback-no" style="display: none;">
+          <div class="title">
+           Did this page help you? - No
+          </div>
+          <div class="content">
+           <p>
+            Thanks for letting us know this page needs work. We're sorry we let you down.
+           </p>
+           <p>
+            If you've got a moment, please tell us how we can make the documentation better.
+           </p>
+           <p>
+            <awsui-button click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service Authorization Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazonfsx.html" id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback">
+            </awsui-button>
+           </p>
+          </div>
+         </div>
+        </div>
+       </body>
+      </div>
+     </awsdocs-view>
+     <div class="page-loading-indicator" id="page-loading-indicator">
+      <awsui-spinner size="large">
+      </awsui-spinner>
+     </div>
+    </div>
+    <div dom-region="tools" id="tools-panel">
+     <awsdocs-tools-panel id="awsdocs-tools-panel">
+     </awsdocs-tools-panel>
+    </div>
+   </awsui-app-layout>
+   <awsdocs-cookie-banner class="doc-cookie-banner">
+   </awsdocs-cookie-banner>
+  </div>
+ </body>
+</html>

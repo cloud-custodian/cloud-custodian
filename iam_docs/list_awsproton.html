@@ -1,0 +1,4708 @@
+<!DOCTYPE html>
+<html lang="en-US" xmlns="http://www.w3.org/1999/xhtml">
+ <head>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+  <title>
+   Actions, resources, and condition keys for AWS Proton - Service Authorization Reference
+  </title>
+  <meta content="width=device-width,initial-scale=1" name="viewport"/>
+  <meta content="/assets" name="assets_root"/>
+  <meta content="list_awsproton" name="target_state"/>
+  <meta content="list_awsproton" name="default_state"/>
+  <link href="https://docs.aws.amazon.com/assets/images/favicon.ico" rel="icon" type="image/ico"/>
+  <link href="https://docs.aws.amazon.com/assets/images/favicon.ico" rel="shortcut icon" type="image/ico"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsproton.html" rel="canonical"/>
+  <meta content="Lists all of the available service-specific resources, actions, and condition keys that can be used in IAM policies to control access to AWS Proton." name="description"/>
+  <meta content="IAD" name="deployment_region"/>
+  <meta content="Service Authorization Reference" name="product"/>
+  <meta content="Service Authorization Reference" name="guide"/>
+  <meta content="Provides a list of the actions, resources, and condition keys supported by each AWS service that can be used in an IAM policy." name="abstract"/>
+  <meta content="en_us" name="guide-locale"/>
+  <meta content="toc-contents.json" name="tocs"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsproton.html" rel="canonical"/>
+  <link href="https://docs.aws.amazon.com/id_id/service-authorization/latest/reference/list_awsproton.html" hreflang="id-id" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/id_id/service-authorization/latest/reference/list_awsproton.html" hreflang="id" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/de_de/service-authorization/latest/reference/list_awsproton.html" hreflang="de-de" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/de_de/service-authorization/latest/reference/list_awsproton.html" hreflang="de" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsproton.html" hreflang="en-us" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsproton.html" hreflang="en" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/es_es/service-authorization/latest/reference/list_awsproton.html" hreflang="es-es" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/es_es/service-authorization/latest/reference/list_awsproton.html" hreflang="es" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/fr_fr/service-authorization/latest/reference/list_awsproton.html" hreflang="fr-fr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/fr_fr/service-authorization/latest/reference/list_awsproton.html" hreflang="fr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/it_it/service-authorization/latest/reference/list_awsproton.html" hreflang="it-it" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/it_it/service-authorization/latest/reference/list_awsproton.html" hreflang="it" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ja_jp/service-authorization/latest/reference/list_awsproton.html" hreflang="ja-jp" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ja_jp/service-authorization/latest/reference/list_awsproton.html" hreflang="ja" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ko_kr/service-authorization/latest/reference/list_awsproton.html" hreflang="ko-kr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ko_kr/service-authorization/latest/reference/list_awsproton.html" hreflang="ko" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/pt_br/service-authorization/latest/reference/list_awsproton.html" hreflang="pt-br" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/pt_br/service-authorization/latest/reference/list_awsproton.html" hreflang="pt" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/zh_cn/service-authorization/latest/reference/list_awsproton.html" hreflang="zh-cn" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/zh_tw/service-authorization/latest/reference/list_awsproton.html" hreflang="zh-tw" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsproton.html" hreflang="x-default" rel="alternative"/>
+  <meta content="Service Authorization Docs" name="feedback-item"/>
+  <meta content="Service Authorization Reference" name="this_doc_product"/>
+  <meta content="Service Authorization Reference" name="this_doc_guide"/>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor4.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor3.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor1.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/awsdocs-common.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/awsdocs-doc-page.js?version=2021.12.02">
+  </script>
+  <link href="https://docs.aws.amazon.com/assets/r/vendor4.css?version=2021.12.02" rel="stylesheet"/>
+  <link href="https://docs.aws.amazon.com/assets/r/awsdocs-common.css?version=2021.12.02" rel="stylesheet"/>
+  <link href="https://docs.aws.amazon.com/assets/r/awsdocs-doc-page.css?version=2021.12.02" rel="stylesheet"/>
+  <script async="" data-config="{'appEntity':'aws-documentation','region':'us-east-1','service':'iam'}" id="awsc-panorama-bundle" src="https://prod.pa.cdn.uis.awsstatic.com/panorama-nav-init.js" type="text/javascript">
+  </script>
+  <meta id="panorama-serviceSubSection" value="Service Authorization Reference"/>
+  <meta id="panorama-serviceConsolePage" value="Actions, resources, and condition keys for AWS Proton"/>
+ </head>
+ <body class="awsdocs awsui">
+  <div class="awsdocs-container">
+   <awsdocs-header>
+   </awsdocs-header>
+   <awsui-app-layout class="awsui-util-no-gutters" header-selector="awsdocs-header" id="app-layout" navigation-change="$ctrl.onNavChange($event)" navigation-hide="false" navigation-open="$ctrl.navOpen" navigation-width="$ctrl.navWidth" ng-controller="ContentController as $ctrl" tools-change="$ctrl.onToolsChange($event)" tools-hide="$ctrl.hideTools" tools-open="$ctrl.toolsOpen" tools-width="$ctrl.toolsWidth">
+    <div dom-region="navigation" id="guide-toc">
+     <awsdocs-toc>
+     </awsdocs-toc>
+    </div>
+    <div dom-region="content" id="main-column" tabindex="-1">
+     <awsdocs-view class="awsdocs-view">
+      <div id="awsdocs-content">
+       <head>
+        <title>
+         Actions, resources, and condition keys for AWS Proton - Service Authorization Reference
+        </title>
+        <meta content="/pdfs/service-authorization/latest/reference/service-authorization.pdf#list_awsproton" name="pdf"/>
+        <meta content="https://repost.aws/tags/TAO7Z4bI5hQVWMiYFs34QhIA" name="forums"/>
+        <meta content="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service%20Authorization%20Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awsproton.html" name="feedback"/>
+        <meta content="feedbackyes.html?topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awsproton.html" name="feedback-yes"/>
+        <meta content="feedbackno.html?topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awsproton.html" name="feedback-no"/>
+        <script type="application/ld+json">
+         {
+    "@context" : "https://schema.org",
+    "@type" : "BreadcrumbList",
+    "itemListElement" : [
+      {
+        "@type" : "ListItem",
+        "position" : 1,
+        "name" : "AWS",
+        "item" : "https://aws.amazon.com"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 2,
+        "name" : "Service Authorization Reference",
+        "item" : "https://docs.aws.amazon.com/iam/index.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 3,
+        "name" : "Service Authorization Reference",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 4,
+        "name" : "Reference",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 5,
+        "name" : "Actions, resources, and condition keys for AWS services",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference_policies_actions-resources-contextkeys.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 6,
+        "name" : "Actions, resources, and condition keys for AWS Proton",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference_policies_actions-resources-contextkeys.html"
+      }
+    ]
+}
+        </script>
+       </head>
+       <body>
+        <div id="main">
+         <div style="display: none">
+          <a href="/pdfs/service-authorization/latest/reference/service-authorization.pdf#list_awsproton" rel="noopener noreferrer" target="_blank" title="Open PDF">
+          </a>
+         </div>
+         <div class="breadcrumb" id="breadcrumbs">
+          <a href="https://aws.amazon.com">
+           AWS
+          </a>
+          <a href="/index.html">
+           Documentation
+          </a>
+          <a href="/iam/index.html">
+           Service Authorization Reference
+          </a>
+          <a href="reference.html">
+           Service Authorization Reference
+          </a>
+         </div>
+         <div id="page-toc-src">
+          <a href="#awsproton-actions-as-permissions">
+           Actions
+          </a>
+          <a href="#awsproton-resources-for-iam-policies">
+           Resource types
+          </a>
+          <a href="#awsproton-policy-keys">
+           Condition keys
+          </a>
+         </div>
+         <div class="awsui-util-container" id="main-content">
+          <div id="main-col-body">
+           <awsdocs-language-banner data-service="$ctrl.pageService">
+           </awsdocs-language-banner>
+           <h1 class="topictitle" id="list_awsproton">
+            Actions, resources, and condition keys for      AWS Proton
+           </h1>
+           <div class="awsdocs-page-header-container">
+            <awsdocs-page-header>
+            </awsdocs-page-header>
+            <awsdocs-filter-selector id="awsdocs-filter-selector">
+            </awsdocs-filter-selector>
+           </div>
+           <p>
+            AWS Proton (service prefix:
+            <code class="code">
+             proton
+            </code>
+            ) provides the following    service-specific resources, actions, and condition context keys for use in IAM permission    policies.
+           </p>
+           <p>
+            References:
+           </p>
+           <div class="itemizedlist">
+            <ul class="itemizedlist">
+             <li class="listitem">
+              <p>
+               Learn how to
+               <a href="https://docs.aws.amazon.com/proton/latest/adminguide/">
+                configure this service
+               </a>
+               .
+              </p>
+             </li>
+             <li class="listitem">
+              <p>
+               View a list of the
+               <a href="https://docs.aws.amazon.com/proton/latest/APIReference/">
+                API operations available for this          service
+               </a>
+               .
+              </p>
+             </li>
+             <li class="listitem">
+              <p>
+               Learn how to secure this service and its resources by
+               <a href="https://docs.aws.amazon.com/proton/latest/adminguide/ag-controlling-access.html">
+                using          IAM
+               </a>
+               permission policies.
+              </p>
+             </li>
+            </ul>
+           </div>
+           <div class="highlights" id="inline-topiclist">
+            <h6>
+             Topics
+            </h6>
+            <ul>
+             <li>
+              <a href="#awsproton-actions-as-permissions">
+               Actions defined by        AWS Proton
+              </a>
+             </li>
+             <li>
+              <a href="#awsproton-resources-for-iam-policies">
+               Resource types defined by        AWS Proton
+              </a>
+             </li>
+             <li>
+              <a href="#awsproton-policy-keys">
+               Condition keys for        AWS Proton
+              </a>
+             </li>
+            </ul>
+           </div>
+           <h2 id="awsproton-actions-as-permissions">
+            Actions defined by        AWS Proton
+           </h2>
+           <p>
+            You can specify the following actions in the
+            <code class="code">
+             Action
+            </code>
+            element of an IAM      policy statement. Use policies to grant permissions to perform an operation in AWS. When you      use an action in a policy, you usually allow or deny access to the API operation or CLI      command with the same name. However, in some cases, a single action controls access to more      than one operation. Alternatively, some operations require several different actions.
+           </p>
+           <p>
+            The
+            <b>
+             Resource types
+            </b>
+            column of the Actions table indicates whether each      action supports resource-level permissions. If there is no value for this column, you must      specify all resources ("*") to which the policy applies in the
+            <code class="code">
+             Resource
+            </code>
+            element      of your policy statement. If the column includes a resource type, then you can specify an ARN      of that type in a statement with that action. If the action has one or more required      resources, the caller must have permission to use the action with those resources. Required      resources are indicated in the table with an asterisk (*). If you limit resource access with      the
+            <code class="code">
+             Resource
+            </code>
+            element in an IAM policy, you must include an ARN or pattern for      each required resource type. Some actions support multiple resource types. If the resource      type is optional (not indicated as required), then you can choose to use one of the optional      resource types.
+           </p>
+           <p>
+            The
+            <b>
+             Condition keys
+            </b>
+            column of the Actions table includes keys that you      can specify in a policy statement's
+            <code class="code">
+             Condition
+            </code>
+            element. For more information on      the condition keys that are associated with resources for the service, see the
+            <b>
+             Condition keys
+            </b>
+            column of the Resource types table.
+           </p>
+           <div class="awsdocs-note">
+            <div class="awsdocs-note-title">
+             <awsui-icon name="status-info" variant="link">
+             </awsui-icon>
+             <h6>
+              Note
+             </h6>
+            </div>
+            <div class="awsdocs-note-text">
+             <p>
+              Resource condition keys are listed in the
+              <a href="#awsproton-resources-for-iam-policies">
+               Resource types
+              </a>
+              table. You        can find a link to the resource type that applies to an action in the
+              <b>
+               Resource          types (*required)
+              </b>
+              column of the Actions table. The resource type in the        Resource types table includes the
+              <b>
+               Condition keys
+              </b>
+              column, which are the        resource condition keys that apply to an action in the Actions table.
+             </p>
+            </div>
+           </div>
+           <p>
+            For details about the columns in the following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#actions_table" rel="noopener noreferrer" target="_blank">
+             Actions table
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9e1253c11c13">
+              <thead>
+               <tr>
+                <th>
+                 Actions
+                </th>
+                <th>
+                 Description
+                </th>
+                <th>
+                 Access level
+                </th>
+                <th>
+                 Resource types (*required)
+                </th>
+                <th>
+                 Condition keys
+                </th>
+                <th>
+                 Dependent actions
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="awsproton-AcceptEnvironmentAccountConnection" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_AcceptEnvironmentAccountConnection.html">
+                 AcceptEnvironmentAccountConnection
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to reject an environment account connection request from another environment account
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-environment-account-connection">
+                  environment-account-connection*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-CancelComponentDeployment" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_CancelComponentDeployment.html">
+                 CancelComponentDeployment
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to cancel component deployment
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-component">
+                  component*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-CancelEnvironmentDeployment" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_CancelEnvironmentDeployment.html">
+                 CancelEnvironmentDeployment
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to cancel an environment deployment
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-environment">
+                  environment*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-proton_EnvironmentTemplate">
+                  proton:EnvironmentTemplate
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-CancelServiceInstanceDeployment" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_CancelServiceInstanceDeployment.html">
+                 CancelServiceInstanceDeployment
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to cancel a service instance deployment
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-service-instance">
+                  service-instance*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-proton_ServiceTemplate">
+                  proton:ServiceTemplate
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-CancelServicePipelineDeployment" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_CancelServicePipelineDeployment.html">
+                 CancelServicePipelineDeployment
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to cancel a service pipeline deployment
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-service">
+                  service*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-proton_ServiceTemplate">
+                  proton:ServiceTemplate
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-CreateComponent" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_CreateComponent.html">
+                 CreateComponent
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to create component
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-component">
+                  component*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsproton-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-CreateEnvironment" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_CreateEnvironment.html">
+                 CreateEnvironment
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to create an environment
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-environment">
+                  environment*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 iam:PassRole
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsproton-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsproton-proton_EnvironmentTemplate">
+                  proton:EnvironmentTemplate
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-CreateEnvironmentAccountConnection" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_CreateEnvironmentAccountConnection.html">
+                 CreateEnvironmentAccountConnection
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create an environment account connection
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsproton-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-CreateEnvironmentTemplate" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_CreateEnvironmentTemplate.html">
+                 CreateEnvironmentTemplate
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to create an environment template
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-environment-template">
+                  environment-template*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsproton-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-CreateEnvironmentTemplateMajorVersion" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_CreateEnvironmentTemplateMajorVersion.html">
+                 CreateEnvironmentTemplateMajorVersion
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to create an environment template major version.  DEPRECATED - use CreateEnvironmentTemplateVersion instead
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-environment-template">
+                  environment-template*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsproton-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-CreateEnvironmentTemplateMinorVersion" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_CreateEnvironmentTemplateMinorVersion.html">
+                 CreateEnvironmentTemplateMinorVersion
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to create an environment template minor version.  DEPRECATED - use CreateEnvironmentTemplateVersion instead
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-environment-template">
+                  environment-template*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsproton-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-CreateEnvironmentTemplateVersion" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_CreateEnvironmentTemplateVersion.html">
+                 CreateEnvironmentTemplateVersion
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to create an environment template version
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-environment-template">
+                  environment-template*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsproton-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-CreateRepository" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_CreateRepository.html">
+                 CreateRepository
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to create a repository
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsproton-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-CreateService" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_CreateService.html">
+                 CreateService
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to create a service
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-service">
+                  service*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 codestar-connections:PassConnection
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsproton-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsproton-proton_ServiceTemplate">
+                  proton:ServiceTemplate
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-CreateServiceInstance" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_CreateServiceInstance.html">
+                 CreateServiceInstance
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to create a service instance
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-service-instance">
+                  service-instance*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsproton-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsproton-proton_ServiceTemplate">
+                  proton:ServiceTemplate
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-CreateServiceSyncConfig" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_CreateServiceSyncConfig.html">
+                 CreateServiceSyncConfig
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a service sync config
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-CreateServiceTemplate" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_CreateServiceTemplate.html">
+                 CreateServiceTemplate
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to create a service template
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-service-template">
+                  service-template*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsproton-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-CreateServiceTemplateMajorVersion" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_CreateServiceTemplateMajorVersion.html">
+                 CreateServiceTemplateMajorVersion
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to create a service template major version.  DEPRECATED - use CreateServiceTemplateVersion instead
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-service-template">
+                  service-template*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsproton-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-CreateServiceTemplateMinorVersion" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_CreateServiceTemplateMinorVersion.html">
+                 CreateServiceTemplateMinorVersion
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to create a service template minor version.  DEPRECATED - use CreateServiceTemplateVersion instead
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-service-template">
+                  service-template*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsproton-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-CreateServiceTemplateVersion" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_CreateServiceTemplateVersion.html">
+                 CreateServiceTemplateVersion
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to create a service template version
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-service-template">
+                  service-template*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsproton-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-CreateTemplateSyncConfig" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_CreateTemplateSyncConfig.html">
+                 CreateTemplateSyncConfig
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a template sync config
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-DeleteAccountRoles" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_DeleteAccountRoles.html">
+                 DeleteAccountRoles
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete account roles.  DEPRECATED - use UpdateAccountSettings instead
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-DeleteComponent" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_DeleteComponent.html">
+                 DeleteComponent
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete component
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-component">
+                  component*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-DeleteDeployment" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_DeleteDeployment.html">
+                 DeleteDeployment
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a deployment
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-deployment">
+                  deployment*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-DeleteEnvironment" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_DeleteEnvironment.html">
+                 DeleteEnvironment
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to delete an environment
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-environment">
+                  environment*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-proton_EnvironmentTemplate">
+                  proton:EnvironmentTemplate
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-DeleteEnvironmentAccountConnection" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_DeleteEnvironmentAccountConnection.html">
+                 DeleteEnvironmentAccountConnection
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete an environment account connection
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-environment-account-connection">
+                  environment-account-connection*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-DeleteEnvironmentTemplate" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_DeleteEnvironmentTemplate.html">
+                 DeleteEnvironmentTemplate
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete an environment template
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-environment-template">
+                  environment-template*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-DeleteEnvironmentTemplateMajorVersion" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_DeleteEnvironmentTemplateMajorVersion.html">
+                 DeleteEnvironmentTemplateMajorVersion
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete an environment template major version.  DEPRECATED - use DeleteEnvironmentTemplateVersion instead
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-environment-template">
+                  environment-template*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-DeleteEnvironmentTemplateMinorVersion" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_DeleteEnvironmentTemplateMinorVersion.html">
+                 DeleteEnvironmentTemplateMinorVersion
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete an environment template minor version.  DEPRECATED - use DeleteEnvironmentTemplateVersion instead
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-environment-template">
+                  environment-template*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-DeleteEnvironmentTemplateVersion" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_DeleteEnvironmentTemplateVersion.html">
+                 DeleteEnvironmentTemplateVersion
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete an environment template version
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-environment-template">
+                  environment-template*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-DeleteRepository" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_DeleteRepository.html">
+                 DeleteRepository
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a repository
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-DeleteService" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_DeleteService.html">
+                 DeleteService
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to delete a service
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-service">
+                  service*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-proton_ServiceTemplate">
+                  proton:ServiceTemplate
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-DeleteServiceSyncConfig" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_DeleteServiceSyncConfig.html">
+                 DeleteServiceSyncConfig
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a service sync config
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-DeleteServiceTemplate" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_DeleteServiceTemplate.html">
+                 DeleteServiceTemplate
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a service template
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-service-template">
+                  service-template*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-DeleteServiceTemplateMajorVersion" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_DeleteServiceTemplateMajorVersion.html">
+                 DeleteServiceTemplateMajorVersion
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a service template major version.  DEPRECATED - use DeleteServiceTemplateVersion instead
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-service-template">
+                  service-template*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-DeleteServiceTemplateMinorVersion" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_DeleteServiceTemplateMinorVersion.html">
+                 DeleteServiceTemplateMinorVersion
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a service template minor version.  DEPRECATED - use DeleteServiceTemplateVersion instead
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-service-template">
+                  service-template*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-DeleteServiceTemplateVersion" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_DeleteServiceTemplateVersion.html">
+                 DeleteServiceTemplateVersion
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a service template version
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-service-template">
+                  service-template*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-DeleteTemplateSyncConfig" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_DeleteTemplateSyncConfig.html">
+                 DeleteTemplateSyncConfig
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a TemplateSyncConfig
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-GetAccountRoles" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_GetAccountRoles.html">
+                 GetAccountRoles
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get account roles.  DEPRECATED - use GetAccountSettings instead
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-GetAccountSettings" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_GetAccountSettings.html">
+                 GetAccountSettings
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to describe the account settings
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-GetComponent" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_GetComponent.html">
+                 GetComponent
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to describe a component
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-component">
+                  component*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-GetDeployment" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_GetDeployment.html">
+                 GetDeployment
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to describe a deployment
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-deployment">
+                  deployment*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-GetEnvironment" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_GetEnvironment.html">
+                 GetEnvironment
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to describe an environment
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-environment">
+                  environment*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-GetEnvironmentAccountConnection" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_GetEnvironmentAccountConnection.html">
+                 GetEnvironmentAccountConnection
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to describe an environment account connection
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-environment-account-connection">
+                  environment-account-connection*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-GetEnvironmentTemplate" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_GetEnvironmentTemplate.html">
+                 GetEnvironmentTemplate
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to describe an environment template
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-environment-template">
+                  environment-template*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-GetEnvironmentTemplateMajorVersion" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_GetEnvironmentTemplateMajorVersion.html">
+                 GetEnvironmentTemplateMajorVersion
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get an environment template major version.  DEPRECATED - use GetEnvironmentTemplateVersion instead
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-environment-template">
+                  environment-template*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-GetEnvironmentTemplateMinorVersion" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_GetEnvironmentTemplateMinorVersion.html">
+                 GetEnvironmentTemplateMinorVersion
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get an environment template minor version.  DEPRECATED - use GetEnvironmentTemplateVersion instead
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-environment-template">
+                  environment-template*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-GetEnvironmentTemplateVersion" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_GetEnvironmentTemplateVersion.html">
+                 GetEnvironmentTemplateVersion
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to describe an environment template version
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-environment-template">
+                  environment-template*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-GetRepository" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_GetRepository.html">
+                 GetRepository
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to describe a repository
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-repository">
+                  repository*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-GetRepositorySyncStatus" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_GetRepositorySyncStatus.html">
+                 GetRepositorySyncStatus
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get the latest sync status for a repository
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-GetResourceTemplateVersionStatusCounts" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_GetResourceTemplateVersionStatusCounts.html">
+                 GetResourceTemplateVersionStatusCounts
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list resource template version status counts
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-GetResourcesSummary" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_GetResourcesSummary.html">
+                 GetResourcesSummary
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get resources summary
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-GetService" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_GetService.html">
+                 GetService
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to describe a service
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-service">
+                  service*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-GetServiceInstance" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_GetServiceInstance.html">
+                 GetServiceInstance
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to describe a service instance
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-service-instance">
+                  service-instance*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-GetServiceInstanceSyncStatus" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_GetServiceInstanceSyncStatus.html">
+                 GetServiceInstanceSyncStatus
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to describe the sync status of a service instance
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-GetServiceSyncBlockerSummary" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_GetServiceSyncBlockerSummary.html">
+                 GetServiceSyncBlockerSummary
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to describe service sync blockers on a service or service instance
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-GetServiceSyncConfig" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_GetServiceSyncConfig.html">
+                 GetServiceSyncConfig
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to describe a service sync config
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-GetServiceTemplate" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_GetServiceTemplate.html">
+                 GetServiceTemplate
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to describe a service template
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-service-template">
+                  service-template*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-GetServiceTemplateMajorVersion" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_GetServiceTemplateMajorVersion.html">
+                 GetServiceTemplateMajorVersion
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get a service template major version.  DEPRECATED - use GetServiceTemplateVersion instead
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-service-template">
+                  service-template*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-GetServiceTemplateMinorVersion" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_GetServiceTemplateMinorVersion.html">
+                 GetServiceTemplateMinorVersion
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get a service template minor version.  DEPRECATED - use GetServiceTemplateVersion instead
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-service-template">
+                  service-template*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-GetServiceTemplateVersion" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_GetServiceTemplateVersion.html">
+                 GetServiceTemplateVersion
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to describe a service template version
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-service-template">
+                  service-template*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-GetTemplateSyncConfig" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_GetTemplateSyncConfig.html">
+                 GetTemplateSyncConfig
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to describe a TemplateSyncConfig
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-GetTemplateSyncStatus" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_GetTemplateSyncStatus.html">
+                 GetTemplateSyncStatus
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to describe the sync status of a template
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-ListComponentOutputs" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_ListComponentOutputs.html">
+                 ListComponentOutputs
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to list component outputs
+               </td>
+               <td rowspan="2" tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-component">
+                  component*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-deployment">
+                  deployment
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-ListComponentProvisionedResources" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_ListComponentProvisionedResources.html">
+                 ListComponentProvisionedResources
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list component provisioned resources
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-component">
+                  component*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-ListComponents" rowspan="3" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_ListComponents.html">
+                 ListComponents
+                </a>
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Grants permission to list components
+               </td>
+               <td rowspan="3" tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-environment">
+                  environment
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-service">
+                  service
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-service-instance">
+                  service-instance
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-ListDeployments" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_ListDeployments.html">
+                 ListDeployments
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list deployments
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-ListEnvironmentAccountConnections" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_ListEnvironmentAccountConnections.html">
+                 ListEnvironmentAccountConnections
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list environment account connections
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-ListEnvironmentOutputs" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_ListEnvironmentOutputs.html">
+                 ListEnvironmentOutputs
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to list environment outputs
+               </td>
+               <td rowspan="2" tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-environment">
+                  environment*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-deployment">
+                  deployment
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-ListEnvironmentProvisionedResources" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_ListEnvironmentProvisionedResources.html">
+                 ListEnvironmentProvisionedResources
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list environment provisioned resources
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-environment">
+                  environment*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-ListEnvironmentTemplateMajorVersions" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_ListEnvironmentTemplateMajorVersions.html">
+                 ListEnvironmentTemplateMajorVersions
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list environment template major versions.  DEPRECATED - use ListEnvironmentTemplateVersions instead
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-environment-template">
+                  environment-template*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-ListEnvironmentTemplateMinorVersions" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_ListEnvironmentTemplateMinorVersions.html">
+                 ListEnvironmentTemplateMinorVersions
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list an environment template minor versions.  DEPRECATED - use ListEnvironmentTemplateVersions instead
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-environment-template">
+                  environment-template*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-ListEnvironmentTemplateVersions" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_ListEnvironmentTemplateVersions.html">
+                 ListEnvironmentTemplateVersions
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list environment template versions
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-environment-template">
+                  environment-template*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-ListEnvironmentTemplates" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_ListEnvironmentTemplates.html">
+                 ListEnvironmentTemplates
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list environment templates
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-ListEnvironments" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_ListEnvironments.html">
+                 ListEnvironments
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list environments
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-ListRepositories" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_ListRepositories.html">
+                 ListRepositories
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list repositories
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-ListRepositorySyncDefinitions" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_ListRepositorySyncDefinitions.html">
+                 ListRepositorySyncDefinitions
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list repository sync definitions
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-ListServiceInstanceOutputs" rowspan="3" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_ListServiceInstanceOutputs.html">
+                 ListServiceInstanceOutputs
+                </a>
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Grants permission to list service instance outputs
+               </td>
+               <td rowspan="3" tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-service">
+                  service*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-service-instance">
+                  service-instance*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-deployment">
+                  deployment
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-ListServiceInstanceProvisionedResources" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_ListServiceInstanceProvisionedResources.html">
+                 ListServiceInstanceProvisionedResources
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to list service instance provisioned resources
+               </td>
+               <td rowspan="2" tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-service">
+                  service*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-service-instance">
+                  service-instance*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-ListServiceInstances" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_ListServiceInstances.html">
+                 ListServiceInstances
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list service instances
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-ListServicePipelineOutputs" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_ListServicePipelineOutputs.html">
+                 ListServicePipelineOutputs
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to list service pipeline outputs
+               </td>
+               <td rowspan="2" tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-service">
+                  service*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-deployment">
+                  deployment
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-ListServicePipelineProvisionedResources" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_ListServicePipelineProvisionedResources.html">
+                 ListServicePipelineProvisionedResources
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list service pipeline provisioned resources
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-service">
+                  service*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-ListServiceTemplateMajorVersions" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_ListServiceTemplateMajorVersions.html">
+                 ListServiceTemplateMajorVersions
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list service template major versions.  DEPRECATED - use ListServiceTemplateVersions instead
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-service-template">
+                  service-template*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-ListServiceTemplateMinorVersions" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_ListServiceTemplateMinorVersions.html">
+                 ListServiceTemplateMinorVersions
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list service template minor versions.  DEPRECATED - use ListServiceTemplateVersions instead
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-service-template">
+                  service-template*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-ListServiceTemplateVersions" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_ListServiceTemplateVersions.html">
+                 ListServiceTemplateVersions
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list service template versions
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-service-template">
+                  service-template*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-ListServiceTemplates" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_ListServiceTemplates.html">
+                 ListServiceTemplates
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list service templates
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-ListServices" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_ListServices.html">
+                 ListServices
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list services
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-ListTagsForResource" rowspan="14" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_ListTagsForResource.html">
+                 ListTagsForResource
+                </a>
+               </td>
+               <td rowspan="14" tabindex="-1">
+                Grants permission to list tags of a resource
+               </td>
+               <td rowspan="14" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-component">
+                  component
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-environment">
+                  environment
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-environment-account-connection">
+                  environment-account-connection
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-environment-template">
+                  environment-template
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-environment-template-major-version">
+                  environment-template-major-version
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-environment-template-minor-version">
+                  environment-template-minor-version
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-environment-template-version">
+                  environment-template-version
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-repository">
+                  repository
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-service">
+                  service
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-service-instance">
+                  service-instance
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-service-template">
+                  service-template
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-service-template-major-version">
+                  service-template-major-version
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-service-template-minor-version">
+                  service-template-minor-version
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-service-template-version">
+                  service-template-version
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-NotifyResourceDeploymentStatusChange" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_NotifyResourceDeploymentStatusChange.html">
+                 NotifyResourceDeploymentStatusChange
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to notify Proton of resource deployment status changes
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-environment">
+                  environment
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-service-instance">
+                  service-instance
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-RejectEnvironmentAccountConnection" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_RejectEnvironmentAccountConnection.html">
+                 RejectEnvironmentAccountConnection
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to reject an environment account connection request from another environment account
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-environment-account-connection">
+                  environment-account-connection*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-TagResource" rowspan="15" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_TagResource.html">
+                 TagResource
+                </a>
+               </td>
+               <td rowspan="15" tabindex="-1">
+                Grants permission to add tags to a resource
+               </td>
+               <td rowspan="15" tabindex="-1">
+                Tagging
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-component">
+                  component
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-environment">
+                  environment
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-environment-account-connection">
+                  environment-account-connection
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-environment-template">
+                  environment-template
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-environment-template-major-version">
+                  environment-template-major-version
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-environment-template-minor-version">
+                  environment-template-minor-version
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-environment-template-version">
+                  environment-template-version
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-repository">
+                  repository
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-service">
+                  service
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-service-instance">
+                  service-instance
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-service-template">
+                  service-template
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-service-template-major-version">
+                  service-template-major-version
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-service-template-minor-version">
+                  service-template-minor-version
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-service-template-version">
+                  service-template-version
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsproton-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-UntagResource" rowspan="15" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_UntagResource.html">
+                 UntagResource
+                </a>
+               </td>
+               <td rowspan="15" tabindex="-1">
+                Grants permission to remove tags from a resource
+               </td>
+               <td rowspan="15" tabindex="-1">
+                Tagging
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-component">
+                  component
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-environment">
+                  environment
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-environment-account-connection">
+                  environment-account-connection
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-environment-template">
+                  environment-template
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-environment-template-major-version">
+                  environment-template-major-version
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-environment-template-minor-version">
+                  environment-template-minor-version
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-environment-template-version">
+                  environment-template-version
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-repository">
+                  repository
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-service">
+                  service
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-service-instance">
+                  service-instance
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-service-template">
+                  service-template
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-service-template-major-version">
+                  service-template-major-version
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-service-template-minor-version">
+                  service-template-minor-version
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-service-template-version">
+                  service-template-version
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-UpdateAccountRoles" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_UpdateAccountRoles.html">
+                 UpdateAccountRoles
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update account roles.  DEPRECATED - use UpdateAccountSettings instead
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 iam:PassRole
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-UpdateAccountSettings" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_UpdateAccountSettings.html">
+                 UpdateAccountSettings
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update the account settings
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 iam:PassRole
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-UpdateComponent" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_UpdateComponent.html">
+                 UpdateComponent
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update component
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-component">
+                  component*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-UpdateEnvironment" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_UpdateEnvironment.html">
+                 UpdateEnvironment
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to update an environment
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-environment">
+                  environment*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 iam:PassRole
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-proton_EnvironmentTemplate">
+                  proton:EnvironmentTemplate
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-UpdateEnvironmentAccountConnection" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_UpdateEnvironmentAccountConnection.html">
+                 UpdateEnvironmentAccountConnection
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update an environment account connection
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-environment-account-connection">
+                  environment-account-connection*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-UpdateEnvironmentTemplate" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_UpdateEnvironmentTemplate.html">
+                 UpdateEnvironmentTemplate
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update an environment template
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-environment-template">
+                  environment-template*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-UpdateEnvironmentTemplateMajorVersion" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_UpdateEnvironmentTemplateMajorVersion.html">
+                 UpdateEnvironmentTemplateMajorVersion
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update an environment template major version.  DEPRECATED - use UpdateEnvironmentTemplateVersion instead
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-environment-template">
+                  environment-template*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-UpdateEnvironmentTemplateMinorVersion" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_UpdateEnvironmentTemplateMinorVersion.html">
+                 UpdateEnvironmentTemplateMinorVersion
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update an environment template minor version.  DEPRECATED - use UpdateEnvironmentTemplateVersion instead
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-environment-template">
+                  environment-template*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-UpdateEnvironmentTemplateVersion" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_UpdateEnvironmentTemplateVersion.html">
+                 UpdateEnvironmentTemplateVersion
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update an environment template version
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-environment-template">
+                  environment-template*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-UpdateService" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_UpdateService.html">
+                 UpdateService
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to update a service
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-service">
+                  service*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-proton_ServiceTemplate">
+                  proton:ServiceTemplate
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-UpdateServiceInstance" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_UpdateServiceInstance.html">
+                 UpdateServiceInstance
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to update a service instance
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-service-instance">
+                  service-instance*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-proton_ServiceTemplate">
+                  proton:ServiceTemplate
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-UpdateServicePipeline" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_UpdateServicePipeline.html">
+                 UpdateServicePipeline
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to update a service pipeline
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-service">
+                  service*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-proton_ServiceTemplate">
+                  proton:ServiceTemplate
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-UpdateServiceSyncBlocker" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_UpdateServiceSyncBlocker.html">
+                 UpdateServiceSyncBlocker
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update a service sync blocker
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-UpdateServiceSyncConfig" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_UpdateServiceSyncConfig.html">
+                 UpdateServiceSyncConfig
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update a service sync config
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-UpdateServiceTemplate" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_UpdateServiceTemplate.html">
+                 UpdateServiceTemplate
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update a service template
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-service-template">
+                  service-template*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-UpdateServiceTemplateMajorVersion" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_UpdateServiceTemplateMajorVersion.html">
+                 UpdateServiceTemplateMajorVersion
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update a service template major version.  DEPRECATED - use UpdateServiceTemplateVersion instead
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-service-template">
+                  service-template*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-UpdateServiceTemplateMinorVersion" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_UpdateServiceTemplateMinorVersion.html">
+                 UpdateServiceTemplateMinorVersion
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a service template minor version.  DEPRECATED - use UpdateServiceTemplateVersion instead
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-service-template">
+                  service-template*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-UpdateServiceTemplateVersion" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_UpdateServiceTemplateVersion.html">
+                 UpdateServiceTemplateVersion
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update a service template version
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-service-template">
+                  service-template*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-UpdateTemplateSyncConfig" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/APIReference/API_UpdateTemplateSyncConfig.html">
+                 UpdateTemplateSyncConfig
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update a TemplateSyncConfig
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <h2 id="awsproton-resources-for-iam-policies">
+            Resource types defined by        AWS Proton
+           </h2>
+           <p>
+            The following resource types are defined by this service and can be used in the
+            <code class="code">
+             Resource
+            </code>
+            element of IAM permission policy statements. Each action in the
+            <a href="#awsproton-actions-as-permissions">
+             Actions table
+            </a>
+            identifies the      resource types that can be specified with that action. A resource type can also define which      condition keys you can include in a policy. These keys are displayed in the last column of the      Resource types table. For details about the columns in the following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#resources_table" rel="noopener noreferrer" target="_blank">
+             Resource types table
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9e1253c13b5">
+              <thead>
+               <tr>
+                <th>
+                 Resource types
+                </th>
+                <th>
+                 ARN
+                </th>
+                <th>
+                 Condition keys
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="awsproton-environment-template" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/adminguide/ag-env-templates.html">
+                 environment-template
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:proton:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:environment-template/$
+                 <span>
+                  {
+                 </span>
+                 Name}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-environment-template-version" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/adminguide/ag-env-templates.html">
+                 environment-template-version
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:proton:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:environment-template/$
+                 <span>
+                  {
+                 </span>
+                 TemplateName}:$
+                 <span>
+                  {
+                 </span>
+                 MajorVersion}.$
+                 <span>
+                  {
+                 </span>
+                 MinorVersion}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-environment-template-major-version" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/adminguide/ag-env-templates.html">
+                 environment-template-major-version
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:proton:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:environment-template/$
+                 <span>
+                  {
+                 </span>
+                 TemplateName}:$
+                 <span>
+                  {
+                 </span>
+                 MajorVersionId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-environment-template-minor-version" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/adminguide/ag-env-templates.html">
+                 environment-template-minor-version
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:proton:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:environment-template/$
+                 <span>
+                  {
+                 </span>
+                 TemplateName}:$
+                 <span>
+                  {
+                 </span>
+                 MajorVersionId}.$
+                 <span>
+                  {
+                 </span>
+                 MinorVersionId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-service-template" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/adminguide/managing-svc-templates.html">
+                 service-template
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:proton:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:service-template/$
+                 <span>
+                  {
+                 </span>
+                 Name}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-service-template-version" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/adminguide/managing-svc-templates.html">
+                 service-template-version
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:proton:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:service-template/$
+                 <span>
+                  {
+                 </span>
+                 TemplateName}:$
+                 <span>
+                  {
+                 </span>
+                 MajorVersion}.$
+                 <span>
+                  {
+                 </span>
+                 MinorVersion}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-service-template-major-version" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/adminguide/managing-svc-templates.html">
+                 service-template-major-version
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:proton:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:service-template/$
+                 <span>
+                  {
+                 </span>
+                 TemplateName}:$
+                 <span>
+                  {
+                 </span>
+                 MajorVersionId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-service-template-minor-version" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/adminguide/managing-svc-templates.html">
+                 service-template-minor-version
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:proton:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:service-template/$
+                 <span>
+                  {
+                 </span>
+                 TemplateName}:$
+                 <span>
+                  {
+                 </span>
+                 MajorVersionId}.$
+                 <span>
+                  {
+                 </span>
+                 MinorVersionId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-environment" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/adminguide/ag-environments.html">
+                 environment
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:proton:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:environment/$
+                 <span>
+                  {
+                 </span>
+                 Name}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-service" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/adminguide/ag-services.html">
+                 service
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:proton:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:service/$
+                 <span>
+                  {
+                 </span>
+                 Name}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-service-instance" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/adminguide/ag-services.html">
+                 service-instance
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:proton:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:service/$
+                 <span>
+                  {
+                 </span>
+                 ServiceName}/service-instance/$
+                 <span>
+                  {
+                 </span>
+                 Name}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-environment-account-connection" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/adminguide/ag-env-account-connections.html">
+                 environment-account-connection
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:proton:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:environment-account-connection/$
+                 <span>
+                  {
+                 </span>
+                 Id}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-repository" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/adminguide/ag-repositories.html">
+                 repository
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:proton:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:repository/$
+                 <span>
+                  {
+                 </span>
+                 Provider}:$
+                 <span>
+                  {
+                 </span>
+                 Name}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-component" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/adminguide/ag-components.html">
+                 component
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:proton:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:component/$
+                 <span>
+                  {
+                 </span>
+                 Id}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-deployment" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/proton/latest/adminguide/ag-deployments.html">
+                 deployment
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:proton:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:deployment/$
+                 <span>
+                  {
+                 </span>
+                 Id}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsproton-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <h2 id="awsproton-policy-keys">
+            Condition keys for        AWS Proton
+           </h2>
+           <p>
+            AWS Proton defines the following condition keys that can be used in the
+            <code class="code">
+             Condition
+            </code>
+            element of an IAM policy. You can use these keys to further refine      the conditions under which the policy statement applies. For details about the columns in the      following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#context_keys_table" rel="noopener noreferrer" target="_blank">
+             Condition keys table
+            </a>
+            .
+           </p>
+           <p>
+            To view the global condition keys that are available to all services, see
+            <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#AvailableKeys">
+             Available global condition keys
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9e1253c15b7">
+              <thead>
+               <tr>
+                <th>
+                 Condition keys
+                </th>
+                <th>
+                 Description
+                </th>
+                <th>
+                 Type
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="awsproton-aws_RequestTag___TagKey_" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-requesttag">
+                 aws:RequestTag/${TagKey}
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by tag key-value pairs in the request
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-aws_ResourceTag___TagKey_" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-resourcetag">
+                 aws:ResourceTag/${TagKey}
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by tag key-value pairs attached to the resource
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-aws_TagKeys" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-tagkeys">
+                 aws:TagKeys
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by tag keys in the request
+               </td>
+               <td tabindex="-1">
+                ArrayOfString
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-proton_EnvironmentTemplate" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html">
+                 proton:EnvironmentTemplate
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by specified environment template related to resource
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awsproton-proton_ServiceTemplate" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html">
+                 proton:ServiceTemplate
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by specified service template related to resource
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <awsdocs-copyright class="copyright-print">
+           </awsdocs-copyright>
+           <awsdocs-thumb-feedback right-edge="{{$ctrl.thumbFeedbackRightEdge}}">
+           </awsdocs-thumb-feedback>
+          </div>
+          <noscript>
+           <div>
+            <div>
+             <div>
+              <div id="js_error_message">
+               <p>
+                <img alt="Warning" src="https://d1ge0kk1l5kms0.cloudfront.net/images/G/01/webservices/console/warning.png"/>
+                <strong>
+                 Javascript is disabled or is unavailable in your browser.
+                </strong>
+               </p>
+               <p>
+                To use the Amazon Web Services Documentation, Javascript must be enabled. Please refer to your browser's Help pages for instructions.
+               </p>
+              </div>
+             </div>
+            </div>
+           </div>
+          </noscript>
+          <div class="awsui-util-font-size-0" id="main-col-footer">
+           <div id="doc-conventions">
+            <a href="/general/latest/gr/docconventions.html" target="_top">
+             Document Conventions
+            </a>
+           </div>
+           <div class="prev-next">
+            <div accesskey="p" class="prev-link" href="./list_awsprivatecertificateauthority.html" id="previous">
+             AWS Private Certificate Authority
+            </div>
+            <div accesskey="n" class="next-link" href="./list_awspurchaseordersconsole.html" id="next">
+             AWS Purchase Orders Console
+            </div>
+           </div>
+          </div>
+          <awsdocs-page-utilities>
+          </awsdocs-page-utilities>
+         </div>
+         <div id="quick-feedback-yes" style="display: none;">
+          <div class="title">
+           Did this page help you? - Yes
+          </div>
+          <div class="content">
+           <p>
+            Thanks for letting us know we're doing a good job!
+           </p>
+           <p>
+            If you've got a moment, please tell us what we did right so we can do more of it.
+           </p>
+           <p>
+            <awsui-button click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service Authorization Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awsproton.html" id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback">
+            </awsui-button>
+           </p>
+          </div>
+         </div>
+         <div id="quick-feedback-no" style="display: none;">
+          <div class="title">
+           Did this page help you? - No
+          </div>
+          <div class="content">
+           <p>
+            Thanks for letting us know this page needs work. We're sorry we let you down.
+           </p>
+           <p>
+            If you've got a moment, please tell us how we can make the documentation better.
+           </p>
+           <p>
+            <awsui-button click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service Authorization Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awsproton.html" id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback">
+            </awsui-button>
+           </p>
+          </div>
+         </div>
+        </div>
+       </body>
+      </div>
+     </awsdocs-view>
+     <div class="page-loading-indicator" id="page-loading-indicator">
+      <awsui-spinner size="large">
+      </awsui-spinner>
+     </div>
+    </div>
+    <div dom-region="tools" id="tools-panel">
+     <awsdocs-tools-panel id="awsdocs-tools-panel">
+     </awsdocs-tools-panel>
+    </div>
+   </awsui-app-layout>
+   <awsdocs-cookie-banner class="doc-cookie-banner">
+   </awsdocs-cookie-banner>
+  </div>
+ </body>
+</html>

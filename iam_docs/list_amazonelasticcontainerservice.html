@@ -1,0 +1,3558 @@
+<!DOCTYPE html>
+<html lang="en-US" xmlns="http://www.w3.org/1999/xhtml">
+ <head>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+  <title>
+   Actions, resources, and condition keys for Amazon Elastic Container Service - Service Authorization Reference
+  </title>
+  <meta content="width=device-width,initial-scale=1" name="viewport"/>
+  <meta content="/assets" name="assets_root"/>
+  <meta content="list_amazonelasticcontainerservice" name="target_state"/>
+  <meta content="list_amazonelasticcontainerservice" name="default_state"/>
+  <link href="https://docs.aws.amazon.com/assets/images/favicon.ico" rel="icon" type="image/ico"/>
+  <link href="https://docs.aws.amazon.com/assets/images/favicon.ico" rel="shortcut icon" type="image/ico"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonelasticcontainerservice.html" rel="canonical"/>
+  <meta content="Lists all of the available service-specific resources, actions, and condition keys that can be used in IAM policies to control access to Amazon Elastic Container Service." name="description"/>
+  <meta content="IAD" name="deployment_region"/>
+  <meta content="Service Authorization Reference" name="product"/>
+  <meta content="Service Authorization Reference" name="guide"/>
+  <meta content="Provides a list of the actions, resources, and condition keys supported by each AWS service that can be used in an IAM policy." name="abstract"/>
+  <meta content="en_us" name="guide-locale"/>
+  <meta content="toc-contents.json" name="tocs"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonelasticcontainerservice.html" rel="canonical"/>
+  <link href="https://docs.aws.amazon.com/id_id/service-authorization/latest/reference/list_amazonelasticcontainerservice.html" hreflang="id-id" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/id_id/service-authorization/latest/reference/list_amazonelasticcontainerservice.html" hreflang="id" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/de_de/service-authorization/latest/reference/list_amazonelasticcontainerservice.html" hreflang="de-de" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/de_de/service-authorization/latest/reference/list_amazonelasticcontainerservice.html" hreflang="de" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonelasticcontainerservice.html" hreflang="en-us" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonelasticcontainerservice.html" hreflang="en" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/es_es/service-authorization/latest/reference/list_amazonelasticcontainerservice.html" hreflang="es-es" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/es_es/service-authorization/latest/reference/list_amazonelasticcontainerservice.html" hreflang="es" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/fr_fr/service-authorization/latest/reference/list_amazonelasticcontainerservice.html" hreflang="fr-fr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/fr_fr/service-authorization/latest/reference/list_amazonelasticcontainerservice.html" hreflang="fr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/it_it/service-authorization/latest/reference/list_amazonelasticcontainerservice.html" hreflang="it-it" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/it_it/service-authorization/latest/reference/list_amazonelasticcontainerservice.html" hreflang="it" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ja_jp/service-authorization/latest/reference/list_amazonelasticcontainerservice.html" hreflang="ja-jp" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ja_jp/service-authorization/latest/reference/list_amazonelasticcontainerservice.html" hreflang="ja" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ko_kr/service-authorization/latest/reference/list_amazonelasticcontainerservice.html" hreflang="ko-kr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ko_kr/service-authorization/latest/reference/list_amazonelasticcontainerservice.html" hreflang="ko" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/pt_br/service-authorization/latest/reference/list_amazonelasticcontainerservice.html" hreflang="pt-br" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/pt_br/service-authorization/latest/reference/list_amazonelasticcontainerservice.html" hreflang="pt" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/zh_cn/service-authorization/latest/reference/list_amazonelasticcontainerservice.html" hreflang="zh-cn" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/zh_tw/service-authorization/latest/reference/list_amazonelasticcontainerservice.html" hreflang="zh-tw" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonelasticcontainerservice.html" hreflang="x-default" rel="alternative"/>
+  <meta content="Service Authorization Docs" name="feedback-item"/>
+  <meta content="Service Authorization Reference" name="this_doc_product"/>
+  <meta content="Service Authorization Reference" name="this_doc_guide"/>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor4.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor3.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor1.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/awsdocs-common.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/awsdocs-doc-page.js?version=2021.12.02">
+  </script>
+  <link href="https://docs.aws.amazon.com/assets/r/vendor4.css?version=2021.12.02" rel="stylesheet"/>
+  <link href="https://docs.aws.amazon.com/assets/r/awsdocs-common.css?version=2021.12.02" rel="stylesheet"/>
+  <link href="https://docs.aws.amazon.com/assets/r/awsdocs-doc-page.css?version=2021.12.02" rel="stylesheet"/>
+  <script async="" data-config="{'appEntity':'aws-documentation','region':'us-east-1','service':'iam'}" id="awsc-panorama-bundle" src="https://prod.pa.cdn.uis.awsstatic.com/panorama-nav-init.js" type="text/javascript">
+  </script>
+  <meta id="panorama-serviceSubSection" value="Service Authorization Reference"/>
+  <meta id="panorama-serviceConsolePage" value="Actions, resources, and condition keys for Amazon Elastic Container Service"/>
+ </head>
+ <body class="awsdocs awsui">
+  <div class="awsdocs-container">
+   <awsdocs-header>
+   </awsdocs-header>
+   <awsui-app-layout class="awsui-util-no-gutters" header-selector="awsdocs-header" id="app-layout" navigation-change="$ctrl.onNavChange($event)" navigation-hide="false" navigation-open="$ctrl.navOpen" navigation-width="$ctrl.navWidth" ng-controller="ContentController as $ctrl" tools-change="$ctrl.onToolsChange($event)" tools-hide="$ctrl.hideTools" tools-open="$ctrl.toolsOpen" tools-width="$ctrl.toolsWidth">
+    <div dom-region="navigation" id="guide-toc">
+     <awsdocs-toc>
+     </awsdocs-toc>
+    </div>
+    <div dom-region="content" id="main-column" tabindex="-1">
+     <awsdocs-view class="awsdocs-view">
+      <div id="awsdocs-content">
+       <head>
+        <title>
+         Actions, resources, and condition keys for Amazon Elastic Container Service - Service Authorization Reference
+        </title>
+        <meta content="/pdfs/service-authorization/latest/reference/service-authorization.pdf#list_amazonelasticcontainerservice" name="pdf"/>
+        <meta content="https://repost.aws/tags/TAO7Z4bI5hQVWMiYFs34QhIA" name="forums"/>
+        <meta content="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service%20Authorization%20Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazonelasticcontainerservice.html" name="feedback"/>
+        <meta content="feedbackyes.html?topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazonelasticcontainerservice.html" name="feedback-yes"/>
+        <meta content="feedbackno.html?topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazonelasticcontainerservice.html" name="feedback-no"/>
+        <script type="application/ld+json">
+         {
+    "@context" : "https://schema.org",
+    "@type" : "BreadcrumbList",
+    "itemListElement" : [
+      {
+        "@type" : "ListItem",
+        "position" : 1,
+        "name" : "AWS",
+        "item" : "https://aws.amazon.com"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 2,
+        "name" : "Service Authorization Reference",
+        "item" : "https://docs.aws.amazon.com/iam/index.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 3,
+        "name" : "Service Authorization Reference",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 4,
+        "name" : "Reference",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 5,
+        "name" : "Actions, resources, and condition keys for AWS services",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference_policies_actions-resources-contextkeys.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 6,
+        "name" : "Actions, resources, and condition keys for Amazon Elastic Container Service",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference_policies_actions-resources-contextkeys.html"
+      }
+    ]
+}
+        </script>
+       </head>
+       <body>
+        <div id="main">
+         <div style="display: none">
+          <a href="/pdfs/service-authorization/latest/reference/service-authorization.pdf#list_amazonelasticcontainerservice" rel="noopener noreferrer" target="_blank" title="Open PDF">
+          </a>
+         </div>
+         <div class="breadcrumb" id="breadcrumbs">
+          <a href="https://aws.amazon.com">
+           AWS
+          </a>
+          <a href="/index.html">
+           Documentation
+          </a>
+          <a href="/iam/index.html">
+           Service Authorization Reference
+          </a>
+          <a href="reference.html">
+           Service Authorization Reference
+          </a>
+         </div>
+         <div id="page-toc-src">
+          <a href="#amazonelasticcontainerservice-actions-as-permissions">
+           Actions
+          </a>
+          <a href="#amazonelasticcontainerservice-resources-for-iam-policies">
+           Resource types
+          </a>
+          <a href="#amazonelasticcontainerservice-policy-keys">
+           Condition keys
+          </a>
+         </div>
+         <div class="awsui-util-container" id="main-content">
+          <div id="main-col-body">
+           <awsdocs-language-banner data-service="$ctrl.pageService">
+           </awsdocs-language-banner>
+           <h1 class="topictitle" id="list_amazonelasticcontainerservice">
+            Actions, resources, and condition keys for      Amazon Elastic Container Service
+           </h1>
+           <div class="awsdocs-page-header-container">
+            <awsdocs-page-header>
+            </awsdocs-page-header>
+            <awsdocs-filter-selector id="awsdocs-filter-selector">
+            </awsdocs-filter-selector>
+           </div>
+           <p>
+            Amazon Elastic Container Service (service prefix:
+            <code class="code">
+             ecs
+            </code>
+            ) provides the following    service-specific resources, actions, and condition context keys for use in IAM permission    policies.
+           </p>
+           <p>
+            References:
+           </p>
+           <div class="itemizedlist">
+            <ul class="itemizedlist">
+             <li class="listitem">
+              <p>
+               Learn how to
+               <a href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/">
+                configure this service
+               </a>
+               .
+              </p>
+             </li>
+             <li class="listitem">
+              <p>
+               View a list of the
+               <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/">
+                API operations available for this          service
+               </a>
+               .
+              </p>
+             </li>
+             <li class="listitem">
+              <p>
+               Learn how to secure this service and its resources by
+               <a href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/security-iam-awsmanpol.html">
+                using          IAM
+               </a>
+               permission policies.
+              </p>
+             </li>
+            </ul>
+           </div>
+           <div class="highlights" id="inline-topiclist">
+            <h6>
+             Topics
+            </h6>
+            <ul>
+             <li>
+              <a href="#amazonelasticcontainerservice-actions-as-permissions">
+               Actions defined by        Amazon Elastic Container Service
+              </a>
+             </li>
+             <li>
+              <a href="#amazonelasticcontainerservice-resources-for-iam-policies">
+               Resource types defined by        Amazon Elastic Container Service
+              </a>
+             </li>
+             <li>
+              <a href="#amazonelasticcontainerservice-policy-keys">
+               Condition keys for        Amazon Elastic Container Service
+              </a>
+             </li>
+            </ul>
+           </div>
+           <h2 id="amazonelasticcontainerservice-actions-as-permissions">
+            Actions defined by        Amazon Elastic Container Service
+           </h2>
+           <p>
+            You can specify the following actions in the
+            <code class="code">
+             Action
+            </code>
+            element of an IAM      policy statement. Use policies to grant permissions to perform an operation in AWS. When you      use an action in a policy, you usually allow or deny access to the API operation or CLI      command with the same name. However, in some cases, a single action controls access to more      than one operation. Alternatively, some operations require several different actions.
+           </p>
+           <p>
+            The
+            <b>
+             Resource types
+            </b>
+            column of the Actions table indicates whether each      action supports resource-level permissions. If there is no value for this column, you must      specify all resources ("*") to which the policy applies in the
+            <code class="code">
+             Resource
+            </code>
+            element      of your policy statement. If the column includes a resource type, then you can specify an ARN      of that type in a statement with that action. If the action has one or more required      resources, the caller must have permission to use the action with those resources. Required      resources are indicated in the table with an asterisk (*). If you limit resource access with      the
+            <code class="code">
+             Resource
+            </code>
+            element in an IAM policy, you must include an ARN or pattern for      each required resource type. Some actions support multiple resource types. If the resource      type is optional (not indicated as required), then you can choose to use one of the optional      resource types.
+           </p>
+           <p>
+            The
+            <b>
+             Condition keys
+            </b>
+            column of the Actions table includes keys that you      can specify in a policy statement's
+            <code class="code">
+             Condition
+            </code>
+            element. For more information on      the condition keys that are associated with resources for the service, see the
+            <b>
+             Condition keys
+            </b>
+            column of the Resource types table.
+           </p>
+           <div class="awsdocs-note">
+            <div class="awsdocs-note-title">
+             <awsui-icon name="status-info" variant="link">
+             </awsui-icon>
+             <h6>
+              Note
+             </h6>
+            </div>
+            <div class="awsdocs-note-text">
+             <p>
+              Resource condition keys are listed in the
+              <a href="#amazonelasticcontainerservice-resources-for-iam-policies">
+               Resource types
+              </a>
+              table. You        can find a link to the resource type that applies to an action in the
+              <b>
+               Resource          types (*required)
+              </b>
+              column of the Actions table. The resource type in the        Resource types table includes the
+              <b>
+               Condition keys
+              </b>
+              column, which are the        resource condition keys that apply to an action in the Actions table.
+             </p>
+            </div>
+           </div>
+           <p>
+            For details about the columns in the following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#actions_table" rel="noopener noreferrer" target="_blank">
+             Actions table
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9d566c11c13">
+              <thead>
+               <tr>
+                <th>
+                 Actions
+                </th>
+                <th>
+                 Description
+                </th>
+                <th>
+                 Access level
+                </th>
+                <th>
+                 Resource types (*required)
+                </th>
+                <th>
+                 Condition keys
+                </th>
+                <th>
+                 Dependent actions
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="amazonelasticcontainerservice-CreateCapacityProvider" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_CreateCapacityProvider.html">
+                 CreateCapacityProvider
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a new capacity provider. Capacity providers are associated with an Amazon ECS cluster and are used in capacity provider strategies to facilitate cluster auto scaling
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-CreateCluster" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_CreateCluster.html">
+                 CreateCluster
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to create a new Amazon ECS cluster
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-cluster">
+                  cluster*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_capacity-provider">
+                  ecs:capacity-provider
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_fargate-ephemeral-storage-kms-key">
+                  ecs:fargate-ephemeral-storage-kms-key
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-CreateService" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_CreateService.html">
+                 CreateService
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to run and maintain a desired number of tasks from a specified task definition via service creation
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-service">
+                  service*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_cluster">
+                  ecs:cluster
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_capacity-provider">
+                  ecs:capacity-provider
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_task-definition">
+                  ecs:task-definition
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_enable-ebs-volumes">
+                  ecs:enable-ebs-volumes
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_enable-execute-command">
+                  ecs:enable-execute-command
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_enable-service-connect">
+                  ecs:enable-service-connect
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_namespace">
+                  ecs:namespace
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-CreateTaskSet" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_CreateTaskSet.html">
+                 CreateTaskSet
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a new Amazon ECS task set
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_cluster">
+                  ecs:cluster
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_capacity-provider">
+                  ecs:capacity-provider
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_service">
+                  ecs:service
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_task-definition">
+                  ecs:task-definition
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-DeleteAccountSetting" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_DeleteAccountSetting.html">
+                 DeleteAccountSetting
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to modify the ARN and resource ID format of a resource for a specified IAM user, IAM role, or the root user for an account. You can specify whether the new ARN and resource ID format are disabled for new resources that are created
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_account-setting">
+                  ecs:account-setting
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-DeleteAttributes" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_DeleteAttributes.html">
+                 DeleteAttributes
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to delete one or more custom attributes from an Amazon ECS resource
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-container-instance">
+                  container-instance*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_cluster">
+                  ecs:cluster
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-DeleteCapacityProvider" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_DeleteCapacityProvider.html">
+                 DeleteCapacityProvider
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to delete the specified capacity provider
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-capacity-provider">
+                  capacity-provider*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-DeleteCluster" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_DeleteCluster.html">
+                 DeleteCluster
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to delete the specified cluster
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-cluster">
+                  cluster*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-DeleteService" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_DeleteService.html">
+                 DeleteService
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to delete a specified service within a cluster
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-service">
+                  service*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_cluster">
+                  ecs:cluster
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-DeleteTaskDefinitions" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_DeleteTaskDefinitions.html">
+                 DeleteTaskDefinitions
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to delete the specified task definitions by family and revision
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-task-definition">
+                  task-definition*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-DeleteTaskSet" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_DeleteTaskSet.html">
+                 DeleteTaskSet
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to delete the specified task set
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-task-set">
+                  task-set*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_cluster">
+                  ecs:cluster
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_service">
+                  ecs:service
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-DeregisterContainerInstance" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_DeregisterContainerInstance.html">
+                 DeregisterContainerInstance
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to deregister an Amazon ECS container instance from the specified cluster
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-cluster">
+                  cluster*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-DeregisterTaskDefinition" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_DeregisterTaskDefinition.html">
+                 DeregisterTaskDefinition
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to deregister the specified task definition by family and revision
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-DescribeCapacityProviders" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_DescribeCapacityProviders.html">
+                 DescribeCapacityProviders
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to describe one or more Amazon ECS capacity providers
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-capacity-provider">
+                  capacity-provider*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-DescribeClusters" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_DescribeClusters.html">
+                 DescribeClusters
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to describes one or more of your clusters
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-cluster">
+                  cluster*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-DescribeContainerInstances" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_DescribeContainerInstances.html">
+                 DescribeContainerInstances
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to describes Amazon ECS container instances
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-container-instance">
+                  container-instance*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_cluster">
+                  ecs:cluster
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-DescribeServices" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_DescribeServices.html">
+                 DescribeServices
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to describe the specified services running in your cluster
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-service">
+                  service*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_cluster">
+                  ecs:cluster
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-DescribeTaskDefinition" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_DescribeTaskDefinition.html">
+                 DescribeTaskDefinition
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to describe a task definition. You can specify a family and revision to find information about a specific task definition, or you can simply specify the family to find the latest ACTIVE revision in that family
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-DescribeTaskSets" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_DescribeTaskSets.html">
+                 DescribeTaskSets
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to describe Amazon ECS task sets
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-task-set">
+                  task-set*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_cluster">
+                  ecs:cluster
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_service">
+                  ecs:service
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-DescribeTasks" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_DescribeTasks.html">
+                 DescribeTasks
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to describe a specified task or tasks
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-task">
+                  task*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_cluster">
+                  ecs:cluster
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-DiscoverPollEndpoint" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_DiscoverPollEndpoint.html">
+                 DiscoverPollEndpoint
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get an endpoint for the Amazon ECS agent to poll for updates
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-ExecuteCommand" rowspan="3" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_ExecuteCommand.html">
+                 ExecuteCommand
+                </a>
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Grants permission to run a command remotely on an Amazon ECS container
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-cluster">
+                  cluster*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-task">
+                  task*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_cluster">
+                  ecs:cluster
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_container-name">
+                  ecs:container-name
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_task">
+                  ecs:task
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-GetTaskProtection" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_GetTaskProtection.html">
+                 GetTaskProtection
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to retrieve the protection status of tasks in an Amazon ECS service
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-task">
+                  task*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_cluster">
+                  ecs:cluster
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-ListAccountSettings" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_ListAccountSettings.html">
+                 ListAccountSettings
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list the account settings for an Amazon ECS resource for a specified principal
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-ListAttributes" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_ListAttributes.html">
+                 ListAttributes
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to lists the attributes for Amazon ECS resources within a specified target type and cluster
+               </td>
+               <td rowspan="2" tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-cluster">
+                  cluster*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-ListClusters" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_ListClusters.html">
+                 ListClusters
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get a list of existing clusters
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-ListContainerInstances" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_ListContainerInstances.html">
+                 ListContainerInstances
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to get a list of container instances in a specified cluster
+               </td>
+               <td rowspan="2" tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-cluster">
+                  cluster*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-ListServices" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_ListServices.html">
+                 ListServices
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get a list of services that are running in a specified cluster
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_cluster">
+                  ecs:cluster
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-ListServicesByNamespace" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_ListServicesByNamespace.html">
+                 ListServicesByNamespace
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get a list of services that are running in a specified AWS Cloud Map Namespace
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_namespace">
+                  ecs:namespace
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-ListTagsForResource" rowspan="8" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_ListTagsForResource.html">
+                 ListTagsForResource
+                </a>
+               </td>
+               <td rowspan="8" tabindex="-1">
+                Grants permission to get a list of tags for the specified resource
+               </td>
+               <td rowspan="8" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-capacity-provider">
+                  capacity-provider
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-cluster">
+                  cluster
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-container-instance">
+                  container-instance
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-service">
+                  service
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-task">
+                  task
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-task-definition">
+                  task-definition
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-task-set">
+                  task-set
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-ListTaskDefinitionFamilies" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_ListTaskDefinitionFamilies.html">
+                 ListTaskDefinitionFamilies
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get a list of task definition families that are registered to your account (which may include task definition families that no longer have any ACTIVE task definitions)
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-ListTaskDefinitions" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_ListTaskDefinitions.html">
+                 ListTaskDefinitions
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get a list of task definitions that are registered to your account
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-ListTasks" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_ListTasks.html">
+                 ListTasks
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to get a list of tasks for a specified cluster
+               </td>
+               <td rowspan="2" tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-container-instance">
+                  container-instance*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_cluster">
+                  ecs:cluster
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-Poll" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/instance_IAM_role.html">
+                 Poll
+                </a>
+                [permission only]
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to an agent to connect with the Amazon ECS service to report status and get commands
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-container-instance">
+                  container-instance*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_cluster">
+                  ecs:cluster
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-PutAccountSetting" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_PutAccountSetting.html">
+                 PutAccountSetting
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to modify the ARN and resource ID format of a resource for a specified IAM user, IAM role, or the root user for an account. You can specify whether the new ARN and resource ID format are enabled for new resources that are created. Enabling this setting is required to use new Amazon ECS features such as resource tagging
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_account-setting">
+                  ecs:account-setting
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-PutAccountSettingDefault" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_PutAccountSettingDefault.html">
+                 PutAccountSettingDefault
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to modify the ARN and resource ID format of a resource type for all IAM users on an account for which no individual account setting has been set. Enabling this setting is required to use new Amazon ECS features such as resource tagging
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_account-setting">
+                  ecs:account-setting
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-PutAttributes" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_PutAttributes.html">
+                 PutAttributes
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to create or update an attribute on an Amazon ECS resource
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-container-instance">
+                  container-instance*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_cluster">
+                  ecs:cluster
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-PutClusterCapacityProviders" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_PutClusterCapacityProviders.html">
+                 PutClusterCapacityProviders
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to modify the available capacity providers and the default capacity provider strategy for a cluster
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-cluster">
+                  cluster*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_capacity-provider">
+                  ecs:capacity-provider
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-RegisterContainerInstance" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_RegisterContainerInstance.html">
+                 RegisterContainerInstance
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to register an EC2 instance into the specified cluster
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-cluster">
+                  cluster*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-RegisterTaskDefinition" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_RegisterTaskDefinition.html">
+                 RegisterTaskDefinition
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to register a new task definition from the supplied family and containerDefinitions
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-RunTask" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_RunTask.html">
+                 RunTask
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to start a task using random placement and the default Amazon ECS scheduler
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-task-definition">
+                  task-definition*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 iam:PassRole
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_cluster">
+                  ecs:cluster
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_capacity-provider">
+                  ecs:capacity-provider
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_enable-ebs-volumes">
+                  ecs:enable-ebs-volumes
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_enable-execute-command">
+                  ecs:enable-execute-command
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-StartTask" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_StartTask.html">
+                 StartTask
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to start a new task from the specified task definition on the specified container instance or instances
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-task-definition">
+                  task-definition*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 iam:PassRole
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_cluster">
+                  ecs:cluster
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_container-instances">
+                  ecs:container-instances
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_enable-ebs-volumes">
+                  ecs:enable-ebs-volumes
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_enable-execute-command">
+                  ecs:enable-execute-command
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-StartTelemetrySession" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/cloudwatch-metrics.html#enable_cloudwatch">
+                 StartTelemetrySession
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to start a telemetry session
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-container-instance">
+                  container-instance*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_cluster">
+                  ecs:cluster
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-StopTask" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_StopTask.html">
+                 StopTask
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to stop a running task
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-task">
+                  task*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_cluster">
+                  ecs:cluster
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-SubmitAttachmentStateChanges" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_SubmitAttachmentStateChanges.html">
+                 SubmitAttachmentStateChanges
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to send an acknowledgement that attachments changed states
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-cluster">
+                  cluster*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-SubmitContainerStateChange" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_SubmitContainerStateChange.html">
+                 SubmitContainerStateChange
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to send an acknowledgement that a container changed states
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-cluster">
+                  cluster*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-SubmitTaskStateChange" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_SubmitTaskStateChange.html">
+                 SubmitTaskStateChange
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to send an acknowledgement that a task changed states
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-cluster">
+                  cluster*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-TagResource" rowspan="8" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_TagResource.html">
+                 TagResource
+                </a>
+               </td>
+               <td rowspan="8" tabindex="-1">
+                Grants permission to tag the specified resource
+               </td>
+               <td rowspan="8" tabindex="-1">
+                Tagging
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-capacity-provider">
+                  capacity-provider
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-cluster">
+                  cluster
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-container-instance">
+                  container-instance
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-service">
+                  service
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-task">
+                  task
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-task-definition">
+                  task-definition
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-task-set">
+                  task-set
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_CreateAction">
+                  ecs:CreateAction
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-UntagResource" rowspan="8" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_UntagResource.html">
+                 UntagResource
+                </a>
+               </td>
+               <td rowspan="8" tabindex="-1">
+                Grants permission to untag the specified resource
+               </td>
+               <td rowspan="8" tabindex="-1">
+                Tagging
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-capacity-provider">
+                  capacity-provider
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-cluster">
+                  cluster
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-container-instance">
+                  container-instance
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-service">
+                  service
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-task">
+                  task
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-task-definition">
+                  task-definition
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-task-set">
+                  task-set
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-UpdateCapacityProvider" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_UpdateCapacityProvider.html">
+                 UpdateCapacityProvider
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to update the specified capacity provider
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-capacity-provider">
+                  capacity-provider*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-UpdateCluster" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_UpdateCluster.html">
+                 UpdateCluster
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to modify the configuration or settings to use for a cluster
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-cluster">
+                  cluster*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_fargate-ephemeral-storage-kms-key">
+                  ecs:fargate-ephemeral-storage-kms-key
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-UpdateClusterSettings" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_UpdateClusterSettings.html">
+                 UpdateClusterSettings
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to modify the settings to use for a cluster
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-cluster">
+                  cluster*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-UpdateContainerAgent" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_UpdateContainerAgent.html">
+                 UpdateContainerAgent
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to update the Amazon ECS container agent on a specified container instance
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-container-instance">
+                  container-instance*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_cluster">
+                  ecs:cluster
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-UpdateContainerInstancesState" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_UpdateContainerInstancesState.html">
+                 UpdateContainerInstancesState
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to the user to modify the status of an Amazon ECS container instance
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-container-instance">
+                  container-instance*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_cluster">
+                  ecs:cluster
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-UpdateService" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_UpdateService.html">
+                 UpdateService
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to modify the parameters of a service
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-service">
+                  service*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_cluster">
+                  ecs:cluster
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_capacity-provider">
+                  ecs:capacity-provider
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_enable-ebs-volumes">
+                  ecs:enable-ebs-volumes
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_enable-execute-command">
+                  ecs:enable-execute-command
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_enable-service-connect">
+                  ecs:enable-service-connect
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_namespace">
+                  ecs:namespace
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_task-definition">
+                  ecs:task-definition
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-UpdateServicePrimaryTaskSet" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_UpdateServicePrimaryTaskSet.html">
+                 UpdateServicePrimaryTaskSet
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to modify the primary task set used in a service
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-service">
+                  service*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_cluster">
+                  ecs:cluster
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-UpdateTaskProtection" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_UpdateTaskProtection.html">
+                 UpdateTaskProtection
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to modify the protection status of a task
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-task">
+                  task*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_cluster">
+                  ecs:cluster
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-UpdateTaskSet" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_UpdateTaskSet.html">
+                 UpdateTaskSet
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to update the specified task set
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-task-set">
+                  task-set*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_cluster">
+                  ecs:cluster
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_service">
+                  ecs:service
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <h2 id="amazonelasticcontainerservice-resources-for-iam-policies">
+            Resource types defined by        Amazon Elastic Container Service
+           </h2>
+           <p>
+            The following resource types are defined by this service and can be used in the
+            <code class="code">
+             Resource
+            </code>
+            element of IAM permission policy statements. Each action in the
+            <a href="#amazonelasticcontainerservice-actions-as-permissions">
+             Actions table
+            </a>
+            identifies the      resource types that can be specified with that action. A resource type can also define which      condition keys you can include in a policy. These keys are displayed in the last column of the      Resource types table. For details about the columns in the following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#resources_table" rel="noopener noreferrer" target="_blank">
+             Resource types table
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9d566c13b5">
+              <thead>
+               <tr>
+                <th>
+                 Resource types
+                </th>
+                <th>
+                 ARN
+                </th>
+                <th>
+                 Condition keys
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="amazonelasticcontainerservice-cluster" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/clusters.html">
+                 cluster
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:ecs:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:cluster/$
+                 <span>
+                  {
+                 </span>
+                 ClusterName}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_ResourceTag___TagKey_">
+                  ecs:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-container-instance" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/manage-capacity.html">
+                 container-instance
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:ecs:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:container-instance/$
+                 <span>
+                  {
+                 </span>
+                 ClusterName}/$
+                 <span>
+                  {
+                 </span>
+                 ContainerInstanceId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_ResourceTag___TagKey_">
+                  ecs:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-service" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs_services.html">
+                 service
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:ecs:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:service/$
+                 <span>
+                  {
+                 </span>
+                 ClusterName}/$
+                 <span>
+                  {
+                 </span>
+                 ServiceName}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_ResourceTag___TagKey_">
+                  ecs:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-task" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/scheduling_tasks.html">
+                 task
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:ecs:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:task/$
+                 <span>
+                  {
+                 </span>
+                 ClusterName}/$
+                 <span>
+                  {
+                 </span>
+                 TaskId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_ResourceTag___TagKey_">
+                  ecs:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-task-definition" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definitions.html">
+                 task-definition
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:ecs:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:task-definition/$
+                 <span>
+                  {
+                 </span>
+                 TaskDefinitionFamilyName}:$
+                 <span>
+                  {
+                 </span>
+                 TaskDefinitionRevisionNumber}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_ResourceTag___TagKey_">
+                  ecs:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-capacity-provider" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/cluster-capacity-providers.html">
+                 capacity-provider
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:ecs:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:capacity-provider/$
+                 <span>
+                  {
+                 </span>
+                 CapacityProviderName}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_ResourceTag___TagKey_">
+                  ecs:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-task-set" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/deployment-type-external.html">
+                 task-set
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:ecs:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:task-set/$
+                 <span>
+                  {
+                 </span>
+                 ClusterName}/$
+                 <span>
+                  {
+                 </span>
+                 ServiceName}/$
+                 <span>
+                  {
+                 </span>
+                 TaskSetId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonelasticcontainerservice-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonelasticcontainerservice-ecs_ResourceTag___TagKey_">
+                  ecs:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <h2 id="amazonelasticcontainerservice-policy-keys">
+            Condition keys for        Amazon Elastic Container Service
+           </h2>
+           <p>
+            Amazon Elastic Container Service defines the following condition keys that can be used in the
+            <code class="code">
+             Condition
+            </code>
+            element of an IAM policy. You can use these keys to further refine      the conditions under which the policy statement applies. For details about the columns in the      following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#context_keys_table" rel="noopener noreferrer" target="_blank">
+             Condition keys table
+            </a>
+            .
+           </p>
+           <p>
+            To view the global condition keys that are available to all services, see
+            <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#AvailableKeys">
+             Available global condition keys
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9d566c15b7">
+              <thead>
+               <tr>
+                <th>
+                 Condition keys
+                </th>
+                <th>
+                 Description
+                </th>
+                <th>
+                 Type
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="amazonelasticcontainerservice-aws_RequestTag___TagKey_" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-requesttag">
+                 aws:RequestTag/${TagKey}
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the tags that are passed in the request
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-aws_ResourceTag___TagKey_" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-resourcetag">
+                 aws:ResourceTag/${TagKey}
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the tag key-value pairs attached to the resource
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-aws_TagKeys" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-tagkeys">
+                 aws:TagKeys
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the tag keys that are passed in the request
+               </td>
+               <td tabindex="-1">
+                ArrayOfString
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-ecs_CreateAction" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-createaction">
+                 ecs:CreateAction
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the name of a resource-creating API action
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-ecs_ResourceTag___TagKey_" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/security_iam_service-with-iam.html#security_iam_service-with-iam-id-based-policies">
+                 ecs:ResourceTag/${TagKey}
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the tag key-value pairs attached to the resource
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-ecs_account-setting" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/security_iam_service-with-iam.html#security_iam_service-with-iam-id-based-policies-conditionkeys">
+                 ecs:account-setting
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the Amazon ECS account setting name
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-ecs_capacity-provider" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/security_iam_service-with-iam.html#security_iam_service-with-iam-id-based-policies-conditionkeys">
+                 ecs:capacity-provider
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the ARN of an Amazon ECS capacity provider
+               </td>
+               <td tabindex="-1">
+                ARN
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-ecs_cluster" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/security_iam_service-with-iam.html#security_iam_service-with-iam-id-based-policies-conditionkeys">
+                 ecs:cluster
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the ARN of an Amazon ECS cluster
+               </td>
+               <td tabindex="-1">
+                ARN
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-ecs_container-instances" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/security_iam_service-with-iam.html#security_iam_service-with-iam-id-based-policies-conditionkeys">
+                 ecs:container-instances
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the ARN of an Amazon ECS container instance
+               </td>
+               <td tabindex="-1">
+                ARN
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-ecs_container-name" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/security_iam_service-with-iam.html#security_iam_service-with-iam-id-based-policies-conditionkeys">
+                 ecs:container-name
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the name of an Amazon ECS container which is defined in the ECS task definition
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-ecs_enable-ebs-volumes" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/security_iam_service-with-iam.html#security_iam_service-with-iam-id-based-policies-conditionkeys">
+                 ecs:enable-ebs-volumes
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the Amazon ECS managed Amazon EBS volume capability of your ECS task or service
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-ecs_enable-execute-command" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/security_iam_service-with-iam.html#security_iam_service-with-iam-id-based-policies-conditionkeys">
+                 ecs:enable-execute-command
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the execute-command capability of your Amazon ECS task or Amazon ECS service
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-ecs_enable-service-connect" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/security_iam_service-with-iam.html#security_iam_service-with-iam-id-based-policies-conditionkeys">
+                 ecs:enable-service-connect
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the enable field value in the Service Connect configuration
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-ecs_fargate-ephemeral-storage-kms-key" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/security_iam_service-with-iam.html#security_iam_service-with-iam-id-based-policies-conditionkeys">
+                 ecs:fargate-ephemeral-storage-kms-key
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the AWS KMS key id provided in the request
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-ecs_namespace" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/security_iam_service-with-iam.html#security_iam_service-with-iam-id-based-policies-conditionkeys">
+                 ecs:namespace
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the ARN of AWS Cloud Map namespace which is defined in the Service Connect Configuration
+               </td>
+               <td tabindex="-1">
+                ARN
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-ecs_service" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/security_iam_service-with-iam.html#security_iam_service-with-iam-id-based-policies-conditionkeys">
+                 ecs:service
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the ARN of an Amazon ECS service
+               </td>
+               <td tabindex="-1">
+                ARN
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-ecs_task" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/security_iam_service-with-iam.html#security_iam_service-with-iam-id-based-policies-conditionkeys">
+                 ecs:task
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the ARN of an Amazon ECS task
+               </td>
+               <td tabindex="-1">
+                ARN
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonelasticcontainerservice-ecs_task-definition" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/security_iam_service-with-iam.html#security_iam_service-with-iam-id-based-policies-conditionkeys">
+                 ecs:task-definition
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the ARN of an Amazon ECS task definition
+               </td>
+               <td tabindex="-1">
+                ARN
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <awsdocs-copyright class="copyright-print">
+           </awsdocs-copyright>
+           <awsdocs-thumb-feedback right-edge="{{$ctrl.thumbFeedbackRightEdge}}">
+           </awsdocs-thumb-feedback>
+          </div>
+          <noscript>
+           <div>
+            <div>
+             <div>
+              <div id="js_error_message">
+               <p>
+                <img alt="Warning" src="https://d1ge0kk1l5kms0.cloudfront.net/images/G/01/webservices/console/warning.png"/>
+                <strong>
+                 Javascript is disabled or is unavailable in your browser.
+                </strong>
+               </p>
+               <p>
+                To use the Amazon Web Services Documentation, Javascript must be enabled. Please refer to your browser's Help pages for instructions.
+               </p>
+              </div>
+             </div>
+            </div>
+           </div>
+          </noscript>
+          <div class="awsui-util-font-size-0" id="main-col-footer">
+           <div id="doc-conventions">
+            <a href="/general/latest/gr/docconventions.html" target="_top">
+             Document Conventions
+            </a>
+           </div>
+           <div class="prev-next">
+            <div accesskey="p" class="prev-link" href="./list_amazonelasticcontainerregistrypublic.html" id="previous">
+             Amazon Elastic Container Registry Public
+            </div>
+            <div accesskey="n" class="next-link" href="./list_awselasticdisasterrecovery.html" id="next">
+             AWS Elastic Disaster Recovery
+            </div>
+           </div>
+          </div>
+          <awsdocs-page-utilities>
+          </awsdocs-page-utilities>
+         </div>
+         <div id="quick-feedback-yes" style="display: none;">
+          <div class="title">
+           Did this page help you? - Yes
+          </div>
+          <div class="content">
+           <p>
+            Thanks for letting us know we're doing a good job!
+           </p>
+           <p>
+            If you've got a moment, please tell us what we did right so we can do more of it.
+           </p>
+           <p>
+            <awsui-button click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service Authorization Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazonelasticcontainerservice.html" id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback">
+            </awsui-button>
+           </p>
+          </div>
+         </div>
+         <div id="quick-feedback-no" style="display: none;">
+          <div class="title">
+           Did this page help you? - No
+          </div>
+          <div class="content">
+           <p>
+            Thanks for letting us know this page needs work. We're sorry we let you down.
+           </p>
+           <p>
+            If you've got a moment, please tell us how we can make the documentation better.
+           </p>
+           <p>
+            <awsui-button click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service Authorization Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazonelasticcontainerservice.html" id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback">
+            </awsui-button>
+           </p>
+          </div>
+         </div>
+        </div>
+       </body>
+      </div>
+     </awsdocs-view>
+     <div class="page-loading-indicator" id="page-loading-indicator">
+      <awsui-spinner size="large">
+      </awsui-spinner>
+     </div>
+    </div>
+    <div dom-region="tools" id="tools-panel">
+     <awsdocs-tools-panel id="awsdocs-tools-panel">
+     </awsdocs-tools-panel>
+    </div>
+   </awsui-app-layout>
+   <awsdocs-cookie-banner class="doc-cookie-banner">
+   </awsdocs-cookie-banner>
+  </div>
+ </body>
+</html>

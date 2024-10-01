@@ -1,0 +1,2109 @@
+<!DOCTYPE html>
+<html lang="en-US" xmlns="http://www.w3.org/1999/xhtml">
+ <head>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+  <title>
+   Actions, resources, and condition keys for AWS Step Functions - Service Authorization Reference
+  </title>
+  <meta content="width=device-width,initial-scale=1" name="viewport"/>
+  <meta content="/assets" name="assets_root"/>
+  <meta content="list_awsstepfunctions" name="target_state"/>
+  <meta content="list_awsstepfunctions" name="default_state"/>
+  <link href="https://docs.aws.amazon.com/assets/images/favicon.ico" rel="icon" type="image/ico"/>
+  <link href="https://docs.aws.amazon.com/assets/images/favicon.ico" rel="shortcut icon" type="image/ico"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsstepfunctions.html" rel="canonical"/>
+  <meta content="Lists all of the available service-specific resources, actions, and condition keys that can be used in IAM policies to control access to AWS Step Functions." name="description"/>
+  <meta content="IAD" name="deployment_region"/>
+  <meta content="Service Authorization Reference" name="product"/>
+  <meta content="Service Authorization Reference" name="guide"/>
+  <meta content="Provides a list of the actions, resources, and condition keys supported by each AWS service that can be used in an IAM policy." name="abstract"/>
+  <meta content="en_us" name="guide-locale"/>
+  <meta content="toc-contents.json" name="tocs"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsstepfunctions.html" rel="canonical"/>
+  <link href="https://docs.aws.amazon.com/id_id/service-authorization/latest/reference/list_awsstepfunctions.html" hreflang="id-id" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/id_id/service-authorization/latest/reference/list_awsstepfunctions.html" hreflang="id" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/de_de/service-authorization/latest/reference/list_awsstepfunctions.html" hreflang="de-de" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/de_de/service-authorization/latest/reference/list_awsstepfunctions.html" hreflang="de" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsstepfunctions.html" hreflang="en-us" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsstepfunctions.html" hreflang="en" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/es_es/service-authorization/latest/reference/list_awsstepfunctions.html" hreflang="es-es" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/es_es/service-authorization/latest/reference/list_awsstepfunctions.html" hreflang="es" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/fr_fr/service-authorization/latest/reference/list_awsstepfunctions.html" hreflang="fr-fr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/fr_fr/service-authorization/latest/reference/list_awsstepfunctions.html" hreflang="fr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/it_it/service-authorization/latest/reference/list_awsstepfunctions.html" hreflang="it-it" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/it_it/service-authorization/latest/reference/list_awsstepfunctions.html" hreflang="it" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ja_jp/service-authorization/latest/reference/list_awsstepfunctions.html" hreflang="ja-jp" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ja_jp/service-authorization/latest/reference/list_awsstepfunctions.html" hreflang="ja" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ko_kr/service-authorization/latest/reference/list_awsstepfunctions.html" hreflang="ko-kr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ko_kr/service-authorization/latest/reference/list_awsstepfunctions.html" hreflang="ko" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/pt_br/service-authorization/latest/reference/list_awsstepfunctions.html" hreflang="pt-br" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/pt_br/service-authorization/latest/reference/list_awsstepfunctions.html" hreflang="pt" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/zh_cn/service-authorization/latest/reference/list_awsstepfunctions.html" hreflang="zh-cn" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/zh_tw/service-authorization/latest/reference/list_awsstepfunctions.html" hreflang="zh-tw" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsstepfunctions.html" hreflang="x-default" rel="alternative"/>
+  <meta content="Service Authorization Docs" name="feedback-item"/>
+  <meta content="Service Authorization Reference" name="this_doc_product"/>
+  <meta content="Service Authorization Reference" name="this_doc_guide"/>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor4.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor3.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor1.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/awsdocs-common.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/awsdocs-doc-page.js?version=2021.12.02">
+  </script>
+  <link href="https://docs.aws.amazon.com/assets/r/vendor4.css?version=2021.12.02" rel="stylesheet"/>
+  <link href="https://docs.aws.amazon.com/assets/r/awsdocs-common.css?version=2021.12.02" rel="stylesheet"/>
+  <link href="https://docs.aws.amazon.com/assets/r/awsdocs-doc-page.css?version=2021.12.02" rel="stylesheet"/>
+  <script async="" data-config="{'appEntity':'aws-documentation','region':'us-east-1','service':'iam'}" id="awsc-panorama-bundle" src="https://prod.pa.cdn.uis.awsstatic.com/panorama-nav-init.js" type="text/javascript">
+  </script>
+  <meta id="panorama-serviceSubSection" value="Service Authorization Reference"/>
+  <meta id="panorama-serviceConsolePage" value="Actions, resources, and condition keys for AWS Step Functions"/>
+ </head>
+ <body class="awsdocs awsui">
+  <div class="awsdocs-container">
+   <awsdocs-header>
+   </awsdocs-header>
+   <awsui-app-layout class="awsui-util-no-gutters" header-selector="awsdocs-header" id="app-layout" navigation-change="$ctrl.onNavChange($event)" navigation-hide="false" navigation-open="$ctrl.navOpen" navigation-width="$ctrl.navWidth" ng-controller="ContentController as $ctrl" tools-change="$ctrl.onToolsChange($event)" tools-hide="$ctrl.hideTools" tools-open="$ctrl.toolsOpen" tools-width="$ctrl.toolsWidth">
+    <div dom-region="navigation" id="guide-toc">
+     <awsdocs-toc>
+     </awsdocs-toc>
+    </div>
+    <div dom-region="content" id="main-column" tabindex="-1">
+     <awsdocs-view class="awsdocs-view">
+      <div id="awsdocs-content">
+       <head>
+        <title>
+         Actions, resources, and condition keys for AWS Step Functions - Service Authorization Reference
+        </title>
+        <meta content="/pdfs/service-authorization/latest/reference/service-authorization.pdf#list_awsstepfunctions" name="pdf"/>
+        <meta content="https://repost.aws/tags/TAO7Z4bI5hQVWMiYFs34QhIA" name="forums"/>
+        <meta content="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service%20Authorization%20Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awsstepfunctions.html" name="feedback"/>
+        <meta content="feedbackyes.html?topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awsstepfunctions.html" name="feedback-yes"/>
+        <meta content="feedbackno.html?topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awsstepfunctions.html" name="feedback-no"/>
+        <script type="application/ld+json">
+         {
+    "@context" : "https://schema.org",
+    "@type" : "BreadcrumbList",
+    "itemListElement" : [
+      {
+        "@type" : "ListItem",
+        "position" : 1,
+        "name" : "AWS",
+        "item" : "https://aws.amazon.com"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 2,
+        "name" : "Service Authorization Reference",
+        "item" : "https://docs.aws.amazon.com/iam/index.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 3,
+        "name" : "Service Authorization Reference",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 4,
+        "name" : "Reference",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 5,
+        "name" : "Actions, resources, and condition keys for AWS services",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference_policies_actions-resources-contextkeys.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 6,
+        "name" : "Actions, resources, and condition keys for AWS Step Functions",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference_policies_actions-resources-contextkeys.html"
+      }
+    ]
+}
+        </script>
+       </head>
+       <body>
+        <div id="main">
+         <div style="display: none">
+          <a href="/pdfs/service-authorization/latest/reference/service-authorization.pdf#list_awsstepfunctions" rel="noopener noreferrer" target="_blank" title="Open PDF">
+          </a>
+         </div>
+         <div class="breadcrumb" id="breadcrumbs">
+          <a href="https://aws.amazon.com">
+           AWS
+          </a>
+          <a href="/index.html">
+           Documentation
+          </a>
+          <a href="/iam/index.html">
+           Service Authorization Reference
+          </a>
+          <a href="reference.html">
+           Service Authorization Reference
+          </a>
+         </div>
+         <div id="page-toc-src">
+          <a href="#awsstepfunctions-actions-as-permissions">
+           Actions
+          </a>
+          <a href="#awsstepfunctions-resources-for-iam-policies">
+           Resource types
+          </a>
+          <a href="#awsstepfunctions-policy-keys">
+           Condition keys
+          </a>
+         </div>
+         <div class="awsui-util-container" id="main-content">
+          <div id="main-col-body">
+           <awsdocs-language-banner data-service="$ctrl.pageService">
+           </awsdocs-language-banner>
+           <h1 class="topictitle" id="list_awsstepfunctions">
+            Actions, resources, and condition keys for      AWS Step Functions
+           </h1>
+           <div class="awsdocs-page-header-container">
+            <awsdocs-page-header>
+            </awsdocs-page-header>
+            <awsdocs-filter-selector id="awsdocs-filter-selector">
+            </awsdocs-filter-selector>
+           </div>
+           <p>
+            AWS Step Functions (service prefix:
+            <code class="code">
+             states
+            </code>
+            ) provides the following    service-specific resources, actions, and condition context keys for use in IAM permission    policies.
+           </p>
+           <p>
+            References:
+           </p>
+           <div class="itemizedlist">
+            <ul class="itemizedlist">
+             <li class="listitem">
+              <p>
+               Learn how to
+               <a href="https://docs.aws.amazon.com/step-functions/latest/dg/welcome.html">
+                configure this service
+               </a>
+               .
+              </p>
+             </li>
+             <li class="listitem">
+              <p>
+               View a list of the
+               <a href="https://docs.aws.amazon.com/step-functions/latest/apireference/">
+                API operations available for this          service
+               </a>
+               .
+              </p>
+             </li>
+             <li class="listitem">
+              <p>
+               Learn how to secure this service and its resources by
+               <a href="https://docs.aws.amazon.com/step-functions/latest/dg/procedure-create-iam-role.html">
+                using          IAM
+               </a>
+               permission policies.
+              </p>
+             </li>
+            </ul>
+           </div>
+           <div class="highlights" id="inline-topiclist">
+            <h6>
+             Topics
+            </h6>
+            <ul>
+             <li>
+              <a href="#awsstepfunctions-actions-as-permissions">
+               Actions defined by        AWS Step Functions
+              </a>
+             </li>
+             <li>
+              <a href="#awsstepfunctions-resources-for-iam-policies">
+               Resource types defined by        AWS Step Functions
+              </a>
+             </li>
+             <li>
+              <a href="#awsstepfunctions-policy-keys">
+               Condition keys for        AWS Step Functions
+              </a>
+             </li>
+            </ul>
+           </div>
+           <h2 id="awsstepfunctions-actions-as-permissions">
+            Actions defined by        AWS Step Functions
+           </h2>
+           <p>
+            You can specify the following actions in the
+            <code class="code">
+             Action
+            </code>
+            element of an IAM      policy statement. Use policies to grant permissions to perform an operation in AWS. When you      use an action in a policy, you usually allow or deny access to the API operation or CLI      command with the same name. However, in some cases, a single action controls access to more      than one operation. Alternatively, some operations require several different actions.
+           </p>
+           <p>
+            The
+            <b>
+             Resource types
+            </b>
+            column of the Actions table indicates whether each      action supports resource-level permissions. If there is no value for this column, you must      specify all resources ("*") to which the policy applies in the
+            <code class="code">
+             Resource
+            </code>
+            element      of your policy statement. If the column includes a resource type, then you can specify an ARN      of that type in a statement with that action. If the action has one or more required      resources, the caller must have permission to use the action with those resources. Required      resources are indicated in the table with an asterisk (*). If you limit resource access with      the
+            <code class="code">
+             Resource
+            </code>
+            element in an IAM policy, you must include an ARN or pattern for      each required resource type. Some actions support multiple resource types. If the resource      type is optional (not indicated as required), then you can choose to use one of the optional      resource types.
+           </p>
+           <p>
+            The
+            <b>
+             Condition keys
+            </b>
+            column of the Actions table includes keys that you      can specify in a policy statement's
+            <code class="code">
+             Condition
+            </code>
+            element. For more information on      the condition keys that are associated with resources for the service, see the
+            <b>
+             Condition keys
+            </b>
+            column of the Resource types table.
+           </p>
+           <div class="awsdocs-note">
+            <div class="awsdocs-note-title">
+             <awsui-icon name="status-info" variant="link">
+             </awsui-icon>
+             <h6>
+              Note
+             </h6>
+            </div>
+            <div class="awsdocs-note-text">
+             <p>
+              Resource condition keys are listed in the
+              <a href="#awsstepfunctions-resources-for-iam-policies">
+               Resource types
+              </a>
+              table. You        can find a link to the resource type that applies to an action in the
+              <b>
+               Resource          types (*required)
+              </b>
+              column of the Actions table. The resource type in the        Resource types table includes the
+              <b>
+               Condition keys
+              </b>
+              column, which are the        resource condition keys that apply to an action in the Actions table.
+             </p>
+            </div>
+           </div>
+           <p>
+            For details about the columns in the following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#actions_table" rel="noopener noreferrer" target="_blank">
+             Actions table
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9e1505c11c13">
+              <thead>
+               <tr>
+                <th>
+                 Actions
+                </th>
+                <th>
+                 Description
+                </th>
+                <th>
+                 Access level
+                </th>
+                <th>
+                 Resource types (*required)
+                </th>
+                <th>
+                 Condition keys
+                </th>
+                <th>
+                 Dependent actions
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="awsstepfunctions-CreateActivity" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/step-functions/latest/apireference/API_CreateActivity.html">
+                 CreateActivity
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to create an activity
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstepfunctions-activity">
+                  activity*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstepfunctions-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsstepfunctions-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstepfunctions-CreateStateMachine" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/step-functions/latest/apireference/API_CreateStateMachine.html">
+                 CreateStateMachine
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to create a state machine
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstepfunctions-statemachine">
+                  statemachine*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 iam:PassRole
+                </p>
+                <p>
+                 states:PublishStateMachineVersion
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstepfunctions-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsstepfunctions-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstepfunctions-CreateStateMachineAlias" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/step-functions/latest/apireference/API_CreateStateMachineAlias.html">
+                 CreateStateMachineAlias
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to create a state machine alias
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstepfunctions-statemachine">
+                  statemachine*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstepfunctions-states_StateMachineQualifier">
+                  states:StateMachineQualifier
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstepfunctions-DeleteActivity" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/step-functions/latest/apireference/API_DeleteActivity.html">
+                 DeleteActivity
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete an activity
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstepfunctions-activity">
+                  activity*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstepfunctions-DeleteStateMachine" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/step-functions/latest/apireference/API_DeleteStateMachine.html">
+                 DeleteStateMachine
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a state machine
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstepfunctions-statemachine">
+                  statemachine*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstepfunctions-DeleteStateMachineAlias" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/step-functions/latest/apireference/API_DeleteStateMachineAlias.html">
+                 DeleteStateMachineAlias
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to delete a state machine alias
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstepfunctions-statemachine">
+                  statemachine*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstepfunctions-states_StateMachineQualifier">
+                  states:StateMachineQualifier
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstepfunctions-DeleteStateMachineVersion" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/step-functions/latest/apireference/API_DeleteStateMachineVersion.html">
+                 DeleteStateMachineVersion
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to delete a state machine version
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstepfunctions-statemachine">
+                  statemachine*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstepfunctions-states_StateMachineQualifier">
+                  states:StateMachineQualifier
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstepfunctions-DescribeActivity" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/step-functions/latest/apireference/API_DescribeActivity.html">
+                 DescribeActivity
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to describe an activity
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstepfunctions-activity">
+                  activity*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstepfunctions-DescribeExecution" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/step-functions/latest/apireference/API_DescribeExecution.html">
+                 DescribeExecution
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to describe an execution
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstepfunctions-execution">
+                  execution*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstepfunctions-express">
+                  express*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstepfunctions-DescribeMapRun" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/step-functions/latest/apireference/API_DescribeMapRun.html">
+                 DescribeMapRun
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to describe a map run
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstepfunctions-maprun">
+                  maprun*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstepfunctions-DescribeStateMachine" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/step-functions/latest/apireference/API_DescribeStateMachine.html">
+                 DescribeStateMachine
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to describe a state machine
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstepfunctions-statemachine">
+                  statemachine*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstepfunctions-states_StateMachineQualifier">
+                  states:StateMachineQualifier
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstepfunctions-DescribeStateMachineAlias" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/step-functions/latest/apireference/API_DescribeStateMachineAlias.html">
+                 DescribeStateMachineAlias
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to describe a state machine alias
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstepfunctions-statemachine">
+                  statemachine*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstepfunctions-states_StateMachineQualifier">
+                  states:StateMachineQualifier
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstepfunctions-DescribeStateMachineForExecution" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/step-functions/latest/apireference/API_DescribeStateMachineForExecution.html">
+                 DescribeStateMachineForExecution
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to describe the state machine for an execution
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstepfunctions-execution">
+                  execution*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstepfunctions-GetActivityTask" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/step-functions/latest/apireference/API_GetActivityTask.html">
+                 GetActivityTask
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to be used by workers to retrieve a task (with the specified activity ARN) which has been scheduled for execution by a running state machine
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstepfunctions-activity">
+                  activity*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstepfunctions-GetExecutionHistory" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/step-functions/latest/apireference/API_GetExecutionHistory.html">
+                 GetExecutionHistory
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to return the history of the specified execution as a list of events
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstepfunctions-execution">
+                  execution*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstepfunctions-InvokeHTTPEndpoint" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/step-functions/latest/dg/connect-third-party-apis.html">
+                 InvokeHTTPEndpoint
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to invoke the HTTP Task state
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstepfunctions-ListActivities" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/step-functions/latest/apireference/API_ListActivities.html">
+                 ListActivities
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list the existing activities
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstepfunctions-ListExecutions" rowspan="3" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/step-functions/latest/apireference/API_ListExecutions.html">
+                 ListExecutions
+                </a>
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Grants permission to list the executions of a state machine
+               </td>
+               <td rowspan="3" tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstepfunctions-maprun">
+                  maprun*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstepfunctions-statemachine">
+                  statemachine*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstepfunctions-states_StateMachineQualifier">
+                  states:StateMachineQualifier
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstepfunctions-ListMapRuns" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/step-functions/latest/apireference/API_ListMapRuns.html">
+                 ListMapRuns
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list the map runs of an execution
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstepfunctions-execution">
+                  execution*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstepfunctions-ListStateMachineAliases" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/step-functions/latest/apireference/API_ListStateMachineAliases.html">
+                 ListStateMachineAliases
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to list the aliases of a state machine
+               </td>
+               <td rowspan="2" tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstepfunctions-statemachine">
+                  statemachine*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstepfunctions-states_StateMachineQualifier">
+                  states:StateMachineQualifier
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstepfunctions-ListStateMachineVersions" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/step-functions/latest/apireference/API_ListStateMachineVersions.html">
+                 ListStateMachineVersions
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list the versions of a state machine
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstepfunctions-statemachine">
+                  statemachine*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstepfunctions-ListStateMachines" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/step-functions/latest/apireference/API_ListStateMachines.html">
+                 ListStateMachines
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to lists the existing state machines
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstepfunctions-ListTagsForResource" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/step-functions/latest/apireference/API_ListTagsForResource.html">
+                 ListTagsForResource
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to list tags for an AWS Step Functions resource
+               </td>
+               <td rowspan="2" tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstepfunctions-activity">
+                  activity
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstepfunctions-statemachine">
+                  statemachine
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstepfunctions-PublishStateMachineVersion" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/step-functions/latest/apireference/API_PublishStateMachineVersion.html">
+                 PublishStateMachineVersion
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to publish a state machine version
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstepfunctions-statemachine">
+                  statemachine*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstepfunctions-RedriveExecution" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/step-functions/latest/apireference/API_RedriveExecution.html">
+                 RedriveExecution
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to redrive an execution
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstepfunctions-execution">
+                  execution*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstepfunctions-RevealSecrets" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/step-functions/latest/dg/test-state-isolation.html">
+                 RevealSecrets
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to reveal sensitive data from an execution
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstepfunctions-SendTaskFailure" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/step-functions/latest/apireference/API_SendTaskFailure.html">
+                 SendTaskFailure
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to report that the task identified by the taskToken failed
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstepfunctions-SendTaskHeartbeat" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/step-functions/latest/apireference/API_SendTaskHeartbeat.html">
+                 SendTaskHeartbeat
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to report to the service that the task represented by the specified taskToken is still making progress
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstepfunctions-SendTaskSuccess" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/step-functions/latest/apireference/API_SendTaskSuccess.html">
+                 SendTaskSuccess
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to report that the task identified by the taskToken completed successfully
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstepfunctions-StartExecution" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/step-functions/latest/apireference/API_StartExecution.html">
+                 StartExecution
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to start a state machine execution
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstepfunctions-statemachine">
+                  statemachine*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstepfunctions-states_StateMachineQualifier">
+                  states:StateMachineQualifier
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstepfunctions-StartSyncExecution" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/step-functions/latest/apireference/API_StartSyncExecution.html">
+                 StartSyncExecution
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to start a Synchronous Express state machine execution
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstepfunctions-statemachine">
+                  statemachine*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstepfunctions-states_StateMachineQualifier">
+                  states:StateMachineQualifier
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstepfunctions-StopExecution" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/step-functions/latest/apireference/API_StopExecution.html">
+                 StopExecution
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to stop an execution
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstepfunctions-execution">
+                  execution*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstepfunctions-TagResource" rowspan="3" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/step-functions/latest/apireference/API_TagResource.html">
+                 TagResource
+                </a>
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Grants permission to tag an AWS Step Functions resource
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Tagging
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstepfunctions-activity">
+                  activity
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstepfunctions-statemachine">
+                  statemachine
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstepfunctions-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsstepfunctions-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstepfunctions-TestState" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/step-functions/latest/apireference/API_TestState.html">
+                 TestState
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to test a state machine definition
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 states:RevealSecrets
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstepfunctions-UntagResource" rowspan="3" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/step-functions/latest/apireference/API_UntagResource.html">
+                 UntagResource
+                </a>
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Grants permission to remove a tag from an AWS Step Functions resource
+               </td>
+               <td rowspan="3" tabindex="-1">
+                Tagging
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstepfunctions-activity">
+                  activity
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstepfunctions-statemachine">
+                  statemachine
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstepfunctions-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstepfunctions-UpdateMapRun" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/step-functions/latest/apireference/API_UpdateMapRun.html">
+                 UpdateMapRun
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update a map run
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstepfunctions-maprun">
+                  maprun*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstepfunctions-UpdateStateMachine" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/step-functions/latest/apireference/API_UpdateStateMachine.html">
+                 UpdateStateMachine
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to update a state machine
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstepfunctions-statemachine">
+                  statemachine*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 iam:PassRole
+                </p>
+                <p>
+                 states:PublishStateMachineVersion
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstepfunctions-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+                <p>
+                 <a href="#awsstepfunctions-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstepfunctions-UpdateStateMachineAlias" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/step-functions/latest/apireference/API_UpdateStateMachineAlias.html">
+                 UpdateStateMachineAlias
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to update a state machine alias
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstepfunctions-statemachine">
+                  statemachine*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstepfunctions-states_StateMachineQualifier">
+                  states:StateMachineQualifier
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstepfunctions-ValidateStateMachineDefinition" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/step-functions/latest/apireference/API_ValidateStateMachineDefinition.html">
+                 ValidateStateMachineDefinition
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to validate a state machine definition
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <h2 id="awsstepfunctions-resources-for-iam-policies">
+            Resource types defined by        AWS Step Functions
+           </h2>
+           <p>
+            The following resource types are defined by this service and can be used in the
+            <code class="code">
+             Resource
+            </code>
+            element of IAM permission policy statements. Each action in the
+            <a href="#awsstepfunctions-actions-as-permissions">
+             Actions table
+            </a>
+            identifies the      resource types that can be specified with that action. A resource type can also define which      condition keys you can include in a policy. These keys are displayed in the last column of the      Resource types table. For details about the columns in the following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#resources_table" rel="noopener noreferrer" target="_blank">
+             Resource types table
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9e1505c13b5">
+              <thead>
+               <tr>
+                <th>
+                 Resource types
+                </th>
+                <th>
+                 ARN
+                </th>
+                <th>
+                 Condition keys
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="awsstepfunctions-activity" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/step-functions/latest/dg/concepts-activities.html">
+                 activity
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:states:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:activity:$
+                 <span>
+                  {
+                 </span>
+                 ActivityName}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstepfunctions-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstepfunctions-execution" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/step-functions/latest/dg/concepts-state-machine-executions.html">
+                 execution
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:states:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:execution:$
+                 <span>
+                  {
+                 </span>
+                 StateMachineName}:$
+                 <span>
+                  {
+                 </span>
+                 ExecutionId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstepfunctions-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstepfunctions-express" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/step-functions/latest/dg/concepts-state-machine-executions.html">
+                 express
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:states:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:express:$
+                 <span>
+                  {
+                 </span>
+                 StateMachineName}:$
+                 <span>
+                  {
+                 </span>
+                 ExecutionId}:$
+                 <span>
+                  {
+                 </span>
+                 ExpressId}
+                </code>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstepfunctions-statemachine" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/step-functions/latest/dg/concepts-amazon-states-language.html">
+                 statemachine
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:states:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:stateMachine:$
+                 <span>
+                  {
+                 </span>
+                 StateMachineName}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#awsstepfunctions-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstepfunctions-statemachineversion" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/step-functions/latest/dg/concepts-cd-aliasing-versioning.html">
+                 statemachineversion
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:states:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:stateMachine:$
+                 <span>
+                  {
+                 </span>
+                 StateMachineName}:$
+                 <span>
+                  {
+                 </span>
+                 StateMachineVersionId}
+                </code>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstepfunctions-statemachinealias" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/step-functions/latest/dg/concepts-cd-aliasing-versioning.html">
+                 statemachinealias
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:states:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:stateMachine:$
+                 <span>
+                  {
+                 </span>
+                 StateMachineName}:$
+                 <span>
+                  {
+                 </span>
+                 StateMachineAliasName}
+                </code>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstepfunctions-maprun" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/step-functions/latest/dg/concepts-examine-map-run.html">
+                 maprun
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:states:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:mapRun:$
+                 <span>
+                  {
+                 </span>
+                 StateMachineName}/$
+                 <span>
+                  {
+                 </span>
+                 MapRunLabel}:$
+                 <span>
+                  {
+                 </span>
+                 MapRunId}
+                </code>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstepfunctions-labelledexecution" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/step-functions/latest/dg/concepts-examine-map-run.html">
+                 labelled execution
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:states:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:execution:$
+                 <span>
+                  {
+                 </span>
+                 StateMachineName}/$
+                 <span>
+                  {
+                 </span>
+                 MapRunLabel}:$
+                 <span>
+                  {
+                 </span>
+                 ExecutionId}
+                </code>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstepfunctions-labelledexpress" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/step-functions/latest/dg/concepts-examine-map-run.html">
+                 labelled express
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:states:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:express:$
+                 <span>
+                  {
+                 </span>
+                 StateMachineName}/$
+                 <span>
+                  {
+                 </span>
+                 MapRunLabel}:$
+                 <span>
+                  {
+                 </span>
+                 ExecutionId}:$
+                 <span>
+                  {
+                 </span>
+                 ExpressId}
+                </code>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <h2 id="awsstepfunctions-policy-keys">
+            Condition keys for        AWS Step Functions
+           </h2>
+           <p>
+            AWS Step Functions defines the following condition keys that can be used in the
+            <code class="code">
+             Condition
+            </code>
+            element of an IAM policy. You can use these keys to further refine      the conditions under which the policy statement applies. For details about the columns in the      following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#context_keys_table" rel="noopener noreferrer" target="_blank">
+             Condition keys table
+            </a>
+            .
+           </p>
+           <p>
+            To view the global condition keys that are available to all services, see
+            <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#AvailableKeys">
+             Available global condition keys
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9e1505c15b7">
+              <thead>
+               <tr>
+                <th>
+                 Condition keys
+                </th>
+                <th>
+                 Description
+                </th>
+                <th>
+                 Type
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="awsstepfunctions-aws_RequestTag___TagKey_" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-requesttag">
+                 aws:RequestTag/${TagKey}
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by a tag key and value pair that is allowed in the request
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstepfunctions-aws_ResourceTag___TagKey_" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-resourcetag">
+                 aws:ResourceTag/${TagKey}
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by a tag key and value pair of a resource
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstepfunctions-aws_TagKeys" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-tagkeys">
+                 aws:TagKeys
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by a list of tag keys that are allowed in the request
+               </td>
+               <td tabindex="-1">
+                ArrayOfString
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstepfunctions-states_HTTPEndpoint" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/step-functions/latest/dg/connect-third-party-apis.html">
+                 states:HTTPEndpoint
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the endpoint that the HTTP Task state allows in the request
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstepfunctions-states_HTTPMethod" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/step-functions/latest/dg/connect-third-party-apis.html">
+                 states:HTTPMethod
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the method that the HTTP Task state allows in the request
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="awsstepfunctions-states_StateMachineQualifier" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/step-functions/latest/dg/auth-version-alias.html">
+                 states:StateMachineQualifier
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the qualifier of a state machine ARN
+               </td>
+               <td tabindex="-1">
+                ArrayOfString
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <awsdocs-copyright class="copyright-print">
+           </awsdocs-copyright>
+           <awsdocs-thumb-feedback right-edge="{{$ctrl.thumbFeedbackRightEdge}}">
+           </awsdocs-thumb-feedback>
+          </div>
+          <noscript>
+           <div>
+            <div>
+             <div>
+              <div id="js_error_message">
+               <p>
+                <img alt="Warning" src="https://d1ge0kk1l5kms0.cloudfront.net/images/G/01/webservices/console/warning.png"/>
+                <strong>
+                 Javascript is disabled or is unavailable in your browser.
+                </strong>
+               </p>
+               <p>
+                To use the Amazon Web Services Documentation, Javascript must be enabled. Please refer to your browser's Help pages for instructions.
+               </p>
+              </div>
+             </div>
+            </div>
+           </div>
+          </noscript>
+          <div class="awsui-util-font-size-0" id="main-col-footer">
+           <div id="doc-conventions">
+            <a href="/general/latest/gr/docconventions.html" target="_top">
+             Document Conventions
+            </a>
+           </div>
+           <div class="prev-next">
+            <div accesskey="p" class="prev-link" href="./list_amazonsqs.html" id="previous">
+             Amazon SQS
+            </div>
+            <div accesskey="n" class="next-link" href="./list_awsstoragegateway.html" id="next">
+             AWS Storage Gateway
+            </div>
+           </div>
+          </div>
+          <awsdocs-page-utilities>
+          </awsdocs-page-utilities>
+         </div>
+         <div id="quick-feedback-yes" style="display: none;">
+          <div class="title">
+           Did this page help you? - Yes
+          </div>
+          <div class="content">
+           <p>
+            Thanks for letting us know we're doing a good job!
+           </p>
+           <p>
+            If you've got a moment, please tell us what we did right so we can do more of it.
+           </p>
+           <p>
+            <awsui-button click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service Authorization Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awsstepfunctions.html" id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback">
+            </awsui-button>
+           </p>
+          </div>
+         </div>
+         <div id="quick-feedback-no" style="display: none;">
+          <div class="title">
+           Did this page help you? - No
+          </div>
+          <div class="content">
+           <p>
+            Thanks for letting us know this page needs work. We're sorry we let you down.
+           </p>
+           <p>
+            If you've got a moment, please tell us how we can make the documentation better.
+           </p>
+           <p>
+            <awsui-button click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service Authorization Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_awsstepfunctions.html" id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback">
+            </awsui-button>
+           </p>
+          </div>
+         </div>
+        </div>
+       </body>
+      </div>
+     </awsdocs-view>
+     <div class="page-loading-indicator" id="page-loading-indicator">
+      <awsui-spinner size="large">
+      </awsui-spinner>
+     </div>
+    </div>
+    <div dom-region="tools" id="tools-panel">
+     <awsdocs-tools-panel id="awsdocs-tools-panel">
+     </awsdocs-tools-panel>
+    </div>
+   </awsui-app-layout>
+   <awsdocs-cookie-banner class="doc-cookie-banner">
+   </awsdocs-cookie-banner>
+  </div>
+ </body>
+</html>

@@ -1,0 +1,3489 @@
+<!DOCTYPE html>
+<html lang="en-US" xmlns="http://www.w3.org/1999/xhtml">
+ <head>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+  <title>
+   Actions, resources, and condition keys for Amazon WorkMail - Service Authorization Reference
+  </title>
+  <meta content="width=device-width,initial-scale=1" name="viewport"/>
+  <meta content="/assets" name="assets_root"/>
+  <meta content="list_amazonworkmail" name="target_state"/>
+  <meta content="list_amazonworkmail" name="default_state"/>
+  <link href="https://docs.aws.amazon.com/assets/images/favicon.ico" rel="icon" type="image/ico"/>
+  <link href="https://docs.aws.amazon.com/assets/images/favicon.ico" rel="shortcut icon" type="image/ico"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonworkmail.html" rel="canonical"/>
+  <meta content="Lists all of the available service-specific resources, actions, and condition keys that can be used in IAM policies to control access to Amazon WorkMail." name="description"/>
+  <meta content="IAD" name="deployment_region"/>
+  <meta content="Service Authorization Reference" name="product"/>
+  <meta content="Service Authorization Reference" name="guide"/>
+  <meta content="Provides a list of the actions, resources, and condition keys supported by each AWS service that can be used in an IAM policy." name="abstract"/>
+  <meta content="en_us" name="guide-locale"/>
+  <meta content="toc-contents.json" name="tocs"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonworkmail.html" rel="canonical"/>
+  <link href="https://docs.aws.amazon.com/id_id/service-authorization/latest/reference/list_amazonworkmail.html" hreflang="id-id" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/id_id/service-authorization/latest/reference/list_amazonworkmail.html" hreflang="id" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/de_de/service-authorization/latest/reference/list_amazonworkmail.html" hreflang="de-de" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/de_de/service-authorization/latest/reference/list_amazonworkmail.html" hreflang="de" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonworkmail.html" hreflang="en-us" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonworkmail.html" hreflang="en" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/es_es/service-authorization/latest/reference/list_amazonworkmail.html" hreflang="es-es" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/es_es/service-authorization/latest/reference/list_amazonworkmail.html" hreflang="es" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/fr_fr/service-authorization/latest/reference/list_amazonworkmail.html" hreflang="fr-fr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/fr_fr/service-authorization/latest/reference/list_amazonworkmail.html" hreflang="fr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/it_it/service-authorization/latest/reference/list_amazonworkmail.html" hreflang="it-it" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/it_it/service-authorization/latest/reference/list_amazonworkmail.html" hreflang="it" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ja_jp/service-authorization/latest/reference/list_amazonworkmail.html" hreflang="ja-jp" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ja_jp/service-authorization/latest/reference/list_amazonworkmail.html" hreflang="ja" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ko_kr/service-authorization/latest/reference/list_amazonworkmail.html" hreflang="ko-kr" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/ko_kr/service-authorization/latest/reference/list_amazonworkmail.html" hreflang="ko" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/pt_br/service-authorization/latest/reference/list_amazonworkmail.html" hreflang="pt-br" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/pt_br/service-authorization/latest/reference/list_amazonworkmail.html" hreflang="pt" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/zh_cn/service-authorization/latest/reference/list_amazonworkmail.html" hreflang="zh-cn" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/zh_tw/service-authorization/latest/reference/list_amazonworkmail.html" hreflang="zh-tw" rel="alternative"/>
+  <link href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonworkmail.html" hreflang="x-default" rel="alternative"/>
+  <meta content="Service Authorization Docs" name="feedback-item"/>
+  <meta content="Service Authorization Reference" name="this_doc_product"/>
+  <meta content="Service Authorization Reference" name="this_doc_guide"/>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor4.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor3.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/vendor1.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/awsdocs-common.js?version=2021.12.02">
+  </script>
+  <script defer="" src="https://docs.aws.amazon.com/assets/r/awsdocs-doc-page.js?version=2021.12.02">
+  </script>
+  <link href="https://docs.aws.amazon.com/assets/r/vendor4.css?version=2021.12.02" rel="stylesheet"/>
+  <link href="https://docs.aws.amazon.com/assets/r/awsdocs-common.css?version=2021.12.02" rel="stylesheet"/>
+  <link href="https://docs.aws.amazon.com/assets/r/awsdocs-doc-page.css?version=2021.12.02" rel="stylesheet"/>
+  <script async="" data-config="{'appEntity':'aws-documentation','region':'us-east-1','service':'iam'}" id="awsc-panorama-bundle" src="https://prod.pa.cdn.uis.awsstatic.com/panorama-nav-init.js" type="text/javascript">
+  </script>
+  <meta id="panorama-serviceSubSection" value="Service Authorization Reference"/>
+  <meta id="panorama-serviceConsolePage" value="Actions, resources, and condition keys for Amazon WorkMail"/>
+ </head>
+ <body class="awsdocs awsui">
+  <div class="awsdocs-container">
+   <awsdocs-header>
+   </awsdocs-header>
+   <awsui-app-layout class="awsui-util-no-gutters" header-selector="awsdocs-header" id="app-layout" navigation-change="$ctrl.onNavChange($event)" navigation-hide="false" navigation-open="$ctrl.navOpen" navigation-width="$ctrl.navWidth" ng-controller="ContentController as $ctrl" tools-change="$ctrl.onToolsChange($event)" tools-hide="$ctrl.hideTools" tools-open="$ctrl.toolsOpen" tools-width="$ctrl.toolsWidth">
+    <div dom-region="navigation" id="guide-toc">
+     <awsdocs-toc>
+     </awsdocs-toc>
+    </div>
+    <div dom-region="content" id="main-column" tabindex="-1">
+     <awsdocs-view class="awsdocs-view">
+      <div id="awsdocs-content">
+       <head>
+        <title>
+         Actions, resources, and condition keys for Amazon WorkMail - Service Authorization Reference
+        </title>
+        <meta content="/pdfs/service-authorization/latest/reference/service-authorization.pdf#list_amazonworkmail" name="pdf"/>
+        <meta content="https://repost.aws/tags/TAO7Z4bI5hQVWMiYFs34QhIA" name="forums"/>
+        <meta content="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service%20Authorization%20Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazonworkmail.html" name="feedback"/>
+        <meta content="feedbackyes.html?topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazonworkmail.html" name="feedback-yes"/>
+        <meta content="feedbackno.html?topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazonworkmail.html" name="feedback-no"/>
+        <script type="application/ld+json">
+         {
+    "@context" : "https://schema.org",
+    "@type" : "BreadcrumbList",
+    "itemListElement" : [
+      {
+        "@type" : "ListItem",
+        "position" : 1,
+        "name" : "AWS",
+        "item" : "https://aws.amazon.com"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 2,
+        "name" : "Service Authorization Reference",
+        "item" : "https://docs.aws.amazon.com/iam/index.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 3,
+        "name" : "Service Authorization Reference",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 4,
+        "name" : "Reference",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 5,
+        "name" : "Actions, resources, and condition keys for AWS services",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference_policies_actions-resources-contextkeys.html"
+      },
+      {
+        "@type" : "ListItem",
+        "position" : 6,
+        "name" : "Actions, resources, and condition keys for Amazon WorkMail",
+        "item" : "https://docs.aws.amazon.com/service-authorization/latest/reference/reference_policies_actions-resources-contextkeys.html"
+      }
+    ]
+}
+        </script>
+       </head>
+       <body>
+        <div id="main">
+         <div style="display: none">
+          <a href="/pdfs/service-authorization/latest/reference/service-authorization.pdf#list_amazonworkmail" rel="noopener noreferrer" target="_blank" title="Open PDF">
+          </a>
+         </div>
+         <div class="breadcrumb" id="breadcrumbs">
+          <a href="https://aws.amazon.com">
+           AWS
+          </a>
+          <a href="/index.html">
+           Documentation
+          </a>
+          <a href="/iam/index.html">
+           Service Authorization Reference
+          </a>
+          <a href="reference.html">
+           Service Authorization Reference
+          </a>
+         </div>
+         <div id="page-toc-src">
+          <a href="#amazonworkmail-actions-as-permissions">
+           Actions
+          </a>
+          <a href="#amazonworkmail-resources-for-iam-policies">
+           Resource types
+          </a>
+          <a href="#amazonworkmail-policy-keys">
+           Condition keys
+          </a>
+         </div>
+         <div class="awsui-util-container" id="main-content">
+          <div id="main-col-body">
+           <awsdocs-language-banner data-service="$ctrl.pageService">
+           </awsdocs-language-banner>
+           <h1 class="topictitle" id="list_amazonworkmail">
+            Actions, resources, and condition keys for      Amazon WorkMail
+           </h1>
+           <div class="awsdocs-page-header-container">
+            <awsdocs-page-header>
+            </awsdocs-page-header>
+            <awsdocs-filter-selector id="awsdocs-filter-selector">
+            </awsdocs-filter-selector>
+           </div>
+           <p>
+            Amazon WorkMail (service prefix:
+            <code class="code">
+             workmail
+            </code>
+            ) provides the following    service-specific resources, actions, and condition context keys for use in IAM permission    policies.
+           </p>
+           <p>
+            References:
+           </p>
+           <div class="itemizedlist">
+            <ul class="itemizedlist">
+             <li class="listitem">
+              <p>
+               Learn how to
+               <a href="https://docs.aws.amazon.com/workmail/latest/userguide/">
+                configure this service
+               </a>
+               .
+              </p>
+             </li>
+             <li class="listitem">
+              <p>
+               View a list of the
+               <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/">
+                API operations available for this          service
+               </a>
+               .
+              </p>
+             </li>
+             <li class="listitem">
+              <p>
+               Learn how to secure this service and its resources by
+               <a href="https://docs.aws.amazon.com/workmail/latest/adminguide/iam_users_groups.html">
+                using          IAM
+               </a>
+               permission policies.
+              </p>
+             </li>
+            </ul>
+           </div>
+           <div class="highlights" id="inline-topiclist">
+            <h6>
+             Topics
+            </h6>
+            <ul>
+             <li>
+              <a href="#amazonworkmail-actions-as-permissions">
+               Actions defined by        Amazon WorkMail
+              </a>
+             </li>
+             <li>
+              <a href="#amazonworkmail-resources-for-iam-policies">
+               Resource types defined by        Amazon WorkMail
+              </a>
+             </li>
+             <li>
+              <a href="#amazonworkmail-policy-keys">
+               Condition keys for        Amazon WorkMail
+              </a>
+             </li>
+            </ul>
+           </div>
+           <h2 id="amazonworkmail-actions-as-permissions">
+            Actions defined by        Amazon WorkMail
+           </h2>
+           <p>
+            You can specify the following actions in the
+            <code class="code">
+             Action
+            </code>
+            element of an IAM      policy statement. Use policies to grant permissions to perform an operation in AWS. When you      use an action in a policy, you usually allow or deny access to the API operation or CLI      command with the same name. However, in some cases, a single action controls access to more      than one operation. Alternatively, some operations require several different actions.
+           </p>
+           <p>
+            The
+            <b>
+             Resource types
+            </b>
+            column of the Actions table indicates whether each      action supports resource-level permissions. If there is no value for this column, you must      specify all resources ("*") to which the policy applies in the
+            <code class="code">
+             Resource
+            </code>
+            element      of your policy statement. If the column includes a resource type, then you can specify an ARN      of that type in a statement with that action. If the action has one or more required      resources, the caller must have permission to use the action with those resources. Required      resources are indicated in the table with an asterisk (*). If you limit resource access with      the
+            <code class="code">
+             Resource
+            </code>
+            element in an IAM policy, you must include an ARN or pattern for      each required resource type. Some actions support multiple resource types. If the resource      type is optional (not indicated as required), then you can choose to use one of the optional      resource types.
+           </p>
+           <p>
+            The
+            <b>
+             Condition keys
+            </b>
+            column of the Actions table includes keys that you      can specify in a policy statement's
+            <code class="code">
+             Condition
+            </code>
+            element. For more information on      the condition keys that are associated with resources for the service, see the
+            <b>
+             Condition keys
+            </b>
+            column of the Resource types table.
+           </p>
+           <div class="awsdocs-note">
+            <div class="awsdocs-note-title">
+             <awsui-icon name="status-info" variant="link">
+             </awsui-icon>
+             <h6>
+              Note
+             </h6>
+            </div>
+            <div class="awsdocs-note-text">
+             <p>
+              Resource condition keys are listed in the
+              <a href="#amazonworkmail-resources-for-iam-policies">
+               Resource types
+              </a>
+              table. You        can find a link to the resource type that applies to an action in the
+              <b>
+               Resource          types (*required)
+              </b>
+              column of the Actions table. The resource type in the        Resource types table includes the
+              <b>
+               Condition keys
+              </b>
+              column, which are the        resource condition keys that apply to an action in the Actions table.
+             </p>
+            </div>
+           </div>
+           <p>
+            For details about the columns in the following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#actions_table" rel="noopener noreferrer" target="_blank">
+             Actions table
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9e1659c11c13">
+              <thead>
+               <tr>
+                <th>
+                 Actions
+                </th>
+                <th>
+                 Description
+                </th>
+                <th>
+                 Access level
+                </th>
+                <th>
+                 Resource types (*required)
+                </th>
+                <th>
+                 Condition keys
+                </th>
+                <th>
+                 Dependent actions
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="amazonworkmail-AllowVendedLogDeliveryForResource" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/adminguide/audit-logging.html">
+                 AllowVendedLogDeliveryForResource
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to configure vended log delivery for WorkMail audit logs
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-AssociateDelegateToResource" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_AssociateDelegateToResource.html">
+                 AssociateDelegateToResource
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to add a member (user or group) to the resource's set of delegates
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-AssociateMemberToGroup" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_AssociateMemberToGroup.html">
+                 AssociateMemberToGroup
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to add a member (user or group) to the group's set
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-AssumeImpersonationRole" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_AssumeImpersonationRole.html">
+                 AssumeImpersonationRole
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to assume an impersonation role for the given Amazon WorkMail organization
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-CancelMailboxExportJob" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_CancelMailboxExportJob.html">
+                 CancelMailboxExportJob
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to cancel a currently running mailbox export job
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-CreateAlias" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_CreateAlias.html">
+                 CreateAlias
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to add an alias to the set of a given member (user or group) of WorkMail
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-CreateAvailabilityConfiguration" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_CreateAvailabilityConfiguration.html">
+                 CreateAvailabilityConfiguration
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create an AvailabilityConfiguration for the given Amazon WorkMail organization and domain
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-CreateGroup" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_CreateGroup.html">
+                 CreateGroup
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a group that can be used in WorkMail by calling the RegisterToWorkMail operation
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-CreateImpersonationRole" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_CreateImpersonationRole.html">
+                 CreateImpersonationRole
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create an impersonation role for the given Amazon WorkMail organization
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-CreateInboundMailFlowRule" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/adminguide/create-email-rules.html">
+                 CreateInboundMailFlowRule
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to create an inbound email flow rule which will apply to all email sent to an organization
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-CreateMailDomain" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/adminguide/add_domain.html">
+                 CreateMailDomain
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a mail domain
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-CreateMobileDeviceAccessRule" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_CreateMobileDeviceAccessRule.html">
+                 CreateMobileDeviceAccessRule
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a new mobile device access rule
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-CreateOrganization" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_CreateOrganization.html">
+                 CreateOrganization
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a new Amazon WorkMail organization
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-CreateOutboundMailFlowRule" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/adminguide/create-email-rules.html">
+                 CreateOutboundMailFlowRule
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to create an outbound email flow rule which will apply to all email sent from an organization
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-CreateResource" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_CreateResource.html">
+                 CreateResource
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a new WorkMail resource
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-CreateSmtpGateway" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/adminguide/smtp-gateway.html">
+                 CreateSmtpGateway
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to register an SMTP gateway to a WorkMail organization
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-CreateUser" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_CreateUser.html">
+                 CreateUser
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to create a user, which can be enabled afterwards by calling the RegisterToWorkMail operation
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-DeleteAccessControlRule" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_DeleteAccessControlRule.html">
+                 DeleteAccessControlRule
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete an access control rule
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-DeleteAlias" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_DeleteAlias.html">
+                 DeleteAlias
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to remove one or more specified aliases from a set of aliases for a given user
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-DeleteAvailabilityConfiguration" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_DeleteAvailabilityConfiguration.html">
+                 DeleteAvailabilityConfiguration
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete the AvailabilityConfiguration for the given Amazon WorkMail organization and domain
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-DeleteEmailMonitoringConfiguration" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_DeleteEmailMonitoringConfiguration.html">
+                 DeleteEmailMonitoringConfiguration
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete the email monitoring configuration for an organization
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-DeleteGroup" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_DeleteGroup.html">
+                 DeleteGroup
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a group from WorkMail
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-DeleteImpersonationRole" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_DeleteImpersonationRole.html">
+                 DeleteImpersonationRole
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete an impersonation role for the given Amazon WorkMail organization
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-DeleteInboundMailFlowRule" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/adminguide/remove-email-flow-rule.html">
+                 DeleteInboundMailFlowRule
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to remove an inbound email flow rule to no longer apply to emails sent to an organization
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-DeleteMailDomain" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/adminguide/remove_domain.html">
+                 DeleteMailDomain
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to remove an unused mail domain from an organization
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-DeleteMailboxPermissions" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_DeleteMailboxPermissions.html">
+                 DeleteMailboxPermissions
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete permissions granted to a member (user or group)
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-DeleteMobileDevice" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/adminguide/manage-devices.html#remove_mobile_device">
+                 DeleteMobileDevice
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to remove a mobile device from a user
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-DeleteMobileDeviceAccessOverride" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_DeleteMobileDeviceAccessOverride.html">
+                 DeleteMobileDeviceAccessOverride
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a mobile device access override
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-DeleteMobileDeviceAccessRule" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_DeleteMobileDeviceAccessRule.html">
+                 DeleteMobileDeviceAccessRule
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a mobile device access rule
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-DeleteOrganization" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_DeleteOrganization.html">
+                 DeleteOrganization
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete an Amazon WorkMail organization and all underlying AWS resources managed by Amazon WorkMail as part of the organization
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-DeleteOutboundMailFlowRule" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/adminguide/remove-email-flow-rule.html">
+                 DeleteOutboundMailFlowRule
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to remove an outbound email flow rule so that it no longer applies to emails sent from an organization
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-DeleteResource" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_DeleteResource.html">
+                 DeleteResource
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete the specified resource
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-DeleteRetentionPolicy" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_DeleteRetentionPolicy.html">
+                 DeleteRetentionPolicy
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete the retention policy based on the supplied organization and policy identifiers
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-DeleteSmtpGateway" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/adminguide/smtp-gateway.html">
+                 DeleteSmtpGateway
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to remove an SMTP gateway from an organization
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-DeleteUser" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_DeleteUser.html">
+                 DeleteUser
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to delete a user from WorkMail and all subsequent systems
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-DeliverToMailbox" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/sesmailmanager/latest/APIReference/API_DeliverToMailboxAction.html">
+                 DeliverToMailbox
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to deliver emails to a WorkMail organization via the SES MailManager DeliverToMailbox action
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-DeregisterFromWorkMail" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_DeregisterFromWorkMail.html">
+                 DeregisterFromWorkMail
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to mark a user, group, or resource as no longer used in WorkMail
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-DeregisterMailDomain" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_DeregisterMailDomain.html">
+                 DeregisterMailDomain
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to deregister a mail domain from an organization
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-DescribeEmailMonitoringConfiguration" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_DescribeEmailMonitoringConfiguration.html">
+                 DescribeEmailMonitoringConfiguration
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retrieve the email monitoring configuration for an organization
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-DescribeEntity" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_DescribeEntity.html">
+                 DescribeEntity
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to read details of an entity
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-DescribeGroup" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_DescribeGroup.html">
+                 DescribeGroup
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to read the details for a group
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-DescribeInboundDmarcSettings" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_DescribeInboundDmarcSettings.html">
+                 DescribeInboundDmarcSettings
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to read the settings in a DMARC policy for a specified organization
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-DescribeInboundMailFlowRule" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/adminguide/email-flows.html#email-flows-rule-actions">
+                 DescribeInboundMailFlowRule
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to read the details of an inbound mail flow rule configured for an organization
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-DescribeMailDomains" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/adminguide/domains_overview.html">
+                 DescribeMailDomains
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to show the details of all mail domains associated with the organization
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-DescribeMailboxExportJob" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_DescribeMailboxExportJob.html">
+                 DescribeMailboxExportJob
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retrieve details of a mailbox export job
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-DescribeOrganization" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_DescribeOrganization.html">
+                 DescribeOrganization
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to read details of an organization
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-DescribeOutboundMailFlowRule" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/adminguide/email-flows.html#email-flows-rule-outbound">
+                 DescribeOutboundMailFlowRule
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to read the details of an outbound mail flow rule configured for an organization
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-DescribeResource" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_DescribeResource.html">
+                 DescribeResource
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to read the details for a resource
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-DescribeSmtpGateway" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/adminguide/smtp-gateway.html">
+                 DescribeSmtpGateway
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to read the details of an SMTP gateway registered to an organization
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-DescribeUser" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_DescribeUser.html">
+                 DescribeUser
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to read details for a user
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-DisassociateDelegateFromResource" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_DisassociateDelegateFromResource.html">
+                 DisassociateDelegateFromResource
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to remove a member from the resource's set of delegates
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-DisassociateMemberFromGroup" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_DisassociateMemberFromGroup.html">
+                 DisassociateMemberFromGroup
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to remove a member from a group
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-EnableMailDomain" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/adminguide/add_domain.html">
+                 EnableMailDomain
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to enable a mail domain in the organization
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-GetAccessControlEffect" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_GetAccessControlEffect.html">
+                 GetAccessControlEffect
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get the effects of access control rules as they apply to a specified IPv4 address, access protocol action, or user ID
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-GetDefaultRetentionPolicy" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_GetDefaultRetentionPolicy.html">
+                 GetDefaultRetentionPolicy
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retrieve the retention policy associated at an organizational level
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-GetImpersonationRole" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_GetImpersonationRole.html">
+                 GetImpersonationRole
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retrieve an impersonation role for the given Amazon WorkMail organization
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-GetImpersonationRoleEffect" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_GetImpersonationRoleEffect.html">
+                 GetImpersonationRoleEffect
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to get the effect of the rules associated to an impersonation role for a specific user
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-GetJournalingRules" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/adminguide/journaling_overview.html">
+                 GetJournalingRules
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to read the configured journaling and fallback email addresses for email journaling
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-GetMailDomain" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_GetMailDomain.html">
+                 GetMailDomain
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retrieve details of a given mail domain in an organization
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-GetMailDomainDetails" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/adminguide/domains_overview.html">
+                 GetMailDomainDetails
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to get the details of the mail domain
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-GetMailboxDetails" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_GetMailboxDetails.html">
+                 GetMailboxDetails
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to read the details of the user's mailbox
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-GetMobileDeviceAccessEffect" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_GetMobileDeviceAccessEffect.html">
+                 GetMobileDeviceAccessEffect
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to simulate the effect of the mobile device access rules for the given attributes of a sample access event
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-GetMobileDeviceAccessOverride" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_GetMobileDeviceAccessOverride.html">
+                 GetMobileDeviceAccessOverride
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to retrieve a mobile device access override
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-GetMobileDeviceDetails" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/adminguide/manage-devices.html">
+                 GetMobileDeviceDetails
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to get the details of the mobile device
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-GetMobileDevicesForUser" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/adminguide/manage-devices.html">
+                 GetMobileDevicesForUser
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to get a list of the mobile devices associated with the user
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-GetMobilePolicyDetails" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/adminguide/edit_organization_mobile_policy.html">
+                 GetMobilePolicyDetails
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to get the details of the mobile device policy associated with the organization
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-ListAccessControlRules" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_ListAccessControlRules.html">
+                 ListAccessControlRules
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list the access control rules
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-ListAliases" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_ListAliases.html">
+                 ListAliases
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list the aliases associated with a given entity
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-ListAvailabilityConfigurations" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_ListAvailabilityConfigurations.html">
+                 ListAvailabilityConfigurations
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list all the AvailabilityConfiguration's for the given Amazon WorkMail organization
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-ListGroupMembers" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_ListGroupMembers.html">
+                 ListGroupMembers
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to read an overview of the members of a group. Users and groups can be members of a group
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-ListGroups" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_ListGroups.html">
+                 ListGroups
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list summaries of the organization's groups
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-ListGroupsForEntity" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_ListGroupsForEntity.html">
+                 ListGroupsForEntity
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list the groups to which an entity belongs
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-ListImpersonationRoles" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_ListImpersonationRoles.html">
+                 ListImpersonationRoles
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list the impersonation roles for the given Amazon WorkMail organization
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-ListInboundMailFlowRules" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/adminguide/email-flows.html#email-flows-rule-actions">
+                 ListInboundMailFlowRules
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to list inbound mail flow rules configured for an organization
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-ListMailDomains" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_ListMailDomains.html">
+                 ListMailDomains
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list the mail domains for a given organization
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-ListMailboxExportJobs" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_ListMailboxExportJobs.html">
+                 ListMailboxExportJobs
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list mailbox export jobs
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-ListMailboxPermissions" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_ListMailboxPermissions.html">
+                 ListMailboxPermissions
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list the mailbox permissions associated with a user, group, or resource mailbox
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-ListMobileDeviceAccessOverrides" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_ListMobileDeviceAccessOverrides.html">
+                 ListMobileDeviceAccessOverrides
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list the mobile device access overrides
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-ListMobileDeviceAccessRules" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_ListMobileDeviceAccessRules.html">
+                 ListMobileDeviceAccessRules
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list the mobile device access rules
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-ListOrganizations" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_ListOrganizations.html">
+                 ListOrganizations
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list the non-deleted organizations
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-ListOutboundMailFlowRules" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/adminguide/email-flows.html#email-flows-rule-outbound">
+                 ListOutboundMailFlowRules
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to list outbound mail flow rules configured for an organization
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-ListResourceDelegates" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_ListResourceDelegates.html">
+                 ListResourceDelegates
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list the delegates associated with a resource
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-ListResources" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_ListResources.html">
+                 ListResources
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list the organization's resources
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-ListSmtpGateways" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/adminguide/smtp-gateway.html">
+                 ListSmtpGateways
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to list SMTP gateways registered to the organization
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-ListTagsForResource" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_ListTagsForResource.html">
+                 ListTagsForResource
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to list the tags applied to an Amazon WorkMail organization resource
+               </td>
+               <td rowspan="2" tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonworkmail-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-ListUsers" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_ListUsers.html">
+                 ListUsers
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to list the organization's users
+               </td>
+               <td tabindex="-1">
+                List
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-PutAccessControlRule" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_PutAccessControlRule.html">
+                 PutAccessControlRule
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to add a new access control rule
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-PutEmailMonitoringConfiguration" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_PutEmailMonitoringConfiguration.html">
+                 PutEmailMonitoringConfiguration
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to add or update the email monitoring configuration for an organization
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-PutInboundDmarcSettings" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_PutInboundDmarcSettings.html">
+                 PutInboundDmarcSettings
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to enable or disable a DMARC policy for a given organization
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-PutMailboxPermissions" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_PutMailboxPermissions.html">
+                 PutMailboxPermissions
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to set permissions for a user, group, or resource, replacing any existing permissions
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-PutMobileDeviceAccessOverride" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_PutMobileDeviceAccessOverride.html">
+                 PutMobileDeviceAccessOverride
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to add or update a mobile device access override
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-PutRetentionPolicy" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_PutRetentionPolicy.html">
+                 PutRetentionPolicy
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to add or update the retention policy
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-RegisterMailDomain" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_RegisterMailDomain.html">
+                 RegisterMailDomain
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to register a new mail domain in an organization
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-RegisterToWorkMail" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_RegisterToWorkMail.html">
+                 RegisterToWorkMail
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to register an existing and disabled user, group, or resource for use by associating a mailbox and calendaring capabilities
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-ResetPassword" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_ResetPassword.html">
+                 ResetPassword
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to allow the administrator to reset the password for a user
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-SearchMembers" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/adminguide/groups_overview.html">
+                 SearchMembers
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to perform a prefix search to find a specific user in a mail group
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-SetDefaultMailDomain" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/adminguide/default_domain.html">
+                 SetDefaultMailDomain
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to set the default mail domain for the organization
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-SetJournalingRules" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/adminguide/journaling_overview.html">
+                 SetJournalingRules
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to set journaling and fallback email addresses for email journaling
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-SetMobilePolicyDetails" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/adminguide/edit_organization_mobile_policy.html">
+                 SetMobilePolicyDetails
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to set the details of a mobile policy associated with the organization
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-StartMailboxExportJob" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_StartMailboxExportJob.html">
+                 StartMailboxExportJob
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to start a new mailbox export job
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-TagResource" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_TagResource.html">
+                 TagResource
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to tag the specified Amazon WorkMail organization resource
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Tagging
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+                <p>
+                 <a href="#amazonworkmail-aws_RequestTag___TagKey_">
+                  aws:RequestTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-TestAvailabilityConfiguration" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_TestAvailabilityConfiguration.html">
+                 TestAvailabilityConfiguration
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to performs a test on an availability provider to ensure that access is allowed
+               </td>
+               <td tabindex="-1">
+                Read
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-TestInboundMailFlowRules" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/adminguide/test-email-flow-rule.html">
+                 TestInboundMailFlowRules
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to test what inbound rules will apply to an email with a given sender and recipient
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-TestOutboundMailFlowRules" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/adminguide/test-email-flow-rule.html">
+                 TestOutboundMailFlowRules
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to test what outbound rules will apply to an email with a given sender and recipient
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-UntagResource" rowspan="2" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_UntagResource.html">
+                 UntagResource
+                </a>
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Grants permission to untag the specified Amazon WorkMail organization resource
+               </td>
+               <td rowspan="2" tabindex="-1">
+                Tagging
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-aws_TagKeys">
+                  aws:TagKeys
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-UpdateAvailabilityConfiguration" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_UpdateAvailabilityConfiguration.html">
+                 UpdateAvailabilityConfiguration
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update an existing AvailabilityConfiguration for the given Amazon WorkMail organization and domain
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-UpdateDefaultMailDomain" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_UpdateDefaultMailDomain.html">
+                 UpdateDefaultMailDomain
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update which domain is the default domain for an organization
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-UpdateGroup" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_UpdateGroup.html">
+                 UpdateGroup
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update details of a group
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-UpdateImpersonationRole" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_UpdateImpersonationRole.html">
+                 UpdateImpersonationRole
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update an existing impersonation role for the given Amazon WorkMail organization
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-UpdateInboundMailFlowRule" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/adminguide/modify-email-flow-rule.html">
+                 UpdateInboundMailFlowRule
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to update the details of an inbound email flow rule which will apply to all email sent to an organization
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-UpdateMailboxQuota" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_UpdateMailboxQuota.html">
+                 UpdateMailboxQuota
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update the maximum size (in MB) of the user's mailbox
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-UpdateMobileDeviceAccessRule" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_UpdateMobileDeviceAccessRule.html">
+                 UpdateMobileDeviceAccessRule
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update a mobile device access rule
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-UpdateOutboundMailFlowRule" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/adminguide/modify-email-flow-rule.html">
+                 UpdateOutboundMailFlowRule
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to update the details of an outbound email flow rule which will apply to all email sent from an organization
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-UpdatePrimaryEmailAddress" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_UpdatePrimaryEmailAddress.html">
+                 UpdatePrimaryEmailAddress
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update the primary email for a user, group, or resource
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-UpdateResource" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_UpdateResource.html">
+                 UpdateResource
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update details for the resource
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-UpdateSmtpGateway" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/adminguide/smtp-gateway.html">
+                 UpdateSmtpGateway
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to update the details of an existing SMTP gateway registered to an organization
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-UpdateUser" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/APIReference/API_UpdateUser.html">
+                 UpdateUser
+                </a>
+               </td>
+               <td tabindex="-1">
+                Grants permission to update details of a user
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-WipeMobileDevice" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/adminguide/manage-devices.html#remote_wipe_device">
+                 WipeMobileDevice
+                </a>
+                [permission only]
+               </td>
+               <td tabindex="-1">
+                Grants permission to remotely wipe the mobile device associated with a user's account
+               </td>
+               <td tabindex="-1">
+                Write
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-organization">
+                  organization*
+                 </a>
+                </p>
+               </td>
+               <td tabindex="-1">
+               </td>
+               <td tabindex="-1">
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <h2 id="amazonworkmail-resources-for-iam-policies">
+            Resource types defined by        Amazon WorkMail
+           </h2>
+           <p>
+            The following resource types are defined by this service and can be used in the
+            <code class="code">
+             Resource
+            </code>
+            element of IAM permission policy statements. Each action in the
+            <a href="#amazonworkmail-actions-as-permissions">
+             Actions table
+            </a>
+            identifies the      resource types that can be specified with that action. A resource type can also define which      condition keys you can include in a policy. These keys are displayed in the last column of the      Resource types table. For details about the columns in the following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#resources_table" rel="noopener noreferrer" target="_blank">
+             Resource types table
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9e1659c13b5">
+              <thead>
+               <tr>
+                <th>
+                 Resource types
+                </th>
+                <th>
+                 ARN
+                </th>
+                <th>
+                 Condition keys
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="amazonworkmail-organization" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/workmail/latest/adminguide/organizations_overview.html">
+                 organization
+                </a>
+               </td>
+               <td tabindex="-1">
+                <code class="code">
+                 arn:$
+                 <span>
+                  {
+                 </span>
+                 Partition}:workmail:$
+                 <span>
+                  {
+                 </span>
+                 Region}:$
+                 <span>
+                  {
+                 </span>
+                 Account}:organization/$
+                 <span>
+                  {
+                 </span>
+                 ResourceId}
+                </code>
+               </td>
+               <td tabindex="-1">
+                <p>
+                 <a href="#amazonworkmail-aws_ResourceTag___TagKey_">
+                  aws:ResourceTag/${TagKey}
+                 </a>
+                </p>
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <h2 id="amazonworkmail-policy-keys">
+            Condition keys for        Amazon WorkMail
+           </h2>
+           <p>
+            Amazon WorkMail defines the following condition keys that can be used in the
+            <code class="code">
+             Condition
+            </code>
+            element of an IAM policy. You can use these keys to further refine      the conditions under which the policy statement applies. For details about the columns in the      following table, see
+            <a href="reference_policies_actions-resources-contextkeys.html#context_keys_table" rel="noopener noreferrer" target="_blank">
+             Condition keys table
+            </a>
+            .
+           </p>
+           <p>
+            To view the global condition keys that are available to all services, see
+            <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#AvailableKeys">
+             Available global condition keys
+            </a>
+            .
+           </p>
+           <div class="table-container">
+            <div class="table-contents disable-scroll">
+             <table id="w43aab5b9e1659c15b7">
+              <thead>
+               <tr>
+                <th>
+                 Condition keys
+                </th>
+                <th>
+                 Description
+                </th>
+                <th>
+                 Type
+                </th>
+               </tr>
+              </thead>
+              <tr>
+               <td id="amazonworkmail-aws_RequestTag___TagKey_" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-requesttag">
+                 aws:RequestTag/${TagKey}
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the tag key-value pairs that are passed in the request
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-aws_ResourceTag___TagKey_" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-resourcetag">
+                 aws:ResourceTag/${TagKey}
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the tag key-value pairs attached to the resource
+               </td>
+               <td tabindex="-1">
+                String
+               </td>
+              </tr>
+              <tr>
+               <td id="amazonworkmail-aws_TagKeys" tabindex="-1">
+                <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-tagkeys">
+                 aws:TagKeys
+                </a>
+               </td>
+               <td tabindex="-1">
+                Filters access by the tag keys that are passed in the request
+               </td>
+               <td tabindex="-1">
+                ArrayOfString
+               </td>
+              </tr>
+             </table>
+            </div>
+           </div>
+           <awsdocs-copyright class="copyright-print">
+           </awsdocs-copyright>
+           <awsdocs-thumb-feedback right-edge="{{$ctrl.thumbFeedbackRightEdge}}">
+           </awsdocs-thumb-feedback>
+          </div>
+          <noscript>
+           <div>
+            <div>
+             <div>
+              <div id="js_error_message">
+               <p>
+                <img alt="Warning" src="https://d1ge0kk1l5kms0.cloudfront.net/images/G/01/webservices/console/warning.png"/>
+                <strong>
+                 Javascript is disabled or is unavailable in your browser.
+                </strong>
+               </p>
+               <p>
+                To use the Amazon Web Services Documentation, Javascript must be enabled. Please refer to your browser's Help pages for instructions.
+               </p>
+              </div>
+             </div>
+            </div>
+           </div>
+          </noscript>
+          <div class="awsui-util-font-size-0" id="main-col-footer">
+           <div id="doc-conventions">
+            <a href="/general/latest/gr/docconventions.html" target="_top">
+             Document Conventions
+            </a>
+           </div>
+           <div class="prev-next">
+            <div accesskey="p" class="prev-link" href="./list_amazonworklink.html" id="previous">
+             Amazon WorkLink
+            </div>
+            <div accesskey="n" class="next-link" href="./list_amazonworkmailmessageflow.html" id="next">
+             Amazon WorkMail Message Flow
+            </div>
+           </div>
+          </div>
+          <awsdocs-page-utilities>
+          </awsdocs-page-utilities>
+         </div>
+         <div id="quick-feedback-yes" style="display: none;">
+          <div class="title">
+           Did this page help you? - Yes
+          </div>
+          <div class="content">
+           <p>
+            Thanks for letting us know we're doing a good job!
+           </p>
+           <p>
+            If you've got a moment, please tell us what we did right so we can do more of it.
+           </p>
+           <p>
+            <awsui-button click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service Authorization Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazonworkmail.html" id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback">
+            </awsui-button>
+           </p>
+          </div>
+         </div>
+         <div id="quick-feedback-no" style="display: none;">
+          <div class="title">
+           Did this page help you? - No
+          </div>
+          <div class="content">
+           <p>
+            Thanks for letting us know this page needs work. We're sorry we let you down.
+           </p>
+           <p>
+            If you've got a moment, please tell us how we can make the documentation better.
+           </p>
+           <p>
+            <awsui-button click="linkClick($event)" href="https://docs.aws.amazon.com/forms/aws-doc-feedback?hidden_service_name=Service Authorization Docs&amp;topic_url=https://docs.aws.amazon.com/en_us/service-authorization/latest/reference/list_amazonworkmail.html" id="fblink" rel="noopener noreferrer" target="_blank" text="Feedback">
+            </awsui-button>
+           </p>
+          </div>
+         </div>
+        </div>
+       </body>
+      </div>
+     </awsdocs-view>
+     <div class="page-loading-indicator" id="page-loading-indicator">
+      <awsui-spinner size="large">
+      </awsui-spinner>
+     </div>
+    </div>
+    <div dom-region="tools" id="tools-panel">
+     <awsdocs-tools-panel id="awsdocs-tools-panel">
+     </awsdocs-tools-panel>
+    </div>
+   </awsui-app-layout>
+   <awsdocs-cookie-banner class="doc-cookie-banner">
+   </awsdocs-cookie-banner>
+  </div>
+ </body>
+</html>
