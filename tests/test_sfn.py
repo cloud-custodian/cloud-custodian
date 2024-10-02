@@ -123,15 +123,15 @@ class TestStepFunction(BaseTest):
                         ]
                     }
                 ]
-            },
+         },
             config={'account_id': '101010101111'},
             session_factory=session_factory
-        )
+     )
         resources = p.run()
         self.assertEqual(len(resources), 1)
         client = session_factory().client('stepfunctions')
         tags = client.list_tags_for_resource(resourceArn=resources[0]['stateMachineArn'])
-        self.assertTrue([t for t in tags['tags'] if t['key'] != 'test'])
+        self.assertEqual(len(tags['tags']), 0)
 
     def test_sfn_get_activity(self):
         session_factory = self.replay_flight_data('test_sfn_get_activity')
