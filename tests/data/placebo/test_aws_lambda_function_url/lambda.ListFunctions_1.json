@@ -6,20 +6,20 @@
             {
                 "FunctionName": "hello_world",
                 "FunctionArn": "arn:aws:lambda:us-west-2:644160558196:function:hello_world",
-                "Runtime": "python3.10",
-                "Role": "arn:aws:iam::644160558196:role/service-role/hello_world-role-58x3rejl",
+                "Runtime": "python3.12",
+                "Role": "arn:aws:iam::644160558196:role/service-role/hello_world-role-wktizgp5",
                 "Handler": "lambda_function.lambda_handler",
                 "CodeSize": 299,
                 "Description": "",
                 "Timeout": 3,
                 "MemorySize": 128,
-                "LastModified": "2023-07-27T13:14:30.913+0000",
+                "LastModified": "2024-10-03T14:27:18.123+0000",
                 "CodeSha256": "HAPq9EReJVEC5gLavtc/gyd5vZtd9eiUGF932t0jBxY=",
                 "Version": "$LATEST",
                 "TracingConfig": {
                     "Mode": "PassThrough"
                 },
-                "RevisionId": "ab995b2c-0862-4005-86af-f69248844da8",
+                "RevisionId": "22ba1803-9bb9-4770-8be5-f8f1e1dff1f1",
                 "PackageType": "Zip",
                 "Architectures": [
                     "x86_64"
@@ -30,48 +30,10 @@
                 "SnapStart": {
                     "ApplyOn": "None",
                     "OptimizationStatus": "Off"
-                }
-            },
-            {
-                "FunctionName": "aws-controltower-NotificationForwarder",
-                "FunctionArn": "arn:aws:lambda:us-west-2:644160558196:function:aws-controltower-NotificationForwarder",
-                "Runtime": "python3.6",
-                "Role": "arn:aws:iam::644160558196:role/aws-controltower-ForwardSnsNotificationRole",
-                "Handler": "index.lambda_handler",
-                "CodeSize": 473,
-                "Description": "SNS message forwarding function for aggregating account notifications.",
-                "Timeout": 60,
-                "MemorySize": 128,
-                "LastModified": "2022-02-16T01:54:12.000+0000",
-                "CodeSha256": "GVxAh4JX5PRa2Q0XAGE0diR8E8wKNBFmirK7LPQ/gf4=",
-                "Version": "$LATEST",
-                "VpcConfig": {
-                    "SubnetIds": [],
-                    "SecurityGroupIds": [],
-                    "VpcId": ""
                 },
-                "DeadLetterConfig": {
-                    "TargetArn": "arn:aws:sns:us-west-2:644160558196:aws-controltower-AggregateSecurityNotifications"
-                },
-                "Environment": {
-                    "Variables": {
-                        "sns_arn": "arn:aws:sns:us-west-2:644160558196:aws-controltower-AggregateSecurityNotifications"
-                    }
-                },
-                "TracingConfig": {
-                    "Mode": "PassThrough"
-                },
-                "RevisionId": "e5f003a7-d2a9-4231-b072-daf0a8b65476",
-                "PackageType": "Zip",
-                "Architectures": [
-                    "x86_64"
-                ],
-                "EphemeralStorage": {
-                    "Size": 512
-                },
-                "SnapStart": {
-                    "ApplyOn": "None",
-                    "OptimizationStatus": "Off"
+                "LoggingConfig": {
+                    "LogFormat": "Text",
+                    "LogGroup": "/aws/lambda/hello_world"
                 }
             }
         ]
