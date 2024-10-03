@@ -4,19 +4,11 @@
         "PaginationToken": "",
         "ResourceTagMappingList": [
             {
-                "ResourceARN": "arn:aws:lambda:us-west-2:644160558196:function:aws-controltower-NotificationForwarder",
+                "ResourceARN": "arn:aws:lambda:us-west-2:644160558196:function:test-kms",
                 "Tags": [
                     {
-                        "Key": "aws:cloudformation:stack-name",
-                        "Value": "StackSet-AWSControlTowerBP-BASELINE-CLOUDWATCH-335a6fe7-d484-449d-ba0f-e361ac2f612e"
-                    },
-                    {
-                        "Key": "aws:cloudformation:stack-id",
-                        "Value": "arn:aws:cloudformation:us-west-2:644160558196:stack/StackSet-AWSControlTowerBP-BASELINE-CLOUDWATCH-335a6fe7-d484-449d-ba0f-e361ac2f612e/799b0a80-fa00-11eb-8fae-02b5c6242747"
-                    },
-                    {
-                        "Key": "aws:cloudformation:logical-id",
-                        "Value": "ForwardSnsNotification"
+                        "Key": "lambda-console:blueprint",
+                        "Value": "hello-world"
                     }
                 ]
             }
