@@ -557,7 +557,7 @@ class LogGroup(QueryResourceManager):
     def get_arns(self, resources):
         # log group arn in resource describe has ':*' suffix, not all
         # apis can use that form, so normalize to standard arn.
-        return [r['arn'][:-2] for r in resources]
+        return [r['arn'][:-2] if r['arn'].endswith(':*') else r['arn'] for r in resources]
 
 
 @resources.register('insight-rule')

@@ -1,0 +1,15 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "logGroups": [
+            {
+                "arn": "arn:aws:logs:us-east-2:644160558196:log-group:/aws/codebuild/custodian",
+                "creationTime": 1504743622686,
+                "metricFilterCount": 0,
+                "logGroupName": "/aws/codebuild/custodian",
+                "storedBytes": 1389598
+            }
+        ]
+    }
+}

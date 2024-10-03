@@ -490,3 +490,17 @@ class LogGroupTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 2)
         self.assertIn('c7n:MetricAlarms', resources[0])
+
+    def test_log_group_get_arns_with_tagging(self) -> None:
+        """Tests validating log group tags if the arn does not end in ':*'."""
+        factory = self.replay_flight_data("test_log_group_get_arns_with_tagging")
+        p = self.load_policy(
+            {
+                "name": "get_arns",
+                "resource": "log-group"
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertNotEqual(resources[0]["Tags"], [])
