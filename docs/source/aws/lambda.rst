@@ -177,7 +177,7 @@ Note:
 
 When switching from `periodic` mode to `schedule` mode for a policy that is already deployed,
 the `custodian run` command will not remove the old EventBridge Rule. The same is true when
-switching from `schedule` to `periodi`. The `custodian run` command cannot know what used to
+switching from `schedule` to `periodic`. The `custodian run` command cannot know what used to
 be in a policy file, only what is there now.
 
 Instead of deleting rules and schedules manually, `tools/ops/mugc.py` deletes any function in
