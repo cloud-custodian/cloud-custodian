@@ -11,6 +11,7 @@ import os
 import time
 import subprocess  # nosec
 import sys
+import shlex
 
 import multiprocessing
 from concurrent.futures import (
@@ -523,10 +524,8 @@ def run_script(config, output_dir, accounts, tags, region, echo, serial, script_
     if echo:
         print("command to run: `%s`" % (" ".join(script_args)))
         return
-    # Support fully quoted scripts, which are common to avoid parameter
-    # overlap with c7n-org run-script.
     if len(script_args) == 1 and " " in script_args[0]:
-        script_args = script_args[0].split()
+        script_args = shlex.split(script_args[0])
 
     success = True
 
