@@ -86,7 +86,33 @@ class SetDeliveryOptions(BaseAction):
                 },
             )
 
+@SESConfigurationSet.action_registry.register('delete')
+class DeleteSESConfigurationSet(Action):
+    """Delete an SES Configuration Set resource.
 
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: ses-delete-configuration-set
+                resource: aws.ses-configuration-set
+                actions:
+                    - delete
+
+    """
+    schema = type_schema('delete')
+    permissions = ("ses:DeleteConfigurationSet",)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ses')
+        for resource in resources:
+            self.manager.retry(
+                client.delete_configuration_set,
+                ConfigurationSetName=resource['Name'],
+                ignore_err_codes=("CannotDeleteException",)
+            )
+            
 @resources.register('ses-email-identity')
 class SESEmailIdentity(QueryResourceManager):
     class resource_type(TypeInfo):
