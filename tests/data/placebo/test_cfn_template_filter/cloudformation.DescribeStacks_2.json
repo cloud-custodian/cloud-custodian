@@ -1,0 +1,1088 @@
+{
+    "status_code": 200,
+    "data": {
+        "Stacks": [
+            {
+                "StackId": "arn:aws:cloudformation:us-east-1:644160558196:stack/c7n-test-template-filter/281508e0-752d-11ef-bc46-0affec6e5521",
+                "StackName": "c7n-test-template-filter",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 9,
+                    "day": 17,
+                    "hour": 19,
+                    "minute": 43,
+                    "second": 47,
+                    "microsecond": 870000
+                },
+                "RollbackConfiguration": {},
+                "StackStatus": "CREATE_COMPLETE",
+                "DisableRollback": false,
+                "NotificationARNs": [],
+                "Capabilities": [
+                    "CAPABILITY_NAMED_IAM"
+                ],
+                "Tags": [],
+                "EnableTerminationProtection": false,
+                "DriftInformation": {
+                    "StackDriftStatus": "NOT_CHECKED"
+                }
+            },
+            {
+                "StackId": "arn:aws:cloudformation:us-east-1:644160558196:stack/powertools-quickstart/9314d190-a11e-11ee-85bd-0ee27b3dad9d",
+                "StackName": "powertools-quickstart",
+                "ChangeSetId": "arn:aws:cloudformation:us-east-1:644160558196:changeSet/samcli-deploy1703372244/197d5219-59d9-45a0-9e5b-3ce4739a6d57",
+                "Description": "Sample SAM Template for powertools-quickstart",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 12,
+                    "day": 22,
+                    "hour": 23,
+                    "minute": 5,
+                    "second": 18,
+                    "microsecond": 524000
+                },
+                "LastUpdatedTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 12,
+                    "day": 23,
+                    "hour": 22,
+                    "minute": 59,
+                    "second": 31,
+                    "microsecond": 93000
+                },
+                "RollbackConfiguration": {},
+                "StackStatus": "UPDATE_COMPLETE",
+                "DisableRollback": false,
+                "NotificationARNs": [],
+                "Capabilities": [
+                    "CAPABILITY_IAM"
+                ],
+                "Outputs": [
+                    {
+                        "OutputKey": "HelloWorldApi",
+                        "OutputValue": "https://zapzzkwsy8.execute-api.us-east-1.amazonaws.com/Prod/hello/",
+                        "Description": "API Gateway endpoint URL for Prod stage for Hello World function"
+                    }
+                ],
+                "Tags": [],
+                "EnableTerminationProtection": false,
+                "DriftInformation": {
+                    "StackDriftStatus": "NOT_CHECKED"
+                }
+            },
+            {
+                "StackId": "arn:aws:cloudformation:us-east-1:644160558196:stack/ECS-Console-V2-Service-test-c7n-test-cluster-9c28ad30/1e1ee3d0-92b9-11ee-8daa-12acc3de49fb",
+                "StackName": "ECS-Console-V2-Service-test-c7n-test-cluster-9c28ad30",
+                "Description": "The template used to create an ECS Service from the ECS Console.",
+                "Parameters": [
+                    {
+                        "ParameterKey": "LoadBalancerName",
+                        "ParameterValue": ""
+                    },
+                    {
+                        "ParameterKey": "VpcID",
+                        "ParameterValue": "vpc-d2d616b5"
+                    },
+                    {
+                        "ParameterKey": "ECSClusterName",
+                        "ParameterValue": "c7n-test-cluster"
+                    },
+                    {
+                        "ParameterKey": "SecurityGroupIDs",
+                        "ParameterValue": "sg-6c7fa917"
+                    },
+                    {
+                        "ParameterKey": "ECSServiceName",
+                        "ParameterValue": "test"
+                    },
+                    {
+                        "ParameterKey": "SubnetIDs",
+                        "ParameterValue": "subnet-efbcccb7,subnet-e3b194de,subnet-044d9e3b66dccd75a,subnet-914763e7"
+                    }
+                ],
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 12,
+                    "day": 4,
+                    "hour": 15,
+                    "minute": 23,
+                    "second": 46,
+                    "microsecond": 769000
+                },
+                "RollbackConfiguration": {},
+                "StackStatus": "CREATE_COMPLETE",
+                "DisableRollback": false,
+                "NotificationARNs": [],
+                "Capabilities": [
+                    "CAPABILITY_NAMED_IAM"
+                ],
+                "Outputs": [
+                    {
+                        "OutputKey": "ECSService",
+                        "OutputValue": "arn:aws:ecs:us-east-1:644160558196:service/c7n-test-cluster/test",
+                        "Description": "The created service."
+                    },
+                    {
+                        "OutputKey": "ClusterName",
+                        "OutputValue": "c7n-test-cluster",
+                        "Description": "The cluster used to create the service."
+                    }
+                ],
+                "Tags": [],
+                "EnableTerminationProtection": false,
+                "DriftInformation": {
+                    "StackDriftStatus": "NOT_CHECKED"
+                }
+            },
+            {
+                "StackId": "arn:aws:cloudformation:us-east-1:644160558196:stack/EC2ContainerService-c7n-test-cluster-2/426fa550-4c03-11ee-abc1-0ee6a8c6a6c7",
+                "StackName": "EC2ContainerService-c7n-test-cluster-2",
+                "Description": "AWS CloudFormation template to create a new ECS Fargate First Run stack",
+                "Parameters": [
+                    {
+                        "ParameterKey": "EcsEndpoint",
+                        "ParameterValue": ""
+                    },
+                    {
+                        "ParameterKey": "VpcCidrBlock",
+                        "ParameterValue": "10.0.0.0/16"
+                    },
+                    {
+                        "ParameterKey": "IsFargate",
+                        "ParameterValue": "true"
+                    },
+                    {
+                        "ParameterKey": "IamRoleInstanceProfile",
+                        "ParameterValue": "ecsInstanceRole"
+                    },
+                    {
+                        "ParameterKey": "SourceCidr",
+                        "ParameterValue": "0.0.0.0/0"
+                    },
+                    {
+                        "ParameterKey": "CreateElasticLoadBalancer",
+                        "ParameterValue": "false"
+                    },
+                    {
+                        "ParameterKey": "EcsClusterName",
+                        "ParameterValue": "c7n-test-cluster-2"
+                    },
+                    {
+                        "ParameterKey": "EcsPort",
+                        "ParameterValue": "80"
+                    },
+                    {
+                        "ParameterKey": "ElbHealthCheckTarget",
+                        "ParameterValue": "HTTP:80/"
+                    },
+                    {
+                        "ParameterKey": "KeyName",
+                        "ParameterValue": ""
+                    },
+                    {
+                        "ParameterKey": "AsgMaxSize",
+                        "ParameterValue": "1"
+                    },
+                    {
+                        "ParameterKey": "ElbPort",
+                        "ParameterValue": "80"
+                    },
+                    {
+                        "ParameterKey": "TargetType",
+                        "ParameterValue": "ip"
+                    },
+                    {
+                        "ParameterKey": "EcsInstanceType",
+                        "ParameterValue": "t2.micro"
+                    },
+                    {
+                        "ParameterKey": "SubnetCidrBlock1",
+                        "ParameterValue": "10.0.0.0/24"
+                    },
+                    {
+                        "ParameterKey": "EcsAmiId",
+                        "ParameterValue": "ami-0d09143c6fc181fe3"
+                    },
+                    {
+                        "ParameterKey": "TargetGroupName",
+                        "ParameterValue": "ECSFirstRunTargetGroup"
+                    },
+                    {
+                        "ParameterKey": "VpcAvailabilityZones",
+                        "ParameterValue": "us-east-1a,us-east-1b,us-east-1c,us-east-1d,us-east-1e,us-east-1f"
+                    },
+                    {
+                        "ParameterKey": "SubnetCidrBlock2",
+                        "ParameterValue": "10.0.1.0/24"
+                    }
+                ],
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 9,
+                    "day": 5,
+                    "hour": 15,
+                    "minute": 45,
+                    "second": 38,
+                    "microsecond": 5000
+                },
+                "DeletionTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 9,
+                    "day": 5,
+                    "hour": 15,
+                    "minute": 45,
+                    "second": 42,
+                    "microsecond": 398000
+                },
+                "RollbackConfiguration": {},
+                "StackStatus": "ROLLBACK_COMPLETE",
+                "DisableRollback": false,
+                "NotificationARNs": [],
+                "Tags": [],
+                "EnableTerminationProtection": false,
+                "DriftInformation": {
+                    "StackDriftStatus": "NOT_CHECKED"
+                }
+            },
+            {
+                "StackId": "arn:aws:cloudformation:us-east-1:644160558196:stack/EC2ContainerService-c7n-test-cluster/0c488df0-4827-11ee-8f0c-12a58b5c38f1",
+                "StackName": "EC2ContainerService-c7n-test-cluster",
+                "Description": "AWS CloudFormation template to create a new ECS Fargate First Run stack",
+                "Parameters": [
+                    {
+                        "ParameterKey": "EcsEndpoint",
+                        "ParameterValue": ""
+                    },
+                    {
+                        "ParameterKey": "VpcCidrBlock",
+                        "ParameterValue": "10.0.0.0/16"
+                    },
+                    {
+                        "ParameterKey": "IsFargate",
+                        "ParameterValue": "true"
+                    },
+                    {
+                        "ParameterKey": "IamRoleInstanceProfile",
+                        "ParameterValue": "ecsInstanceRole"
+                    },
+                    {
+                        "ParameterKey": "SourceCidr",
+                        "ParameterValue": "0.0.0.0/0"
+                    },
+                    {
+                        "ParameterKey": "CreateElasticLoadBalancer",
+                        "ParameterValue": "false"
+                    },
+                    {
+                        "ParameterKey": "EcsClusterName",
+                        "ParameterValue": "c7n-test-cluster"
+                    },
+                    {
+                        "ParameterKey": "EcsPort",
+                        "ParameterValue": "80"
+                    },
+                    {
+                        "ParameterKey": "ElbHealthCheckTarget",
+                        "ParameterValue": "HTTP:80/"
+                    },
+                    {
+                        "ParameterKey": "KeyName",
+                        "ParameterValue": ""
+                    },
+                    {
+                        "ParameterKey": "AsgMaxSize",
+                        "ParameterValue": "1"
+                    },
+                    {
+                        "ParameterKey": "ElbPort",
+                        "ParameterValue": "80"
+                    },
+                    {
+                        "ParameterKey": "TargetType",
+                        "ParameterValue": "ip"
+                    },
+                    {
+                        "ParameterKey": "EcsInstanceType",
+                        "ParameterValue": "t2.micro"
+                    },
+                    {
+                        "ParameterKey": "SubnetCidrBlock1",
+                        "ParameterValue": "10.0.0.0/24"
+                    },
+                    {
+                        "ParameterKey": "EcsAmiId",
+                        "ParameterValue": "ami-0d09143c6fc181fe3"
+                    },
+                    {
+                        "ParameterKey": "TargetGroupName",
+                        "ParameterValue": "ECSFirstRunTargetGroup"
+                    },
+                    {
+                        "ParameterKey": "VpcAvailabilityZones",
+                        "ParameterValue": "us-east-1a,us-east-1b,us-east-1c,us-east-1d,us-east-1e,us-east-1f"
+                    },
+                    {
+                        "ParameterKey": "SubnetCidrBlock2",
+                        "ParameterValue": "10.0.1.0/24"
+                    }
+                ],
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 8,
+                    "day": 31,
+                    "hour": 17,
+                    "minute": 51,
+                    "second": 44,
+                    "microsecond": 299000
+                },
+                "RollbackConfiguration": {},
+                "StackStatus": "CREATE_COMPLETE",
+                "DisableRollback": false,
+                "NotificationARNs": [],
+                "Outputs": [
+                    {
+                        "OutputKey": "Version",
+                        "OutputValue": "3.0.0",
+                        "Description": "ECS Cloudformation template version"
+                    },
+                    {
+                        "OutputKey": "EcsElbName",
+                        "OutputValue": "",
+                        "Description": "Load Balancer for ECS Service"
+                    }
+                ],
+                "Tags": [],
+                "EnableTerminationProtection": false,
+                "DriftInformation": {
+                    "StackDriftStatus": "NOT_CHECKED"
+                }
+            },
+            {
+                "StackId": "arn:aws:cloudformation:us-east-1:644160558196:stack/AppSync-Realtime-MyAppSyncApp2-2022340dWU/b45c0280-756c-11ed-9cf1-0a2ea1127e0d",
+                "StackName": "AppSync-Realtime-MyAppSyncApp2-2022340dWU",
+                "Description": "AppSync Template for a Realtime App",
+                "Parameters": [
+                    {
+                        "ParameterKey": "graphQLAPIName",
+                        "ParameterValue": "My AppSync App2"
+                    }
+                ],
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 12,
+                    "day": 6,
+                    "hour": 13,
+                    "minute": 48,
+                    "second": 46,
+                    "microsecond": 179000
+                },
+                "RollbackConfiguration": {},
+                "StackStatus": "CREATE_COMPLETE",
+                "DisableRollback": false,
+                "NotificationARNs": [],
+                "Capabilities": [
+                    "CAPABILITY_IAM",
+                    "CAPABILITY_NAMED_IAM"
+                ],
+                "Outputs": [
+                    {
+                        "OutputKey": "GraphQLApiId",
+                        "OutputValue": "heim6ph2ejepjh33s5wx57dwpu",
+                        "Description": "Unique AWS AppSync GraphQL API Identifier"
+                    }
+                ],
+                "Tags": [],
+                "EnableTerminationProtection": false,
+                "DriftInformation": {
+                    "StackDriftStatus": "NOT_CHECKED"
+                }
+            },
+            {
+                "StackId": "arn:aws:cloudformation:us-east-1:644160558196:stack/AppSync-Realtime-MyAppSyncApp-2022340xqZ/fee3ab70-756a-11ed-b603-0ad4184b227d",
+                "StackName": "AppSync-Realtime-MyAppSyncApp-2022340xqZ",
+                "Description": "AppSync Template for a Realtime App",
+                "Parameters": [
+                    {
+                        "ParameterKey": "graphQLAPIName",
+                        "ParameterValue": "My AppSync App"
+                    }
+                ],
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 12,
+                    "day": 6,
+                    "hour": 13,
+                    "minute": 36,
+                    "second": 32,
+                    "microsecond": 237000
+                },
+                "RollbackConfiguration": {},
+                "StackStatus": "CREATE_COMPLETE",
+                "DisableRollback": false,
+                "NotificationARNs": [],
+                "Capabilities": [
+                    "CAPABILITY_IAM",
+                    "CAPABILITY_NAMED_IAM"
+                ],
+                "Outputs": [
+                    {
+                        "OutputKey": "GraphQLApiId",
+                        "OutputValue": "cbns7htygbbxnk5bj2udeibawq",
+                        "Description": "Unique AWS AppSync GraphQL API Identifier"
+                    }
+                ],
+                "Tags": [],
+                "EnableTerminationProtection": false,
+                "DriftInformation": {
+                    "StackDriftStatus": "NOT_CHECKED"
+                }
+            },
+            {
+                "StackId": "arn:aws:cloudformation:us-east-1:644160558196:stack/aws-cloud9-test-cloud9-f50f4b74ef7b4be38747a30cb32b5174/db3b5ed0-3eb4-11ed-908e-0e8d6118be6f",
+                "StackName": "aws-cloud9-test-cloud9-f50f4b74ef7b4be38747a30cb32b5174",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 9,
+                    "day": 27,
+                    "hour": 22,
+                    "minute": 36,
+                    "second": 41,
+                    "microsecond": 206000
+                },
+                "RollbackConfiguration": {},
+                "StackStatus": "CREATE_COMPLETE",
+                "DisableRollback": false,
+                "NotificationARNs": [],
+                "Tags": [
+                    {
+                        "Key": "aws:cloud9:environment",
+                        "Value": "f50f4b74ef7b4be38747a30cb32b5174"
+                    },
+                    {
+                        "Key": "aws:cloud9:owner",
+                        "Value": "AIDAZL6XWCR2JKN3HU3BM"
+                    }
+                ],
+                "EnableTerminationProtection": false,
+                "DriftInformation": {
+                    "StackDriftStatus": "NOT_CHECKED"
+                }
+            },
+            {
+                "StackId": "arn:aws:cloudformation:us-east-1:644160558196:stack/CloudActionModulePoc3Stack/a9ffcfa0-b74a-11ec-95ce-0ea7f09e1d49",
+                "StackName": "CloudActionModulePoc3Stack",
+                "ChangeSetId": "arn:aws:cloudformation:us-east-1:644160558196:changeSet/cdk-deploy-change-set/36f3c90a-c7c0-4bfc-a2d7-93763eb43040",
+                "Parameters": [
+                    {
+                        "ParameterKey": "BootstrapVersion",
+                        "ParameterValue": "/cdk-bootstrap/hnb659fds/version",
+                        "ResolvedValue": "11"
+                    }
+                ],
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 4,
+                    "day": 8,
+                    "hour": 14,
+                    "minute": 46,
+                    "second": 25,
+                    "microsecond": 422000
+                },
+                "LastUpdatedTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 4,
+                    "day": 8,
+                    "hour": 14,
+                    "minute": 53,
+                    "second": 23,
+                    "microsecond": 942000
+                },
+                "RollbackConfiguration": {},
+                "StackStatus": "UPDATE_COMPLETE",
+                "DisableRollback": false,
+                "NotificationARNs": [],
+                "Capabilities": [
+                    "CAPABILITY_IAM",
+                    "CAPABILITY_NAMED_IAM",
+                    "CAPABILITY_AUTO_EXPAND"
+                ],
+                "RoleARN": "arn:aws:iam::644160558196:role/cdk-hnb659fds-cfn-exec-role-644160558196-us-east-1",
+                "Tags": [],
+                "EnableTerminationProtection": false,
+                "DriftInformation": {
+                    "StackDriftStatus": "NOT_CHECKED"
+                }
+            },
+            {
+                "StackId": "arn:aws:cloudformation:us-east-1:644160558196:stack/CDKToolkit/b8e16500-b679-11ec-8259-0e3a79ee7dd1",
+                "StackName": "CDKToolkit",
+                "ChangeSetId": "arn:aws:cloudformation:us-east-1:644160558196:changeSet/cdk-deploy-change-set/7b9d2c92-8504-4c4f-b231-4fe461734173",
+                "Description": "This stack includes resources needed to deploy AWS CDK apps into this environment",
+                "Parameters": [
+                    {
+                        "ParameterKey": "FileAssetsBucketKmsKeyId",
+                        "ParameterValue": "AWS_MANAGED_KEY"
+                    },
+                    {
+                        "ParameterKey": "PublicAccessBlockConfiguration",
+                        "ParameterValue": "true"
+                    },
+                    {
+                        "ParameterKey": "FileAssetsBucketName",
+                        "ParameterValue": ""
+                    },
+                    {
+                        "ParameterKey": "CloudFormationExecutionPolicies",
+                        "ParameterValue": ""
+                    },
+                    {
+                        "ParameterKey": "TrustedAccountsForLookup",
+                        "ParameterValue": ""
+                    },
+                    {
+                        "ParameterKey": "Qualifier",
+                        "ParameterValue": "hnb659fds"
+                    },
+                    {
+                        "ParameterKey": "ContainerAssetsRepositoryName",
+                        "ParameterValue": ""
+                    },
+                    {
+                        "ParameterKey": "TrustedAccounts",
+                        "ParameterValue": ""
+                    }
+                ],
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 4,
+                    "day": 7,
+                    "hour": 13,
+                    "minute": 50,
+                    "second": 45,
+                    "microsecond": 232000
+                },
+                "LastUpdatedTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 4,
+                    "day": 7,
+                    "hour": 13,
+                    "minute": 50,
+                    "second": 51,
+                    "microsecond": 530000
+                },
+                "RollbackConfiguration": {},
+                "StackStatus": "CREATE_COMPLETE",
+                "DisableRollback": false,
+                "NotificationARNs": [],
+                "Capabilities": [
+                    "CAPABILITY_IAM",
+                    "CAPABILITY_NAMED_IAM",
+                    "CAPABILITY_AUTO_EXPAND"
+                ],
+                "Outputs": [
+                    {
+                        "OutputKey": "ImageRepositoryName",
+                        "OutputValue": "cdk-hnb659fds-container-assets-644160558196-us-east-1",
+                        "Description": "The name of the ECR repository which hosts docker image assets"
+                    },
+                    {
+                        "OutputKey": "BucketName",
+                        "OutputValue": "cdk-hnb659fds-assets-644160558196-us-east-1",
+                        "Description": "The name of the S3 bucket owned by the CDK toolkit stack"
+                    },
+                    {
+                        "OutputKey": "BootstrapVersion",
+                        "OutputValue": "11",
+                        "Description": "The version of the bootstrap resources that are currently mastered in this stack"
+                    },
+                    {
+                        "OutputKey": "BucketDomainName",
+                        "OutputValue": "cdk-hnb659fds-assets-644160558196-us-east-1.s3.us-east-1.amazonaws.com",
+                        "Description": "The domain name of the S3 bucket owned by the CDK toolkit stack"
+                    },
+                    {
+                        "OutputKey": "FileAssetKeyArn",
+                        "OutputValue": "AWS_MANAGED_KEY",
+                        "Description": "The ARN of the KMS key used to encrypt the asset bucket (deprecated)",
+                        "ExportName": "CdkBootstrap-hnb659fds-FileAssetKeyArn"
+                    }
+                ],
+                "Tags": [],
+                "EnableTerminationProtection": false,
+                "DriftInformation": {
+                    "StackDriftStatus": "NOT_CHECKED"
+                }
+            },
+            {
+                "StackId": "arn:aws:cloudformation:us-east-1:644160558196:stack/ECS-Console-V2-Service-ab9f045e-634a-469c-95bb-81d56a912ba7/b89ae170-2c95-11ec-883a-0a40cd3c9135",
+                "StackName": "ECS-Console-V2-Service-ab9f045e-634a-469c-95bb-81d56a912ba7",
+                "Description": "The template used to create an ECS Service from the ECS Console.",
+                "Parameters": [
+                    {
+                        "ParameterKey": "LoadBalancerName",
+                        "ParameterValue": ""
+                    },
+                    {
+                        "ParameterKey": "VpcID",
+                        "ParameterValue": "vpc-072f438c953672ace"
+                    },
+                    {
+                        "ParameterKey": "ECSClusterName",
+                        "ParameterValue": "insights"
+                    },
+                    {
+                        "ParameterKey": "SecurityGroupIDs",
+                        "ParameterValue": "sg-0e563fefd26ffdd33"
+                    },
+                    {
+                        "ParameterKey": "SubnetIDs",
+                        "ParameterValue": "subnet-023db907202d61c00"
+                    },
+                    {
+                        "ParameterKey": "LoadBalancerType",
+                        "ParameterValue": "application"
+                    }
+                ],
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 10,
+                    "day": 14,
+                    "hour": 2,
+                    "minute": 23,
+                    "second": 30,
+                    "microsecond": 116000
+                },
+                "RollbackConfiguration": {},
+                "StackStatus": "CREATE_COMPLETE",
+                "DisableRollback": false,
+                "NotificationARNs": [],
+                "Capabilities": [
+                    "CAPABILITY_NAMED_IAM"
+                ],
+                "Outputs": [
+                    {
+                        "OutputKey": "ECSService",
+                        "OutputValue": "arn:aws:ecs:us-east-1:644160558196:service/insights/insights",
+                        "Description": "The created service."
+                    },
+                    {
+                        "OutputKey": "ClusterName",
+                        "OutputValue": "insights",
+                        "Description": "The cluster used to create the service."
+                    }
+                ],
+                "Tags": [],
+                "EnableTerminationProtection": false,
+                "DriftInformation": {
+                    "StackDriftStatus": "NOT_CHECKED"
+                }
+            },
+            {
+                "StackId": "arn:aws:cloudformation:us-east-1:644160558196:stack/ECS-Console-V2-Service-b38479d5-9070-41a8-9f75-b577dd88324a/42cec880-2c95-11ec-ba07-122b567ac405",
+                "StackName": "ECS-Console-V2-Service-b38479d5-9070-41a8-9f75-b577dd88324a",
+                "Description": "The template used to create an ECS Service from the ECS Console.",
+                "Parameters": [
+                    {
+                        "ParameterKey": "LoadBalancerName",
+                        "ParameterValue": ""
+                    },
+                    {
+                        "ParameterKey": "VpcID",
+                        "ParameterValue": "vpc-d2d616b5"
+                    },
+                    {
+                        "ParameterKey": "ECSClusterName",
+                        "ParameterValue": "insights"
+                    },
+                    {
+                        "ParameterKey": "SecurityGroupIDs",
+                        "ParameterValue": "sg-6c7fa917"
+                    },
+                    {
+                        "ParameterKey": "SubnetIDs",
+                        "ParameterValue": "subnet-3a334610,subnet-efbcccb7,subnet-e3b194de,subnet-914763e7"
+                    },
+                    {
+                        "ParameterKey": "LoadBalancerType",
+                        "ParameterValue": "application"
+                    }
+                ],
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 10,
+                    "day": 14,
+                    "hour": 2,
+                    "minute": 20,
+                    "second": 12,
+                    "microsecond": 479000
+                },
+                "RollbackConfiguration": {},
+                "StackStatus": "CREATE_COMPLETE",
+                "DisableRollback": false,
+                "NotificationARNs": [],
+                "Capabilities": [
+                    "CAPABILITY_NAMED_IAM"
+                ],
+                "Outputs": [
+                    {
+                        "OutputKey": "ECSService",
+                        "OutputValue": "arn:aws:ecs:us-east-1:644160558196:service/insights/log-insights",
+                        "Description": "The created service."
+                    },
+                    {
+                        "OutputKey": "ClusterName",
+                        "OutputValue": "insights",
+                        "Description": "The cluster used to create the service."
+                    }
+                ],
+                "Tags": [],
+                "EnableTerminationProtection": false,
+                "DriftInformation": {
+                    "StackDriftStatus": "NOT_CHECKED"
+                }
+            },
+            {
+                "StackId": "arn:aws:cloudformation:us-east-1:644160558196:stack/aws-sam-cli-managed-default/bb7f9190-3fbd-11ea-b3d9-12e346dd5d0c",
+                "StackName": "aws-sam-cli-managed-default",
+                "Description": "Managed Stack for AWS SAM CLI",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 1,
+                    "day": 25,
+                    "hour": 21,
+                    "minute": 57,
+                    "second": 51,
+                    "microsecond": 561000
+                },
+                "DeletionTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 1,
+                    "day": 25,
+                    "hour": 23,
+                    "minute": 5,
+                    "second": 26,
+                    "microsecond": 754000
+                },
+                "LastUpdatedTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 1,
+                    "day": 25,
+                    "hour": 21,
+                    "minute": 58,
+                    "second": 6,
+                    "microsecond": 912000
+                },
+                "RollbackConfiguration": {},
+                "StackStatus": "DELETE_FAILED",
+                "StackStatusReason": "The following resource(s) failed to delete: [SamCliSourceBucket]. ",
+                "DisableRollback": false,
+                "NotificationARNs": [],
+                "Outputs": [
+                    {
+                        "OutputKey": "SourceBucket",
+                        "OutputValue": "aws-sam-cli-managed-default-samclisourcebucket-1elladfxaxxtv"
+                    }
+                ],
+                "Tags": [
+                    {
+                        "Key": "ManagedStackSource",
+                        "Value": "AwsSamCli"
+                    }
+                ],
+                "EnableTerminationProtection": false,
+                "DriftInformation": {
+                    "StackDriftStatus": "NOT_CHECKED"
+                }
+            },
+            {
+                "StackId": "arn:aws:cloudformation:us-east-1:644160558196:stack/guard-duty-archiver/b6feace0-06ae-11e8-9c98-500c285eae99",
+                "StackName": "guard-duty-archiver",
+                "ChangeSetId": "arn:aws:cloudformation:us-east-1:644160558196:changeSet/awscli-cloudformation-package-deploy-1517420808/b79659bf-025a-4175-93ee-d312bf18b83d",
+                "Parameters": [
+                    {
+                        "ParameterKey": "StreamTopic",
+                        "ParameterValue": "arn:aws:sns:us-east-1:644160558196:cof-guard-duty-stream-notify"
+                    },
+                    {
+                        "ParameterKey": "ArchiverRole",
+                        "ParameterValue": "arn:aws:iam::644160558196:role/custodian-mu"
+                    }
+                ],
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2018,
+                    "month": 1,
+                    "day": 31,
+                    "hour": 17,
+                    "minute": 46,
+                    "second": 50,
+                    "microsecond": 101000
+                },
+                "LastUpdatedTime": {
+                    "__class__": "datetime",
+                    "year": 2018,
+                    "month": 1,
+                    "day": 31,
+                    "hour": 17,
+                    "minute": 46,
+                    "second": 55,
+                    "microsecond": 649000
+                },
+                "RollbackConfiguration": {},
+                "StackStatus": "CREATE_COMPLETE",
+                "DisableRollback": false,
+                "NotificationARNs": [],
+                "Capabilities": [
+                    "CAPABILITY_IAM"
+                ],
+                "Outputs": [
+                    {
+                        "OutputKey": "Function",
+                        "OutputValue": "guard-duty-archiver-EnhancedEventArchiver-RUML739UKXP0",
+                        "Description": "Archiver Lambda"
+                    }
+                ],
+                "Tags": [],
+                "EnableTerminationProtection": false,
+                "DriftInformation": {
+                    "StackDriftStatus": "NOT_CHECKED"
+                }
+            },
+            {
+                "StackId": "arn:aws:cloudformation:us-east-1:644160558196:stack/sphere7-dev/baa91190-e095-11e6-a15e-500c32cd4462",
+                "StackName": "sphere7-dev",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2017,
+                    "month": 1,
+                    "day": 22,
+                    "hour": 11,
+                    "minute": 27,
+                    "second": 17,
+                    "microsecond": 13000
+                },
+                "DeletionTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 3,
+                    "day": 12,
+                    "hour": 3,
+                    "minute": 26,
+                    "second": 19,
+                    "microsecond": 574000
+                },
+                "LastUpdatedTime": {
+                    "__class__": "datetime",
+                    "year": 2017,
+                    "month": 1,
+                    "day": 22,
+                    "hour": 11,
+                    "minute": 48,
+                    "second": 7,
+                    "microsecond": 577000
+                },
+                "RollbackConfiguration": {},
+                "StackStatus": "DELETE_FAILED",
+                "StackStatusReason": "The following resource(s) failed to delete: [ApiFunctionConfigSubscription]. ",
+                "DisableRollback": false,
+                "NotificationARNs": [],
+                "Capabilities": [
+                    "CAPABILITY_IAM"
+                ],
+                "Outputs": [
+                    {
+                        "OutputKey": "Function",
+                        "OutputValue": "sphere7-dev-ApiFunction-7K03QNRVA8OD",
+                        "Description": "Lambda Name"
+                    },
+                    {
+                        "OutputKey": "Gateway",
+                        "OutputValue": "5xhc1cnb7h",
+                        "Description": "API Gateway Name"
+                    },
+                    {
+                        "OutputKey": "Url",
+                        "OutputValue": "https://5xhc1cnb7h.execute-api.us-east-1.amazonaws.com/latest",
+                        "Description": "Api Url"
+                    }
+                ],
+                "Tags": [],
+                "EnableTerminationProtection": false,
+                "DriftInformation": {
+                    "StackDriftStatus": "NOT_CHECKED"
+                }
+            },
+            {
+                "StackId": "arn:aws:cloudformation:us-east-1:644160558196:stack/sphere6-dev/173ff010-e03a-11e6-b569-50fae98a10d2",
+                "StackName": "sphere6-dev",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2017,
+                    "month": 1,
+                    "day": 22,
+                    "hour": 0,
+                    "minute": 31,
+                    "second": 18,
+                    "microsecond": 557000
+                },
+                "DeletionTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 3,
+                    "day": 12,
+                    "hour": 3,
+                    "minute": 26,
+                    "second": 15,
+                    "microsecond": 755000
+                },
+                "LastUpdatedTime": {
+                    "__class__": "datetime",
+                    "year": 2017,
+                    "month": 1,
+                    "day": 22,
+                    "hour": 1,
+                    "minute": 34,
+                    "second": 2,
+                    "microsecond": 922000
+                },
+                "RollbackConfiguration": {},
+                "StackStatus": "DELETE_FAILED",
+                "StackStatusReason": "The following resource(s) failed to delete: [ApiFunctionConfigSubscription]. ",
+                "DisableRollback": false,
+                "NotificationARNs": [],
+                "Capabilities": [
+                    "CAPABILITY_IAM"
+                ],
+                "Outputs": [
+                    {
+                        "OutputKey": "Function",
+                        "OutputValue": "sphere6-dev-ApiFunction-UU4BL4XR70AR",
+                        "Description": "Lambda Name"
+                    },
+                    {
+                        "OutputKey": "Gateway",
+                        "OutputValue": "bjswh8i7kj",
+                        "Description": "API Gateway Name"
+                    },
+                    {
+                        "OutputKey": "Url",
+                        "OutputValue": "https://bjswh8i7kj.execute-api.us-east-1.amazonaws.com/latest",
+                        "Description": "Api Url"
+                    }
+                ],
+                "Tags": [],
+                "EnableTerminationProtection": false,
+                "DriftInformation": {
+                    "StackDriftStatus": "NOT_CHECKED"
+                }
+            },
+            {
+                "StackId": "arn:aws:cloudformation:us-east-1:644160558196:stack/sphere5-dev/6da94b20-df83-11e6-bd81-500c28b236fd",
+                "StackName": "sphere5-dev",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2017,
+                    "month": 1,
+                    "day": 21,
+                    "hour": 2,
+                    "minute": 43,
+                    "second": 46,
+                    "microsecond": 60000
+                },
+                "DeletionTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 3,
+                    "day": 12,
+                    "hour": 3,
+                    "minute": 26,
+                    "second": 9,
+                    "microsecond": 359000
+                },
+                "LastUpdatedTime": {
+                    "__class__": "datetime",
+                    "year": 2017,
+                    "month": 1,
+                    "day": 22,
+                    "hour": 0,
+                    "minute": 16,
+                    "second": 57,
+                    "microsecond": 847000
+                },
+                "RollbackConfiguration": {},
+                "StackStatus": "DELETE_FAILED",
+                "StackStatusReason": "The following resource(s) failed to delete: [ApiFunctionConfigSubscription]. ",
+                "DisableRollback": false,
+                "NotificationARNs": [],
+                "Capabilities": [
+                    "CAPABILITY_IAM"
+                ],
+                "Outputs": [
+                    {
+                        "OutputKey": "Function",
+                        "OutputValue": "sphere5-dev-ApiFunction-5549LBVY1WC6",
+                        "Description": "Lambda Name"
+                    },
+                    {
+                        "OutputKey": "Gateway",
+                        "OutputValue": "reehrks2p7",
+                        "Description": "API Gateway Name"
+                    },
+                    {
+                        "OutputKey": "Url",
+                        "OutputValue": "https://reehrks2p7.execute-api.us-east-1.amazonaws.com/latest",
+                        "Description": "Api Url"
+                    }
+                ],
+                "Tags": [],
+                "EnableTerminationProtection": false,
+                "DriftInformation": {
+                    "StackDriftStatus": "NOT_CHECKED"
+                }
+            },
+            {
+                "StackId": "arn:aws:cloudformation:us-east-1:644160558196:stack/sphere11-db/5825dba0-c69d-11e6-881a-50d5ca632656",
+                "StackName": "sphere11-db",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2016,
+                    "month": 12,
+                    "day": 20,
+                    "hour": 10,
+                    "minute": 16,
+                    "second": 17,
+                    "microsecond": 252000
+                },
+                "RollbackConfiguration": {},
+                "StackStatus": "CREATE_COMPLETE",
+                "DisableRollback": false,
+                "NotificationARNs": [],
+                "Tags": [],
+                "EnableTerminationProtection": false,
+                "DriftInformation": {
+                    "StackDriftStatus": "NOT_CHECKED"
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

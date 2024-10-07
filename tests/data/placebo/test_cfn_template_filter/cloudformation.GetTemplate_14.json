@@ -1,0 +1,11 @@
+{
+    "status_code": 200,
+    "data": {
+        "TemplateBody": "{\"AWSTemplateFormatVersion\":\"2010-09-09\",\"Outputs\":{\"Function\":{\"Description\":\"Archiver Lambda\",\"Value\":{\"Ref\":\"EnhancedEventArchiver\"}}},\"Parameters\":{\"ArchiverRole\":{\"Default\":\"arn:aws:iam::644160558196:role/custodian-mu\",\"Type\":\"String\",\"Description\":\"Enhanced Event Stream Archiver\"},\"StreamTopic\":{\"Default\":\"arn:aws:sns:us-east-1:644160558196:my_topic\",\"Type\":\"String\",\"Description\":\"Custodian Guard Duty Enhanced Event Stream\"}},\"Resources\":{\"EnhancedEventArchiverStreamPermission\":{\"Type\":\"AWS::Lambda::Permission\",\"Properties\":{\"Action\":\"lambda:invokeFunction\",\"Principal\":\"sns.amazonaws.com\",\"FunctionName\":{\"Ref\":\"EnhancedEventArchiver\"},\"SourceArn\":{\"Ref\":\"StreamTopic\"}}},\"EnhancedEventArchiver\":{\"Type\":\"AWS::Lambda::Function\",\"Properties\":{\"Code\":{\"S3Bucket\":\"c7n-guard-duty-dev\",\"S3Key\":\"build/cbcba3413e5a21ad25aae1612bc02e9c\"},\"Handler\":\"archiver.handler\",\"Role\":{\"Ref\":\"ArchiverRole\"},\"Runtime\":\"python2.7\",\"Tags\":[{\"Value\":\"SAM\",\"Key\":\"lambda:createdBy\"}]}},\"EnhancedEventArchiverStream\":{\"Type\":\"AWS::SNS::Subscription\",\"Properties\":{\"Endpoint\":{\"Fn::GetAtt\":[\"EnhancedEventArchiver\",\"Arn\"]},\"Protocol\":\"lambda\",\"TopicArn\":{\"Ref\":\"StreamTopic\"}}}}}",
+        "StagesAvailable": [
+            "Original",
+            "Processed"
+        ],
+        "ResponseMetadata": {}
+    }
+}
