@@ -1,6 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-from c7n.filters.core import Filter
+from c7n.filters.core import Filter, ValueFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema, QueryParser
@@ -68,19 +68,20 @@ class DirectoryLDAPFilter(Filter):
     """
     schema = type_schema(
         'ldap',
-        **{'status': {'type': 'string', 'enum': ['Enabled', 'Disabled']}})
+        status={'type': 'string', 'enum': ['Enabled', 'Disabled']},
+        required=['status']
+    )
 
     permissions = ('ds:DescribeLDAPSSettings',)
     annotation_key = 'c7n:LDAPSSettings'
+    valid_directory_types = ['MicrosoftAD']
 
     def process(self, resources, event=None):
+        resources = self.filter_resources(resources, 'Type', self.valid_directory_types)
         client = local_session(self.manager.session_factory).client('ds')
         status = self.data.get('status', 'Enabled')
         matches = []
         for r in resources:
-            # Skip Directories that do not support LDAP settings
-            if r['Type'] != 'MicrosoftAD':
-                continue
             if self.annotation_key not in r:
                 try:
                     ldap_settings = client.describe_ldaps_settings(
@@ -115,21 +116,18 @@ class DirectorySettingsFilter(Filter):
                     value: Enable
     """
     schema = type_schema(
-        'settings',
-        required=['key', 'value'],
-        key={'type': 'string'},
-        value={'type': 'string'})
+        'settings', rinherit=ValueFilter.schema)
 
     permissions = ('ds:DescribeSettings',)
+    valid_directory_types = ['MicrosoftAD']
 
     def process(self, resources, event=None):
+        resources = self.filter_resources(resources, 'Type', self.valid_directory_types)
         client = local_session(self.manager.session_factory).client('ds')
         key = self.data.get('key')
         value = self.data.get('value')
         matches = []
         for r in resources:
-            if r['Type'] != 'MicrosoftAD':
-                continue
             settings = client.describe_settings(
                 DirectoryId=r['DirectoryId'])['SettingEntries']
             for setting in settings:
