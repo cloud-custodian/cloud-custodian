@@ -218,6 +218,9 @@ class CloudFormationRemoveTag(RemoveTag):
               - type: remove-tag
                 tags: ['DesiredTag']
     """
+    def process_resource_set(self, client, stacks, keys):
+        for s in stacks:
+            _tag_stack(client, s, remove=keys)
 
 
 @CloudFormation.filter_registry.register('search-template')
@@ -284,7 +287,3 @@ class CloudFormationTemplateFilter(Filter):
                 continue
 
         return matched
-
-    def process_resource_set(self, client, stacks, keys):
-        for s in stacks:
-            _tag_stack(client, s, remove=keys)
