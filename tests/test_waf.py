@@ -89,3 +89,38 @@ class WAFTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertTrue('c7n:WafV2LoggingConfiguration' not in resources[0])
+
+    def test_wafv2_enable_logging(self):
+        session_factory = self.replay_flight_data("test_wafv2_enable_logging")
+        policy = {
+            "name": "wafv2-enable-logging",
+            "resource": "aws.wafv2",
+            "filters": [
+                {
+                    "type": "value",
+                    "key": "Name",
+                    "value": "test-custodian-waf",
+                    "op": "eq"
+                }
+            ],
+            "actions": [
+                {
+                    "type": "enable-logging",
+                    "log_destination_arn": "arn:aws:s3:::aws-waf-logs-test-custodian-creation"
+                }
+            ]
+        }
+        p = self.load_policy(policy,
+                             session_factory=session_factory,
+                             config={"region": "us-east-1"})
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["ARN"],
+                         "arn:aws:wafv2:us-east-1:644160558196:regional/webacl/test-custodian-waf/0b6d34b1-689c-4d33-8d84-3effe427413f")
+
+        client = session_factory().client("wafv2")
+        logging_config = client.get_logging_configuration(ResourceArn=resources[0]["ARN"])
+        self.assertEqual(logging_config["LoggingConfiguration"]["ResourceArn"], resources[0]["ARN"])
+        self.assertEqual(logging_config["LoggingConfiguration"]["LogDestinationConfigs"][0],
+                         "arn:aws:s3:::aws-waf-logs-test-custodian-creation")

@@ -1,0 +1,25 @@
+{
+    "status_code": 200,
+    "data": {
+        "WebACL": {
+            "Name": "test-custodian-waf",
+            "Id": "0b6d34b1-689c-4d33-8d84-3effe427413f",
+            "ARN": "arn:aws:wafv2:us-east-1:644160558196:regional/webacl/test-custodian-waf/0b6d34b1-689c-4d33-8d84-3effe427413f",
+            "DefaultAction": {
+                "Allow": {}
+            },
+            "Description": "Delete me later",
+            "Rules": [],
+            "VisibilityConfig": {
+                "SampledRequestsEnabled": true,
+                "CloudWatchMetricsEnabled": true,
+                "MetricName": "test-custodian-waf"
+            },
+            "Capacity": 0,
+            "ManagedByFirewallManager": false,
+            "LabelNamespace": "awswaf:644160558196:webacl:test-custodian-waf:"
+        },
+        "LockToken": "062ebb22-4395-4f1c-ad4f-9c5809b2a4e2",
+        "ResponseMetadata": {}
+    }
+}
