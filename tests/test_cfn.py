@@ -242,7 +242,7 @@ class TestCFN(BaseTest):
                 "resource": "cfn",
                 "filters": [
                     {
-                        "type": "search-template",
+                        "type": "template",
                         "query": "API_KEY[0-9A-Z]",
                         "encoding": "yaml"
                     }

@@ -223,12 +223,12 @@ class CloudFormationRemoveTag(RemoveTag):
             _tag_stack(client, s, remove=keys)
 
 
-@CloudFormation.filter_registry.register('search-template')
+@CloudFormation.filter_registry.register('template')
 class CloudFormationTemplateFilter(Filter):
     """Filter CloudFormation stacks based on their template body
 
     This filter retrieves the CloudFormation template for each stack and
-    searched for the regex pattern within the search-template
+    searched for the regex pattern within the template
 
     :example:
 
@@ -238,7 +238,7 @@ class CloudFormationTemplateFilter(Filter):
           - name: detect-api-keys-in-templates
             resource: cfn
             filters:
-              - type: search-template
+              - type: template
                 query: 'API_KEY[0-9A-Z]'
                 encoding: yaml
 
