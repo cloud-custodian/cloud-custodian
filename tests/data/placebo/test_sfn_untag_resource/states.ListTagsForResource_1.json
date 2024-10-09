@@ -1,21 +1,7 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "e5005a5c-33ba-11e9-aca6-15aec11d246c", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "e5005a5c-33ba-11e9-aca6-15aec11d246c", 
-                "content-length": "40", 
-                "content-type": "application/x-amz-json-1.0"
-            }
-        }, 
-        "tags": [
-            {
-                "value": "Python",
-                "key": "Name"
-            }
-        ]
+        "tags": [],
+        "ResponseMetadata": {}
     }
 }

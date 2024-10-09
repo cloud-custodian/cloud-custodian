@@ -167,6 +167,7 @@ ResourceMap = {
   "aws.lightsail-db": "c7n.resources.lightsail.Database",
   "aws.lightsail-elb": "c7n.resources.lightsail.LoadBalancer",
   "aws.lightsail-instance": "c7n.resources.lightsail.Instance",
+  "aws.log-destination": "c7n.resources.cw.LogDestination",
   "aws.log-group": "c7n.resources.cw.LogGroup",
   "aws.log-metric": "c7n.resources.cw.LogMetric",
   "aws.memorydb": "c7n.resources.memorydb.MemoryDb",
