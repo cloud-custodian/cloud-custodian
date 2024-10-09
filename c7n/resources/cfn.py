@@ -240,7 +240,7 @@ class CloudFormationTemplateFilter(Filter):
             filters:
               - type: template
                 query: 'API_KEY[0-9A-Z]'
-                encoding: yaml
+                encoding: 'yaml'
 
     :param query: (required) The regular expression pattern to search for within the template
     :param encoding: (optional) The template format, either json or yaml (default is yaml)
