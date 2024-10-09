@@ -250,7 +250,7 @@ class CloudFormationTemplateFilter(Filter):
         'template',
         required=['query'],
         query={'type': 'string'},
-        encoding={'type': 'string', 'enum': ['json', 'yaml'], 'default': 'yaml'},
+        encoding={'type': 'string'},
     )
     permissions = ('cloudformation:GetTemplate',)
 
