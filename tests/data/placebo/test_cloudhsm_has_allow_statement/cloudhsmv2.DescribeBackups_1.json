@@ -1,0 +1,122 @@
+{
+    "status_code": 200,
+    "data": {
+        "Backups": [
+            {
+                "BackupId": "backup-5tptus75gbc",
+                "BackupArn": "arn:aws:cloudhsm:us-east-1:644160558196:backup/backup-5tptus75gbc",
+                "BackupState": "READY",
+                "ClusterId": "cluster-72zn6eby7x2",
+                "CreateTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 9,
+                    "day": 11,
+                    "hour": 18,
+                    "minute": 48,
+                    "second": 38,
+                    "microsecond": 594000
+                },
+                "NeverExpires": false,
+                "TagList": [
+                    {
+                        "Key": "owner",
+                        "Value": "policy"
+                    }
+                ],
+                "HsmType": "hsm1.medium",
+                "Mode": "FIPS"
+            },
+            {
+                "BackupId": "backup-6qjbcmkhcxm",
+                "BackupArn": "arn:aws:cloudhsm:us-east-1:644160558196:backup/backup-6qjbcmkhcxm",
+                "BackupState": "READY",
+                "ClusterId": "cluster-72zn6eby7x2",
+                "CreateTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 9,
+                    "day": 10,
+                    "hour": 18,
+                    "minute": 46,
+                    "second": 22,
+                    "microsecond": 678000
+                },
+                "NeverExpires": false,
+                "TagList": [
+                    {
+                        "Key": "owner",
+                        "Value": "policy"
+                    },
+                    {
+                        "Key": "custodian_cleanup",
+                        "Value": "Resource does not meet policy: notify@2024/09/12"
+                    }
+                ],
+                "HsmType": "hsm1.medium",
+                "Mode": "FIPS"
+            },
+            {
+                "BackupId": "backup-vwcz7w4kikp",
+                "BackupArn": "arn:aws:cloudhsm:us-east-1:644160558196:backup/backup-vwcz7w4kikp",
+                "BackupState": "PENDING_DELETION",
+                "ClusterId": "cluster-72zn6eby7x2",
+                "CreateTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 9,
+                    "day": 9,
+                    "hour": 18,
+                    "minute": 44,
+                    "second": 54,
+                    "microsecond": 794000
+                },
+                "NeverExpires": false,
+                "DeleteTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 9,
+                    "day": 17,
+                    "hour": 13,
+                    "minute": 37,
+                    "second": 17,
+                    "microsecond": 133000
+                },
+                "TagList": [],
+                "HsmType": "hsm1.medium",
+                "Mode": "FIPS"
+            },
+            {
+                "BackupId": "backup-wpc4fu35qe2",
+                "BackupArn": "arn:aws:cloudhsm:us-east-1:644160558196:backup/backup-wpc4fu35qe2",
+                "BackupState": "PENDING_DELETION",
+                "ClusterId": "cluster-72zn6eby7x2",
+                "CreateTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 9,
+                    "day": 9,
+                    "hour": 9,
+                    "minute": 40,
+                    "second": 0,
+                    "microsecond": 642000
+                },
+                "NeverExpires": false,
+                "DeleteTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 9,
+                    "day": 17,
+                    "hour": 13,
+                    "minute": 37,
+                    "second": 17,
+                    "microsecond": 165000
+                },
+                "TagList": [],
+                "HsmType": "hsm1.medium",
+                "Mode": "FIPS"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
