@@ -86,6 +86,7 @@ class SetDeliveryOptions(BaseAction):
                 },
             )
 
+
 @SESConfigurationSet.action_registry.register('delete')
 class DeleteSESConfigurationSet(Action):
     """Delete an SES Configuration Set resource.
@@ -112,7 +113,8 @@ class DeleteSESConfigurationSet(Action):
                 ConfigurationSetName=resource['Name'],
                 ignore_err_codes=("CannotDeleteException",)
             )
-            
+
+
 @resources.register('ses-email-identity')
 class SESEmailIdentity(QueryResourceManager):
     class resource_type(TypeInfo):
