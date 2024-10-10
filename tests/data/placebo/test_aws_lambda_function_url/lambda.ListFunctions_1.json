@@ -1,0 +1,41 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Functions": [
+            {
+                "FunctionName": "hello_world",
+                "FunctionArn": "arn:aws:lambda:us-west-2:644160558196:function:hello_world",
+                "Runtime": "python3.12",
+                "Role": "arn:aws:iam::644160558196:role/service-role/hello_world-role-wktizgp5",
+                "Handler": "lambda_function.lambda_handler",
+                "CodeSize": 299,
+                "Description": "",
+                "Timeout": 3,
+                "MemorySize": 128,
+                "LastModified": "2024-10-03T14:27:18.123+0000",
+                "CodeSha256": "HAPq9EReJVEC5gLavtc/gyd5vZtd9eiUGF932t0jBxY=",
+                "Version": "$LATEST",
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                },
+                "RevisionId": "22ba1803-9bb9-4770-8be5-f8f1e1dff1f1",
+                "PackageType": "Zip",
+                "Architectures": [
+                    "x86_64"
+                ],
+                "EphemeralStorage": {
+                    "Size": 512
+                },
+                "SnapStart": {
+                    "ApplyOn": "None",
+                    "OptimizationStatus": "Off"
+                },
+                "LoggingConfig": {
+                    "LogFormat": "Text",
+                    "LogGroup": "/aws/lambda/hello_world"
+                }
+            }
+        ]
+    }
+}
