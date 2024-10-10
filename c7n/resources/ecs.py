@@ -25,6 +25,18 @@ def ecs_tag_normalize(resources):
             r.pop('tags')
 
 
+def allow_all(s):
+    return ('Condition' not in s and
+            'Action' in s and
+            ((isinstance(s['Action'], str) and s['Action'] == "*") or
+            (isinstance(s['Action'], list) and "*" in s['Action'])) and
+            'Resource' in s and
+            ((isinstance(s['Resource'], str) and s['Resource'] == "*") or
+            (isinstance(s['Resource'], list) and "*" in s['Resource'])) and
+            s['Effect'] == "Allow"
+            )
+
+
 NEW_ARN_STYLE = ('container-instance', 'service', 'task')
 
 
@@ -1171,6 +1183,93 @@ class ECSTaggable(Filter):
             return [r for r in resources if not ecs_taggable(self.manager.resource_type, r)]
         else:
             return [r for r in resources if ecs_taggable(self.manager.resource_type, r)]
+
+
+@TaskDefinition.filter_registry.register('role-has-allow-all')
+class ECSTaskRoleAllowAll(Filter):
+    """
+    Filter ECS task definition resources where task role has allow all permissions.
+    It checks inline policies as well as managed(customer and aws) policies.
+    :example:
+
+        .. code-block:: yaml
+
+            policies:
+                - name: ecsrolehasallowall
+                  resource: ecs-task-definition
+                  filters:
+                    - type: role-has-allow-all
+    """
+
+    schema = type_schema('role-has-allow-all')
+    permissions = ('iam:GetPolicyVersion', 'iam:GetPolicy',
+        'iam:GetRole', 'iam:GetRolePolicy', 'iam:ListRolePolicies')
+
+    def _inline_policy_has_allow_all(self, client, resource):
+        resource['c7n:InlinePolicyHasAllowAll'] = []
+        RoleName = resource[self.get_role_arn_qualifier()].split('/')[-1]
+
+        try:
+            policies = client.list_role_policies(
+                RoleName=RoleName)['PolicyNames']
+        except client.exceptions.NoSuchEntityException:
+            return resource
+
+        resource['c7n:InlinePolicies'] = policies
+
+        if len(resource['c7n:InlinePolicies']) > 0:
+            for p in policies:
+                inline_policy_document = client.get_role_policy(RoleName=RoleName, PolicyName=p)
+                statements = inline_policy_document['PolicyDocument']['Statement']
+                if isinstance(statements, dict):
+                    statements = [statements]
+
+                for s in statements:
+                    if allow_all(s):
+                        resource['c7n:InlinePolicyHasAllowAll'].append(p)
+        return resource
+
+    def _managed_policy_has_allow_all(self, client, resource):
+        resource['c7n:ManagedPolicyHasAllowAll'] = []
+        RoleName = resource[self.get_role_arn_qualifier()].split('/')[-1]
+
+        try:
+            policies = client.list_attached_role_policies(
+                RoleName=RoleName)['AttachedPolicies']
+        except client.exceptions.NoSuchEntityException:
+            return resource
+
+        resource['c7n:ManagedPolicies'] = policies
+
+        if len(resource['c7n:ManagedPolicies']) > 0:
+            for p in policies:
+                cmanaged_policy = client.get_policy(PolicyArn=p['PolicyArn'])
+                cmanaged_policy_document = client.get_policy_version(
+                    PolicyArn=p['PolicyArn'],
+                    VersionId=cmanaged_policy['Policy']['DefaultVersionId'])
+                statements = cmanaged_policy_document['PolicyVersion']['Document']['Statement']
+                if isinstance(statements, dict):
+                    statements = [statements]
+
+                for s in statements:
+                    if allow_all(s):
+                        resource['c7n:ManagedPolicyHasAllowAll'].append(p)
+        return resource
+
+    def get_role_arn_qualifier(self):
+        return "taskRoleArn"
+
+    def process(self, resources, event=None):
+        c = local_session(self.manager.session_factory).client('iam')
+        res = []
+        for r in resources:
+            if self.get_role_arn_qualifier() in r:
+                r = self._inline_policy_has_allow_all(c, r)
+                r = self._managed_policy_has_allow_all(c, r)
+                if len(r['c7n:InlinePolicyHasAllowAll']) > 0 \
+                        or len(r['c7n:ManagedPolicyHasAllowAll']) > 0:
+                    res.append(r)
+        return res
 
 
 ECSCluster.filter_registry.register('marked-for-op', TagActionFilter)
