@@ -3,6 +3,7 @@ from c7n.query import QueryResourceManager
 
 METRICS = ['JobRunTime', 'WorkersUsed']
 
+
 @resources.register('emr-serverless-jobs')
 class EMRServerlessJobs(QueryResourceManager):
 
@@ -15,7 +16,6 @@ class EMRServerlessJobs(QueryResourceManager):
         date = 'CreatedOn'
         dimension = None
 
-
     def get_metrics(self):
         client = local_session(self.session_factory).client('emr')
         for job in self.resources():
@@ -24,4 +24,5 @@ class EMRServerlessJobs(QueryResourceManager):
                 Metrics=METRICS
             )
             job['Metrics'] = response['Metrics']
+
 

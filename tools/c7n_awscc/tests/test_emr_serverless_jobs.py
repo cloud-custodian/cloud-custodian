@@ -11,3 +11,4 @@ class TestEMRServerlessJobs(BaseTest):
         }, session_factory=factory)
         resources = p.run()
         self.assertTrue(len(resources) > 0)
+
