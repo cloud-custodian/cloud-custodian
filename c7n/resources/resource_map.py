@@ -95,6 +95,7 @@ ResourceMap = {
   "aws.eks-nodegroup": "c7n.resources.eks.NodeGroup",
   "aws.elastic-ip": "c7n.resources.vpc.NetworkAddress",
   "aws.elasticache-group": "c7n.resources.elasticache.ElastiCacheReplicationGroup",
+  "aws.elasticache-user": "c7n.resources.elasticache.ElastiCacheUser",
   "aws.elasticbeanstalk": "c7n.resources.elasticbeanstalk.ElasticBeanstalk",
   "aws.elasticbeanstalk-environment": "c7n.resources.elasticbeanstalk.ElasticBeanstalkEnvironment",
   "aws.elasticsearch": "c7n.resources.elasticsearch.ElasticSearchDomain",
