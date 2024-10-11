@@ -1,11 +1,13 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from .common import BaseTest
+from c7n import schema
 from c7n.provider import clouds
 from c7n.exceptions import PolicyValidationError
 from c7n.executor import MainThreadExecutor
 from c7n.utils import local_session, format_string_values
-from c7n.resources import account
+from c7n.resources import account, load_resources
+from c7n.schema import StructureParser
 from c7n.testing import mock_datetime_now
 
 from pytest_terraform import terraform
@@ -1437,6 +1439,56 @@ class AccountTests(BaseTest):
                 "enabled",
                 "enabled",
             ]
+        )
+
+    def test_set_ec2_metadata_defaults_schema_validation(self):
+        policy_data = {"policies": [{
+            "name": "ec2-metadata-defaults",
+            "resource": "account",
+            "actions": [{
+                    "type": "set-ec2-metadata-defaults",
+                    "HttpTokens": "nay",
+            }],
+        }]}
+        structure = StructureParser()
+        load_resources(structure.get_resource_types(policy_data))
+        schm = schema.generate()
+        results = schema.validate(policy_data, schm)
+        self.assertIn(
+            "'nay' is not one of",
+            str(results)
+        )
+
+        with self.assertRaises(PolicyValidationError) as err:
+            self.load_policy(
+                {
+                    "name": "ec2-metadata-defaults",
+                    "resource": "account",
+                    "actions": [{
+                            "type": "set-ec2-metadata-defaults",
+                            "HttpPutResponseHopLimit": "oops, not a number",
+                    }],
+                },
+            )
+        self.assertIn(
+            "Invalid type for parameter HttpPutResponseHopLimit",
+            str(err.exception)
+        )
+
+        with self.assertRaises(PolicyValidationError) as err:
+            self.load_policy(
+                {
+                    "name": "ec2-metadata-defaults",
+                    "resource": "account",
+                    "actions": [{
+                            "type": "set-ec2-metadata-defaults",
+                            "UnknownOption": True,
+                    }],
+                },
+            )
+        self.assertIn(
+            'Unknown parameter in input: "UnknownOption"',
+            str(err.exception)
         )
 
 

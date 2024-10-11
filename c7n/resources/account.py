@@ -21,6 +21,7 @@ from c7n.manager import resources
 from c7n.utils import local_session, type_schema, generate_arn, get_support_region, jmespath_search
 from c7n.query import QueryResourceManager, TypeInfo, DescribeSource
 from c7n.filters import ListItemFilter
+from c7n.schema import ExpandedSchemaMeta
 
 from c7n.resources.iam import CredentialReport
 from c7n.resources.securityhub import OtherResourcePostFinding
@@ -2542,7 +2543,7 @@ class EC2MetadataDefaults(ValueFilter):
 
 
 @actions.register('set-ec2-metadata-defaults')
-class SetEC2MetadataDefaults(BaseAction):
+class SetEC2MetadataDefaults(BaseAction, metaclass=ExpandedSchemaMeta):
     """Modifies the default instance metadata service (IMDS) settings at the account level.
 
     :example:
@@ -2567,14 +2568,7 @@ class SetEC2MetadataDefaults(BaseAction):
 
     """
 
-    schema = type_schema(
-        'set-ec2-metadata-defaults',
-        HttpTokens={'enum': ['optional', 'required', 'no-preference']},
-        HttpPutResponseHopLimit={'type': 'integer'},
-        HttpEndpoint={'enum': ['enabled', 'disabled', 'no-preference']},
-        InstanceMetadataTags={'enum': ['enabled', 'disabled', 'no-preference']},
-    )
-
+    schema = type_schema('set-ec2-metadata-defaults')
     permissions = ('ec2:ModifyInstanceMetadataDefaults',)
     service = 'ec2'
     shape = 'ModifyInstanceMetadataDefaultsRequest'
