@@ -111,7 +111,7 @@ class DeleteSESConfigurationSet(Action):
             self.manager.retry(
                 client.delete_configuration_set,
                 ConfigurationSetName=resource['Name'],
-                ignore_err_codes=("CannotDeleteException",)
+                ignore_err_codes=("ConfigurationSetDoesNotExistException",)
             )
 
 
