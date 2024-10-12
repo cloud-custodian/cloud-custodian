@@ -936,6 +936,13 @@ class ContainerInstance(query.ChildResourceManager):
             source = 'describe-ecs-container-instance'
         return source
 
+    def get_resources(self, ids, cache=True, augment=True):
+        # The get_resources call in the source calls into the
+        # process_cluster_resources. This actually returns fully
+        # augmented resources, so the augment call actually fails
+        # because augment is expecting tuples.
+        return super().get_resources(ids, cache=cache, augment=False)
+
 
 @query.sources.register('describe-ecs-container-instance')
 class ECSContainerInstanceDescribeSource(ECSClusterResourceDescribeSource):
