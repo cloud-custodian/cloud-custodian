@@ -4,7 +4,7 @@
         "PaginationToken": "",
         "ResourceTagMappingList": [
             {
-                "ResourceARN": "arn:aws:ses:us-east-1:644160558196:configuration-set/c7n-test",
+                "ResourceARN": "arn:aws:ses:us-east-1:123456789012:configuration-set/c7n-test",
                 "Tags": [
                     {
                         "Key": "Owner",
