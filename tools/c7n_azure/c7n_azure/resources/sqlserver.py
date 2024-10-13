@@ -328,7 +328,7 @@ class VulnerabilityAssessmentFilter(ValueFilter):
     def _process_resource_set(self, resources, event=None):
         client = self.manager.get_client()
         for resource in resources:
-            if self.key not in resource['properties']:
+            if self.key not in resource:
                 va = list(client.server_vulnerability_assessments.list_by_server(
                     resource['resourceGroup'],
                     resource['name']))
@@ -350,6 +350,75 @@ class VulnerabilityAssessmentFilter(ValueFilter):
         # otherwise process the VA info using ValueFilter logic for full flexibility
         else:
             return super(VulnerabilityAssessmentFilter, self).__call__(resource[self.key])
+
+
+@SqlServer.filter_registry.register('advanced-threat-protection')
+class AdvancedThreatProtectionFilter(Filter):
+    """
+    Filter sql servers by their advanced protection state
+
+    :example:
+
+    Find SQL servers without vulnerability assessments enabled
+
+    .. code-block:: yaml
+
+        policies:
+          - name: sql-server-no-atp
+            resource: azure.sql-server
+            filters:
+              - type: advanced-threat-protection
+                enabled: false
+
+    """
+
+    schema = type_schema(
+        'advanced-threat-protection',
+        required=['type', 'enabled'],
+        **{
+            'enabled': {"type": "boolean"},
+        }
+    )
+
+    cache_key = 'c7n:advanced-threat-protection'
+
+    def process(self, resources, event=None):
+        # process the servers in parallel, updating them in place
+        # with the VA assesment properties
+        filtered, exceptions = ThreadHelper.execute_in_parallel(
+            resources=resources,
+            event=event,
+            execution_method=self._process_resource_set,
+            executor_factory=self.executor_factory,
+            log=log
+        )
+
+        if exceptions:
+            raise exceptions[0]
+
+        return filtered
+
+    def _process_resource_set(self, resources, event=None):
+        client = self.manager.get_client()
+        filtered = []
+        for resource in resources:
+            if self.cache_key not in resource:
+                atp = list(client.server_advanced_threat_protection_settings.list_by_server(
+                    resource['resourceGroup'],
+                    resource['name']))
+
+                if atp:
+                    # there can only be a single instance
+                    resource[self.cache_key] = atp[0].serialize(True).get('properties', {})
+                else:
+                    resource[self.cache_key] = {}
+
+            is_enabled = resource[self.cache_key].get('state') == 'Enabled'
+
+            if is_enabled == self.data['enabled']:
+                filtered.append(resource)
+
+        return filtered
 
 
 @SqlServer.filter_registry.register('firewall-rules')
