@@ -28,7 +28,9 @@ class SecurityHubMode(BaseTest):
         self.assertEqual(
             sorted(resources),
             sorted(['arn:aws:iam::644160558196:user/kapil']))
-        resources = hub.resolve_resources(event)
+        # Lazy import to avoid aws sdk runtime dep in core
+        from c7n.resources.aws import Arn
+        resources = hub.resolve_resources({Arn.parse(r) for r in resources})
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['UserName'], 'kapil')
 
