@@ -1067,6 +1067,7 @@ class CloudWatchDashboard(QueryResourceManager):
         name = "DashboardName"
         cfn_type = "AWS::CloudWatch::Dashboard"
         universal_taggable = object()
+        global_resource = True
 
     source_mapping = {
        "describe": DescribeWithResourceTags,
