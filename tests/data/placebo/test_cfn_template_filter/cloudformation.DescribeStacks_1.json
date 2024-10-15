@@ -1,0 +1,34 @@
+{
+    "status_code": 200,
+    "data": {
+        "Stacks": [
+            {
+                "StackId": "arn:aws:cloudformation:us-east-1:644160558196:stack/c7n-test-template-filter/a4c11ae0-8b09-11ef-9ffb-124e0717e8af",
+                "StackName": "c7n-test-template-filter",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 10,
+                    "day": 15,
+                    "hour": 15,
+                    "minute": 25,
+                    "second": 0,
+                    "microsecond": 741000
+                },
+                "RollbackConfiguration": {},
+                "StackStatus": "CREATE_COMPLETE",
+                "DisableRollback": false,
+                "NotificationARNs": [],
+                "Capabilities": [
+                    "CAPABILITY_NAMED_IAM"
+                ],
+                "Tags": [],
+                "EnableTerminationProtection": false,
+                "DriftInformation": {
+                    "StackDriftStatus": "NOT_CHECKED"
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,11 +1,14 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import logging
+import re
 
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 
 from c7n.actions import BaseAction
+from c7n.exceptions import PolicyValidationError
+from c7n.filters import Filter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema
@@ -213,7 +216,59 @@ class CloudFormationRemoveTag(RemoveTag):
               - type: remove-tag
                 tags: ['DesiredTag']
     """
-
     def process_resource_set(self, client, stacks, keys):
         for s in stacks:
             _tag_stack(client, s, remove=keys)
+
+
+@CloudFormation.filter_registry.register('template')
+class CloudFormationTemplateFilter(Filter):
+    """Filter CloudFormation stacks based on their template body
+
+    This filter retrieves the CloudFormation template for each stack and
+    searches for the regex pattern provided in the template
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: detect-api-keys-in-templates
+            resource: cfn
+            filters:
+              - type: template
+                query: API_KEY[0-9A-Z]
+
+    :param query: The regular expression pattern to search for within the template
+    """
+
+    schema = type_schema(
+        'template',
+        required=['query'],
+        query={'type': 'string'},
+    )
+    permissions = ('cloudformation:GetTemplate',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('cloudformation')
+        matched = []
+        pattern = self.data.get('query')
+
+        try:
+            regex = re.compile(pattern)
+        except re.error as e:
+            raise PolicyValidationError(f"Invalid regex pattern: {e}")
+
+        for r in resources:
+            stack_id = r['StackId']
+            try:
+                response = client.get_template(StackName=stack_id)
+                template_body = response.get('TemplateBody')
+
+                if regex.search(template_body):
+                    matched.append(r)
+            except Exception as e:
+                self.log.error(f"Error processing stack {stack_id}: {e}")
+                continue
+
+        return matched
