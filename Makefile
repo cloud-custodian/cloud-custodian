@@ -30,8 +30,7 @@ endif
 install:
 	@if [[ -z "$(VIRTUAL_ENV)" ]]; then echo "Create and Activate VirtualEnv First, ie. python3 -m venv .venv && source .venv/bin/activate"; exit 1; fi
 	poetry install
-	for pkg in $(PKG_SET); do echo "Install $$pkg" && cd $$pkg && poetry install --all-extras && cd ../..; done
-
+	for pkg in $(PKG_SET); do echo "Install $$pkg" && env -C $$pkg poetry install --all-extras; done
 .PHONY: test
 
 test:

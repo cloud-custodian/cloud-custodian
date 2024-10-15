@@ -29,11 +29,8 @@ try:
     )
     from c7n_left.providers.terraform.graph import Resolver
     from c7n_left.providers.terraform.filters import Taggable
-
-    LEFT_INSTALLED = True
 except ImportError:
     pytest.skip(reason="c7n_left not installed", allow_module_level=True)
-    LEFT_INSTALLED = False
 else:
     load_resources(("terraform.*",))
 
@@ -814,6 +811,59 @@ def test_traverse_multi_resource_nested_or(tmp_path):
         "aws_s3_bucket.owner_enforced",
         "aws_s3_bucket.owner_preferred",
     }
+
+
+def test_traverse_match_values(policy_env, test):
+    policy_env.write_tf(
+        """
+resource "r" "r1" {
+  name = "r-r1"
+}
+
+resource "r" "r2" {
+  label = "r-r2"
+}
+
+resource "rr" "rx" {
+  rn = [r.r1.name]
+}
+
+resource "rr" "ry" {
+  rl = [r.r2.label]
+}
+        """
+    )
+    policy_env.write_policy(
+        {
+            "name": "test1",
+            "resource": "terraform.rr",
+            "filters": [
+                {
+                    "type": "traverse",
+                    "resources": "r",
+                    "attrs": [{"name": "r-r1"}],
+                }
+            ],
+        },
+    )
+    policy_env.write_policy(
+        {
+            "name": "test2",
+            "resource": "terraform.rr",
+            "filters": [
+                {
+                    "type": "traverse",
+                    "resources": "r",
+                    "attrs": [{"label": "r-r2"}],
+                }
+            ],
+        },
+    )
+    res1, res2 = (r.as_dict() for r in policy_env.run())
+    assert res1["policy"]["name"] == "test1"
+    assert res1["resource"]["__tfmeta"]["path"] == "rr.rx"
+    assert res2["policy"]["name"] == "test2"
+    assert res2["resource"]["__tfmeta"]["path"] == "rr.ry"
 
 
 def test_traverse_filter_not_found(tmp_path):

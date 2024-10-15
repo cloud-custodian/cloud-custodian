@@ -16,11 +16,8 @@ from c7n.config import Bag
 try:
     from c7n_left import cli
     from c7n_left import test as left_test
-
-    LEFT_INSTALLED = True
 except ImportError:
     pytest.skip(reason="c7n_left not installed", allow_module_level=True)
-    LEFT_INSTALLED = False
 
 
 data_dir = Path(os.curdir).absolute() / "data"

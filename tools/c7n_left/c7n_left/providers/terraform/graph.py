@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
+import uuid
+
 from ...core import ResourceGraph
 from .resource import TerraformResource
 
@@ -18,20 +20,22 @@ class TerraformGraph(ResourceGraph):
         for type_name, type_items in self.resource_data.items():
             if types and (type_name not in types and f"data.{type_name}" not in types):
                 continue
-            elif type_name == "module":
-                yield type_name, [self.as_resource(type_name, d, "module") for d in type_items]
-            elif type_name == "moved":
-                yield type_name, [self.as_resource(type_name, d, "moved") for d in type_items]
-            elif type_name == "locals":
-                yield type_name, [self.as_resource(type_name, d, "local") for d in type_items]
-            elif type_name == "terraform":
-                yield type_name, [self.as_resource(type_name, d, "terraform") for d in type_items]
-            elif type_name == "provider":
-                yield type_name, [self.as_resource(type_name, d, "provider") for d in type_items]
-            elif type_name == "variable":
-                yield type_name, [self.as_resource(type_name, d, "variable") for d in type_items]
-            elif type_name == "output":
-                yield type_name, [self.as_resource(type_name, d, "output") for d in type_items]
+            elif type_name in (
+                "module",
+                "moved",
+                "locals",
+                "terraform",
+                "provider",
+                "variable",
+                "output",
+            ):
+                if type_name == "locals":
+                    name = "local"
+                else:
+                    name = type_name
+                yield type_name, [
+                    self.as_resource(type_name, d, type_name=name) for d in type_items
+                ]
             else:
                 data_resources = []
                 resources = []
@@ -76,10 +80,11 @@ class Resolver:
 
     @staticmethod
     def is_id_ref(v):
-        if len(v) != 36:
+        try:
+            uuid.UUID(hex=v)
+        except ValueError:
             return False
-        if v.count("-") != 4:
-            return False
+
         return True
 
     def resolve_refs(self, block, types=None):
@@ -95,7 +100,7 @@ class Resolver:
                 continue
             yield r
 
-    def visit(self, block, root=False):
+    def visit(self, block):
         if not isinstance(block, dict):
             return ()
 
@@ -110,10 +115,14 @@ class Resolver:
                 refs.add(v)
             if isinstance(v, (str, int, float, bool)):
                 continue
-            if isinstance(v, dict) and k != "__tfmeta":
-                refs.update(self.visit(v))
+            if isinstance(v, dict):
+                if k == "__tfmeta":
+                    refs.update(r["id"] for r in v.get("references", ()))
+                else:
+                    refs.update(self.visit(v))
             if isinstance(v, list):
-                list(map(self.visit, v))
+                for entry in v:
+                    self.visit(entry)
 
         if refs and block.get("__tfmeta", {}).get("label"):
             self._ref_map.setdefault(bid, []).extend(refs)
