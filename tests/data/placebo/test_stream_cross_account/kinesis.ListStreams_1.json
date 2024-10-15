@@ -1,0 +1,49 @@
+{
+    "status_code": 200,
+    "data": {
+        "StreamNames": [
+            "amazon-workspaces-web-test",
+            "test-stream-2"
+        ],
+        "HasMoreStreams": false,
+        "StreamSummaries": [
+            {
+                "StreamName": "amazon-workspaces-web-test",
+                "StreamARN": "arn:aws:kinesis:us-east-1:644160558196:stream/amazon-workspaces-web-test",
+                "StreamStatus": "ACTIVE",
+                "StreamModeDetails": {
+                    "StreamMode": "ON_DEMAND"
+                },
+                "StreamCreationTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 7,
+                    "day": 30,
+                    "hour": 7,
+                    "minute": 14,
+                    "second": 28,
+                    "microsecond": 0
+                }
+            },
+            {
+                "StreamName": "test-stream-2",
+                "StreamARN": "arn:aws:kinesis:us-east-1:644160558196:stream/test-stream-2",
+                "StreamStatus": "ACTIVE",
+                "StreamModeDetails": {
+                    "StreamMode": "ON_DEMAND"
+                },
+                "StreamCreationTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 9,
+                    "day": 11,
+                    "hour": 16,
+                    "minute": 27,
+                    "second": 9,
+                    "microsecond": 0
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
