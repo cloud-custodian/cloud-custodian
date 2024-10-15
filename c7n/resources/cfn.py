@@ -1,10 +1,8 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-import json
 import logging
 import re
 
-import yaml
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 
@@ -255,7 +253,6 @@ class CloudFormationTemplateFilter(Filter):
         client = local_session(self.manager.session_factory).client('cloudformation')
         matched = []
         pattern = self.data.get('query')
-        encoding = self.data.get('encoding', 'yaml')
 
         try:
             regex = re.compile(pattern)
@@ -267,17 +264,8 @@ class CloudFormationTemplateFilter(Filter):
             try:
                 response = client.get_template(StackName=stack_id)
                 template_body = response.get('TemplateBody')
-                if not template_body:
-                    continue
 
-                if encoding == 'json':
-                    template = json.loads(template_body)
-                else:
-                    template = yaml.safe_load(template_body)
-
-                template_str = json.dumps(template)
-
-                if regex.search(template_str):
+                if regex.search(template_body):
                     matched.append(r)
             except Exception as e:
                 self.log.error(f"Error processing stack {stack_id}: {e}")
