@@ -1,0 +1,25 @@
+{
+    "status_code": 200,
+    "data": {
+        "WebACL": {
+            "Name": "test",
+            "Id": "f7e2f5e5-f2e1-4d17-98a7-2a09983c3083",
+            "ARN": "arn:aws:wafv2:us-east-1:644160558196:regional/webacl/test/f7e2f5e5-f2e1-4d17-98a7-2a09983c3083",
+            "DefaultAction": {
+                "Allow": {}
+            },
+            "Description": "",
+            "Rules": [],
+            "VisibilityConfig": {
+                "SampledRequestsEnabled": true,
+                "CloudWatchMetricsEnabled": true,
+                "MetricName": "test"
+            },
+            "Capacity": 0,
+            "ManagedByFirewallManager": false,
+            "LabelNamespace": "awswaf:644160558196:webacl:test:"
+        },
+        "LockToken": "d474436a-e677-4a29-93fe-6b83b5af04d4",
+        "ResponseMetadata": {}
+    }
+}

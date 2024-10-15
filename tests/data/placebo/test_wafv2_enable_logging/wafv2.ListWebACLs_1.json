@@ -1,0 +1,23 @@
+{
+    "status_code": 200,
+    "data": {
+        "NextMarker": "test-custodian-waf",
+        "WebACLs": [
+            {
+                "Name": "test",
+                "Id": "f7e2f5e5-f2e1-4d17-98a7-2a09983c3083",
+                "Description": "",
+                "LockToken": "d474436a-e677-4a29-93fe-6b83b5af04d4",
+                "ARN": "arn:aws:wafv2:us-east-1:644160558196:regional/webacl/test/f7e2f5e5-f2e1-4d17-98a7-2a09983c3083"
+            },
+            {
+                "Name": "test-custodian-waf",
+                "Id": "0b6d34b1-689c-4d33-8d84-3effe427413f",
+                "Description": "Delete me later",
+                "LockToken": "062ebb22-4395-4f1c-ad4f-9c5809b2a4e2",
+                "ARN": "arn:aws:wafv2:us-east-1:644160558196:regional/webacl/test-custodian-waf/0b6d34b1-689c-4d33-8d84-3effe427413f"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
