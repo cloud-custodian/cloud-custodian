@@ -1,55 +1,76 @@
+# Stage 1: Build Stage
 FROM cgr.dev/chainguard/wolfi-base as builder
 
+# Arguments for versions
 ARG POETRY_VERSION="1.8.3"
-ARG PY_VERSION=3.12
+ARG PY_VERSION="3.12"
+
+# Set working directory
 WORKDIR /app
 
-RUN apk add python-${PY_VERSION} py${PY_VERSION}-pip && \
+# Install Python and pip using apk, and set appropriate permissions
+RUN apk add --no-cache python${PY_VERSION} py${PY_VERSION}-pip && \
     chown -R nonroot.nonroot /app/
 
+# Switch to nonroot user for security
 USER nonroot
 
-# Install Poetry in its own virtual environment
-RUN python3 -m venv "${HOME}/tools" && \
-    . "${HOME}/tools/bin/activate" && \
-    pip install --verbose "poetry==${POETRY_VERSION}"
+# Install Poetry globally
+RUN pip install --no-cache-dir "poetry==${POETRY_VERSION}"
 
-
-# Copy enough of the c7n source that poetry can
-# use it when installing c7n-left
+# Copy project files needed for Poetry to resolve dependencies
 WORKDIR /app/c7n
 COPY pyproject.toml poetry.lock README.md /app/c7n
 COPY c7n /app/c7n/c7n
 
-# Install c7n-left, which comes with a path-based dependency
-# on c7n
+# Set working directory for c7n-left installation
 WORKDIR /app/c7n/tools/c7n_left
 COPY tools/c7n_left /app/c7n/tools/c7n_left
+
+# Install dependencies with Poetry in the builder stage
 RUN python -m venv "${HOME}/venv" && \
     . "${HOME}/venv/bin/activate" && \
-    ~/tools/bin/poetry install --only main
+    poetry install --only main
 
+# Stage 2: Final Stage
+FROM cgr.dev/chainguard/wolfi-base
 
-FROM chainguard/wolfi-base
-
+# Labels for metadata
 LABEL name="c7n-left" \
-      repository="http://github.com/cloud-custodian/cloud-custodian"
-LABEL "org.opencontainers.image.title"="c7n-left"
-LABEL "org.opencontainers.image.description"="IaC Policy Engine"
-LABEL "org.opencontainers.image.documentation"="https://cloudcustodian.io/docs"
+      repository="https://github.com/cloud-custodian/cloud-custodian" \
+      org.opencontainers.image.title="c7n-left" \
+      org.opencontainers.image.description="IaC Policy Engine" \
+      org.opencontainers.image.documentation="https://cloudcustodian.io/docs"
 
-ARG PY_VERSION=3.12
+# Argument for Python version
+ARG PY_VERSION="3.12"
 
+# Set working directory
 WORKDIR /app
-RUN apk add git python-${PY_VERSION} && \
+
+# Install Python in the final image, and ensure Git is available for potential future needs
+RUN apk add --no-cache git python${PY_VERSION} && \
     chown -R nonroot.nonroot /app/
 
+# Copy necessary Python dependencies from the builder stage to the final image
 COPY --from=builder /home/nonroot/venv/lib/python${PY_VERSION}/site-packages /home/nonroot/.local/lib/python${PY_VERSION}/site-packages
-RUN rm -Rf /home/nonroot/.local/lib/python${PY_VERSION}/site-packages/pip*
+
+# Remove unnecessary files (like pip) to reduce image size
+RUN rm -rf /home/nonroot/.local/lib/python${PY_VERSION}/site-packages/pip*
+
+# Copy the c7n and c7n_left source code from the builder stage
 COPY --from=builder /app/c7n/c7n /app/c7n
 COPY --from=builder /app/c7n/tools/c7n_left /app/c7n/tools/c7n_left
 
-ENV LC_ALL="C.UTF-8" LANG="C.UTF-8"
-ENV PYTHONPATH=/app:/app/c7n/tools/c7n_left:/home/nonroot/.local/lib/python${PY_VERSION}/site-packages:$PYTHONPATH
+# Set environment variables for Python paths
+ENV LC_ALL="C.UTF-8" \
+    LANG="C.UTF-8" \
+    PYTHONPATH="/app:/app/c7n/tools/c7n_left:/home/nonroot/.local/lib/python${PY_VERSION}/site-packages:$PYTHONPATH"
 
+# Define the entry point for the c7n-left CLI
 ENTRYPOINT [ "python", "-m", "c7n_left.cli"]
+#Key Changes:
+Poetry installation: Poetry is installed globally to simplify usage in the build stage.
+Improved dependency caching: Using --no-cache-dir in pip install prevents unnecessary files from being cached.
+Image size optimization: The final image removes unnecessary packages like pip to reduce the overall size, which is important for cloud deployments.
+Better organization of stages: The multi-stage build is optimized to only include the necessary Python packages in the final image, minimizing its size.
