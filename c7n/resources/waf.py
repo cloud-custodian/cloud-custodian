@@ -233,25 +233,16 @@ class EnableWAFV2Logging(BaseAction):
             'wafv2', region_name=self.manager.region)
 
         log_destination_arn = self.data.get('log_destination_arn')
-        if not log_destination_arn:
-            self.log.error("Missing log destination ARN for enabling WAFv2 logging.")
-            return
 
         for r in resources:
             self.enable_logging(client, r, log_destination_arn)
 
     def enable_logging(self, client, resource, log_destination_arn):
-        try:
-            client.put_logging_configuration(
-                LoggingConfiguration={
-                    'ResourceArn': resource['ARN'],
-                    'LogDestinationConfigs': [log_destination_arn]
-                }
-            )
-            self.log.info(f"Enabled logging for WAFv2 WebACL: "
-                          f"{resource['Name']} ({resource['ARN']})")
-        except client.exceptions.WAFNonexistentItemException:
-            self.log.error(f"WebACL does not exist: {resource['Name']} ({resource['ARN']})")
-        except Exception as e:
-            self.log.error(f"Failed to enable logging for WebACL: "
-                           f"{resource['Name']} ({resource['ARN']}) - {str(e)}")
+        client.put_logging_configuration(
+            LoggingConfiguration={
+                'ResourceArn': resource['ARN'],
+                'LogDestinationConfigs': [log_destination_arn]
+            }
+        )
+        self.log.info(f"Enabled logging for WAFv2 WebACL: "
+                      f"{resource['Name']} ({resource['ARN']})")
