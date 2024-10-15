@@ -3,6 +3,7 @@
 import json
 
 from c7n.actions import BaseAction, Action
+from c7n.filters.iamaccess import CrossAccountAccessFilter
 import c7n.filters.policystatement as polstmt_filter
 from c7n.manager import resources
 from c7n.query import DescribeSource, QueryResourceManager, TypeInfo
@@ -99,6 +100,31 @@ class SESEmailIdentity(QueryResourceManager):
         permission_prefix = 'ses'
         arn_service = 'ses'
         cfn_type = 'AWS::SES::EmailIdentity'
+
+
+@SESEmailIdentity.filter_registry.register('cross-account')
+class CrossAccountEmailIdentity(CrossAccountAccessFilter):
+
+    # dummy permission
+    permissions = ('ses:ListEmailIdentities',)
+    policy_attribute = 'c7n:AggregatedPolicy'
+
+    def process(self, resources, event=None):
+        for r in resources:
+            aggregated = {}
+            for policy_text in r.get('Policies', {}).values():
+                policy = json.loads(policy_text)
+                if not aggregated:
+                    aggregated = policy
+                else:
+                    aggregated["Statement"] += policy["Statement"]
+            r[self.policy_attribute] = aggregated
+
+        def _remove_policy_attr(r):
+            r.pop(self.policy_attribute)
+            return r
+
+        return list(map(_remove_policy_attr, super().process(resources, event)))
 
 
 @SESEmailIdentity.filter_registry.register('has-statement')

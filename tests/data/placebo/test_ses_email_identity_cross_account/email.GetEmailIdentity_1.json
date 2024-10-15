@@ -1,0 +1,53 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "IdentityType": "DOMAIN",
+        "FeedbackForwardingStatus": true,
+        "VerifiedForSendingStatus": false,
+        "DkimAttributes": {
+            "SigningEnabled": true,
+            "Status": "PENDING",
+            "Tokens": [
+                "t77srlygz75k4ccggfmgiha5pu5dpckb",
+                "4xl6eft4g7yqbctnqoywi4ckswxe36lz",
+                "flnv4kuahcizhhhjvzvxhozjyarikxo4"
+            ],
+            "SigningAttributesOrigin": "AWS_SES",
+            "NextSigningKeyLength": "RSA_2048_BIT",
+            "CurrentSigningKeyLength": "RSA_2048_BIT",
+            "LastKeyGenerationTimestamp": {
+                "__class__": "datetime",
+                "year": 2024,
+                "month": 10,
+                "day": 4,
+                "hour": 15,
+                "minute": 34,
+                "second": 33,
+                "microsecond": 464000
+            }
+        },
+        "MailFromAttributes": {
+            "BehaviorOnMxFailure": "USE_DEFAULT_VALUE"
+        },
+        "Policies": {
+            "Policy-1728070425896": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"stmt1728070551839\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::123456789012:root\"},\"Action\":\"ses:*\",\"Resource\":\"arn:aws:ses:us-west-2:123456789012:identity/c7ntest.com\",\"Condition\":{}}]}",
+            "Policy-1728070619290": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"stmt1728070670549\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::210987654321:root\"},\"Action\":\"ses:SendEmail\",\"Resource\":\"arn:aws:ses:us-west-2:123456789012:identity/c7ntest.com\",\"Condition\":{}}]}"
+        },
+        "Tags": [],
+        "VerificationStatus": "PENDING",
+        "VerificationInfo": {
+            "LastCheckedTimestamp": {
+                "__class__": "datetime",
+                "year": 2024,
+                "month": 10,
+                "day": 4,
+                "hour": 16,
+                "minute": 0,
+                "second": 35,
+                "microsecond": 800000
+            },
+            "ErrorType": "HOST_NOT_FOUND"
+        }
+    }
+}

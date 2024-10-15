@@ -180,3 +180,17 @@ class SESV2Test(BaseTest):
         resources = p.run()
         self.assertEqual(1, len(resources))
         self.assertEqual(resources[0]["IdentityName"], "c7n@t.com")
+
+    def test_ses_email_identity_cross_account(self):
+        session_factory = self.replay_flight_data("test_ses_email_identity_cross_account")
+        p = self.load_policy(
+            {
+                "name": "ses-cross-acct",
+                "resource": "ses-email-identity",
+                "filters": ["cross-account"],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+        self.assertEqual(resources[0]["IdentityName"], "c7ntest.com")
