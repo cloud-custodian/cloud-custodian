@@ -222,7 +222,7 @@ class EnableWAFV2Logging(BaseAction):
             resource: aws.wafv2
             actions:
               - type: enable-logging
-                log_destination_arn: arn:aws:logs:us-east-1:123456789012:log-group:my-waf-logs
+                log_destination_arn: arn:aws:s3:::logging-destination-bucket
     """
     schema = type_schema('enable-logging',
                          log_destination_arn={'type': 'string'})
