@@ -1,0 +1,8 @@
+{
+    "status_code": 200,
+    "data": {
+        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"Statement1\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::210987654321:root\"},\"Action\":\"dynamodb:BatchGetItem\",\"Resource\":\"arn:aws:dynamodb:us-east-1:123456789012:table/c7n-cross-account\"},{\"Sid\":\"Statement2\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::123456789012:user/TestUser\"},\"Action\":\"dynamodb:*\",\"Resource\":\"arn:aws:dynamodb:us-east-1:644160558196:table/c7n-cross-account\"}]}",
+        "RevisionId": "1726669535060",
+        "ResponseMetadata": {}
+    }
+}

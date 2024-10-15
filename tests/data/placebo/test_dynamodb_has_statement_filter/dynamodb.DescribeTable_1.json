@@ -1,0 +1,45 @@
+{
+    "status_code": 200,
+    "data": {
+        "Table": {
+            "AttributeDefinitions": [
+                {
+                    "AttributeName": "c7n",
+                    "AttributeType": "S"
+                }
+            ],
+            "TableName": "c7n-test",
+            "KeySchema": [
+                {
+                    "AttributeName": "c7n",
+                    "KeyType": "HASH"
+                }
+            ],
+            "TableStatus": "ACTIVE",
+            "CreationDateTime": {
+                "__class__": "datetime",
+                "year": 2024,
+                "month": 10,
+                "day": 6,
+                "hour": 12,
+                "minute": 8,
+                "second": 33,
+                "microsecond": 300000
+            },
+            "ProvisionedThroughput": {
+                "NumberOfDecreasesToday": 0,
+                "ReadCapacityUnits": 1,
+                "WriteCapacityUnits": 1
+            },
+            "TableSizeBytes": 0,
+            "ItemCount": 0,
+            "TableArn": "arn:aws:dynamodb:us-east-1:123456789012:table/c7n-test",
+            "TableId": "ea7da970-2519-441a-a7ec-d15c58f1ffef",
+            "TableClassSummary": {
+                "TableClass": "STANDARD"
+            },
+            "DeletionProtectionEnabled": false
+        },
+        "ResponseMetadata": {}
+    }
+}
