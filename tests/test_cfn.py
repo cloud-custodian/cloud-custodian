@@ -244,7 +244,6 @@ class TestCFN(BaseTest):
                     {
                         "type": "template",
                         "query": "API_KEY[0-9A-Z]",
-                        "encoding": "yaml"
                     }
                 ]
             },

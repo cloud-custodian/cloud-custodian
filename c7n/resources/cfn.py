@@ -228,7 +228,7 @@ class CloudFormationTemplateFilter(Filter):
     """Filter CloudFormation stacks based on their template body
 
     This filter retrieves the CloudFormation template for each stack and
-    searched for the regex pattern within the template
+    searches for the regex pattern provided in the template
 
     :example:
 
@@ -240,17 +240,14 @@ class CloudFormationTemplateFilter(Filter):
             filters:
               - type: template
                 query: API_KEY[0-9A-Z]
-                encoding: yaml
 
-    :param query: (required) The regular expression pattern to search for within the template
-    :param encoding: (optional) The template format, either json or yaml (default is yaml)
+    :param query: The regular expression pattern to search for within the template
     """
 
     schema = type_schema(
         'template',
         required=['query'],
         query={'type': 'string'},
-        encoding={'type': 'string'},
     )
     permissions = ('cloudformation:GetTemplate',)
 
