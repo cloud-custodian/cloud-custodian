@@ -60,7 +60,6 @@ Lambdas can receive CWE over CloudTrail API calls within seconds of delay at P99
        actions:
          - type: mark
            tag: foo
-           msg: bar
 
 Because the total AWS API surface area is so large most CloudTrail API
 event subscriptions need two additional fields:
@@ -168,10 +167,10 @@ not support tagging, but groups do.
          type: schedule
          role: arn:aws:iam::{account_id}:role/some-role
          schedule: "rate(1 day)"
-         schedule-role: arn:aws:iam::{account_id}:role/some-scheduler-role
+         scheduler-role: arn:aws:iam::{account_id}:role/some-scheduler-role
          timezone: Asia/Seoul
          group-name: MySchedGroup
-         start-date: 2024-04-04T00:05:23
+         start-date: "2024-04-04T00:05:23"
 
 Note:
 

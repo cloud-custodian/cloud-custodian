@@ -103,7 +103,11 @@ timeline or resource attributes.
        resource: aws.kinesis
        mode:
          type: config-poll-rule
-	 role: custodian-config-role
+         role: custodian-config-role
          schedule: Three_Hours
        filters:
          - tag:App: Dev
+
+When the resources is supported you will get this validation error::
+
+  custodian.commands:ERROR Policy: kinesis-one-stream is invalid: resource:aws.kinesis fully supported by config and should use mode: config-rule
