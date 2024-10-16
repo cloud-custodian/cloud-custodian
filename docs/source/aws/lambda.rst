@@ -60,6 +60,7 @@ Lambdas can receive CWE over CloudTrail API calls within seconds of delay at P99
        actions:
          - type: mark
            tag: foo
+           value: bar
 
 Because the total AWS API surface area is so large most CloudTrail API
 event subscriptions need two additional fields:
