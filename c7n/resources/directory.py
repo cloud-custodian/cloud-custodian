@@ -119,6 +119,7 @@ class DirectorySettingsFilter(Filter):
         'settings', rinherit=ValueFilter.schema)
 
     permissions = ('ds:DescribeSettings',)
+    annotation_key = 'c7n:Settings'
     valid_directory_types = ['MicrosoftAD']
 
     def process(self, resources, event=None):
@@ -128,9 +129,11 @@ class DirectorySettingsFilter(Filter):
         value = self.data.get('value')
         matches = []
         for r in resources:
-            settings = client.describe_settings(
-                DirectoryId=r['DirectoryId'])['SettingEntries']
-            for setting in settings:
+            if self.annotation_key not in r:
+                settings = client.describe_settings(
+                    DirectoryId=r['DirectoryId'])['SettingEntries']
+                r[self.annotation_key] = settings
+            for setting in r[self.annotation_key]:
                 if setting['Name'] == key and setting['AppliedValue'] == value:
                     matches.append(r)
                     break

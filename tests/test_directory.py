@@ -171,6 +171,7 @@ class DirectoryTests(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertTrue("c7n:LDAPSSettings" in resources[0])
 
     def test_directory_ldap_setting_enabled(self):
         factory = self.replay_flight_data("test_directory_ldap_setting_enabled")
@@ -198,6 +199,7 @@ class DirectoryTests(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertTrue("c7n:Settings" in resources[0])
 
 
 class CloudDirectoryQueryParse(BaseTest):
