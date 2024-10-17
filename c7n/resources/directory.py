@@ -1,5 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+from c7n.filters.core import Filter, ValueFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema, QueryParser
@@ -48,6 +49,95 @@ class DirectorySecurityGroupFilter(SecurityGroupFilter):
 class DirectoryVpcFilter(VpcFilter):
 
     RelatedIdsExpression = "VpcSettings.VpcId"
+
+
+@Directory.filter_registry.register('ldap')
+class DirectoryLDAPFilter(Filter):
+    """Filter directories based on their LDAP status
+
+    :example:
+
+        .. code-block:: yaml
+
+            policies:
+              - name: ldap-enabled-directories
+                resource: directory
+                filters:
+                  - type: ldap
+                    status: Disabled
+    """
+    schema = type_schema(
+        'ldap',
+        status={'type': 'string', 'enum': ['Enabled', 'Disabled']},
+        required=['status']
+    )
+
+    permissions = ('ds:DescribeLDAPSSettings',)
+    annotation_key = 'c7n:LDAPSSettings'
+    valid_directory_types = ['MicrosoftAD']
+
+    def process(self, resources, event=None):
+        resources = self.filter_resources(resources, 'Type', self.valid_directory_types)
+        client = local_session(self.manager.session_factory).client('ds')
+        status = self.data.get('status', 'Enabled')
+        matches = []
+        for r in resources:
+            if self.annotation_key not in r:
+                try:
+                    ldap_settings = client.describe_ldaps_settings(
+                        DirectoryId=r['DirectoryId'])['LDAPSSettingsInfo']
+                except client.exceptions.ClientError:
+                    continue
+                r[self.annotation_key] = ldap_settings
+            if status == "Disabled" and len(r[self.annotation_key]) == 0:
+                matches.append(r)
+            else:
+                for setting in r[self.annotation_key]:
+                    if setting['LDAPSStatus'] == status:
+                        matches.append(r)
+                        break
+        return matches
+
+
+@Directory.filter_registry.register('settings')
+class DirectorySettingsFilter(Filter):
+    """Filter directories based on their settings
+
+    :example:
+
+        .. code-block:: yaml
+
+            policies:
+              - name: settings-enabled-directories
+                resource: directory
+                filters:
+                  - type: settings
+                    key: TLS_1_0
+                    value: Enable
+    """
+    schema = type_schema(
+        'settings', rinherit=ValueFilter.schema)
+
+    permissions = ('ds:DescribeSettings',)
+    annotation_key = 'c7n:Settings'
+    valid_directory_types = ['MicrosoftAD']
+
+    def process(self, resources, event=None):
+        resources = self.filter_resources(resources, 'Type', self.valid_directory_types)
+        client = local_session(self.manager.session_factory).client('ds')
+        key = self.data.get('key')
+        value = self.data.get('value')
+        matches = []
+        for r in resources:
+            if self.annotation_key not in r:
+                settings = client.describe_settings(
+                    DirectoryId=r['DirectoryId'])['SettingEntries']
+                r[self.annotation_key] = settings
+            for setting in r[self.annotation_key]:
+                if setting['Name'] == key and setting['AppliedValue'] == value:
+                    matches.append(r)
+                    break
+        return matches
 
 
 @Directory.action_registry.register('tag')

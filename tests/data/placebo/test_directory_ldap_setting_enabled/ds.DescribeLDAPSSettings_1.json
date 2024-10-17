@@ -1,0 +1,20 @@
+{
+    "status_code": 200,
+    "data": {
+        "LDAPSSettingsInfo": [
+            { 
+                "LastUpdatedDateTime": {"__class__": "datetime",
+                "year": 2023,
+                "month": 5,
+                "day": 26,
+                "hour": 13,
+                "minute": 12,
+                "second": 38,
+                "microsecond": 219000 },
+                "LDAPSStatus": "Enabled",
+                "LDAPSStatusReason": ""
+             }
+        ],
+        "ResponseMetadata": {}
+    }
+}
