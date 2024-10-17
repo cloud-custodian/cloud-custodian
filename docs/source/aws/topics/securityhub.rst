@@ -53,7 +53,7 @@ custodian actions are resource specific.
        actions:
         - snapshot
         - type: set-instance-profile
-          name: default
+          name: null
         - stop
 
 
