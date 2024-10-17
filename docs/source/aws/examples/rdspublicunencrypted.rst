@@ -3,6 +3,7 @@ RDS - Terminate Unencrypted Public Instances
 
 .. code-block:: yaml
 
+  policies:
    - name: terminate-unencrypted-public-rds
      description: |
        Terminate all unencrypted or publicly available RDS upon creation

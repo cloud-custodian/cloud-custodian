@@ -24,6 +24,7 @@ date will be filtered in when utilizing the ``marked-for-op`` filter.
 
   .. code-block:: yaml
 
+    policies:
      - name: ebs-mark-unattached-deletion
        resource: ebs
        comments: |

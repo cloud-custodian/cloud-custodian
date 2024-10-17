@@ -67,10 +67,10 @@ ELB Log Accounts: https://docs.aws.amazon.com/elasticloadbalancing/latest/classi
          role: arn:aws:iam::{account_id}:role/Cloud_Custodian_Role
          timeout: 200
        description: |
-         Appends a bucket policy statement to an s3 bucket when it detects
-         a policy change to the bucket or a new bucket is created which
-         will deny anyone except some AWS logging services from setting
-         s3 objects in the bucket to public-read, public-read-write, or
+         Appends a bucket policy to an S3 bucket when it detects
+         a policy change or a new bucket is created which
+         will deny anyone except AWS logging services from setting
+         S3 objects in the bucket to public-read, public-read-write, or
          any authenticated AWS user.
        actions:
          - type: set-statements

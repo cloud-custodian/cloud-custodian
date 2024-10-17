@@ -3,9 +3,10 @@ ELB - SSL Blacklist
 
 .. code-block:: yaml
 
-   - name: elb-ssl-whitelist
+  policies:
+   - name: elb-ssl-blacklist
      description: |
-       HTTPS/SSL ELBs should only have whitelisted ciphers/protocols
+       HTTPS/SSL ELBs should not have blacklisted ciphers/protocols
      resource: elb
      mode:
        type: cloudtrail
