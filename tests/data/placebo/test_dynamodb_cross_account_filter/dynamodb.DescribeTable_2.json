@@ -1,0 +1,55 @@
+{
+    "status_code": 200,
+    "data": {
+        "Table": {
+            "AttributeDefinitions": [
+                {
+                    "AttributeName": "name",
+                    "AttributeType": "S"
+                }
+            ],
+            "TableName": "test-1",
+            "KeySchema": [
+                {
+                    "AttributeName": "name",
+                    "KeyType": "HASH"
+                }
+            ],
+            "TableStatus": "ACTIVE",
+            "CreationDateTime": {
+                "__class__": "datetime",
+                "year": 2024,
+                "month": 2,
+                "day": 8,
+                "hour": 16,
+                "minute": 20,
+                "second": 50,
+                "microsecond": 43000
+            },
+            "ProvisionedThroughput": {
+                "LastDecreaseDateTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 2,
+                    "day": 8,
+                    "hour": 16,
+                    "minute": 32,
+                    "second": 49,
+                    "microsecond": 707000
+                },
+                "NumberOfDecreasesToday": 0,
+                "ReadCapacityUnits": 1,
+                "WriteCapacityUnits": 1
+            },
+            "TableSizeBytes": 0,
+            "ItemCount": 0,
+            "TableArn": "arn:aws:dynamodb:us-east-1:123456789012:table/test-1",
+            "TableId": "ce83b159-c233-4fc7-8617-9d544a0ad076",
+            "TableClassSummary": {
+                "TableClass": "STANDARD"
+            },
+            "DeletionProtectionEnabled": false
+        },
+        "ResponseMetadata": {}
+    }
+}

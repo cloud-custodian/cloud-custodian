@@ -1398,6 +1398,47 @@ class AccountTests(BaseTest):
             ]
         )
 
+    def test_ec2_metadata_defaults(self):
+        factory = self.replay_flight_data("test_ec2_metadata_defaults")
+        p = self.load_policy(
+            {
+                "name": "ec2-metadata-defaults",
+                "resource": "account",
+                "filters": [{
+                    "type": "ec2-metadata-defaults",
+                    "key": "HttpTokens",
+                    "value": "optional"
+                }],
+                "actions": [{
+                        "type": "set-ec2-metadata-defaults",
+                        "HttpTokens": "required",
+                        "HttpPutResponseHopLimit": 1,
+                        "HttpEndpoint": "enabled",
+                        "InstanceMetadataTags": "enabled"
+                }],
+            },
+            session_factory=factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = local_session(factory).client('ec2')
+        defaults = client.get_instance_metadata_defaults()["AccountLevel"]
+        self.assertEqual(
+            [
+                defaults["HttpTokens"],
+                defaults["HttpPutResponseHopLimit"],
+                defaults["HttpEndpoint"],
+                defaults["InstanceMetadataTags"],
+            ],
+            [
+                "required",
+                1,
+                "enabled",
+                "enabled",
+            ]
+        )
+
 
 class AccountDataEvents(BaseTest):
 
