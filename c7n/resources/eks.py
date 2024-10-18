@@ -4,6 +4,7 @@ import c7n.filters.vpc as net_filters
 from c7n.actions import Action
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter
 from c7n.manager import resources
+from c7n.schema import ExpandedSchemaMeta
 from c7n import tags, query
 from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, \
     ChildResourceManager, ChildDescribeSource
@@ -169,24 +170,30 @@ class EKSRemoveTag(tags.RemoveTag):
 
 
 @EKS.action_registry.register('update-config')
-class UpdateConfig(Action):
+class UpdateConfig(Action, metaclass=ExpandedSchemaMeta):
 
-    schema = {
-        'type': 'object',
-        'additionalProperties': False,
-        'oneOf': [
+    # schema = {
+    #     'type': 'object',
+    #     'additionalProperties': False,
+    #     'oneOf': [
+    #         {'required': ['type', 'logging']},
+    #         {'required': ['type', 'resourcesVpcConfig']},
+    #         {'required': ['type', 'logging', 'resourcesVpcConfig']}],
+    #     'properties': {
+    #         'type': {'enum': ['update-config']},
+    #         'logging': {'type': 'object'},
+    #         'resourcesVpcConfig': {'type': 'object'}
+    #     }
+    # }
+    resource_id_key = 'name'
+    schema = type_schema('update-config', **{'oneOf': [
             {'required': ['type', 'logging']},
             {'required': ['type', 'resourcesVpcConfig']},
-            {'required': ['type', 'logging', 'resourcesVpcConfig']}],
-        'properties': {
-            'type': {'enum': ['update-config']},
-            'logging': {'type': 'object'},
-            'resourcesVpcConfig': {'type': 'object'}
-        }
-    }
+            {'required': ['type', 'logging', 'resourcesVpcConfig']}]})
 
     permissions = ('eks:UpdateClusterConfig',)
     shape = 'UpdateClusterConfigRequest'
+    service = 'eks'
 
     def validate(self):
         cfg = dict(self.data)
