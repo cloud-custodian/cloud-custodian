@@ -1,0 +1,10 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Policies": {
+            "C7nTestPolicy2": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"stmt1729266688400\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::123456789012:root\"},\"Action\":\"ses:GetEmailIdentity\",\"Resource\":\"arn:aws:ses:us-east-1:123456789012:identity/c7n-test.com\"}]}",
+            "Policy-1729266167922": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"stmt1729266179519\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::123456789012:root\"},\"Action\":\"ses:*\",\"Resource\":\"arn:aws:ses:us-east-1:123456789012:identity/c7n-test.com\"}]}"
+        }
+    }
+}
