@@ -74,6 +74,8 @@ class DirectoryLDAPFilter(Filter):
 
     permissions = ('ds:DescribeLDAPSSettings',)
     annotation_key = 'c7n:LDAPSSettings'
+    # Only MicrosoftAD and ADConnector directories have LDAP settings
+    # the other types will throw an UnsupportedOperationException
     valid_directory_types = ['MicrosoftAD', "ADConnector"]
 
     def process(self, resources, event=None):
@@ -117,6 +119,8 @@ class DirectorySettingsFilter(Filter):
 
     permissions = ('ds:DescribeSettings',)
     annotation_key = 'c7n:Settings'
+    # Only MicrosoftAD directories have settings
+    # Other types will throw an InvalidParameterException
     valid_directory_types = ['MicrosoftAD']
 
     def process(self, resources, event=None):
