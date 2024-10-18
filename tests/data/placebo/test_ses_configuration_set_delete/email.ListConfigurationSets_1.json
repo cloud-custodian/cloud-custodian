@@ -1,0 +1,11 @@
+{
+    "status_code": 200,
+    "data": {
+        "ConfigurationSets": [
+            {
+                "Name": "c7n-test"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
