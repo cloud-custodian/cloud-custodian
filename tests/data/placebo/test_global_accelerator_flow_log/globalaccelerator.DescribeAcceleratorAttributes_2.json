@@ -1,0 +1,11 @@
+{
+    "status_code": 200,
+    "data": {
+        "AcceleratorAttributes": {
+            "FlowLogsEnabled": true,
+            "FlowLogsS3Bucket": "test-for-global-accelerator-bucket/test-custodian",
+            "FlowLogsS3Prefix": "us-west-2"
+        },
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,9 @@
+{
+    "status_code": 200,
+    "data": {
+        "AcceleratorAttributes": {
+            "FlowLogsEnabled": false
+        },
+        "ResponseMetadata": {}
+    }
+}
