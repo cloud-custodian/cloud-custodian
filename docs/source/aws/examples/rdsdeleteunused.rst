@@ -108,10 +108,9 @@ and configured.
            schedule: "rate(1 hour)"
            timeout: 300
        description: |
-         This policy deploys a Lambda function with an hourly CloudWatch Event Schedule trigger.  
-         The policy takes the average number of connections over 26 days and stops the RDS and
-         notifies the resource owner hourly on any of their unused databases that have already
-         been marked for deletion.
+         This policy deploys a Lambda function triggered hourly by a CloudWatch Event.
+         It averages connections over 26 days, stops the RDS, and notifies resource
+         owners hourly about unused databases marked for deletion.
        filters:
          - "tag:c7n_rds_unused": present
          - type: marked-for-op
@@ -202,7 +201,7 @@ and configured.
              - "tag:Resource Contact": present
              - "tag:CreatorName": present
        actions:
-         - type: unmark
+         - type: remove-tag
            tags: ["c7n_rds_unused"]
          - type: notify
            template: default.html
