@@ -74,7 +74,7 @@ class DirectoryLDAPFilter(Filter):
 
     permissions = ('ds:DescribeLDAPSSettings',)
     annotation_key = 'c7n:LDAPSSettings'
-    valid_directory_types = ['MicrosoftAD']
+    valid_directory_types = ['MicrosoftAD', "ADConnector"]
 
     def process(self, resources, event=None):
         resources = self.filter_resources(resources, 'Type', self.valid_directory_types)
@@ -83,11 +83,8 @@ class DirectoryLDAPFilter(Filter):
         matches = []
         for r in resources:
             if self.annotation_key not in r:
-                try:
-                    ldap_settings = client.describe_ldaps_settings(
-                        DirectoryId=r['DirectoryId'])['LDAPSSettingsInfo']
-                except client.exceptions.ClientError:
-                    continue
+                ldap_settings = client.describe_ldaps_settings(
+                    DirectoryId=r['DirectoryId'])['LDAPSSettingsInfo']
                 r[self.annotation_key] = ldap_settings
             if status == "Disabled" and len(r[self.annotation_key]) == 0:
                 matches.append(r)
