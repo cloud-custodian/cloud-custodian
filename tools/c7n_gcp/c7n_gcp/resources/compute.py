@@ -116,12 +116,14 @@ class BootDiskSourceImage(ValueFilter):
                 boot_disk_project, \
                 boot_disk_zone, \
                 boot_disk_name = disk_param_re.match(disk["source"]).groups()
-                boot_disk = Disk.resource_type.get(session.client(model.service, model.version, "disks"), 
-                    {'project_id': boot_disk_project, 'zone': boot_disk_zone, 'disk_id': boot_disk_name})
+                boot_disk = Disk.resource_type.get(
+                    session.client(model.service, model.version, "disks"),
+                    {'project_id': boot_disk_project, \
+                    'zone': boot_disk_zone, 'disk_id': boot_disk_name})
                 image_project, image_name = image_param_re.match(boot_disk["sourceImage"]).groups()
-                boot_disk_image = Image.resource_type.get(session.client(
-                    model.service, \
-                    model.version, "images"), {'project_id': image_project, 'image_id': image_name})
+                boot_disk_image = Image.resource_type.get(
+                    session.client(model.service, model.version, "images"),
+                    {'project_id': image_project, 'image_id': image_name})
                 boot_disk_images.append(boot_disk_image)
         return super(BootDiskSourceImage, self).process(boot_disk_images, None)
     

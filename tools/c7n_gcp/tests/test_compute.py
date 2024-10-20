@@ -195,7 +195,7 @@ class InstanceTest(BaseTest):
             session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
-    
+
     def test_filter_boot_disk_source_image(self):
         project_id = 'custodian-testing-439216'
         factory = self.record_flight_data('boot-disk-source-image', project_id=project_id)
@@ -205,7 +205,7 @@ class InstanceTest(BaseTest):
              'filters': [
                  {'type': 'boot-disk-source-image',
                  'key': 'name',
-                 'value': 'ubuntu-minimal-2204-jammy-v20240926',}]},
+                 'value': 'ubuntu-minimal-2204-jammy-v20240926'}]},
             session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
