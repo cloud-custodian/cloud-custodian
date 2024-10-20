@@ -74,6 +74,7 @@ class Instance(QueryResourceManager):
 Instance.filter_registry.register('offhour', OffHour)
 Instance.filter_registry.register('onhour', OnHour)
 
+
 @Instance.filter_registry.register('boot-disk-source-image')
 class BootDiskSourceImage(ValueFilter):
     """Filters instances by their boot disk's source image
@@ -103,29 +104,31 @@ class BootDiskSourceImage(ValueFilter):
         path_param_re = re.compile('.*?/projects/(.*?)/zones/(.*?)/instances/.*')
         project, zone = path_param_re.match(resource['selfLink']).groups()
         return {'project': project, 'zone': zone, 'instance': resource["name"]}
-    
+
     def process_resource(self, resource, event=None):
         session = local_session(self.manager.session_factory)
         model = self.manager.get_model()
-        params = self.get_resource_params(resource)
         boot_disk_images = []
         disk_param_re = re.compile('.*?/projects/(.*?)/zones/(.*?)/disks/(.*?)$')
         image_param_re = re.compile('.*?/projects/(.*?)/global/images/(.*?)$')
         for disk in resource["disks"]:
-            if disk["boot"] == True :
-                boot_disk_project, boot_disk_zone, boot_disk_name = disk_param_re.match(disk["source"]).groups()
-                boot_disk = Disk.resource_type.get(session.client(
-                    model.service, model.version, "disks"), {'project_id': boot_disk_project, 'zone': boot_disk_zone, 'disk_id': boot_disk_name})
+            if disk["boot"]:
+                boot_disk_project, \
+                boot_disk_zone, \
+                boot_disk_name = disk_param_re.match(disk["source"]).groups()
+                boot_disk = Disk.resource_type.get(session.client(model.service, model.version, "disks"), 
+                    {'project_id': boot_disk_project, 'zone': boot_disk_zone, 'disk_id': boot_disk_name})
                 image_project, image_name = image_param_re.match(boot_disk["sourceImage"]).groups()
                 boot_disk_image = Image.resource_type.get(session.client(
-                    model.service, model.version, "images"), {'project_id': image_project, 'image_id': image_name})
+                    model.service, \
+                    model.version, "images"), {'project_id': image_project, 'image_id': image_name})
                 boot_disk_images.append(boot_disk_image)
         return super(BootDiskSourceImage, self).process(boot_disk_images, None)
     
     def get_client(self, session, model):
         return session.client(
             model.service, model.version, model.component)
-    
+
     def process(self, resources, event=None):
         return [r for r in resources if self.process_resource(r)]
 
@@ -406,7 +409,7 @@ class DeleteImage(MethodAction):
     def get_resource_params(self, m, r):
         project, image_id = self.path_param_re.match(r['selfLink']).groups()
         return {'project': project, 'image': image_id}
-        
+
 
 @resources.register('disk')
 class Disk(QueryResourceManager):
