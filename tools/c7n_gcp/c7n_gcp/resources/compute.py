@@ -74,6 +74,28 @@ class Instance(QueryResourceManager):
 Instance.filter_registry.register('offhour', OffHour)
 Instance.filter_registry.register('onhour', OnHour)
 
+@Instance.filter_registry.register('boot-disk-source-image')
+class EffectiveFirewall(ValueFilter):
+    """Filters instances by their boot disk's source image
+    See https://cloud.google.com/compute/docs/reference/rest/v1/images/get for valid fields.
+
+    :example:
+
+    Filter all instances that have a source boot disk image older than 1 year
+
+    .. code-block:: yaml
+
+        policies:
+          - name: find-instances-with-old-boot-images
+            resources: gcp.instance
+            filters:
+            - type: boot-disk-source-image
+              key: creationTimestamp
+              op: greater-than
+              value_type: age
+              value 365
+    """
+
 
 @Instance.filter_registry.register('effective-firewall')
 class EffectiveFirewall(ValueFilter):
