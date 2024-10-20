@@ -310,6 +310,21 @@ class DiskTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_disk_snapshot_availability(self):
+        factory = self.replay_flight_data(
+            'disk-snapshot-availability', project_id='cloud-custodian')
+        p = self.load_policy(
+            {'name': 'test-disk-snapshot-availability',
+             'resource': 'gcp.snapshot',
+             'filters': [
+                 {'type': 'disk-availability'}]},
+            session_factory=factory)
+
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], 'test-snapshot')
+
     def test_disk_snapshot_add_date(self):
         factory = self.replay_flight_data('disk-snapshot', project_id='cloud-custodian')
         p = self.load_policy(
