@@ -75,7 +75,7 @@ Instance.filter_registry.register('offhour', OffHour)
 Instance.filter_registry.register('onhour', OnHour)
 
 @Instance.filter_registry.register('boot-disk-source-image')
-class EffectiveFirewall(ValueFilter):
+class BootDiskSourceImage(ValueFilter):
     """Filters instances by their boot disk's source image
     See https://cloud.google.com/compute/docs/reference/rest/v1/images/get for valid fields.
 
@@ -87,14 +87,51 @@ class EffectiveFirewall(ValueFilter):
 
         policies:
           - name: find-instances-with-old-boot-images
-            resources: gcp.instance
+            resource: gcp.instance
             filters:
-            - type: boot-disk-source-image
-              key: creationTimestamp
-              op: greater-than
-              value_type: age
-              value 365
+              - type: boot-disk-source-image
+                key: creationTimestamp
+                op: greater-than
+                value_type: age
+                value: 365
     """
+
+    schema = type_schema('boot-disk-source-image', rinherit=ValueFilter.schema)
+    permissions = ('compute.images.get',)
+
+    def get_resource_params(self, resource):
+        path_param_re = re.compile('.*?/projects/(.*?)/zones/(.*?)/instances/.*')
+        project, zone = path_param_re.match(resource['selfLink']).groups()
+        return {'project': project, 'zone': zone, 'instance': resource["name"]}
+    
+    def process_resource(self, client, resource):
+        params = self.get_resource_params(resource)
+        boot_disk_images = []
+        boot_disk_image = {}
+        disk_param_re = re.compile('.*?/projects/(.*?)/zones/(.*?)/disks/(.*?)$')
+        disk_image_param_re = re.compile('.*?/projects/(.*?)/global/images/(.*?)$')
+        session = local_session(self.manager.session_factory)
+        model = self.manager.get_model()
+        for disk in resource["disks"]:
+            if disk["boot"] == True :
+                boot_disk_project, boot_disk_zone, boot_disk_name = disk_param_re.match(disk["source"]).groups()
+                boot_disk = Disk.resource_type.get(session.client(
+                    model.service, model.version, "disks"), {'project_id': boot_disk_project, 'zone': boot_disk_zone, 'disk_id': boot_disk_name})
+                image_project, image_name = disk_image_param_re.match(boot_disk["sourceImage"]).groups()
+                boot_disk_image = Image.resource_type.get(session.client(
+                    model.service, model.version, "images"), {'project_id': image_project, 'image_id': image_name})
+                boot_disk_images.append(boot_disk_image)
+        return super(BootDiskSourceImage, self).process(boot_disk_images, None)
+    
+    def get_client(self, session, model):
+        return session.client(
+            model.service, model.version, model.component)
+    
+    def process(self, resources, event=None):
+        model = self.manager.get_model()
+        session = local_session(self.manager.session_factory)
+        client = self.get_client(session, model)
+        return [r for r in resources if self.process_resource(client, r)]
 
 
 @Instance.filter_registry.register('effective-firewall')
@@ -374,6 +411,38 @@ class DeleteImage(MethodAction):
         project, image_id = self.path_param_re.match(r['selfLink']).groups()
         return {'project': project, 'image': image_id}
 
+@resources.register('image')
+class Image(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'compute'
+        version = 'v1'
+        component = 'images'
+        scope = 'zone'
+        enum_spec = ('aggregatedList', 'items.*.images[]', None)
+        name = id = 'name'
+        labels = True
+        default_report_fields = ["name", "status", "diskSizeGb"]
+        asset_type = "compute.googleapis.com/Images"
+        urn_component = "image"
+        urn_zonal = True
+
+        @staticmethod
+        def get(client, resource_info):
+            return client.execute_command(
+                'get', {'project': resource_info['project_id'],
+                        'image': resource_info['image_id']})
+
+        @staticmethod
+        def get_label_params(resource, all_labels):
+            disk_image_param_re = re.compile('.*?/projects/(.*?)/global/images/(.*?)$')
+            project, image = disk_image_param_re.match(
+                resource['selfLink']).groups()
+            return {'project': project, 'resource': image,
+                    'body': {
+                        'labels': all_labels,
+                        'labelFingerprint': resource['labelFingerprint']
+                    }}
 
 @resources.register('disk')
 class Disk(QueryResourceManager):
