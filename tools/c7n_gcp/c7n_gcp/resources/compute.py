@@ -104,20 +104,19 @@ class BootDiskSourceImage(ValueFilter):
         project, zone = path_param_re.match(resource['selfLink']).groups()
         return {'project': project, 'zone': zone, 'instance': resource["name"]}
     
-    def process_resource(self, client, resource):
-        params = self.get_resource_params(resource)
-        boot_disk_images = []
-        boot_disk_image = {}
-        disk_param_re = re.compile('.*?/projects/(.*?)/zones/(.*?)/disks/(.*?)$')
-        disk_image_param_re = re.compile('.*?/projects/(.*?)/global/images/(.*?)$')
+    def process_resource(self, resource, event=None):
         session = local_session(self.manager.session_factory)
         model = self.manager.get_model()
+        params = self.get_resource_params(resource)
+        boot_disk_images = []
+        disk_param_re = re.compile('.*?/projects/(.*?)/zones/(.*?)/disks/(.*?)$')
+        image_param_re = re.compile('.*?/projects/(.*?)/global/images/(.*?)$')
         for disk in resource["disks"]:
             if disk["boot"] == True :
                 boot_disk_project, boot_disk_zone, boot_disk_name = disk_param_re.match(disk["source"]).groups()
                 boot_disk = Disk.resource_type.get(session.client(
                     model.service, model.version, "disks"), {'project_id': boot_disk_project, 'zone': boot_disk_zone, 'disk_id': boot_disk_name})
-                image_project, image_name = disk_image_param_re.match(boot_disk["sourceImage"]).groups()
+                image_project, image_name = image_param_re.match(boot_disk["sourceImage"]).groups()
                 boot_disk_image = Image.resource_type.get(session.client(
                     model.service, model.version, "images"), {'project_id': image_project, 'image_id': image_name})
                 boot_disk_images.append(boot_disk_image)
@@ -128,10 +127,7 @@ class BootDiskSourceImage(ValueFilter):
             model.service, model.version, model.component)
     
     def process(self, resources, event=None):
-        model = self.manager.get_model()
-        session = local_session(self.manager.session_factory)
-        client = self.get_client(session, model)
-        return [r for r in resources if self.process_resource(client, r)]
+        return [r for r in resources if self.process_resource(r)]
 
 
 @Instance.filter_registry.register('effective-firewall')
