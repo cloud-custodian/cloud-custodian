@@ -406,39 +406,7 @@ class DeleteImage(MethodAction):
     def get_resource_params(self, m, r):
         project, image_id = self.path_param_re.match(r['selfLink']).groups()
         return {'project': project, 'image': image_id}
-
-@resources.register('image')
-class Image(QueryResourceManager):
-
-    class resource_type(TypeInfo):
-        service = 'compute'
-        version = 'v1'
-        component = 'images'
-        scope = 'zone'
-        enum_spec = ('aggregatedList', 'items.*.images[]', None)
-        name = id = 'name'
-        labels = True
-        default_report_fields = ["name", "status", "diskSizeGb"]
-        asset_type = "compute.googleapis.com/Images"
-        urn_component = "image"
-        urn_zonal = True
-
-        @staticmethod
-        def get(client, resource_info):
-            return client.execute_command(
-                'get', {'project': resource_info['project_id'],
-                        'image': resource_info['image_id']})
-
-        @staticmethod
-        def get_label_params(resource, all_labels):
-            disk_image_param_re = re.compile('.*?/projects/(.*?)/global/images/(.*?)$')
-            project, image = disk_image_param_re.match(
-                resource['selfLink']).groups()
-            return {'project': project, 'resource': image,
-                    'body': {
-                        'labels': all_labels,
-                        'labelFingerprint': resource['labelFingerprint']
-                    }}
+        
 
 @resources.register('disk')
 class Disk(QueryResourceManager):
