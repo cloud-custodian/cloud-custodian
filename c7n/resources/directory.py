@@ -141,10 +141,51 @@ class DirectorySettingsFilter(Filter):
         return matches
 
 
+@Directory.filter_registry.register('trust')
+class DirectoryTrustFilter(ValueFilter):
+    """Filter directories based on their trust relationships
+
+    :example:
+
+        .. code-block:: yaml
+
+            policies:
+              - name: trust-enabled-directories
+                resource: directory
+                filters:
+                  - type: trust
+                    key: TrustState
+                    value: Verified
+              - name: trust-remote-domain
+                resource: directory
+                filters:
+                  - type: trust
+                    key: RemoteDomainName
+                    value: example.com
+    """
+    schema = type_schema(
+        'trust', rinherit=ValueFilter.schema)
+
+    permissions = ('ds:DescribeTrusts',)
+    annotation_key = 'c7n:Trusts'
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('ds')
+        trusts = client.describe_trusts()['Trusts']
+        for r in resources:
+            r[self.annotation_key] = [
+                t for t in trusts if t['DirectoryId'] == r['DirectoryId']]
+        matched = []
+        for r in resources:
+            if any((self.match(trust) for trust in r[self.annotation_key])):
+                matched.append(r)
+        return matched
+
+
 @Directory.action_registry.register('tag')
 class DirectoryTag(Tag):
     """Add tags to a directory
-
+-
     :example:
 
         .. code-block:: yaml
