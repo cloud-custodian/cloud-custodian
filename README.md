@@ -240,6 +240,7 @@ See the notes below for more technical information on joining the meeting.
 - [Community Meeting Notes Archive](https://github.com/orgs/cloud-custodian/discussions/categories/announcements)
 - [Upcoming Community Events](https://cloudcustodian.io/events/)
 - [Cloud Custodian Annual Report 2021](https://github.com/cncf/toc/blob/main/reviews/2021-cloud-custodian-annual.md) - Annual health check provided to the CNCF outlining the health of the project
+- [Ada Logics Third Party Security Audit](https://ostif.org/cc-audit-complete/)
 
 
 Additional Tools
