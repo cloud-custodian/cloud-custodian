@@ -93,7 +93,7 @@ CloudFormation.  This is effectively a periodic policy that queries
 the resource's service api and filters resources to evaluate
 compliance/non-compliance and then records results to AWS Config.
 CloudFormation resources are only partially supported by AWS Config,
-and are not supported for `source: config` nor do they support resource
+and are not supported for ``source: config`` nor do they support resource
 timeline or resource attributes.
 
 .. code-block:: yaml
@@ -108,6 +108,12 @@ timeline or resource attributes.
        filters:
          - tag:App: Dev
 
-When the resources is supported you will get this validation error::
+For resource types with native AWS Config support, the ``config-rule``
+mode is typically a better fit because it avoids running policies when
+resources haven't changed. For those resource types, the ``config-poll-rule``
+mode will raise an error like this by default::
 
   custodian.commands:ERROR Policy: kinesis-one-stream is invalid: resource:aws.kinesis fully supported by config and should use mode: config-rule
+
+Adding ``ignore_support_check: true`` to a policy's ``mode`` block
+can bypass that error and force ``config-poll-rule`` mode to succeed.
