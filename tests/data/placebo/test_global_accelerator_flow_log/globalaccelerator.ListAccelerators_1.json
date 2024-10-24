@@ -1,0 +1,84 @@
+{
+    "status_code": 200,
+    "data": {
+        "Accelerators": [
+            {
+                "AcceleratorArn": "arn:aws:globalaccelerator::644160558196:accelerator/990cb71d-6e7a-43f2-957a-275434ee7d13",
+                "Name": "test-accelerator-2",
+                "IpAddressType": "IPV4",
+                "Enabled": false,
+                "IpSets": [
+                    {
+                        "IpFamily": "IPv4",
+                        "IpAddresses": [
+                            "13.248.241.139",
+                            "99.83.200.232"
+                        ],
+                        "IpAddressFamily": "IPv4"
+                    }
+                ],
+                "DnsName": "a224cc643a2590470.awsglobalaccelerator.com",
+                "Status": "DEPLOYED",
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 9,
+                    "day": 24,
+                    "hour": 14,
+                    "minute": 42,
+                    "second": 24,
+                    "microsecond": 0
+                },
+                "LastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 9,
+                    "day": 24,
+                    "hour": 14,
+                    "minute": 51,
+                    "second": 29,
+                    "microsecond": 0
+                }
+            },
+            {
+                "AcceleratorArn": "arn:aws:globalaccelerator::644160558196:accelerator/1460ad64-e386-41e4-9715-d8bcc665963e",
+                "Name": "test-custodian",
+                "IpAddressType": "IPV4",
+                "Enabled": true,
+                "IpSets": [
+                    {
+                        "IpFamily": "IPv4",
+                        "IpAddresses": [
+                            "13.248.152.148",
+                            "76.223.30.202"
+                        ],
+                        "IpAddressFamily": "IPv4"
+                    }
+                ],
+                "DnsName": "aea02fd17533c8186.awsglobalaccelerator.com",
+                "Status": "DEPLOYED",
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 1,
+                    "day": 16,
+                    "hour": 16,
+                    "minute": 27,
+                    "second": 50,
+                    "microsecond": 0
+                },
+                "LastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 9,
+                    "day": 24,
+                    "hour": 13,
+                    "minute": 53,
+                    "second": 29,
+                    "microsecond": 0
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
