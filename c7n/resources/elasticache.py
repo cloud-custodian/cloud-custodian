@@ -16,7 +16,9 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.tags import universal_augment
 from c7n.utils import (
-    local_session, chunks, snapshot_identifier, type_schema, jmespath_search)
+    local_session, chunks, snapshot_identifier, type_schema, jmespath_search, get_retry)
+
+from .aws import shape_validate
 
 filters = FilterRegistry('elasticache.filters')
 actions = ActionRegistry('elasticache.actions')
@@ -545,3 +547,97 @@ class DeleteReplicationGroup(BaseAction):
                 params.update({'FinalSnapshotIdentifier': r['ReplicationGroupId'] + '-snapshot'})
             self.manager.retry(client.delete_replication_group, **params, ignore_err_codes=(
                 'ReplicationGroupNotFoundFault',))
+
+
+@resources.register('elasticache-user')
+class ElastiCacheUser(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'elasticache'
+        enum_spec = ('describe_users', 'Users[]', None)
+        arn_separator = ":"
+        arn_type = 'user'
+        arn = 'ARN'
+        id = 'UserId'
+        name = 'UserName'
+        cfn_type = 'AWS::ElastiCache::User'
+        universal_taggable = object()
+
+    augment = universal_augment
+    permissions = ('elasticache:DescribeUsers',)
+
+
+@ElastiCacheUser.action_registry.register('delete')
+class DeleteUser(BaseAction):
+    """Action to delete a cache user
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: elasticache-delete-user
+                resource: aws.elasticache-user
+                filters:
+                  - type: value
+                    key: Authentication.Type
+                    value: no-password
+                actions:
+                  - delete
+
+    """
+    schema = type_schema('delete')
+
+    permissions = ('elasticache:DeleteUser',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('elasticache')
+        retry = get_retry(('ThrottlingException', 'InvalidUserStateFault'))
+        for r in resources:
+            retry(client.delete_user, UserId=r['UserId'], ignore_err_codes=('UserNotFoundFault',))
+
+
+@ElastiCacheUser.action_registry.register('modify')
+class ModifyUser(BaseAction):
+    """Action to modify a cache user
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: elasticache-modify-user
+                resource: aws.elasticache-user
+                filters:
+                  - type: value
+                    key: Authentication.Type
+                    value: no-password
+                actions:
+                  - type: modify
+                    attributes:
+                      AuthenticationMode:
+                        Type: password
+                        Passwords:
+                          - "password"
+    """
+
+    permissions = ('elasticache:ModifyUser',)
+    schema = type_schema(
+        'modify',
+        attributes={'type:': 'object'},
+        required=('attributes',))
+    shape = 'ModifyUserMessage'
+
+    def validate(self):
+        req = dict(self.data["attributes"])
+        req["UserId"] = "validate"
+        return shape_validate(
+            req, self.shape, self.manager.resource_type.service
+        )
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('elasticache')
+        retry = get_retry(('ThrottlingException', 'InvalidUserStateFault'))
+        for r in resources:
+            retry(client.modify_user, UserId=r['UserId'], **self.data["attributes"],
+                ignore_err_codes=('UserNotFoundFault',))

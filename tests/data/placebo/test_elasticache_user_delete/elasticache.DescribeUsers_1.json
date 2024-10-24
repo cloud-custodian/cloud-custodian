@@ -1,0 +1,35 @@
+{
+    "status_code": 200,
+    "data": {
+        "Users": [
+            {
+                "UserId": "c7n-user",
+                "UserName": "c7n-user",
+                "Status": "active",
+                "Engine": "redis",
+                "MinimumEngineVersion": "6.0",
+                "AccessString": "on +@all",
+                "UserGroupIds": [],
+                "Authentication": {
+                    "Type": "password",
+                    "PasswordCount": 1
+                },
+                "ARN": "arn:aws:elasticache:us-east-1:123456789012:user:c7n-user"
+            },
+            {
+                "UserId": "default",
+                "UserName": "default",
+                "Status": "active",
+                "Engine": "redis",
+                "MinimumEngineVersion": "6.0",
+                "AccessString": "on ~* +@all",
+                "UserGroupIds": [],
+                "Authentication": {
+                    "Type": "no-password"
+                },
+                "ARN": "arn:aws:elasticache:us-east-1:123456789012:user:default"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
