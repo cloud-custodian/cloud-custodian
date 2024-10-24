@@ -3287,3 +3287,140 @@ class CrossAZRouteTable(Filter):
                 results.append(resource)
 
         return results
+
+
+@Vpc.filter_registry.register('resolver-rules-associated')
+class VpcResolverRulesAssociatedFilter(BaseAction):
+    """Filter VPCs which have either missing or matching groups
+    of Route53 Resolver Rules and annotate for action.
+
+    :Example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: vpcs-missing-resolver-rules
+                resource: vpc
+                filters:
+                  - type: resolver-rules-associated
+                    name: my-rule.*
+                    associated: False
+    """
+    schema = type_schema(
+        'resolver-rules-associated',
+        name={'type': 'string'},
+        associated={'type': 'boolean'},
+        required=['name', 'associated']
+    )
+    permissions = (
+        'route53resolver:ListResolverRules',
+        'route53resolver:ListResolverRuleAssociations'
+    )
+
+    def get_all(self, client, type, key):
+        paginator = client.get_paginator(type)
+        paginator.PAGE_ITERATOR_CLS = query.RetryPageIterator
+        results = paginator.paginate().build_full_result().get(key, [])
+        return results
+
+    def process(self, resources, event=None):
+        results = []
+        target_rule_name = self.data['name']
+        associated = self.data['associated']
+        client = local_session(self.manager.session_factory).client('route53resolver')
+
+        rules = self.get_all(client, 'list_resolver_rules', 'ResolverRules')
+        rules_set = set()
+        for rule in rules:
+            if re.match(target_rule_name, rule['Name']):
+                rules_set.add(rule['Id'])
+
+        rule_associations = self.get_all(client,
+            'list_resolver_rule_associations',
+            'ResolverRuleAssociations'
+        )
+        vpc_rule_map = {}
+        for a in rule_associations:
+            if a['VPCId'] in vpc_rule_map:
+                vpc_rule_map[a['VPCId']] += [a['ResolverRuleId']]
+            else:
+                vpc_rule_map[a['VPCId']] = [a['ResolverRuleId']]
+
+        for r in resources:
+            if not associated:
+                if r['VpcId'] in vpc_rule_map:
+                    r['c7n:MissingResolverRules'] = list(rules_set - set(vpc_rule_map[r['VpcId']]))
+                else:
+                    r['c7n:MissingResolverRules'] = list(rules_set)
+
+                if len(r['c7n:MissingResolverRules']) > 0:
+                    results.append(r)
+            else:
+                if r['VpcId'] in vpc_rule_map:
+                    r['c7n:MatchingResolverRules'] = list(
+                        rules_set.intersection(set(vpc_rule_map[r['VpcId']]))
+                    )
+                    if len(r['c7n:MatchingResolverRules']) > 0:
+                        results.append(r)
+
+        return results
+
+
+@Vpc.action_registry.register('associate-resolver-rules')
+class AssociateResolverRule(BaseAction):
+    """Associates or disasssociates VPC from Route53 Resolver Rules.
+    Use in conjunction with filter "resolver-rules-associated".
+
+    :Example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: vpc-remediate-missing-resolver-rules
+                resource: vpc
+                filters:
+                  - type: resolver-rules-associated
+                    name: my-rule.*
+                    associated: False
+                actions:
+                  - type: associate-resolver-rules
+                    remove: False
+    """
+    schema = type_schema(
+        'associate-resolver-rules',
+        remove={'type': 'boolean'}
+    )
+    permissions = (
+        'route53resolver:AssociateResolverRule',
+        'route53resolver:DisassociateResolverRule'
+    )
+
+    def validate(self):
+        found = False
+        for f in self.manager.iter_filters():
+            if isinstance(f, VpcResolverRulesAssociatedFilter):
+                found = True
+                break
+        if not found:
+            # try to ensure idempotent usage
+            raise PolicyValidationError(
+                "'associate-resolver-rules' action should be used in conjunction \
+                    with 'resolver-rules-associated' filter")
+        return self
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('route53resolver')
+        remove = self.data.get('remove', False)
+
+        for vpc in resources:
+            if not remove:
+                for ruleId in vpc['c7n:MissingResolverRules']:
+                    client.associate_resolver_rule(
+                        ResolverRuleId=ruleId,
+                        Name="c7n Rule Association",
+                        VPCId=vpc['VpcId'])
+            else:
+                for ruleId in vpc['c7n:MatchingResolverRules']:
+                    client.disassociate_resolver_rule(
+                        ResolverRuleId=ruleId,
+                        VPCId=vpc['VpcId'])
