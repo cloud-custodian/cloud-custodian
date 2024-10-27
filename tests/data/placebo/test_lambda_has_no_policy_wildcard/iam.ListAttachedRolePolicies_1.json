@@ -1,0 +1,13 @@
+{
+    "status_code": 200,
+    "data": {
+        "AttachedPolicies": [
+            {
+                "PolicyName": "lambda-wildcard-managed-policy-fail",
+                "PolicyArn": "arn:aws:iam::123456789012:policy/lambda-wildcard-managed-policy-fail"
+            }
+        ],
+        "IsTruncated": false,
+        "ResponseMetadata": {}
+    }
+}
