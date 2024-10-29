@@ -1,0 +1,839 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.KeyVault/vaults?api-version=2019-09-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-original-request-ids": [
+                        "abdd0a45-e186-4d05-bb04-59ab0320dddb",
+                        "9956f117-b01b-4dfb-9a1c-902f061936a3",
+                        "e249d947-0e52-4bf2-aadd-deaa37f7eea1"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 6D484CDA0DFD4740A8D87A1600BAD3EB Ref B: BL2AA2010204053 Ref C: 2024-09-20T17:43:17Z"
+                    ],
+                    "date": [
+                        "Fri, 20 Sep 2024 17:43:18 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "content-length": [
+                        "8184"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/aj-testing/providers/Microsoft.KeyVault/vaults/ajtest",
+                                "name": "ajtest",
+                                "type": "Microsoft.KeyVault/vaults",
+                                "location": "eastus",
+                                "tags": {},
+                                "properties": {
+                                    "sku": {
+                                        "family": "A",
+                                        "name": "standard"
+                                    },
+                                    "tenantId": "00000000-0000-0000-0000-000000000003",
+                                    "accessPolicies": [
+                                        {
+                                            "tenantId": "00000000-0000-0000-0000-000000000003",
+                                            "objectId": "17285ecf-6528-44e9-a94d-e77024b77418",
+                                            "permissions": {
+                                                "keys": [
+                                                    "get",
+                                                    "create",
+                                                    "delete",
+                                                    "list",
+                                                    "update",
+                                                    "import",
+                                                    "backup",
+                                                    "restore",
+                                                    "recover"
+                                                ],
+                                                "secrets": [
+                                                    "get",
+                                                    "list",
+                                                    "set",
+                                                    "delete",
+                                                    "backup",
+                                                    "restore",
+                                                    "recover"
+                                                ],
+                                                "certificates": [
+                                                    "get",
+                                                    "list",
+                                                    "delete",
+                                                    "create",
+                                                    "import",
+                                                    "update",
+                                                    "managecontacts",
+                                                    "getissuers",
+                                                    "listissuers",
+                                                    "setissuers",
+                                                    "deleteissuers",
+                                                    "manageissuers",
+                                                    "recover"
+                                                ],
+                                                "storage": [
+                                                    "get",
+                                                    "list",
+                                                    "delete",
+                                                    "set",
+                                                    "update",
+                                                    "regeneratekey",
+                                                    "setsas",
+                                                    "listsas",
+                                                    "getsas",
+                                                    "deletesas"
+                                                ]
+                                            }
+                                        }
+                                    ],
+                                    "enabledForDeployment": false,
+                                    "enableSoftDelete": true,
+                                    "softDeleteRetentionInDays": 90,
+                                    "vaultUri": "https://ajtest.vault.azure.net/",
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/jamison-policy-testing/providers/Microsoft.KeyVault/vaults/CMKVaultStacklet",
+                                "name": "CMKVaultStacklet",
+                                "type": "Microsoft.KeyVault/vaults",
+                                "location": "eastus",
+                                "tags": {},
+                                "properties": {
+                                    "sku": {
+                                        "family": "A",
+                                        "name": "Standard"
+                                    },
+                                    "tenantId": "00000000-0000-0000-0000-000000000003",
+                                    "accessPolicies": [
+                                        {
+                                            "tenantId": "00000000-0000-0000-0000-000000000003",
+                                            "objectId": "e61e859a-dd48-4936-ab90-61d39c79b872",
+                                            "permissions": {
+                                                "keys": [
+                                                    "Get",
+                                                    "List",
+                                                    "Update",
+                                                    "Create",
+                                                    "Import",
+                                                    "Delete",
+                                                    "Recover",
+                                                    "Backup",
+                                                    "Restore",
+                                                    "Decrypt",
+                                                    "Encrypt",
+                                                    "UnwrapKey",
+                                                    "WrapKey",
+                                                    "Verify",
+                                                    "Sign",
+                                                    "Purge",
+                                                    "Rotate",
+                                                    "GetRotationPolicy",
+                                                    "SetRotationPolicy"
+                                                ],
+                                                "secrets": [
+                                                    "Get",
+                                                    "List",
+                                                    "Set",
+                                                    "Delete",
+                                                    "Recover",
+                                                    "Backup",
+                                                    "Restore",
+                                                    "Purge"
+                                                ],
+                                                "certificates": [
+                                                    "Get",
+                                                    "List",
+                                                    "Update",
+                                                    "Create",
+                                                    "Import",
+                                                    "Delete",
+                                                    "Recover",
+                                                    "Backup",
+                                                    "Restore",
+                                                    "ManageContacts",
+                                                    "ManageIssuers",
+                                                    "GetIssuers",
+                                                    "ListIssuers",
+                                                    "SetIssuers",
+                                                    "DeleteIssuers",
+                                                    "Purge"
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "tenantId": "00000000-0000-0000-0000-000000000003",
+                                            "objectId": "880b2cbd-71f2-4fc7-bf41-8806715fa179",
+                                            "applicationId": "e6f3313f-2e39-4a53-a830-0d5fcf014641",
+                                            "permissions": {
+                                                "keys": [
+                                                    "Get",
+                                                    "List",
+                                                    "Update",
+                                                    "Create",
+                                                    "Import",
+                                                    "Delete",
+                                                    "Recover",
+                                                    "Backup",
+                                                    "Restore",
+                                                    "Decrypt",
+                                                    "Encrypt",
+                                                    "UnwrapKey",
+                                                    "WrapKey",
+                                                    "Verify",
+                                                    "Sign",
+                                                    "Purge",
+                                                    "Rotate",
+                                                    "GetRotationPolicy",
+                                                    "SetRotationPolicy"
+                                                ],
+                                                "secrets": [
+                                                    "Get",
+                                                    "List",
+                                                    "Set",
+                                                    "Delete",
+                                                    "Recover",
+                                                    "Backup",
+                                                    "Restore",
+                                                    "Purge"
+                                                ],
+                                                "certificates": [
+                                                    "Get",
+                                                    "List",
+                                                    "Update",
+                                                    "Create",
+                                                    "Import",
+                                                    "Delete",
+                                                    "Recover",
+                                                    "Backup",
+                                                    "Restore",
+                                                    "ManageContacts",
+                                                    "ManageIssuers",
+                                                    "GetIssuers",
+                                                    "ListIssuers",
+                                                    "SetIssuers",
+                                                    "DeleteIssuers",
+                                                    "Purge"
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "tenantId": "00000000-0000-0000-0000-000000000003",
+                                            "objectId": "880b2cbd-71f2-4fc7-bf41-8806715fa179",
+                                            "permissions": {
+                                                "keys": [
+                                                    "Get",
+                                                    "List",
+                                                    "Update",
+                                                    "Create",
+                                                    "Import",
+                                                    "Delete",
+                                                    "Recover",
+                                                    "Backup",
+                                                    "Restore",
+                                                    "Decrypt",
+                                                    "Encrypt",
+                                                    "UnwrapKey",
+                                                    "WrapKey",
+                                                    "Verify",
+                                                    "Sign",
+                                                    "Purge",
+                                                    "Rotate",
+                                                    "GetRotationPolicy",
+                                                    "SetRotationPolicy"
+                                                ],
+                                                "secrets": [
+                                                    "Get",
+                                                    "List",
+                                                    "Set",
+                                                    "Delete",
+                                                    "Recover",
+                                                    "Backup",
+                                                    "Restore",
+                                                    "Purge"
+                                                ],
+                                                "certificates": [
+                                                    "Get",
+                                                    "List",
+                                                    "Update",
+                                                    "Create",
+                                                    "Import",
+                                                    "Delete",
+                                                    "Recover",
+                                                    "Backup",
+                                                    "Restore",
+                                                    "ManageContacts",
+                                                    "ManageIssuers",
+                                                    "GetIssuers",
+                                                    "ListIssuers",
+                                                    "SetIssuers",
+                                                    "DeleteIssuers",
+                                                    "Purge"
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "tenantId": "00000000-0000-0000-0000-000000000003",
+                                            "objectId": "c88b8c45-7a36-4019-8717-7db561ac0f35",
+                                            "permissions": {
+                                                "keys": [
+                                                    "Get",
+                                                    "List",
+                                                    "Update",
+                                                    "Create",
+                                                    "Import",
+                                                    "Delete",
+                                                    "Recover",
+                                                    "Backup",
+                                                    "Restore",
+                                                    "Decrypt",
+                                                    "Encrypt",
+                                                    "UnwrapKey",
+                                                    "WrapKey",
+                                                    "Verify",
+                                                    "Sign",
+                                                    "Purge",
+                                                    "Rotate",
+                                                    "GetRotationPolicy",
+                                                    "SetRotationPolicy"
+                                                ],
+                                                "secrets": [
+                                                    "Get",
+                                                    "List",
+                                                    "Set",
+                                                    "Delete",
+                                                    "Recover",
+                                                    "Backup",
+                                                    "Restore",
+                                                    "Purge"
+                                                ],
+                                                "certificates": [
+                                                    "Get",
+                                                    "List",
+                                                    "Update",
+                                                    "Create",
+                                                    "Import",
+                                                    "Delete",
+                                                    "Recover",
+                                                    "Backup",
+                                                    "Restore",
+                                                    "ManageContacts",
+                                                    "ManageIssuers",
+                                                    "GetIssuers",
+                                                    "ListIssuers",
+                                                    "SetIssuers",
+                                                    "DeleteIssuers",
+                                                    "Purge"
+                                                ]
+                                            }
+                                        }
+                                    ],
+                                    "enabledForDeployment": true,
+                                    "enabledForDiskEncryption": true,
+                                    "enabledForTemplateDeployment": true,
+                                    "enableSoftDelete": true,
+                                    "softDeleteRetentionInDays": 10,
+                                    "enablePurgeProtection": true,
+                                    "vaultUri": "https://cmkvaultstacklet.vault.azure.net/",
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/Stacklet-Marketplace/providers/Microsoft.KeyVault/vaults/Stacklet-kv",
+                                "name": "Stacklet-kv",
+                                "type": "Microsoft.KeyVault/vaults",
+                                "location": "eastus",
+                                "tags": {},
+                                "properties": {
+                                    "sku": {
+                                        "family": "A",
+                                        "name": "standard"
+                                    },
+                                    "tenantId": "00000000-0000-0000-0000-000000000003",
+                                    "networkAcls": {
+                                        "bypass": "AzureServices",
+                                        "defaultAction": "Deny",
+                                        "ipRules": [],
+                                        "virtualNetworkRules": [
+                                            {
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/stacklet-marketplace/providers/microsoft.network/virtualnetworks/stacklet-vnet/subnets/web"
+                                            }
+                                        ]
+                                    },
+                                    "accessPolicies": [
+                                        {
+                                            "tenantId": "00000000-0000-0000-0000-000000000003",
+                                            "objectId": "1f537904-396d-40b3-a7c0-720f9fb33c6b",
+                                            "permissions": {
+                                                "keys": [
+                                                    "all"
+                                                ],
+                                                "secrets": [
+                                                    "all"
+                                                ],
+                                                "certificates": [
+                                                    "all"
+                                                ],
+                                                "storage": [
+                                                    "all"
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "tenantId": "00000000-0000-0000-0000-000000000003",
+                                            "objectId": "460acc15-add3-4af1-af13-ad17c4a44626",
+                                            "permissions": {
+                                                "keys": [
+                                                    "get",
+                                                    "list"
+                                                ],
+                                                "secrets": [
+                                                    "get",
+                                                    "list"
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "tenantId": "00000000-0000-0000-0000-000000000003",
+                                            "objectId": "7d4f3ad8-c5e6-46b2-9e35-b7df291750fe",
+                                            "permissions": {
+                                                "keys": [
+                                                    "get",
+                                                    "list"
+                                                ],
+                                                "secrets": [
+                                                    "get",
+                                                    "list"
+                                                ]
+                                            }
+                                        }
+                                    ],
+                                    "enabledForDeployment": false,
+                                    "enableSoftDelete": true,
+                                    "softDeleteRetentionInDays": 90,
+                                    "enableRbacAuthorization": false,
+                                    "vaultUri": "https://stacklet-kv.vault.azure.net/",
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/jamison-policy-testing/providers/Microsoft.KeyVault/vaults/testingmlworks8472261778",
+                                "name": "testingmlworks8472261778",
+                                "type": "Microsoft.KeyVault/vaults",
+                                "location": "centralus",
+                                "tags": {},
+                                "properties": {
+                                    "sku": {
+                                        "family": "A",
+                                        "name": "standard"
+                                    },
+                                    "tenantId": "00000000-0000-0000-0000-000000000003",
+                                    "accessPolicies": [
+                                        {
+                                            "tenantId": "00000000-0000-0000-0000-000000000003",
+                                            "objectId": "bb487020-3c21-4933-9c5a-51e7c70e07de",
+                                            "permissions": {
+                                                "keys": [
+                                                    "all"
+                                                ],
+                                                "secrets": [
+                                                    "all"
+                                                ],
+                                                "certificates": [
+                                                    "all"
+                                                ],
+                                                "storage": []
+                                            }
+                                        }
+                                    ],
+                                    "enabledForDeployment": false,
+                                    "enableSoftDelete": true,
+                                    "vaultUri": "https://testingmlworks8472261778.vault.azure.net/",
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_keyvault/providers/Microsoft.KeyVault/vaults/cckeyvault1zd2yzvhwvtnsu",
+                                "name": "cckeyvault1zd2yzvhwvtnsu",
+                                "type": "Microsoft.KeyVault/vaults",
+                                "location": "southcentralus",
+                                "tags": {},
+                                "properties": {
+                                    "sku": {
+                                        "family": "A",
+                                        "name": "Standard"
+                                    },
+                                    "tenantId": "00000000-0000-0000-0000-000000000003",
+                                    "networkAcls": {
+                                        "bypass": "AzureServices",
+                                        "defaultAction": "Deny",
+                                        "ipRules": [
+                                            {
+                                                "value": "0.0.0.0/2"
+                                            },
+                                            {
+                                                "value": "64.0.0.0/3"
+                                            },
+                                            {
+                                                "value": "96.0.0.0/4"
+                                            },
+                                            {
+                                                "value": "112.0.0.0/5"
+                                            },
+                                            {
+                                                "value": "120.0.0.0/6"
+                                            },
+                                            {
+                                                "value": "124.0.0.0/7"
+                                            },
+                                            {
+                                                "value": "126.0.0.0/8"
+                                            },
+                                            {
+                                                "value": "128.0.0.0/1"
+                                            }
+                                        ],
+                                        "virtualNetworkRules": []
+                                    },
+                                    "accessPolicies": [
+                                        {
+                                            "tenantId": "00000000-0000-0000-0000-000000000003",
+                                            "objectId": "17285ecf-6528-44e9-a94d-e77024b77418",
+                                            "permissions": {
+                                                "keys": [
+                                                    "Get",
+                                                    "List",
+                                                    "Update",
+                                                    "Create",
+                                                    "Import",
+                                                    "Delete",
+                                                    "Recover",
+                                                    "Backup",
+                                                    "Restore"
+                                                ],
+                                                "secrets": [
+                                                    "Get",
+                                                    "List",
+                                                    "Set",
+                                                    "Delete",
+                                                    "Recover",
+                                                    "Backup",
+                                                    "Restore"
+                                                ],
+                                                "certificates": [
+                                                    "Get",
+                                                    "List",
+                                                    "Update",
+                                                    "Create",
+                                                    "Import",
+                                                    "Delete",
+                                                    "Recover",
+                                                    "ManageContacts",
+                                                    "ManageIssuers",
+                                                    "GetIssuers",
+                                                    "ListIssuers",
+                                                    "SetIssuers",
+                                                    "DeleteIssuers"
+                                                ],
+                                                "storage": [
+                                                    "Get",
+                                                    "List",
+                                                    "Set",
+                                                    "regeneratekey"
+                                                ]
+                                            }
+                                        }
+                                    ],
+                                    "enabledForDeployment": false,
+                                    "enabledForDiskEncryption": false,
+                                    "enabledForTemplateDeployment": false,
+                                    "vaultUri": "https://cckeyvault1zd2yzvhwvtnsu.vault.azure.net/",
+                                    "provisioningState": "Succeeded"
+                                }
+                            }
+                        ],
+                        "nextLink": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.KeyVault/vaults?api-version=2019-09-01&%24skiptoken=1ZJNb6MwEED%2fi1X1FILBm7aJFK2iKh%2fbFqomhBBug%2b0QAhhkm5RQ9b%2fXaaVq97p7yUqjOcyMZvQ07w0J3uqnTOQKjd7QdLIK1is0QnutazWy7RIEpLzkQvehayTv06q0VZMoKrNaZ5VQ9g1xb4cYBhY4ANYPjql1R6lj7WCXcO6wQUKGdi2rY8a4VLaXUVmpaqf7j%2fwUQlNo%2b3jO6ifUmXU0I2br2MXO0MImnOsrlZtTVc7FeE2W%2b62rVRy96GAzO4EbYjpvTS28%2b70HZDtGPXQ%2f9YPl5OmCgaCcaYj8Y5I5r4nb1luSazYPOzYvmpi0OI58DJuBSDYtSciDpF2K%2fe7XyT9Mid%2blZ8jV8zpYXD7pJ9VsKOOocLdRqNiiPZhXFjyK92zTYi%2bqc08UN6zcEyaWDSXrMXrvIZDlJE0lT0FzFpwtMHZOlp4hP5vrgcy5NKUvc0f%2fv7e9719eKMy%2fOtv709gLpfw7Xz8A"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.KeyVault/vaults?api-version=2019-09-01&%24skiptoken=1ZJNb6MwEED%2Fi1X1FILBm7aJFK2iKh%2FbFqomhBBug%2B0QAhhkm5RQ9b%2FXaaVq97p7yUqjOcyMZvQ07w0J3uqnTOQKjd7QdLIK1is0QnutazWy7RIEpLzkQvehayTv06q0VZMoKrNaZ5VQ9g1xb4cYBhY4ANYPjql1R6lj7WCXcO6wQUKGdi2rY8a4VLaXUVmpaqf7j%2FwUQlNo%2B3jO6ifUmXU0I2br2MXO0MImnOsrlZtTVc7FeE2W%2B62rVRy96GAzO4EbYjpvTS28%2B70HZDtGPXQ%2F9YPl5OmCgaCcaYj8Y5I5r4nb1luSazYPOzYvmpi0OI58DJuBSDYtSciDpF2K%2Fe7XyT9Mid%2BlZ8jV8zpYXD7pJ9VsKOOocLdRqNiiPZhXFjyK92zTYi%2Bqc08UN6zcEyaWDSXrMXrvIZDlJE0lT0FzFpwtMHZOlp4hP5vrgcy5NKUvc0f%2Fv7e9719eKMy%2FOtv709gLpfw7Xz8A",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-original-request-ids": [
+                        "0623c022-1c7a-4f7a-829d-35a84d55395a",
+                        "769bb4d3-7fc1-429f-9bc8-574466f5e980",
+                        "0d11e282-b335-4e10-bc82-cddb1a154ffb"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 4BAEF676D8AE4FE7A5AD9393AB3EE8B7 Ref B: BL2AA2010204053 Ref C: 2024-09-20T17:43:18Z"
+                    ],
+                    "date": [
+                        "Fri, 20 Sep 2024 17:43:18 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "content-length": [
+                        "12"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": []
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "PUT",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_keyvault/providers/Microsoft.KeyVault/vaults/cckeyvault1zd2yzvhwvtnsu/accessPolicies/add?api-version=2019-09-01",
+                "body": "mock_body",
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-msedge-ref": [
+                        "Ref A: 13B8C399482C41D28E8902D8F56C37F6 Ref B: BL2AA2010204053 Ref C: 2024-09-20T17:43:18Z"
+                    ],
+                    "date": [
+                        "Fri, 20 Sep 2024 17:43:18 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-writes": [
+                        "2999"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-writes": [
+                        "199"
+                    ],
+                    "content-length": [
+                        "383"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_keyvault/providers/Microsoft.KeyVault/vaults/cckeyvault1zd2yzvhwvtnsu/accessPolicies/",
+                        "type": "Microsoft.KeyVault/vaults/accessPolicies",
+                        "properties": {
+                            "accessPolicies": [
+                                {
+                                    "tenantId": "00000000-0000-0000-0000-000000000003",
+                                    "objectId": "11111111-1111-1111-1111-111111111111",
+                                    "permissions": {
+                                        "keys": [
+                                            "Get"
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_keyvault/providers/Microsoft.KeyVault/vaults/cckeyvault1zd2yzvhwvtnsu?api-version=2019-09-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-msedge-ref": [
+                        "Ref A: 7B2B6AAC37C34D779146A5E525E16194 Ref B: MNZ221060619035 Ref C: 2024-09-20T17:43:19Z"
+                    ],
+                    "date": [
+                        "Fri, 20 Sep 2024 17:43:18 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "content-length": [
+                        "1482"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_keyvault/providers/Microsoft.KeyVault/vaults/cckeyvault1zd2yzvhwvtnsu",
+                        "name": "cckeyvault1zd2yzvhwvtnsu",
+                        "type": "Microsoft.KeyVault/vaults",
+                        "location": "southcentralus",
+                        "tags": {},
+                        "properties": {
+                            "sku": {
+                                "family": "A",
+                                "name": "Standard"
+                            },
+                            "tenantId": "00000000-0000-0000-0000-000000000003",
+                            "networkAcls": {
+                                "bypass": "AzureServices",
+                                "defaultAction": "Deny",
+                                "ipRules": [
+                                    {
+                                        "value": "0.0.0.0/2"
+                                    },
+                                    {
+                                        "value": "64.0.0.0/3"
+                                    },
+                                    {
+                                        "value": "96.0.0.0/4"
+                                    },
+                                    {
+                                        "value": "112.0.0.0/5"
+                                    },
+                                    {
+                                        "value": "120.0.0.0/6"
+                                    },
+                                    {
+                                        "value": "124.0.0.0/7"
+                                    },
+                                    {
+                                        "value": "126.0.0.0/8"
+                                    },
+                                    {
+                                        "value": "128.0.0.0/1"
+                                    }
+                                ],
+                                "virtualNetworkRules": []
+                            },
+                            "accessPolicies": [
+                                {
+                                    "tenantId": "00000000-0000-0000-0000-000000000003",
+                                    "objectId": "17285ecf-6528-44e9-a94d-e77024b77418",
+                                    "permissions": {
+                                        "keys": [
+                                            "Get",
+                                            "List",
+                                            "Update",
+                                            "Create",
+                                            "Import",
+                                            "Delete",
+                                            "Recover",
+                                            "Backup",
+                                            "Restore"
+                                        ],
+                                        "secrets": [
+                                            "Get",
+                                            "List",
+                                            "Set",
+                                            "Delete",
+                                            "Recover",
+                                            "Backup",
+                                            "Restore"
+                                        ],
+                                        "certificates": [
+                                            "Get",
+                                            "List",
+                                            "Update",
+                                            "Create",
+                                            "Import",
+                                            "Delete",
+                                            "Recover",
+                                            "ManageContacts",
+                                            "ManageIssuers",
+                                            "GetIssuers",
+                                            "ListIssuers",
+                                            "SetIssuers",
+                                            "DeleteIssuers"
+                                        ],
+                                        "storage": [
+                                            "Get",
+                                            "List",
+                                            "Set",
+                                            "regeneratekey"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "tenantId": "00000000-0000-0000-0000-000000000003",
+                                    "objectId": "11111111-1111-1111-1111-111111111111",
+                                    "permissions": {
+                                        "keys": [
+                                            "Get"
+                                        ]
+                                    }
+                                }
+                            ],
+                            "enabledForDeployment": false,
+                            "enabledForDiskEncryption": false,
+                            "enabledForTemplateDeployment": false,
+                            "vaultUri": "https://cckeyvault1zd2yzvhwvtnsu.vault.azure.net/",
+                            "provisioningState": "Succeeded"
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}

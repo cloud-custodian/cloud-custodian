@@ -275,7 +275,7 @@ Enforce Tag Compliance - AutoScaling Groups
         comments: |
           Your ASG has been suspended and resized to 0 instances as they do not have all
           the required tags on them.  Please login to AWS and add the required tags to your ASG.
-          Starting tomorrow hourly emails and suspensions will start occuring if the ASG is
+          Starting tomorrow hourly emails and suspensions will start occurring if the ASG is
           still not compliant. The following day your ASG will be deleted.
         filters:
           - or: *tag-compliance-filters

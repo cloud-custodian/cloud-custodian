@@ -2497,3 +2497,96 @@ class SetBedrockModelInvocationLogging(BaseAction):
             client.put_model_invocation_logging_configuration(loggingConfig=params)
         else:
             client.delete_model_invocation_logging_configuration()
+
+
+@filters.register('ec2-metadata-defaults')
+class EC2MetadataDefaults(ValueFilter):
+    """Filter on the default instance metadata service (IMDS) settings for the specified account and
+    region.  NOTE: Any configuration that has never been set (or is set to 'No Preference'), will
+    not be returned in the response.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: ec2-imds-defaults
+                resource: account
+                filters:
+                - or:
+                  - type: ec2-metadata-defaults
+                    key: HttpTokens
+                    value: optional
+                  - type: ec2-metadata-defaults
+                    key: HttpTokens
+                    value: absent
+    """
+
+    annotation_key = 'c7n:EC2MetadataDefaults'
+    annotate = False  # no annotation from value filter
+    schema = type_schema('ec2-metadata-defaults', rinherit=ValueFilter.schema)
+    permissions = ('ec2:GetInstanceMetadataDefaults',)
+
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('ec2')
+        for r in resources:
+            r[self.annotation_key] = self.manager.retry(
+                client.get_instance_metadata_defaults)["AccountLevel"]
+
+    def process(self, resources, event=None):
+        self.augment([r for r in resources if self.annotation_key not in r])
+        return super(EC2MetadataDefaults, self).process(resources, event)
+
+    def __call__(self, r):
+        return super(EC2MetadataDefaults, self).__call__(r[self.annotation_key])
+
+
+@actions.register('set-ec2-metadata-defaults')
+class SetEC2MetadataDefaults(BaseAction):
+    """Modifies the default instance metadata service (IMDS) settings at the account level.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: set-ec2-metadata-defaults
+                resource: account
+                filters:
+                  - or:
+                    - type: ec2-metadata-defaults
+                      key: HttpTokens
+                      op: eq
+                      value: optional
+                    - type: ec2-metadata-defaults
+                      key: HttpTokens
+                      value: absent
+                actions:
+                  - type: set-ec2-metadata-defaults
+                    HttpTokens: required
+
+    """
+
+    schema = type_schema(
+        'set-ec2-metadata-defaults',
+        HttpTokens={'enum': ['optional', 'required', 'no-preference']},
+        HttpPutResponseHopLimit={'type': 'integer'},
+        HttpEndpoint={'enum': ['enabled', 'disabled', 'no-preference']},
+        InstanceMetadataTags={'enum': ['enabled', 'disabled', 'no-preference']},
+    )
+
+    permissions = ('ec2:ModifyInstanceMetadataDefaults',)
+    service = 'ec2'
+    shape = 'ModifyInstanceMetadataDefaultsRequest'
+
+    def validate(self):
+        req = dict(self.data)
+        req.pop('type')
+        return shape_validate(
+            req, self.shape, self.service
+        )
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client(self.service)
+        self.data.pop('type')
+        client.modify_instance_metadata_defaults(**self.data)

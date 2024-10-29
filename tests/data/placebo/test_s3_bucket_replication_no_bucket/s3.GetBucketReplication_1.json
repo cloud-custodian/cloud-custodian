@@ -1,0 +1,25 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "ReplicationConfiguration": {
+            "Role": "arn:aws:iam::644160558196:role/s3-replication",
+            "Rules": [
+                {
+                    "ID": "rule-1",
+                    "Priority": 0,
+                    "Filter": {
+                        "Prefix": "test"
+                    },
+                    "Status": "Enabled",
+                    "Destination": {
+                        "Bucket": "arn:aws:s3:::c1-replication-west"
+                    },
+                    "DeleteMarkerReplication": {
+                        "Status": "Disabled"
+                    }
+                }
+            ]
+        }
+    }
+}

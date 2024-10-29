@@ -60,7 +60,7 @@ Lambdas can receive CWE over CloudTrail API calls within seconds of delay at P99
        actions:
          - type: mark
            tag: foo
-           msg: bar
+           value: bar
 
 Because the total AWS API surface area is so large most CloudTrail API
 event subscriptions need two additional fields:
@@ -168,16 +168,16 @@ not support tagging, but groups do.
          type: schedule
          role: arn:aws:iam::{account_id}:role/some-role
          schedule: "rate(1 day)"
-         schedule-role: arn:aws:iam::{account_id}:role/some-scheduler-role
+         scheduler-role: arn:aws:iam::{account_id}:role/some-scheduler-role
          timezone: Asia/Seoul
          group-name: MySchedGroup
-         start-date: 2024-04-04T00:05:23
+         start-date: "2024-04-04T00:05:23"
 
 Note:
 
 When switching from `periodic` mode to `schedule` mode for a policy that is already deployed,
 the `custodian run` command will not remove the old EventBridge Rule. The same is true when
-switching from `schedule` to `periodi`. The `custodian run` command cannot know what used to
+switching from `schedule` to `periodic`. The `custodian run` command cannot know what used to
 be in a policy file, only what is there now.
 
 Instead of deleting rules and schedules manually, `tools/ops/mugc.py` deletes any function in

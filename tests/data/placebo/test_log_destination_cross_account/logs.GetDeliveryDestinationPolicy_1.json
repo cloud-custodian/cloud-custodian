@@ -1,0 +1,9 @@
+{
+    "status_code": 200,
+    "data": {
+        "policy": {
+            "deliveryDestinationPolicy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"AllowLogDeliveryActions\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::111111111111:root\"},\"Action\":\"logs:CreateDelivery\",\"Resource\":\"arn:aws:logs:us-east-1:123456789012:delivery-destination:test-destination\"}]}"
+        },
+        "ResponseMetadata": {}
+    }
+}

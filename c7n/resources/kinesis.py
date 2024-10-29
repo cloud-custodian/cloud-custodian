@@ -4,6 +4,7 @@
 from c7n.actions import Action
 from c7n.manager import resources
 from c7n.filters.kms import KmsRelatedFilter
+from c7n.filters import CrossAccountAccessFilter
 from c7n.query import (
     ConfigSource,
     DescribeWithResourceTags, QueryResourceManager, TypeInfo)
@@ -459,3 +460,38 @@ class VideoStreamRemoveTag(RemoveTag):
                 ResourceARN=r['StreamARN'],
                 TagKeyList=tag_keys,
                 ignore_err_codes=("ResourceNotFoundException",))
+
+
+@KinesisStream.filter_registry.register('cross-account')
+class KinesisStreamCrossAccount(CrossAccountAccessFilter):
+    """Filters all Kinesis Data Streams with cross-account access
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: kinesis-cross-account
+                resource: kinesis
+                filters:
+                  - type: cross-account
+                    whitelist_from:
+                      expr: "accounts.*.accountNumber"
+                      url: accounts_url
+    """
+
+    permissions = ('kinesis:GetResourcePolicy',)
+    policy_annotation = "c7n:Policy"
+
+    def get_resource_policy(self, r):
+        client = local_session(self.manager.session_factory).client('kinesis')
+        if self.policy_annotation in r:
+            return r[self.policy_annotation]
+        result = self.manager.retry(
+                client.get_resource_policy,
+                ResourceARN=r['StreamARN'],
+                ignore_err_codes=('ResourceNotFoundException'))
+        if result:
+            policy = result.get(self.policy_attribute, None)
+            r[self.policy_annotation] = policy
+        return policy

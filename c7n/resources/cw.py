@@ -1071,3 +1071,68 @@ class CloudWatchDashboard(QueryResourceManager):
     source_mapping = {
        "describe": DescribeWithResourceTags,
     }
+
+
+@resources.register("log-destination")
+class LogDestination(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = "logs"
+        enum_spec = ('describe_delivery_destinations', 'deliveryDestinations', None)
+        arn_type = "destination"
+        arn_separator = ":"
+        arn = "arn"
+        id = name = "name"
+        cfn_type = "AWS::Logs::Destination"
+        universal_taggable = object()
+
+    source_mapping = {
+       "describe": DescribeWithResourceTags,
+    }
+
+
+@LogDestination.filter_registry.register('cross-account')
+class DestinationCrossAccount(CrossAccountAccessFilter):
+
+    policy_attribute = 'c7n:Policy'
+    permissions = ('logs:GetDeliveryDestinationPolicy',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('logs')
+
+        for r in resources:
+            resp = self.manager.retry(
+                client.get_delivery_destination_policy,
+                deliveryDestinationName=r['name'],
+                ignore_err_codes=('ResourceNotFoundException',)
+            )
+            r[self.policy_attribute] = resp['policy']['deliveryDestinationPolicy']
+        return super().process(resources)
+
+
+@LogDestination.action_registry.register('delete')
+class DestinationDelete(BaseAction):
+    """Action to delete a delivery destination
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: delete-destination
+            resource: aws.log-destination
+            filters:
+              - type: value
+                key: deliveryDestinationType
+                value: S3
+            actions:
+              - delete
+    """
+    schema = type_schema('delete')
+
+    permissions = ('logs:DeleteDeliveryDestination',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('logs')
+        for r in resources:
+            self.manager.retry(client.delete_delivery_destination, name=r['name'],
+                ignore_err_codes=('ResourceNotFoundException',))
