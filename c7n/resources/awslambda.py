@@ -138,12 +138,6 @@ class URLConfig(ValueFilter):
                 r[self.annotation_key].pop('ResponseMetadata')
             except client.exceptions.ResourceNotFoundException:
                 r[self.annotation_key] = {}
-            except ClientError as e:
-                if e.response['Error']['Code'] == ErrAccessDenied:
-                    self.log.warning(
-                        "Access denied getting lambda:%s",
-                        r['FunctionName'])
-                raise
             return r
 
         with self.executor_factory(max_workers=3) as w:
