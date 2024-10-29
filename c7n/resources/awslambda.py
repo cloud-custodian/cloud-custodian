@@ -140,7 +140,7 @@ class URLConfig(ValueFilter):
                 r[self.annotation_key] = {}
             return r
 
-        with self.executor_factory(max_workers=3) as w:
+        with self.executor_factory(max_workers=2) as w:
             resources = list(filter(None, w.map(_augment, resources)))
 
         return super().process(resources, event)
