@@ -161,7 +161,8 @@ service or automation identity matching a complex regular expression.
       resource: aws.ec2
       mode:
         type: cloudtrail
-        events: RunInstances
+        events:
+         - RunInstances
       conditions:
         - type: value           ─▶ evaluated at deployment and execution
           key: region
