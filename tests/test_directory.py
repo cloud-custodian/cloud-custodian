@@ -201,6 +201,24 @@ class DirectoryTests(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertTrue("c7n:Settings" in resources[0])
 
+    def test_directory_trust_relationship(self):
+        factory = self.replay_flight_data("test_directory_trust_relationship")
+        p = self.load_policy(
+            {
+                "name": "trust-relationship",
+                "resource": "directory",
+                "filters": [{"type": "trust", "key": "RemoteDomainName",
+                        "value": "cloudcustodian.io"},
+                        {"type": "trust", "key": "TrustDirection",
+                            "value": "One-Way: Outgoing"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue("c7n:Trusts" in resources[0])
+        self.assertEqual(resources[0]["c7n:Trusts"][0]['RemoteDomainName'], "cloudcustodian.io")
+
 
 class CloudDirectoryQueryParse(BaseTest):
 
