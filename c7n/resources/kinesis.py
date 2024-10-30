@@ -354,7 +354,7 @@ class KinesisVideoStream(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'kinesisvideo'
         arn_type = 'stream'
-        enum_spec = ('list_streams', 'StreamInfoList', None)
+        enum_spec = ('list_streams', 'StreamInfoList', {'MaxResults': 10000})
         name = id = 'StreamName'
         arn = 'StreamARN'
         dimension = 'StreamName'
