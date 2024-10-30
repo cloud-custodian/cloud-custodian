@@ -7,7 +7,6 @@ from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 
 from c7n.actions import BaseAction
-from c7n.exceptions import PolicyValidationError
 from c7n.filters import Filter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
@@ -254,21 +253,14 @@ class CloudFormationTemplateFilter(Filter):
         matched = []
         pattern = self.data.get('query')
 
-        try:
-            regex = re.compile(pattern)
-        except re.error as e:
-            raise PolicyValidationError(f"Invalid regex pattern: {e}")
+        regex = re.compile(pattern)
 
         for r in resources:
             stack_id = r['StackId']
-            try:
-                response = client.get_template(StackName=stack_id)
-                template_body = response.get('TemplateBody')
+            response = client.get_template(StackName=stack_id)
+            template_body = response.get('TemplateBody')
 
-                if regex.search(template_body):
-                    matched.append(r)
-            except Exception as e:
-                self.log.error(f"Error processing stack {stack_id}: {e}")
-                continue
+            if regex.search(template_body):
+                matched.append(r)
 
         return matched
