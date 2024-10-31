@@ -64,10 +64,10 @@ guard duty (note custodian also has support for guard duty events directly).
 
    policies:
      - name: remediate
-       resource: aws.iam
+       resource: aws.iam-user
        mode:
          type: hub-finding
-	 role: MyRole
+         role: MyRole
        filters:
          - type: event
            key: detail.findings[].ProductFields.aws/securityhub/ProductName
