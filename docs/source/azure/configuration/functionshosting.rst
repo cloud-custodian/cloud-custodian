@@ -134,9 +134,9 @@ turned on. Based on the RAM consumption in the underlying VMs, the App Service P
                 skuName: B1
                 autoScale:
                   enabled: true
-                  minCapacity: 1
-                  maxCapacity: 3
-                  defaultCapacity: 1
+                  minCapacity: "1"
+                  maxCapacity: "3"
+                  defaultCapacity: "1"
         resource: azure.vm
         filters:
           - type: instance-view

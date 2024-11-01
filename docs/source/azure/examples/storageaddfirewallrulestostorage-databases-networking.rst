@@ -26,13 +26,13 @@ Finds storage accounts with no ip rules and modifies them to:
          actions:
            - type: set-firewall-rules
              default-action: Deny
-             bypass: [Logging, Metrics]
+             bypass-rules: [Logging, Metrics]
              ip-rules:
                  - 11.12.13.14
                  - 21.22.23.24
              virtual-network-rules:
-                 - virtual-network-resource-id: /subscriptions/12345678-1234-1234-1234-123456789012/resourceGroups/rg1/providers/Microsoft.Network/virtualNetworks/vnet1/subnets/subnet1
-                 - virtual-network-resource-id: /subscriptions/12345678-1234-1234-1234-123456789012/resourceGroups/rg1/providers/Microsoft.Network/virtualNetworks/vnet2/subnets/subnet2
+                 - /subscriptions/12345678-1234-1234-1234-123456789012/resourceGroups/rg1/providers/Microsoft.Network/virtualNetworks/vnet1/subnets/subnet1
+                 - /subscriptions/12345678-1234-1234-1234-123456789012/resourceGroups/rg1/providers/Microsoft.Network/virtualNetworks/vnet2/subnets/subnet2
 
 Finds storage account with no ip rules and modifies it to:
 - Enable Logging and Metrics access to the database

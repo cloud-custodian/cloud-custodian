@@ -62,7 +62,7 @@ lambda.
       filters:
         - type: image
           tag: "NotSupported"
-	  value: absent
+          value: absent
 
 
 Filter
