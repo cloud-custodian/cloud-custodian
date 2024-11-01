@@ -179,10 +179,10 @@ filter resources based on the event itself. For instance:
          operations:
          - CREATE
          - UPDATE
-      filters:
-        - type: event
-          key: request.userInfo.username
-          value: foo
+       filters:
+         - type: event
+           key: request.userInfo.username
+           value: foo
 
 A sample event looks like:
 
