@@ -61,7 +61,7 @@ lambda.
         role: MyLambdaConfigRole
       filters:
         - type: image
-          tag: "NotSupported"
+          key: "tag:NotSupported"
           value: absent
 
 
