@@ -504,6 +504,7 @@ list of possible keys are now from the cloudtrail event and not the
 describe resource call as is the case in the ValueFilter
 
   .. code-block:: yaml
+
     policies:
      - name: no-ec2-public-ips
        resource: aws.ec2
