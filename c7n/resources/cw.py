@@ -196,6 +196,11 @@ class EventBusCrossAccountFilter(CrossAccountAccessFilter):
     permissions = ('events:ListEventBuses',)
 
 
+@EventBus.filter_registry.register('kms-key')
+class EventBusKmsFilter(KmsRelatedFilter):
+    RelatedIdsExpression = 'KmsKeyIdentifier'
+
+
 @EventBus.action_registry.register('delete')
 class EventBusDelete(BaseAction):
     """Delete an event bus.
