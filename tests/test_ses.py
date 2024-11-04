@@ -43,6 +43,27 @@ class SESTest(BaseTest):
             tls_policy = response['DeliveryOptions']['TlsPolicy']
             self.assertEqual(tls_policy, "Require")
 
+    def test_ses_configuration_set_delete(self):
+        session_factory = self.replay_flight_data("test_ses_configuration_set_delete")
+        p = self.load_policy(
+            {
+                "name": "ses-configuration_set-delete-test",
+                "resource": "ses-configuration-set",
+                "actions": [{"type": "delete"}],
+            }, session_factory=session_factory
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        p = self.load_policy(
+            {
+                "name": "ses-configuration-set-delete-test",
+                "resource": "ses-configuration-set",
+            }, session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
     def test_ses_receipt_rule_set_query(self):
         session_factory = self.replay_flight_data("test_ses_rule_set_query")
         p = self.load_policy(

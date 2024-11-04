@@ -1,0 +1,57 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "items": [
+            {
+                "id": "gaaxs9moo3",
+                "name": "PetStore",
+                "description": "Your first API with Amazon API Gateway. This is a sample API that integrates via HTTP with our demo Pet Store endpoints",
+                "createdDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 12,
+                    "day": 6,
+                    "hour": 14,
+                    "minute": 46,
+                    "second": 9,
+                    "microsecond": 0
+                },
+                "apiKeySource": "HEADER",
+                "endpointConfiguration": {
+                    "types": [
+                        "REGIONAL"
+                    ]
+                },
+                "disableExecuteApiEndpoint": false,
+                "rootResourceId": "0249vgozv7"
+            },
+            {
+                "id": "jt2w8rh6ik",
+                "name": "policy-data-rest-api",
+                "createdDate": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 11,
+                    "day": 2,
+                    "hour": 20,
+                    "minute": 41,
+                    "second": 32,
+                    "microsecond": 0
+                },
+                "apiKeySource": "HEADER",
+                "endpointConfiguration": {
+                    "types": [
+                        "EDGE"
+                    ]
+                },
+                "policy": "{\\\"Version\\\":\\\"2012-10-17\\\",\\\"Statement\\\":[{\\\"Effect\\\":\\\"Allow\\\",\\\"Principal\\\":{\\\"AWS\\\":\\\"arn:aws:iam::123456789012:root\\\"},\\\"Action\\\":\\\"execute-api:Invoke\\\",\\\"Resource\\\":\\\"*\\\"}]}",
+                "tags": {
+                    "test": "test-val"
+                },
+                "disableExecuteApiEndpoint": false,
+                "rootResourceId": "snilzemip4"
+            }
+        ]
+    }
+}
