@@ -145,13 +145,14 @@ class VariableResolver:
             ).relative_to(self.source_dir.absolute())
         ]
 
-    def get_type_default(self, vtype):
-        if vtype in self.type_defaults:
-            return self.type_defaults[vtype]
+    @classmethod
+    def get_type_default(cls, vtype):
+        if vtype in cls.type_defaults:
+            return cls.type_defaults[vtype]
         elif " " in vtype:
             vtype, _ = vtype.split(' ', 1)
-            return self.type_defaults[vtype]
-        return self.type_defaults["string"]
+            return cls.type_defaults[vtype]
+        return cls.type_defaults["string"]
 
     def get_env_variables(self):
         prefix = "TF_VAR_"
