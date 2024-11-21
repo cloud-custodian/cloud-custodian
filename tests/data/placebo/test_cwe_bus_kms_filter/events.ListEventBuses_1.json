@@ -1,0 +1,57 @@
+{
+    "status_code": 200,
+    "data": {
+        "EventBuses": [
+            {
+                "Name": "default",
+                "Arn": "arn:aws:events:us-east-1:644160558196:event-bus/default",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 1,
+                    "day": 14,
+                    "hour": 15,
+                    "minute": 4,
+                    "second": 24,
+                    "microsecond": 369000
+                },
+                "LastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 1,
+                    "day": 14,
+                    "hour": 15,
+                    "minute": 4,
+                    "second": 31,
+                    "microsecond": 877000
+                }
+            },
+            {
+                "Name": "c7n-cwe",
+                "Arn": "arn:aws:events:us-east-1:644160558196:event-bus/c7n-cwe",
+                "KmsKeyIdentifier": "3bd15351-ad10-4cf4-b230-280746ad3dbb",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 10,
+                    "day": 28,
+                    "hour": 14,
+                    "minute": 2,
+                    "second": 16,
+                    "microsecond": 15000
+                },
+                "LastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 10,
+                    "day": 28,
+                    "hour": 14,
+                    "minute": 2,
+                    "second": 16,
+                    "microsecond": 15000
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,17 @@
+{
+    "status_code": 200,
+    "data": {
+        "DBClusterSnapshotAttributesResult": {
+            "DBClusterSnapshotIdentifier": "c7n-testing-public",
+            "DBClusterSnapshotAttributes": [
+                {
+                    "AttributeName": "restore",
+                    "AttributeValues": [
+                        "all"
+                    ]
+                }
+            ]
+        },
+        "ResponseMetadata": {}
+    }
+}

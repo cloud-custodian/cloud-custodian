@@ -76,3 +76,22 @@ class GlobalAcceleratorTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         assert resources[0]['Name'] == 'test-custodian'
+
+    def test_global_accelerator_flow_log(self):
+        factory = self.replay_flight_data(
+            "test_global_accelerator_flow_log")
+
+        p = self.load_policy(
+            {
+                "name": "global-accelerator-flow-log",
+                "resource": "globalaccelerator",
+                "filters": [{"type": "attribute",
+                             "key": "FlowLogsEnabled",
+                             "value": True
+                             }],
+            },
+            session_factory=factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)

@@ -130,9 +130,9 @@ class VariableResolver:
                 if not v["__tfmeta"]["path"].startswith("variable"):
                     continue
                 if v["__tfmeta"]["label"] not in var_map:
-                    uninitialized_vars[v["__tfmeta"]["label"]] = self.type_defaults[
+                    uninitialized_vars[v["__tfmeta"]["label"]] = self.get_type_default(
                         v.get("type", "string") or "string"
-                    ]
+                    )
 
         if not uninitialized_vars:
             return []
@@ -144,6 +144,15 @@ class VariableResolver:
                 self._write_file_content(json.dumps(uninitialized_vars), ".tfvars.json").name
             ).relative_to(self.source_dir.absolute())
         ]
+
+    @classmethod
+    def get_type_default(cls, vtype):
+        if vtype in cls.type_defaults:
+            return cls.type_defaults[vtype]
+        elif " " in vtype:
+            vtype, _ = vtype.split(' ', 1)
+            return cls.type_defaults[vtype]
+        return cls.type_defaults["string"]
 
     def get_env_variables(self):
         prefix = "TF_VAR_"

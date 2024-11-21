@@ -548,7 +548,7 @@ class BrowerPolicyFilter(ValueFilter):
         client = local_session(self.manager.session_factory).client('workspaces-web')
         results = []
         for r in resources:
-            if self.policy_annotation not in r:
+            if (self.policy_annotation not in r) and ('browserSettingsArn' in r):
                 browserSettings = self.manager.retry(
                     client.get_browser_settings,
                     browserSettingsArn=r['browserSettingsArn']).get('browserSettings')
