@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:ses:us-east-1:123456789012:configuration-set/c7n-test",
+                "Tags": [
+                    {
+                        "Key": "Owner",
+                        "Value": "Pratyush"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

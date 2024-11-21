@@ -1,0 +1,48 @@
+{
+    "status_code": 200,
+    "data": {
+        "Trusts": [
+            {
+                "DirectoryId": "d-9067d77ae2",
+                "TrustId": "t-906764b0c1",
+                "RemoteDomainName": "cloudcustodian.io",
+                "TrustType": "External",
+                "TrustDirection": "One-Way: Outgoing",
+                "TrustState": "Failed",
+                "CreatedDateTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 10,
+                    "day": 21,
+                    "hour": 8,
+                    "minute": 45,
+                    "second": 23,
+                    "microsecond": 700000
+                },
+                "LastUpdatedDateTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 10,
+                    "day": 21,
+                    "hour": 8,
+                    "minute": 45,
+                    "second": 47,
+                    "microsecond": 649000
+                },
+                "StateLastUpdatedDateTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 10,
+                    "day": 21,
+                    "hour": 8,
+                    "minute": 45,
+                    "second": 47,
+                    "microsecond": 649000
+                },
+                "TrustStateReason": "The specified domain either does not exist or could not be contacted. Name: cloudcustodian.io",
+                "SelectiveAuth": "Disabled"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

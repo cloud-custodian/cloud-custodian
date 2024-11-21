@@ -196,6 +196,11 @@ class EventBusCrossAccountFilter(CrossAccountAccessFilter):
     permissions = ('events:ListEventBuses',)
 
 
+@EventBus.filter_registry.register('kms-key')
+class EventBusKmsFilter(KmsRelatedFilter):
+    RelatedIdsExpression = 'KmsKeyIdentifier'
+
+
 @EventBus.action_registry.register('delete')
 class EventBusDelete(BaseAction):
     """Delete an event bus.
@@ -1067,6 +1072,7 @@ class CloudWatchDashboard(QueryResourceManager):
         name = "DashboardName"
         cfn_type = "AWS::CloudWatch::Dashboard"
         universal_taggable = object()
+        global_resource = True
 
     source_mapping = {
        "describe": DescribeWithResourceTags,

@@ -1,0 +1,45 @@
+{
+    "status_code": 200,
+    "data": {
+        "Table": {
+            "AttributeDefinitions": [
+                {
+                    "AttributeName": "test",
+                    "AttributeType": "S"
+                }
+            ],
+            "TableName": "c7n-cross-account",
+            "KeySchema": [
+                {
+                    "AttributeName": "test",
+                    "KeyType": "HASH"
+                }
+            ],
+            "TableStatus": "ACTIVE",
+            "CreationDateTime": {
+                "__class__": "datetime",
+                "year": 2024,
+                "month": 9,
+                "day": 18,
+                "hour": 10,
+                "minute": 25,
+                "second": 35,
+                "microsecond": 60000
+            },
+            "ProvisionedThroughput": {
+                "NumberOfDecreasesToday": 0,
+                "ReadCapacityUnits": 1,
+                "WriteCapacityUnits": 1
+            },
+            "TableSizeBytes": 0,
+            "ItemCount": 0,
+            "TableArn": "arn:aws:dynamodb:us-east-1:123456789012:table/c7n-cross-account",
+            "TableId": "491eb9f0-b783-491a-a832-9733abc3417e",
+            "TableClassSummary": {
+                "TableClass": "STANDARD"
+            },
+            "DeletionProtectionEnabled": false
+        },
+        "ResponseMetadata": {}
+    }
+}
