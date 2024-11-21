@@ -5,7 +5,7 @@
             {
                 "name": "c7n-test",
                 "status": "REGISTERED",
-                "arn": "arn:aws:swf:us-east-1:644160558196:/domain/c7n-test"
+                "arn": "arn:aws:swf:us-east-1:123456789012:/domain/c7n-test"
             }
         ],
         "ResponseMetadata": {}

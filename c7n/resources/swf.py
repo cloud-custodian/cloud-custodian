@@ -33,6 +33,7 @@ class SimpleWorkflowDomain(QueryResourceManager):
 class SWFConfigurationFilter(ValueFilter):
 
     annotation_key = "c7n:configuration"
+    permissions = ("swf:DescribeDomain")
     schema = type_schema('configuration', rinherit=ValueFilter.schema)
 
     def process(self, resources, event=None):
@@ -41,6 +42,8 @@ class SWFConfigurationFilter(ValueFilter):
         for r in resources:
             if self.annotation_key not in r:
                 config = self.manager.retry(client.describe_domain, name=r["name"])["configuration"]
+                config["workflowExecutionRetentionPeriodInDays"] = int(
+                    config["workflowExecutionRetentionPeriodInDays"])
                 r[self.annotation_key] = config
 
             if self.match(r[self.annotation_key]):

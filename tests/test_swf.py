@@ -71,8 +71,8 @@ class TestSimpleWorkflow(BaseTest):
                 "filters": [{
                     "type": "configuration",
                     "key": "workflowExecutionRetentionPeriodInDays",
-                    "op": "eq",
-                    "value": "90"
+                    "op": "gt",
+                    "value": 45
                 }]
             },
             session_factory=session_factory,
@@ -81,4 +81,4 @@ class TestSimpleWorkflow(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["c7n:configuration"][
-                "workflowExecutionRetentionPeriodInDays"], "90")
+                "workflowExecutionRetentionPeriodInDays"], 90)
