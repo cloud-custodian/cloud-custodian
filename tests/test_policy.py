@@ -448,7 +448,6 @@ class PolicyMetaLint(BaseTest):
             "AWS::Kendra::Index",
             "AWS::KinesisVideo::Stream",
             "AWS::Logs::Destination",
-            "AWS::MSK::Configuration",
             "AWS::MediaConnect::FlowEntitlement",
             "AWS::MediaConnect::FlowVpcInterface",
             "AWS::MediaTailor::PlaybackConfiguration",

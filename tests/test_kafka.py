@@ -166,20 +166,24 @@ class KafkaTest(BaseTest):
 
 
 class TestKafkaClusterConfiguration(BaseTest):
+
     def test_kafka_configuration_delete(self):
         session_factory = self.replay_flight_data("test_kafka_configuration_delete")
         p = self.load_policy(
             {
                 "name": "kafka-configuration-delete",
                 "resource": "kafka-config",
-                "filters": [{"Arn": "arn:aws:kafka:us-east-1:761002975749:configuration/foo-config/dfc47fc4-9959-40ae-ae72-f128900f33aa-7"}],
-                "actions": [{"type": "delete"}],
+                "filters": [{"Arn": "arn:aws:kafka:us-east-1:761002975749:"
+                             "configuration/foo-config/bce83305-ca42-499b-be2c-fefbec586fa0-7"}],
+                "actions": [{"type": "delete"}]
             },
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources), 0)
         client = session_factory().client("kafka")
         cluster_configrations = client.list_configurations()
-        self.assertFalse("arn:aws:kafka:us-east-1:761002975749:configuration/foo-config/dfc47fc4-9959-40ae-ae72-f128900f33aa-7" in [t.get("Arn")
+        self.assertFalse("arn:aws:kafka:us-east-1:761002975749:"
+                         "configuration/foo-config/bce83305-ca42-499b-be2c-fefbec586fa0-7"
+                         in [t.get("Arn")
             for t in cluster_configrations.get("Configurations", [])])

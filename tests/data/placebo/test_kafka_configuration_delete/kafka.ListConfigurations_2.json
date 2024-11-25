@@ -1,0 +1,37 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Configurations": [
+            {
+                "Arn": "arn:aws:kafka:us-east-1:644160558196:configuration/foo-config/bce83305-ca42-499b-be2c-fefbec586fa0-7",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 11,
+                    "day": 25,
+                    "hour": 20,
+                    "minute": 51,
+                    "second": 12,
+                    "microsecond": 734000
+                },
+                "KafkaVersions": [],
+                "LatestRevision": {
+                    "CreationTime": {
+                        "__class__": "datetime",
+                        "year": 2024,
+                        "month": 11,
+                        "day": 25,
+                        "hour": 20,
+                        "minute": 51,
+                        "second": 12,
+                        "microsecond": 734000
+                    },
+                    "Revision": 1
+                },
+                "Name": "foo-config",
+                "State": "DELETING"
+            }
+        ]
+    }
+}

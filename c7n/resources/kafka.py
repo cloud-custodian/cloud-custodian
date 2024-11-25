@@ -48,7 +48,8 @@ class Kafka(QueryResourceManager):
     source_mapping = {
         'describe': DescribeKafka,
         'config': ConfigSource
-    }
+}
+
 
 @resources.register('kafka-config')
 class KafkaClusterConfiguration(QueryResourceManager):
@@ -78,7 +79,7 @@ class DeleteClusterConfiguration(BaseAction):
                 client.delete_configuration(Arn=r['Arn'])
             except client.exceptions.NotFoundException:
                 continue
-    
+
 
 @Kafka.filter_registry.register('security-group')
 class KafkaSGFilter(SecurityGroupFilter):
