@@ -163,3 +163,26 @@ class KafkaTest(BaseTest):
         self.assertEqual(len(resources), 2)
         self.assertEqual(resources[0]['ClusterType'], 'PROVISIONED')
         self.assertEqual(resources[1]['ClusterType'], 'SERVERLESS')
+
+
+
+
+# class TestKafkaClusterConfiguration(BaseTest):
+
+    def test_kafka_configuration_delete(self):
+        session_factory = self.replay_flight_data("test_kafka_configuration_delete")
+        p = self.load_policy(
+            {
+                "name": "kafka-configuration-delete",
+                "resource": "kafka-config",
+                "filters": [{"Arn": "arn:aws:kafka:us-east-1:761002975749:configuration/foo-config/dfc47fc4-9959-40ae-ae72-f128900f33aa-7"}],
+                "actions": [{"type": "delete"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client("kafka")
+        cluster_configrations = client.list_configurations()
+        self.assertFalse("arn:aws:kafka:us-east-1:761002975749:configuration/foo-config/dfc47fc4-9959-40ae-ae72-f128900f33aa-7" in [t.get("Arn")
+            for t in cluster_configrations.get("Configurations", [])])

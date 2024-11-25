@@ -1,0 +1,9 @@
+{
+    "status_code": 200,
+    "data": {
+      "ResponseMetadata": {
+        "Arn": "arn:aws:kafka:us-east-1:761002975749:configuration/foo-config/b29d8f5f-5076-49c7-9e24-fb5b81ec5dd1-7",
+        "State": "DELETING"
+      }
+    }
+  }
