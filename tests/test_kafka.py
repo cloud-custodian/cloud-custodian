@@ -167,8 +167,7 @@ class KafkaTest(BaseTest):
 
 
 
-# class TestKafkaClusterConfiguration(BaseTest):
-
+class TestKafkaClusterConfiguration(BaseTest):
     def test_kafka_configuration_delete(self):
         session_factory = self.replay_flight_data("test_kafka_configuration_delete")
         p = self.load_policy(
