@@ -117,7 +117,7 @@ class WAFTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["ARN"],
-                         "arn:aws:wafv2:us-east-1:644160558196:regional/webacl/test-custodian-waf/0b6d34b1-689c-4d33-8d84-3effe427413f")
+                         "arn:aws:wafv2:us-east-1:644160558196:regional/webacl/test-custodian-waf/48fbb7cc-c08d-4858-900f-a6072fe1a948")
 
         client = session_factory().client("wafv2")
         logging_config = client.get_logging_configuration(ResourceArn=resources[0]["ARN"])

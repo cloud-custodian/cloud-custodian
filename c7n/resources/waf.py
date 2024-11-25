@@ -211,21 +211,111 @@ class WAFV2LoggingFilter(ValueFilter):
 @WAFV2.action_registry.register('enable-logging')
 class EnableWAFV2Logging(BaseAction):
     """
-    Action to enable logging for WAFv2 WebACLs with S3 Destination
+    Action to enable logging for WAF WebACLs with S3 Destination
 
     :example:
 
     .. code-block:: yaml
 
-        policies:
-          - name: enable-wafv2-logging
-            resource: aws.wafv2
-            actions:
-              - type: enable-logging
-                log_destination_arn: arn:aws:s3:::logging-destination-bucket
+    policies:
+      - name: enable-wafv2-logging
+        resource: aws.wafv2
+        actions:
+          - type: enable-logging
+            log_destination_arn: arn:aws:s3:::logging-destination-bucket
+            redacted_fields:
+              - type: SingleHeader
+                data: authorization
+              - type: JsonBody
+                match_pattern:
+                  All: {}
+                match_scope: ALL
+                oversize_handling: CONTINUE
+            logging_filter:
+              Filters:
+                - Behavior: KEEP
+                  Requirement: MEETS_ALL
+                  Conditions:
+                    - ActionCondition:
+                        Action: ALLOW
+                    - LabelNameCondition:
+                        LabelName: example-label
+              DefaultBehavior: DROP
+            managed_by_firewall_manager: true
+            log_type: WAF_LOGS
+            log_scope: CUSTOMER
+
+
     """
-    schema = type_schema('enable-logging',
-                         log_destination_arn={'type': 'string'})
+    schema = type_schema(
+        'enable-logging',
+        log_destination_arn={'type': 'string'},
+        redacted_fields={
+            'type': 'array',
+            'items': {
+                'type': 'object',
+                'properties': {
+                    'type': {'type': 'string', 'enum': [
+                        'SingleHeader', 'SingleQueryArgument', 'AllQueryArguments',
+                        'UriPath', 'QueryString', 'Body', 'Method', 'JsonBody',
+                        'Headers', 'Cookies', 'HeaderOrder', 'JA3Fingerprint']},
+                    'data': {'type': 'string'},
+                    'oversize_handling': {
+                        'type': 'string',
+                        'enum': ['CONTINUE', 'MATCH', 'NO_MATCH']
+                    },
+                    'match_pattern': {'type': 'object'},
+                    'match_scope': {'type': 'string', 'enum': ['ALL', 'KEY', 'VALUE']},
+                    'invalid_fallback_behavior':
+                        {
+                            'type': 'string',
+                            'enum': ['MATCH', 'NO_MATCH', 'EVALUATE_AS_STRING']
+                        },
+                    'fallback_behavior': {'type': 'string', 'enum': ['MATCH', 'NO_MATCH']}
+                }
+            }
+        },
+        logging_filter={
+            'type': 'object',
+            'properties': {
+                'Filters': {
+                    'type': 'array',
+                    'items': {
+                        'type': 'object',
+                        'properties': {
+                            'Behavior': {'type': 'string', 'enum': ['KEEP', 'DROP']},
+                            'Requirement': {'type': 'string', 'enum': ['MEETS_ALL', 'MEETS_ANY']},
+                            'Conditions': {
+                                'type': 'array',
+                                'items': {
+                                    'type': 'object',
+                                    'properties': {
+                                        'ActionCondition': {
+                                            'type': 'object',
+                                            'properties': {
+                                                'Action': {'type': 'string', 'enum': [
+                                                    'ALLOW', 'BLOCK', 'COUNT', 'CAPTCHA',
+                                                    'CHALLENGE', 'EXCLUDED_AS_COUNT']}
+                                            }
+                                        },
+                                        'LabelNameCondition': {
+                                            'type': 'object',
+                                            'properties': {'LabelName': {'type': 'string'}}
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                'DefaultBehavior': {'type': 'string', 'enum': ['KEEP', 'DROP']}
+            }
+        },
+        managed_by_firewall_manager={'type': 'boolean'},
+        log_type={'type': 'string', 'enum': ['WAF_LOGS']},
+        log_scope={'type': 'string', 'enum': ['CUSTOMER', 'SECURITY_LAKE']}
+    )
+
     permissions = ('wafv2:PutLoggingConfiguration',)
 
     def process(self, resources):
@@ -233,16 +323,87 @@ class EnableWAFV2Logging(BaseAction):
             'wafv2', region_name=self.manager.region)
 
         log_destination_arn = self.data.get('log_destination_arn')
+        redacted_fields_data = self.data.get('redacted_fields', [])
 
         for r in resources:
-            self.enable_logging(client, r, log_destination_arn)
+            self.enable_logging(client, r, log_destination_arn, redacted_fields_data)
 
-    def enable_logging(self, client, resource, log_destination_arn):
-        client.put_logging_configuration(
-            LoggingConfiguration={
-                'ResourceArn': resource['ARN'],
-                'LogDestinationConfigs': [log_destination_arn]
-            }
-        )
-        self.log.info(f"Enabled logging for WAFv2 WebACL: "
-                      f"{resource['Name']} ({resource['ARN']})")
+    def enable_logging(self, client, resource, log_destination_arn, redacted_fields_data=None,
+                       managed_by_firewall_manager=False, logging_filter=None,
+                       log_type="WAF_LOGS", log_scope=None):
+        """
+        Enable logging for a WAFv2 WebACL, incorporating all put_logging_configuration parameters.
+        """
+
+        # Validate log_scope
+        valid_log_scopes = ["CUSTOMER", "SECURITY_LAKE"]
+        if log_scope and log_scope not in valid_log_scopes:
+            raise ValueError(f"Invalid log_scope value: {log_scope}."
+                             f" Must be one of {valid_log_scopes}")
+
+        if not log_scope:
+            log_scope = "CUSTOMER"
+
+        redacted_fields = []
+        if redacted_fields_data:
+            for f in redacted_fields_data:
+                field = {}
+                if f['type'] == 'SingleHeader':
+                    field['SingleHeader'] = {'Name': f['data']}
+                elif f['type'] == 'SingleQueryArgument':
+                    field['SingleQueryArgument'] = {'Name': f['data']}
+                elif f['type'] == 'AllQueryArguments':
+                    field['AllQueryArguments'] = {}
+                elif f['type'] == 'UriPath':
+                    field['UriPath'] = {}
+                elif f['type'] == 'QueryString':
+                    field['QueryString'] = {}
+                elif f['type'] == 'Body':
+                    field['Body'] = {'OversizeHandling': f.get('oversize_handling', 'CONTINUE')}
+                elif f['type'] == 'Method':
+                    field['Method'] = {}
+                elif f['type'] == 'JsonBody':
+                    field['JsonBody'] = {
+                        'MatchPattern': f.get('match_pattern', {}),
+                        'MatchScope': f['match_scope'],
+                        'InvalidFallbackBehavior': f.get('invalid_fallback_behavior', 'MATCH'),
+                        'OversizeHandling': f.get('oversize_handling', 'CONTINUE')
+                    }
+                elif f['type'] == 'Headers':
+                    field['Headers'] = {
+                        'MatchPattern': f.get('match_pattern', {}),
+                        'MatchScope': f['match_scope'],
+                        'OversizeHandling': f.get('oversize_handling', 'CONTINUE')
+                    }
+                elif f['type'] == 'Cookies':
+                    field['Cookies'] = {
+                        'MatchPattern': f.get('match_pattern', {}),
+                        'MatchScope': f['match_scope'],
+                        'OversizeHandling': f.get('oversize_handling', 'CONTINUE')
+                    }
+                elif f['type'] == 'HeaderOrder':
+                    field['HeaderOrder'] = {'OversizeHandling':
+                                                f.get('oversize_handling', 'CONTINUE')}
+                elif f['type'] == 'JA3Fingerprint':
+                    field['JA3Fingerprint'] = {'FallbackBehavior':
+                                                   f.get('fallback_behavior', 'MATCH')}
+                redacted_fields.append(field)
+
+        logging_configuration = {
+            'ResourceArn': resource['ARN'],
+            'LogDestinationConfigs': [log_destination_arn],
+            'LogType': log_type,
+            'LogScope': log_scope
+        }
+
+        if redacted_fields:
+            logging_configuration['RedactedFields'] = redacted_fields
+
+        if logging_filter:
+            logging_configuration['LoggingFilter'] = logging_filter
+
+        if managed_by_firewall_manager:
+            logging_configuration['ManagedByFirewallManager'] = managed_by_firewall_manager
+
+        client.put_logging_configuration(LoggingConfiguration=logging_configuration)
+        self.log.info(f"Enabled logging for WAFv2 WebACL: {resource['Name']} ({resource['ARN']})")
