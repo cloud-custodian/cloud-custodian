@@ -165,8 +165,6 @@ class KafkaTest(BaseTest):
         self.assertEqual(resources[1]['ClusterType'], 'SERVERLESS')
 
 
-
-
 class TestKafkaClusterConfiguration(BaseTest):
     def test_kafka_configuration_delete(self):
         session_factory = self.replay_flight_data("test_kafka_configuration_delete")
