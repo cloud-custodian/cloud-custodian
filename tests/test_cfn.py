@@ -213,7 +213,7 @@ class TestCFN(BaseTest):
                 "MyBucket": {
                     "Type": "AWS::S3::Bucket",
                     "Properties": {
-                        "BucketName": "c7n-access-key-test-bucket-one"
+                        "BucketName": "c7n-access-key-test-bucket"
                     }
                 }
             },

@@ -1,5 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import json
 import logging
 import re
 
@@ -219,7 +220,6 @@ class CloudFormationRemoveTag(RemoveTag):
         for s in stacks:
             _tag_stack(client, s, remove=keys)
 
-
 @CloudFormation.filter_registry.register('template')
 class CloudFormationTemplateFilter(Filter):
     """Filter CloudFormation stacks based on their template body
@@ -239,12 +239,16 @@ class CloudFormationTemplateFilter(Filter):
                 query: API_KEY[0-9A-Z]
 
     :param query: The regular expression pattern to search for within the template
+    :param change-set-name: The name of the change set to retrieve the template for
+    :param template-stage: The stage of the template to retrieve ('Original' or 'Processed')
     """
 
     schema = type_schema(
         'template',
         required=['query'],
         query={'type': 'string'},
+        change_set_name={'type': 'string'},
+        template_stage={'type': 'string', 'enum': ['Original', 'Processed']}
     )
     permissions = ('cloudformation:GetTemplate',)
 
@@ -252,13 +256,27 @@ class CloudFormationTemplateFilter(Filter):
         client = local_session(self.manager.session_factory).client('cloudformation')
         matched = []
         pattern = self.data.get('query')
+        change_set_name = self.data.get('change_set_name', None)
+        template_stage = self.data.get('template_stage', "Processed")
 
         regex = re.compile(pattern)
 
         for r in resources:
             stack_id = r['StackId']
-            response = client.get_template(StackName=stack_id)
+            params = {'StackName': stack_id}
+
+            if change_set_name:
+                params['ChangeSetName'] = change_set_name
+
+            if template_stage:
+                params['TemplateStage'] = template_stage
+
+            response = client.get_template(**params)
             template_body = response.get('TemplateBody')
+
+            # Serialize TemplateBody to a string
+            if isinstance(template_body, dict):
+                template_body = json.dumps(template_body, indent=2)
 
             if regex.search(template_body):
                 matched.append(r)
