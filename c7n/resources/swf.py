@@ -33,7 +33,7 @@ class SimpleWorkflowDomain(QueryResourceManager):
 class SWFConfigurationFilter(ValueFilter):
 
     annotation_key = "c7n:configuration"
-    permissions = ("swf:DescribeDomain")
+    permissions = ("swf:DescribeDomain",)
     schema = type_schema('configuration', rinherit=ValueFilter.schema)
 
     def process(self, resources, event=None):
