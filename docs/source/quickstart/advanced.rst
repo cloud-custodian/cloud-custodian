@@ -48,7 +48,7 @@ When running against multiple regions the output files are placed in a different
 location that when running against a single region.  When generating a report, specify
 multiple regions the same way as with the ``run`` command::
 
-   custodian report -s out --region us-east-1 --region-us-west-1 policy.yml
+   custodian report -s out --region us-east-1 --region us-west-1 policy.yml
 
 A region column will be added to reports generated that include multiple regions to
 indicate which region each row is from.
