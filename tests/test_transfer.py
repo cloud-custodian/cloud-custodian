@@ -17,6 +17,7 @@ class TestTransferServer(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["ServerId"], "s-4a6d521483294bd79")
         self.assertEqual(resources[0]["State"], "ONLINE")
+        self.assertEqual(resources[0]["SecurityPolicyName"], "TransferSecurityPolicy-2020-06")
 
     def test_stop_server(self):
         session_factory = self.replay_flight_data("test_transfer_server_stop")

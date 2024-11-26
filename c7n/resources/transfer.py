@@ -14,7 +14,7 @@ class TransferServer(QueryResourceManager):
         service = 'transfer'
         enum_spec = ('list_servers', 'Servers', {'MaxResults': 60})
         detail_spec = (
-            'describe_server', 'ServerId', 'ServerId', None)
+            'describe_server', 'ServerId', 'ServerId', 'Server')
         id = name = 'ServerId'
         arn_type = "server"
         cfn_type = 'AWS::Transfer::Server'

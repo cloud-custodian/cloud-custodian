@@ -29,6 +29,7 @@ try:
     )
     from c7n_left.providers.terraform.graph import Resolver
     from c7n_left.providers.terraform.filters import Taggable
+    from c7n_left.providers.terraform.variables import VariableResolver
 
     LEFT_INSTALLED = True
 except ImportError:
@@ -635,6 +636,11 @@ def test_graph_merge_function(policy_env):
     resource_types = list(graph.get_resources_by_type("aws_cloudwatch_log_group"))
     log_group = resource_types.pop()[-1][0]
     assert log_group["tags"] == {"Env": "Public", "Component": "application"}
+
+
+def test_variable_type_default():
+    assert VariableResolver.get_type_default("xyz") == ""
+    assert VariableResolver.get_type_default("map of strings") == {}
 
 
 def test_null_tag_value(policy_env):

@@ -13,6 +13,7 @@ from c7n.filters import (
     FilterRegistry, ValueFilter, MetricsFilter, WafV2FilterBase,
     WafClassicRegionalFilterBase)
 from c7n.filters.iamaccess import CrossAccountAccessFilter
+from c7n.filters.policystatement import HasStatementFilter
 from c7n.filters.related import RelatedResourceFilter
 from c7n.manager import resources, ResourceManager
 from c7n import query, utils
@@ -190,6 +191,26 @@ class RestApiCrossAccount(CrossAccountAccessFilter):
                 'Effect': 'Allow',
                 'Principal': '*'}]}
         return policy
+
+
+@RestApi.filter_registry.register('has-statement')
+class HasStatementRestApi(HasStatementFilter):
+
+    permissions = ('apigateway:GET',)
+    policy_attribute = 'policy'
+
+    def get_std_format_args(self, table):
+        return {
+            'api_name': table[self.manager.resource_type.name],
+            'account_id': self.manager.config.account_id,
+            'region': self.manager.config.region,
+        }
+
+    def process(self, resources, event=None):
+        for r in resources:
+            if policy := r.get(self.policy_attribute):
+                r[self.policy_attribute] = policy.replace('\\', '')
+        return super().process(resources, event)
 
 
 @RestApi.action_registry.register('update')
