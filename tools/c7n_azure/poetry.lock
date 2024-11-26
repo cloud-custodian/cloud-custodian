@@ -855,19 +855,20 @@ msrestazure = ">=0.4.32,<2.0.0"
 
 [[package]]
 name = "azure-mgmt-network"
-version = "17.1.0"
+version = "28.0.0"
 description = "Microsoft Azure Network Management Client Library for Python"
 optional = false
-python-versions = "*"
+python-versions = ">=3.8"
 files = [
-    {file = "azure-mgmt-network-17.1.0.zip", hash = "sha256:f47852836a5960447ab534784a9285696969f007744ba030828da2eab92621ab"},
-    {file = "azure_mgmt_network-17.1.0-py2.py3-none-any.whl", hash = "sha256:43a1896c4d674ab28c46e2261f128d3ab7a30bcb19cf806f20ff5bccf95187d9"},
+    {file = "azure_mgmt_network-28.0.0-py3-none-any.whl", hash = "sha256:2ee23c1f2ba75752187bd7f4c3e94ad172282cbf8153694feadc7886ef88493c"},
+    {file = "azure_mgmt_network-28.0.0.tar.gz", hash = "sha256:40356d348ef4838324f19a41cd80340b4f8dd4ac2f0a18a4cbd5cc95ef2974f3"},
 ]
 
 [package.dependencies]
-azure-common = ">=1.1,<2.0"
-azure-mgmt-core = ">=1.2.0,<2.0.0"
-msrest = ">=0.5.0"
+azure-common = ">=1.1"
+azure-mgmt-core = ">=1.3.2"
+isodate = ">=0.6.1"
+typing-extensions = ">=4.6.0"
 
 [[package]]
 name = "azure-mgmt-nspkg"
@@ -2832,4 +2833,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "d22bac50978fe2a0229b5dd68aed857013441c75dd35028576c0201813f8deb9"
+content-hash = "e81507eead1a64332b30d9db3336351d8bc23b91160263ab39ac293107bd65b2"
