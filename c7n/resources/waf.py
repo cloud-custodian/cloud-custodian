@@ -326,16 +326,15 @@ class EnableWAFV2Logging(BaseAction):
         redacted_fields_data = self.data.get('redacted_fields', [])
 
         for r in resources:
-            self.enable_logging(client, r, log_destination_arn, redacted_fields_data)
+            self.enable_waf_logging(client, r, log_destination_arn, redacted_fields_data)
 
-    def enable_logging(self, client, resource, log_destination_arn, redacted_fields_data=None,
+    def enable_waf_logging(self, client, resource, log_destination_arn, redacted_fields_data=None,
                        managed_by_firewall_manager=False, logging_filter=None,
                        log_type="WAF_LOGS", log_scope=None):
         """
-        Enable logging for a WAFv2 WebACL, incorporating all put_logging_configuration parameters.
+        Enable logging for a WAFv2 WebACL
         """
 
-        # Validate log_scope
         valid_log_scopes = ["CUSTOMER", "SECURITY_LAKE"]
         if log_scope and log_scope not in valid_log_scopes:
             raise ValueError(f"Invalid log_scope value: {log_scope}."
