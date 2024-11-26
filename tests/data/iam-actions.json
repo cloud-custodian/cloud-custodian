@@ -8097,7 +8097,6 @@
     "GetInvitationsCount",
     "GetMalwareProtectionPlan",
     "GetMalwareScanSettings",
-    "GetMasterAccount",
     "GetMemberDetectors",
     "GetMembers",
     "GetOrganizationStatistics",

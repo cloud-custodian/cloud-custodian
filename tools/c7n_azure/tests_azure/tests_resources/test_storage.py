@@ -668,6 +668,26 @@ class StorageTest(BaseTest):
         resources = p.run()
         self.assertEqual(1, len(resources))
 
+    def test_storage_management_policy_rules_filter(self):
+        p = self.load_policy({
+            'name': 'test-azure-mp-rules',
+            'resource': 'azure.storage',
+            'filters': [{
+                'type': 'management-policy-rules',
+                'attrs': [{
+                    'type': 'value',
+                    'key': 'definition.actions.baseBlob.delete.daysAfterModificationGreaterThan',
+                    'value': 3,
+                    'op': 'le'
+                }]
+            }]
+        }, validate=True)
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+        self.assertEqual(resources[0]['name'], 'cloudcustodiantest')
+        self.assertEqual(len(resources[0]['c7n:management-policy-rules']), 1)
+        self.assertEqual(resources[0]['c7n:management-policy-rules'][0]['name'], 'test')
+
 
 class StorageFirewallFilterTest(BaseTest):
 
