@@ -220,6 +220,7 @@ class CloudFormationRemoveTag(RemoveTag):
         for s in stacks:
             _tag_stack(client, s, remove=keys)
 
+
 @CloudFormation.filter_registry.register('template')
 class CloudFormationTemplateFilter(Filter):
     """Filter CloudFormation stacks based on their template body
