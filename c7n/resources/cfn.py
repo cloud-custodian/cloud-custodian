@@ -1,11 +1,14 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import json
 import logging
+import re
 
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 
 from c7n.actions import BaseAction
+from c7n.filters import Filter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema
@@ -213,7 +216,70 @@ class CloudFormationRemoveTag(RemoveTag):
               - type: remove-tag
                 tags: ['DesiredTag']
     """
-
     def process_resource_set(self, client, stacks, keys):
         for s in stacks:
             _tag_stack(client, s, remove=keys)
+
+
+@CloudFormation.filter_registry.register('template')
+class CloudFormationTemplateFilter(Filter):
+    """Filter CloudFormation stacks based on their template body
+
+    This filter retrieves the CloudFormation template for each stack and
+    searches for the regex pattern provided in the template
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: detect-api-keys-in-templates
+            resource: cfn
+            filters:
+              - type: template
+                pattern: "API_KEY[0-9A-Z]"
+
+    :param pattern: The regular expression pattern to search for within the template
+    :param change-set-name: The name of the change set to retrieve the template for
+    :param template-stage: The stage of the template to retrieve ('Original' or 'Processed')
+    """
+
+    schema = type_schema(
+        'template',
+        required=['pattern'],
+        pattern={'type': 'string'},
+        change_set_name={'type': 'string'},
+        template_stage={'type': 'string', 'enum': ['Original', 'Processed']}
+    )
+    permissions = ('cloudformation:GetTemplate',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('cloudformation')
+        matched = []
+        pattern = self.data.get('pattern')
+        change_set_name = self.data.get('change_set_name', None)
+        template_stage = self.data.get('template_stage', "Processed")
+
+        regex = re.compile(pattern)
+
+        for r in resources:
+            stack_id = r['StackId']
+            params = {'StackName': stack_id}
+
+            if change_set_name:
+                params['ChangeSetName'] = change_set_name
+
+            if template_stage:
+                params['TemplateStage'] = template_stage
+
+            response = client.get_template(**params)
+            template_body = response.get('TemplateBody')
+
+            # Serialize TemplateBody to a string
+            if isinstance(template_body, dict):
+                template_body = json.dumps(template_body, indent=2)
+
+            if regex.search(template_body):
+                matched.append(r)
+
+        return matched

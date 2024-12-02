@@ -1,0 +1,11 @@
+{
+    "status_code": 200,
+    "data": {
+        "TemplateBody": "Metadata:\n  API_KEY: API_KEY123456789\nResources:\n  MyBucket:\n    Properties:\n      BucketName: c7n-access-key-test-bucket\n    Type: AWS::S3::Bucket\n",
+        "StagesAvailable": [
+            "Original",
+            "Processed"
+        ],
+        "ResponseMetadata": {}
+    }
+}
