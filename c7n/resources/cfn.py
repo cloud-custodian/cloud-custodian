@@ -239,7 +239,7 @@ class CloudFormationTemplateFilter(Filter):
               - type: template
                 pattern: "API_KEY[0-9A-Z]"
 
-    :param query: The regular expression pattern to search for within the template
+    :param pattern: The regular expression pattern to search for within the template
     :param change-set-name: The name of the change set to retrieve the template for
     :param template-stage: The stage of the template to retrieve ('Original' or 'Processed')
     """
