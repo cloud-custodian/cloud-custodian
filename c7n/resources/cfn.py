@@ -237,7 +237,7 @@ class CloudFormationTemplateFilter(Filter):
             resource: cfn
             filters:
               - type: template
-                query: API_KEY[0-9A-Z]
+                pattern: "API_KEY[0-9A-Z]"
 
     :param query: The regular expression pattern to search for within the template
     :param change-set-name: The name of the change set to retrieve the template for
@@ -246,8 +246,8 @@ class CloudFormationTemplateFilter(Filter):
 
     schema = type_schema(
         'template',
-        required=['query'],
-        query={'type': 'string'},
+        required=['pattern'],
+        pattern={'type': 'string'},
         change_set_name={'type': 'string'},
         template_stage={'type': 'string', 'enum': ['Original', 'Processed']}
     )
