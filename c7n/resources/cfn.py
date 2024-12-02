@@ -256,7 +256,7 @@ class CloudFormationTemplateFilter(Filter):
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('cloudformation')
         matched = []
-        pattern = self.data.get('query')
+        pattern = self.data.get('pattern')
         change_set_name = self.data.get('change_set_name', None)
         template_stage = self.data.get('template_stage', "Processed")
 

@@ -243,7 +243,7 @@ class TestCFN(BaseTest):
                 "filters": [
                     {
                         "type": "template",
-                        "query": "API_KEY[0-9A-Z]",
+                        "pattern": "API_KEY[0-9A-Z]",
                     }
                 ]
             },
