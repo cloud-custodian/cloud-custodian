@@ -1,0 +1,8 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "FileSystemId": "fs-00a56cc8f138d4765",
+        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"WhatIsIt\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":[\"elasticfilesystem:DescribeFileSystemPolicy\",\"elasticfilesystem:DescribeFileSystems\"],\"Resource\":\"arn:aws:elasticfilesystem:us-east-1:644160558196:file-system/fs-00a56cc8f138d4765\"}]}"
+    }
+}
