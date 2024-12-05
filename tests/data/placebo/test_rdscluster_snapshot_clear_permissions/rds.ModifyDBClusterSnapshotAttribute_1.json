@@ -1,0 +1,15 @@
+{
+    "status_code": 200,
+    "data": {
+        "DBClusterSnapshotAttributesResult": {
+            "DBClusterSnapshotIdentifier": "test",
+            "DBClusterSnapshotAttributes": [
+                {
+                    "AttributeName": "restore",
+                    "AttributeValues": []
+                }
+            ]
+        },
+        "ResponseMetadata": {}
+    }
+}

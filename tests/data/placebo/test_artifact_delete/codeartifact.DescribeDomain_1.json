@@ -1,0 +1,16 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+	"domain": {
+            "name": "pizzaspace",
+            "owner": "644160558196",
+            "arn": "arn:aws:codeartifact:us-east-1:644160558196:domain/pizzaspace",
+            "status": "Active",
+            "createdTime": "2020-09-12T09:56:59.849000-04:00",
+            "encryptionKey": "arn:aws:kms:us-east-1:644160558196:key/a46cfc7a-5490-42d3-95b4-4e1b2f2de3c8",
+            "repositoryCount": 1,
+            "assetSizeBytes": 0
+	}
+    }
+}

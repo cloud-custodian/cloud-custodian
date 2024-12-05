@@ -1,0 +1,10 @@
+{
+    "status_code": 200,
+    "data": {
+        "TableNames": [
+            "c7n-cross-account",
+            "test-1"
+        ],
+        "ResponseMetadata": {}
+    }
+}

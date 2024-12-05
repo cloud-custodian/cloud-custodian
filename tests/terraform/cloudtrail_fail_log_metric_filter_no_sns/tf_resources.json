@@ -1,0 +1,266 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_caller_identity": {
+            "current": {
+                "account_id": "644160558196",
+                "arn": "arn:aws:sts::644160558196:assumed-role/AWSReservedSSO_AWSAdministratorAccess_32be95b7471a99e1/sonny@stacklet.io",
+                "id": "644160558196",
+                "user_id": "AROAXYCHC33BTMJIK3JOU:sonny@stacklet.io"
+            }
+        },
+        "aws_region": {
+            "current": {
+                "description": "US East (N. Virginia)",
+                "endpoint": "ec2.us-east-1.amazonaws.com",
+                "id": "us-east-1",
+                "name": "us-east-1"
+            }
+        },
+        "aws_cloudtrail": {
+            "fail-cloudtrail": {
+                "advanced_event_selector": [],
+                "arn": "arn:aws:cloudtrail:us-east-1:644160558196:trail/fail-tf-trail-9059",
+                "cloud_watch_logs_group_arn": "arn:aws:logs:us-east-1:644160558196:log-group:fail-cloudtrail-test-group20221121222631391600000001:*",
+                "cloud_watch_logs_role_arn": "arn:aws:iam::644160558196:role/cloudtrail_cloudwatch_role-fail20221121222632062300000004",
+                "enable_log_file_validation": false,
+                "enable_logging": true,
+                "event_selector": [
+                    {
+                        "data_resource": [
+                            {
+                                "type": "AWS::S3::Object",
+                                "values": [
+                                    "arn:aws:s3:::fail-trail-test-bucket-testing20221121222631400900000002/"
+                                ]
+                            }
+                        ],
+                        "exclude_management_event_sources": null,
+                        "include_management_events": true,
+                        "read_write_type": "All"
+                    }
+                ],
+                "home_region": "us-east-1",
+                "id": "fail-tf-trail-9059",
+                "include_global_service_events": true,
+                "insight_selector": [],
+                "is_multi_region_trail": true,
+                "is_organization_trail": false,
+                "kms_key_id": "",
+                "name": "fail-tf-trail-9059",
+                "s3_bucket_name": "fail-trail-test-bucket-testing20221121222631400900000002",
+                "s3_key_prefix": "",
+                "sns_topic_name": "",
+                "tags": {
+                    "c7n": "true"
+                },
+                "tags_all": {
+                    "c7n": "true"
+                }
+            }
+        },
+        "aws_cloudwatch_log_group": {
+            "log-group-fail": {
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:fail-cloudtrail-test-group20221121222631391600000001",
+                "id": "fail-cloudtrail-test-group20221121222631391600000001",
+                "kms_key_id": "",
+                "name": "fail-cloudtrail-test-group20221121222631391600000001",
+                "name_prefix": "fail-cloudtrail-test-group",
+                "retention_in_days": 0,
+                "skip_destroy": false,
+                "tags": {
+                    "c7n": "true"
+                },
+                "tags_all": {
+                    "c7n": "true"
+                }
+            }
+        },
+        "aws_cloudwatch_log_metric_filter": {
+            "fail-metric-filter": {
+                "id": "test-filter-name-fail",
+                "log_group_name": "fail-cloudtrail-test-group20221121222631391600000001",
+                "metric_transformation": [
+                    {
+                        "default_value": "",
+                        "dimensions": null,
+                        "name": "no_mfa_console_signin_metric_fail",
+                        "namespace": "ImportantMetrics",
+                        "unit": "None",
+                        "value": "1"
+                    }
+                ],
+                "name": "test-filter-name-fail",
+                "pattern": "{ ($.eventName = ConsoleLogin) && ($.additionalEventData.MFAUsed != Yes) }"
+            }
+        },
+        "aws_cloudwatch_log_stream": {
+            "fail-log-stream": {
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:fail-cloudtrail-test-group20221121222631391600000001:log-stream:532725030595_CloudTrail_us-east-1",
+                "id": "532725030595_CloudTrail_us-east-1",
+                "log_group_name": "fail-cloudtrail-test-group20221121222631391600000001",
+                "name": "532725030595_CloudTrail_us-east-1"
+            }
+        },
+        "aws_cloudwatch_metric_alarm": {
+            "metric-alarm-fail": {
+                "actions_enabled": true,
+                "alarm_actions": null,
+                "alarm_description": "",
+                "alarm_name": "NoMFAConsoleLoginAlarm_fail_9059",
+                "arn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:NoMFAConsoleLoginAlarm_fail_9059",
+                "comparison_operator": "GreaterThanThreshold",
+                "datapoints_to_alarm": 1,
+                "dimensions": null,
+                "evaluate_low_sample_count_percentiles": "",
+                "evaluation_periods": 1,
+                "extended_statistic": "",
+                "id": "NoMFAConsoleLoginAlarm_fail_9059",
+                "insufficient_data_actions": null,
+                "metric_name": "no_mfa_console_signin_metric_fail",
+                "metric_query": [],
+                "namespace": "ImportantMetrics",
+                "ok_actions": null,
+                "period": 60,
+                "statistic": "Sum",
+                "tags": {
+                    "c7n": "true"
+                },
+                "tags_all": {
+                    "c7n": "true"
+                },
+                "threshold": 0,
+                "threshold_metric_id": "",
+                "treat_missing_data": "missing",
+                "unit": ""
+            }
+        },
+        "aws_iam_policy": {
+            "testing-policy-fail": {
+                "arn": "arn:aws:iam::644160558196:policy/fail-testing-trailtest_policy20221121222631790700000003",
+                "description": "cloudtrail role policy",
+                "id": "arn:aws:iam::644160558196:policy/fail-testing-trailtest_policy20221121222631790700000003",
+                "name": "fail-testing-trailtest_policy20221121222631790700000003",
+                "name_prefix": "fail-testing-trailtest_policy",
+                "path": "/",
+                "policy": "{\"Statement\":[{\"Action\":[\"logs:CreateLogStream\",\"logs:PutLogEvents\"],\"Effect\":\"Allow\",\"Resource\":\"*\"}],\"Version\":\"2012-10-17\"}",
+                "policy_id": "ANPAXYCHC33B5AJJ3Z72Q",
+                "tags": {
+                    "c7n": "true"
+                },
+                "tags_all": {
+                    "c7n": "true"
+                }
+            }
+        },
+        "aws_iam_role": {
+            "fail-cloudtrail-cloudwatch-role": {
+                "arn": "arn:aws:iam::644160558196:role/cloudtrail_cloudwatch_role-fail20221121222632062300000004",
+                "assume_role_policy": "{\"Statement\":[{\"Action\":\"sts:AssumeRole\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"cloudtrail.amazonaws.com\"}}],\"Version\":\"2012-10-17\"}",
+                "create_date": "2022-11-21T22:26:32Z",
+                "description": "",
+                "force_detach_policies": false,
+                "id": "cloudtrail_cloudwatch_role-fail20221121222632062300000004",
+                "inline_policy": [],
+                "managed_policy_arns": [],
+                "max_session_duration": 3600,
+                "name": "cloudtrail_cloudwatch_role-fail20221121222632062300000004",
+                "name_prefix": "cloudtrail_cloudwatch_role-fail",
+                "path": "/",
+                "permissions_boundary": null,
+                "tags": {
+                    "c7n": "true"
+                },
+                "tags_all": {
+                    "c7n": "true"
+                },
+                "unique_id": "AROAXYCHC33BVZOKT6TAH"
+            }
+        },
+        "aws_iam_role_policy_attachment": {
+            "fail-cloudtrail-cloudwatch-role-policy-attachment": {
+                "id": "cloudtrail_cloudwatch_role-fail20221121222632062300000004-20221121222632773200000005",
+                "policy_arn": "arn:aws:iam::644160558196:policy/fail-testing-trailtest_policy20221121222631790700000003",
+                "role": "cloudtrail_cloudwatch_role-fail20221121222632062300000004"
+            }
+        },
+        "aws_s3_bucket": {
+            "fail-bucket": {
+                "acceleration_status": "",
+                "acl": null,
+                "arn": "arn:aws:s3:::fail-trail-test-bucket-testing20221121222631400900000002",
+                "bucket": "fail-trail-test-bucket-testing20221121222631400900000002",
+                "bucket_domain_name": "fail-trail-test-bucket-testing20221121222631400900000002.s3.amazonaws.com",
+                "bucket_prefix": "fail-trail-test-bucket-testing",
+                "bucket_regional_domain_name": "fail-trail-test-bucket-testing20221121222631400900000002.s3.amazonaws.com",
+                "cors_rule": [],
+                "force_destroy": true,
+                "grant": [
+                    {
+                        "id": "07941fb2b9ec4c72bfc4f5f5ca58a61bf9268ded440c7fa1ef081f2511e87d2f",
+                        "permissions": [
+                            "FULL_CONTROL"
+                        ],
+                        "type": "CanonicalUser",
+                        "uri": ""
+                    }
+                ],
+                "hosted_zone_id": "Z3AQBSTGFYJSTF",
+                "id": "fail-trail-test-bucket-testing20221121222631400900000002",
+                "lifecycle_rule": [],
+                "logging": [],
+                "object_lock_configuration": [],
+                "object_lock_enabled": false,
+                "policy": "",
+                "region": "us-east-1",
+                "replication_configuration": [],
+                "request_payer": "BucketOwner",
+                "server_side_encryption_configuration": [],
+                "tags": {
+                    "c7n": "true"
+                },
+                "tags_all": {
+                    "c7n": "true"
+                },
+                "timeouts": null,
+                "versioning": [
+                    {
+                        "enabled": false,
+                        "mfa_delete": false
+                    }
+                ],
+                "website": [],
+                "website_domain": null,
+                "website_endpoint": null
+            }
+        },
+        "aws_s3_bucket_policy": {
+            "fail-policy": {
+                "bucket": "fail-trail-test-bucket-testing20221121222631400900000002",
+                "id": "fail-trail-test-bucket-testing20221121222631400900000002",
+                "policy": "{\n    \"Version\": \"2012-10-17\",\n    \"Statement\": [\n        {\n            \"Sid\": \"AWSCloudTrailAclCheck20150319\",\n            \"Effect\": \"Allow\",\n            \"Principal\": {\n                \"Service\": \"cloudtrail.amazonaws.com\"\n            },\n            \"Action\": \"s3:GetBucketAcl\",\n            \"Resource\": \"arn:aws:s3:::fail-trail-test-bucket-testing20221121222631400900000002\",\n            \"Condition\": {\n                \"StringEquals\": {\n                    \"AWS:SourceArn\": \"arn:aws:cloudtrail:us-east-1:644160558196:trail/fail-tf-trail-9059\"\n                }\n            }\n        },\n        {\n            \"Sid\": \"AWSCloudTrailWrite20150319\",\n            \"Effect\": \"Allow\",\n            \"Principal\": {\n                \"Service\": \"cloudtrail.amazonaws.com\"\n            },\n            \"Action\": \"s3:PutObject\",\n            \"Resource\": \"arn:aws:s3:::fail-trail-test-bucket-testing20221121222631400900000002/*\",\n            \"Condition\": {\n                \"StringEquals\": {\n                    \"AWS:SourceArn\": \"arn:aws:cloudtrail:us-east-1:644160558196:trail/fail-tf-trail-9059\",\n                    \"s3:x-amz-acl\": \"bucket-owner-full-control\"\n                }\n            }\n        }\n    ]\n}\n"
+            }
+        },
+        "aws_s3_bucket_public_access_block": {
+            "fail-bucket-block": {
+                "block_public_acls": true,
+                "block_public_policy": true,
+                "bucket": "fail-trail-test-bucket-testing20221121222631400900000002",
+                "id": "fail-trail-test-bucket-testing20221121222631400900000002",
+                "ignore_public_acls": true,
+                "restrict_public_buckets": true
+            }
+        },
+        "random_integer": {
+            "trail": {
+                "id": "9059",
+                "keepers": null,
+                "max": 50000,
+                "min": 1,
+                "result": 9059,
+                "seed": null
+            }
+        }
+    }
+}

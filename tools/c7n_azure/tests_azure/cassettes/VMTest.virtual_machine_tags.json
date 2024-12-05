@@ -1,0 +1,406 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/virtualMachines?api-version=2020-12-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-original-request-ids": [
+                        "a123c795-4d10-49bd-a0e5-30eae437eccd",
+                        "df32c994-5a91-482c-a475-b49fbd400adf"
+                    ],
+                    "date": [
+                        "Mon, 24 May 2021 14:43:19 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "7019"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "name": "cctestvm",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm",
+                                "type": "Microsoft.Compute/virtualMachines",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "testtag": "testvalue",
+                                    "schedule": "on=(M-U,8);off=(M-U,18);tz=pt"
+                                },
+                                "properties": {
+                                    "vmId": "f6a6b9b2-9b99-45b0-8a18-025998fc74d0",
+                                    "hardwareProfile": {
+                                        "vmSize": "Standard_A1_v2"
+                                    },
+                                    "storageProfile": {
+                                        "imageReference": {
+                                            "publisher": "Canonical",
+                                            "offer": "UbuntuServer",
+                                            "sku": "16.04.0-LTS",
+                                            "version": "latest",
+                                            "exactVersion": "16.04.202104290"
+                                        },
+                                        "osDisk": {
+                                            "osType": "Linux",
+                                            "name": "cctestvm_OsDisk_1_517889dc284d4327990247d6d933e390",
+                                            "createOption": "FromImage",
+                                            "caching": "ReadWrite",
+                                            "managedDisk": {
+                                                "storageAccountType": "Standard_LRS",
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_517889dc284d4327990247d6d933e390"
+                                            },
+                                            "diskSizeGB": 30
+                                        },
+                                        "dataDisks": [
+                                            {
+                                                "lun": 0,
+                                                "name": "cctestvm_disk2_c891bbcef098417b9c9eaed9b8af5e86",
+                                                "createOption": "Empty",
+                                                "caching": "None",
+                                                "managedDisk": {
+                                                    "storageAccountType": "Standard_LRS",
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_disk2_c891bbcef098417b9c9eaed9b8af5e86"
+                                                },
+                                                "diskSizeGB": 1023,
+                                                "toBeDetached": false
+                                            }
+                                        ]
+                                    },
+                                    "osProfile": {
+                                        "computerName": "vmmilaytvhe7nwq",
+                                        "adminUsername": "testuser",
+                                        "linuxConfiguration": {
+                                            "disablePasswordAuthentication": false,
+                                            "patchSettings": {
+                                                "patchMode": "ImageDefault"
+                                            }
+                                        },
+                                        "secrets": []
+                                    },
+                                    "networkProfile": {
+                                        "networkInterfaces": [
+                                            {
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic"
+                                            }
+                                        ]
+                                    },
+                                    "diagnosticsProfile": {
+                                        "bootDiagnostics": {
+                                            "enabled": true,
+                                            "storageUri": "https://milaytvhe7nwqsalinuxvm.blob.core.windows.net/"
+                                        }
+                                    },
+                                    "provisioningState": "Succeeded"
+                                },
+                                "resources": [
+                                    {
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm/extensions/script1"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/virtualMachines?api-version=2020-12-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-original-request-ids": [
+                        "3129ed5e-c6b0-4b72-9de8-810c93621251",
+                        "2bef5201-70d5-4348-844b-07bee330503c"
+                    ],
+                    "date": [
+                        "Mon, 24 May 2021 14:43:22 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "7019"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "name": "erinvm",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/ERIN/providers/Microsoft.Compute/virtualMachines/erinvm",
+                                "type": "Microsoft.Compute/virtualMachines",
+                                "location": "centralus",
+                                "tags": {
+                                    "Function": "Works"
+                                },
+                                "properties": {
+                                    "vmId": "03934a52-9025-44fa-b7d6-29a43d21fd3a",
+                                    "hardwareProfile": {
+                                        "vmSize": "Standard_B1ls"
+                                    },
+                                    "storageProfile": {
+                                        "imageReference": {
+                                            "publisher": "Canonical",
+                                            "offer": "UbuntuServer",
+                                            "sku": "18.04-LTS",
+                                            "version": "latest",
+                                            "exactVersion": "18.04.202101290"
+                                        },
+                                        "osDisk": {
+                                            "osType": "Linux",
+                                            "name": "erinvm_OsDisk_1_426c2bbdcfa94699a7461c1bf6e843f6",
+                                            "createOption": "FromImage",
+                                            "caching": "ReadWrite",
+                                            "managedDisk": {
+                                                "storageAccountType": "Premium_LRS",
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/erin/providers/Microsoft.Compute/disks/erinvm_OsDisk_1_426c2bbdcfa94699a7461c1bf6e843f6"
+                                            },
+                                            "diskSizeGB": 30
+                                        },
+                                        "dataDisks": []
+                                    },
+                                    "osProfile": {
+                                        "computerName": "erinvm",
+                                        "adminUsername": "azureuser",
+                                        "linuxConfiguration": {
+                                            "disablePasswordAuthentication": true,
+                                            "ssh": {
+                                                "publicKeys": [
+                                                    {
+                                                        "path": "/home/azureuser/.ssh/authorized_keys",
+                                                        "keyData": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCrwvuw0D6bumrQ29hMlXevFuhn\r\nzqZKh7yVwqXCFpJt4nsvmDL4GbdZuaIcZUU2omHJM8UlW9I1ar+IuDO9u9CZuok7\r\n/6KpZn5/C5TvTt69BvqvP1eMldCWk6FAxKjxICjqHwr9a/KJWe9zCziEKUBR/nCf\r\nU/05NDGwkttVyqcaeogG3f8MKnOmzrkKudVUvuUDoFXtypaJkDs6Veoax3YqkZ//\r\nlmbtyHCc1IhC7Wl97RFmHHc6521nyxPXCHQHDGhRMrtAOXV+OQwa9hk2RnYlPnoJ\r\nECZ/LpKJpOjpEb8AoQB55Zu0itZwohXYAnvXF+sb1xe23WV67zakwaq0+ljMGGk7\r\ngL/0FdmC76jVy40t+EMS3jagRzOjIoqdzZH/g0sqNeUvtG9VdA/uPwUqn64ZRsvB\r\nNGXPLf2G02S6UvRFqCFO2ilVgS1Wr/S0fkNcjE3wghkwgqXcB3lVkefzfN9U241t\r\nsl/ueBVtE5WOSfzIJ3B5t3FJwuO/oYFepAn/G0c= generated-by-azure\r\n"
+                                                    }
+                                                ]
+                                            },
+                                            "provisionVMAgent": true,
+                                            "patchSettings": {
+                                                "patchMode": "ImageDefault"
+                                            }
+                                        },
+                                        "secrets": [],
+                                        "allowExtensionOperations": true,
+                                        "requireGuestProvisionSignal": true
+                                    },
+                                    "networkProfile": {
+                                        "networkInterfaces": [
+                                            {
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/erin/providers/Microsoft.Network/networkInterfaces/erinvm761"
+                                            }
+                                        ]
+                                    },
+                                    "diagnosticsProfile": {
+                                        "bootDiagnostics": {
+                                            "enabled": true
+                                        }
+                                    },
+                                    "provisioningState": "Succeeded"
+                                },
+                                "zones": [
+                                    "1"
+                                ],
+                                "resources": [
+                                    {
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/ERIN/providers/Microsoft.Compute/virtualMachines/erinvm/extensions/OmsAgentForLinux"
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "stefanvm",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/STEFAN/providers/Microsoft.Compute/virtualMachines/stefanvm",
+                                "type": "Microsoft.Compute/virtualMachines",
+                                "location": "centralus",
+                                "identity": {
+                                    "type": "SystemAssigned",
+                                    "principalId": "513cf7d8-7f02-4edb-a66c-eeff06b63ac4",
+                                    "tenantId": "00000000-0000-0000-0000-000000000003"
+                                },
+                                "properties": {
+                                    "vmId": "078f2d6a-5ad8-4061-98de-cef497cf0fcc",
+                                    "hardwareProfile": {
+                                        "vmSize": "Standard_D2s_v3"
+                                    },
+                                    "storageProfile": {
+                                        "imageReference": {
+                                            "publisher": "canonical",
+                                            "offer": "0001-com-ubuntu-server-focal",
+                                            "sku": "20_04-lts",
+                                            "version": "latest",
+                                            "exactVersion": "20.04.202105130"
+                                        },
+                                        "osDisk": {
+                                            "osType": "Linux",
+                                            "name": "stefanvm_OsDisk_1_d74edd8dc091445c95c343aa26d8d3b0",
+                                            "createOption": "FromImage",
+                                            "caching": "ReadWrite",
+                                            "managedDisk": {
+                                                "storageAccountType": "Premium_LRS",
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/stefan/providers/Microsoft.Compute/disks/stefanvm_OsDisk_1_d74edd8dc091445c95c343aa26d8d3b0"
+                                            },
+                                            "diskSizeGB": 30
+                                        },
+                                        "dataDisks": []
+                                    },
+                                    "osProfile": {
+                                        "computerName": "stefanvm",
+                                        "adminUsername": "stefangordon",
+                                        "linuxConfiguration": {
+                                            "disablePasswordAuthentication": true,
+                                            "ssh": {
+                                                "publicKeys": [
+                                                    {
+                                                        "path": "/home/stefangordon/.ssh/authorized_keys",
+                                                        "keyData": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDS/HbjMl4A7hiflAY+h0ZKf5QJ\r\nbl8L5mZ+0BNX9K8U2FxzigeNvwmnNnSVOBcReSE1d4MK8b89+zj6YiLBqj+sbdPN\r\nEqdFvnfinEIODlSojoDGPGeS2TLYqA+74hs24mzDw/7M5DhEkP+5MiNTQ/+mL+EJ\r\n9mcGL3LC0WweCNsavX/qopy7BydmznEyIcBXUqfanq1PxwxrWhmHFK649XOooplZ\r\n+NF3cROadwxAutnlJu1GvABptOQ7Aw6sjuYZbegL/iLeAGhPdzAUZEgGFkkF0qCi\r\n37yrtlE7kaBWmPwdiL0c8kImIHO8mj/5uxuRwiJYwC2rLPwjDhV4DrFGtm/0NgO0\r\nJm7VnpCzFyT3wHoKeVt8vKslEQlkrJCNaLcvk6lLbHjdfIgtt161Loj1gZmyMZQi\r\nyjyadoJOTWx5ZzylvB/U2MmA03wf5qDn/NcFyr706xwqksH1miAXuRd5B7lG9jSO\r\n+2fCehfrmGBFVpIWkNVMJEzgx/TbxHTENwKmccs= generated-by-azure\r\n"
+                                                    }
+                                                ]
+                                            },
+                                            "provisionVMAgent": true,
+                                            "patchSettings": {
+                                                "patchMode": "ImageDefault"
+                                            }
+                                        },
+                                        "secrets": [],
+                                        "allowExtensionOperations": true,
+                                        "requireGuestProvisionSignal": true
+                                    },
+                                    "networkProfile": {
+                                        "networkInterfaces": [
+                                            {
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/stefan/providers/Microsoft.Network/networkInterfaces/stefanvm542"
+                                            }
+                                        ]
+                                    },
+                                    "diagnosticsProfile": {
+                                        "bootDiagnostics": {
+                                            "enabled": true
+                                        }
+                                    },
+                                    "provisioningState": "Succeeded",
+                                    "priority": "Spot",
+                                    "evictionPolicy": "Deallocate",
+                                    "billingProfile": {
+                                        "maxPrice": -1.0
+                                    }
+                                },
+                                "resources": [
+                                    {
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/STEFAN/providers/Microsoft.Compute/virtualMachines/stefanvm/extensions/CustomScript"
+                                    },
+                                    {
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/STEFAN/providers/Microsoft.Compute/virtualMachines/stefanvm/extensions/OmsAgentForLinux"
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "cctestvm",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm",
+                                "type": "Microsoft.Compute/virtualMachines",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "testtag": "testvalue",
+                                    "schedule": "on=(M-U,8);off=(M-U,18);tz=pt"
+                                },
+                                "properties": {
+                                    "vmId": "f6a6b9b2-9b99-45b0-8a18-025998fc74d0",
+                                    "hardwareProfile": {
+                                        "vmSize": "Standard_A1_v2"
+                                    },
+                                    "storageProfile": {
+                                        "imageReference": {
+                                            "publisher": "Canonical",
+                                            "offer": "UbuntuServer",
+                                            "sku": "16.04.0-LTS",
+                                            "version": "latest",
+                                            "exactVersion": "16.04.202104290"
+                                        },
+                                        "osDisk": {
+                                            "osType": "Linux",
+                                            "name": "cctestvm_OsDisk_1_517889dc284d4327990247d6d933e390",
+                                            "createOption": "FromImage",
+                                            "caching": "ReadWrite",
+                                            "managedDisk": {
+                                                "storageAccountType": "Standard_LRS",
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_517889dc284d4327990247d6d933e390"
+                                            },
+                                            "diskSizeGB": 30
+                                        },
+                                        "dataDisks": [
+                                            {
+                                                "lun": 0,
+                                                "name": "cctestvm_disk2_c891bbcef098417b9c9eaed9b8af5e86",
+                                                "createOption": "Empty",
+                                                "caching": "None",
+                                                "managedDisk": {
+                                                    "storageAccountType": "Standard_LRS",
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_disk2_c891bbcef098417b9c9eaed9b8af5e86"
+                                                },
+                                                "diskSizeGB": 1023,
+                                                "toBeDetached": false
+                                            }
+                                        ]
+                                    },
+                                    "osProfile": {
+                                        "computerName": "vmmilaytvhe7nwq",
+                                        "adminUsername": "testuser",
+                                        "linuxConfiguration": {
+                                            "disablePasswordAuthentication": false,
+                                            "patchSettings": {
+                                                "patchMode": "ImageDefault"
+                                            }
+                                        },
+                                        "secrets": []
+                                    },
+                                    "networkProfile": {
+                                        "networkInterfaces": [
+                                            {
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic"
+                                            }
+                                        ]
+                                    },
+                                    "diagnosticsProfile": {
+                                        "bootDiagnostics": {
+                                            "enabled": true,
+                                            "storageUri": "https://milaytvhe7nwqsalinuxvm.blob.core.windows.net/"
+                                        }
+                                    },
+                                    "provisioningState": "Succeeded"
+                                },
+                                "resources": [
+                                    {
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm/extensions/script1"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

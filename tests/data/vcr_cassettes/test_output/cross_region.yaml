@@ -1,0 +1,162 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Connection:
+      - close
+      Host:
+      - s3.us-west-2.amazonaws.com
+      User-Agent:
+      - Python-urllib/3.10
+    method: HEAD
+    uri: https://s3.us-west-2.amazonaws.com/slack.cloudcustodian.io
+  response:
+    body:
+      string: ''
+    headers:
+      Connection:
+      - close
+      Content-Type:
+      - application/xml
+      Date:
+      - Thu, 16 Feb 2023 19:52:09 GMT
+      Server:
+      - AmazonS3
+      x-amz-bucket-region:
+      - us-east-1
+      x-amz-id-2:
+      - MkXiMw1yTeyVvSEbKz0u+mt98At8XaW2X11amisH7vcIr8983i+EiZ7csCsyndmNdZJs7aOWpMI=
+      x-amz-request-id:
+      - 8DGDM3HQBFKE238B
+    status:
+      code: 301
+      message: Moved Permanently
+- request:
+    body: null
+    headers:
+      Connection:
+      - close
+      Host:
+      - s3.us-west-2.amazonaws.com
+      User-Agent:
+      - Python-urllib/3.10
+    method: HEAD
+    uri: https://s3.us-west-2.amazonaws.com/slack.cloudcustodian.io
+  response:
+    body:
+      string: ''
+    headers:
+      Connection:
+      - close
+      Content-Type:
+      - application/xml
+      Date:
+      - Thu, 16 Feb 2023 19:54:12 GMT
+      Server:
+      - AmazonS3
+      x-amz-bucket-region:
+      - us-east-1
+      x-amz-id-2:
+      - tfwwGq2B5HoIFQ862G1hI3Oju5/inpw3+BRlDqbpZCgR6HyWXh9Y2xa5hPoRmH3S7WlcTJjci0M=
+      x-amz-request-id:
+      - YNH9286KRVVN4694
+    status:
+      code: 301
+      message: Moved Permanently
+- request:
+    body: null
+    headers:
+      Connection:
+      - close
+      Host:
+      - s3.us-west-2.amazonaws.com
+      User-Agent:
+      - Python-urllib/3.10
+    method: HEAD
+    uri: https://s3.us-west-2.amazonaws.com/slack.cloudcustodian.io
+  response:
+    body:
+      string: ''
+    headers:
+      Connection:
+      - close
+      Content-Type:
+      - application/xml
+      Date:
+      - Thu, 16 Feb 2023 19:55:23 GMT
+      Server:
+      - AmazonS3
+      x-amz-bucket-region:
+      - us-east-1
+      x-amz-id-2:
+      - zJrNdEMDQNmGSLSzoCCN2idTVcODWw3MwwgtFtKLa7NkVBepEZ9yqK8SUgYBrMJT4bNNuJCioJ8=
+      x-amz-request-id:
+      - JZT2F8K3JB00AMK8
+    status:
+      code: 301
+      message: Moved Permanently
+- request:
+    body: null
+    headers:
+      Connection:
+      - close
+      Host:
+      - s3.us-west-2.amazonaws.com
+      User-Agent:
+      - Python-urllib/3.10
+    method: HEAD
+    uri: https://s3.us-west-2.amazonaws.com/slack.cloudcustodian.io
+  response:
+    body:
+      string: ''
+    headers:
+      Connection:
+      - close
+      Content-Type:
+      - application/xml
+      Date:
+      - Thu, 16 Feb 2023 19:57:20 GMT
+      Server:
+      - AmazonS3
+      x-amz-bucket-region:
+      - us-east-1
+      x-amz-id-2:
+      - iBf20guJUvSFI6lBuVcIatIF65zv37698qytK47kiMT40jh3+gVSFEZMnNnqslVzrWB1ZXn3/fI=
+      x-amz-request-id:
+      - 25XQ74ST20F0M8H3
+    status:
+      code: 301
+      message: Moved Permanently
+- request:
+    body: null
+    headers:
+      Connection:
+      - close
+      Host:
+      - s3.us-west-2.amazonaws.com
+      User-Agent:
+      - Python-urllib/3.10
+    method: HEAD
+    uri: https://s3.us-west-2.amazonaws.com/slack.cloudcustodian.io
+  response:
+    body:
+      string: ''
+    headers:
+      Connection:
+      - close
+      Content-Type:
+      - application/xml
+      Date:
+      - Thu, 16 Feb 2023 19:57:29 GMT
+      Server:
+      - AmazonS3
+      x-amz-bucket-region:
+      - us-east-1
+      x-amz-id-2:
+      - /+Kqysguj3jBVzyBenGhpXCmHTlh1SuEJKdY03zQOPBQzsY8LYlBawCl2Buk+iy77nz0ytsyPSg=
+      x-amz-request-id:
+      - E1PGBG8RFDGK3C9F
+    status:
+      code: 301
+      message: Moved Permanently
+version: 1

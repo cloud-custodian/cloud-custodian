@@ -1,0 +1,32 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "MountTargets": [
+            {
+                "OwnerId": "644160558196",
+                "MountTargetId": "fsmt-0fca46e06dcfff8e2",
+                "FileSystemId": "fs-017557a9f00b1bec9",
+                "SubnetId": "subnet-914763e7",
+                "LifeCycleState": "available",
+                "IpAddress": "172.31.14.29",
+                "NetworkInterfaceId": "eni-0fdd63701abdf11c2",
+                "AvailabilityZoneId": "use1-az4",
+                "AvailabilityZoneName": "us-east-1a",
+                "VpcId": "vpc-d2d616b5"
+            },
+            {
+                "OwnerId": "644160558196",
+                "MountTargetId": "fsmt-0fcbb40c868d404e8",
+                "FileSystemId": "fs-017557a9f00b1bec9",
+                "SubnetId": "subnet-efbcccb7",
+                "LifeCycleState": "available",
+                "IpAddress": "172.31.29.132",
+                "NetworkInterfaceId": "eni-0f028fdc238330d73",
+                "AvailabilityZoneId": "use1-az6",
+                "AvailabilityZoneName": "us-east-1b",
+                "VpcId": "vpc-d2d616b5"
+            }
+        ]
+    }
+}

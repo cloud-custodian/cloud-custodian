@@ -1,0 +1,126 @@
+{
+    "eventVersion": "1.08",
+    "userIdentity": {
+        "type": "Root",
+        "principalId": "659775036450",
+        "arn": "arn:aws:iam::659775036450:root",
+        "accountId": "659775036450",
+        "accessKeyId": "ASIAZTHNIDQRCD53GXGD",
+        "sessionContext": {
+            "sessionIssuer": {},
+            "webIdFederationData": {},
+            "attributes": {
+                "creationDate": "2024-03-22T23:10:19Z",
+                "mfaAuthenticated": "true"
+            }
+        }
+    },
+    "eventTime": "2024-03-23T00:28:16Z",
+    "eventSource": "appmesh.amazonaws.com",
+    "eventName": "CreateVirtualNode",
+    "awsRegion": "us-east-1",
+    "sourceIPAddress": "81.100.136.98",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
+    "requestParameters": {
+        "virtualNodeName": "vn3",
+        "meshName": "m1",
+        "spec": {
+            "serviceDiscovery": {
+                "dns": {
+                    "hostname": "vn3.hostname"
+                }
+            },
+            "listeners": [
+                {
+                    "portMapping": {
+                        "port": 321,
+                        "protocol": "http"
+                    }
+                }
+            ],
+            "backends": [],
+            "backendDefaults": {
+                "clientPolicy": {
+                    "tls": {
+                        "enforce": false,
+                        "ports": [],
+                        "validation": {
+                            "trust": {
+                                "file": {
+                                    "certificateChain": "/the/capath"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "logging": {}
+        },
+        "clientToken": "42ca0c77-d0e7-4d75-a4b2-9b14127b73fb",
+        "meshOwner": "659775036450"
+    },
+    "responseElements": {
+        "virtualNode": {
+            "meshName": "m1",
+            "virtualNodeName": "vn3",
+            "spec": {
+                "serviceDiscovery": {
+                    "dns": {
+                        "hostname": "vn3.hostname"
+                    }
+                },
+                "listeners": [
+                    {
+                        "portMapping": {
+                            "port": 321,
+                            "protocol": "http"
+                        }
+                    }
+                ],
+                "backends": [],
+                "backendDefaults": {
+                    "clientPolicy": {
+                        "tls": {
+                            "enforce": false,
+                            "ports": [],
+                            "validation": {
+                                "trust": {
+                                    "file": {
+                                        "certificateChain": "/the/capath"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "logging": {}
+            },
+            "metadata": {
+                "arn": "arn:aws:appmesh:us-east-1:659775036450:mesh/m1/virtualNode/vn1",
+                "version": 1,
+                "uid": "01169a61-9127-4c69-ba3d-41a9ddfbe432",
+                "createdAt": "Mar 23, 2024, 12:28:16 AM",
+                "lastUpdatedAt": "Mar 23, 2024, 12:28:16 AM",
+                "meshOwner": "659775036450",
+                "resourceOwner": "659775036450"
+            },
+            "status": {
+                "status": "ACTIVE"
+            }
+        }
+    },
+    "requestID": "e58b1d71-1475-49d4-b879-a7d9a3543099",
+    "eventID": "e3ea18ad-9f89-4833-9051-ba2ea1430553",
+    "readOnly": false,
+    "eventType": "AwsApiCall",
+    "apiVersion": "2019-01-25",
+    "managementEvent": true,
+    "recipientAccountId": "659775036450",
+    "eventCategory": "Management",
+    "tlsDetails": {
+        "tlsVersion": "TLSv1.3",
+        "cipherSuite": "TLS_AES_128_GCM_SHA256",
+        "clientProvidedHostHeader": "appmesh.us-east-1.amazonaws.com"
+    },
+    "sessionCredentialFromConsole": "true"
+}

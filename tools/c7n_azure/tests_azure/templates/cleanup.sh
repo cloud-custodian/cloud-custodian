@@ -60,6 +60,11 @@ delete_policy_assignment() {
     echo "Delete for policy assignment complete"
 }
 
+delete_cognitive_services() {
+    echo "Delete for cog services started"
+    az resource delete --ids /subscriptions/${AZURE_SUBSCRIPTION_ID}/providers/Microsoft.CognitiveServices/locations/global/resourceGroups/test_cognitive-service/deletedAccounts/cctest-cog-serv
+    echo "Delete for cog services complete"
+}
 
 function should_cleanup() {
     if [[ ${cleanup_all} -eq 1 ]]; then
@@ -95,6 +100,12 @@ should_cleanup "policy"
 # Destroy Azure Policy Assignment
 if [[ $? -eq 1 ]]; then
     delete_policy_assignment &
+fi
+
+should_cleanup "cognitive-service"
+# Destroy Azure Cog Services Soft Delete
+if [[ $? -eq 1 ]]; then
+    delete_cognitive_services &
 fi
 
 # Wait until all cleanup is finished

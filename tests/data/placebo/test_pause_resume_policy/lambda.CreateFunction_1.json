@@ -1,0 +1,30 @@
+{
+    "status_code": 201,
+    "data": {
+        "ResponseMetadata": {},
+        "FunctionName": "custodian-test",
+        "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-test",
+        "Runtime": "python3.8",
+        "Role": "arn:aws:iam::644160558196:role/custodian-mu",
+        "Handler": "custodian_policy.run",
+        "CodeSize": 493693,
+        "Description": "cloud-custodian lambda policy",
+        "Timeout": 900,
+        "MemorySize": 512,
+        "LastModified": "2021-10-19T00:35:12.014+0000",
+        "CodeSha256": "Efc1kYGlUgHp97kELzzuKa1O8iJngAugyL6w/dK5zow=",
+        "Version": "7",
+        "VpcConfig": {
+            "SubnetIds": [],
+            "SecurityGroupIds": [],
+            "VpcId": ""
+        },
+        "TracingConfig": {
+            "Mode": "PassThrough"
+        },
+        "RevisionId": "23887d2f-ddb1-4e6d-86fe-5647eabd6c34",
+        "State": "Active",
+        "LastUpdateStatus": "Successful",
+        "PackageType": "Zip"
+    }
+}

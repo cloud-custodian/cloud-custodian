@@ -1,0 +1,26 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:cloudfront::123456789012:distribution/E2NIUPD85HMA1Z",
+                "Tags": []
+            },
+            {
+                "ResourceARN": "arn:aws:cloudfront::123456789012:distribution/EDE3N9QJR1AWP",
+                "Tags": [
+                    {
+                        "Key": "name",
+                        "Value": "cfb-wyzcrudc"
+                    },
+                    {
+                        "Key": "TEST_ID",
+                        "Value": "905B6EFF-61E1-4D54-BB2E-F5F73047F62D"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,145 @@
+{
+    "status_code": 200,
+    "data": {
+        "VpcEndpoints": [
+            {
+                "VpcEndpointId": "vpce-04a4c8e2145cb966e",
+                "VpcEndpointType": "Interface",
+                "VpcId": "vpc-d2d616b5",
+                "ServiceName": "com.amazonaws.vpce.us-east-1.vpce-svc-0caf1c7342f032f18",
+                "State": "available",
+                "PolicyDocument": "{\n  \"Statement\": [\n    {\n      \"Action\": \"*\", \n      \"Effect\": \"Allow\", \n      \"Principal\": \"*\", \n      \"Resource\": \"*\"\n    }\n  ]\n}",
+                "RouteTableIds": [],
+                "SubnetIds": [
+                    "subnet-3a334610",
+                    "subnet-efbcccb7"
+                ],
+                "Groups": [
+                    {
+                        "GroupId": "sg-6c7fa917",
+                        "GroupName": "default"
+                    }
+                ],
+                "PrivateDnsEnabled": false,
+                "RequesterManaged": true,
+                "NetworkInterfaceIds": [
+                    "eni-009c64280f9096586",
+                    "eni-6441605581967e01c"
+                ],
+                "DnsEntries": [
+                    {
+                        "DnsName": "vpce-04a4c8e2145cb966e-mt4iyi9i.vpce-svc-0caf1c7342f032f18.us-east-1.vpce.amazonaws.com",
+                        "HostedZoneId": "Z7HUB22UULQXV"
+                    },
+                    {
+                        "DnsName": "vpce-04a4c8e2145cb966e-mt4iyi9i-us-east-1d.vpce-svc-0caf1c7342f032f18.us-east-1.vpce.amazonaws.com",
+                        "HostedZoneId": "Z7HUB22UULQXV"
+                    },
+                    {
+                        "DnsName": "vpce-04a4c8e2145cb966e-mt4iyi9i-us-east-1b.vpce-svc-0caf1c7342f032f18.us-east-1.vpce.amazonaws.com",
+                        "HostedZoneId": "Z7HUB22UULQXV"
+                    }
+                ],
+                "CreationTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 10,
+                    "day": 20,
+                    "hour": 10,
+                    "minute": 53,
+                    "second": 39,
+                    "microsecond": 0
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "c7n"
+                    }
+                ],
+                "OwnerId": "644160558196"
+            },
+            {
+                "VpcEndpointId": "vpce-0bc8bcfcc74fa2db9",
+                "VpcEndpointType": "Gateway",
+                "VpcId": "vpc-072f438c953672ace",
+                "ServiceName": "com.amazonaws.us-east-1.s3",
+                "State": "available",
+                "PolicyDocument": "{\"Version\":\"2008-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"*\",\"Resource\":\"*\"}]}",
+                "RouteTableIds": [
+                    "rtb-0b0e2aef9dd3d7580",
+                    "rtb-09e9ec4e3854addd7"
+                ],
+                "SubnetIds": [],
+                "Groups": [],
+                "PrivateDnsEnabled": false,
+                "RequesterManaged": false,
+                "NetworkInterfaceIds": [],
+                "DnsEntries": [],
+                "CreationTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 4,
+                    "day": 28,
+                    "hour": 20,
+                    "minute": 52,
+                    "second": 11,
+                    "microsecond": 0
+                },
+                "Tags": [],
+                "OwnerId": "644160558196"
+            },
+            {
+                "VpcEndpointId": "vpce-08ff0494faf0210d3",
+                "VpcEndpointType": "Interface",
+                "VpcId": "vpc-072f438c953672ace",
+                "ServiceName": "com.amazonaws.us-east-1.athena",
+                "State": "available",
+                "PolicyDocument": "{\n    \"Statement\": [\n        {\n            \"Action\": \"*\",\n            \"Effect\": \"Allow\",\n            \"Resource\": \"*\",\n            \"Principal\": \"*\"\n        }\n    ]\n}",
+                "RouteTableIds": [],
+                "SubnetIds": [
+                    "subnet-068dfbf3f275a6ae8",
+                    "subnet-03ec1a55eadb55221"
+                ],
+                "Groups": [
+                    {
+                        "GroupId": "sg-0d30141b566cfa039",
+                        "GroupName": "default"
+                    }
+                ],
+                "PrivateDnsEnabled": false,
+                "RequesterManaged": false,
+                "NetworkInterfaceIds": [
+                    "eni-01704d489bb6aeb98",
+                    "eni-029615f8fb7a39561"
+                ],
+                "DnsEntries": [
+                    {
+                        "DnsName": "vpce-08ff0494faf0210d3-idd6w0by.athena.us-east-1.vpce.amazonaws.com",
+                        "HostedZoneId": "Z7HUB22UULQXV"
+                    },
+                    {
+                        "DnsName": "vpce-08ff0494faf0210d3-idd6w0by-us-east-1a.athena.us-east-1.vpce.amazonaws.com",
+                        "HostedZoneId": "Z7HUB22UULQXV"
+                    },
+                    {
+                        "DnsName": "vpce-08ff0494faf0210d3-idd6w0by-us-east-1b.athena.us-east-1.vpce.amazonaws.com",
+                        "HostedZoneId": "Z7HUB22UULQXV"
+                    }
+                ],
+                "CreationTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 7,
+                    "day": 7,
+                    "hour": 19,
+                    "minute": 25,
+                    "second": 38,
+                    "microsecond": 0
+                },
+                "Tags": [],
+                "OwnerId": "644160558196"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

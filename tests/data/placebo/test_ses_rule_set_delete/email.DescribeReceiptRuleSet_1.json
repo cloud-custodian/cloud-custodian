@@ -1,0 +1,31 @@
+{
+    "status_code": 200,
+    "data": {
+        "Metadata": {
+            "Name": "test-set",
+            "CreatedTimestamp": {
+                "__class__": "datetime",
+                "year": 2023,
+                "month": 6,
+                "day": 22,
+                "hour": 18,
+                "minute": 37,
+                "second": 9,
+                "microsecond": 607000
+            }
+        },
+        "Rules": [
+            {
+                "Name": "receive-1",
+                "Enabled": true,
+                "TlsPolicy": "Optional",
+                "Recipients": [
+                    "xyz@sample.com"
+                ],
+                "Actions": [],
+                "ScanEnabled": true
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

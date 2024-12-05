@@ -1,0 +1,150 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.DBForMySql/flexibleServers?api-version=2020-07-01-preview",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Tue, 21 Feb 2023 16:59:06 GMT"
+                    ],
+                    "content-length": [
+                        "2898"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "sku": {
+                                    "name": "Standard_B1ms",
+                                    "tier": "Burstable"
+                                },
+                                "properties": {
+                                    "administratorLogin": "azureheights",
+                                    "storageProfile": {
+                                        "storageMB": 20480,
+                                        "storageIops": 360,
+                                        "backupRetentionDays": 7,
+                                        "storageAutogrow": "Enabled",
+                                        "fileStorageSkuName": "Premium_LRS"
+                                    },
+                                    "version": "5.7",
+                                    "state": "Ready",
+                                    "haState": "NotEnabled",
+                                    "fullyQualifiedDomainName": "azureheight.mysql.database.azure.com",
+                                    "sourceServerId": "",
+                                    "publicNetworkAccess": "Enabled",
+                                    "sslEnforcement": "Disabled",
+                                    "haEnabled": "Disabled",
+                                    "availabilityZone": "3",
+                                    "standbyAvailabilityZone": "",
+                                    "earliestRestoreDate": "2023-02-14T16:59:06.5497275+00:00",
+                                    "replicationRole": "None",
+                                    "replicaCapacity": 10,
+                                    "byokEnforcement": "Disabled"
+                                },
+                                "location": "East US",
+                                "tags": {
+                                    "product_id": "13742"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/ska-demo-test/providers/Microsoft.DBforMySQL/flexibleServers/azureheight",
+                                "name": "azureheight",
+                                "type": "Microsoft.DBforMySQL/flexibleServers"
+                            },
+                            {
+                                "sku": {
+                                    "name": "Standard_B1ms",
+                                    "tier": "Burstable"
+                                },
+                                "properties": {
+                                    "administratorLogin": "custodian",
+                                    "storageProfile": {
+                                        "storageMB": 20480,
+                                        "storageIops": 0,
+                                        "backupRetentionDays": 7,
+                                        "storageAutogrow": "Enabled",
+                                        "fileStorageSkuName": "Premium_LRS"
+                                    },
+                                    "version": "5.7",
+                                    "state": "Ready",
+                                    "haState": "NotEnabled",
+                                    "fullyQualifiedDomainName": "cctestmyflexibleserveradeqcukmdv6zs.mysql.database.azure.com",
+                                    "sourceServerId": "",
+                                    "publicNetworkAccess": "Enabled",
+                                    "sslEnforcement": "Disabled",
+                                    "haEnabled": "Disabled",
+                                    "availabilityZone": "3",
+                                    "standbyAvailabilityZone": "",
+                                    "earliestRestoreDate": "2023-02-21T16:32:29.983741+00:00",
+                                    "replicationRole": "None",
+                                    "replicaCapacity": 10,
+                                    "byokEnforcement": "Disabled"
+                                },
+                                "location": "East US",
+                                "tags": {
+                                    "product_id": "13742"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_mysql-flexibleserver/providers/Microsoft.DBforMySQL/flexibleServers/cctestmyflexibleserveradeqcukmdv6zs",
+                                "name": "cctestmyflexibleserveradeqcukmdv6zs",
+                                "type": "Microsoft.DBforMySQL/flexibleServers"
+                            },
+                            {
+                                "sku": {
+                                    "name": "Standard_B1ms",
+                                    "tier": "Burstable"
+                                },
+                                "properties": {
+                                    "administratorLogin": "MTASecureCloud",
+                                    "storageProfile": {
+                                        "storageMB": 20480,
+                                        "storageIops": 360,
+                                        "backupRetentionDays": 7,
+                                        "storageAutogrow": "Enabled",
+                                        "fileStorageSkuName": "Premium_LRS"
+                                    },
+                                    "version": "5.7",
+                                    "state": "Ready",
+                                    "haState": "NotEnabled",
+                                    "fullyQualifiedDomainName": "mysql-test-server-20221213.mysql.database.azure.com",
+                                    "sourceServerId": "",
+                                    "publicNetworkAccess": "Enabled",
+                                    "sslEnforcement": "Disabled",
+                                    "haEnabled": "Disabled",
+                                    "availabilityZone": "2",
+                                    "standbyAvailabilityZone": "",
+                                    "earliestRestoreDate": "2023-02-14T16:59:06.5497275+00:00",
+                                    "replicationRole": "None",
+                                    "replicaCapacity": 10,
+                                    "byokEnforcement": "Disabled"
+                                },
+                                "location": "East US",
+                                "tags": {
+                                    "product_id": "13742"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/stacklet-test-rg-2/providers/Microsoft.DBforMySQL/flexibleServers/mysql-test-server-20221213",
+                                "name": "mysql-test-server-20221213",
+                                "type": "Microsoft.DBforMySQL/flexibleServers"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

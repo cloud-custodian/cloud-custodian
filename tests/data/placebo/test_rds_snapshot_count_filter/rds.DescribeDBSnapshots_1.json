@@ -1,0 +1,155 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200,
+            "RequestId": "9ec20898-2cce-11e6-9e53-995121fda0e7"
+        },
+        "DBSnapshots": [
+            {
+                "Engine": "postgres",
+                "SnapshotCreateTime": {
+                    "hour": 19,
+                    "__class__": "datetime",
+                    "month": 3,
+                    "second": 52,
+                    "microsecond": 776000,
+                    "year": 2022,
+                    "day": 29,
+                    "minute": 4
+                },
+                "AvailabilityZone": "us-east-1b",
+                "PercentProgress": 100,
+                "MasterUsername": "dbadmin",
+                "Encrypted": true,
+                "LicenseModel": "postgresql-license",
+                "StorageType": "gp2",
+                "Status": "available",
+                "VpcId": "vpc-f3581498",
+                "DBSnapshotIdentifier": "abc-restore-final-snapshot-1",
+                "InstanceCreateTime": {
+                    "hour": 3,
+                    "__class__": "datetime",
+                    "month": 3,
+                    "second": 42,
+                    "microsecond": 265000,
+                    "year": 2022,
+                    "day": 8,
+                    "minute": 33
+                },
+                "OptionGroupName": "default:postgres-9-4",
+                "AllocatedStorage": 100,
+                "EngineVersion": "9.4.5",
+                "SnapshotType": "manual",
+                "Port": 5432,
+                "DBInstanceIdentifier": "abc-restore",
+                "TagList": [
+                    {
+                        "Value": "other",
+                        "Key": "workload-type"
+                    },
+                    {
+                        "Value": "test-value-1",
+                        "Key": "test-key"
+                    }
+                ]
+            },
+            {
+                "Engine": "postgres",
+                "SnapshotCreateTime": {
+                    "hour": 19,
+                    "__class__": "datetime",
+                    "month": 3,
+                    "second": 52,
+                    "microsecond": 776000,
+                    "year": 2022,
+                    "day": 28,
+                    "minute": 4
+                },
+                "AvailabilityZone": "us-east-1b",
+                "PercentProgress": 100,
+                "MasterUsername": "dbadmin",
+                "Encrypted": true,
+                "LicenseModel": "postgresql-license",
+                "StorageType": "gp2",
+                "Status": "available",
+                "VpcId": "vpc-f3581498",
+                "DBSnapshotIdentifier": "abc-restore-final-snapshot-2",
+                "InstanceCreateTime": {
+                    "hour": 3,
+                    "__class__": "datetime",
+                    "month": 3,
+                    "second": 42,
+                    "microsecond": 265000,
+                    "year": 2022,
+                    "day": 8,
+                    "minute": 33
+                },
+                "OptionGroupName": "default:postgres-9-4",
+                "AllocatedStorage": 100,
+                "EngineVersion": "9.4.5",
+                "SnapshotType": "manual",
+                "Port": 5432,
+                "DBInstanceIdentifier": "abc-restore",
+                "TagList": [
+                    {
+                        "Value": "other",
+                        "Key": "workload-type"
+                    },
+                    {
+                        "Value": "test-value-2",
+                        "Key": "test-key"
+                    }
+                ]
+            },
+            {
+                "Engine": "postgres",
+                "SnapshotCreateTime": {
+                    "hour": 19,
+                    "__class__": "datetime",
+                    "month": 3,
+                    "second": 52,
+                    "microsecond": 776000,
+                    "year": 2022,
+                    "day": 27,
+                    "minute": 4
+                },
+                "AvailabilityZone": "us-east-1b",
+                "PercentProgress": 100,
+                "MasterUsername": "dbadmin",
+                "Encrypted": true,
+                "LicenseModel": "postgresql-license",
+                "StorageType": "gp2",
+                "Status": "available",
+                "VpcId": "vpc-f3581498",
+                "DBSnapshotIdentifier": "abc-restore-final-snapshot-3",
+                "InstanceCreateTime": {
+                    "hour": 3,
+                    "__class__": "datetime",
+                    "month": 3,
+                    "second": 42,
+                    "microsecond": 265000,
+                    "year": 2022,
+                    "day": 8,
+                    "minute": 33
+                },
+                "OptionGroupName": "default:postgres-9-4",
+                "AllocatedStorage": 100,
+                "EngineVersion": "9.4.5",
+                "SnapshotType": "manual",
+                "Port": 5432,
+                "DBInstanceIdentifier": "abc-restore",
+                "TagList": [
+                    {
+                        "Value": "other",
+                        "Key": "workload-type"
+                    },
+                    {
+                        "Value": "test-value-3",
+                        "Key": "test-key"
+                    }
+                ]
+            }
+        ]
+    }
+}

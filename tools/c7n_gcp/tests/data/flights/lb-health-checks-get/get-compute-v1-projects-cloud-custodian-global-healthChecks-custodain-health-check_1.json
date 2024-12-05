@@ -1,0 +1,37 @@
+{
+  "body": {
+    "kind": "compute#healthCheck", 
+    "description": "", 
+    "timeoutSec": 5, 
+    "type": "TCP", 
+    "checkIntervalSec": 10, 
+    "unhealthyThreshold": 3, 
+    "healthyThreshold": 2, 
+    "tcpHealthCheck": {
+      "proxyHeader": "NONE", 
+      "port": 80
+    }, 
+    "creationTimestamp": "2019-04-29T02:38:47.562-07:00", 
+    "id": "305912909021280456", 
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/healthChecks/custodain-health-check", 
+    "name": "custodain-health-check"
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "477", 
+    "transfer-encoding": "chunked", 
+    "expires": "Fri, 03 May 2019 15:55:34 GMT", 
+    "vary": "Origin, X-Origin", 
+    "-content-encoding": "gzip", 
+    "date": "Fri, 03 May 2019 15:55:34 GMT", 
+    "x-xss-protection": "1; mode=block", 
+    "content-location": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/healthChecks/custodain-health-check?alt=json", 
+    "x-content-type-options": "nosniff", 
+    "server": "GSE", 
+    "etag": "\"l9rbqKQHa5fgXglnFgleW8YW3yE=/8U4zj-tp3tA__EwidIKSCgyD7oo=\"", 
+    "cache-control": "private, max-age=0, must-revalidate, no-transform", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}

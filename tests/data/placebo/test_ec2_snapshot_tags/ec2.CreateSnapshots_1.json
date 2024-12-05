@@ -3,7 +3,7 @@
     "data": {
         "Snapshots": [
             {
-                "Description": "",
+                "Description": "Snapshot Created for i-063c6794763254b51 (Foo)",
                 "Tags": [
                     {
                         "Key": "Stage",
@@ -37,7 +37,7 @@
                 "SnapshotId": "snap-07187bfeb49818609"
             },
             {
-                "Description": "",
+                "Description": "Snapshot Created for i-063c6794763254b51 (Foo)",
                 "Tags": [
                     {
                         "Key": "Stage",
@@ -71,7 +71,7 @@
                 "SnapshotId": "snap-051cf33e858fe7bf7"
             },
             {
-                "Description": "",
+                "Description": "Snapshot Created for i-063c6794763254b51 (Foo)",
                 "Tags": [
                     {
                         "Key": "Stage",

@@ -1,49 +1,18 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
-        "nextToken": "Kwfr0bfVKkYk4OrYazFRiSPBUegOe6vJHiD713515C2p9TytdMv-GwaMxZWwu_Psi55mHUvbSZ5UlbnslJWA1pBS472vhMM7olpDXY3z-0Frbzy0nmxS8txqmuSsi7hA-tpvbiBPJX5BbmOff3mjO_u6MbSH5kk2lbiB-V-Lq57QDXd9r6WjH12fvaU5UzfV8yuQcZzPeokR1hp0s3ZO3aQpFJwgHvFYIv-FWUK_cOQacc3PH0aOZ3Xng3Sqovq3Lh_MBU5JIOQtI-oJpxPfGbJfA7GJ3k6FE8O9mW6UaIO_KgA_2vLJmzE5Kum93dkEK_cR7NDTGd4ACNgZq7VjYIX7aaZNGQDJn4pGI5uIC1Tf8HOwqrZ7RJurBsNzM1CjEjyDhmUyJj4Ex4L6PZHOBUhVdpIh5SRnDYDRc6IDDLw", 
         "logStreams": [
             {
-                "firstEventTimestamp": 1475794494883, 
-                "lastEventTimestamp": 1475794678480, 
-                "creationTime": 1475794490432, 
-                "uploadSequenceToken": "49556672175244671430190678947097366711174030821098004594", 
-                "logStreamName": "2016/10/06/[$LATEST]50e648c275d2442aadaede9365e257ff", 
-                "lastIngestionTime": 1475794681868, 
-                "arn": "arn:aws:logs:us-west-2:644160558196:log-group:/aws/lambda/ec2-instance-type:log-stream:2016/10/06/[$LATEST]50e648c275d2442aadaede9365e257ff", 
-                "storedBytes": 3470
-            }, 
-            {
-                "firstEventTimestamp": 1475794494882, 
-                "lastEventTimestamp": 1475794496148, 
-                "creationTime": 1475794490441, 
-                "uploadSequenceToken": "49559378137029605676309007198270686698225454696244446114", 
-                "logStreamName": "2016/10/06/[$LATEST]56af3afd288f4389bf0508cf2dcfc00f", 
-                "lastIngestionTime": 1475794511197, 
-                "arn": "arn:aws:logs:us-west-2:644160558196:log-group:/aws/lambda/ec2-instance-type:log-stream:2016/10/06/[$LATEST]56af3afd288f4389bf0508cf2dcfc00f", 
-                "storedBytes": 795
-            }, 
-            {
-                "firstEventTimestamp": 1475772890936, 
-                "lastEventTimestamp": 1475773090796, 
-                "creationTime": 1475772889706, 
-                "uploadSequenceToken": "49560151011569771415869364756268269064202472543177677682", 
-                "logStreamName": "2016/10/06/[$LATEST]e9e0941a8cad46c485a9051cc8aba35d", 
-                "lastIngestionTime": 1475773098901, 
-                "arn": "arn:aws:logs:us-west-2:644160558196:log-group:/aws/lambda/ec2-instance-type:log-stream:2016/10/06/[$LATEST]e9e0941a8cad46c485a9051cc8aba35d", 
-                "storedBytes": 3723
+                "logStreamName": "stream1",
+                "creationTime": 1598337794706,
+                "firstEventTimestamp": 1598337799769,
+                "lastEventTimestamp": 1598337799769,
+                "lastIngestionTime": 1598337799829,
+                "uploadSequenceToken": "49609538486258003219375262998828380693436133092895373906",
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:test-log-group:log-stream:stream1",
+                "storedBytes": 0
             }
-        ], 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "dc63229b-a41d-11e6-9255-e3cfb8501926", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "dc63229b-a41d-11e6-9255-e3cfb8501926", 
-                "date": "Sun, 06 Nov 2016 12:38:03 GMT", 
-                "content-length": "1822", 
-                "content-type": "application/x-amz-json-1.1"
-            }
-        }
+        ],
+        "ResponseMetadata": {}
     }
 }

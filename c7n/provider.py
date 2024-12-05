@@ -1,24 +1,16 @@
-# Copyright 2015-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 import abc
 import importlib
+import logging
 
 from c7n.registry import PluginRegistry
 
 
 clouds = PluginRegistry('c7n.providers')
+
+log = logging.getLogger('c7n.providers')
 
 
 class Provider(metaclass=abc.ABCMeta):
@@ -80,14 +72,31 @@ def import_resource_classes(resource_map, resource_types):
         if r not in resource_map:
             not_found.add(r)
             continue
-        rmodule, rclass = resource_map[r].rsplit('.', 1)
+        provider_value = resource_map[r]
+        if isinstance(provider_value, type):
+            continue
+        rmodule, rclass = provider_value.rsplit('.', 1)
         rmods.add(rmodule)
 
+    import_errs = set()
     for rmodule in rmods:
-        mod_map[rmodule] = importlib.import_module(rmodule)
+        try:
+            mod_map[rmodule] = importlib.import_module(rmodule)
+        except ModuleNotFoundError:  # pragma: no cover
+            import_errs.add(rmodule)
+
+    for emod in import_errs:  # pragma: no cover
+        for rtype, rclass in resource_map.items():
+            if emod == rclass.rsplit('.', 1)[0]:
+                log.warning('unable to import %s from %s', rtype, emod)
+                resource_types.remove(rtype)
 
     for rtype in resource_types:
         if rtype in not_found:
+            continue
+        provider_value = resource_map[rtype]
+        if isinstance(provider_value, type):
+            found.append(provider_value)
             continue
         rmodule, rclass = resource_map[rtype].rsplit('.', 1)
         r = getattr(mod_map[rmodule], rclass, None)
@@ -113,6 +122,8 @@ def resources(cloud_provider=None):
 
 
 def get_resource_class(resource_type):
+    if isinstance(resource_type, list):
+        resource_type = resource_type[0]
     if '.' in resource_type:
         provider_name, resource = resource_type.split('.', 1)
     else:

@@ -1,16 +1,5 @@
-# Copyright 2018-2019 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 from gcp_common import BaseTest, event_data
 
@@ -30,6 +19,12 @@ class DnsManagedZoneTest(BaseTest):
 
         managed_zone_resources = policy.run()
         self.assertEqual(managed_zone_resources[0]['name'], managed_zone_name)
+        self.assertEqual(
+            policy.resource_manager.get_urns(managed_zone_resources),
+            [
+                'gcp:dns::cloud-custodian:managed-zone/custodian'
+            ],
+        )
 
     def test_managed_zone_get(self):
         project_id = 'cloud-custodian'
@@ -50,6 +45,31 @@ class DnsManagedZoneTest(BaseTest):
         resources = exec_mode.run(event, None)
 
         self.assertEqual(resources[0]['name'], resource_name)
+        self.assertEqual(
+            policy.resource_manager.get_urns(resources),
+            [
+                'gcp:dns::cloud-custodian:managed-zone/custodian'
+            ],
+        )
+
+    def test_managed_zone_delete(self):
+        project_id = "cloud-custodian"
+        resource_name = "custodian-delete-test"
+
+        factory = self.replay_flight_data('dns-managed-zone-delete')
+        p = self.load_policy(
+            {'name': 'gcp-dns-managed-zone-delete',
+             'resource': 'gcp.dns-managed-zone',
+             'filters': [{'name': resource_name}],
+             'actions': ['delete']},
+            session_factory=factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = p.resource_manager.get_client()
+        result = client.execute_query('list', {"project": project_id})
+        self.assertNotIn(resource_name, result['managedZones'])
 
 
 class DnsPolicyTest(BaseTest):
@@ -67,6 +87,12 @@ class DnsPolicyTest(BaseTest):
 
         policy_resources = policy.run()
         self.assertEqual(policy_resources[0]['name'], policy_name)
+        self.assertEqual(
+            policy.resource_manager.get_urns(policy_resources),
+            [
+                'gcp:dns::cloud-custodian:policy/custodian'
+            ],
+        )
 
     def test_policy_get(self):
         project_id = 'cloud-custodian'
@@ -87,3 +113,35 @@ class DnsPolicyTest(BaseTest):
         resources = exec_mode.run(event, None)
 
         self.assertEqual(resources[0]['name'], policy_name)
+        self.assertEqual(
+            policy.resource_manager.get_urns(resources),
+            [
+                'gcp:dns::cloud-custodian:policy/custodian'
+            ],
+        )
+
+
+class TestDnsResourceRecordsFilter(BaseTest):
+
+    def test_query(self):
+        project_id = 'cloud-custodian'
+        session_factory = self.replay_flight_data(
+            'test-dns-resource-records-filter-query', project_id=project_id)
+
+        policy = self.load_policy(
+            {'name': 'dns-resource-record',
+             'resource': 'gcp.dns-managed-zone',
+             'filters': [{'type': 'records-sets',
+                          'attrs': [{
+                              'type': 'value',
+                              'key': 'type',
+                              'op': 'eq',
+                              'value': 'TXT'
+                          }]
+            }]},
+            session_factory=session_factory)
+
+        policy_resources = policy.run()
+
+        self.assertEqual(len(policy_resources), 1)
+        self.assertEqual(policy_resources[0]['name'], 'zone-277-red')

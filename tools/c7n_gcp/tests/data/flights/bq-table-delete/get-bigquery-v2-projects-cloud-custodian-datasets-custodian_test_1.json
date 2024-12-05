@@ -1,0 +1,55 @@
+{
+  "headers": {
+    "etag": "bRO3xnxRLFHlJHgzjbUSbg==",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Tue, 28 Feb 2023 20:28:03 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "879",
+    "-content-encoding": "gzip",
+    "content-location": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/custodian_test?alt=json"
+  },
+  "body": {
+    "kind": "bigquery#dataset",
+    "etag": "bRO3xnxRLFHlJHgzjbUSbg==",
+    "id": "premise-governance-rd:custodian_test",
+    "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/custodian_test",
+    "datasetReference": {
+      "datasetId": "custodian_test",
+      "projectId": "premise-governance-rd"
+    },
+    "friendlyName": "custodian_test",
+    "description": "",
+    "labels": {
+      "delete_me": "yes"
+    },
+    "access": [
+      {
+        "role": "WRITER",
+        "specialGroup": "projectWriters"
+      },
+      {
+        "role": "OWNER",
+        "specialGroup": "projectOwners"
+      },
+      {
+        "role": "OWNER",
+        "userByEmail": "virendra_agarwal@gcp.matter.mckinsey.cloud"
+      },
+      {
+        "role": "READER",
+        "specialGroup": "projectReaders"
+      }
+    ],
+    "creationTime": "1677600419448",
+    "lastModifiedTime": "1677615937219",
+    "location": "US",
+    "type": "DEFAULT"
+  }
+}

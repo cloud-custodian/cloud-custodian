@@ -1,16 +1,5 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 """
 Python Standard Logging integration with CloudWatch Logs
 
@@ -87,7 +76,7 @@ class CloudWatchLogHandler(logging.Handler):
             logs = retry(
                 client.describe_log_groups,
                 logGroupNamePrefix=self.log_group)['logGroups']
-            if not [l for l in logs if l['logGroupName'] == self.log_group]:
+            if not [lg for lg in logs if lg['logGroupName'] == self.log_group]:
                 retry(client.create_log_group,
                       logGroupName=self.log_group)
         except ClientError as e:

@@ -1,0 +1,33 @@
+{
+    "status_code": 200,
+    "data": {
+        "ScalingPolicies": [
+            {
+                "AutoScalingGroupName": "asg-test-scaling-policy",
+                "PolicyName": "Target Tracking Policy",
+                "PolicyARN": "arn:aws:autoscaling:us-east-1:644160559186:scalingPolicy:7a3f5572-72cb-46b9-9fc1-c8932f1dcf6e:autoScalingGroupName/asg-test-scaling-policy:policyName/Target Tracking Policy",
+                "PolicyType": "TargetTrackingScaling",
+                "StepAdjustments": [],
+                "Alarms": [
+                    {
+                        "AlarmName": "TargetTracking-asg-test-scaling-policy-AlarmHigh-c299652c-6bf7-418a-b170-b7350c03934f",
+                        "AlarmARN": "arn:aws:cloudwatch:us-east-1:644160559186:alarm:TargetTracking-asg-test-scaling-policy-AlarmHigh-c299652c-6bf7-418a-b170-b7350c03934f"
+                    },
+                    {
+                        "AlarmName": "TargetTracking-asg-test-scaling-policy-AlarmLow-de75fd0c-4f7c-4b0f-a36a-8397f4bb1a8d",
+                        "AlarmARN": "arn:aws:cloudwatch:us-east-1:644160559186:alarm:TargetTracking-asg-test-scaling-policy-AlarmLow-de75fd0c-4f7c-4b0f-a36a-8397f4bb1a8d"
+                    }
+                ],
+                "TargetTrackingConfiguration": {
+                    "PredefinedMetricSpecification": {
+                        "PredefinedMetricType": "ASGAverageCPUUtilization"
+                    },
+                    "TargetValue": 50.0,
+                    "DisableScaleIn": false
+                },
+                "Enabled": true
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

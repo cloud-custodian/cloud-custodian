@@ -1,20 +1,10 @@
-# Copyright 2015-2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import collections
 import datetime
 
 from ..azure_common import BaseTest, cassette_name, arm_template
+from c7n.exceptions import PolicyValidationError
 from c7n_azure.resources.sqlserver import SqlServerFirewallRulesFilter, \
     SqlServerFirewallBypassFilter
 from mock import patch, Mock
@@ -103,6 +93,26 @@ class SqlServerTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_data_encryption_filter(self):
+        p = self.load_policy({
+            'name': 'test-azure-sql-server-tde',
+            'resource': 'azure.sql-server',
+            'filters': [
+                {
+                    'type': 'value',
+                    'key': 'name',
+                    'op': 'glob',
+                    'value_type': 'normalize',
+                    'value': 'cfb*'
+                },
+                {
+                    'type': 'transparent-data-encryption',
+                    'key_type': 'CustomerManaged'
+                }],
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_metric_database(self):
         p = self.load_policy({
             'name': 'test-azure-sql-server',
@@ -119,6 +129,29 @@ class SqlServerTest(BaseTest):
                  'aggregation': 'average',
                  'threshold': 10,
                  'timeframe': 72,
+                 'filter': "DatabaseResourceId eq '*'"
+                 }],
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_metric_database_to_zero(self):
+        p = self.load_policy({
+            'name': 'test-azure-sql-server',
+            'resource': 'azure.sqlserver',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value_type': 'normalize',
+                 'value': 'cctestsqlserver*'},
+                {'type': 'metric',
+                 'metric': 'dtu_consumption_percent',
+                 'op': 'equal',
+                 'aggregation': 'minimum',
+                 'threshold': 0,
+                 'timeframe': 72,
+                 'no_data_action': 'to_zero',
                  'filter': "DatabaseResourceId eq '*'"
                  }],
         })
@@ -245,6 +278,145 @@ class SqlServerTest(BaseTest):
         resources = p.run()
         self.assertEqual(1, len(resources))
 
+    @cassette_name('administrators')
+    def test_administrators_filter(self):
+        """
+        It is not practical to programmatically assign AD
+        users/administrators for testing, but a test for missing
+        administrator still verifies most of the code.
+        """
+        p = self.load_policy({
+            'name': 'test-azure-sql-server',
+            'resource': 'azure.sqlserver',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value_type': 'normalize',
+                 'value': 'cctestsqlserver*'},
+                {'type': 'azure-ad-administrators',
+                 'key': 'login',
+                 'value': 'absent'}],
+        })
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+
+    @cassette_name('vulnerability-scan')
+    def test_vulnerability_filter(self):
+        """
+        Vulnerability scans require expensive account level defender
+        subscriptions so we'll only test the negative here.
+        """
+        p = self.load_policy({
+            'name': 'test-azure-sql-server',
+            'resource': 'azure.sqlserver',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value_type': 'normalize',
+                 'value': 'cctestsqlserver*'},
+                {'type': 'vulnerability-assessment',
+                 'enabled': False}],
+        })
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+
+    @cassette_name('vulnerability-scan')
+    def test_vulnerability_filter_value(self):
+        """
+        Vulnerability scans require expensive account level defender
+        subscriptions so we'll only test the negative here.
+        """
+        p = self.load_policy({
+            'name': 'test-azure-sql-server',
+            'resource': 'azure.sqlserver',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value_type': 'normalize',
+                 'value': 'cctestsqlserver*'},
+                {'type': 'vulnerability-assessment',
+                 'key': 'storageContainerPath',
+                 'value': 'absent'}],
+        })
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+
+    def test_vulnerability_filter_validation_fail(self):
+        """
+        Ensure legacy behavior cannot be mixed with ValueFilter behavior
+        """
+        with self.assertRaises(PolicyValidationError):
+            self.load_policy({
+                'name': 'test-azure-sql-server',
+                'resource': 'azure.sqlserver',
+                'filters': [
+                    {'type': 'value',
+                    'key': 'name',
+                    'op': 'glob',
+                    'value_type': 'normalize',
+                    'value': 'cctestsqlserver*'},
+                    {'type': 'vulnerability-assessment',
+                    'key': 'storageContainerPath',
+                    'value': 'absent',
+                    'enabled': True}],
+            })
+
+    @cassette_name('auditing')
+    def test_auditing_filter_enabled(self):
+        p = self.load_policy({
+            'name': 'test-azure-sql-server',
+            'resource': 'azure.sqlserver',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value_type': 'normalize',
+                 'value': 'cctestsqlserver*'},
+                {'type': 'auditing',
+                 'enabled': True}],
+        }, validate=True)
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+
+    @cassette_name('auditing')
+    def test_auditing_filter_value(self):
+        p = self.load_policy({
+            'name': 'test-azure-sql-server',
+            'resource': 'azure.sqlserver',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value_type': 'normalize',
+                 'value': 'cctestsqlserver*'},
+                {'type': 'auditing',
+                 'key': "auditActionsAndGroups[?@=='FAILED_DATABASE_AUTHENTICATION_GROUP']" +
+                        " | length(@)",
+                 'value': 1}],
+        }, validate=True)
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+
+    def test_auditing_policies_filter(self):
+        p = self.load_policy({
+            'name': 'test-azure-auditing-policies',
+            'resource': 'azure.sqlserver',
+            'filters': [{
+                'type': 'auditing-policies',
+                'attrs': [{
+                    'type': 'value',
+                    'key': 'retentionDays',
+                    'value': 7,
+                    'op': 'less-than'
+                }]
+            }]
+        })
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+
 
 class SQLServerFirewallFilterTest(BaseTest):
 
@@ -268,8 +440,18 @@ class SQLServerFirewallFilterTest(BaseTest):
         expected = IPSet(['8.8.8.8', '10.0.0.0/16'])
         self.assertEqual(expected, self._get_filter(rules)._query_rules(self.resource))
 
-    def _get_filter(self, rules, mode='equal'):
-        data = {mode: ['10.0.0.0/8', '127.0.0.1']}
+    def test_query_regular_rules_include_magic(self):
+        rules = [IpRange(start_ip_address='10.0.0.0', end_ip_address='10.0.255.255'),
+                 IpRange(start_ip_address='8.8.8.8', end_ip_address='8.8.8.8'),
+                 IpRange(start_ip_address='0.0.0.0', end_ip_address='0.0.0.0')]
+        expected = IPSet(['8.8.8.8', '10.0.0.0/16', '0.0.0.0'])
+        self.assertEqual(
+            expected,
+            self._get_filter(rules, include_magic=True)._query_rules(self.resource)
+        )
+
+    def _get_filter(self, rules, mode='equal', include_magic=False):
+        data = {mode: ['10.0.0.0/8', '127.0.0.1'], 'include-azure-services': include_magic}
         filter = SqlServerFirewallRulesFilter(data, Mock())
         filter.client = Mock()
         filter.client.firewall_rules.list_by_server.return_value = rules
@@ -398,3 +580,56 @@ class SQLServerFirewallActionTest(BaseTest):
 
         _, args, _ = update.mock_calls[0]
         self.assertIn("test-prefix", args[2])
+
+
+class TestFailoverGroupFilter(BaseTest):
+    def test_failover_query(self):
+        policy = self.load_policy({
+            'name': 'test-azure-sql-server-failover-group-filter',
+            'resource': 'azure.sql-server',
+            'filters': [{
+                'type': 'failover-group',
+                'count': 0,
+                'count_op': 'gt'
+            }],
+        })
+        resources = policy.run()
+        self.assertEqual(2, len(resources))
+        self.assertEqual('293-sql1-green', resources[0]['name'])
+
+
+class SqlServerSecurityAlertPoliciesFilterTest(BaseTest):
+
+    def test_sql_server_security_alert_policies_filter_validate(self):
+        policy = self.load_policy({
+            'name': 'test-azure-sql-server-security-alert-policies',
+            'resource': 'azure.sql-server',
+            'filters': [{
+                'type': 'security-alert-policies',
+                'attrs': [{
+                    'type': 'value',
+                    'key': 'state',
+                    'value': 'Disabled'
+                }]
+            }],
+        }, validate=True)
+        self.assertTrue(policy)
+
+    @arm_template('sqlserver.json')
+    def test_sql_server_security_alert_policies_filter(self):
+        policy = self.load_policy({
+            'name': 'test-azure-sql-server-security-alert-policies',
+            'resource': 'azure.sql-server',
+            'filters': [{
+                'type': 'security-alert-policies',
+                'attrs': [{
+                    'type': 'value',
+                    'key': 'properties.state',
+                    'value': 'Disabled'
+                }]
+            }],
+        })
+        resources = policy.run()
+        self.assertEqual(2, len(resources))
+        self.assertEqual('server-016cisads', resources[0]['name'])
+        self.assertEqual('cctestsqlserverp2fkgne6rt5vw', resources[1]['name'])

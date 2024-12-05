@@ -1,0 +1,14 @@
+{
+    "status_code": 200,
+    "data": {
+        "domainInfos": [
+            {
+                "name": "test-custodian-swf-domain",
+                "status": "REGISTERED",
+                "description": "Test filtering SWF Domain resources via Custodian",
+                "arn": "arn:aws:swf:us-east-1:012345678910:/domain/test-custodian-swf-domain"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

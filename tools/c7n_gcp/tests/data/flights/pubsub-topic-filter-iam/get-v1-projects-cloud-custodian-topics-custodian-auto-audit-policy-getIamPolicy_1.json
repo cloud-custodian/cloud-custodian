@@ -1,0 +1,30 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 09 Aug 2023 22:00:19 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "208",
+    "-content-encoding": "gzip",
+    "content-location": "https://pubsub.googleapis.com/v1/projects/cloud-custodian/topics/custodian-auto-audit-policy:getIamPolicy?alt=json"
+  },
+  "body": {
+    "version": 1,
+    "etag": "BwXYVl/pQcE=",
+    "bindings": [
+      {
+        "role": "roles/pubsub.publisher",
+        "members": [
+          "serviceAccount:cloud-logs@system.gserviceaccount.com"
+        ]
+      }
+    ]
+  }
+}

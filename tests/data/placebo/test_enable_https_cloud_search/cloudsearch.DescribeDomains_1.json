@@ -1,0 +1,40 @@
+{
+    "status_code": 200,
+    "data": {
+        "DomainStatusList": [
+            {
+                "DomainId": "123456789/demo-search",
+                "DomainName": "demo-search",
+                "ARN": "arn:aws:cloudsearch:us-east-1:123456789:domain/demo-search",
+                "Created": true,
+                "Deleted": false,
+                "DocService": {
+                    "Endpoint": "doc-demo-search-xxx.us-east-1.cloudsearch.amazonaws.com"
+                },
+                "SearchService": {
+                    "Endpoint": "search-demo-search-xxx.us-east-1.cloudsearch.amazonaws.com"
+                },
+                "RequiresIndexDocuments": false,
+                "Processing": false,
+                "SearchInstanceType": "search.small",
+                "SearchPartitionCount": 1,
+                "SearchInstanceCount": 1,
+                "Limits": {
+                    "MaximumReplicationCount": 5,
+                    "MaximumPartitionCount": 10
+                }
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "5fcac0-cf65-xxx-839f-0d2237aa70f6",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "5fcac0-xxxx-4c81-839f-0d2237aa70f6",
+                "content-type": "text/xml",
+                "content-length": "1623",
+                "date": "Wed, 01 Dec 2021 16:08:40 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

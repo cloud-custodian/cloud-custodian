@@ -1,16 +1,6 @@
-# Copyright 2017-2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
+import hashlib
 
 from .core import BaseAction
 from c7n import utils
@@ -42,7 +32,7 @@ def remove_statements(match_ids, statements, matched=()):
         elif match_ids == 'matched':
             if s in matched:
                 s_found = True
-        elif s['Sid'] in match_ids:
+        elif 'Sid' in s and s['Sid'] in match_ids:
             s_found = True
         if s_found:
             found.append(s)
@@ -50,6 +40,11 @@ def remove_statements(match_ids, statements, matched=()):
     if not found:
         return None, found
     return statements, found
+
+
+def statement_id(s):
+    # for statements without a sid, use a checksum for identity
+    return hashlib.sha224(utils.dumps(s, indent=0).encode('utf8')).hexdigest()
 
 
 class ModifyPolicyBase(BaseAction):
@@ -108,8 +103,8 @@ class ModifyPolicyBase(BaseAction):
         self.manager = manager
 
     def add_statements(self, policy_statements):
-        current = {s['Sid']: s for s in policy_statements}
-        additional = {s['Sid']: s for s in self.data.get('add-statements', [])}
+        current = {s.get('Sid', statement_id(s)): s for s in policy_statements}
+        additional = {s.get('Sid', statement_id(s)): s for s in self.data.get('add-statements', [])}
         current.update(additional)
         return list(current.values()), bool(additional)
 

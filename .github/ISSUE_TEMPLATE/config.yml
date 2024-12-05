@@ -1,0 +1,14 @@
+blank_issues_enabled: true
+contact_links:
+  - name: AWS
+    url: https://github.com/cloud-custodian/cloud-custodian/discussions/new?category=aws
+    about: Ask a question or request support for using Cloud Custodian on Amazon Web Services
+  - name: Azure
+    url: https://github.com/cloud-custodian/cloud-custodian/discussions/new?category=azure
+    about: Ask a question or request support for using Cloud Custodian on Microsoft Azure
+  - name: GCP
+    url: https://github.com/cloud-custodian/cloud-custodian/discussions/new?category=gcp
+    about: Ask a question or request support for using Cloud Custodian on Google Cloud Platform
+  - name: General Questions
+    url: https://github.com/cloud-custodian/cloud-custodian/discussions/categories/general
+    about: Ask a general questions about Custodian

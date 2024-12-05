@@ -1,16 +1,5 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import logging
 
 from azure.mgmt.resource.resources.models import GenericResource, ResourceGroupPatchable
@@ -47,7 +36,7 @@ class TagHelper:
             # create a PATCH object with only updates to tags
             tags_patch = GenericResource(tags=tags)
 
-            client.resources.update_by_id(resource['id'], api_version, tags_patch)
+            client.resources.begin_update_by_id(resource['id'], api_version, tags_patch)
 
     @staticmethod
     def remove_tags(tag_action, resource, tags_to_delete):
@@ -65,6 +54,7 @@ class TagHelper:
         if tags_exist:
             resource_tags = {key: tags[key] for key in tags if key not in tags_to_delete}
             TagHelper.update_resource_tags(tag_action, resource, resource_tags)
+            return list(tags_to_delete)
 
     @staticmethod
     def add_tags(tag_action, resource, tags_to_add):
@@ -88,6 +78,7 @@ class TagHelper:
         # call the arm resource update method if there are new or updated tags
         if new_or_updated_tags:
             TagHelper.update_resource_tags(tag_action, resource, tags)
+            return tags_to_add
 
     @staticmethod
     def get_tag_value(resource, tag, utf_8=False):

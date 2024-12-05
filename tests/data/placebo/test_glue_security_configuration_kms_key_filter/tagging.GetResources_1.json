@@ -1,0 +1,36 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:kms:us-east-1:0123456789012:key/75d1e7ba-f9c5-46b9-97bc-28e6c834aa49",
+                "Tags": [
+                    {
+                        "Key": "Test",
+                        "Value": "Test"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:kms:us-east-1:0123456789012:key/3f2ab3af-cc4e-427b-b96d-d4356f9764c4",
+                "Tags": [
+                    {
+                        "Key": "Test",
+                        "Value": "Test"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:kms:us-east-1:0123456789012:key/a476e533-b970-4c74-a341-707420ecf59b",
+                "Tags": [
+                    {
+                        "Key": "Test",
+                        "Value": "Test"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

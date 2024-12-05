@@ -1,0 +1,51 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Buckets": [
+            {
+                "Name": "c7ntest-20211227212502652800000001",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 12,
+                    "day": 27,
+                    "hour": 21,
+                    "minute": 25,
+                    "second": 3,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "c7ntest-20211227212502652900000002",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 12,
+                    "day": 27,
+                    "hour": 21,
+                    "minute": 25,
+                    "second": 3,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "c7ntest-20211227212502652900000003",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 12,
+                    "day": 27,
+                    "hour": 21,
+                    "minute": 25,
+                    "second": 3,
+                    "microsecond": 0
+                }
+            }
+        ],
+        "Owner": {
+            "DisplayName": "c7ntest",
+            "ID": "e46bca81657fdc9f58bc5bab457564bb66f16636bd724a9f51d212fa2185a2b0"
+        }
+    }
+}

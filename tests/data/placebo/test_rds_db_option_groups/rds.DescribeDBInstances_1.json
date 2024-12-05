@@ -1,0 +1,377 @@
+{
+    "status_code": 200,
+    "data": {
+        "DBInstances": [
+            {
+                "DBInstanceIdentifier": "database-1",
+                "DBInstanceClass": "db.t3.micro",
+                "Engine": "mysql",
+                "DBInstanceStatus": "available",
+                "MasterUsername": "admin",
+                "Endpoint": {
+                    "Address": "database-1.cfgj9q47wyoq.us-west-2.rds.amazonaws.com",
+                    "Port": 3306,
+                    "HostedZoneId": "Z1PVIF0B656C1W"
+                },
+                "AllocatedStorage": 200,
+                "InstanceCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 11,
+                    "day": 19,
+                    "hour": 3,
+                    "minute": 53,
+                    "second": 18,
+                    "microsecond": 289000
+                },
+                "PreferredBackupWindow": "11:49-12:19",
+                "BackupRetentionPeriod": 7,
+                "DBSecurityGroups": [],
+                "VpcSecurityGroups": [
+                    {
+                        "VpcSecurityGroupId": "sg-0e2ab1caa4c2552aa",
+                        "Status": "active"
+                    }
+                ],
+                "DBParameterGroups": [
+                    {
+                        "DBParameterGroupName": "default.mysql8.0",
+                        "ParameterApplyStatus": "in-sync"
+                    }
+                ],
+                "AvailabilityZone": "us-west-2a",
+                "DBSubnetGroup": {
+                    "DBSubnetGroupName": "default-vpc-0d9dd54496f180583",
+                    "DBSubnetGroupDescription": "Created from the RDS Management Console",
+                    "VpcId": "vpc-0d9dd54496f180583",
+                    "SubnetGroupStatus": "Complete",
+                    "Subnets": [
+                        {
+                            "SubnetIdentifier": "subnet-0668a38519b561c60",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2c"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-002b9ca7a52e3eba9",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2c"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-0ca0141952cc328ff",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2a"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-0920f5ae14cc6f29a",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2b"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-0720860a70192ff45",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2a"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-0d8f4dacc7c028e85",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2c"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-05922ef0bb1cbfcf8",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2b"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-0dbfc1826522cd5c0",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2c"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-03ff340d7be6e0b90",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2b"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-09e1a62f8df076edc",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2a"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-0f558b63fc045c965",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2b"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-035195edf8ec4e4c4",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2a"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        }
+                    ]
+                },
+                "PreferredMaintenanceWindow": "mon:08:07-mon:08:37",
+                "PendingModifiedValues": {},
+                "LatestRestorableTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 11,
+                    "day": 21,
+                    "hour": 17,
+                    "minute": 20,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "MultiAZ": false,
+                "EngineVersion": "8.0.28",
+                "AutoMinorVersionUpgrade": true,
+                "ReadReplicaDBInstanceIdentifiers": [],
+                "LicenseModel": "general-public-license",
+                "OptionGroupMemberships": [
+                    {
+                        "OptionGroupName": "default:mysql-8-0",
+                        "Status": "in-sync"
+                    }
+                ],
+                "PubliclyAccessible": false,
+                "StorageType": "gp2",
+                "DbInstancePort": 0,
+                "StorageEncrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/38db0a99-0bec-40f1-8d65-c73a1a16e83a",
+                "DbiResourceId": "db-WYY6G33SJTXPDRM37WAJIIIIXE",
+                "CACertificateIdentifier": "rds-ca-2019",
+                "DomainMemberships": [],
+                "CopyTagsToSnapshot": true,
+                "MonitoringInterval": 0,
+                "DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:database-1",
+                "IAMDatabaseAuthenticationEnabled": false,
+                "PerformanceInsightsEnabled": false,
+                "DeletionProtection": true,
+                "AssociatedRoles": [],
+                "MaxAllocatedStorage": 1000,
+                "TagList": [],
+                "CustomerOwnedIpEnabled": false,
+                "ActivityStreamStatus": "stopped",
+                "BackupTarget": "region",
+                "NetworkType": "IPV4"
+            },
+            {
+                "DBInstanceIdentifier": "database-2",
+                "DBInstanceClass": "db.m5.xlarge",
+                "Engine": "oracle-ee",
+                "DBInstanceStatus": "available",
+                "MasterUsername": "admin",
+                "DBName": "ORCL",
+                "Endpoint": {
+                    "Address": "database-2.cfgj9q47wyoq.us-west-2.rds.amazonaws.com",
+                    "Port": 1521,
+                    "HostedZoneId": "Z1PVIF0B656C1W"
+                },
+                "AllocatedStorage": 20,
+                "InstanceCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 11,
+                    "day": 19,
+                    "hour": 4,
+                    "minute": 3,
+                    "second": 5,
+                    "microsecond": 784000
+                },
+                "PreferredBackupWindow": "09:11-09:41",
+                "BackupRetentionPeriod": 0,
+                "DBSecurityGroups": [],
+                "VpcSecurityGroups": [
+                    {
+                        "VpcSecurityGroupId": "sg-0e2ab1caa4c2552aa",
+                        "Status": "active"
+                    }
+                ],
+                "DBParameterGroups": [
+                    {
+                        "DBParameterGroupName": "default.oracle-ee-19",
+                        "ParameterApplyStatus": "in-sync"
+                    }
+                ],
+                "AvailabilityZone": "us-west-2b",
+                "DBSubnetGroup": {
+                    "DBSubnetGroupName": "default-vpc-0d9dd54496f180583",
+                    "DBSubnetGroupDescription": "Created from the RDS Management Console",
+                    "VpcId": "vpc-0d9dd54496f180583",
+                    "SubnetGroupStatus": "Complete",
+                    "Subnets": [
+                        {
+                            "SubnetIdentifier": "subnet-0668a38519b561c60",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2c"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-002b9ca7a52e3eba9",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2c"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-0ca0141952cc328ff",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2a"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-0920f5ae14cc6f29a",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2b"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-0720860a70192ff45",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2a"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-0d8f4dacc7c028e85",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2c"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-05922ef0bb1cbfcf8",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2b"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-0dbfc1826522cd5c0",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2c"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-03ff340d7be6e0b90",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2b"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-09e1a62f8df076edc",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2a"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-0f558b63fc045c965",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2b"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-035195edf8ec4e4c4",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2a"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        }
+                    ]
+                },
+                "PreferredMaintenanceWindow": "sun:07:51-sun:08:21",
+                "PendingModifiedValues": {},
+                "MultiAZ": false,
+                "EngineVersion": "19.0.0.0.ru-2022-10.rur-2022-10.r1",
+                "AutoMinorVersionUpgrade": false,
+                "ReadReplicaDBInstanceIdentifiers": [],
+                "LicenseModel": "bring-your-own-license",
+                "OptionGroupMemberships": [
+                    {
+                        "OptionGroupName": "oracle-option-groups",
+                        "Status": "in-sync"
+                    }
+                ],
+                "CharacterSetName": "AL32UTF8",
+                "NcharCharacterSetName": "AL16UTF16",
+                "PubliclyAccessible": false,
+                "StorageType": "gp2",
+                "DbInstancePort": 0,
+                "StorageEncrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/38db0a99-0bec-40f1-8d65-c73a1a16e83a",
+                "DbiResourceId": "db-J2DRHE2A4EM5WQWE5BQKO56Q6U",
+                "CACertificateIdentifier": "rds-ca-2019",
+                "DomainMemberships": [],
+                "CopyTagsToSnapshot": true,
+                "MonitoringInterval": 60,
+                "EnhancedMonitoringResourceArn": "arn:aws:logs:us-west-2:644160558196:log-group:RDSOSMetrics:log-stream:db-J2DRHE2A4EM5WQWE5BQKO56Q6U",
+                "MonitoringRoleArn": "arn:aws:iam::644160558196:role/rds-monitoring-role",
+                "DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:database-2",
+                "IAMDatabaseAuthenticationEnabled": false,
+                "PerformanceInsightsEnabled": false,
+                "DeletionProtection": true,
+                "AssociatedRoles": [],
+                "MaxAllocatedStorage": 1000,
+                "TagList": [],
+                "CustomerOwnedIpEnabled": false,
+                "ActivityStreamStatus": "stopped",
+                "BackupTarget": "region",
+                "NetworkType": "IPV4"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,11 @@
+{
+    "status_code": 404,
+    "data": {
+        "Error": {
+            "Type": "Sender",
+            "Code": "NoSuchEntity",
+            "Message": "The group with name sandbox_developers cannot be found."
+        },
+        "ResponseMetadata": {}
+    }
+}

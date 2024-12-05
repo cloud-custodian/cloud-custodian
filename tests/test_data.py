@@ -1,16 +1,5 @@
-# Copyright 2020 Kapil Thangavelu
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 import json
 import pytest
@@ -71,7 +60,24 @@ def test_load_array_expression(test):
             "query": [{"path": data_path("iam-actions.json"), "key": "account"}],
         }
     )
-    assert p.run() == ["DisableRegion", "EnableRegion", "ListRegions"]
+    assert p.run() == [
+        "AcceptPrimaryEmailUpdate",
+        "CloseAccount",
+        "DeleteAlternateContact",
+        "DisableRegion",
+        "EnableRegion",
+        "GetAccountInformation",
+        "GetAlternateContact",
+        "GetChallengeQuestions",
+        "GetContactInformation",
+        "GetPrimaryEmail",
+        "GetRegionOptStatus",
+        "ListRegions",
+        "PutAlternateContact",
+        "PutChallengeQuestions",
+        "PutContactInformation",
+        "StartPrimaryEmailUpdate"
+    ]
 
 
 def test_disk_bad_path(tmpdir, test):
@@ -99,9 +105,7 @@ def test_dir_missing_glob(tmpdir, test):
 
 
 def test_invalid_static_record(test):
-    with pytest.raises(
-        PolicyValidationError, match="invalid static data source `records`"
-    ):
+    with pytest.raises(PolicyValidationError, match="invalid static data source `records`"):
         test.load_policy(
             {
                 "name": "smack",
@@ -113,11 +117,10 @@ def test_invalid_static_record(test):
 
 
 def test_bad_source(test):
-
     with pytest.raises(PolicyValidationError, match="invalid source dask"):
         test.load_policy(
-            {"name": "snack", "resource": "c7n.data", "source": "dask"},
-            validate=False)
+            {"name": "snack", "resource": "c7n.data", "source": "dask"}, validate=False
+        )
 
 
 def test_provider_initialize(test):

@@ -1,16 +1,5 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 """Salactus, eater of s3 buckets.
 
 queues:
@@ -536,7 +525,7 @@ def get_keys_charset(keys, bid):
     if charset is None:
         raise ValueError(
             "Bucket: %s Failed charset ngram detection %r\n%s" % (
-                bid, "".join(chars)), "\n".join(sorted(keys)))
+                bid, "".join(chars), "\n".join(sorted(keys))))
 
     for n, sset in normalized.items():
         charset = charset.symmetric_difference(sset)
@@ -559,7 +548,7 @@ def detect_partition_strategy(bid, delimiters=('/', '-'), prefix=''):
 
     (contents_key,
      contents_method,
-     continue_tokens) = BUCKET_OBJ_DESC[versioned]
+     _) = BUCKET_OBJ_DESC[versioned]
 
     with bucket_ops(bid, 'detect'):
         keys = set()
@@ -710,7 +699,7 @@ def process_bucket_inventory(bid, inventory_bucket, inventory_prefix):
     """
     log.info("Loading bucket %s keys from inventory s3://%s/%s",
              bid, inventory_bucket, inventory_prefix)
-    account, bucket = bid.split(':', 1)
+    account, _ = bid.split(':', 1)
     region = connection.hget('bucket-regions', bid)
     versioned = bool(int(connection.hget('bucket-versions', bid)))
     session = boto3.Session()
@@ -750,7 +739,7 @@ def process_bucket_iterator(bid, prefix="", delimiter="", **continuation):
         json.loads(connection.hget('bucket-accounts', account)))
     s3 = session.client('s3', region_name=region, config=s3config)
 
-    (contents_key, contents_method, _) = BUCKET_OBJ_DESC[versioned]
+    (_, contents_method, _) = BUCKET_OBJ_DESC[versioned]
 
     params = dict(Bucket=bucket)
     if prefix:

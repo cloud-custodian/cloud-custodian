@@ -1,0 +1,13 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "StreamInfoList": [
+            {
+                "StreamName": "test-video",
+                "StreamARN": "arn:aws:kinesisvideo:us-east-1:123456789012:stream/test-video/1614616058246",
+                "KmsKeyId": "arn:aws:kms:us-east-1:123456789012:alias/aws/lambda"
+            }
+        ]
+    }
+}

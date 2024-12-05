@@ -1,0 +1,29 @@
+{
+    "status_code": 200,
+    "data": {
+        "Sessions": [
+            {
+                "SessionId": "timmy-01cd54a0c8322733a",
+                "Target": "i-04ddf14c18a4d4995",
+                "Status": "Connected",
+                "StartDate": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 8,
+                    "day": 14,
+                    "hour": 15,
+                    "minute": 24,
+                    "second": 58,
+                    "microsecond": 207000
+                },
+                "Owner": "arn:aws:iam::644160558196:user/timmy",
+                "Details": "",
+                "OutputUrl": {
+                    "S3OutputUrl": "",
+                    "CloudWatchOutputUrl": ""
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

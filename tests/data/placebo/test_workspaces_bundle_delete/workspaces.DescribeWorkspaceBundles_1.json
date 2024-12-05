@@ -1,0 +1,46 @@
+{
+    "status_code": 200,
+    "data": {
+        "Bundles": [
+            {
+                "BundleId": "wsb-g0znf3451",
+                "Name": "test",
+                "Owner": "644160558196",
+                "Description": "test",
+                "ImageId": "wsi-f19s7dtsh",
+                "RootStorage": {
+                    "Capacity": "80"
+                },
+                "UserStorage": {
+                    "Capacity": "10"
+                },
+                "ComputeType": {
+                    "Name": "VALUE"
+                },
+                "LastUpdatedTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 3,
+                    "day": 23,
+                    "hour": 14,
+                    "minute": 1,
+                    "second": 43,
+                    "microsecond": 963000
+                },
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 3,
+                    "day": 23,
+                    "hour": 13,
+                    "minute": 58,
+                    "second": 2,
+                    "microsecond": 280000
+                },
+                "State": "AVAILABLE",
+                "BundleType": "REGULAR"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

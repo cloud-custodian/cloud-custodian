@@ -1,0 +1,74 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Functions": [
+            {
+                "FunctionName": "c7n-lambda-edge-new",
+                "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:c7n-lambda-edge-new",
+                "Runtime": "nodejs14.x",
+                "Role": "arn:aws:iam::644160558196:role/CloudCustodianRole",
+                "Handler": "index.handler",
+                "CodeSize": 376,
+                "Description": "Blueprint for returning HTTP redirect implemented in NodeJS.",
+                "Timeout": 1,
+                "MemorySize": 128,
+                "LastModified": "2023-08-30T03:28:55.000+0000",
+                "CodeSha256": "qxW4g+uEr2cGdO3l52WOfSVjv5TdNG6Pd+rj8YJFjAw=",
+                "Version": "$LATEST",
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                },
+                "RevisionId": "6780e2d7-4336-46c1-aba9-f5c6f7aa766a",
+                "PackageType": "Zip",
+                "Architectures": [
+                    "x86_64"
+                ],
+                "EphemeralStorage": {
+                    "Size": 512
+                },
+                "SnapStart": {
+                    "ApplyOn": "None",
+                    "OptimizationStatus": "Off"
+                },
+                "LoggingConfig": {
+                    "LogFormat": "Text",
+                    "LogGroup": "/aws/lambda/c7n-lambda-edge-new"
+                }
+            },
+            {
+                "FunctionName": "test-lambda-edge",
+                "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:test-lambda-edge",
+                "Runtime": "nodejs14.x",
+                "Role": "arn:aws:iam::644160558196:role/CloudCustodianRole",
+                "Handler": "index.handler",
+                "CodeSize": 389,
+                "Description": "Blueprint for modifying CloudFront response header implemented in NodeJS.",
+                "Timeout": 1,
+                "MemorySize": 128,
+                "LastModified": "2023-03-15T01:20:54.053+0000",
+                "CodeSha256": "PRrkU1iZ2meuOdge3XCeQPebrEknjcZlEEMBbMAT70g=",
+                "Version": "$LATEST",
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                },
+                "RevisionId": "7e0c0cd4-45ec-4b9a-a33f-bf2e18d22cbc",
+                "PackageType": "Zip",
+                "Architectures": [
+                    "x86_64"
+                ],
+                "EphemeralStorage": {
+                    "Size": 512
+                },
+                "SnapStart": {
+                    "ApplyOn": "None",
+                    "OptimizationStatus": "Off"
+                },
+                "LoggingConfig": {
+                    "LogFormat": "Text",
+                    "LogGroup": "/aws/lambda/test-lambda-edge"
+                }
+            }
+        ]
+    }
+}

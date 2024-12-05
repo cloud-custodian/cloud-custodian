@@ -1,16 +1,5 @@
-# Copyright 2015-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 """
 Outputs metrics, logs, stats, traces, and structured records across
 a variety of sinks.
@@ -19,22 +8,24 @@ See docs/usage/outputs.rst
 
 """
 import contextlib
-from datetime import datetime
-import json
+import datetime
 import gzip
 import logging
 import os
 import shutil
+import tempfile
 import time
 import uuid
 
+from abc import ABC, abstractmethod
 
 from c7n.exceptions import InvalidOutputConfig
 from c7n.registry import PluginRegistry
-from c7n.utils import parse_url_config
+from c7n.utils import parse_url_config, join_output_path
 
 try:
     import psutil
+
     HAVE_PSUTIL = True
 except ImportError:
     HAVE_PSUTIL = False
@@ -53,7 +44,9 @@ class OutputRegistry(PluginRegistry):
     def select(self, selector, ctx):
         if not selector:
             return self['default'](ctx, {'url': selector})
-        if self.default_protocol and '://' not in selector:
+        if '://' not in selector and selector in self:
+            selector = "{}://".format(selector)
+        elif self.default_protocol and '://' not in selector:
             selector = "{}://{}".format(
                 self.default_protocol, selector)
         for k in self.keys():
@@ -166,7 +159,7 @@ class NullStats:
         """Take a snapshot of the system stats and append to the stack."""
 
     def pop_snapshot(self):
-        """Remove a snapshot from the snack and return a delta of the current stats to it.
+        """Remove a snapshot from the stack and return a delta of the current stats to it.
         """
         return {}
 
@@ -302,7 +295,7 @@ class LogMetrics(Metrics):
     def _format_metric(self, key, value, unit, dimensions):
         d = {
             "MetricName": key,
-            "Timestamp": datetime.now(),
+            "Timestamp": datetime.datetime.now(),
             "Value": value,
             "Unit": unit}
         d["Dimensions"] = [
@@ -339,9 +332,9 @@ class LogOutput:
         return self
 
     def __exit__(self, exc_type=None, exc_value=None, exc_traceback=None):
-        self.leave_log()
         if exc_type is not None:
             log.exception("Error while executing policy")
+        self.leave_log()
 
     def join_log(self):
         self.handler = self.get_handler()
@@ -391,8 +384,33 @@ class NullLog(LogOutput):
         return None
 
 
+class OutputFileHandler(ABC):
+    """Base class for types registered with the blob_outputs registry.
+
+    Provides explicit interface definition for the types.
+
+    The file handlers are treated as context managers.
+    """
+
+    type: str  # Injected by the register method, matches the string type passed.
+    root_dir: str  # The base directory that will hold the output files.
+
+    @abstractmethod
+    def __enter__(self):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def __exit__(self, exc_type=None, exc_value=None, exc_traceback=None):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def write_file(self, rel_path, value):
+        "Write a file at the relative path specified with the value as the content."
+        raise NotImplementedError()
+
+
 @blob_outputs.register('null')
-class NullBlobOutput:
+class NullBlobOutput(OutputFileHandler):
     # default - for unit tests
 
     def __init__(self, ctx, config):
@@ -404,15 +422,18 @@ class NullBlobOutput:
         return "<null blob output>"
 
     def __enter__(self):
-        return
+        "A no-op for the null handler."
 
     def __exit__(self, exc_type=None, exc_value=None, exc_traceback=None):
-        return
+        "A no-op for the null handler."
+
+    def write_file(self, rel_path, value):
+        "A no-op for the null handler."
 
 
 @blob_outputs.register('file')
 @blob_outputs.register('default')
-class DirectoryOutput:
+class DirectoryOutput(OutputFileHandler):
 
     permissions = ()
 
@@ -437,6 +458,10 @@ class DirectoryOutput:
     def __repr__(self):
         return "<%s to dir:%s>" % (self.__class__.__name__, self.root_dir)
 
+    def write_file(self, rel_path, value):
+        with open(os.path.join(self.root_dir, rel_path), 'w') as fh:
+            fh.write(value)
+
     def compress(self):
         # Compress files individually so thats easy to walk them, without
         # downloading tar and extracting.
@@ -458,20 +483,55 @@ class DirectoryOutput:
             'account_id': self.ctx.options.account_id,
             'region': self.ctx.options.region,
             'policy_name': self.ctx.policy.name,
-            'now': datetime.utcnow(),
-            'uuid': str(uuid.uuid4())}
+            'now': datetime.datetime.utcnow(),
+            'uuid': str(uuid.uuid4()),
+        }
         return data
 
-    def get_resource_set(self):
-        record_path = os.path.join(self.root_dir, 'resources.json')
 
-        if not os.path.exists(record_path):
-            return []
+class BlobOutput(DirectoryOutput):
 
-        mdate = datetime.fromtimestamp(
-            os.stat(record_path).st_ctime)
+    log = logging.getLogger('custodian.output.blob')
 
-        with open(record_path) as fh:
-            records = json.load(fh)
-            [r.__setitem__('CustodianDate', mdate) for r in records]
-            return records
+    def __init__(self, ctx, config):
+        self.ctx = ctx
+        # we allow format strings in output urls so reparse config
+        # post interpolation.
+        self.config = parse_url_config(self.get_output_path(config['url']))
+        self.bucket = self.config.netloc
+        self.key_prefix = self.config.path.strip('/')
+        self.root_dir = tempfile.mkdtemp()
+
+    def __repr__(self):
+        return "<output:%s to bucket:%s prefix:%s>" % (
+            self.type,
+            self.bucket,
+            self.key_prefix,
+        )
+
+    def get_output_path(self, output_url):
+        if '{' not in output_url:
+            return join_output_path(
+                output_url.strip('/'),
+                self.ctx.policy.name,
+                datetime.datetime.utcnow().strftime('%Y/%m/%d/%H')
+            )
+        return output_url.format(**self.get_output_vars()).rstrip('/')
+
+    def __exit__(self, exc_type=None, exc_value=None, exc_traceback=None):
+        self.log.debug("%s: uploading policy logs", self.type)
+        self.compress()
+        self.upload()
+        shutil.rmtree(self.root_dir)
+        self.log.debug("%s: policy logs uploaded", self.type)
+
+    def upload(self):
+        for root, dirs, files in os.walk(self.root_dir):
+            len_root_dir = len(self.root_dir)
+            for f in files:
+                rel_path = root[len_root_dir:]
+                key = "/".join(filter(None, [self.key_prefix, rel_path, f]))
+                self.upload_file(os.path.join(root, f), key)
+
+    def upload_file(self, path, key):
+        raise NotImplementedError("subclass responsibility")

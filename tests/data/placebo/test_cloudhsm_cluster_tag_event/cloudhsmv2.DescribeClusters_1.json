@@ -1,0 +1,41 @@
+{
+    "status_code": 200,
+    "data": {
+        "Clusters": [
+            {
+                "BackupPolicy": "DEFAULT",
+                "BackupRetentionPolicy": {
+                    "Type": "DAYS",
+                    "Value": "90"
+                },
+                "ClusterId": "cluster-dqf7m6ithhc",
+                "CreateTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 11,
+                    "day": 15,
+                    "hour": 10,
+                    "minute": 49,
+                    "second": 20,
+                    "microsecond": 314000
+                },
+                "Hsms": [],
+                "HsmType": "hsm1.medium",
+                "SecurityGroup": "sg-0d402886a1b75282a",
+                "State": "UNINITIALIZED",
+                "SubnetMapping": {
+                    "us-east-1a": "subnet-07c118e47bb84cee7"
+                },
+                "VpcId": "vpc-03005fb9b8740263d",
+                "Certificates": {},
+                "TagList": [
+                    {
+                        "Key": "Owner",
+                        "Value": "test"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

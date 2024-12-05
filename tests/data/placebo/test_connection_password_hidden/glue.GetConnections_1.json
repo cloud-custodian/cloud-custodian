@@ -1,0 +1,44 @@
+{
+    "status_code": 200,
+    "data": {
+        "ConnectionList": [
+            {
+                "Name": "test",
+                "ConnectionType": "JDBC",
+                "ConnectionProperties": {
+                    "JDBC_CONNECTION_URL": "jdbc:mysql://database-3-instance-1.cz6wy8cci3uf.us-east-1.rds.amazonaws.com:3306/test",
+                    "JDBC_ENFORCE_SSL": "false",
+                    "USERNAME": "admin"
+                },
+                "PhysicalConnectionRequirements": {
+                    "SubnetId": "subnet-3a334610",
+                    "SecurityGroupIdList": [
+                        "sg-6c7fa917"
+                    ],
+                    "AvailabilityZone": "us-east-1d"
+                },
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 5,
+                    "day": 4,
+                    "hour": 17,
+                    "minute": 1,
+                    "second": 0,
+                    "microsecond": 856000
+                },
+                "LastUpdatedTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 5,
+                    "day": 4,
+                    "hour": 17,
+                    "minute": 1,
+                    "second": 0,
+                    "microsecond": 856000
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

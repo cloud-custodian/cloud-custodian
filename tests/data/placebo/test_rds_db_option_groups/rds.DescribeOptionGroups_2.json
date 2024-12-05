@@ -1,0 +1,181 @@
+{
+    "status_code": 200,
+    "data": {
+        "OptionGroupsList": [
+            {
+                "OptionGroupName": "oracle-option-groups",
+                "OptionGroupDescription": "oracle-option-groups",
+                "EngineName": "oracle-ee",
+                "MajorEngineVersion": "19",
+                "Options": [
+                    {
+                        "OptionName": "NATIVE_NETWORK_ENCRYPTION",
+                        "OptionDescription": "Oracle Advanced Security - Native Network Encryption",
+                        "Persistent": false,
+                        "Permanent": false,
+                        "OptionSettings": [
+                            {
+                                "Name": "SQLNET.CRYPTO_CHECKSUM_CLIENT",
+                                "Value": "REQUESTED",
+                                "DefaultValue": "REQUESTED",
+                                "Description": "Specifies the desired data integrity behavior",
+                                "ApplyType": "STATIC",
+                                "DataType": "STRING",
+                                "AllowedValues": "ACCEPTED,REJECTED,REQUESTED,REQUIRED",
+                                "IsModifiable": true,
+                                "IsCollection": false
+                            },
+                            {
+                                "Name": "SQLNET.ENCRYPTION_SERVER",
+                                "Value": "REQUESTED",
+                                "DefaultValue": "REQUESTED",
+                                "Description": "Specifies the desired encryption behavior",
+                                "ApplyType": "STATIC",
+                                "DataType": "STRING",
+                                "AllowedValues": "ACCEPTED,REJECTED,REQUESTED,REQUIRED",
+                                "IsModifiable": true,
+                                "IsCollection": false
+                            },
+                            {
+                                "Name": "SQLNET.ENCRYPTION_TYPES_SERVER",
+                                "Value": "RC4_256,AES256,AES192,3DES168,RC4_128,AES128,3DES112,RC4_56,DES,RC4_40,DES40",
+                                "DefaultValue": "RC4_256,AES256,AES192,3DES168,RC4_128,AES128,3DES112,RC4_56,DES,RC4_40,DES40",
+                                "Description": "Specifies list of encryption algorithms in order of intended use",
+                                "ApplyType": "STATIC",
+                                "DataType": "STRING",
+                                "AllowedValues": "RC4_256,AES256,AES192,3DES168,RC4_128,AES128,3DES112,RC4_56,DES,RC4_40,DES40",
+                                "IsModifiable": true,
+                                "IsCollection": true
+                            },
+                            {
+                                "Name": "SQLNET.ALLOW_WEAK_CRYPTO_CLIENTS",
+                                "Value": "TRUE",
+                                "DefaultValue": "TRUE",
+                                "Description": "Block clients that have not been patched with July 2021 PSU from connecting to the database.",
+                                "ApplyType": "STATIC",
+                                "DataType": "STRING",
+                                "AllowedValues": "TRUE,FALSE",
+                                "IsModifiable": true,
+                                "IsCollection": false
+                            },
+                            {
+                                "Name": "SQLNET.CRYPTO_CHECKSUM_TYPES_CLIENT",
+                                "Value": "SHA512,SHA384,SHA256",
+                                "DefaultValue": "SHA512,SHA384,SHA256",
+                                "Description": "Specifies list of checksumming algorithms in order of intended use",
+                                "ApplyType": "STATIC",
+                                "DataType": "STRING",
+                                "AllowedValues": "SHA256,SHA384,SHA512,SHA1,MD5",
+                                "IsModifiable": true,
+                                "IsCollection": true
+                            },
+                            {
+                                "Name": "SQLNET.ALLOW_WEAK_CRYPTO",
+                                "Value": "TRUE",
+                                "DefaultValue": "TRUE",
+                                "Description": "Allow use of weak encryption and checksumming algorithms.",
+                                "ApplyType": "STATIC",
+                                "DataType": "STRING",
+                                "AllowedValues": "TRUE,FALSE",
+                                "IsModifiable": true,
+                                "IsCollection": false
+                            },
+                            {
+                                "Name": "SQLNET.ENCRYPTION_CLIENT",
+                                "Value": "REQUESTED",
+                                "DefaultValue": "REQUESTED",
+                                "Description": "Specifies the desired encryption behavior",
+                                "ApplyType": "STATIC",
+                                "DataType": "STRING",
+                                "AllowedValues": "ACCEPTED,REJECTED,REQUESTED,REQUIRED",
+                                "IsModifiable": true,
+                                "IsCollection": false
+                            },
+                            {
+                                "Name": "SQLNET.CRYPTO_CHECKSUM_SERVER",
+                                "Value": "REQUESTED",
+                                "DefaultValue": "REQUESTED",
+                                "Description": "Specifies the desired data integrity behavior",
+                                "ApplyType": "STATIC",
+                                "DataType": "STRING",
+                                "AllowedValues": "ACCEPTED,REJECTED,REQUESTED,REQUIRED",
+                                "IsModifiable": true,
+                                "IsCollection": false
+                            },
+                            {
+                                "Name": "SQLNET.CRYPTO_CHECKSUM_TYPES_SERVER",
+                                "Value": "SHA512,SHA384,SHA256,SHA1,MD5",
+                                "DefaultValue": "SHA512,SHA384,SHA256,SHA1,MD5",
+                                "Description": "Specifies list of checksumming algorithms in order of intended use",
+                                "ApplyType": "STATIC",
+                                "DataType": "STRING",
+                                "AllowedValues": "SHA256,SHA384,SHA512,SHA1,MD5",
+                                "IsModifiable": true,
+                                "IsCollection": true
+                            },
+                            {
+                                "Name": "SQLNET.ENCRYPTION_TYPES_CLIENT",
+                                "Value": "RC4_256,AES256,AES192,3DES168,RC4_128,AES128,3DES112,RC4_56,DES,RC4_40,DES40",
+                                "DefaultValue": "RC4_256,AES256,AES192,3DES168,RC4_128,AES128,3DES112,RC4_56,DES,RC4_40,DES40",
+                                "Description": "Specifies list of encryption algorithms in order of intended use",
+                                "ApplyType": "STATIC",
+                                "DataType": "STRING",
+                                "AllowedValues": "RC4_256,AES256,AES192,3DES168,RC4_128,AES128,3DES112,RC4_56,DES,RC4_40,DES40",
+                                "IsModifiable": true,
+                                "IsCollection": true
+                            }
+                        ],
+                        "DBSecurityGroupMemberships": [],
+                        "VpcSecurityGroupMemberships": []
+                    },
+                    {
+                        "OptionName": "SSL",
+                        "OptionDescription": "Oracle Advanced Security - Native Network Encryption",
+                        "Persistent": false,
+                        "Permanent": false,
+                        "OptionSettings": [
+                            {
+                                "Name": "SQLNET.CRYPTO_CHECKSUM_CLIENT",
+                                "Value": "REQUESTED",
+                                "DefaultValue": "REQUESTED",
+                                "Description": "Specifies the desired data integrity behavior",
+                                "ApplyType": "STATIC",
+                                "DataType": "STRING",
+                                "AllowedValues": "ACCEPTED,REJECTED,REQUESTED,REQUIRED",
+                                "IsModifiable": true,
+                                "IsCollection": false
+                            }
+                        ],
+                        "DBSecurityGroupMemberships": [],
+                        "VpcSecurityGroupMemberships": []
+                    },
+                    {
+                        "OptionName": "OPTION_NAME_123",
+                        "OptionDescription": "Oracle Advanced Security - Native Network Encryption",
+                        "Persistent": false,
+                        "Permanent": false,
+                        "OptionSettings": [
+                            {
+                                "Name": "SQLNET.CRYPTO_CHECKSUM_CLIENT",
+                                "Value": "REQUESTED",
+                                "DefaultValue": "REQUESTED",
+                                "Description": "Specifies the desired data integrity behavior",
+                                "ApplyType": "STATIC",
+                                "DataType": "STRING",
+                                "AllowedValues": "ACCEPTED,REJECTED,REQUESTED,REQUIRED",
+                                "IsModifiable": true,
+                                "IsCollection": false
+                            }
+                        ],
+                        "DBSecurityGroupMemberships": [],
+                        "VpcSecurityGroupMemberships": []
+                    }
+                ],
+                "AllowsVpcAndNonVpcInstanceMemberships": false,
+                "VpcId": "vpc-0d9dd54496f180583",
+                "OptionGroupArn": "arn:aws:rds:us-west-2:644160558196:og:oracle-option-groups"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,9 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResourceArns": [
+            "arn:aws:elasticloadbalancing:us-east-1:123456789012:loadbalancer/app/cfb-mxaqrwbd/560445e4830a79c6"
+        ],
+        "ResponseMetadata": {}
+    }
+}

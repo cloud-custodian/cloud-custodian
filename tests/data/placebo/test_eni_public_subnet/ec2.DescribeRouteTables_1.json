@@ -1,0 +1,141 @@
+{
+    "status_code": 200,
+    "data": {
+        "RouteTables": [
+            {
+                "Associations": [
+                    {
+                        "Main": true,
+                        "RouteTableAssociationId": "rtbassoc-f8232c83",
+                        "RouteTableId": "rtb-0795cb7f",
+                        "AssociationState": {
+                            "State": "associated"
+                        }
+                    }
+                ],
+                "PropagatingVgws": [],
+                "RouteTableId": "rtb-0795cb7f",
+                "Routes": [
+                    {
+                        "DestinationCidrBlock": "10.0.0.0/28",
+                        "GatewayId": "local",
+                        "Origin": "CreateRouteTable",
+                        "State": "active"
+                    }
+                ],
+                "Tags": [],
+                "VpcId": "vpc-39831640",
+                "OwnerId": "644160558196"
+            },
+            {
+                "Associations": [
+                    {
+                        "Main": true,
+                        "RouteTableAssociationId": "rtbassoc-5efeff3b",
+                        "RouteTableId": "rtb-dac896bf",
+                        "AssociationState": {
+                            "State": "associated"
+                        }
+                    }
+                ],
+                "PropagatingVgws": [],
+                "RouteTableId": "rtb-dac896bf",
+                "Routes": [
+                    {
+                        "DestinationCidrBlock": "10.0.0.0/16",
+                        "GatewayId": "local",
+                        "Origin": "CreateRouteTable",
+                        "State": "active"
+                    }
+                ],
+                "Tags": [],
+                "VpcId": "vpc-65db9700",
+                "OwnerId": "644160558196"
+            },
+            {
+                "Associations": [
+                    {
+                        "Main": false,
+                        "RouteTableAssociationId": "rtbassoc-6026291b",
+                        "RouteTableId": "rtb-e997c991",
+                        "SubnetId": "subnet-8e261cb2",
+                        "AssociationState": {
+                            "State": "associated"
+                        }
+                    }
+                ],
+                "PropagatingVgws": [],
+                "RouteTableId": "rtb-e997c991",
+                "Routes": [
+                    {
+                        "DestinationCidrBlock": "10.0.0.0/28",
+                        "GatewayId": "local",
+                        "Origin": "CreateRouteTable",
+                        "State": "active"
+                    },
+                    {
+                        "DestinationCidrBlock": "0.0.0.0/0",
+                        "GatewayId": "igw-d74339b1",
+                        "Origin": "CreateRoute",
+                        "State": "active"
+                    }
+                ],
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "fast-ai-route-table"
+                    }
+                ],
+                "VpcId": "vpc-39831640",
+                "OwnerId": "644160558196"
+            },
+            {
+                "Associations": [
+                    {
+                        "Main": false,
+                        "RouteTableAssociationId": "rtbassoc-fc848599",
+                        "RouteTableId": "rtb-5bc59b3e",
+                        "SubnetId": "subnet-381d864f",
+                        "AssociationState": {
+                            "State": "associated"
+                        }
+                    },
+                    {
+                        "Main": false,
+                        "RouteTableAssociationId": "rtbassoc-c88485ad",
+                        "RouteTableId": "rtb-5bc59b3e",
+                        "SubnetId": "subnet-b2cb8788",
+                        "AssociationState": {
+                            "State": "associated"
+                        }
+                    }
+                ],
+                "PropagatingVgws": [],
+                "RouteTableId": "rtb-5bc59b3e",
+                "Routes": [
+                    {
+                        "DestinationCidrBlock": "10.0.0.0/16",
+                        "GatewayId": "local",
+                        "Origin": "CreateRouteTable",
+                        "State": "active"
+                    },
+                    {
+                        "DestinationCidrBlock": "0.0.0.0/0",
+                        "GatewayId": "igw-bda12fd8",
+                        "Origin": "CreateRoute",
+                        "State": "active"
+                    }
+                ],
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "cfndev-internet-route"
+                    }
+                ],
+                "VpcId": "vpc-65db9700",
+                "OwnerId": "644160558196"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,107 @@
+{
+    "status_code": 200,
+    "data": {
+        "PendingMaintenanceActions": [
+            {
+                "ResourceIdentifier": "arn:aws:rds:us-west-2:644160558196:db:asset-sync-instance-1",
+                "PendingMaintenanceActionDetails": [
+                    {
+                        "Action": "system-update",
+                        "Description": "New Operating System patch is available"
+                    }
+                ]
+            },
+            {
+                "ResourceIdentifier": "arn:aws:rds:us-west-2:644160558196:db:awsssl-dev-aurora1196",
+                "PendingMaintenanceActionDetails": [
+                    {
+                        "Action": "system-update",
+                        "Description": "New Operating System patch is available"
+                    }
+                ]
+            },
+            {
+                "ResourceIdentifier": "arn:aws:rds:us-west-2:644160558196:db:docdb-2020-08-05-07-53-40",
+                "PendingMaintenanceActionDetails": [
+                    {
+                        "Action": "system-update",
+                        "Description": "New Operating System upgrade is available"
+                    }
+                ]
+            },
+            {
+                "ResourceIdentifier": "arn:aws:rds:us-west-2:644160558196:db:ipgroups-rbac-cluster-instance-1",
+                "PendingMaintenanceActionDetails": [
+                    {
+                        "Action": "system-update",
+                        "Description": "New Operating System patch is available"
+                    }
+                ]
+            },
+            {
+                "ResourceIdentifier": "arn:aws:rds:us-west-2:644160558196:db:ith-acl-aurora-upgraded-db",
+                "PendingMaintenanceActionDetails": [
+                    {
+                        "Action": "system-update",
+                        "Description": "New Operating System patch is available"
+                    }
+                ]
+            },
+            {
+                "ResourceIdentifier": "arn:aws:rds:us-west-2:644160558196:db:ith-nat-upgraded-aurora-db",
+                "PendingMaintenanceActionDetails": [
+                    {
+                        "Action": "system-update",
+                        "Description": "New Operating System patch is available"
+                    }
+                ]
+            },
+            {
+                "ResourceIdentifier": "arn:aws:rds:us-west-2:644160558196:db:ng-dns-dev-instance-1",
+                "PendingMaintenanceActionDetails": [
+                    {
+                        "Action": "system-update",
+                        "Description": "New Operating System patch is available"
+                    }
+                ]
+            },
+            {
+                "ResourceIdentifier": "arn:aws:rds:us-west-2:644160558196:db:ssl-v2-e2e-db-cluster-instance-1",
+                "PendingMaintenanceActionDetails": [
+                    {
+                        "Action": "system-update",
+                        "Description": "New Operating System patch is available"
+                    }
+                ]
+            },
+            {
+                "ResourceIdentifier": "arn:aws:rds:us-west-2:644160558196:db:ssl-v2-e2e-db-cluster-instance-1-us-west-2b",
+                "PendingMaintenanceActionDetails": [
+                    {
+                        "Action": "system-update",
+                        "Description": "New Operating System patch is available"
+                    }
+                ]
+            },
+            {
+                "ResourceIdentifier": "arn:aws:rds:us-west-2:644160558196:db:sslv2dbcluster-instance-1",
+                "PendingMaintenanceActionDetails": [
+                    {
+                        "Action": "system-update",
+                        "Description": "New Operating System patch is available"
+                    }
+                ]
+            },
+            {
+                "ResourceIdentifier": "arn:aws:rds:us-west-2:644160558196:db:vanity-rd-upgraded-aurora-test",
+                "PendingMaintenanceActionDetails": [
+                    {
+                        "Action": "system-update",
+                        "Description": "New Operating System patch is available"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

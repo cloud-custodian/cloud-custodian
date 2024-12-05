@@ -1,0 +1,264 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Tue, 03 Oct 2023 18:44:49 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "7146",
+    "-content-encoding": "gzip",
+    "content-location": "https://compute.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/gke-test-network-jldkfaskl/getEffectiveFirewalls?alt=json"
+  },
+  "body": {
+    "firewalls": [
+      {
+        "kind": "compute#firewall",
+        "id": "1639490286771467065",
+        "creationTimestamp": "2023-10-02T07:04:06.856-07:00",
+        "name": "gke-c7nfailnode-cluster-2-dbe39418-exkubelet",
+        "description": "",
+        "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/gke-test-network-jldkfaskl",
+        "priority": 1000,
+        "sourceRanges": [
+          "0.0.0.0/0"
+        ],
+        "targetTags": [
+          "gke-c7nfailnode-cluster-2-dbe39418-node"
+        ],
+        "denied": [
+          {
+            "IPProtocol": "tcp",
+            "ports": [
+              "10255"
+            ]
+          }
+        ],
+        "direction": "INGRESS",
+        "logConfig": {
+          "enable": false
+        },
+        "disabled": false,
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/firewalls/gke-c7nfailnode-cluster-2-dbe39418-exkubelet"
+      },
+      {
+        "kind": "compute#firewall",
+        "id": "6109505584874615631",
+        "creationTimestamp": "2023-10-02T07:03:12.979-07:00",
+        "name": "c7nfail10250ipv6secondary",
+        "description": "",
+        "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/gke-test-network-jldkfaskl",
+        "priority": 1000,
+        "sourceRanges": [
+          "::"
+        ],
+        "sourceTags": [
+          "web"
+        ],
+        "allowed": [
+          {
+            "IPProtocol": "tcp",
+            "ports": [
+              "8080",
+              "10250",
+              "1000-2000"
+            ]
+          }
+        ],
+        "direction": "INGRESS",
+        "logConfig": {
+          "enable": false
+        },
+        "disabled": false,
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/firewalls/c7nfail10250ipv6secondary"
+      },
+      {
+        "kind": "compute#firewall",
+        "id": "1207305968501093177",
+        "creationTimestamp": "2023-10-02T07:04:06.847-07:00",
+        "name": "gke-c7nfailnode-cluster-2-dbe39418-inkubelet",
+        "description": "",
+        "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/gke-test-network-jldkfaskl",
+        "priority": 999,
+        "sourceRanges": [
+          "10.128.0.0/14"
+        ],
+        "sourceTags": [
+          "gke-c7nfailnode-cluster-2-dbe39418-node"
+        ],
+        "targetTags": [
+          "gke-c7nfailnode-cluster-2-dbe39418-node"
+        ],
+        "allowed": [
+          {
+            "IPProtocol": "tcp",
+            "ports": [
+              "10255"
+            ]
+          }
+        ],
+        "direction": "INGRESS",
+        "logConfig": {
+          "enable": false
+        },
+        "disabled": false,
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/firewalls/gke-c7nfailnode-cluster-2-dbe39418-inkubelet"
+      },
+      {
+        "kind": "compute#firewall",
+        "id": "7949216867194870405",
+        "creationTimestamp": "2023-10-03T07:25:46.460-07:00",
+        "name": "testing-port-0",
+        "description": "",
+        "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/gke-test-network-jldkfaskl",
+        "priority": 800,
+        "sourceRanges": [
+          "130.41.238.42"
+        ],
+        "allowed": [
+          {
+            "IPProtocol": "tcp",
+            "ports": [
+              "0"
+            ]
+          }
+        ],
+        "direction": "INGRESS",
+        "logConfig": {
+          "enable": false
+        },
+        "disabled": false,
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/firewalls/testing-port-0"
+      },
+      {
+        "kind": "compute#firewall",
+        "id": "4595157492773122873",
+        "creationTimestamp": "2023-10-02T07:04:06.801-07:00",
+        "name": "gke-c7nfailnode-cluster-2-dbe39418-all",
+        "description": "",
+        "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/gke-test-network-jldkfaskl",
+        "priority": 1000,
+        "sourceRanges": [
+          "10.128.0.0/14"
+        ],
+        "targetTags": [
+          "gke-c7nfailnode-cluster-2-dbe39418-node"
+        ],
+        "allowed": [
+          {
+            "IPProtocol": "sctp"
+          },
+          {
+            "IPProtocol": "tcp"
+          },
+          {
+            "IPProtocol": "udp"
+          },
+          {
+            "IPProtocol": "icmp"
+          },
+          {
+            "IPProtocol": "esp"
+          },
+          {
+            "IPProtocol": "ah"
+          }
+        ],
+        "direction": "INGRESS",
+        "logConfig": {
+          "enable": false
+        },
+        "disabled": false,
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/firewalls/gke-c7nfailnode-cluster-2-dbe39418-all"
+      },
+      {
+        "kind": "compute#firewall",
+        "id": "4608863536573160655",
+        "creationTimestamp": "2023-10-03T07:16:00.897-07:00",
+        "name": "testing-deny-all",
+        "description": "",
+        "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/gke-test-network-jldkfaskl",
+        "priority": 300,
+        "sourceRanges": [
+          "130.41.238.44"
+        ],
+        "denied": [
+          {
+            "IPProtocol": "all"
+          }
+        ],
+        "direction": "INGRESS",
+        "logConfig": {
+          "enable": false
+        },
+        "disabled": false,
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/firewalls/testing-deny-all"
+      },
+      {
+        "kind": "compute#firewall",
+        "id": "8460231844144717553",
+        "creationTimestamp": "2023-10-03T07:07:26.592-07:00",
+        "name": "testing-all-protocol",
+        "description": "",
+        "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/gke-test-network-jldkfaskl",
+        "priority": 200,
+        "sourceRanges": [
+          "130.41.238.42"
+        ],
+        "allowed": [
+          {
+            "IPProtocol": "all"
+          }
+        ],
+        "direction": "INGRESS",
+        "logConfig": {
+          "enable": false
+        },
+        "disabled": false,
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/firewalls/testing-all-protocol"
+      },
+      {
+        "kind": "compute#firewall",
+        "id": "3074747277671625528",
+        "creationTimestamp": "2023-10-02T07:04:07.215-07:00",
+        "name": "gke-c7nfailnode-cluster-2-dbe39418-vms",
+        "description": "",
+        "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/gke-test-network-jldkfaskl",
+        "priority": 1000,
+        "sourceRanges": [
+          "10.10.0.0/24"
+        ],
+        "targetTags": [
+          "gke-c7nfailnode-cluster-2-dbe39418-node"
+        ],
+        "allowed": [
+          {
+            "IPProtocol": "icmp"
+          },
+          {
+            "IPProtocol": "tcp",
+            "ports": [
+              "1-65535"
+            ]
+          },
+          {
+            "IPProtocol": "udp",
+            "ports": [
+              "1-65535"
+            ]
+          }
+        ],
+        "direction": "INGRESS",
+        "logConfig": {
+          "enable": false
+        },
+        "disabled": false,
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/firewalls/gke-c7nfailnode-cluster-2-dbe39418-vms"
+      }
+    ]
+  }
+}

@@ -1,0 +1,16 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "DomainNames": [
+            {
+                "DomainName": "default-inbound",
+                "EngineType": "Elasticsearch"
+            },
+            {
+                "DomainName": "default-outbound",
+                "EngineType": "Elasticsearch"
+            }
+        ]
+    }
+}

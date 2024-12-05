@@ -1,0 +1,25 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Groups": [
+            {
+                "GroupName": "Default",
+                "GroupARN": "arn:aws:xray:us-east-1:644160558196:group/Default",
+                "InsightsConfiguration": {
+                    "InsightsEnabled": false,
+                    "NotificationsEnabled": false
+                }
+            },
+            {
+                "GroupName": "example",
+                "GroupARN": "arn:aws:xray:us-east-1:644160558196:group/example/4SNNSKC4UA4KCCP23LRVLHCAFFRFU5FT23LXC6C6T2AUFTHDXELQ",
+                "FilterExpression": "responsetime > 5",
+                "InsightsConfiguration": {
+                    "InsightsEnabled": true,
+                    "NotificationsEnabled": true
+                }
+            }
+        ]
+    }
+}

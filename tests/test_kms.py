@@ -1,22 +1,16 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import json
 import time
+from unittest.mock import patch
 
 
 from c7n.resources.aws import shape_validate
 from .common import BaseTest, functional
+
+from c7n.config import Config
+from c7n.executor import MainThreadExecutor
+from c7n.filters.iamaccess import CrossAccountAccessFilter
 
 
 class KMSTest(BaseTest):
@@ -34,6 +28,28 @@ class KMSTest(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 0)
+
+    def test_kms_key_alias_augment(self):
+        session_factory = self.replay_flight_data("test_kms_key_alias")
+        p = self.load_policy(
+            {
+                "name": "kms-key-alias-filter",
+                "resource": "kms-key",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "AliasNames",
+                        "op": "in",
+                        "value": "alias/aws/dms",
+                        "value_type": "swap"
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
 
     def test_key_rotation(self):
         session_factory = self.replay_flight_data("test_key_rotation")
@@ -78,6 +94,51 @@ class KMSTest(BaseTest):
         client = session_factory(region="us-east-1").client("kms")
         key = client.get_key_rotation_status(KeyId=resources[0]["KeyId"])
         self.assertEqual(key["KeyRotationEnabled"], True)
+
+    def test_kms_config_source(self):
+        session_factory = self.replay_flight_data("test_kms_config_source")
+        p = self.load_policy(
+            {
+                "name": "kms-config-source",
+                "resource": "kms-key",
+                "source": "config",
+                "query": [
+                    {"clause": "configuration.description = 'For testing the KMS config source'"}
+                ],
+                "filters": [
+                    {"AliasNames[0]": "alias/config-source-testing"},
+                    {"tag:ConfigTesting": "present"}
+                ],
+            },
+            session_factory=session_factory,
+            config={"region": "us-east-2"}
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_kms_access_denied(self):
+        session_factory = self.replay_flight_data("test_kms_access_denied")
+        p = self.load_policy(
+            {
+                "name": "survive-access-denied",
+                "resource": "kms-key",
+                "filters": [
+                    {"type": "value",
+                     "key": "AliasNames[0]",
+                     "op": "glob",
+                     "value": "alias/test-kms*"}
+                ],
+            },
+            session_factory=session_factory,
+            config={"region": "us-west-1"}
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+
+        # Restrictive key policies may prevent us from loading detailed
+        # key information, but we should always have an Arn
+        self.assertFalse(all('KeyState' in r for r in resources))
+        self.assertTrue(all('Arn' in r for r in resources))
 
     @functional
     def test_kms_remove_matched(self):
@@ -265,22 +326,27 @@ class KMSTagging(BaseTest):
         )
 
         resources = policy.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["KeyId"], key_id)
         tags = client.list_resource_tags(KeyId=key_id)["Tags"]
         self.assertEqual(len(tags), 0)
 
     def test_kms_key_related(self):
         session_factory = self.replay_flight_data("test_kms_key_related")
+        key_alias = "alias/aws/sqs"
         p = self.load_policy(
             {
-                "name": "dms-instance-kms-key-related",
-                "resource": 'dms-instance',
+                "name": "sqs-kms-key-related",
+                "resource": "sqs",
+                "source": "config",
+                "query": [
+                    {"clause": "resourceName like 'test-kms%'"}
+                ],
                 "filters": [
                     {
                         "type": "kms-key",
                         "key": "c7n:AliasName",
-                        "value": "alias/aws/dms",
+                        "value": key_alias,
                         "op": "eq"
                     }
                 ]
@@ -289,15 +355,66 @@ class KMSTagging(BaseTest):
         )
         resources = p.run()
         client = session_factory().client("kms")
+        self.assertEqual(len(resources), 2)
+        target_key = client.describe_key(KeyId=key_alias)
+        self.assertTrue(all(
+            res['KmsMasterKeyId'] in (key_alias, target_key['KeyMetadata']['Arn'])
+            for res in resources
+        ))
+
+        # Whether a resource specifies a key by ID or alias, it should resolve
+        # to the same ID for related resource lookups.
+        related_ids = p.resource_manager.filters[0].get_related_ids(resources)
+        self.assertEqual(set(related_ids), {target_key['KeyMetadata']['KeyId']})
+
+    def test_kms_key_related_cache_lookup(self):
+        """Validate that the kms-key filter can perform alias lookups
+        against cached keys.
+
+        See https://github.com/cloud-custodian/cloud-custodian/issues/8504
+        """
+        session_factory = self.replay_flight_data("test_kms_key_related_cache_lookup")
+        key_alias = "alias/kms-cache-check"
+        p = self.load_policy(
+            {
+                "name": "load-keys-into-cache",
+                "resource": "aws.kms-key",
+            },
+            cache=True,
+            config=Config.empty(
+                cache='memory',
+                cache_period=10,
+                output_dir=self.get_temp_dir(),
+            ),
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertGreater(len(resources), 0)
+
+        p = self.load_policy(
+            {
+                "name": "sqs-kms-key-related-from-cache",
+                "resource": "aws.sqs",
+                "filters": [
+                    {
+                        "type": "kms-key",
+                        "key": "c7n:AliasName",
+                        "value": key_alias,
+                        "op": "eq"
+                    }
+                ]
+            },
+            cache=True,
+            config=Config.empty(
+                cache='memory',
+                cache_period=10,
+                output_dir=self.get_temp_dir(),
+            ),
+            session_factory=session_factory,
+        )
+        with patch('c7n.resources.sqs.SQS.executor_factory', MainThreadExecutor):
+            resources = p.run()
         self.assertEqual(len(resources), 1)
-        resource_kms_key = resources[0]['KmsKeyId']
-        aliases = client.list_aliases(KeyId=resource_kms_key)
-        target_key_arn = None
-        if aliases['Aliases'][0]['AliasName'] == 'alias/aws/dms':
-            target_key_id = aliases['Aliases'][0].get('TargetKeyId')
-            target_key_arn = client.describe_key(
-                KeyId=target_key_id).get('KeyMetadata').get('Arn')
-        self.assertEqual(resources[0]['KmsKeyId'], target_key_arn)
 
     def test_kms_post_finding(self):
         factory = self.replay_flight_data('test_kms_post_finding')
@@ -315,13 +432,13 @@ class KMSTagging(BaseTest):
         rfinding = p.resource_manager.actions[0].format_resource(
             resources[0])
         self.maxDiff = None
-        rfinding['Details']['AwsKmsKey'].pop('CreationDate')
         self.assertEqual(
             rfinding,
             {'Details': {'AwsKmsKey': {
                 'KeyId': '44d25a5c-7efa-44ed-8436-b9511ea921b3',
                 'KeyManager': 'CUSTOMER',
                 'KeyState': 'Enabled',
+                'CreationDate': 1493967398.394,
                 'Origin': 'AWS_KMS'}},
              'Id': 'arn:aws:kms:us-west-2:644160558196:alias/44d25a5c-7efa-44ed-8436-b9511ea921b3',
              'Partition': 'aws',
@@ -330,3 +447,249 @@ class KMSTagging(BaseTest):
 
         shape_validate(
             rfinding['Details']['AwsKmsKey'], 'AwsKmsKeyDetails', 'securityhub')
+
+
+class KMSCrossAccount(BaseTest):
+
+    def test_kms_cross_account(self):
+        self.patch(CrossAccountAccessFilter, "executor_factory", MainThreadExecutor)
+        session_factory = self.replay_flight_data("test_cross_account_kms")
+        client = session_factory().client("kms")
+
+        policy = {
+            "Id": "Lulu",
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Sid": "Enable IAM User Permissions",
+                    "Effect": "Allow",
+                    "Principal": {"AWS": "arn:aws:iam::644160558196:root"},
+                    "Action": "kms:*",
+                    "Resource": "*",
+                },
+                {
+                    "Sid": "Enable Cross Account",
+                    "Effect": "Allow",
+                    "Principal": "*",
+                    "Action": "kms:Encrypt",
+                    "Resource": "*",
+                },
+            ],
+        }
+
+        key_info = client.create_key(
+            Policy=json.dumps(policy), Description="test-cross-account-1"
+        )[
+            "KeyMetadata"
+        ]
+
+        # disable and schedule deletion
+        self.addCleanup(
+            client.schedule_key_deletion, KeyId=key_info["KeyId"], PendingWindowInDays=7
+        )
+        self.addCleanup(client.disable_key, KeyId=key_info["KeyId"])
+
+        p = self.load_policy(
+            {
+                "name": "kms-cross",
+                "resource": "kms-key",
+                "filters": [{"KeyState": "Enabled"}, "cross-account"],
+            },
+            session_factory=session_factory,
+            config={"region": "us-east-1"}
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["KeyId"], key_info["KeyId"])
+
+    def test_kms_cross_account_condition_keys_1(self):
+        self.patch(CrossAccountAccessFilter, "executor_factory", MainThreadExecutor)
+        session_factory = self.replay_flight_data(
+            "test_cross_account_kms_condition_keys_1", region="af-south-1")
+        client = session_factory().client("kms")
+
+        policy = {
+            "Id": "Lulu",
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Sid": "Enable IAM User Permissions",
+                    "Effect": "Allow",
+                    "Principal": {"AWS": "arn:aws:iam::644160558196:root"},
+                    "Action": "kms:*",
+                    "Resource": "*",
+                },
+                {
+                    "Sid": "Good condition key",
+                    "Effect": "Allow",
+                    "Principal": {
+                        "AWS": "*"
+                    },
+                    "Action": "kms:CreateGrant",
+                    "Resource": "*",
+                    "Condition": {
+                        "StringEquals": {
+                            "kms:CallerAccount": "644160558196"
+                        }
+                    }
+                },
+            ],
+        }
+
+        key_info = client.create_key(
+            Policy=json.dumps(policy), Description="test-cross-account-2"
+        )[
+            "KeyMetadata"
+        ]
+
+        # disable and schedule deletion
+        self.addCleanup(
+            client.schedule_key_deletion, KeyId=key_info["KeyId"], PendingWindowInDays=7
+        )
+        self.addCleanup(client.disable_key, KeyId=key_info["KeyId"])
+
+        p = self.load_policy(
+            {
+                "name": "kms-cross",
+                "resource": "kms-key",
+                "filters": [{"KeyState": "Enabled"}, "cross-account"],
+            },
+            session_factory=session_factory,
+            config={"region": "af-south-1"}
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    def test_kms_cross_account_condition_keys_2(self):
+        self.patch(CrossAccountAccessFilter, "executor_factory", MainThreadExecutor)
+        session_factory = self.replay_flight_data(
+            "test_cross_account_kms_condition_keys_2", region="af-south-1")
+        client = session_factory().client("kms")
+
+        policy = {
+            "Id": "Lulu",
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Sid": "Enable IAM User Permissions",
+                    "Effect": "Allow",
+                    "Principal": {"AWS": "arn:aws:iam::644160558196:root"},
+                    "Action": "kms:*",
+                    "Resource": "*",
+                },
+                {
+                    "Sid": "Good condition key",
+                    "Effect": "Allow",
+                    "Principal": {
+                        "AWS": "644160558196"
+                    },
+                    "Action": "kms:Encrypt",
+                    "Resource": "*",
+                    "Condition": {
+                        "StringEquals": {
+                            "kms:ViaService": "s3.af-south-1.amazonaws.com",
+                        },
+                        "ForAllValues:StringEquals": {
+                            "kms:GrantOperations": [
+                                "Encrypt",
+                                "ReEncryptTo"
+                            ]
+                        }
+
+                    }
+                },
+            ],
+        }
+
+        key_info = client.create_key(
+            Policy=json.dumps(policy), Description="test-cross-account-3"
+        )[
+            "KeyMetadata"
+        ]
+
+        # disable and schedule deletion
+        self.addCleanup(
+            client.schedule_key_deletion, KeyId=key_info["KeyId"], PendingWindowInDays=7
+        )
+        self.addCleanup(client.disable_key, KeyId=key_info["KeyId"])
+
+        p = self.load_policy(
+            {
+                "name": "kms-cross",
+                "resource": "kms-key",
+                "filters": [{"KeyState": "Enabled"}, "cross-account"],
+            },
+            session_factory=session_factory,
+            config={"region": "af-south-1"}
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    def test_kms_cross_account_condition_keys_3(self):
+        self.patch(CrossAccountAccessFilter, "executor_factory", MainThreadExecutor)
+        session_factory = self.replay_flight_data(
+            "test_cross_account_kms_condition_keys_3", region="af-south-1")
+        client = session_factory().client("kms")
+
+        policy = {
+            "Id": "Lulu",
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Sid": "Enable IAM User Permissions",
+                    "Effect": "Allow",
+                    "Principal": {"AWS": "arn:aws:iam::644160558196:root"},
+                    "Action": "kms:*",
+                    "Resource": "*",
+                },
+                {
+                    "Sid": "Bad condition key",
+                    "Effect": "Allow",
+                    "Principal": {
+                        "AWS": "*"
+                    },
+                    "Action": "kms:Encrypt",
+                    "Resource": "*",
+                    "Condition": {
+                        "StringEquals": {
+                            "kms:ViaService": "s3.af-south-1.amazonaws.com",
+                            "kms:CallerAccount": "*",
+                        },
+                        "ForAllValues:StringEquals": {
+                            "kms:GrantOperations": [
+                                "Encrypt"
+                            ]
+                        }
+                    }
+                },
+            ],
+        }
+
+        key_info = client.create_key(
+            Policy=json.dumps(policy), Description="test-cross-account-4"
+        )[
+            "KeyMetadata"
+        ]
+
+        # disable and schedule deletion
+        self.addCleanup(
+            client.schedule_key_deletion, KeyId=key_info["KeyId"], PendingWindowInDays=7
+        )
+        self.addCleanup(client.disable_key, KeyId=key_info["KeyId"])
+
+        p = self.load_policy(
+            {
+                "name": "kms-cross",
+                "resource": "kms-key",
+                "filters": [{"KeyState": "Enabled"}, "cross-account"],
+            },
+            session_factory=session_factory,
+            config={"region": "af-south-1"}
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["KeyId"], key_info["KeyId"])

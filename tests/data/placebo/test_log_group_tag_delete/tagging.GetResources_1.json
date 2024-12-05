@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:logs:us-west-2:644160558196:log-group:Yada",
+                "Tags": [
+                    {
+                        "Key": "App",
+                        "Value": "Foie"
+                    },
+                    {
+                        "Key": "Environment",
+                        "Value": "production"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

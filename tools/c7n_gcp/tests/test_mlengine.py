@@ -1,16 +1,5 @@
-# Copyright 2019 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 from gcp_common import BaseTest, event_data
 
@@ -32,6 +21,12 @@ class MLModelTest(BaseTest):
 
         resources = policy.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            policy.resource_manager.get_urns(resources),
+            [
+                'gcp:ml::cloud-custodian:model/test_model',
+            ],
+        )
 
     def test_models_get(self):
         project_id = 'cloud-custodian'
@@ -50,6 +45,12 @@ class MLModelTest(BaseTest):
         event = event_data('ml-model-create.json')
         models = exec_mode.run(event, None)
         self.assertIn(name, models[0]['name'])
+        self.assertEqual(
+            p.resource_manager.get_urns(models),
+            [
+                'gcp:ml::cloud-custodian:model/test_model',
+            ],
+        )
 
 
 class MLJobTest(BaseTest):
@@ -69,6 +70,12 @@ class MLJobTest(BaseTest):
 
         resources = policy.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            policy.resource_manager.get_urns(resources),
+            [
+                'gcp:ml::cloud-custodian:job/test_job',
+            ],
+        )
 
     def test_jobs_get(self):
         project_id = 'cloud-custodian'
@@ -87,3 +94,9 @@ class MLJobTest(BaseTest):
         event = event_data('ml-job-create.json')
         jobs = exec_mode.run(event, None)
         self.assertIn(name, jobs[0]['jobId'])
+        self.assertEqual(
+            p.resource_manager.get_urns(jobs),
+            [
+                'gcp:ml::cloud-custodian:job/test_job',
+            ],
+        )

@@ -1,0 +1,51 @@
+{
+    "status_code": 200,
+    "data": {
+        "Directories": [
+            {
+                "DirectoryId": "d-9067482f7d",
+                "Alias": "c7ntesting",
+                "DirectoryName": "c7ntesting.com",
+                "RegistrationCode": "SLiad+5D8GZ2",
+                "SubnetIds": [
+                    "subnet-0bd18cd4df2d0d3b9",
+                    "subnet-0472841b16adf7476"
+                ],
+                "DnsIpAddresses": [
+                    "10.0.0.18",
+                    "10.0.38.117"
+                ],
+                "CustomerUserName": "Administrator",
+                "IamRoleId": "arn:aws:iam::644160558196:role/workspaces_DefaultRole",
+                "DirectoryType": "SIMPLE_AD",
+                "WorkspaceSecurityGroupId": "sg-0062658f98c94b7fc",
+                "State": "REGISTERED",
+                "WorkspaceCreationProperties": {
+                    "EnableWorkDocs": false,
+                    "EnableInternetAccess": true,
+                    "UserEnabledAsLocalAdministrator": true,
+                    "EnableMaintenanceMode": true
+                },
+                "WorkspaceAccessProperties": {
+                    "DeviceTypeWindows": "ALLOW",
+                    "DeviceTypeOsx": "ALLOW",
+                    "DeviceTypeWeb": "DENY",
+                    "DeviceTypeIos": "ALLOW",
+                    "DeviceTypeAndroid": "ALLOW",
+                    "DeviceTypeChromeOs": "ALLOW",
+                    "DeviceTypeZeroClient": "ALLOW",
+                    "DeviceTypeLinux": "DENY"
+                },
+                "Tenancy": "SHARED",
+                "SelfservicePermissions": {
+                    "RestartWorkspace": "ENABLED",
+                    "IncreaseVolumeSize": "DISABLED",
+                    "ChangeComputeType": "DISABLED",
+                    "SwitchRunningMode": "DISABLED",
+                    "RebuildWorkspace": "DISABLED"
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

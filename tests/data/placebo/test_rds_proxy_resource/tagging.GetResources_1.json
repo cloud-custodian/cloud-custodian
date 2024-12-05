@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:rds:us-east-1:644160558196:db-proxy:prx-09e4477de0da790ce",
+                "Tags": [
+                    {
+                        "Key": "TestKey",
+                        "Value": "Yes"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,67 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "oci_identity_auth_token": {
+            "test_auth_token1": {
+                "description": "Test user auth token",
+                "id": "ocid1.credential.oc1..<unique_ID>",
+                "inactive_state": null,
+                "state": "ACTIVE",
+                "time_created": "2023-06-15 18:45:38.681 +0000 UTC",
+                "time_expires": null,
+                "timeouts": null,
+                "token": "8dz:vK5:7::_dAbJz0WQ",
+                "user_id": "ocid1.user.oc1..<unique_ID>"
+            },
+            "test_auth_token2": {
+                "description": "Test user auth token",
+                "id": "ocid1.credential.oc1..<unique_ID>",
+                "inactive_state": null,
+                "state": "ACTIVE",
+                "time_created": "2023-06-15 18:45:38.467 +0000 UTC",
+                "time_expires": null,
+                "timeouts": null,
+                "token": "qgM;.qNeW;Uv)t_{z3Z2",
+                "user_id": "ocid1.user.oc1..<unique_ID>"
+            }
+        },
+        "oci_identity_user": {
+            "test_user": {
+                "capabilities": [
+                    {
+                        "can_use_api_keys": true,
+                        "can_use_auth_tokens": true,
+                        "can_use_console_password": true,
+                        "can_use_customer_secret_keys": true,
+                        "can_use_db_credentials": true,
+                        "can_use_oauth2client_credentials": true,
+                        "can_use_smtp_credentials": true
+                    }
+                ],
+                "compartment_id": "ocid1.tenancy.oc1..<unique_ID>",
+                "db_user_name": null,
+                "defined_tags": {
+                    "Oracle-Tags.CreatedBy": "user@example.com",
+                    "Oracle-Tags.CreatedOn": "2023-06-15T18:45:37.853Z"
+                },
+                "description": "Test User1",
+                "email": "test@custodian.com",
+                "email_verified": false,
+                "external_identifier": null,
+                "freeform_tags": {
+                    "Cloud_Custodian": "True"
+                },
+                "id": "ocid1.user.oc1..<unique_ID>",
+                "identity_provider_id": null,
+                "inactive_state": null,
+                "last_successful_login_time": null,
+                "name": "Custodian_User",
+                "previous_successful_login_time": null,
+                "state": "ACTIVE",
+                "time_created": "2023-06-15 18:45:37.962 +0000 UTC",
+                "timeouts": null
+            }
+        }
+    }
+}

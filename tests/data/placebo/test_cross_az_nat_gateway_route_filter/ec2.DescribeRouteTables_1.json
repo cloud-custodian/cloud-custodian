@@ -1,0 +1,999 @@
+{
+    "status_code": 200,
+    "data": {
+        "RouteTables": [
+            {
+                "Associations": [
+                    {
+                        "Main": false,
+                        "RouteTableAssociationId": "rtbassoc-0bea6f7ad50d15e14",
+                        "RouteTableId": "rtb-02dab232d4d3e7062",
+                        "SubnetId": "subnet-0b5bd0c426f2d2833",
+                        "AssociationState": {
+                            "State": "associated"
+                        }
+                    }
+                ],
+                "PropagatingVgws": [],
+                "RouteTableId": "rtb-02dab232d4d3e7062",
+                "Routes": [
+                    {
+                        "DestinationCidrBlock": "10.0.0.0/21",
+                        "GatewayId": "local",
+                        "Origin": "CreateRouteTable",
+                        "State": "active"
+                    },
+                    {
+                        "DestinationCidrBlock": "0.0.0.0/0",
+                        "GatewayId": "igw-047f2ff9f61175a8e",
+                        "Origin": "CreateRoute",
+                        "State": "active"
+                    },
+                    {
+                        "DestinationPrefixListId": "pl-00a54069",
+                        "GatewayId": "vpce-00cf599081019f56d",
+                        "Origin": "CreateRoute",
+                        "State": "active"
+                    },
+                    {
+                        "DestinationPrefixListId": "pl-68a54001",
+                        "GatewayId": "vpce-036452b71622c1bf8",
+                        "Origin": "CreateRoute",
+                        "State": "active"
+                    }
+                ],
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "IngressRouteTable3"
+                    },
+                    {
+                        "Key": "aws:cloudformation:logical-id",
+                        "Value": "RouteTableIngress3"
+                    },
+                    {
+                        "Key": "xyz:vpc:component:description",
+                        "Value": "Routes to local VPC, Internet via Internet Gateway and S3 via VPC Endpoint"
+                    },
+                    {
+                        "Key": "xyz:cfn:version",
+                        "Value": "2.7.8"
+                    },
+                    {
+                        "Key": "xyz:vpc:component:type",
+                        "Value": "route"
+                    },
+                    {
+                        "Key": "Type",
+                        "Value": "Ingress"
+                    },
+                    {
+                        "Key": "aws:cloudformation:stack-id",
+                        "Value": "arn:aws:cloudformation:us-west-2:644160558196:stack/xyz-vpc-1-RouteTable-1AFSXQCNQF4LN/2e051350-dfd7-11ec-bbab-02b759b22f01"
+                    },
+                    {
+                        "Key": "xyz:vpc:component:name",
+                        "Value": "IngressRouteTable3"
+                    },
+                    {
+                        "Key": "aws:cloudformation:stack-name",
+                        "Value": "xyz-vpc-1-RouteTable-1AFSXQCNQF4LN"
+                    },
+                    {
+                        "Key": "xyz:vpc:env",
+                        "Value": "learning"
+                    }
+                ],
+                "VpcId": "vpc-012347c909f1f1896",
+                "OwnerId": "644160558196"
+            },
+            {
+                "Associations": [
+                    {
+                        "Main": false,
+                        "RouteTableAssociationId": "rtbassoc-0749ea24982503e14",
+                        "RouteTableId": "rtb-0790946c364d31f08",
+                        "SubnetId": "subnet-01989283067fcc12f",
+                        "AssociationState": {
+                            "State": "associated"
+                        }
+                    }
+                ],
+                "PropagatingVgws": [],
+                "RouteTableId": "rtb-0790946c364d31f08",
+                "Routes": [
+                    {
+                        "DestinationCidrBlock": "10.0.0.0/21",
+                        "GatewayId": "local",
+                        "Origin": "CreateRouteTable",
+                        "State": "active"
+                    },
+                    {
+                        "DestinationCidrBlock": "0.0.0.0/0",
+                        "NatGatewayId": "nat-06e9acaa9c0ab8799",
+                        "Origin": "CreateRoute",
+                        "State": "active"
+                    },
+                    {
+                        "DestinationPrefixListId": "pl-00a54069",
+                        "GatewayId": "vpce-00cf599081019f56d",
+                        "Origin": "CreateRoute",
+                        "State": "active"
+                    },
+                    {
+                        "DestinationPrefixListId": "pl-68a54001",
+                        "GatewayId": "vpce-036452b71622c1bf8",
+                        "Origin": "CreateRoute",
+                        "State": "active"
+                    }
+                ],
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "PrivateRouteTable3"
+                    },
+                    {
+                        "Key": "xyz:vpc:component:description",
+                        "Value": "Routes to local VPC, Internet via NAT Gateway, S3 via VPC Endpoint and if VPN enabled will have routes to QDC/LVDC datacenters"
+                    },
+                    {
+                        "Key": "xyz:vpc:env",
+                        "Value": "learning"
+                    },
+                    {
+                        "Key": "aws:cloudformation:stack-id",
+                        "Value": "arn:aws:cloudformation:us-west-2:644160558196:stack/xyz-vpc-1-RouteTable-1AFSXQCNQF4LN/2e051350-dfd7-11ec-bbab-02b759b22f01"
+                    },
+                    {
+                        "Key": "aws:cloudformation:stack-name",
+                        "Value": "xyz-vpc-1-RouteTable-1AFSXQCNQF4LN"
+                    },
+                    {
+                        "Key": "xyz:vpc:component:name",
+                        "Value": "PrivateRouteTable3"
+                    },
+                    {
+                        "Key": "aws:cloudformation:logical-id",
+                        "Value": "RouteTablePrivate3"
+                    },
+                    {
+                        "Key": "Type",
+                        "Value": "Private"
+                    },
+                    {
+                        "Key": "xyz:vpc:component:type",
+                        "Value": "route"
+                    },
+                    {
+                        "Key": "xyz:cfn:version",
+                        "Value": "2.7.8"
+                    }
+                ],
+                "VpcId": "vpc-012347c909f1f1896",
+                "OwnerId": "644160558196"
+            },
+            {
+                "Associations": [
+                    {
+                        "Main": false,
+                        "RouteTableAssociationId": "rtbassoc-0ee038f91489f88e7",
+                        "RouteTableId": "rtb-0123fa60166cf0a3b",
+                        "SubnetId": "subnet-084dae0d9c11bca66",
+                        "AssociationState": {
+                            "State": "associated"
+                        }
+                    }
+                ],
+                "PropagatingVgws": [],
+                "RouteTableId": "rtb-0123fa60166cf0a3b",
+                "Routes": [
+                    {
+                        "DestinationCidrBlock": "10.0.0.0/21",
+                        "GatewayId": "local",
+                        "Origin": "CreateRouteTable",
+                        "State": "active"
+                    }
+                ],
+                "Tags": [
+                    {
+                        "Key": "xyz:vpc:env",
+                        "Value": "learning"
+                    },
+                    {
+                        "Key": "Name",
+                        "Value": "DataRouteTable1"
+                    },
+                    {
+                        "Key": "xyz:vpc:component:description",
+                        "Value": "Routes to local VPC but if VPN enabled will also have routes to QDC/LVDC datacenters"
+                    },
+                    {
+                        "Key": "xyz:cfn:version",
+                        "Value": "2.7.8"
+                    },
+                    {
+                        "Key": "xyz:vpc:component:type",
+                        "Value": "route"
+                    },
+                    {
+                        "Key": "Type",
+                        "Value": "Data"
+                    },
+                    {
+                        "Key": "xyz:vpc:component:name",
+                        "Value": "DataRouteTable1"
+                    },
+                    {
+                        "Key": "aws:cloudformation:stack-id",
+                        "Value": "arn:aws:cloudformation:us-west-2:644160558196:stack/xyz-vpc-1-RouteTable-1AFSXQCNQF4LN/2e051350-dfd7-11ec-bbab-02b759b22f01"
+                    },
+                    {
+                        "Key": "aws:cloudformation:logical-id",
+                        "Value": "RouteTableData1"
+                    },
+                    {
+                        "Key": "aws:cloudformation:stack-name",
+                        "Value": "xyz-vpc-1-RouteTable-1AFSXQCNQF4LN"
+                    }
+                ],
+                "VpcId": "vpc-012347c909f1f1896",
+                "OwnerId": "644160558196"
+            },
+            {
+                "Associations": [
+                    {
+                        "Main": false,
+                        "RouteTableAssociationId": "rtbassoc-080e4e509c7f93390",
+                        "RouteTableId": "rtb-0f13aebd1241f7141",
+                        "SubnetId": "subnet-0b8f90974afb1a016",
+                        "AssociationState": {
+                            "State": "associated"
+                        }
+                    }
+                ],
+                "PropagatingVgws": [],
+                "RouteTableId": "rtb-0f13aebd1241f7141",
+                "Routes": [
+                    {
+                        "DestinationCidrBlock": "10.0.0.0/21",
+                        "GatewayId": "local",
+                        "Origin": "CreateRouteTable",
+                        "State": "active"
+                    }
+                ],
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "DataRouteTable3"
+                    },
+                    {
+                        "Key": "xyz:vpc:env",
+                        "Value": "learning"
+                    },
+                    {
+                        "Key": "aws:cloudformation:stack-id",
+                        "Value": "arn:aws:cloudformation:us-west-2:644160558196:stack/xyz-vpc-1-RouteTable-1AFSXQCNQF4LN/2e051350-dfd7-11ec-bbab-02b759b22f01"
+                    },
+                    {
+                        "Key": "aws:cloudformation:stack-name",
+                        "Value": "xyz-vpc-1-RouteTable-1AFSXQCNQF4LN"
+                    },
+                    {
+                        "Key": "Type",
+                        "Value": "Data"
+                    },
+                    {
+                        "Key": "xyz:vpc:component:type",
+                        "Value": "route"
+                    },
+                    {
+                        "Key": "aws:cloudformation:logical-id",
+                        "Value": "RouteTableData3"
+                    },
+                    {
+                        "Key": "xyz:vpc:component:description",
+                        "Value": "Routes to local VPC but if VPN enabled will also have routes to QDC/LVDC datacenters"
+                    },
+                    {
+                        "Key": "xyz:cfn:version",
+                        "Value": "2.7.8"
+                    },
+                    {
+                        "Key": "xyz:vpc:component:name",
+                        "Value": "DataRouteTable3"
+                    }
+                ],
+                "VpcId": "vpc-012347c909f1f1896",
+                "OwnerId": "644160558196"
+            },
+            {
+                "Associations": [
+                    {
+                        "Main": false,
+                        "RouteTableAssociationId": "rtbassoc-0f4ed0a5e8305821f",
+                        "RouteTableId": "rtb-046ba441cf1187b69",
+                        "SubnetId": "subnet-059f1e047a5ca7c1f",
+                        "AssociationState": {
+                            "State": "associated"
+                        }
+                    }
+                ],
+                "PropagatingVgws": [],
+                "RouteTableId": "rtb-046ba441cf1187b69",
+                "Routes": [
+                    {
+                        "DestinationCidrBlock": "10.0.0.0/21",
+                        "GatewayId": "local",
+                        "Origin": "CreateRouteTable",
+                        "State": "active"
+                    },
+                    {
+                        "DestinationCidrBlock": "0.0.0.0/0",
+                        "GatewayId": "igw-047f2ff9f61175a8e",
+                        "Origin": "CreateRoute",
+                        "State": "active"
+                    },
+                    {
+                        "DestinationPrefixListId": "pl-00a54069",
+                        "GatewayId": "vpce-00cf599081019f56d",
+                        "Origin": "CreateRoute",
+                        "State": "active"
+                    },
+                    {
+                        "DestinationPrefixListId": "pl-68a54001",
+                        "GatewayId": "vpce-036452b71622c1bf8",
+                        "Origin": "CreateRoute",
+                        "State": "active"
+                    }
+                ],
+                "Tags": [
+                    {
+                        "Key": "xyz:vpc:component:name",
+                        "Value": "EgressRouteTable1"
+                    },
+                    {
+                        "Key": "Type",
+                        "Value": "Egress"
+                    },
+                    {
+                        "Key": "xyz:vpc:component:type",
+                        "Value": "route"
+                    },
+                    {
+                        "Key": "Name",
+                        "Value": "EgressRouteTable1"
+                    },
+                    {
+                        "Key": "xyz:cfn:version",
+                        "Value": "2.7.8"
+                    },
+                    {
+                        "Key": "aws:cloudformation:logical-id",
+                        "Value": "RouteTableEgress1"
+                    },
+                    {
+                        "Key": "xyz:vpc:env",
+                        "Value": "learning"
+                    },
+                    {
+                        "Key": "aws:cloudformation:stack-id",
+                        "Value": "arn:aws:cloudformation:us-west-2:644160558196:stack/xyz-vpc-1-RouteTable-1AFSXQCNQF4LN/2e051350-dfd7-11ec-bbab-02b759b22f01"
+                    },
+                    {
+                        "Key": "aws:cloudformation:stack-name",
+                        "Value": "xyz-vpc-1-RouteTable-1AFSXQCNQF4LN"
+                    },
+                    {
+                        "Key": "xyz:vpc:component:description",
+                        "Value": "Routes to local VPC, Internet via Internet Gateway and S3 via VPC Endpoint"
+                    }
+                ],
+                "VpcId": "vpc-012347c909f1f1896",
+                "OwnerId": "644160558196"
+            },
+            {
+                "Associations": [
+                    {
+                        "Main": false,
+                        "RouteTableAssociationId": "rtbassoc-053335f512e2c92e9",
+                        "RouteTableId": "rtb-0ba85f9bc06635600",
+                        "SubnetId": "subnet-09e7dd01ed236e50c",
+                        "AssociationState": {
+                            "State": "associated"
+                        }
+                    }
+                ],
+                "PropagatingVgws": [],
+                "RouteTableId": "rtb-0ba85f9bc06635600",
+                "Routes": [
+                    {
+                        "DestinationCidrBlock": "10.0.0.0/21",
+                        "GatewayId": "local",
+                        "Origin": "CreateRouteTable",
+                        "State": "active"
+                    },
+                    {
+                        "DestinationCidrBlock": "0.0.0.0/0",
+                        "GatewayId": "igw-047f2ff9f61175a8e",
+                        "Origin": "CreateRoute",
+                        "State": "active"
+                    },
+                    {
+                        "DestinationPrefixListId": "pl-00a54069",
+                        "GatewayId": "vpce-00cf599081019f56d",
+                        "Origin": "CreateRoute",
+                        "State": "active"
+                    },
+                    {
+                        "DestinationPrefixListId": "pl-68a54001",
+                        "GatewayId": "vpce-036452b71622c1bf8",
+                        "Origin": "CreateRoute",
+                        "State": "active"
+                    }
+                ],
+                "Tags": [
+                    {
+                        "Key": "aws:cloudformation:stack-id",
+                        "Value": "arn:aws:cloudformation:us-west-2:644160558196:stack/xyz-vpc-1-RouteTable-1AFSXQCNQF4LN/2e051350-dfd7-11ec-bbab-02b759b22f01"
+                    },
+                    {
+                        "Key": "xyz:vpc:component:description",
+                        "Value": "Routes to local VPC, Internet via Internet Gateway and S3 via VPC Endpoint"
+                    },
+                    {
+                        "Key": "Name",
+                        "Value": "IngressRouteTable1"
+                    },
+                    {
+                        "Key": "aws:cloudformation:stack-name",
+                        "Value": "xyz-vpc-1-RouteTable-1AFSXQCNQF4LN"
+                    },
+                    {
+                        "Key": "xyz:vpc:component:type",
+                        "Value": "route"
+                    },
+                    {
+                        "Key": "xyz:cfn:version",
+                        "Value": "2.7.8"
+                    },
+                    {
+                        "Key": "aws:cloudformation:logical-id",
+                        "Value": "RouteTableIngress1"
+                    },
+                    {
+                        "Key": "Type",
+                        "Value": "Ingress"
+                    },
+                    {
+                        "Key": "xyz:vpc:env",
+                        "Value": "learning"
+                    },
+                    {
+                        "Key": "xyz:vpc:component:name",
+                        "Value": "IngressRouteTable1"
+                    }
+                ],
+                "VpcId": "vpc-012347c909f1f1896",
+                "OwnerId": "644160558196"
+            },
+            {
+                "Associations": [
+                    {
+                        "Main": false,
+                        "RouteTableAssociationId": "rtbassoc-0f8c83e0ef16c46b5",
+                        "RouteTableId": "rtb-02ddf9ac6ccafbd28",
+                        "SubnetId": "subnet-02c40a509d26f8d34",
+                        "AssociationState": {
+                            "State": "associated"
+                        }
+                    }
+                ],
+                "PropagatingVgws": [],
+                "RouteTableId": "rtb-02ddf9ac6ccafbd28",
+                "Routes": [
+                    {
+                        "DestinationCidrBlock": "10.0.0.0/21",
+                        "GatewayId": "local",
+                        "Origin": "CreateRouteTable",
+                        "State": "active"
+                    }
+                ],
+                "Tags": [
+                    {
+                        "Key": "Type",
+                        "Value": "Data"
+                    },
+                    {
+                        "Key": "aws:cloudformation:stack-name",
+                        "Value": "xyz-vpc-1-RouteTable-1AFSXQCNQF4LN"
+                    },
+                    {
+                        "Key": "xyz:cfn:version",
+                        "Value": "2.7.8"
+                    },
+                    {
+                        "Key": "xyz:vpc:component:name",
+                        "Value": "DataRouteTable2"
+                    },
+                    {
+                        "Key": "xyz:vpc:component:description",
+                        "Value": "Routes to local VPC but if VPN enabled will also have routes to QDC/LVDC datacenters"
+                    },
+                    {
+                        "Key": "aws:cloudformation:logical-id",
+                        "Value": "RouteTableData2"
+                    },
+                    {
+                        "Key": "xyz:vpc:env",
+                        "Value": "learning"
+                    },
+                    {
+                        "Key": "Name",
+                        "Value": "DataRouteTable2"
+                    },
+                    {
+                        "Key": "aws:cloudformation:stack-id",
+                        "Value": "arn:aws:cloudformation:us-west-2:644160558196:stack/xyz-vpc-1-RouteTable-1AFSXQCNQF4LN/2e051350-dfd7-11ec-bbab-02b759b22f01"
+                    },
+                    {
+                        "Key": "xyz:vpc:component:type",
+                        "Value": "route"
+                    }
+                ],
+                "VpcId": "vpc-012347c909f1f1896",
+                "OwnerId": "644160558196"
+            },
+            {
+                "Associations": [
+                    {
+                        "Main": false,
+                        "RouteTableAssociationId": "rtbassoc-092dbacf8ef5e6d2e",
+                        "RouteTableId": "rtb-036b56057df88bd48",
+                        "SubnetId": "subnet-0fba8806c8acb78c9",
+                        "AssociationState": {
+                            "State": "associated"
+                        }
+                    }
+                ],
+                "PropagatingVgws": [],
+                "RouteTableId": "rtb-036b56057df88bd48",
+                "Routes": [
+                    {
+                        "DestinationCidrBlock": "10.0.0.0/21",
+                        "GatewayId": "local",
+                        "Origin": "CreateRouteTable",
+                        "State": "active"
+                    },
+                    {
+                        "DestinationCidrBlock": "0.0.0.0/0",
+                        "GatewayId": "igw-047f2ff9f61175a8e",
+                        "Origin": "CreateRoute",
+                        "State": "active"
+                    },
+                    {
+                        "DestinationPrefixListId": "pl-00a54069",
+                        "GatewayId": "vpce-00cf599081019f56d",
+                        "Origin": "CreateRoute",
+                        "State": "active"
+                    },
+                    {
+                        "DestinationPrefixListId": "pl-68a54001",
+                        "GatewayId": "vpce-036452b71622c1bf8",
+                        "Origin": "CreateRoute",
+                        "State": "active"
+                    }
+                ],
+                "Tags": [
+                    {
+                        "Key": "Type",
+                        "Value": "Ingress"
+                    },
+                    {
+                        "Key": "xyz:vpc:component:type",
+                        "Value": "route"
+                    },
+                    {
+                        "Key": "xyz:cfn:version",
+                        "Value": "2.7.8"
+                    },
+                    {
+                        "Key": "Name",
+                        "Value": "IngressRouteTable2"
+                    },
+                    {
+                        "Key": "xyz:vpc:component:description",
+                        "Value": "Routes to local VPC, Internet via Internet Gateway and S3 via VPC Endpoint"
+                    },
+                    {
+                        "Key": "xyz:vpc:env",
+                        "Value": "learning"
+                    },
+                    {
+                        "Key": "xyz:vpc:component:name",
+                        "Value": "IngressRouteTable2"
+                    },
+                    {
+                        "Key": "aws:cloudformation:logical-id",
+                        "Value": "RouteTableIngress2"
+                    },
+                    {
+                        "Key": "aws:cloudformation:stack-name",
+                        "Value": "xyz-vpc-1-RouteTable-1AFSXQCNQF4LN"
+                    },
+                    {
+                        "Key": "aws:cloudformation:stack-id",
+                        "Value": "arn:aws:cloudformation:us-west-2:644160558196:stack/xyz-vpc-1-RouteTable-1AFSXQCNQF4LN/2e051350-dfd7-11ec-bbab-02b759b22f01"
+                    }
+                ],
+                "VpcId": "vpc-012347c909f1f1896",
+                "OwnerId": "644160558196"
+            },
+            {
+                "Associations": [
+                    {
+                        "Main": false,
+                        "RouteTableAssociationId": "rtbassoc-0ba8dd16a97cd8897",
+                        "RouteTableId": "rtb-0e40b5294fd751b38",
+                        "SubnetId": "subnet-0845061a295aef2b6",
+                        "AssociationState": {
+                            "State": "associated"
+                        }
+                    }
+                ],
+                "PropagatingVgws": [],
+                "RouteTableId": "rtb-0e40b5294fd751b38",
+                "Routes": [
+                    {
+                        "DestinationCidrBlock": "10.0.0.0/21",
+                        "GatewayId": "local",
+                        "Origin": "CreateRouteTable",
+                        "State": "active"
+                    },
+                    {
+                        "DestinationCidrBlock": "0.0.0.0/0",
+                        "GatewayId": "igw-047f2ff9f61175a8e",
+                        "Origin": "CreateRoute",
+                        "State": "active"
+                    },
+                    {
+                        "DestinationPrefixListId": "pl-00a54069",
+                        "GatewayId": "vpce-00cf599081019f56d",
+                        "Origin": "CreateRoute",
+                        "State": "active"
+                    },
+                    {
+                        "DestinationPrefixListId": "pl-68a54001",
+                        "GatewayId": "vpce-036452b71622c1bf8",
+                        "Origin": "CreateRoute",
+                        "State": "active"
+                    }
+                ],
+                "Tags": [
+                    {
+                        "Key": "Type",
+                        "Value": "Egress"
+                    },
+                    {
+                        "Key": "aws:cloudformation:logical-id",
+                        "Value": "RouteTableEgress2"
+                    },
+                    {
+                        "Key": "xyz:vpc:component:type",
+                        "Value": "route"
+                    },
+                    {
+                        "Key": "xyz:cfn:version",
+                        "Value": "2.7.8"
+                    },
+                    {
+                        "Key": "Name",
+                        "Value": "EgressRouteTable2"
+                    },
+                    {
+                        "Key": "xyz:vpc:component:name",
+                        "Value": "EgressRouteTable2"
+                    },
+                    {
+                        "Key": "xyz:vpc:component:description",
+                        "Value": "Routes to local VPC, Internet via Internet Gateway and S3 via VPC Endpoint"
+                    },
+                    {
+                        "Key": "xyz:vpc:env",
+                        "Value": "learning"
+                    },
+                    {
+                        "Key": "aws:cloudformation:stack-id",
+                        "Value": "arn:aws:cloudformation:us-west-2:644160558196:stack/xyz-vpc-1-RouteTable-1AFSXQCNQF4LN/2e051350-dfd7-11ec-bbab-02b759b22f01"
+                    },
+                    {
+                        "Key": "aws:cloudformation:stack-name",
+                        "Value": "xyz-vpc-1-RouteTable-1AFSXQCNQF4LN"
+                    }
+                ],
+                "VpcId": "vpc-012347c909f1f1896",
+                "OwnerId": "644160558196"
+            },
+            {
+                "Associations": [
+                    {
+                        "Main": true,
+                        "RouteTableAssociationId": "rtbassoc-086d5c250dc3c4d0c",
+                        "RouteTableId": "rtb-0c26eee79085b11b4",
+                        "AssociationState": {
+                            "State": "associated"
+                        }
+                    }
+                ],
+                "PropagatingVgws": [],
+                "RouteTableId": "rtb-0c26eee79085b11b4",
+                "Routes": [
+                    {
+                        "DestinationCidrBlock": "10.0.0.0/21",
+                        "GatewayId": "local",
+                        "Origin": "CreateRouteTable",
+                        "State": "active"
+                    }
+                ],
+                "Tags": [],
+                "VpcId": "vpc-012347c909f1f1896",
+                "OwnerId": "644160558196"
+            },
+            {
+                "Associations": [
+                    {
+                        "Main": false,
+                        "RouteTableAssociationId": "rtbassoc-017f32b3f6f718011",
+                        "RouteTableId": "rtb-006b59c15032dee2c",
+                        "SubnetId": "subnet-03f2787d0dd5a9094",
+                        "AssociationState": {
+                            "State": "associated"
+                        }
+                    }
+                ],
+                "PropagatingVgws": [],
+                "RouteTableId": "rtb-006b59c15032dee2c",
+                "Routes": [
+                    {
+                        "DestinationCidrBlock": "10.0.0.0/21",
+                        "GatewayId": "local",
+                        "Origin": "CreateRouteTable",
+                        "State": "active"
+                    },
+                    {
+                        "DestinationCidrBlock": "0.0.0.0/0",
+                        "GatewayId": "igw-047f2ff9f61175a8e",
+                        "Origin": "CreateRoute",
+                        "State": "active"
+                    },
+                    {
+                        "DestinationPrefixListId": "pl-00a54069",
+                        "GatewayId": "vpce-00cf599081019f56d",
+                        "Origin": "CreateRoute",
+                        "State": "active"
+                    },
+                    {
+                        "DestinationPrefixListId": "pl-68a54001",
+                        "GatewayId": "vpce-036452b71622c1bf8",
+                        "Origin": "CreateRoute",
+                        "State": "active"
+                    }
+                ],
+                "Tags": [
+                    {
+                        "Key": "xyz:vpc:component:name",
+                        "Value": "EgressRouteTable3"
+                    },
+                    {
+                        "Key": "xyz:vpc:component:type",
+                        "Value": "route"
+                    },
+                    {
+                        "Key": "Type",
+                        "Value": "Egress"
+                    },
+                    {
+                        "Key": "aws:cloudformation:stack-id",
+                        "Value": "arn:aws:cloudformation:us-west-2:644160558196:stack/xyz-vpc-1-RouteTable-1AFSXQCNQF4LN/2e051350-dfd7-11ec-bbab-02b759b22f01"
+                    },
+                    {
+                        "Key": "aws:cloudformation:stack-name",
+                        "Value": "xyz-vpc-1-RouteTable-1AFSXQCNQF4LN"
+                    },
+                    {
+                        "Key": "xyz:vpc:component:description",
+                        "Value": "Routes to local VPC, Internet via Internet Gateway and S3 via VPC Endpoint"
+                    },
+                    {
+                        "Key": "xyz:vpc:env",
+                        "Value": "learning"
+                    },
+                    {
+                        "Key": "Name",
+                        "Value": "EgressRouteTable3"
+                    },
+                    {
+                        "Key": "xyz:cfn:version",
+                        "Value": "2.7.8"
+                    },
+                    {
+                        "Key": "aws:cloudformation:logical-id",
+                        "Value": "RouteTableEgress3"
+                    }
+                ],
+                "VpcId": "vpc-012347c909f1f1896",
+                "OwnerId": "644160558196"
+            },
+            {
+                "Associations": [
+                    {
+                        "Main": false,
+                        "RouteTableAssociationId": "rtbassoc-0cf259a49ac883b3e",
+                        "RouteTableId": "rtb-0da8d0fc8d7c46a45",
+                        "SubnetId": "subnet-06b85e2b5aac87c58",
+                        "AssociationState": {
+                            "State": "associated"
+                        }
+                    }
+                ],
+                "PropagatingVgws": [],
+                "RouteTableId": "rtb-0da8d0fc8d7c46a45",
+                "Routes": [
+                    {
+                        "DestinationCidrBlock": "10.0.0.0/21",
+                        "GatewayId": "local",
+                        "Origin": "CreateRouteTable",
+                        "State": "active"
+                    },
+                    {
+                        "DestinationCidrBlock": "0.0.0.0/0",
+                        "NatGatewayId": "nat-06e9acaa9c0ab8799",
+                        "Origin": "CreateRoute",
+                        "State": "active"
+                    },
+                    {
+                        "DestinationPrefixListId": "pl-00a54069",
+                        "GatewayId": "vpce-00cf599081019f56d",
+                        "Origin": "CreateRoute",
+                        "State": "active"
+                    },
+                    {
+                        "DestinationPrefixListId": "pl-68a54001",
+                        "GatewayId": "vpce-036452b71622c1bf8",
+                        "Origin": "CreateRoute",
+                        "State": "active"
+                    }
+                ],
+                "Tags": [
+                    {
+                        "Key": "aws:cloudformation:logical-id",
+                        "Value": "RouteTablePrivate2"
+                    },
+                    {
+                        "Key": "xyz:vpc:env",
+                        "Value": "learning"
+                    },
+                    {
+                        "Key": "aws:cloudformation:stack-name",
+                        "Value": "xyz-vpc-1-RouteTable-1AFSXQCNQF4LN"
+                    },
+                    {
+                        "Key": "xyz:vpc:component:description",
+                        "Value": "Routes to local VPC, Internet via NAT Gateway, S3 via VPC Endpoint and if VPN enabled will have routes to QDC/LVDC datacenters"
+                    },
+                    {
+                        "Key": "xyz:vpc:component:name",
+                        "Value": "PrivateRouteTable2"
+                    },
+                    {
+                        "Key": "xyz:vpc:component:type",
+                        "Value": "route"
+                    },
+                    {
+                        "Key": "aws:cloudformation:stack-id",
+                        "Value": "arn:aws:cloudformation:us-west-2:644160558196:stack/xyz-vpc-1-RouteTable-1AFSXQCNQF4LN/2e051350-dfd7-11ec-bbab-02b759b22f01"
+                    },
+                    {
+                        "Key": "Type",
+                        "Value": "Private"
+                    },
+                    {
+                        "Key": "xyz:cfn:version",
+                        "Value": "2.7.8"
+                    },
+                    {
+                        "Key": "Name",
+                        "Value": "PrivateRouteTable2"
+                    }
+                ],
+                "VpcId": "vpc-012347c909f1f1896",
+                "OwnerId": "644160558196"
+            },
+            {
+                "Associations": [
+                    {
+                        "Main": false,
+                        "RouteTableAssociationId": "rtbassoc-09390e85f42bcab20",
+                        "RouteTableId": "rtb-0564036d8c3e1e117",
+                        "SubnetId": "subnet-0a57b9d3da96e4364",
+                        "AssociationState": {
+                            "State": "associated"
+                        }
+                    }
+                ],
+                "PropagatingVgws": [],
+                "RouteTableId": "rtb-0564036d8c3e1e117",
+                "Routes": [
+                    {
+                        "DestinationCidrBlock": "10.0.0.0/21",
+                        "GatewayId": "local",
+                        "Origin": "CreateRouteTable",
+                        "State": "active"
+                    },
+                    {
+                        "DestinationCidrBlock": "0.0.0.0/0",
+                        "NatGatewayId": "nat-06e9acaa9c0ab8799",
+                        "Origin": "CreateRoute",
+                        "State": "active"
+                    },
+                    {
+                        "DestinationPrefixListId": "pl-00a54069",
+                        "GatewayId": "vpce-00cf599081019f56d",
+                        "Origin": "CreateRoute",
+                        "State": "active"
+                    },
+                    {
+                        "DestinationPrefixListId": "pl-68a54001",
+                        "GatewayId": "vpce-036452b71622c1bf8",
+                        "Origin": "CreateRoute",
+                        "State": "active"
+                    }
+                ],
+                "Tags": [
+                    {
+                        "Key": "xyz:cfn:version",
+                        "Value": "2.7.8"
+                    },
+                    {
+                        "Key": "xyz:vpc:component:description",
+                        "Value": "Routes to local VPC, Internet via NAT Gateway, S3 via VPC Endpoint and if VPN enabled will have routes to QDC/LVDC datacenters"
+                    },
+                    {
+                        "Key": "xyz:vpc:component:type",
+                        "Value": "route"
+                    },
+                    {
+                        "Key": "aws:cloudformation:logical-id",
+                        "Value": "RouteTablePrivate1"
+                    },
+                    {
+                        "Key": "aws:cloudformation:stack-name",
+                        "Value": "xyz-vpc-1-RouteTable-1AFSXQCNQF4LN"
+                    },
+                    {
+                        "Key": "xyz:vpc:env",
+                        "Value": "learning"
+                    },
+                    {
+                        "Key": "Name",
+                        "Value": "PrivateRouteTable1"
+                    },
+                    {
+                        "Key": "aws:cloudformation:stack-id",
+                        "Value": "arn:aws:cloudformation:us-west-2:644160558196:stack/xyz-vpc-1-RouteTable-1AFSXQCNQF4LN/2e051350-dfd7-11ec-bbab-02b759b22f01"
+                    },
+                    {
+                        "Key": "Type",
+                        "Value": "Private"
+                    },
+                    {
+                        "Key": "xyz:vpc:component:name",
+                        "Value": "PrivateRouteTable1"
+                    }
+                ],
+                "VpcId": "vpc-012347c909f1f1896",
+                "OwnerId": "644160558196"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

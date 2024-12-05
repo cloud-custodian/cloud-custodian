@@ -1,0 +1,59 @@
+name: "Functional"
+
+on:
+  workflow_dispatch: {}
+jobs:
+  AWS:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+      checks: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_FTEST_ROLE }}
+          aws-region: us-east-1
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+          # last OSS version
+          terraform_version: "1.5.5"
+
+      - name: Install Custodian
+        uses: ./.github/composites/install
+        with:
+          python-version: "3.11"
+
+      - name: Set up cache
+        uses: actions/cache@v4
+        id: tfcache
+        with:
+          path: .tfcache
+          key: tf-${{ runner.os }}-${{ hashFiles('**/*.tf') }}            
+
+      - name: Functional Tests
+        run: |
+          mkdir -p .tfcache
+          pytest -m "terraform and audited and not skiplive" -v tests
+        env:
+          C7N_FUNCTIONAL: "true"
+          C7N_TEST_RUN: "true"
+
+      - name: Notify Slack
+        uses: ravsamhq/notify-slack-action@v2
+        if: always()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_CI_HOOK }}
+        with:
+          status: ${{ job.status }}
+          notification_title: "{workflow}:{job} has {status_message}"
+          message_format: "{emoji} *{workflow}:{job}* {status_message} in <{repo_url}|{repo}>"
+          footer: "Logs <{run_url}|{job}>"
+          notify_when: "failure,success"

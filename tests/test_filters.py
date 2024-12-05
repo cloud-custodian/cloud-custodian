@@ -1,31 +1,24 @@
-# Copyright 2015-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
+import copy
 import calendar
+from collections import namedtuple
 from datetime import datetime, timedelta
 from dateutil import tz
 from dateutil.parser import parse as parse_date
+import random
 import unittest
 import os
 
-from c7n.exceptions import PolicyValidationError
+from c7n.exceptions import PolicyValidationError, PolicyExecutionError
 from c7n.executor import MainThreadExecutor
 from c7n import filters as base_filters
 from c7n.resources.ec2 import filters
 from c7n.resources.elb import ELB
+from c7n.testing import mock_datetime_now
 from c7n.utils import annotation
 from .common import instance, event_data, Bag, BaseTest
-from c7n.filters.core import ValueRegex, parse_date as core_parse_date
+from c7n.filters.core import AnnotationSweeper, ValueRegex, parse_date as core_parse_date
 
 
 class BaseFilterTest(unittest.TestCase):
@@ -194,6 +187,7 @@ class TestValueFilter(unittest.TestCase):
         value = "10.10.10.10"
         res = vf.process_value_type(sentinel, value, resource)
         self.assertEqual((str(res[0]), str(res[1])), (sentinel, value))
+
         vf.vtype = "cidr_size"
         value = "10.10.10.300"
         res = vf.process_value_type(sentinel, value, resource)
@@ -219,10 +213,20 @@ class TestValueFilter(unittest.TestCase):
 
     def test_value_type_expr(self):
         resource = {'a': 1, 'b': 1}
+
+        # test explicit op
         vf = filters.factory({
             "type": "value",
             "value": "b",
             "op": 'eq',
+            "value_type": "expr",
+            "key": "a"})
+        self.assertTrue(vf.match(resource))
+
+        # test implicit/fallback op
+        vf = filters.factory({
+            "type": "value",
+            "value": "b",
             "value_type": "expr",
             "key": "a"})
         self.assertTrue(vf.match(resource))
@@ -238,6 +242,66 @@ class TestValueFilter(unittest.TestCase):
         self.assertTrue(vf.content_initialized)
         self.assertEqual(vf.v, None)
         self.assertFalse(res)
+
+    def test_value_type_cidr(self):
+        # test cidr range match
+        resource = {"ingress": "10.10.10.0/24"}
+        TestCidrValue = namedtuple("TestCidrValue", ["value", "contains_resource"])
+
+        test_networks = [
+            TestCidrValue("10.10.0.0/16", True),
+            TestCidrValue(["10.10.0.0/16"], True),
+            TestCidrValue(["172.17.0.0/24", "10.10.0.0/16"], True),
+            TestCidrValue("10.0.0.0/16", False),
+            TestCidrValue(["10.0.0.0/16"], False),
+            TestCidrValue(["172.17.0.0/24", "10.0.0.0/16"], False)
+        ]
+
+        for net in test_networks:
+            vf = filters.factory({
+                "type": "value",
+                "value": net.value,
+                "op": "in",
+                "value_type": "cidr",
+                "key": "ingress"})
+            res = vf.match(resource)
+            self.assertEqual(res, net.contains_resource)
+
+            vf = filters.factory({
+                "type": "value",
+                "value": net.value,
+                "op": "not-in",
+                "value_type": "cidr",
+                "key": "ingress"})
+            res = vf.match(resource)
+            self.assertEqual(res, not net.contains_resource)
+
+        resource = {"ingress": "xyz"}
+        vf = filters.factory({
+            "type": "value",
+            "value": ["abc"],
+            "op": "in",
+            "value_type": "cidr",
+            "key": "ingress"})
+        self.assertRaises(TypeError, vf.match(resource))
+
+    def test_value_path(self):
+        resource = {'list': [{'a': ['one', 'two'], 'b': 'one'}, {'a': ['one'], 'b': 'two'}]}
+        vf = filters.factory({
+            "type": "value",
+            "key": "list[?(b=='one')].a[]",
+            "value_path": "list[?(b=='two')].a[]",
+            "op": "intersect"})
+        res = vf.match(resource)
+        self.assertEqual(res, True)
+
+        vf = filters.factory({
+            "type": "value",
+            "key": "list[?(b=='one')].a[]",
+            "value_path": "list[?(b=='three')].a[]",
+            "op": "intersect"})
+        res = vf.match(resource)
+        self.assertEqual(res, False)
 
 
 class TestAgeFilter(unittest.TestCase):
@@ -341,6 +405,28 @@ class TestValueTypes(BaseFilterTest):
         fdata["op"] = "equal"
         self.assertFilter(fdata, i("abc"), True)
 
+    def test_float(self):
+        fdata = {
+            "type": "value",
+            "key": "tag:Cost",
+            "op": "greater-than",
+            "value_type": "float",
+            "value": 10.0,
+        }
+
+        def i(d):
+            return instance(Tags=[{"Key": "Cost", "Value": d}])
+
+        self.assertFilter(fdata, i("9.9"), False)
+        self.assertFilter(fdata, i("42.1"), True)
+        self.assertFilter(fdata, i("42"), True)
+        self.assertFilter(fdata, i("abc"), False)
+
+        # set default value to 0.0 if the given value is not float
+        fdata["op"] = "equal"
+        fdata["value"] = 0.0
+        self.assertFilter(fdata, i("abc"), True)
+
     def test_integer_with_value_regex(self):
         fdata = {
             "type": "value",
@@ -426,7 +512,6 @@ class TestValueTypes(BaseFilterTest):
             else:
                 self.assertEqual(dt.year, y)
 
-        t("123456789", 1973)        # (1973, 11, 29, 13, 33, 9)
         t("1234567890", 2009)       # (2009, 2, 13, 15, 31, 30)
         t("1234567890123", 2009)    # (2009, 2, 13, 15, 31, 30, 123000)
 
@@ -996,6 +1081,22 @@ class TestIntersect(unittest.TestCase):
         self.assertEqual(f(instance(Thing=["C", "D", "E"])), True)
 
 
+class TestModValue(unittest.TestCase):
+    def test_mod(self):
+        f = filters.factory({
+            "type": "value",
+            "key": "Number",
+            "value": 3,
+            "op": "mod"
+        })
+        self.assertEqual(f(instance(Number=3)), False)
+        self.assertEqual(f(instance(Number=6)), False)
+        self.assertEqual(f(instance(Number=24)), False)
+        self.assertEqual(f(instance(Number=2)), True)
+        self.assertEqual(f(instance(Number=5)), True)
+        self.assertEqual(f(instance(Number=23)), True)
+
+
 class TestFilterRegistry(unittest.TestCase):
 
     def test_filter_registry(self):
@@ -1003,7 +1104,7 @@ class TestFilterRegistry(unittest.TestCase):
         self.assertRaises(PolicyValidationError, reg.factory, {"type": ""})
 
 
-class TestMissingMetrics(BaseTest):
+class TestMetricsFilter(BaseTest):
 
     def test_missing_metrics(self):
         self.patch(ELB, "executor_factory", MainThreadExecutor)
@@ -1055,14 +1156,632 @@ class TestMissingMetrics(BaseTest):
 
         self.assertEqual(len(resources), 2)
         self.assertEqual(all(
-            isinstance(res["c7n.metrics"]["AWS/ELB.RequestCount.Sum"], list)
+            isinstance(res["c7n.metrics"]["AWS/ELB.RequestCount.Sum.14"], list)
             for res in resources
         ), True)
         self.assertIn(
             "Fill value for missing data",
-            (res["c7n.metrics"]["AWS/ELB.RequestCount.Sum"][0].get("c7n:detail")
+            (res["c7n.metrics"]["AWS/ELB.RequestCount.Sum.14"][0].get("c7n:detail")
                 for res in resources)
         )
+
+    def test_metric_period_rounding(self):
+        """Round metrics start and end times to align with CloudWatch retention periods"""
+
+        with mock_datetime_now(parse_date("2020-12-03T04:47:15+00:00"), base_filters.metrics):
+            for (days, expected_start, expected_end) in (
+                ((1 / 24.0), "2020-12-03T03:47:16+00:00", "2020-12-03T04:47:16+00:00"),
+                (1, "2020-12-02T04:48:00+00:00", "2020-12-03T04:48:00+00:00"),
+                (20, "2020-11-13T04:50:00+00:00", "2020-12-03T04:50:00+00:00"),
+                (90, "2020-09-04T05:00:00+00:00", "2020-12-03T05:00:00+00:00"),
+            ):
+                p = self.load_policy(
+                    {
+                        "name": "sqs-no-messages",
+                        "resource": "sqs",
+                        "filters": [
+                            {
+                                "type": "metrics",
+                                "name": "NumberOfMessagesSent",
+                                "statistics": "Sum",
+                                "days": days,
+                                "value": 0,
+                                "op": "eq"
+                            }
+                        ]
+                    }
+                )
+                metrics_filter = p.resource_manager.filters[0]
+                window = metrics_filter.get_metric_window()
+                self.assertEqual(parse_date(expected_start), window.start)
+                self.assertEqual(parse_date(expected_end), window.end)
+
+    def test_metric_period_too_long(self):
+        """The longest CloudWatch retention period is 455 days. If we specify a period like 900
+        days, CloudWatch will happily show us 455 days of data with a start date 900 days ago.
+        Avoid that sort of confusion in validation."""
+
+        with self.assertRaises(PolicyValidationError) as err:
+            self.load_policy({
+                "name": "sqs-metrics-period-too-long",
+                "resource": "sqs",
+                "filters": [
+                    {
+                        "type": "metrics",
+                        "name": "NumberOfMessagesSent",
+                        "statistics": "Sum",
+                        "days": 900,
+                        "value": 0,
+                        "op": "eq"
+                    }
+                ]
+            })
+        self.assertIn('cannot exceed 455', str(err.exception))
+
+
+class TestReduceFilter(BaseFilterTest):
+
+    def instances(self):
+        return [
+            dict(InstanceId="A", Group="A", Foo="a", Bar="3", Date="2011/05/06"),
+            dict(InstanceId="B", Group="B", Foo="c", Bar="1", Date="2020/01/01"),
+            dict(InstanceId="C", Group="C", Foo="d", Date="2015-05-25T01:02:03"),
+            dict(InstanceId="D", Group="A", Foo="b", Date="1592870000"),  # 2020-06-22 23:53:20 UTC
+            dict(InstanceId="E", Group="B", Foo="e", Bar="23", Date="invalid"),
+            dict(InstanceId="F", Group="C", Foo="f"),
+        ]
+
+    def test_limit(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "limit": 2,
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(len(rs), 2)
+
+    def test_limit_no_number(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "limit": 0,
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(len(rs), len(resources))
+
+    def test_limit_negative_number(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "limit": -2,
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(len(rs), len(resources))
+
+    def test_limit_percent(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "limit-percent": 50,
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(len(rs), 3)
+        self.assertEqual([r['InstanceId'] for r in rs], ['A', 'B', 'C'])
+
+    def test_limit_percent_and_count(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "limit": 2,
+                "limit-percent": 50,
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(len(rs), 2)
+        self.assertEqual([r['InstanceId'] for r in rs], ['A', 'B'])
+
+    def test_discard(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "discard": 2,
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(len(rs), 4)
+
+    def test_discard_percent(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "discard": 2,
+                "discard-percent": 50,
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(len(rs), 3)
+        self.assertEqual([r['InstanceId'] for r in rs], ['D', 'E', 'F'])
+
+    def test_discard_and_limit(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "discard": 2,
+                "limit": 2,
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(len(rs), 2)
+        self.assertEqual([r['InstanceId'] for r in rs], ['C', 'D'])
+
+    def test_sort(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "sort-by": "Foo",
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(len(rs), len(resources))
+        self.assertEqual([r['Foo'] for r in rs], ['a', 'b', 'c', 'd', 'e', 'f'])
+
+    def test_sort_desc(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "sort-by": "Foo",
+                "order": "desc",
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(len(rs), len(resources))
+        self.assertEqual([r['Foo'] for r in rs], ['f', 'e', 'd', 'c', 'b', 'a'])
+
+    def test_group_sort(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "group-by": "Group",
+                "sort-by": "Foo",
+                "order": "desc",
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(len(rs), len(resources))
+        self.assertEqual([r['InstanceId'] for r in rs], ['F', 'C', 'E', 'B', 'D', 'A'])
+        ['D', 'A', 'E', 'B', 'F', 'C']
+
+    def test_group_sort_limit(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "group-by": "Group",
+                "sort-by": "Foo",
+                "order": "desc",
+                "limit": 1,
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(len(rs), 3)
+        self.assertEqual([r['InstanceId'] for r in rs], ['F', 'E', 'D'])
+
+    def test_randomize(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "order": "randomize",
+            }
+        )
+        # Set the rand seed to ensure that the random sets aren't accidentally
+        # the same.
+        random.seed(1234)
+        rs1 = f.process(resources)
+        rs2 = f.process(resources)
+        self.assertEqual(len(rs1), len(resources))
+        self.assertEqual(len(rs2), len(resources))
+        self.assertNotEqual(
+            [r['InstanceId'] for r in rs1],
+            [r['InstanceId'] for r in rs2]
+        )
+
+    def test_reverse(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "order": "reverse",
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(len(rs), len(resources))
+        self.assertEqual(
+            [r['InstanceId'] for r in rs],
+            [r['InstanceId'] for r in resources[::-1]]
+        )
+
+    def test_sort_string(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "sort-by": "Bar",
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(
+            [r['InstanceId'] for r in rs],
+            ['B', 'E', 'A', 'C', 'D', 'F']
+        )
+
+    def test_sort_number(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "sort-by": {
+                    "key": "Bar",
+                    "value_type": "number"
+                }
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(
+            [r['InstanceId'] for r in rs],
+            ['B', 'A', 'E', 'C', 'D', 'F']
+        )
+
+    def test_sort_date(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "sort-by": {
+                    "key": "Date",
+                    "value_type": "date"
+                }
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(
+            [r['InstanceId'] for r in rs],
+            ['A', 'C', 'B', 'D', 'E', 'F']
+        )
+
+    def test_group_string(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "group-by": "Bar",
+                "limit": 1,
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(len(rs), 4)
+        self.assertEqual(
+            [r['InstanceId'] for r in rs],
+            ['B', 'E', 'A', 'C']
+        )
+
+    def test_group_number(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "group-by": {
+                    "key": "Bar",
+                    "value_type": "number"
+                },
+                "limit": 1
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(
+            [r['InstanceId'] for r in rs],
+            ['B', 'A', 'E', 'C']
+        )
+
+    def test_group_regex_date_asc(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "group-by": {
+                    "key": "Date",
+                    "value_type": "date",
+                    "value_regex": "([0-9]{4}-[0-9]{2}-[0-9]{2}).*"
+                },
+                "limit": 1
+            }
+        )
+        f.validate()
+        rs = f.process(resources)
+        self.assertEqual(
+            [r['InstanceId'] for r in rs],
+            ['C', 'A']
+        )
+
+    def test_group_regex_date_desc(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "group-by": {
+                    "key": "Date",
+                    "value_type": "date",
+                    "value_regex": "([0-9]{4}[/-][0-9]{2}[/-][0-9]{2}).*",
+                },
+                "order": "desc",
+                "limit": 1
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(
+            [r['InstanceId'] for r in rs],
+            ['B', 'C', 'A', 'D']
+        )
+
+    def test_group_regex_date_desc_null_first(self):
+        resources = self.instances()
+        f = filters.factory(
+            {
+                "type": "reduce",
+                "group-by": {
+                    "key": "Date",
+                    "value_type": "date",
+                    "value_regex": "([0-9]{4}[/-][0-9]{2}[/-][0-9]{2}).*",
+                },
+                "order": "desc",
+                "null-order": "first",
+                "limit": 1
+            }
+        )
+        rs = f.process(resources)
+        self.assertEqual(
+            [r['InstanceId'] for r in rs],
+            ['D', 'B', 'C', 'A']
+        )
+
+
+class ListItemFilterTest(BaseFilterTest):
+
+    def get_manager(self):
+        class Manager:
+            ctx = unittest.mock.MagicMock()
+        m = Manager()
+        m.ctx.options.cache = None
+        return m
+
+    def instance(self, id_, list_):
+        return {
+            'id': id_,
+            'list_elements': list_
+        }
+
+    def resources(self, lists):
+        result = []
+        for i in range(len(lists)):
+            result.append(self.instance(i, lists[i]))
+        return result
+
+    def test_list_item_filter(self):
+        resources = self.resources(
+            [
+                [{'foo': 'bar', 'bar': '0'}],
+                [{'foo': 'bar', 'bar': '1'}],
+                [{'foo': 'bar', 'bar': '2'}]
+            ]
+        )
+        f = filters.factory(
+            {
+                'type': 'list-item',
+                'key': 'list_elements',
+                'attrs': [
+                    {'foo': 'bar'}
+                ]
+            }, manager=self.get_manager()
+        )
+        res = f.process(resources)
+        self.assertEqual(len(res), 3)
+
+    def test_list_item_filter_match_1(self):
+        resources = self.resources(
+            [
+                [{'foo': 'bar', 'bar': '0'}],
+                [{'foo': 'bar', 'bar': '1'}],
+                [{'foo': 'bar', 'bar': '2'}]
+            ]
+        )
+        f = filters.factory(
+            {
+                'type': 'list-item',
+                'key': 'list_elements',
+                'attrs': [
+                    {'foo': 'bar'},
+                    {'bar': '1'}
+                ]
+            }, manager=self.get_manager()
+        )
+        res = f.process(resources)
+        self.assertEqual(len(res), 1)
+
+    def test_list_item_filter_match_bool(self):
+        resources = self.resources(
+            [
+                [{'foo': 'bar', 'bar': '0'}],
+                [{'foo': 'bar', 'bar': '1'}],
+                [{'foo': 'bar', 'bar': '2'}]
+            ]
+        )
+        f = filters.factory(
+            {
+                'type': 'list-item',
+                'key': 'list_elements',
+                'attrs': [
+                    {'foo': 'bar'},
+                    {'or': [
+                        {'bar': '1'},
+                        {'bar': '0'}
+                    ]}
+                ]
+            }, manager=self.get_manager()
+        )
+        res = f.process(resources)
+        self.assertEqual(len(res), 2)
+
+    def test_list_item_filter_match_regex(self):
+        resources = self.resources(
+            [
+                [{'foo': 'bar', 'bar': 'c7n'}],
+                [{'foo': 'bar', 'bar': 'myregistry.com/c7n'}],
+                [{'foo': 'bar', 'bar': 'myregistry.com/c7n'}]
+            ]
+        )
+        f = filters.factory(
+            {
+                'type': 'list-item',
+                'key': 'list_elements',
+                'attrs': [
+                    {'foo': 'bar'},
+                    {
+                        'not': [
+                            {
+                                'type': 'value',
+                                'key': 'bar',
+                                'value': 'myregistry.com/.*',
+                                'op': 'regex'
+                            }
+                        ]
+                    }
+                ]
+            }, manager=self.get_manager()
+        )
+        res = f.process(resources)
+        self.assertEqual(len(res), 1)
+        self.assertEqual(res[0]['list_elements'][0]['bar'], 'c7n')
+        self.assertEqual(res[0]['c7n:ListItemMatches'], ['list_elements[0]'])
+
+    def test_list_item_filter_match_empty(self):
+        resources = self.resources(
+            [
+                [{'foo': 'bar', 'bar': 'c7n'}],
+                [{'foo': 'bar', 'bar': 'myregistry.com/c7n'}],
+                [{'foo': 'bar', 'bar': 'myregistry.com/c7n'}]
+            ]
+        )
+        f = filters.factory(
+            {
+                'type': 'list-item',
+                'key': 'baz',
+                'attrs': [
+                    {'foo': 'bar'},
+                    {
+                        'not': [
+                            {
+                                'type': 'value',
+                                'key': 'bar',
+                                'value': 'myregistry.com/.*',
+                                'op': 'regex'
+                            }
+                        ]
+                    }
+                ]
+            }, manager=self.get_manager()
+        )
+        res = f.process(resources)
+        self.assertEqual(len(res), 0)
+
+    def test_list_item_filter_match_non_list_value(self):
+        resources = self.resources(
+            [1, 2, 3]
+        )
+        f = filters.factory(
+            {
+                'type': 'list-item',
+                'key': 'id',
+                'attrs': [
+                    {'foo': 'bar'},
+                ]
+            }, manager=self.get_manager()
+        )
+        with self.assertRaises(PolicyExecutionError):
+            f.process(resources)
+
+    def test_list_item_filter_match_count(self):
+        resources = self.resources(
+            [
+                [{'foo': 'bar', 'bar': 'c7n'}, {'foo': 'bar'}, {'foo': 'bar'}, {'foo': 'bar'}],
+                [{'foo': 'bar', 'bar': 'c7n'}, {'foo': 'bar'}, {'foo': 'bar'}],
+                [{'foo': 'bar', 'bar': 'c7n'}, {'foo': 'bar'}],
+            ]
+        )
+        f = filters.factory(
+            {
+                'type': 'list-item',
+                'key': 'list_elements',
+                'count': 3,
+                'count_op': 'gt',
+                'attrs': [
+                    {'foo': 'bar'},
+                ]
+            }, manager=self.get_manager()
+        )
+        resources = f.process(resources)
+        self.assertEqual(len(resources), 1)
+
+
+class AnnotationSweeperTest(unittest.TestCase):
+    def test_annotation_sweep_jmespath(self):
+        resources = [
+            {
+                "metadata": {"uid": "foo"}, "c7n:annotation": "bar"
+            },
+            {
+                "metadata": {"uid": "bar"}, "c7n:annotation": "bar"
+            },
+            {
+                "metadata": {"uid": "baz"},
+            }
+        ]
+        sweeper = AnnotationSweeper(
+            id_key="metadata.uid", resources=resources)
+        sweeper.sweep(resources=resources)
+        self.assertEqual(len(resources), 3)
+        for r in resources:
+            self.assertTrue("c7n:annotation" not in resources)
+
+    def test_annotation_sweep_jmespath_no_annotations(self):
+        resources = [
+            {
+                "metadata": {"uid": "foo"},
+            },
+            {
+                "metadata": {"uid": "bar"},
+            }
+        ]
+        swept = copy.deepcopy(resources)
+        sweeper = AnnotationSweeper(
+            id_key="metadata.uid", resources=swept)
+        sweeper.sweep(resources=swept)
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(resources, swept)
 
 
 if __name__ == "__main__":

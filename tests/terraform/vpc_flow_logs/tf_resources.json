@@ -1,0 +1,93 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_cloudwatch_log_group": {
+            "example": {
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:example",
+                "id": "example",
+                "kms_key_id": "",
+                "name": "example",
+                "name_prefix": null,
+                "retention_in_days": 0,
+                "tags": null
+            }
+        },
+        "aws_flow_log": {
+            "example": {
+                "arn": "arn:aws:ec2:us-east-1:644160558196:vpc-flow-log/fl-069df76b301f1327d",
+                "eni_id": null,
+                "iam_role_arn": "arn:aws:iam::644160558196:role/example",
+                "id": "fl-069df76b301f1327d",
+                "log_destination": "arn:aws:logs:us-east-1:644160558196:log-group:example",
+                "log_destination_type": "cloud-watch-logs",
+                "log_format": "${version} ${account-id} ${interface-id} ${srcaddr} ${dstaddr} ${srcport} ${dstport} ${protocol} ${packets} ${bytes} ${start} ${end} ${action} ${log-status}",
+                "log_group_name": "example",
+                "max_aggregation_interval": 600,
+                "subnet_id": null,
+                "tags": null,
+                "traffic_type": "ALL",
+                "vpc_id": "vpc-065087ed31e016b80"
+            }
+        },
+        "aws_iam_role": {
+            "example": {
+                "arn": "arn:aws:iam::644160558196:role/example",
+                "assume_role_policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"vpc-flow-logs.amazonaws.com\"},\"Action\":\"sts:AssumeRole\"}]}",
+                "create_date": "2021-02-04T19:34:07Z",
+                "description": "",
+                "force_detach_policies": false,
+                "id": "example",
+                "max_session_duration": 3600,
+                "name": "example",
+                "name_prefix": null,
+                "path": "/",
+                "permissions_boundary": null,
+                "tags": null,
+                "unique_id": "AROAU77LF2IF3ZLAQDRY5"
+            }
+        },
+        "aws_vpc": {
+            "example": {
+                "arn": "arn:aws:ec2:us-east-1:644160558196:vpc/vpc-065087ed31e016b80",
+                "assign_generated_ipv6_cidr_block": false,
+                "cidr_block": "10.1.0.0/16",
+                "default_network_acl_id": "acl-0577cc82f4c760853",
+                "default_route_table_id": "rtb-06e7a03cae0ac0000",
+                "default_security_group_id": "sg-0ca73914f6d90a46c",
+                "dhcp_options_id": "dopt-daa1e3a0",
+                "enable_classiclink": false,
+                "enable_classiclink_dns_support": false,
+                "enable_dns_hostnames": false,
+                "enable_dns_support": true,
+                "id": "vpc-065087ed31e016b80",
+                "instance_tenancy": "default",
+                "ipv6_association_id": "",
+                "ipv6_cidr_block": "",
+                "main_route_table_id": "rtb-06e7a03cae0ac0000",
+                "owner_id": "644160558196",
+                "tags": null
+            },
+            "example_no_flow_log": {
+                "arn": "arn:aws:ec2:us-east-1:644160558196:vpc/vpc-0d2f08cdd14782e56",
+                "assign_generated_ipv6_cidr_block": false,
+                "cidr_block": "10.2.0.0/16",
+                "default_network_acl_id": "acl-0c570722e3fc38740",
+                "default_route_table_id": "rtb-0d38f82ec02cb15b3",
+                "default_security_group_id": "sg-011612d8e7c18512d",
+                "dhcp_options_id": "dopt-daa1e3a0",
+                "enable_classiclink": false,
+                "enable_classiclink_dns_support": false,
+                "enable_dns_hostnames": false,
+                "enable_dns_support": true,
+                "id": "vpc-0d2f08cdd14782e56",
+                "instance_tenancy": "default",
+                "ipv6_association_id": "",
+                "ipv6_cidr_block": "",
+                "main_route_table_id": "rtb-0d38f82ec02cb15b3",
+                "owner_id": "644160558196",
+                "tags": null
+            }
+        }
+    }
+}

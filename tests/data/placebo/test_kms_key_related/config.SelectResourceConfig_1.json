@@ -1,0 +1,24 @@
+{
+    "status_code": 200,
+    "data": {
+        "Results": [
+            "{\"resourceId\":\"https://sqs.us-east-1.amazonaws.com/644160558196/test-kms-alias\",\"configuration\":{\"ReceiveMessageWaitTimeSeconds\":0.0,\"CreatedTimestamp\":\"1618263401\",\"KmsMasterKeyId\":\"alias/aws/sqs\",\"DelaySeconds\":0.0,\"MessageRetentionPeriod\":345600.0,\"MaximumMessageSize\":262144.0,\"VisibilityTimeout\":30.0,\"KmsDataKeyReusePeriodSeconds\":\"300\",\"LastModifiedTimestamp\":\"1618263620\",\"QueueArn\":\"arn:aws:sqs:us-east-1:644160558196:test-kms-alias\"},\"supplementaryConfiguration\":{\"Tags\":{}}}",
+            "{\"resourceId\":\"https://sqs.us-east-1.amazonaws.com/644160558196/test-kms-id\",\"configuration\":{\"ReceiveMessageWaitTimeSeconds\":0.0,\"CreatedTimestamp\":\"1618307699\",\"KmsMasterKeyId\":\"arn:aws:kms:us-east-1:644160558196:key/5a4af27f-a9e6-40fb-a2ed-fc3fbfdb34a5\",\"DelaySeconds\":0.0,\"MessageRetentionPeriod\":345600.0,\"MaximumMessageSize\":262144.0,\"VisibilityTimeout\":30.0,\"KmsDataKeyReusePeriodSeconds\":\"300\",\"LastModifiedTimestamp\":\"1618307719\",\"QueueArn\":\"arn:aws:sqs:us-east-1:644160558196:test-kms-id\"},\"supplementaryConfiguration\":{\"Tags\":{}}}",
+            "{\"resourceId\":\"https://sqs.us-east-1.amazonaws.com/644160558196/test-kms-no-alias\",\"configuration\":{\"ReceiveMessageWaitTimeSeconds\":0.0,\"CreatedTimestamp\":\"1618263408\",\"KmsMasterKeyId\":\"arn:aws:kms:us-east-1:644160558196:key/4d327245-234d-4bf9-8c26-afd6ee1a65c8\",\"DelaySeconds\":0.0,\"MessageRetentionPeriod\":345600.0,\"MaximumMessageSize\":262144.0,\"VisibilityTimeout\":30.0,\"KmsDataKeyReusePeriodSeconds\":\"300\",\"LastModifiedTimestamp\":\"1618263592\",\"QueueArn\":\"arn:aws:sqs:us-east-1:644160558196:test-kms-no-alias\"},\"supplementaryConfiguration\":{\"Tags\":{}}}"
+        ],
+        "QueryInfo": {
+            "SelectFields": [
+                {
+                    "Name": "resourceId"
+                },
+                {
+                    "Name": "configuration"
+                },
+                {
+                    "Name": "supplementaryConfiguration"
+                }
+            ]
+        },
+        "ResponseMetadata": {}
+    }
+}

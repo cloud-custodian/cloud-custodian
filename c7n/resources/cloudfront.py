@@ -1,16 +1,5 @@
-# Copyright 2016-2019 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import re
 
 from c7n.actions import BaseAction
@@ -18,11 +7,12 @@ from c7n.filters import MetricsFilter, ShieldMetrics, Filter
 from c7n.manager import resources
 from c7n.query import ConfigSource, QueryResourceManager, DescribeSource, TypeInfo
 from c7n.tags import universal_augment
-from c7n.utils import local_session, type_schema, get_retry
-from c7n.filters import ValueFilter
+from c7n.utils import local_session, merge_dict, type_schema, get_retry
+from c7n.filters import ValueFilter, WafV2FilterBase
 from .aws import shape_validate
 from c7n.exceptions import PolicyValidationError
 
+from c7n.resources.aws import Arn
 from c7n.resources.shield import IsShieldProtected, SetShieldProtection
 from c7n.resources.securityhub import PostFinding
 
@@ -31,6 +21,19 @@ class DescribeDistribution(DescribeSource):
 
     def augment(self, resources):
         return universal_augment(self.manager, resources)
+
+    def get_resources(self, ids, cache=True):
+        results = []
+        distribution_ids = []
+        for i in ids:
+            # if we get cloudfront distribution arn, we pick distribution id
+            if i.startswith('arn:'):
+                distribution_ids.append(Arn.parse(i).resource)
+            else:
+                distribution_ids.append(i)
+        if distribution_ids:
+            results = super().get_resources(distribution_ids, cache)
+        return results
 
 
 @resources.register('distribution')
@@ -49,6 +52,7 @@ class Distribution(QueryResourceManager):
         cfn_type = config_type = "AWS::CloudFront::Distribution"
         # Denotes this resource type exists across regions
         global_resource = True
+        permission_augment = ("cloudfront:ListTagsForResource",)
 
     source_mapping = {
         'describe': DescribeDistribution,
@@ -85,6 +89,25 @@ class StreamingDistribution(QueryResourceManager):
     }
 
 
+@resources.register("origin-access-control")
+class OriginAccessControl(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = "cloudfront"
+        arn_type = "origin-access-control"
+        enum_spec = (
+            "list_origin_access_controls",
+            "OriginAccessControlList.Items",
+            None,
+        )
+        id = "Id"
+        description = "Description"
+        name = "Name"
+        signing_protocol = "SigningProtocol"
+        signing_behavior = "SigningBehavior"
+        origin_type = "OriginAccessControlOriginType"
+        cfn_type = "AWS::CloudFront::OriginAccessControl"
+
+
 Distribution.filter_registry.register('shield-metrics', ShieldMetrics)
 Distribution.filter_registry.register('shield-enabled', IsShieldProtected)
 Distribution.action_registry.register('set-shield', SetShieldProtection)
@@ -117,9 +140,20 @@ class DistributionMetrics(MetricsFilter):
 
 @Distribution.filter_registry.register('waf-enabled')
 class IsWafEnabled(Filter):
-    # useful primarily to use the same name across accounts, else webaclid
-    # attribute works as well
+    """Filter CloudFront distribution by waf-regional web-acl
 
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: filter-distribution-waf
+                resource: distribution
+                filters:
+                  - type: waf-enabled
+                    state: false
+                    web-acl: test
+    """
     schema = type_schema(
         'waf-enabled', **{
             'web-acl': {'type': 'string'},
@@ -142,7 +176,8 @@ class IsWafEnabled(Filter):
         for r in resources:
             if state and target_acl_id is None and r.get('WebACLId'):
                 results.append(r)
-            elif not state and target_acl_id is None and not r.get('WebACLId'):
+            elif not state and target_acl_id is None and (not r.get('WebACLId') or
+                    r.get('WebACLId') not in waf_name_id_map.values()):
                 results.append(r)
             elif state and target_acl_id and r['WebACLId'] == target_acl_id:
                 results.append(r)
@@ -151,8 +186,65 @@ class IsWafEnabled(Filter):
         return results
 
 
+@Distribution.filter_registry.register('wafv2-enabled')
+class IsWafV2Enabled(WafV2FilterBase):
+    """Filter CloudFront distribution by wafv2 web-acl
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: filter-distribution-wafv2
+                description: |
+                  match resources that are NOT associated with any wafV2 web-acls
+                resource: distribution
+                filters:
+                  - type: wafv2-enabled
+                    state: false
+
+              - name: filter-distribution-wafv2-specific-acl
+                description: |
+                  match resources that are NOT associated with wafV2's testv2 web-acl
+                resource: distribution
+                filters:
+                  - type: wafv2-enabled
+                    state: false
+                    web-acl: testv2
+
+              - name: filter-distribution-wafv2-regex
+                description: |
+                  match resources that are NOT associated with specified
+                  wafV2 web-acl regex
+                resource: distribution
+                filters:
+                  - type: wafv2-enabled
+                    state: false
+                    web-acl: .*FMManagedWebACLV2-?FMS-.*
+    """
+
+    def get_associated_web_acl(self, resource):
+        # for WAFv2 Cloudfront stores the ARN of the WebACL even though the attribute is 'WebACLId'
+        return self.get_web_acl_by_arn(resource.get('WebACLId'), scope='CLOUDFRONT')
+
+
+class BaseDistributionConfig(ValueFilter):
+    schema = type_schema('distribution-config', rinherit=ValueFilter.schema)
+    schema_alias = False
+    annotation_key = 'c7n:distribution-config'
+    annotate = False
+
+    def process(self, resources, event=None):
+
+        self.augment([r for r in resources if self.annotation_key not in r])
+        return super().process(resources, event)
+
+    def __call__(self, r):
+        return super(BaseDistributionConfig, self).__call__(r[self.annotation_key])
+
+
 @Distribution.filter_registry.register('distribution-config')
-class DistributionConfig(ValueFilter):
+class DistributionConfig(BaseDistributionConfig):
     """Check for Cloudfront distribution config values
 
     :example:
@@ -165,22 +257,11 @@ class DistributionConfig(ValueFilter):
                 filters:
                   - type: distribution-config
                     key: Logging.Enabled
-                    value: true
+                    value: False
    """
-
-    schema = type_schema('distribution-config', rinherit=ValueFilter.schema)
-    schema_alias = False
     permissions = ('cloudfront:GetDistributionConfig',)
-    annotation_key = 'c7n:distribution-config'
-    annotate = False
-
-    def process(self, resources, event=None):
-
-        self.augment([r for r in resources if self.annotation_key not in r])
-        return super().process(resources, event)
 
     def augment(self, resources):
-
         client = local_session(self.manager.session_factory).client(
             'cloudfront', region_name=self.manager.config.region)
 
@@ -196,8 +277,41 @@ class DistributionConfig(ValueFilter):
                     r['ARN'], e)
                 raise e
 
-    def __call__(self, r):
-        return super(DistributionConfig, self).__call__(r[self.annotation_key])
+
+@StreamingDistribution.filter_registry.register('distribution-config')
+class StreamingDistributionConfig(BaseDistributionConfig):
+    """Check for Cloudfront streaming distribution config values
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: streaming-distribution-logging-enabled
+                resource: streaming-distribution
+                filters:
+                  - type: distribution-config
+                    key: Logging.Enabled
+                    value: true
+   """
+    permissions = ('cloudfront:GetStreamingDistributionConfig',)
+
+    def augment(self, resources):
+
+        client = local_session(self.manager.session_factory).client(
+            'cloudfront', region_name=self.manager.config.region)
+
+        for r in resources:
+            try:
+                r[self.annotation_key] = client.get_streaming_distribution_config(Id=r['Id']) \
+                    .get('StreamingDistributionConfig')
+            except (client.exceptions.NoSuchStreamingDistribution):
+                r[self.annotation_key] = {}
+            except Exception as e:
+                self.log.warning(
+                    "Exception trying to get Streaming Distribution Config: %s error: %s",
+                    r['ARN'], e)
+                raise e
 
 
 @Distribution.filter_registry.register('mismatch-s3-origin')
@@ -217,8 +331,8 @@ class MismatchS3Origin(Filter):
                     check_custom_origins: true
    """
 
-    s3_prefix = re.compile(r'.*(?=\.s3(-.*)?\.amazonaws.com)')
-    s3_suffix = re.compile(r'^([^.]+\.)?s3(-.*)?\.amazonaws.com')
+    s3_prefix = re.compile(r'.*(?=\.s3(-.*)?(\..*-\d)?\.amazonaws.com)')
+    s3_suffix = re.compile(r'^([^.]+\.)?s3(-.*)?(\..*-\d)?\.amazonaws.com')
 
     schema = type_schema(
         'mismatch-s3-origin',
@@ -279,17 +393,30 @@ class DistributionPostFinding(PostFinding):
 
     def format_resource(self, r):
         envelope, payload = self.format_envelope(r)
-        origins = r['DistributionConfig']['Origins']
+        origins = r['Origins']
 
         payload.update(self.filter_empty({
             'DomainName': r['DomainName'],
-            'WebACLId': r.get('WebACLId'),
-            'LastModifiedTime': r['LastModifiedTime'],
+            "WebAclId": r.get('WebACLId'),
+            'LastModifiedTime': r['LastModifiedTime'].isoformat(),
             'Status': r['Status'],
-            'Logging': self.filter_empty(r['DistributionConfig'].get('Logging', {})),
-            'Origins': [
-                dict(Id=o['Id'], OriginPath=o['OriginPath'], DomainName=o['DomainName'])
-                for o in origins]
+            'Logging': self.filter_empty(r.get('Logging', {})),
+            'Origins': {
+                'Items': [
+                    {
+                        # Extract a subset of origin item keys,
+                        # only if they're non-empty.
+                        #
+                        # The full item can be large and noisy, and
+                        # empty string values (notably for OriginPath)
+                        # will fail validation.
+                        k: o[k]
+                        for k in self.filter_empty(o)
+                        if k in ('Id', 'OriginPath', 'DomainName')
+                    }
+                    for o in origins['Items']
+                ]
+            }
         }))
 
         return envelope
@@ -297,6 +424,37 @@ class DistributionPostFinding(PostFinding):
 
 @Distribution.action_registry.register('set-waf')
 class SetWaf(BaseAction):
+    """Enable waf protection on CloudFront distribution.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: set-waf-for-cloudfront
+                resource: distribution
+                filters:
+                  - type: waf-enabled
+                    state: false
+                    web-acl: test
+                actions:
+                  - type: set-waf
+                    state: true
+                    force: true
+                    web-acl: test
+
+              - name: disassociate-waf-associate-wafv2-cf
+                resource: distribution
+                filters:
+                  - type: waf-enabled
+                    state: true
+                actions:
+                  - type: set-wafv2
+                    state: true
+                    force: true
+                    web-acl: testv2
+
+    """
     permissions = ('cloudfront:UpdateDistribution', 'waf:ListWebACLs')
     schema = type_schema(
         'set-waf', required=['web-acl'], **{
@@ -317,6 +475,91 @@ class SetWaf(BaseAction):
 
         client = local_session(self.manager.session_factory).client(
             'cloudfront')
+        force = self.data.get('force', False)
+
+        for r in resources:
+            if r.get('WebACLId') and not force:
+                continue
+            if r.get('WebACLId') == target_acl_id:
+                continue
+            result = client.get_distribution_config(Id=r['Id'])
+            config = result['DistributionConfig']
+            config['WebACLId'] = target_acl_id
+            self.retry(
+                client.update_distribution,
+                Id=r['Id'], DistributionConfig=config, IfMatch=result['ETag'])
+
+
+@Distribution.action_registry.register('set-wafv2')
+class SetWafv2(BaseAction):
+    """Enable wafv2 protection on CloudFront distribution.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: set-wafv2-for-cloudfront
+                resource: distribution
+                filters:
+                  - type: wafv2-enabled
+                    state: false
+                    web-acl: testv2
+                actions:
+                  - type: set-wafv2
+                    state: true
+                    force: true
+                    web-acl: testv2
+
+              - name: disassociate-wafv2-associate-waf-cf
+                resource: distribution
+                filters:
+                  - type: wafv2-enabled
+                    state: true
+                actions:
+                  - type: set-waf
+                    state: true
+                    force: true
+                    web-acl: test
+
+            policies:
+              - name: set-wafv2-for-cloudfront-regex
+                resource: distribution
+                filters:
+                  - type: wafv2-enabled
+                    state: false
+                    web-acl: .*FMManagedWebACLV2-?FMS-.*
+                actions:
+                  - type: set-wafv2
+                    state: true
+                    web-acl: FMManagedWebACLV2-?FMS-TestWebACL
+    """
+    permissions = ('cloudfront:UpdateDistribution', 'wafv2:ListWebACLs')
+    schema = type_schema(
+        'set-wafv2', **{
+            'web-acl': {'type': 'string'},
+            'force': {'type': 'boolean'},
+            'state': {'type': 'boolean'}})
+
+    retry = staticmethod(get_retry(('Throttling',)))
+
+    def process(self, resources):
+        query = {'Scope': 'CLOUDFRONT'}
+        wafs = self.manager.get_resource_manager('wafv2').resources(query, augment=False)
+        waf_name_id_map = {w['Name']: w['ARN'] for w in wafs}
+        state = self.data.get('state', True)
+
+        target_acl_id = ''
+        if state:
+            target_acl = self.data.get('web-acl', '')
+            target_acl_ids = [v for k, v in waf_name_id_map.items() if
+                              re.match(target_acl, k)]
+            if len(target_acl_ids) != 1:
+                raise ValueError(f'{target_acl} matching to none or '
+                                 f'multiple webacls')
+            target_acl_id = target_acl_ids[0]
+
+        client = local_session(self.manager.session_factory).client('cloudfront')
         force = self.data.get('force', False)
 
         for r in resources:
@@ -512,8 +755,38 @@ class DistributionSSLAction(BaseAction):
             return
 
 
+class BaseUpdateAction(BaseAction):
+    schema = type_schema('set-attributes',
+                        attributes={"type": "object"},
+                        required=('attributes',))
+    schema_alias = False
+
+    def validate(self, config_name, shape):
+        attrs = dict(self.data.get('attributes'))
+        if attrs.get('CallerReference'):
+            raise PolicyValidationError('CallerReference field cannot be updated')
+
+        # Set default values for required fields if they are not present
+        attrs["CallerReference"] = ""
+        config = self.validation_config
+        updatedConfig = {**config, **attrs}
+
+        request = {
+            config_name: updatedConfig,
+            "Id": "sample_id",
+            "IfMatch": "sample_string",
+        }
+        return shape_validate(request, shape, 'cloudfront')
+
+    def process(self, distributions):
+        client = local_session(self.manager.session_factory).client(
+            self.manager.get_model().service)
+        for d in distributions:
+            self.process_distribution(client, d)
+
+
 @Distribution.action_registry.register('set-attributes')
-class DistributionUpdateAction(BaseAction):
+class DistributionUpdateAction(BaseUpdateAction):
     """Action to update the attributes of a distribution
 
     :example:
@@ -538,70 +811,49 @@ class DistributionUpdateAction(BaseAction):
                     Bucket: 'test-enable-logging-c7n.s3.amazonaws.com'
                     Prefix: ''
     """
-    schema = type_schema('set-attributes',
-                        attributes={"type": "object"},
-                        required=('attributes',))
-
     permissions = ("cloudfront:UpdateDistribution",
                    "cloudfront:GetDistributionConfig",)
     shape = 'UpdateDistributionRequest'
+    validation_config = {
+        'Origins': {
+            'Quantity': 0,
+            'Items': [{
+                'Id': '',
+                'DomainName': ''
+            }]
+        },
+        'DefaultCacheBehavior': {
+            'TargetOriginId': '',
+            'ForwardedValues': {
+                'QueryString': True,
+                'Cookies': {
+                    'Forward': ''
+                }
+            },
+            'TrustedSigners': {
+                'Enabled': True,
+                'Quantity': 0
+            },
+            'ViewerProtocolPolicy': '',
+            'MinTTL': 0
+        },
+        'Comment': '',
+        'Enabled': False
+    }
 
     def validate(self):
-        attrs = dict(self.data.get('attributes'))
-        if attrs.get('CallerReference'):
-            raise PolicyValidationError('CallerReference field cannot be updated')
-
-        # Set default values for required fields if they are not present
-        attrs["CallerReference"] = ""
-        self.set_required_update_fields(attrs)
-        request = {
-            "DistributionConfig": attrs,
-            "Id": "sample_id",
-            "IfMatch": "sample_string",
-        }
-        return shape_validate(request, self.shape, 'cloudfront')
-
-    def set_required_update_fields(self, config):
-        if 'Origins' not in config:
-            config["Origins"] = {
-                "Quantity": 0,
-                "Items": [
-                    {
-                        "Id": "",
-                        "DomainName": ""
-                    }
-                ],
-            }
-        if 'DefaultCacheBehavior' not in config:
-            config["DefaultCacheBehavior"] = {
-                "TargetOriginId": "",
-                "ForwardedValues": {
-                    "QueryString": True,
-                    "Cookies": {
-                        "Forward": ""
-                    }
-                },
-                "TrustedSigners": {
-                    "Enabled": True,
-                    "Quantity": 0,
-                },
-                "ViewerProtocolPolicy": "",
-                "MinTTL": 0
-            }
-
-    def process(self, distributions):
-        client = local_session(self.manager.session_factory).client(
-            self.manager.get_model().service)
-        for d in distributions:
-            self.process_distribution(client, d)
+        return super().validate('DistributionConfig', self.shape)
 
     def process_distribution(self, client, distribution):
         try:
             res = client.get_distribution_config(
                 Id=distribution[self.manager.get_model().id])
-            config = res['DistributionConfig']
-            updatedConfig = {**config, **self.data['attributes']}
-            self.set_required_update_fields(updatedConfig)
+            default_config = self.validation_config
+            config = {**default_config, **res['DistributionConfig']}
+
+            # Recursively merge config to allow piecemeal updates of
+            # nested structures
+            updatedConfig = merge_dict(config, self.data['attributes'])
             if config == updatedConfig:
                 return
             res = client.update_distribution(
@@ -609,10 +861,79 @@ class DistributionUpdateAction(BaseAction):
                 IfMatch=res['ETag'],
                 DistributionConfig=updatedConfig
             )
-        except (client.exceptions.NoSuchResource, client.exceptions.NoSuchDistribution):
+        except (client.exceptions.NoSuchDistribution):
             pass
         except Exception as e:
             self.log.warning(
                 "Exception trying to update Distribution: %s error: %s",
                 distribution['ARN'], e)
+            raise e
+
+
+StreamingDistribution.filter_registry.register('shield-enabled', IsShieldProtected)
+StreamingDistribution.action_registry.register('set-shield', SetShieldProtection)
+
+
+@StreamingDistribution.action_registry.register('set-attributes')
+class StreamingDistributionUpdateAction(BaseUpdateAction):
+    """Action to update the attributes of a distribution
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+        - name: enforce-streaming-distribution-logging
+          resource: streaming-distribution
+          filters:
+            - type: value
+              key: "Logging.Enabled"
+              value: false
+          actions:
+            - type: set-attributes
+              attributes:
+                Logging:
+                    Enabled: true
+                    Bucket: 'test-enable-logging-c7n.s3.amazonaws.com'
+                    Prefix: ''
+    """
+    permissions = ("cloudfront:UpdateStreamingDistribution",
+                   "cloudfront:GetStreamingDistributionConfig",)
+    shape = 'UpdateStreamingDistributionRequest'
+    validation_config = {
+        'S3Origin': {
+            'DomainName': 'domain_name',
+            'OriginAccessIdentity': 'origin_access_identity'
+        },
+        'TrustedSigners': {
+            'Enabled': False,
+            'Quantity': 0
+        },
+        'Comment': '',
+        'Enabled': False
+    }
+
+    def validate(self):
+        return super().validate('StreamingDistributionConfig', self.shape)
+
+    def process_distribution(self, client, streaming_distribution):
+        try:
+            res = client.get_streaming_distribution_config(
+                Id=streaming_distribution[self.manager.get_model().id])
+            default_config = self.validation_config
+            config = {**default_config, **res['StreamingDistributionConfig']}
+            updatedConfig = {**config, **self.data['attributes']}
+            if config == updatedConfig:
+                return
+            res = client.update_streaming_distribution(
+                Id=streaming_distribution[self.manager.get_model().id],
+                IfMatch=res['ETag'],
+                StreamingDistributionConfig=updatedConfig
+            )
+        except (client.exceptions.NoSuchStreamingDistribution):
+            pass
+        except Exception as e:
+            self.log.warning(
+                "Exception trying to update Streaming Distribution: %s error: %s",
+                streaming_distribution['ARN'], e)
             raise e

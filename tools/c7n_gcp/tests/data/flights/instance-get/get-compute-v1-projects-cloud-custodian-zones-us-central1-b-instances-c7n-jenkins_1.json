@@ -1,0 +1,104 @@
+{
+  "body": {
+    "status": "RUNNING", 
+    "cpuPlatform": "Intel Haswell", 
+    "kind": "compute#instance", 
+    "machineType": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-b/machineTypes/n1-standard-1", 
+    "description": "", 
+    "zone": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-b", 
+    "tags": {
+      "items": [
+        "https-server"
+      ], 
+      "fingerprint": "nNZ0SA7CJyk="
+    }, 
+    "labelFingerprint": "42WmSpB8rSM=", 
+    "disks": [
+      {
+        "index": 0, 
+        "kind": "compute#attachedDisk", 
+        "autoDelete": true, 
+        "deviceName": "c7n-jenkins", 
+        "boot": true, 
+        "guestOsFeatures": [
+          {
+            "type": "VIRTIO_SCSI_MULTIQUEUE"
+          }
+        ], 
+        "source": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-b/disks/c7n-jenkins", 
+        "interface": "SCSI", 
+        "mode": "READ_WRITE", 
+        "licenses": [
+          "https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/licenses/ubuntu-1804-lts"
+        ], 
+        "type": "PERSISTENT"
+      }
+    ], 
+    "metadata": {
+      "kind": "compute#metadata", 
+      "fingerprint": "yKr6py6Xll8="
+    }, 
+    "startRestricted": false, 
+    "deletionProtection": false, 
+    "scheduling": {
+      "automaticRestart": true, 
+      "preemptible": false, 
+      "onHostMaintenance": "MIGRATE"
+    }, 
+    "canIpForward": false, 
+    "serviceAccounts": [
+      {
+        "scopes": [
+          "https://www.googleapis.com/auth/devstorage.read_only", 
+          "https://www.googleapis.com/auth/logging.write", 
+          "https://www.googleapis.com/auth/monitoring.write", 
+          "https://www.googleapis.com/auth/servicecontrol", 
+          "https://www.googleapis.com/auth/service.management.readonly", 
+          "https://www.googleapis.com/auth/trace.append"
+        ], 
+        "email": "628364689359-compute@developer.gserviceaccount.com"
+      }
+    ], 
+    "networkInterfaces": [
+      {
+        "kind": "compute#networkInterface", 
+        "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default", 
+        "accessConfigs": [
+          {
+            "networkTier": "PREMIUM", 
+            "kind": "compute#accessConfig", 
+            "type": "ONE_TO_ONE_NAT", 
+            "name": "External NAT", 
+            "natIP": "104.197.114.99"
+          }
+        ], 
+        "networkIP": "10.128.0.3", 
+        "fingerprint": "PUin560skLg=", 
+        "subnetwork": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/subnetworks/default-48aec19374439812", 
+        "name": "nic0"
+      }
+    ], 
+    "creationTimestamp": "2018-05-19T05:15:46.024-07:00", 
+    "id": "2966820606951926687", 
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-b/instances/c7n-jenkins", 
+    "name": "c7n-jenkins"
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "2544", 
+    "transfer-encoding": "chunked", 
+    "expires": "Mon, 30 Jul 2018 13:33:17 GMT", 
+    "vary": "Origin, X-Origin", 
+    "-content-encoding": "gzip", 
+    "date": "Mon, 30 Jul 2018 13:33:17 GMT", 
+    "x-xss-protection": "1; mode=block", 
+    "content-location": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-b/instances/c7n-jenkins?alt=json", 
+    "x-content-type-options": "nosniff", 
+    "server": "GSE", 
+    "etag": "\"4Ovct3UISVZG5R8hyXcYLagyY-Y=/obed6Y1PmxA_DWgVM8u3lC_AC3c=\"", 
+    "cache-control": "private, max-age=0, must-revalidate, no-transform", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"44,43,39,35\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}

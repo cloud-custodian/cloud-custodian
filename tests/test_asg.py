@@ -1,22 +1,17 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from datetime import datetime
 from dateutil import tz as tzutil
 
+import pytest
+from pytest_terraform import terraform
+
 from .common import BaseTest
 
+from c7n.exceptions import PolicyValidationError
 from c7n.resources.asg import LaunchInfo
+from c7n.resources.aws import shape_validate
+from c7n.utils import jmespath_search
 
 
 class LaunchConfigTest(BaseTest):
@@ -112,6 +107,84 @@ class AutoScalingTemplateTest(BaseTest):
             LaunchInfo(p.resource_manager).get_launch_id(d), ("lt-0877401c93c294001", "4"))
 
 
+@pytest.mark.audited
+@terraform('aws_asg')
+def test_asg_propagate_tag_action(test, aws_asg):
+
+    factory = test.replay_flight_data('test_asg_propagate_tag_action')
+    p = test.load_policy({
+        'name': 'asg-tagger',
+        'resource': 'aws.asg',
+        'filters': [
+            {'AutoScalingGroupName': aws_asg['aws_autoscaling_group.bar.id']},
+            {'tag:Owner': 'absent'}
+        ],
+        'actions': [
+            {'type': 'tag', 'key': 'Owner', 'value': 'Kapil', 'propagate': True},
+            {'type': 'propagate-tags', 'tags': ['Owner']}]},
+        session_factory=factory)
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+    client = factory().client('ec2')
+    itags = {t['Key']: t['Value'] for t in jmespath_search(
+        'Reservations[0].Instances[0].Tags',
+        client.describe_instances(
+            InstanceIds=[resources[0]['Instances'][0]['InstanceId']]))}
+    assert 'Owner' in itags
+    assert itags['Owner'] == 'Kapil'
+
+
+@pytest.mark.audited
+@terraform("aws_asg_update")
+def test_aws_asg_update(test, aws_asg_update):
+    factory = test.replay_flight_data("test_aws_asg_update")
+    p = test.load_policy(
+        {
+            "name": "asg-update",
+            "resource": "aws.asg",
+            "filters": [{
+                "AutoScalingGroupName": aws_asg_update["aws_autoscaling_group.bar.id"]
+            }],
+            "actions": [{
+                "type": "update",
+                "default-cooldown": 600,
+                "max-instance-lifetime": 604800,
+                "new-instances-protected-from-scale-in": True,
+                "capacity-rebalance": True,
+            }],
+        },
+        session_factory=factory,
+    )
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+
+    client = factory().client("autoscaling")
+    result = client.describe_auto_scaling_groups(
+        AutoScalingGroupNames=[resources[0]["AutoScalingGroupName"]]
+    )[
+        "AutoScalingGroups"
+    ].pop()
+    test.assertEqual(result["DefaultCooldown"], 600)
+    test.assertEqual(result["MaxInstanceLifetime"], 604800)
+    test.assertTrue(result["NewInstancesProtectedFromScaleIn"])
+    test.assertTrue(result["CapacityRebalance"])
+
+
+def test_aws_asg_update_no_settings(test):
+    factory = test.replay_flight_data("test_aws_asg_update")
+    with test.assertRaises(PolicyValidationError):
+        test.load_policy(
+            {
+                "name": "asg-update",
+                "resource": "aws.asg",
+                "actions": [{
+                    "type": "update",
+                }],
+            },
+            session_factory=factory,
+        )
+
+
 class AutoScalingTest(BaseTest):
 
     def get_ec2_tags(self, ec2, instance_id):
@@ -199,6 +272,82 @@ class AutoScalingTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_asg_image_age_filter_deleted_config(self):
+        factory = self.replay_flight_data("test_asg_image_age_filter_deleted_config")
+        p = self.load_policy(
+            {
+                "name": "asg-image-age-filter",
+                "resource": "asg",
+                "filters": [
+                    {"tag:Env": "present"},
+                    {"type": "image-age", "days": 5000, "op": "gt"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue('Env' in resources[0].get('Tags')[1].values())
+
+    def test_asg_image_filter_from_launch_template(self):
+        factory = self.replay_flight_data("test_asg_image_filter_from_launch_template")
+        p = self.load_policy(
+            {
+                "name": "asg-image-filter_lt",
+                "resource": "asg",
+                "filters": [
+                    {
+                        "type": "image",
+                        "key": "Description",
+                        "value": ".*CentOS7.*",
+                        "op": "regex"
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_asg_image_filter_from_launch_config(self):
+        factory = self.replay_flight_data("test_asg_image_filter_from_launch_config")
+        p = self.load_policy(
+            {
+                "name": "asg-image-filter_lc",
+                "resource": "asg",
+                "filters": [
+                    {
+                        "type": "image",
+                        "key": "Description",
+                        "value": ".*Ubuntu1804.*",
+                        "op": "regex"
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_asg_image_filter_from_lc_and_lt(self):
+        factory = self.replay_flight_data("test_asg_image_filter_from_lc_and_lt")
+        p = self.load_policy(
+            {
+                "name": "asg-image-filter_lc_lt",
+                "resource": "asg",
+                "filters": [
+                    {
+                        "type": "image",
+                        "key": "Description",
+                        "value": ".*AmazonLinux2.*",
+                        "op": "regex"
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+
     def test_asg_config_filter(self):
         factory = self.replay_flight_data("test_asg_config_filter")
         p = self.load_policy(
@@ -213,6 +362,28 @@ class AutoScalingTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_asg_scaling_policy_filter(self):
+        factory = self.replay_flight_data("test_asg_scaling_policy_filter")
+        p = self.load_policy(
+            {
+                "name": "asg-sp-filter",
+                "resource": "asg",
+                "filters": [
+                    {
+                        "type": "scaling-policy",
+                        "key": "PolicyType",
+                        "value": "TargetTrackingScaling"}
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['AutoScalingGroupName'], 'asg-test-scaling-policy')
+        self.assertTrue('c7n:matched-policies' in resources[0])
+        self.assertTrue(
+            resources[0]['c7n:matched-policies'][0]['PolicyName'], 'Target Tracking Policy')
 
     def test_asg_vpc_filter(self):
         factory = self.replay_flight_data("test_asg_vpc_filter")
@@ -306,6 +477,43 @@ class AutoScalingTest(BaseTest):
             t["Key"]: (t["Value"], t["PropagateAtLaunch"]) for t in result["Tags"]
         }
         self.assertFalse("CustomerId" in tag_map)
+
+    def test_asg_post_finding_format(self):
+        factory = self.replay_flight_data('test_asg_mark_for_op')
+        p = self.load_policy({
+            'name': 'asg-post',
+            'resource': 'aws.asg',
+            'actions': [
+                {'type': 'post-finding',
+                 'types': [
+                     'Software and Configuration Checks/OrgStandard/abc-123']}]},
+            session_factory=factory)
+
+        resources = p.resource_manager.resources()
+        rfinding = p.resource_manager.actions[0].format_resource(
+            resources[0])
+        self.maxDiff = None
+        self.assertEqual(
+            rfinding,
+            {'Details': {
+                'AwsAutoScalingAutoScalingGroup': {
+                    'CreatedTime': '2016-05-16T18:31:32.276000+00:00',
+                    'HealthCheckGracePeriod': 300,
+                    'HealthCheckType': 'EC2',
+                    'LaunchConfigurationName': 'CustodianASGTestCopyCopy',
+                    'LoadBalancerNames': []}},
+             'Id': 'arn:aws:autoscaling:us-west-2:619193117841:autoScalingGroup:650754f5-21d3-409f-b43a-fffdeb22910d:autoScalingGroupName/CustodianASG',  # noqa
+             'Partition': 'aws',
+             'Region': 'us-east-1',
+             'Tags': {'Platform': 'ubuntu',
+                      'custodian_action': (
+                          'AutoScaleGroup does not meet org tag policy: '
+                          'suspend@2016/05/21')},
+             'Type': 'AwsAutoScalingAutoScalingGroup'})
+
+        shape_validate(
+            rfinding['Details']['AwsAutoScalingAutoScalingGroup'],
+            'AwsAutoScalingAutoScalingGroupDetails', 'securityhub')
 
     def test_asg_mark_for_op(self):
         factory = self.replay_flight_data("test_asg_mark_for_op")
@@ -627,6 +835,33 @@ class AutoScalingTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_asg_invalid_filter_validation(self):
+        """Validate policy execution mode
+
+        The valid/invalid filters should cause Lambda mode policies to fail, but
+        pass for other execution modes whether specified explicitly or not.
+        """
+        base_policy = {
+            "name": "asg-invalid-filter",
+            "resource": "asg",
+            "filters": ["invalid"],
+        }
+
+        # Policy should validate cleanly for pull mode, whether it's the implicit
+        # default mode or specified explicitly.
+        p = self.load_policy(base_policy)
+        p.validate()
+        p = self.load_policy({**base_policy, "mode": {"type": "pull"}})
+        p.validate()
+
+        with self.assertRaisesRegex(
+            PolicyValidationError, "too many queries to be run in lambda"
+        ):
+            p = self.load_policy(
+                {**base_policy, "mode": {"type": "periodic", "schedule": "rate(1 day)"}}
+            )
+            p.validate()
+
     def test_asg_invalid_filter_good(self):
         factory = self.replay_flight_data("test_asg_invalid_filter_good")
         p = self.load_policy(
@@ -648,6 +883,23 @@ class AutoScalingTest(BaseTest):
         s = {x[0] for x in resources[0]["Invalid"]}
         self.assertTrue("invalid-subnet" in s)
         self.assertTrue("invalid-security-group" in s)
+
+    def test_asg_invalid_az(self):
+        factory = self.replay_flight_data("test_asg_invalid_az")
+        p = self.load_policy(
+            {
+                "name": "asg-invalid-az",
+                "resource": "asg",
+                "filters": [
+                    {"type": "invalid"}
+                ],
+            },
+            session_factory=factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        for resource in resources:
+            self.assertIn("invalid-availability-zone", resource["Invalid"][0])
 
     def test_asg_subnet(self):
         factory = self.replay_flight_data("test_asg_subnet")
@@ -803,6 +1055,28 @@ class AutoScalingTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["AutoScalingGroupName"], "c7n-asg-np-missing")
 
+    def test_asg_propagate_tag_no_instances(self):
+        factory = self.replay_flight_data("test_asg_propagate_tag_no_instances")
+        p = self.load_policy(
+            {
+                "name": "asg-tag",
+                "resource": "asg",
+                "filters": [{"tag:Platform": "ubuntu"}],
+                "actions": [
+                    {
+                        "type": "propagate-tags",
+                        "trim": True,
+                        "tags": ["CustomerId", "Platform"],
+                    },
+                ],
+            },
+            session_factory=factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["AutoScalingGroupName"], "c7n.asg.ec2.01")
+
     def test_asg_filter_capacity_delta_match(self):
         factory = self.replay_flight_data("test_asg_filter_capacity_delta_match")
         p = self.load_policy(
@@ -832,3 +1106,22 @@ class AutoScalingTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 0)
+
+
+class AutoScalingPolicy(BaseTest):
+
+    def test_asg_scaling_policy_enabled(self):
+        factory = self.replay_flight_data("test_asg_scaling_policy_enabled")
+        p = self.load_policy(
+            {
+                "name": "asg-sp-enabled",
+                "resource": "scaling-policy",
+                "filters": [
+                    {"type": "value", "key": "PolicyName", "value": "Target Tracking Policy"}
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue(resources[0].get('Enabled'))

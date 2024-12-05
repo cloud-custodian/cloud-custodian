@@ -1,0 +1,12 @@
+{
+    "status_code": 200,
+    "data": {
+        "AccountLevel": {
+            "HttpTokens": "required",
+            "HttpPutResponseHopLimit": 1,
+            "HttpEndpoint": "enabled",
+            "InstanceMetadataTags": "enabled"
+        },
+        "ResponseMetadata": {}
+    }
+}

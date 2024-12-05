@@ -1,0 +1,20 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "userSettings": {
+            "associatedPortalArns": [
+                "arn:aws:workspaces-web:us-east-1:644160558196:portal/f917202c-98da-463a-83d0-fc062263d8e2"
+            ],
+            "copyAllowed": "Disabled",
+            "deepLinkAllowed": "Disabled",
+            "disconnectTimeoutInMinutes": 60,
+            "downloadAllowed": "Disabled",
+            "idleDisconnectTimeoutInMinutes": 15,
+            "pasteAllowed": "Disabled",
+            "printAllowed": "Disabled",
+            "uploadAllowed": "Disabled",
+            "userSettingsArn": "arn:aws:workspaces-web:us-east-1:644160558196:userSettings/d7038141-9fc3-4c87-9e26-7bbe33e02197"
+        }
+    }
+}

@@ -1,0 +1,16 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "ReadinessChecks": [
+            {
+                "ReadinessCheckArn": "arn:aws:route53-recovery-readiness::644160558196:readiness-check/sample_check",
+                "ReadinessCheckName": "sample_check",
+                "ResourceSet": "sample_rs",
+                "Tags": {
+                    "TestTag": "Resource does not meet policy: notify@2022/12/29"
+                }
+            }
+        ]
+    }
+}

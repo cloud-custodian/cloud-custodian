@@ -1,0 +1,21 @@
+{
+    "status_code": 200,
+    "data": {
+        "Attributes": {
+            "Policy": "{\"Version\":\"2008-10-17\",\"Id\":\"__default_policy_ID\",\"Statement\":[{\"Sid\":\"__default_statement_ID\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Action\":[\"SNS:GetTopicAttributes\",\"SNS:SetTopicAttributes\",\"SNS:AddPermission\",\"SNS:RemovePermission\",\"SNS:DeleteTopic\",\"SNS:Subscribe\",\"SNS:ListSubscriptionsByTopic\",\"SNS:Publish\"],\"Resource\":\"arn:aws:sns:us-east-1:644160558196:mfa-notification-topic20221122165720935200000005\",\"Condition\":{\"StringEquals\":{\"AWS:SourceOwner\":\"644160558196\"}}}]}",
+            "LambdaSuccessFeedbackSampleRate": "0",
+            "Owner": "644160558196",
+            "SubscriptionsPending": "0",
+            "TopicArn": "arn:aws:sns:us-east-1:644160558196:mfa-notification-topic20221122165720935200000005",
+            "EffectiveDeliveryPolicy": "{\"http\":{\"defaultHealthyRetryPolicy\":{\"minDelayTarget\":20,\"maxDelayTarget\":20,\"numRetries\":3,\"numMaxDelayRetries\":0,\"numNoDelayRetries\":0,\"numMinDelayRetries\":0,\"backoffFunction\":\"linear\"},\"disableSubscriptionOverrides\":false}}",
+            "FirehoseSuccessFeedbackSampleRate": "0",
+            "SubscriptionsConfirmed": "1",
+            "SQSSuccessFeedbackSampleRate": "0",
+            "HTTPSuccessFeedbackSampleRate": "0",
+            "ApplicationSuccessFeedbackSampleRate": "0",
+            "DisplayName": "",
+            "SubscriptionsDeleted": "0"
+        },
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,108 @@
+{
+  "headers": {
+    "expires": "Thu, 14 Nov 2019 10:16:29 GMT",
+    "date": "Thu, 14 Nov 2019 10:16:29 GMT",
+    "cache-control": "private, max-age=0, must-revalidate, no-transform",
+    "etag": "\"BFk6ClrDXzvEEkhNxyuEqzuPp5U=/fh42lwpI0oq6I6axxBh524nfeac=\"",
+    "vary": "Origin, X-Origin",
+    "content-type": "application/json; charset=UTF-8",
+    "x-content-type-options": "nosniff",
+    "x-frame-options": "SAMEORIGIN",
+    "x-xss-protection": "1; mode=block",
+    "server": "GSE",
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,43\",h3-Q050=\":443\"; ma=2592000,h3-Q049=\":443\"; ma=2592000,h3-Q048=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "656712",
+    "-content-encoding": "gzip",
+    "content-location": "https://compute.googleapis.com/compute/v1/projects/cloud-custodian/aggregated/instances?alt=json"
+  },
+  "body": {
+    "kind": "compute#instanceAggregatedList",
+    "id": "projects/cloud-custodian/aggregated/instances",
+    "items": {
+      "zones/us-central1-a": {
+        "instances": [
+          {
+            "kind": "compute#instance",
+            "id": "8759471929923434140",
+            "creationTimestamp": "2019-10-31T04:41:40.541-07:00",
+            "name": "test-ingwar",
+            "description": "ansible",
+            "tags": {
+              "items": [
+              ],
+              "fingerprint": "-WSiILlLEok="
+            },
+            "machineType": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-c/machineTypes/f1-micro",
+            "status": "TERMINATED",
+            "zone": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-c",
+            "canIpForward": false,
+            "networkInterfaces": [
+              {
+                "kind": "compute#networkInterface",
+                "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/optiva-gcp-vpc",
+                "subnetwork": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/subnetworks/team-saasops-us-central1",
+                "networkIP": "172.16.20.73",
+                "name": "nic0",
+                "fingerprint": "Shr9TaIBDBE="
+              }
+            ],
+            "disks": [
+              {
+                "kind": "compute#attachedDisk",
+                "type": "PERSISTENT",
+                "mode": "READ_WRITE",
+                "source": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-c/disks/test-ingwar",
+                "deviceName": "test-ingwar",
+                "index": 0,
+                "boot": true,
+                "autoDelete": true,
+                "licenses": [
+                  "https://www.googleapis.com/compute/v1/projects/centos-cloud/global/licenses/centos-7"
+                ],
+                "interface": "SCSI"
+              }
+            ],
+            "metadata": {
+              "kind": "compute#metadata",
+              "fingerprint": "1wRjLI5jciU=",
+              "items": [
+                {
+                }
+              ]
+            },
+            "serviceAccounts": [
+              {
+                "email": "gcp-automation@team-saasops.iam.gserviceaccount.com",
+                "scopes": [
+                  "https://www.googleapis.com/auth/cloud-platform"
+                ]
+              }
+            ],
+            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-c/instances/test-ingwar",
+            "scheduling": {
+              "onHostMaintenance": "MIGRATE",
+              "automaticRestart": true,
+              "preemptible": false
+            },
+            "cpuPlatform": "Unknown CPU Platform",
+            "labels": {
+              "custodian_status": "resource_policy-stop-2019_10_10__0_0"
+            },
+            "labelFingerprint": "Mjad3HjNiLE=",
+            "startRestricted": false,
+            "deletionProtection": false,
+            "reservationAffinity": {
+              "consumeReservationType": "ANY_RESERVATION"
+            },
+            "displayDevice": {
+              "enableDisplay": false
+            }
+          }
+        ]
+      }
+    },
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/aggregated/instances"
+  }
+}

@@ -1,0 +1,12 @@
+{
+    "status_code": 200, 
+    "data":{
+        "resourcePolicies": [
+            {
+                "policyName": "OpenSearchCloudwatchLogPermissions", 
+                "policyDocument": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"OpenSearchCloudWatchLogs\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"es.amazonaws.com\"},\"Action\":[\"logs:PutLogEvents\",\"logs:CreateLogStream\"],\"Resource\":[\"arn:aws:logs:us-east-1:123456789012:log-group:/aws/domains/test-es-dom/audit-logs:*\"]}]}", 
+                "lastUpdatedTime": 1675735655912
+            }
+        ]
+    }
+}

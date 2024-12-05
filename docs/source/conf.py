@@ -16,6 +16,7 @@ import sys
 import os
 import shlex
 import sphinx_rtd_theme
+from sphinx.ext import autodoc
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -34,9 +35,21 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.viewcode',
     'c7n_sphinxext.docgen',
-    'recommonmark',
-    'sphinx_markdown_tables'
+    'myst_parser',
+    'sphinx_markdown_tables',
+    'sphinxcontrib.jquery',
 ]
+
+# Extract only a classes docstrings
+class DocsonlyMethodDocumenter(autodoc.MethodDocumenter):
+  objtype = "doconly"
+  content_indent = ""
+
+  def format_signature(self, **kwargs):
+    return ""
+
+  def add_directive_header(self, sig: str):
+    return None
 
 # Add any paths that contain templates here, relative to this directory.
 #templates_path = ['_templates']
@@ -51,6 +64,9 @@ source_suffix = ['.rst', '.md']
 
 # The master toctree document.
 master_doc = 'index'
+
+# Generate Markdown header links anchors
+myst_heading_anchors = 3
 
 # General information about the project.
 project = u'Cloud Custodian'
@@ -70,7 +86,7 @@ author = u'Kapil Thangavelu'
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = "en"
 
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used:
@@ -129,10 +145,6 @@ html_theme_options = {
   'includehidden': True,
   'titles_only': False
 }
-
-# Add any paths that contain custom themes here, relative to this directory.
-#html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
-html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
@@ -301,5 +313,6 @@ texinfo_documents = [
 
 # This adds in our expand/collapse JS/CSS
 def setup(app):
-    app.add_javascript('js/expand.js')
-    app.add_stylesheet('css/expand.css')
+    app.add_js_file('js/expand.js')
+    app.add_css_file('css/expand.css')
+    app.add_autodocumenter(DocsonlyMethodDocumenter)

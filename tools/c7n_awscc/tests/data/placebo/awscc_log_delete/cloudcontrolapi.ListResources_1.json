@@ -1,0 +1,13 @@
+{
+    "status_code": 200,
+    "data": {
+        "TypeName": "AWS::Logs::LogGroup",
+        "ResourceDescriptions": [
+            {
+                "Identifier": "/aws/apigateway/welcome",
+                "Properties": "{\"RetentionInDays\":30,\"LogGroupName\":\"/aws/apigateway/welcome\",\"Arn\":\"arn:aws:logs:us-east-1:644160558196:log-group:/aws/apigateway/welcome:*\",\"Tags\":[{\"Value\":\"Kapil\",\"Key\":\"Owner\"}]}"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,16 +1,5 @@
-# Copyright 2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import json
 
 import re
@@ -27,29 +16,33 @@ from ldap3.core.exceptions import LDAPSocketOpenError
 
 
 class LdapLookup:
-
     def __init__(self, config, logger):
         self.log = logger
         self.connection = self.get_connection(
-            config.get('ldap_uri'),
-            config.get('ldap_bind_user', None),
-            config.get('ldap_bind_password', None)
+            config.get("ldap_uri"),
+            config.get("ldap_bind_user", None),
+            config.get("ldap_bind_password", None),
         )
-        self.base_dn = config.get('ldap_bind_dn')
-        self.email_key = config.get('ldap_email_key', 'mail')
-        self.manager_attr = config.get('ldap_manager_attribute', 'manager')
-        self.uid_key = config.get('ldap_uid_attribute', 'sAMAccountName')
-        self.attributes = ['displayName', self.uid_key, self.email_key, self.manager_attr]
-        self.uid_regex = config.get('ldap_uid_regex', None)
-        self.cache_engine = config.get('cache_engine', None)
-        if self.cache_engine == 'redis':
-            redis_host = config.get('redis_host')
-            redis_port = int(config.get('redis_port', 6379))
+        self.base_dn = config.get("ldap_bind_dn")
+        self.email_key = config.get("ldap_email_key", "mail")
+        self.manager_attr = config.get("ldap_manager_attribute", "manager")
+        self.uid_key = config.get("ldap_uid_attribute", "sAMAccountName")
+        self.attributes = ["displayName", self.uid_key, self.email_key, self.manager_attr]
+        self.uid_regex = config.get("ldap_uid_regex", None)
+        self.cache_engine = config.get("cache_engine", None)
+        if self.cache_engine == "redis":
+            redis_host = config.get("redis_host")
+            redis_port = int(config.get("redis_port", 6379))
             self.caching = self.get_redis_connection(redis_host, redis_port)
-        elif self.cache_engine == 'sqlite':
+        elif self.cache_engine == "sqlite":  # nosec
             if not have_sqlite:
-                raise RuntimeError('No sqlite available: stackoverflow.com/q/44058239')
-            self.caching = LocalSqlite(config.get('ldap_cache_file', '/var/tmp/ldap.cache'), logger)
+                raise RuntimeError("No sqlite available: stackoverflow.com/q/44058239")
+            # re nosec, this is running in serverless compute
+            # environments, where /tmp is the only writeable space and
+            # is effectively isolated to this process.
+            self.caching = LocalSqlite(
+                config.get("ldap_cache_file", "/var/tmp/ldap.cache"), logger  # nosec
+            )
 
     def get_redis_connection(self, redis_host, redis_port):
         return Redis(redis_host=redis_host, redis_port=redis_port, db=0)
@@ -59,13 +52,17 @@ class LdapLookup:
         # an anonymous bind will be attempted.
         try:
             return Connection(
-                ldap_uri, user=ldap_bind_user, password=ldap_bind_password,
+                ldap_uri,
+                user=ldap_bind_user,
+                password=ldap_bind_password,
                 auto_bind=True,
                 receive_timeout=30,
                 auto_referrals=False,
             )
         except LDAPSocketOpenError:
-            self.log.error('Not able to establish a connection with LDAP.')
+            self.log.error("Not able to establish a connection with LDAP.")
+        except Exception as e:
+            self.log.warning(f"Error occurred getting LDAP connection: {e}")
 
     def search_ldap(self, base_dn, ldap_filter, attributes):
         self.connection.search(base_dn, ldap_filter, attributes=self.attributes)
@@ -88,7 +85,7 @@ class LdapLookup:
             uid_manager_email = None
             if uid_manager_dn:
                 uid_manager = self.get_metadata_from_dn(uid_manager_dn)
-                uid_manager_email = uid_manager.get('mail')
+                uid_manager_email = uid_manager.get("mail")
             if uid_manager_email:
                 to_addrs.append(uid_manager_email)
         return to_addrs
@@ -98,10 +95,10 @@ class LdapLookup:
         if self.cache_engine:
             cache_result = self.caching.get(user_dn)
             if cache_result:
-                cache_msg = 'Got ldap metadata from local cache for: %s' % user_dn
+                cache_msg = "Got ldap metadata from local cache for: %s" % user_dn
                 self.log.debug(cache_msg)
                 return cache_result
-        ldap_filter = '(%s=*)' % self.uid_key
+        ldap_filter = "(%s=*)" % self.uid_key
         ldap_results = self.search_ldap(user_dn, ldap_filter, attributes=self.attributes)
         if ldap_results:
             ldap_user_metadata = self.get_dict_from_ldap_object(self.connection.entries[0])
@@ -109,14 +106,14 @@ class LdapLookup:
             self.caching.set(user_dn, {})
             return {}
         if self.cache_engine:
-            self.log.debug('Writing user: %s metadata to cache engine.' % user_dn)
+            self.log.debug("Writing user: %s metadata to cache engine." % user_dn)
             self.caching.set(user_dn, ldap_user_metadata)
             self.caching.set(ldap_user_metadata[self.uid_key], ldap_user_metadata)
         return ldap_user_metadata
 
     def get_dict_from_ldap_object(self, ldap_user_object):
         ldap_user_metadata = {attr.key: attr.value for attr in ldap_user_object}
-        ldap_user_metadata['dn'] = ldap_user_object.entry_dn
+        ldap_user_metadata["dn"] = ldap_user_object.entry_dn
 
         email_key = ldap_user_metadata.get(self.email_key, None)
         uid_key = ldap_user_metadata.get(self.uid_key, None)
@@ -124,8 +121,8 @@ class LdapLookup:
         if not email_key or not uid_key:
             return {}
         else:
-            ldap_user_metadata['self.email_key'] = email_key.lower()
-            ldap_user_metadata['self.uid_key'] = uid_key.lower()
+            ldap_user_metadata["self.email_key"] = email_key.lower()
+            ldap_user_metadata["self.uid_key"] = uid_key.lower()
 
         return ldap_user_metadata
 
@@ -139,23 +136,23 @@ class LdapLookup:
             # Out[41]: <_sre.SRE_Match at 0x1109ab440>
             # re.search("^[0-9]{6}$", "1234567") returns None, or "12345a' also returns None
             if not re.search(self.uid_regex, uid):
-                regex_msg = 'uid does not match regex: %s %s' % (self.uid_regex, uid)
+                regex_msg = "uid does not match regex: %s %s" % (self.uid_regex, uid)
                 self.log.debug(regex_msg)
                 return {}
         if self.cache_engine:
             cache_result = self.caching.get(uid)
             if cache_result or cache_result == {}:
-                cache_msg = 'Got ldap metadata from local cache for: %s' % uid
+                cache_msg = "Got ldap metadata from local cache for: %s" % uid
                 self.log.debug(cache_msg)
                 return cache_result
-        ldap_filter = '(%s=%s)' % (self.uid_key, uid)
+        ldap_filter = "(%s=%s)" % (self.uid_key, uid)
         ldap_results = self.search_ldap(self.base_dn, ldap_filter, attributes=self.attributes)
         if ldap_results:
             ldap_user_metadata = self.get_dict_from_ldap_object(self.connection.entries[0])
             if self.cache_engine:
-                self.log.debug('Writing user: %s metadata to cache engine.' % uid)
-                if ldap_user_metadata.get('dn'):
-                    self.caching.set(ldap_user_metadata['dn'], ldap_user_metadata)
+                self.log.debug("Writing user: %s metadata to cache engine." % uid)
+                if ldap_user_metadata.get("dn"):
+                    self.caching.set(ldap_user_metadata["dn"], ldap_user_metadata)
                     self.caching.set(uid, ldap_user_metadata)
                 else:
                     self.caching.set(uid, {})
@@ -174,13 +171,13 @@ class LocalSqlite:
     def __init__(self, local_filename, logger):
         self.log = logger
         self.sqlite = sqlite3.connect(local_filename)
-        self.sqlite.execute('''CREATE TABLE IF NOT EXISTS ldap_cache(key text, value text)''')
+        self.sqlite.execute("""CREATE TABLE IF NOT EXISTS ldap_cache(key text, value text)""")
 
     def get(self, key):
         sqlite_result = self.sqlite.execute("select * FROM ldap_cache WHERE key=?", (key,))
         result = sqlite_result.fetchall()
         if len(result) != 1:
-            error_msg = 'Did not get 1 result from sqlite, something went wrong with key: %s' % key
+            error_msg = "Did not get 1 result from sqlite, something went wrong with key: %s" % key
             self.log.error(error_msg)
             return None
         return json.loads(result[0][1])

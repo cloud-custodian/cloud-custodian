@@ -1,0 +1,21 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_iam_openid_connect_provider": {
+            "test_oidc_provider": {
+                "arn": "arn:aws:iam::644160558196:oidc-provider/accounts.google.com",
+                "client_id_list": [
+                    "644160558196-342342xasdasdasda-apps.googleusercontent.com"
+                ],
+                "id": "arn:aws:iam::644160558196:oidc-provider/accounts.google.com",
+                "tags": null,
+                "tags_all": {},
+                "thumbprint_list": [
+                    "cf23df2207d99a74fbe169e3eba035e633b65d94"
+                ],
+                "url": "accounts.google.com"
+            }
+        }
+    }
+}

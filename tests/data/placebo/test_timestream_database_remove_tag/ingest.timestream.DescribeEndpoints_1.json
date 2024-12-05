@@ -1,0 +1,12 @@
+{
+    "status_code": 200,
+    "data": {
+        "Endpoints": [
+            {
+                "Address": "ingest-cell2.timestream.us-east-1.amazonaws.com",
+                "CachePeriodInMinutes": 1440
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,16 +1,5 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 from .common import BaseTest
 
@@ -22,6 +11,13 @@ class TestStepFunction(BaseTest):
         p = self.load_policy({
             'name': 'test-invoke-sfn-bulk',
             'resource': 'step-machine',
+            'filters': [
+                    {
+                        'type': 'value',
+                        'key': 'name',
+                        'value': 'Helloworld'
+                    }
+            ],
             'actions': [{
                 'type': 'invoke-sfn',
                 'bulk': True,
@@ -45,6 +41,13 @@ class TestStepFunction(BaseTest):
         p = self.load_policy({
             'name': 'test-invoke-sfn',
             'resource': 'step-machine',
+            'filters': [
+                    {
+                        'type': 'value',
+                        'key': 'name',
+                        'value': 'Helloworld'
+                    }
+            ],
             'actions': [{
                 'type': 'invoke-sfn',
                 'state-machine': 'Helloworld'}]},
@@ -72,7 +75,7 @@ class TestStepFunction(BaseTest):
                     {
                         'type': 'value',
                         'key': 'name',
-                        'value': 'test'
+                        'value': 'Helloworld'
                     }
                 ]
             },
@@ -80,8 +83,8 @@ class TestStepFunction(BaseTest):
             session_factory=session_factory
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
-        self.assertTrue(resources[0]['name'], 'test')
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], 'Helloworld')
 
     def test_sfn_tag_resource(self):
         session_factory = self.replay_flight_data('test_sfn_tag_resource')
@@ -112,6 +115,9 @@ class TestStepFunction(BaseTest):
             {
                 'name': 'test-untag-sfn',
                 'resource': 'step-machine',
+                'filters': [
+                    {'tag:test': 'test'},
+                ],
                 'actions': [
                     {
                         'type': 'remove-tag',
@@ -127,5 +133,41 @@ class TestStepFunction(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         client = session_factory().client('stepfunctions')
-        tags = client.list_tags_for_resource(resourceArn=resources[0]['stateMachineArn'])
-        self.assertTrue([t for t in tags['tags'] if t['key'] != 'test'])
+        resp = client.list_tags_for_resource(resourceArn=resources[0]['stateMachineArn'])
+        self.assertTrue(len(resp['tags']) == 0)
+
+    def test_sfn_get_activity(self):
+        session_factory = self.replay_flight_data('test_sfn_get_activity')
+        p = self.load_policy(
+            {
+                'name': 'test-sfn-get-activity',
+                'resource': 'sfn-activity',
+                'filters': [
+                    {'tag:name': 'test'},
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], 'test-c7n')
+
+    def test_sfn_activity_kms_alias(self):
+        session_factory = self.replay_flight_data('test_sfn_activity_kms_alias')
+        p = self.load_policy(
+            {
+                'name': 'test-sfn-activity-kms-alias',
+                'resource': 'sfn-activity',
+                'filters': [
+                    {
+                        "type": "kms-key",
+                        "key": "c7n:AliasName",
+                        "value": "alias/test/sfn/encrypted",
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], 'test-c7n')

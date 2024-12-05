@@ -1,4 +1,6 @@
-from msrestazure.azure_exceptions import CloudError
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
+from azure.core.exceptions import ResourceNotFoundError
 
 from c7n_azure.provisioning.deployment_unit import DeploymentUnit
 from c7n_azure.provisioning.resource_group import ResourceGroupUnit
@@ -14,7 +16,7 @@ class AppInsightsUnit(DeploymentUnit):
     def _get(self, params):
         try:
             return self.client.components.get(params['resource_group_name'], params['name'])
-        except CloudError:
+        except ResourceNotFoundError:
             return None
 
     def _provision(self, params):

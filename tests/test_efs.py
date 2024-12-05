@@ -1,24 +1,17 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from c7n.exceptions import PolicyValidationError
 
-from .common import BaseTest, functional
+from .common import BaseTest, functional, event_data
 
 import uuid
 import time
 
 from operator import itemgetter
+from c7n.testing import mock_datetime_now
+from dateutil import parser
+import c7n.resources.efs
+import c7n.filters.backup
 
 
 class ElasticFileSystem(BaseTest):
@@ -82,6 +75,50 @@ class ElasticFileSystem(BaseTest):
         self.assertEqual(len(resources), 3)
         resources = sorted(resources, key=itemgetter("MountTargetId"))
         self.assertEqual(resources[0]["MountTargetId"], "fsmt-a47385dd")
+
+    def test_create_efs_mount_target(self):
+        factory = self.replay_flight_data("test_create_efs_mount_target")
+        policy = self.load_policy(
+            {
+                "name": "create-efs-mount-target",
+                "resource": "efs-mount-target",
+                "mode": {"type": "cloudtrail", "events": [{
+                    "source": "elasticfilesystem.amazonaws.com",
+                    "ids": "responseElements.mountTargetId",
+                    "event": "CreateMountTarget"
+                }]},
+            },
+            session_factory=factory,
+        )
+
+        event = {
+            "detail": event_data("event-cloud-trail-create-efs-mount-target.json"),
+            "debug": True,
+        }
+        resources = policy.push(event, None)
+        self.assertEqual(len(resources), 1)
+
+    def test_modify_efs_mount_target_security_group(self):
+        factory = self.replay_flight_data("test_modify_efs_mount_target_security_group")
+        policy = self.load_policy(
+            {
+                "name": "modify-efs-mount-target-security-group",
+                "resource": "efs-mount-target",
+                "mode": {"type": "cloudtrail", "events": [{
+                    "source": "elasticfilesystem.amazonaws.com",
+                    "ids": "requestParameters.mountTargetId",
+                    "event": "ModifyMountTargetSecurityGroups"
+                }]},
+            },
+            session_factory=factory,
+        )
+
+        event = {
+            "detail": event_data("event-cloud-trail-update-efs-mount-target-security-group.json"),
+            "debug": True,
+        }
+        resources = policy.push(event, None)
+        self.assertEqual(len(resources), 1)
 
     def test_delete(self):
         factory = self.replay_flight_data("test_efs_delete")
@@ -233,3 +270,84 @@ class ElasticFileSystem(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["FileSystemId"], "fs-5f61b0df")
+
+    def test_filter_securetransport_check(self):
+        factory = self.replay_flight_data("test_efs_filter_check_secure_transport")
+        p = self.load_policy(
+            {
+                "name": "efs-check-securetransport",
+                "resource": "efs",
+                "filters": [{"type": "check-secure-transport"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["Name"], "efs-without-secure-transport")
+
+    def test_efs_has_statement(self):
+        factory = self.replay_flight_data("test_efs_has_statement")
+        p = self.load_policy(
+            {
+                "name": "efs-has-statement",
+                "resource": "efs",
+                "filters": [
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Allow",
+                                "Condition":
+                                    {"Bool": {"elasticfilesystem:AccessedViaMountTarget": "true"}},
+                                "Resource": "{fs_arn}"
+                            }
+                        ]
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["Name"], "efs-has-statement")
+
+        p = self.load_policy(
+            {
+                "name": "efs-has-statement",
+                "resource": "efs",
+                "filters": [
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Deny"
+                            }
+                        ]
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    def test_efs_consecutive_aws_backups_count_filter(self):
+        session_factory = self.replay_flight_data("test_efs_consecutive_aws_backups_count_filter")
+        p = self.load_policy(
+            {
+                "name": "efs_consecutive_aws_backups_count_filter",
+                "resource": "efs",
+                "filters": [
+                    {
+                        "type": "consecutive-aws-backups",
+                        "count": 2,
+                        "period": "days",
+                        "status": "COMPLETED"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        with mock_datetime_now(parser.parse("2022-09-09T00:00:00+00:00"), c7n.filters.backup):
+            resources = p.run()
+        self.assertEqual(len(resources), 1)

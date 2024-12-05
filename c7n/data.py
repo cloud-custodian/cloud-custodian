@@ -1,30 +1,18 @@
-# Copyright 2020 Kapil Thangavelu
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 """Data Resource Provider implementation.
 """
 import os
 from pathlib import Path
-
-import jmespath
 
 from c7n.actions import ActionRegistry
 from c7n.exceptions import PolicyExecutionError, PolicyValidationError
 from c7n.filters import FilterRegistry
 from c7n.manager import ResourceManager
 from c7n.provider import Provider, clouds
+from c7n.query import sources
 from c7n.registry import PluginRegistry
-from c7n.utils import load_file
+from c7n.utils import load_file, jmespath_search
 
 
 @clouds.register("c7n")
@@ -50,6 +38,7 @@ class NullSession:
     """dummy session"""
 
 
+@sources.register('static')
 class StaticSource:
     def __init__(self, queries):
         self.queries = queries
@@ -66,6 +55,7 @@ class StaticSource:
                 raise PolicyValidationError("invalid static data source `records`")
 
 
+@sources.register('disk')
 class DiskSource:
     def __init__(self, queries):
         self.queries = queries
@@ -96,7 +86,7 @@ class DiskSource:
     def load_file(self, path, resource_key):
         data = load_file(path)
         if resource_key:
-            data = jmespath.search(resource_key, data)
+            data = jmespath_search(resource_key, data)
         if not isinstance(data, list):
             raise PolicyExecutionError(
                 "found disk records at %s in non list format %s" % (path, type(data))

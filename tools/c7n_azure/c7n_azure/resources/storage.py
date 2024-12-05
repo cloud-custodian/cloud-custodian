@@ -1,41 +1,28 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
-import json
 import logging
 
-import jsonpickle
 from azure.cosmosdb.table import TableService
-from azure.mgmt.storage.models import IPRule, \
-    NetworkRuleSet, StorageAccountUpdateParameters, VirtualNetworkRule
-from azure.storage.blob import BlockBlobService
-from azure.storage.common.models import RetentionPolicy, Logging
+from azure.mgmt.storage.models import (IPRule, NetworkRuleSet,
+                                       StorageAccountUpdateParameters,
+                                       VirtualNetworkRule)
+from azure.storage.blob import BlobServiceClient
+from azure.storage.common.models import Logging, RetentionPolicy
 from azure.storage.file import FileService
-from azure.storage.queue import QueueService
+from azure.storage.queue import QueueServiceClient
+from c7n.exceptions import PolicyValidationError
+from c7n.filters.core import type_schema, ListItemFilter
+from c7n.utils import get_annotation_prefix, local_session
 from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.actions.firewall import SetFirewallAction
 from c7n_azure.constants import BLOB_TYPE, FILE_TYPE, QUEUE_TYPE, TABLE_TYPE
-from c7n_azure.filters import FirewallRulesFilter, ValueFilter, FirewallBypassFilter
+from c7n_azure.filters import (FirewallBypassFilter, FirewallRulesFilter, ValueFilter)
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 from c7n_azure.storage_utils import StorageUtilities
-from c7n_azure.utils import ThreadHelper
+from c7n_azure.utils import ThreadHelper, serialize
 from netaddr import IPSet
-
-from c7n.exceptions import PolicyValidationError
-from c7n.filters.core import type_schema
-from c7n.utils import local_session, get_annotation_prefix
 
 
 @resources.register('storage')
@@ -194,6 +181,52 @@ class StorageSetFirewallAction(SetFirewallAction):
             StorageAccountUpdateParameters(network_rule_set=rule_set))
 
 
+@Storage.filter_registry.register("management-policy-rules")
+class StorageAccountManagementPolicyRulesFilter(ListItemFilter):
+    """
+    Filter Storage Accounts based on their management policy rules
+
+    :example:
+
+    Find storage accounts where lifecycle policy configured to remove base Blob
+    after less or equal than 3 days
+
+    .. code-block:: yaml
+
+        policies:
+          - name: storage-delete-blob-le-3-days
+            resource: azure.storage
+            filters:
+              - type: management-policy-rules
+                attrs:
+                  - type: value
+                    key: definition.actions.baseBlob.delete.daysAfterModificationGreaterThan
+                    value: 3
+                    op: le
+
+    """
+    schema = type_schema(
+        "management-policy-rules",
+        attrs={"$ref": "#/definitions/filters_common/list_item_attrs"},
+        count={"type": "number"},
+        count_op={"$ref": "#/definitions/filters_common/comparison_operators"}
+    )
+    item_annotation_key = "c7n:management-policy-rules"
+    annotate_items = True
+
+    def get_item_values(self, resource):
+        try:
+            item = self.manager.get_client().management_policies.get(
+                resource_group_name=resource["resourceGroup"],
+                account_name=resource["name"],
+                management_policy_name="default"
+            )
+            return item.serialize(True)["properties"]["policy"].get("rules", [])
+        except Exception as e:  # azure.core.exceptions.ResourceNotFoundError
+            self.log.error(e)
+            return []  # no rules
+
+
 @Storage.filter_registry.register('firewall-rules')
 class StorageFirewallRulesFilter(FirewallRulesFilter):
 
@@ -333,22 +366,23 @@ class StorageDiagnosticSettingsFilter(ValueFilter):
 
     def process(self, resources, event=None):
         session = local_session(self.manager.session_factory)
-        token = StorageUtilities.get_storage_token(session)
-        result, errors = ThreadHelper.execute_in_parallel(
+        result, _ = ThreadHelper.execute_in_parallel(
             resources=resources,
             event=event,
             execution_method=self.process_resource_set,
             executor_factory=self.executor_factory,
             log=self.log,
-            session=session,
-            token=token
+            session=session
         )
         return result
 
-    def process_resource_set(self, resources, event=None, session=None, token=None):
+    def process_resource_set(self, resources, event=None, session=None):
         matched = []
         for resource in resources:
-            settings = self._get_settings(resource, session, token)
+            settings = self._get_settings(resource, session)
+            # New SDK renamed the property, this code is to ensure back compat
+            if 'analytics_logging' in settings.keys():
+                settings['logging'] = settings.pop('analytics_logging')
             filtered_settings = super(StorageDiagnosticSettingsFilter, self).process([settings],
                                                                                      event)
 
@@ -357,13 +391,13 @@ class StorageDiagnosticSettingsFilter(ValueFilter):
 
         return matched
 
-    def _get_settings(self, storage_account, session=None, token=None):
+    def _get_settings(self, storage_account, session=None):
         storage_prefix_property = get_annotation_prefix(self.storage_type)
 
-        if not (storage_prefix_property in storage_account):
+        if storage_prefix_property not in storage_account:
             settings = StorageSettingsUtilities.get_settings(
-                self.storage_type, storage_account, session, token)
-            storage_account[storage_prefix_property] = json.loads(jsonpickle.encode(settings))
+                self.storage_type, storage_account, session)
+            storage_account[storage_prefix_property] = serialize(settings)
 
         return storage_account[storage_prefix_property]
 
@@ -432,26 +466,41 @@ class SetLogSettingsAction(AzureBaseAction):
                 'attribute: retention can not be less than 0 or greater than 365')
 
     def process_in_parallel(self, resources, event):
-        self.token = StorageUtilities.get_storage_token(self.session)
         return super(SetLogSettingsAction, self).process_in_parallel(resources, event)
 
     def _process_resource(self, resource, event=None):
-        retention = RetentionPolicy(enabled=self.retention != 0, days=self.retention)
-        log_settings = Logging(self.DELETE in self.logs_to_enable, self.READ in self.logs_to_enable,
-                               self.WRITE in self.logs_to_enable, retention_policy=retention)
 
         for storage_type in self.storage_types:
+            if storage_type in [BLOB_TYPE, QUEUE_TYPE, FILE_TYPE]:
+                log_settings = {
+                    'delete': self.DELETE in self.logs_to_enable,
+                    'read': self.READ in self.logs_to_enable,
+                    'write': self.WRITE in self.logs_to_enable,
+                    'retention_policy': {
+                        'enabled': self.retention != 0,
+                        'days': self.retention if self.retention != 0 else None  # Throws if 0
+                    },
+                    'version': '1.0'}
+            else:
+                log_settings = Logging(
+                    self.DELETE in self.logs_to_enable,
+                    self.READ in self.logs_to_enable,
+                    self.WRITE in self.logs_to_enable,
+                    retention_policy=RetentionPolicy(
+                        enabled=self.retention != 0,
+                        days=self.retention))
+
             StorageSettingsUtilities.update_logging(storage_type, resource,
-                                                    log_settings, self.session, self.token)
+                                                    log_settings, self.session)
 
 
 class StorageSettingsUtilities:
 
     @staticmethod
-    def _get_blob_client_from_storage_account(storage_account, token):
-        return BlockBlobService(
-            account_name=storage_account['name'],
-            token_credential=token
+    def _get_blob_client_from_storage_account(storage_account, session):
+        return BlobServiceClient(
+            account_url=storage_account['properties']['primaryEndpoints']['blob'],
+            credential=session.get_credentials()
         )
 
     @staticmethod
@@ -477,30 +526,32 @@ class StorageSettingsUtilities:
         )
 
     @staticmethod
-    def _get_queue_client_from_storage_account(storage_account, token):
-        return QueueService(account_name=storage_account['name'], token_credential=token)
+    def _get_queue_client_from_storage_account(storage_account, session):
+        return QueueServiceClient(
+            account_url=storage_account['properties']['primaryEndpoints']['queue'],
+            credential=session.get_credentials()
+        )
 
     @staticmethod
-    def _get_client(storage_type, storage_account, session=None, token=None):
-        if storage_type == TABLE_TYPE or storage_type == FILE_TYPE:
-            client = getattr(StorageSettingsUtilities, '_get_{}_client_from_storage_account'
-                             .format(storage_type))(storage_account, session)
-        else:
-            client = getattr(StorageSettingsUtilities, '_get_{}_client_from_storage_account'
-                             .format(storage_type))(storage_account, token)
-
+    def _get_client(storage_type, storage_account, session=None):
+        client = getattr(StorageSettingsUtilities, '_get_{}_client_from_storage_account'
+                         .format(storage_type))(storage_account, session)
         return client
 
     @staticmethod
-    def get_settings(storage_type, storage_account, session=None, token=None):
-        client = StorageSettingsUtilities._get_client(storage_type, storage_account, session, token)
+    def get_settings(storage_type, storage_account, session=None):
+        client = StorageSettingsUtilities._get_client(storage_type, storage_account, session)
 
+        if storage_type in [QUEUE_TYPE, BLOB_TYPE]:
+            return getattr(client, 'get_service_properties')()
         return getattr(client, 'get_{}_service_properties'.format(storage_type))()
 
     @staticmethod
-    def update_logging(storage_type, storage_account, logging_settings, session=None, token=None):
-        client = StorageSettingsUtilities._get_client(storage_type, storage_account, session, token)
+    def update_logging(storage_type, storage_account, logging_settings, session=None):
+        client = StorageSettingsUtilities._get_client(storage_type, storage_account, session)
 
+        if storage_type in [QUEUE_TYPE, BLOB_TYPE]:
+            return getattr(client, 'set_service_properties')(analytics_logging=logging_settings)
         return getattr(client, 'set_{}_service_properties'
                        .format(storage_type))(logging=logging_settings)
 
@@ -544,3 +595,71 @@ class RequireSecureTransferAction(AzureBaseAction):
             resource['name'],
             StorageAccountUpdateParameters(enable_https_traffic_only=self.data.get('value'))
         )
+
+
+@Storage.filter_registry.register('blob-services')
+class BlobServicesFilter(ValueFilter):
+    """
+    Filter by the current blob services
+    configuration for this storage account.
+
+    :example:
+
+    Find storage accounts with blob services soft delete disabled
+    or retention less than 7 days
+
+    .. code-block:: yaml
+
+        policies:
+          - name: storage-no-soft-delete
+            resource: azure.storage
+            filters:
+              - or:
+                  - type: blob-services
+                    key: deleteRetentionPolicy.enabled
+                    value: false
+                  - type: blob-services
+                    key: deleteRetentionPolicy.days
+                    value: 7
+                    op: lt
+    """
+
+    schema = type_schema('blob-services', rinherit=ValueFilter.schema)
+
+    log = logging.getLogger('custodian.azure.storage.blob-services-filter')
+
+    def __init__(self, data, manager=None):
+        super(BlobServicesFilter, self).__init__(data, manager)
+
+    def process(self, resources, event=None):
+        resources, exceptions = ThreadHelper.execute_in_parallel(
+            resources=resources,
+            event=event,
+            execution_method=self._process_resource_set,
+            executor_factory=self.executor_factory,
+            log=self.log
+        )
+        if exceptions:
+            raise exceptions[0]
+        return resources
+
+    def _process_resource_set(self, resources, event=None):
+        client = self.manager.get_client()
+        result = []
+        for resource in resources:
+            if 'c7n:blobServices' not in resource['properties']:
+                blob_services = client.blob_services.get_service_properties(
+                    resource['resourceGroup'],
+                    resource['name'])
+
+                resource['properties']['c7n:blobServices'] = \
+                    blob_services.serialize(True).get('properties', {})
+
+            filtered_resources = super(BlobServicesFilter, self).process(
+                [resource['properties']['c7n:blobServices']],
+                event)
+
+            if filtered_resources:
+                result.append(resource)
+
+        return result

@@ -1,0 +1,17 @@
+{
+    "status_code": 200,
+    "data": {
+        "DeliveryChannels": [
+            {
+                "name": "aws-controltower-BaselineConfigDeliveryChannel",
+                "s3BucketName": "aws-controltower-logs-644160558196-us-east-1",
+                "s3KeyPrefix": "o-r2x4ytpwhl",
+                "snsTopicARN": "arn:aws:sns:us-east-2:644160558196:aws-controltower-AllConfigNotifications",
+                "configSnapshotDeliveryProperties": {
+                    "deliveryFrequency": "TwentyFour_Hours"
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,31 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 26 Dec 2018 14:11:50 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "1; mode=block",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"44,43,39,35\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "409",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "name": "projects/cloud-custodian/locations/us-central1/jobs/custodian-auto-instance-off",
+    "httpTarget": {
+      "uri": "https://us-central1-cloud-custodian.cloudfunctions.net/instance-off",
+      "httpMethod": "POST",
+      "headers": {
+        "User-Agent": "Google-Cloud-Scheduler"
+      }
+    },
+    "userUpdateTime": "2018-12-26T14:11:50Z",
+    "state": "ENABLED",
+    "schedule": "every 2 hours",
+    "timeZone": "Etc/UTC"
+  }
+}

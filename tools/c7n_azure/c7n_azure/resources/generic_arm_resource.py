@@ -1,21 +1,10 @@
-# Copyright 2019 Microsoft Corporation
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 from c7n_azure.constants import RESOURCE_GROUPS_TYPE
 from c7n_azure.provider import resources
 from c7n_azure.query import DescribeSource, ResourceQuery
-from c7n_azure.resources.arm import ArmResourceManager, arm_resource_types
+from c7n_azure.resources.arm import ArmResourceManager
 
 from c7n.filters.core import Filter, type_schema
 from c7n.query import sources
@@ -24,7 +13,7 @@ from c7n_azure.utils import ResourceIdParser, is_resource_group_id
 
 class GenericArmResourceQuery(ResourceQuery):
 
-    def filter(self, resource_manager, **params):
+    def filter(self, resource_manager, query=None, **params):
         client = resource_manager.get_client()
         results = [r.serialize(True) for r in client.resources.list()]
 
@@ -67,7 +56,6 @@ class GenericArmResource(ArmResourceManager):
         client = 'ResourceManagementClient'
 
         resource_type = 'armresource'
-        enable_tag_operations = True
         diagnostic_settings_enabled = False
 
         default_report_fields = (
@@ -91,11 +79,6 @@ class GenericArmResource(ArmResourceManager):
             result.append(resource)
 
         return self.augment([r.serialize(True) for r in result])
-
-    def tag_operation_enabled(self, resource_type):
-        if resource_type.lower() in arm_resource_types:
-            return arm_resource_types[resource_type.lower()].enable_tag_operations
-        return False
 
     @property
     def source_type(self):

@@ -1,9 +1,9 @@
 {
-  "status_code": 200,
-  "data": {
-    "ResponseMetadata": {},
-    "Tags": {
-      "App": "Custodian"
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Tags": {
+            "App": "Custodian"
+        }
     }
-  }
 }

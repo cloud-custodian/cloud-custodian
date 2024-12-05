@@ -1,16 +1,5 @@
-# Copyright 2019 Karol Lassak
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from gcp_common import BaseTest
 
 from c7n.filters import FilterValidationError
@@ -104,3 +93,18 @@ class LabelActionFilterTest(BaseTest):
                 {'type': 'marked-for-op',
                  'op': 'no-such-op'}
             ]))
+
+    def test_parse(self):
+        p = self.load_policy(get_policy(None, [{"type": "marked-for-op", "op": "detach-disks"}]))
+        marked_for = p.resource_manager.filters[0]
+        assert marked_for.parse("resource_policy-detach-disks-2022_10_23_12_10") == (
+            'resource_policy', 'detach-disks', '2022_10_23_12_10')
+
+        assert marked_for.parse("resource_policy-create-machine-image-2022_10_23_12_10") == (
+            'resource_policy', 'create-machine-image', '2022_10_23_12_10')
+
+        assert marked_for.parse("resource_policy-delete-2022_10_23_12_10") == (
+            'resource_policy', 'delete', '2022_10_23_12_10')
+
+        assert marked_for.parse("custom-message-delete-2022_10_23_12_10") == (
+            'custom-message', 'delete', '2022_10_23_12_10')

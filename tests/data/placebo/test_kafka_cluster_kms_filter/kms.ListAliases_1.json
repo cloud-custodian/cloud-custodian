@@ -1,0 +1,232 @@
+{
+    "status_code": 200,
+    "data": {
+        "Aliases": [
+            {
+                "AliasName": "alias/aws/dynamodb",
+                "AliasArn": "arn:aws:kms:ap-northeast-2:644160558196:alias/aws/dynamodb"
+            },
+            {
+                "AliasName": "alias/aws/ebs",
+                "AliasArn": "arn:aws:kms:ap-northeast-2:644160558196:alias/aws/ebs"
+            },
+            {
+                "AliasName": "alias/aws/elasticfilesystem",
+                "AliasArn": "arn:aws:kms:ap-northeast-2:644160558196:alias/aws/elasticfilesystem"
+            },
+            {
+                "AliasName": "alias/aws/es",
+                "AliasArn": "arn:aws:kms:ap-northeast-2:644160558196:alias/aws/es"
+            },
+            {
+                "AliasName": "alias/aws/glue",
+                "AliasArn": "arn:aws:kms:ap-northeast-2:644160558196:alias/aws/glue"
+            },
+            {
+                "AliasName": "alias/aws/kafka",
+                "AliasArn": "arn:aws:kms:ap-northeast-2:644160558196:alias/aws/kafka",
+                "TargetKeyId": "d0e564f4-ec4c-43bd-b379-a22f92253dbe",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 12,
+                    "day": 9,
+                    "hour": 15,
+                    "minute": 13,
+                    "second": 39,
+                    "microsecond": 173000
+                },
+                "LastUpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 12,
+                    "day": 9,
+                    "hour": 15,
+                    "minute": 13,
+                    "second": 39,
+                    "microsecond": 173000
+                }
+            },
+            {
+                "AliasName": "alias/aws/kinesisvideo",
+                "AliasArn": "arn:aws:kms:ap-northeast-2:644160558196:alias/aws/kinesisvideo"
+            },
+            {
+                "AliasName": "alias/aws/lambda",
+                "AliasArn": "arn:aws:kms:ap-northeast-2:644160558196:alias/aws/lambda",
+                "TargetKeyId": "3f6dc1e2-3b43-4fa7-9114-5290fd4bbfc0",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 3,
+                    "day": 29,
+                    "hour": 17,
+                    "minute": 51,
+                    "second": 22,
+                    "microsecond": 65000
+                },
+                "LastUpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 3,
+                    "day": 29,
+                    "hour": 17,
+                    "minute": 51,
+                    "second": 22,
+                    "microsecond": 65000
+                }
+            },
+            {
+                "AliasName": "alias/aws/rds",
+                "AliasArn": "arn:aws:kms:ap-northeast-2:644160558196:alias/aws/rds"
+            },
+            {
+                "AliasName": "alias/aws/redshift",
+                "AliasArn": "arn:aws:kms:ap-northeast-2:644160558196:alias/aws/redshift"
+            },
+            {
+                "AliasName": "alias/aws/redshifttest",
+                "AliasArn": "arn:aws:kms:ap-northeast-2:644160558196:alias/aws/redshifttest"
+            },
+            {
+                "AliasName": "alias/aws/s3",
+                "AliasArn": "arn:aws:kms:ap-northeast-2:644160558196:alias/aws/s3"
+            },
+            {
+                "AliasName": "alias/aws/sns",
+                "AliasArn": "arn:aws:kms:ap-northeast-2:644160558196:alias/aws/sns",
+                "TargetKeyId": "e033425f-2d43-45e1-b404-cc86549b3621",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 12,
+                    "day": 9,
+                    "hour": 12,
+                    "minute": 7,
+                    "second": 16,
+                    "microsecond": 535000
+                },
+                "LastUpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 12,
+                    "day": 9,
+                    "hour": 12,
+                    "minute": 7,
+                    "second": 16,
+                    "microsecond": 535000
+                }
+            },
+            {
+                "AliasName": "alias/aws/ssm",
+                "AliasArn": "arn:aws:kms:ap-northeast-2:644160558196:alias/aws/ssm"
+            },
+            {
+                "AliasName": "alias/aws/xray",
+                "AliasArn": "arn:aws:kms:ap-northeast-2:644160558196:alias/aws/xray"
+            },
+            {
+                "AliasName": "alias/sandbox-regional-db-execution",
+                "AliasArn": "arn:aws:kms:ap-northeast-2:644160558196:alias/sandbox-regional-db-execution",
+                "TargetKeyId": "f0a247a2-b089-4876-a886-ecde526961b1",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 9,
+                    "day": 21,
+                    "hour": 12,
+                    "minute": 46,
+                    "second": 15,
+                    "microsecond": 680000
+                },
+                "LastUpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 9,
+                    "day": 21,
+                    "hour": 12,
+                    "minute": 46,
+                    "second": 15,
+                    "microsecond": 680000
+                }
+            },
+            {
+                "AliasName": "alias/sandbox/execution-queue",
+                "AliasArn": "arn:aws:kms:ap-northeast-2:644160558196:alias/sandbox/execution-queue",
+                "TargetKeyId": "0c776c05-6b3f-4e74-ba00-0ac59969d0c2",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 9,
+                    "day": 21,
+                    "hour": 12,
+                    "minute": 46,
+                    "second": 16,
+                    "microsecond": 696000
+                },
+                "LastUpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 9,
+                    "day": 21,
+                    "hour": 12,
+                    "minute": 46,
+                    "second": 16,
+                    "microsecond": 696000
+                }
+            },
+            {
+                "AliasName": "alias/sandbox/execution/env",
+                "AliasArn": "arn:aws:kms:ap-northeast-2:644160558196:alias/sandbox/execution/env",
+                "TargetKeyId": "335722f1-a330-4f23-a338-8544297eae0c",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 9,
+                    "day": 21,
+                    "hour": 12,
+                    "minute": 46,
+                    "second": 14,
+                    "microsecond": 669000
+                },
+                "LastUpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 9,
+                    "day": 21,
+                    "hour": 12,
+                    "minute": 46,
+                    "second": 14,
+                    "microsecond": 669000
+                }
+            },
+            {
+                "AliasName": "alias/skunk/trails",
+                "AliasArn": "arn:aws:kms:ap-northeast-2:644160558196:alias/skunk/trails",
+                "TargetKeyId": "4e587a21-567d-4504-aa8e-879b1b98ca15",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 12,
+                    "day": 9,
+                    "hour": 12,
+                    "minute": 8,
+                    "second": 27,
+                    "microsecond": 381000
+                },
+                "LastUpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 12,
+                    "day": 9,
+                    "hour": 12,
+                    "minute": 8,
+                    "second": 27,
+                    "microsecond": 381000
+                }
+            }
+        ],
+        "Truncated": false,
+        "ResponseMetadata": {}
+    }
+}

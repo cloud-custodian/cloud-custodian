@@ -1,16 +1,5 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 from googleapiclient.errors import HttpError
 
@@ -42,6 +31,9 @@ class MethodAction(Action):
 
     # error codes that can be safely ignored
     ignore_error_codes = ()
+
+    permissions = ()
+    method_perm = None
 
     def validate(self):
         if not self.method_spec:
@@ -78,8 +70,16 @@ class MethodAction(Action):
         for resource in resources:
             op_name = self.get_operation_name(model, resource)
             params = self.get_resource_params(model, resource)
-            result = self.invoke_api(client, op_name, params)
-            if result_key and annotation_key:
+            try:
+                result = self.invoke_api(client, op_name, params)
+            except HttpError as e:
+                result = self.handle_resource_error(
+                    client, model, resource, op_name, params, e
+                )
+                # if the error handler recovered it returns a result
+                if not result:
+                    raise
+            if result and result_key and annotation_key:
                 resource[annotation_key] = result.get(result_key)
 
     def invoke_api(self, client, op_name, params):
@@ -89,6 +89,25 @@ class MethodAction(Action):
             if e.resp.status in self.ignore_error_codes:
                 return e
             raise
+
+    def handle_resource_error(self, client, model, resource, op_name, params, error):
+        """ subclasses implement specific error handling
+        """
+
+    def get_permissions(self):
+        if self.permissions:
+            return self.permissions
+        m = self.manager.resource_type
+        method = self.method_perm
+        if not method and 'op' not in self.method_spec:
+            return ()
+        if not method:
+            method = self.method_spec['op']
+        component = m.component
+        if '.' in component:
+            component = component.split('.')[-1]
+        return ("{}.{}.{}".format(
+            m.perm_service or m.service, component, method),)
 
     def get_operation_name(self, model, resource):
         return self.method_spec['op']

@@ -1,16 +1,5 @@
-# Copyright 2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from .common import BaseTest, functional
 from botocore.exceptions import ClientError
 
@@ -142,6 +131,27 @@ class RDSParamGroupTest(BaseTest):
             if count == 2:
                 break
         self.assertEqual(count, 2)
+
+    def test_rdsparamgroup_param_value_filter(self):
+        session_factory = self.replay_flight_data('test_rdsparamgroup_param_value_filter')
+        policy = self.load_policy(
+            {
+                "name": "rds-paramter-group-value-filter-test",
+                "resource": "rds-param-group",
+                "filters": [
+                    {
+                        "type": "db-parameter",
+                        "key": "tls_version",
+                        "op": "eq",
+                        "value": "TLSv1.2"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+
+        resources = policy.resource_manager.resources()
+        self.assertEqual(len(resources), 1)
 
 
 class RDSClusterParamGroupTest(BaseTest):
@@ -285,3 +295,24 @@ class RDSClusterParamGroupTest(BaseTest):
             if count == 2:
                 break
         self.assertEqual(count, 2)
+
+    def test_rdsclusterparamgroup_param_value_filter(self):
+        session_factory = self.replay_flight_data('test_rdsclusterparamgroup_param_value_filter')
+        policy = self.load_policy(
+            {
+                "name": "rdscluster-paramter-group-value-filter-test",
+                "resource": "rds-cluster-param-group",
+                "filters": [
+                    {
+                        "type": "db-parameter",
+                        "key": "tls_version",
+                        "op": "eq",
+                        "value": "TLSv1.2"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+
+        resources = policy.resource_manager.resources()
+        self.assertEqual(len(resources), 1)

@@ -1,0 +1,19 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "IsTruncated": false,
+        "IntelligentTieringConfigurationList": [
+            {
+                "Id": "hello-1",
+                "Status": "Enabled",
+                "Tierings": [
+                    {
+                        "Days": 105,
+                        "AccessTier": "ARCHIVE_ACCESS"
+                    }
+                ]
+            }
+        ]
+    }
+}

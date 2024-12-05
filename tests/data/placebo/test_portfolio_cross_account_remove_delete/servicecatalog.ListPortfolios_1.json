@@ -1,0 +1,41 @@
+{
+    "status_code": 200,
+    "data": {
+        "PortfolioDetails": [
+            {
+                "Id": "port-srkytozjwbzpc",
+                "ARN": "arn:aws:catalog:us-east-1:644160558196:portfolio/port-srkytozjwbzpc",
+                "DisplayName": "dev",
+                "Description": "dev",
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 5,
+                    "day": 14,
+                    "hour": 11,
+                    "minute": 34,
+                    "second": 1,
+                    "microsecond": 554000
+                },
+                "ProviderName": "kapilt"
+            },
+            {
+                "Id": "port-t24m4nifknphk",
+                "ARN": "arn:aws:catalog:us-east-1:644160558196:portfolio/port-t24m4nifknphk",
+                "DisplayName": "c7n-test",
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 10,
+                    "day": 30,
+                    "hour": 17,
+                    "minute": 53,
+                    "second": 44,
+                    "microsecond": 22000
+                },
+                "ProviderName": "pratyush"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

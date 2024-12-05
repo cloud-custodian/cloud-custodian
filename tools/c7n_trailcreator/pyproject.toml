@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "c7n_trailcreator"
-version = "0.2.0"
+version = "0.2.41"
 readme = "readme.md"
 homepage = "https://cloudcustodian.io"
 repository = "https://github.com/cloud-custodian/cloud-custodian"
@@ -10,6 +10,7 @@ authors = ["Cloud Custodian Project"]
 license = "Apache-2.0"
 
 classifiers=[
+   "License :: OSI Approved :: Apache Software License",
    "Topic :: System :: Systems Administration",
    "Topic :: System :: Distributed Computing"
 ]
@@ -18,13 +19,13 @@ classifiers=[
 c7n-trailcreator = 'c7n_trailcreator.trailcreator:cli'
 
 [tool.poetry.dependencies]
-python = "^3.6"
-click = "^7.0"
-
-[tool.poetry.dev-dependencies]
-c7n_org = {path = "../c7n_org", develop = true}
+python = "^3.8"
 c7n = {path = "../..", develop = true}
+c7n_org = {path = "../c7n_org", develop = true}
+
+click = "^8.0"
 
 [build-system]
-requires = ["poetry>=0.12"]
-build-backend = "poetry.masonry.api"
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+

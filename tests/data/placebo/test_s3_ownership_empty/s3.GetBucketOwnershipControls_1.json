@@ -1,0 +1,11 @@
+{
+    "status_code": 404,
+    "data": {
+        "Error": {
+            "Code": "OwnershipControlsNotFoundError",
+            "Message": "The bucket ownership controls were not found",
+            "BucketName": "c7ntest-20211227212502652800000001"
+        },
+        "ResponseMetadata": {}
+    }
+}

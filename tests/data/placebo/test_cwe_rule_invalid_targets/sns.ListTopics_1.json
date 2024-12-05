@@ -1,0 +1,14 @@
+{
+    "status_code": 200,
+    "data": {
+        "Topics": [
+            {
+                "TopicArn": "arn:aws:sns:us-east-1:644160558196:aws-controltower-SecurityNotifications"
+            },
+            {
+                "TopicArn": "arn:aws:sns:us-east-1:644160558196:test2"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

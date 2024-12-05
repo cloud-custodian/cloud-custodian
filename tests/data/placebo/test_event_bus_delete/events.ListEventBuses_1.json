@@ -1,0 +1,16 @@
+{
+    "status_code": 200,
+    "data": {
+        "EventBuses": [
+            {
+                "Name": "default",
+                "Arn": "arn:aws:events:us-east-1:644160558196:event-bus/default"
+            },
+            {
+                "Name": "test-event-bus",
+                "Arn": "arn:aws:events:us-east-1:644160558196:event-bus/test-event-bus"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

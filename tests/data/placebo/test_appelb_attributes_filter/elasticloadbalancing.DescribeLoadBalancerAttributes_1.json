@@ -1,0 +1,32 @@
+{
+    "status_code": 200,
+    "data": {
+        "Attributes": [
+            {
+                "Value": "true",
+                "Key": "access_logs.s3.enabled"
+            },
+            {
+                "Value": "elbv2logtest",
+                "Key": "access_logs.s3.bucket"
+            },
+            {
+                "Value": "50",
+                "Key": "idle_timeout.timeout_seconds"
+            },
+            {
+                "Value": "gah5",
+                "Key": "access_logs.s3.prefix"
+            },
+            {
+                "Value": "true",
+                "Key": "deletion_protection.enabled"
+            },
+            {
+                "Value": "true",
+                "Key": "routing.http2.enabled"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

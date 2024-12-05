@@ -1,0 +1,63 @@
+{
+    "status_code": 200,
+    "data": {
+        "configurationItems": [
+            {
+                "version": "1.3",
+                "accountId": "644160558196",
+                "configurationItemCaptureTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 10,
+                    "day": 23,
+                    "hour": 12,
+                    "minute": 46,
+                    "second": 53,
+                    "microsecond": 279000
+                },
+                "configurationItemStatus": "ResourceDiscovered",
+                "configurationStateId": "6441605581969",
+                "configurationItemMD5Hash": "",
+                "arn": "arn:aws:rds:us-east-1:644160558196:cluster-snapshot:verify",
+                "resourceType": "AWS::RDS::DBClusterSnapshot",
+                "resourceId": "verify",
+                "resourceName": "verify",
+                "awsRegion": "us-east-1",
+                "availabilityZone": "Multiple Availability Zones",
+                "resourceCreationTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 10,
+                    "day": 23,
+                    "hour": 12,
+                    "minute": 44,
+                    "second": 39,
+                    "microsecond": 790000
+                },
+                "tags": {
+                    "Owner": "kapil"
+                },
+                "relatedEvents": [],
+                "relationships": [
+                    {
+                        "resourceType": "AWS::RDS::DBCluster",
+                        "resourceName": "database-1",
+                        "relationshipName": "Is associated with "
+                    },
+                    {
+                        "resourceType": "AWS::EC2::VPC",
+                        "resourceId": "vpc-d2d616b5",
+                        "relationshipName": "Is associated with "
+                    }
+                ],
+                "configuration": "{\"availabilityZones\":[\"us-east-1a\",\"us-east-1b\",\"us-east-1d\"],\"snapshotCreateTime\":6441605581960,\"engine\":\"aurora-postgresql\",\"allocatedStorage\":0,\"status\":\"available\",\"port\":0,\"vpcId\":\"vpc-d2d616b5\",\"clusterCreateTime\":6441605581960,\"masterUsername\":\"postgres\",\"engineVersion\":\"10.serverless_7\",\"licenseModel\":\"postgresql-license\",\"snapshotType\":\"manual\",\"percentProgress\":100,\"storageEncrypted\":true,\"kmsKeyId\":\"arn:aws:kms:us-east-1:644160558196:key/b10f842a-feb7-4318-92d5-0640a75b7688\",\"dbclusterSnapshotIdentifier\":\"verify\",\"dbclusterIdentifier\":\"database-1\",\"iamdatabaseAuthenticationEnabled\":false,\"dbclusterSnapshotArn\":\"arn:aws:rds:us-east-1:644160558196:cluster-snapshot:verify\"}",
+                "supplementaryConfiguration": {
+                    "DBClusterSnapshotAttributes": "[{\"attributeName\":\"restore\",\"attributeValues\":[]}]",
+                    "Tags": "[{\"key\":\"Owner\",\"value\":\"kapil\"}]"
+                }
+            }
+        ],
+        "nextToken": "eyJlbmNyeXB0ZWREYXRhIjpbLTM4LC01NywtMjAsNTIsLTEwNiwxMTksOTEsNzMsODYsLTExLC0zNywxMDYsMzAsMTE1LC0xMTAsMTA1LDc3LC00NywtMjksLTE2LC0xMTAsLTEwOSw0OSwtNDgsLTkxLC00NiwtMTAwLC0xMjcsNzEsLTY5LDEyNywtMTI3LDQ3LDY2LC05MiwtMTE0LDczLDM1LC0xNiwxMjQsMzksLTI1LC04NCw5Miw1MywtOTksLTcyLDkwLC0zLDg5LC01OSwxMTMsMSwtMTEwLDE3LDcxLC0zNywtMjQsLTEwMywxNSwtNiwtOTUsLTM0LDM2LC0xMCwtOSwtNTAsMTE3LC05MCwzMywtODAsNTgsLTEyNywtOTAsLTUyLC0xMiwxMjAsLTUzLDEwNywtMTEzLC01NywtOSwtMTExLC0xMDgsLTEyNCwtMTMsLTY2LC0xMTIsMTksLTEyNSwtNjEsLTExLDEwOCw1Nyw1OCwtNDksNzYsLTEyNCwtOTEsNzYsLTcsLTg2LDQ4LC03OCwtMSwxMTQsOCwtNjYsNDEsLTc0LC0zNCw5Myw2MiwtMTMsNTIsLTksLTExOSw0MCw5Miw5NiwtMTE5LDU1LDg4LDgxLDM1LC04NiwxMTYsLTExNSwyNCwtMTksLTgsNCwtMTExLC03MSwtOTgsLTM0LDY1LC01OCw1NiwtODksOTMsMzksLTk2LDUzLDU4LDEwLC04NCwtOTYsLTMzLC03LC03MiwxMDIsLTQ0LDMzLC0zNywtNjgsMywxMjMsMzAsLTExNiwtNzgsLTYzLDI3LC0zNCwtMTAyLC0zXSwibWF0ZXJpYWxTZXRTZXJpYWxOdW1iZXIiOjEsIml2UGFyYW1ldGVyU3BlYyI6eyJpdiI6WzEwMSwyNCw4MSw5NiwtNDgsLTkwLDU4LDM5LDQyLDU1LC04MSwtMTMsNzUsLTExNiw5NSwtMTddfX0=",
+        "ResponseMetadata": {}
+    }
+}

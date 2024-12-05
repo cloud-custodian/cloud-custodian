@@ -1,16 +1,5 @@
-# Copyright 2019 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import re
 
 from c7n_gcp.actions import MethodAction
@@ -32,12 +21,26 @@ class DMDeployment(QueryResourceManager):
         name = id = 'name'
 
         default_report_fields = ['name', 'description', 'insertTime', 'updateTime']
+        urn_component = "deployment"
 
         @staticmethod
         def get(client, resource_info):
             return client.execute_command(
                 'get', {'project': resource_info['project_id'],
                         'deployment': resource_info['name']})
+
+    def augment(self, resources):
+        # normalize labels from array to mapping like other gcp resources.
+        for r in resources:
+            if isinstance(r.get('labels'), list):
+                r['labels'] = {l['key']: l['value'] for l in r['labels']}
+        return resources
+
+    def get_resource(self, resource_info):
+        resource = self.resource_type.get(self.get_client(), resource_info)
+        if resource:
+            self.augment((resource,))
+        return resource
 
 
 @DMDeployment.action_registry.register('delete')

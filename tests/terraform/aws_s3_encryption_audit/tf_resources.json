@@ -1,0 +1,130 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_s3_bucket": {
+            "example_a": {
+                "acceleration_status": "",
+                "acl": "private",
+                "arn": "arn:aws:s3:::c7n-aws-s3-encryption-audit-test-a",
+                "bucket": "c7n-aws-s3-encryption-audit-test-a",
+                "bucket_domain_name": "c7n-aws-s3-encryption-audit-test-a.s3.amazonaws.com",
+                "bucket_prefix": null,
+                "bucket_regional_domain_name": "c7n-aws-s3-encryption-audit-test-a.s3.amazonaws.com",
+                "cors_rule": [],
+                "force_destroy": false,
+                "grant": [],
+                "hosted_zone_id": "Z3AQBSTGFYJSTF",
+                "id": "c7n-aws-s3-encryption-audit-test-a",
+                "lifecycle_rule": [],
+                "logging": [],
+                "object_lock_configuration": [],
+                "policy": null,
+                "region": "us-east-1",
+                "replication_configuration": [],
+                "request_payer": "BucketOwner",
+                "server_side_encryption_configuration": [
+                    {
+                        "rule": [
+                            {
+                                "apply_server_side_encryption_by_default": [
+                                    {
+                                        "kms_master_key_id": "",
+                                        "sse_algorithm": "aws:kms"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "tags": null,
+                "versioning": [
+                    {
+                        "enabled": false,
+                        "mfa_delete": false
+                    }
+                ],
+                "website": [],
+                "website_domain": null,
+                "website_endpoint": null
+            },
+            "example_b": {
+                "acceleration_status": "",
+                "acl": "private",
+                "arn": "arn:aws:s3:::c7n-aws-s3-encryption-audit-test-b",
+                "bucket": "c7n-aws-s3-encryption-audit-test-b",
+                "bucket_domain_name": "c7n-aws-s3-encryption-audit-test-b.s3.amazonaws.com",
+                "bucket_prefix": null,
+                "bucket_regional_domain_name": "c7n-aws-s3-encryption-audit-test-b.s3.amazonaws.com",
+                "cors_rule": [],
+                "force_destroy": false,
+                "grant": [],
+                "hosted_zone_id": "Z3AQBSTGFYJSTF",
+                "id": "c7n-aws-s3-encryption-audit-test-b",
+                "lifecycle_rule": [],
+                "logging": [],
+                "object_lock_configuration": [],
+                "policy": null,
+                "region": "us-east-1",
+                "replication_configuration": [],
+                "request_payer": "BucketOwner",
+                "server_side_encryption_configuration": [
+                    {
+                        "rule": [
+                            {
+                                "apply_server_side_encryption_by_default": [
+                                    {
+                                        "kms_master_key_id": "",
+                                        "sse_algorithm": "AES256"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "tags": null,
+                "versioning": [
+                    {
+                        "enabled": false,
+                        "mfa_delete": false
+                    }
+                ],
+                "website": [],
+                "website_domain": null,
+                "website_endpoint": null
+            },
+            "example_c": {
+                "acceleration_status": "",
+                "acl": "private",
+                "arn": "arn:aws:s3:::c7n-aws-s3-encryption-audit-test-c",
+                "bucket": "c7n-aws-s3-encryption-audit-test-c",
+                "bucket_domain_name": "c7n-aws-s3-encryption-audit-test-c.s3.amazonaws.com",
+                "bucket_prefix": null,
+                "bucket_regional_domain_name": "c7n-aws-s3-encryption-audit-test-c.s3.amazonaws.com",
+                "cors_rule": [],
+                "force_destroy": false,
+                "grant": [],
+                "hosted_zone_id": "Z3AQBSTGFYJSTF",
+                "id": "c7n-aws-s3-encryption-audit-test-c",
+                "lifecycle_rule": [],
+                "logging": [],
+                "object_lock_configuration": [],
+                "policy": null,
+                "region": "us-east-1",
+                "replication_configuration": [],
+                "request_payer": "BucketOwner",
+                "server_side_encryption_configuration": [],
+                "tags": null,
+                "versioning": [
+                    {
+                        "enabled": false,
+                        "mfa_delete": false
+                    }
+                ],
+                "website": [],
+                "website_domain": null,
+                "website_endpoint": null
+            }
+        }
+    }
+}

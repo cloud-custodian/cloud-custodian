@@ -1,0 +1,33 @@
+{
+    "status_code": 200,
+    "data": {
+        "Label": "RepositoryPullCount",
+        "Datapoints": [
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 8,
+                    "day": 29,
+                    "hour": 0,
+                    "minute": 14,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "Sum": 50,
+                "Unit": "Count"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "34a04417-fa52-11e7-917a-f7a6d7e3d98b",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "34a04417-fa52-11e7-917a-f7a6d7e3d98b",
+                "content-type": "text/xml",
+                "content-length": "515",
+                "date": "Mon, 29 Aug 2022 00:14:23 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

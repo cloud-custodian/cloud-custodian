@@ -1,0 +1,568 @@
+interactions:
+- request:
+    body: '{"Offset": 0, "Limit": 20}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '26'
+      Content-Type:
+      - application/json
+      Host:
+      - clb.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - DescribeLoadBalancers
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2018-03-17'
+    method: POST
+    uri: https://clb.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: "{\"Response\": {\"TotalCount\": 10, \"LoadBalancerSet\": [{\"LoadBalancerId\":
+        \"lb-aqsfvh8m\", \"LoadBalancerName\": \"lb-63230854\", \"Forward\": 1, \"Domain\":
+        \"\", \"LoadBalancerVips\": [\"43.134.149.139\"], \"AddressIPv6\": null, \"AddressIPVersion\":
+        \"ipv4\", \"IPv6Mode\": null, \"LoadBalancerType\": \"OPEN\", \"Status\":
+        1, \"CreateTime\": \"2022-09-21 11:38:40\", \"StatusTime\": \"2022-09-21 11:38:42\",
+        \"ProjectId\": 0, \"OpenBgp\": 0, \"Snat\": false, \"Isolation\": 0, \"Log\":
+        \"\", \"AnycastZone\": \"\", \"VpcId\": \"vpc-2hxl6jir\", \"NumericalVpcId\":
+        9493687, \"TargetRegionInfo\": {\"Region\": \"ap-singapore\", \"VpcId\": \"vpc-2hxl6jir\"},
+        \"SubnetId\": \"\", \"SecureGroups\": [], \"Tags\": [], \"MasterZone\": {\"ZoneId\":
+        900002, \"Zone\": \"ap-singapore-2\", \"ZoneName\": \"\u65B0\u52A0\u5761\u4E8C\u533A\",
+        \"ZoneRegion\": \"ap-singapore\", \"LocalZone\": false}, \"BackupZoneSet\":
+        null, \"IsolatedTime\": null, \"ExpireTime\": \"2022-10-21 11:38:40\", \"ChargeType\":
+        \"POSTPAID_BY_HOUR\", \"NetworkAttributes\": {\"InternetChargeType\": \"TRAFFIC_POSTPAID_BY_HOUR\",
+        \"InternetMaxBandwidthOut\": 1, \"BandwidthpkgSubType\": null}, \"PrepaidAttributes\":
+        null, \"ExtraInfo\": null, \"LogSetId\": \"\", \"LogTopicId\": \"\", \"LoadBalancerPassToTarget\":
+        false, \"IsDDos\": false, \"ConfigId\": \"\", \"ExclusiveCluster\": {}, \"SnatPro\":
+        false, \"SnatIps\": [], \"IsBlock\": false, \"IsBlockTime\": \"\", \"SlaType\":
+        \"\", \"ClusterTag\": null, \"LocalBgp\": false, \"MixIpTarget\": false, \"Zones\":
+        null, \"NfvInfo\": \"\", \"HealthLogSetId\": \"\", \"HealthLogTopicId\": \"\",
+        \"ClusterIds\": null, \"AttributeFlags\": [], \"VipIsp\": \"BGP\"}, {\"LoadBalancerId\":
+        \"lb-24jxs9vy\", \"LoadBalancerName\": \"arron_clb\", \"Forward\": 1, \"Domain\":
+        \"\", \"LoadBalancerVips\": [\"43.134.149.189\"], \"AddressIPv6\": null, \"AddressIPVersion\":
+        \"ipv4\", \"IPv6Mode\": null, \"LoadBalancerType\": \"OPEN\", \"Status\":
+        1, \"CreateTime\": \"2022-09-16 14:26:00\", \"StatusTime\": \"2022-09-16 22:17:19\",
+        \"ProjectId\": 0, \"OpenBgp\": 0, \"Snat\": false, \"Isolation\": 0, \"Log\":
+        \"\", \"AnycastZone\": \"\", \"VpcId\": \"vpc-rdsfj6ot\", \"NumericalVpcId\":
+        9471689, \"TargetRegionInfo\": {\"Region\": \"ap-singapore\", \"VpcId\": \"vpc-rdsfj6ot\"},
+        \"SubnetId\": \"\", \"SecureGroups\": [\"sg-lz5lxopi\"], \"Tags\": [], \"MasterZone\":
+        {\"ZoneId\": 900002, \"Zone\": \"ap-singapore-2\", \"ZoneName\": \"\u65B0\u52A0\u5761\u4E8C\u533A\",
+        \"ZoneRegion\": \"ap-singapore\", \"LocalZone\": false}, \"BackupZoneSet\":
+        null, \"IsolatedTime\": null, \"ExpireTime\": \"2022-10-16 14:26:00\", \"ChargeType\":
+        \"POSTPAID_BY_HOUR\", \"NetworkAttributes\": {\"InternetChargeType\": \"TRAFFIC_POSTPAID_BY_HOUR\",
+        \"InternetMaxBandwidthOut\": 1, \"BandwidthpkgSubType\": null}, \"PrepaidAttributes\":
+        null, \"ExtraInfo\": null, \"LogSetId\": \"\", \"LogTopicId\": \"\", \"LoadBalancerPassToTarget\":
+        false, \"IsDDos\": false, \"ConfigId\": \"\", \"ExclusiveCluster\": {}, \"SnatPro\":
+        false, \"SnatIps\": [], \"IsBlock\": false, \"IsBlockTime\": \"\", \"SlaType\":
+        \"\", \"ClusterTag\": null, \"LocalBgp\": false, \"MixIpTarget\": false, \"Zones\":
+        null, \"NfvInfo\": \"\", \"HealthLogSetId\": \"\", \"HealthLogTopicId\": \"\",
+        \"ClusterIds\": null, \"AttributeFlags\": [], \"VipIsp\": \"BGP\"}, {\"LoadBalancerId\":
+        \"lb-ml5vr8ei\", \"LoadBalancerName\": \"peter_high_perf_clb_test_bos1\",
+        \"Forward\": 1, \"Domain\": \"\", \"LoadBalancerVips\": [\"43.134.151.61\"],
+        \"AddressIPv6\": null, \"AddressIPVersion\": \"ipv4\", \"IPv6Mode\": null,
+        \"LoadBalancerType\": \"OPEN\", \"Status\": 1, \"CreateTime\": \"2022-07-14
+        18:15:50\", \"StatusTime\": \"2022-07-14 18:19:40\", \"ProjectId\": 0, \"OpenBgp\":
+        0, \"Snat\": false, \"Isolation\": 0, \"Log\": \"\", \"AnycastZone\": \"\",
+        \"VpcId\": \"vpc-3aajxqgr\", \"NumericalVpcId\": 830620, \"TargetRegionInfo\":
+        {\"Region\": \"ap-singapore\", \"VpcId\": \"vpc-3aajxqgr\"}, \"SubnetId\":
+        \"\", \"SecureGroups\": [], \"Tags\": [], \"MasterZone\": {\"ZoneId\": 900002,
+        \"Zone\": \"ap-singapore-2\", \"ZoneName\": \"\u65B0\u52A0\u5761\u4E8C\u533A\",
+        \"ZoneRegion\": \"ap-singapore\", \"LocalZone\": false}, \"BackupZoneSet\":
+        null, \"IsolatedTime\": null, \"ExpireTime\": \"2022-08-14 18:15:50\", \"ChargeType\":
+        \"POSTPAID_BY_HOUR\", \"NetworkAttributes\": {\"InternetChargeType\": \"TRAFFIC_POSTPAID_BY_HOUR\",
+        \"InternetMaxBandwidthOut\": 100, \"BandwidthpkgSubType\": null}, \"PrepaidAttributes\":
+        null, \"ExtraInfo\": null, \"LogSetId\": \"\", \"LogTopicId\": \"\", \"LoadBalancerPassToTarget\":
+        false, \"IsDDos\": false, \"ConfigId\": \"\", \"ExclusiveCluster\": {}, \"SnatPro\":
+        false, \"SnatIps\": [], \"IsBlock\": false, \"IsBlockTime\": \"\", \"SlaType\":
+        \"clb.c4.small\", \"ClusterTag\": null, \"LocalBgp\": false, \"MixIpTarget\":
+        false, \"Zones\": null, \"NfvInfo\": \"\", \"HealthLogSetId\": \"\", \"HealthLogTopicId\":
+        \"\", \"ClusterIds\": null, \"AttributeFlags\": [], \"VipIsp\": \"BGP\"},
+        {\"LoadBalancerId\": \"lb-47hh8ana\", \"LoadBalancerName\": \"peter_high_perf_clb_test_bos2\",
+        \"Forward\": 1, \"Domain\": \"\", \"LoadBalancerVips\": [\"101.33.51.229\"],
+        \"AddressIPv6\": null, \"AddressIPVersion\": \"ipv4\", \"IPv6Mode\": null,
+        \"LoadBalancerType\": \"OPEN\", \"Status\": 1, \"CreateTime\": \"2022-07-14
+        18:15:50\", \"StatusTime\": \"2022-07-14 18:15:56\", \"ProjectId\": 0, \"OpenBgp\":
+        0, \"Snat\": false, \"Isolation\": 0, \"Log\": \"\", \"AnycastZone\": \"\",
+        \"VpcId\": \"vpc-3aajxqgr\", \"NumericalVpcId\": 830620, \"TargetRegionInfo\":
+        {\"Region\": \"ap-singapore\", \"VpcId\": \"vpc-3aajxqgr\"}, \"SubnetId\":
+        \"\", \"SecureGroups\": [], \"Tags\": [], \"MasterZone\": {\"ZoneId\": 900003,
+        \"Zone\": \"ap-singapore-3\", \"ZoneName\": \"\u65B0\u52A0\u5761\u4E09\u533A\",
+        \"ZoneRegion\": \"ap-singapore\", \"LocalZone\": false}, \"BackupZoneSet\":
+        null, \"IsolatedTime\": null, \"ExpireTime\": \"2022-08-14 18:15:50\", \"ChargeType\":
+        \"POSTPAID_BY_HOUR\", \"NetworkAttributes\": {\"InternetChargeType\": \"TRAFFIC_POSTPAID_BY_HOUR\",
+        \"InternetMaxBandwidthOut\": 100, \"BandwidthpkgSubType\": null}, \"PrepaidAttributes\":
+        null, \"ExtraInfo\": null, \"LogSetId\": \"\", \"LogTopicId\": \"\", \"LoadBalancerPassToTarget\":
+        false, \"IsDDos\": false, \"ConfigId\": \"\", \"ExclusiveCluster\": {}, \"SnatPro\":
+        false, \"SnatIps\": [], \"IsBlock\": false, \"IsBlockTime\": \"\", \"SlaType\":
+        \"clb.c4.small\", \"ClusterTag\": null, \"LocalBgp\": false, \"MixIpTarget\":
+        false, \"Zones\": null, \"NfvInfo\": \"\", \"HealthLogSetId\": \"\", \"HealthLogTopicId\":
+        \"\", \"ClusterIds\": null, \"AttributeFlags\": [], \"VipIsp\": \"BGP\"},
+        {\"LoadBalancerId\": \"lb-8w5xraw2\", \"LoadBalancerName\": \"lb-62a7f211\",
+        \"Forward\": 1, \"Domain\": \"\", \"LoadBalancerVips\": [\"10.0.1.10\"], \"AddressIPv6\":
+        null, \"AddressIPVersion\": \"ipv4\", \"IPv6Mode\": null, \"LoadBalancerType\":
+        \"INTERNAL\", \"Status\": 1, \"CreateTime\": \"2022-06-14 20:36:13\", \"StatusTime\":
+        \"2022-06-14 20:36:50\", \"ProjectId\": 1000000511, \"OpenBgp\": 0, \"Snat\":
+        false, \"Isolation\": 0, \"Log\": \"\", \"AnycastZone\": \"\", \"VpcId\":
+        \"vpc-aik1957f\", \"NumericalVpcId\": 5705813, \"TargetRegionInfo\": {\"Region\":
+        \"ap-singapore\", \"VpcId\": \"vpc-aik1957f\"}, \"SubnetId\": \"subnet-5k1ixnpo\",
+        \"SecureGroups\": [], \"Tags\": [], \"MasterZone\": null, \"BackupZoneSet\":
+        null, \"IsolatedTime\": null, \"ExpireTime\": \"2022-07-14 20:36:13\", \"ChargeType\":
+        \"POSTPAID_BY_HOUR\", \"NetworkAttributes\": {\"InternetChargeType\": \"TRAFFIC_POSTPAID_BY_HOUR\",
+        \"InternetMaxBandwidthOut\": 0, \"BandwidthpkgSubType\": null}, \"PrepaidAttributes\":
+        null, \"ExtraInfo\": null, \"LogSetId\": \"\", \"LogTopicId\": \"\", \"LoadBalancerPassToTarget\":
+        false, \"IsDDos\": false, \"ConfigId\": \"\", \"ExclusiveCluster\": {}, \"SnatPro\":
+        false, \"SnatIps\": [], \"IsBlock\": false, \"IsBlockTime\": \"\", \"SlaType\":
+        \"\", \"ClusterTag\": null, \"LocalBgp\": false, \"MixIpTarget\": false, \"Zones\":
+        null, \"NfvInfo\": \"\", \"HealthLogSetId\": \"\", \"HealthLogTopicId\": \"\",
+        \"ClusterIds\": null, \"AttributeFlags\": [], \"VipIsp\": \"INTERNAL\"}, {\"LoadBalancerId\":
+        \"lb-qniokvxq\", \"LoadBalancerName\": \"lb-62a7f219-rex-public\", \"Forward\":
+        1, \"Domain\": \"\", \"LoadBalancerVips\": [\"101.32.104.223\"], \"AddressIPv6\":
+        null, \"AddressIPVersion\": \"ipv4\", \"IPv6Mode\": null, \"LoadBalancerType\":
+        \"OPEN\", \"Status\": 1, \"CreateTime\": \"2022-06-14 20:33:19\", \"StatusTime\":
+        \"2022-06-14 22:26:40\", \"ProjectId\": 1000000511, \"OpenBgp\": 0, \"Snat\":
+        false, \"Isolation\": 0, \"Log\": \"\", \"AnycastZone\": \"\", \"VpcId\":
+        \"vpc-aik1957f\", \"NumericalVpcId\": 5705813, \"TargetRegionInfo\": {\"Region\":
+        \"ap-singapore\", \"VpcId\": \"vpc-aik1957f\"}, \"SubnetId\": \"\", \"SecureGroups\":
+        [], \"Tags\": [], \"MasterZone\": {\"ZoneId\": 900001, \"Zone\": \"ap-singapore-1\",
+        \"ZoneName\": \"\u65B0\u52A0\u5761\u4E00\u533A\", \"ZoneRegion\": \"ap-singapore\",
+        \"LocalZone\": false}, \"BackupZoneSet\": null, \"IsolatedTime\": null, \"ExpireTime\":
+        \"2022-07-14 20:33:19\", \"ChargeType\": \"POSTPAID_BY_HOUR\", \"NetworkAttributes\":
+        {\"InternetChargeType\": \"TRAFFIC_POSTPAID_BY_HOUR\", \"InternetMaxBandwidthOut\":
+        101, \"BandwidthpkgSubType\": null}, \"PrepaidAttributes\": null, \"ExtraInfo\":
+        null, \"LogSetId\": \"\", \"LogTopicId\": \"\", \"LoadBalancerPassToTarget\":
+        false, \"IsDDos\": false, \"ConfigId\": \"\", \"ExclusiveCluster\": {}, \"SnatPro\":
+        true, \"SnatIps\": [{\"SubnetId\": \"subnet-nfuq1tri\", \"Ip\": \"10.0.0.16\"},
+        {\"SubnetId\": \"subnet-nfuq1tri\", \"Ip\": \"10.0.0.7\"}, {\"SubnetId\":
+        \"subnet-5k1ixnpo\", \"Ip\": \"10.0.1.12\"}, {\"SubnetId\": \"subnet-5k1ixnpo\",
+        \"Ip\": \"10.0.1.6\"}], \"IsBlock\": false, \"IsBlockTime\": \"\", \"SlaType\":
+        \"\", \"ClusterTag\": null, \"LocalBgp\": false, \"MixIpTarget\": false, \"Zones\":
+        null, \"NfvInfo\": \"\", \"HealthLogSetId\": \"\", \"HealthLogTopicId\": \"\",
+        \"ClusterIds\": null, \"AttributeFlags\": [], \"VipIsp\": \"BGP\"}, {\"LoadBalancerId\":
+        \"lb-bypd04o6\", \"LoadBalancerName\": \"cls-4bqctahq_yb-demo-900001_yb-tserver-service\",
+        \"Forward\": 1, \"Domain\": \"\", \"LoadBalancerVips\": [\"101.32.111.45\"],
+        \"AddressIPv6\": null, \"AddressIPVersion\": \"ipv4\", \"IPv6Mode\": null,
+        \"LoadBalancerType\": \"OPEN\", \"Status\": 1, \"CreateTime\": \"2022-03-11
+        11:09:48\", \"StatusTime\": \"2022-03-11 11:10:07\", \"ProjectId\": 0, \"OpenBgp\":
+        0, \"Snat\": false, \"Isolation\": 0, \"Log\": \"\", \"AnycastZone\": \"\",
+        \"VpcId\": \"vpc-jls90tbv\", \"NumericalVpcId\": 7656321, \"TargetRegionInfo\":
+        {\"Region\": \"ap-singapore\", \"VpcId\": \"vpc-jls90tbv\"}, \"SubnetId\":
+        \"\", \"SecureGroups\": [], \"Tags\": [{\"TagKey\": \"tke-createdBy-flag\",
+        \"TagValue\": \"yes\"}, {\"TagKey\": \"tke-clusterId\", \"TagValue\": \"cls-4bqctahq\"},
+        {\"TagKey\": \"tke-lb-serviceuuid\", \"TagValue\": \"66d99ee9-ab69-4eea-b852-21e2f21c9487\"}],
+        \"MasterZone\": {\"ZoneId\": 900003, \"Zone\": \"ap-singapore-3\", \"ZoneName\":
+        \"\u65B0\u52A0\u5761\u4E09\u533A\", \"ZoneRegion\": \"ap-singapore\", \"LocalZone\":
+        false}, \"BackupZoneSet\": null, \"IsolatedTime\": null, \"ExpireTime\": \"2022-04-11
+        11:09:48\", \"ChargeType\": \"POSTPAID_BY_HOUR\", \"NetworkAttributes\": {\"InternetChargeType\":
+        \"TRAFFIC_POSTPAID_BY_HOUR\", \"InternetMaxBandwidthOut\": 10, \"BandwidthpkgSubType\":
+        null}, \"PrepaidAttributes\": null, \"ExtraInfo\": null, \"LogSetId\": \"\",
+        \"LogTopicId\": \"\", \"LoadBalancerPassToTarget\": false, \"IsDDos\": false,
+        \"ConfigId\": \"\", \"ExclusiveCluster\": {}, \"SnatPro\": false, \"SnatIps\":
+        [], \"IsBlock\": false, \"IsBlockTime\": \"\", \"SlaType\": \"\", \"ClusterTag\":
+        null, \"LocalBgp\": false, \"MixIpTarget\": false, \"Zones\": null, \"NfvInfo\":
+        \"\", \"HealthLogSetId\": \"\", \"HealthLogTopicId\": \"\", \"ClusterIds\":
+        null, \"AttributeFlags\": [], \"VipIsp\": \"BGP\"}, {\"LoadBalancerId\": \"lb-m6gyftdy\",
+        \"LoadBalancerName\": \"cls-4bqctahq_yb-demo-900001_yb-master-ui\", \"Forward\":
+        1, \"Domain\": \"\", \"LoadBalancerVips\": [\"101.32.172.102\"], \"AddressIPv6\":
+        null, \"AddressIPVersion\": \"ipv4\", \"IPv6Mode\": null, \"LoadBalancerType\":
+        \"OPEN\", \"Status\": 1, \"CreateTime\": \"2022-03-11 11:09:48\", \"StatusTime\":
+        \"2022-03-11 11:10:01\", \"ProjectId\": 0, \"OpenBgp\": 0, \"Snat\": false,
+        \"Isolation\": 0, \"Log\": \"\", \"AnycastZone\": \"\", \"VpcId\": \"vpc-jls90tbv\",
+        \"NumericalVpcId\": 7656321, \"TargetRegionInfo\": {\"Region\": \"ap-singapore\",
+        \"VpcId\": \"vpc-jls90tbv\"}, \"SubnetId\": \"\", \"SecureGroups\": [], \"Tags\":
+        [{\"TagKey\": \"tke-createdBy-flag\", \"TagValue\": \"yes\"}, {\"TagKey\":
+        \"tke-clusterId\", \"TagValue\": \"cls-4bqctahq\"}, {\"TagKey\": \"tke-lb-serviceuuid\",
+        \"TagValue\": \"1353e5e1-84dd-4b74-83f9-f21bd7e41309\"}], \"MasterZone\":
+        {\"ZoneId\": 900001, \"Zone\": \"ap-singapore-1\", \"ZoneName\": \"\u65B0\u52A0\u5761\u4E00\u533A\",
+        \"ZoneRegion\": \"ap-singapore\", \"LocalZone\": false}, \"BackupZoneSet\":
+        null, \"IsolatedTime\": null, \"ExpireTime\": \"2022-04-11 11:09:48\", \"ChargeType\":
+        \"POSTPAID_BY_HOUR\", \"NetworkAttributes\": {\"InternetChargeType\": \"TRAFFIC_POSTPAID_BY_HOUR\",
+        \"InternetMaxBandwidthOut\": 10, \"BandwidthpkgSubType\": null}, \"PrepaidAttributes\":
+        null, \"ExtraInfo\": null, \"LogSetId\": \"\", \"LogTopicId\": \"\", \"LoadBalancerPassToTarget\":
+        false, \"IsDDos\": false, \"ConfigId\": \"\", \"ExclusiveCluster\": {}, \"SnatPro\":
+        false, \"SnatIps\": [], \"IsBlock\": false, \"IsBlockTime\": \"\", \"SlaType\":
+        \"\", \"ClusterTag\": null, \"LocalBgp\": false, \"MixIpTarget\": false, \"Zones\":
+        null, \"NfvInfo\": \"\", \"HealthLogSetId\": \"\", \"HealthLogTopicId\": \"\",
+        \"ClusterIds\": null, \"AttributeFlags\": [], \"VipIsp\": \"BGP\"}, {\"LoadBalancerId\":
+        \"lb-h8tc4gem\", \"LoadBalancerName\": \"cls-4bqctahq_kube-system_kube-dns-lb\",
+        \"Forward\": 1, \"Domain\": \"\", \"LoadBalancerVips\": [\"43.134.149.219\"],
+        \"AddressIPv6\": null, \"AddressIPVersion\": \"ipv4\", \"IPv6Mode\": null,
+        \"LoadBalancerType\": \"OPEN\", \"Status\": 1, \"CreateTime\": \"2022-02-24
+        09:31:05\", \"StatusTime\": \"2022-02-24 09:31:17\", \"ProjectId\": 0, \"OpenBgp\":
+        0, \"Snat\": false, \"Isolation\": 0, \"Log\": \"\", \"AnycastZone\": \"\",
+        \"VpcId\": \"vpc-jls90tbv\", \"NumericalVpcId\": 7656321, \"TargetRegionInfo\":
+        {\"Region\": \"ap-singapore\", \"VpcId\": \"vpc-jls90tbv\"}, \"SubnetId\":
+        \"\", \"SecureGroups\": [], \"Tags\": [{\"TagKey\": \"tke-createdBy-flag\",
+        \"TagValue\": \"yes\"}, {\"TagKey\": \"tke-clusterId\", \"TagValue\": \"cls-4bqctahq\"},
+        {\"TagKey\": \"tke-lb-serviceuuid\", \"TagValue\": \"6dea2184-5c1b-4543-b20a-51db4f3353c9\"}],
+        \"MasterZone\": {\"ZoneId\": 900002, \"Zone\": \"ap-singapore-2\", \"ZoneName\":
+        \"\u65B0\u52A0\u5761\u4E8C\u533A\", \"ZoneRegion\": \"ap-singapore\", \"LocalZone\":
+        false}, \"BackupZoneSet\": null, \"IsolatedTime\": null, \"ExpireTime\": \"2022-03-24
+        09:31:05\", \"ChargeType\": \"POSTPAID_BY_HOUR\", \"NetworkAttributes\": {\"InternetChargeType\":
+        \"TRAFFIC_POSTPAID_BY_HOUR\", \"InternetMaxBandwidthOut\": 10, \"BandwidthpkgSubType\":
+        null}, \"PrepaidAttributes\": null, \"ExtraInfo\": null, \"LogSetId\": \"\",
+        \"LogTopicId\": \"\", \"LoadBalancerPassToTarget\": false, \"IsDDos\": false,
+        \"ConfigId\": \"\", \"ExclusiveCluster\": {}, \"SnatPro\": false, \"SnatIps\":
+        [], \"IsBlock\": false, \"IsBlockTime\": \"\", \"SlaType\": \"\", \"ClusterTag\":
+        null, \"LocalBgp\": false, \"MixIpTarget\": false, \"Zones\": null, \"NfvInfo\":
+        \"\", \"HealthLogSetId\": \"\", \"HealthLogTopicId\": \"\", \"ClusterIds\":
+        null, \"AttributeFlags\": [], \"VipIsp\": \"BGP\"}, {\"LoadBalancerId\": \"lb-n6g4mc26\",
+        \"LoadBalancerName\": \"cls-57vn5lu8_grafana-00004abbf1fa-grafana-4gohjl7g\",
+        \"Forward\": 1, \"Domain\": \"\", \"LoadBalancerVips\": [\"172.22.32.16\"],
+        \"AddressIPv6\": null, \"AddressIPVersion\": \"ipv4\", \"IPv6Mode\": null,
+        \"LoadBalancerType\": \"INTERNAL\", \"Status\": 1, \"CreateTime\": \"2022-01-20
+        10:34:23\", \"StatusTime\": \"2022-01-20 10:34:38\", \"ProjectId\": 0, \"OpenBgp\":
+        0, \"Snat\": false, \"Isolation\": 0, \"Log\": \"\", \"AnycastZone\": \"\",
+        \"VpcId\": \"vpc-3aajxqgr\", \"NumericalVpcId\": 830620, \"TargetRegionInfo\":
+        {\"Region\": \"ap-singapore\", \"VpcId\": \"vpc-3aajxqgr\"}, \"SubnetId\":
+        \"subnet-1miim8ks\", \"SecureGroups\": [], \"Tags\": [{\"TagKey\": \"tke-name\",
+        \"TagValue\": \"grafana-00004abbf1fa-grafana-4gohjl7g/grafana-4gohjl7g-grafana\"},
+        {\"TagKey\": \"tke-clusterId\", \"TagValue\": \"cls-57vn5lu8\"}, {\"TagKey\":
+        \"tke-created\", \"TagValue\": \"yes\"}, {\"TagKey\": \"tke-kind\", \"TagValue\":
+        \"service\"}], \"MasterZone\": null, \"BackupZoneSet\": null, \"IsolatedTime\":
+        null, \"ExpireTime\": \"2022-02-20 10:34:23\", \"ChargeType\": \"POSTPAID_BY_HOUR\",
+        \"NetworkAttributes\": {\"InternetChargeType\": \"TRAFFIC_POSTPAID_BY_HOUR\",
+        \"InternetMaxBandwidthOut\": 0, \"BandwidthpkgSubType\": null}, \"PrepaidAttributes\":
+        null, \"ExtraInfo\": null, \"LogSetId\": \"\", \"LogTopicId\": \"\", \"LoadBalancerPassToTarget\":
+        false, \"IsDDos\": false, \"ConfigId\": \"\", \"ExclusiveCluster\": {}, \"SnatPro\":
+        false, \"SnatIps\": [], \"IsBlock\": false, \"IsBlockTime\": \"\", \"SlaType\":
+        \"\", \"ClusterTag\": null, \"LocalBgp\": false, \"MixIpTarget\": false, \"Zones\":
+        null, \"NfvInfo\": \"\", \"HealthLogSetId\": \"\", \"HealthLogTopicId\": \"\",
+        \"ClusterIds\": null, \"AttributeFlags\": [], \"VipIsp\": \"INTERNAL\"}],
+        \"RequestId\": \"bddb7256-478f-44d7-8a34-9431d3b90992\"}}"
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '15431'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 18 Oct 2022 07:07:48 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"ResourceList": ["qcs::clb:ap-singapore:uin/100000750436:clb/lb-aqsfvh8m",
+      "qcs::clb:ap-singapore:uin/100000750436:clb/lb-24jxs9vy", "qcs::clb:ap-singapore:uin/100000750436:clb/lb-ml5vr8ei",
+      "qcs::clb:ap-singapore:uin/100000750436:clb/lb-47hh8ana", "qcs::clb:ap-singapore:uin/100000750436:clb/lb-8w5xraw2",
+      "qcs::clb:ap-singapore:uin/100000750436:clb/lb-qniokvxq", "qcs::clb:ap-singapore:uin/100000750436:clb/lb-bypd04o6",
+      "qcs::clb:ap-singapore:uin/100000750436:clb/lb-m6gyftdy", "qcs::clb:ap-singapore:uin/100000750436:clb/lb-h8tc4gem"]}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '540'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetResources
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"","ResourceTagMappingList":[{"Resource":"qcs::clb:ap-singapore:uin\/100000750436:clb\/lb-m6gyftdy","Tags":[{"TagKey":"tke-clusterId","TagValue":"cls-4bqctahq"},{"TagKey":"tke-createdBy-flag","TagValue":"yes"},{"TagKey":"tke-lb-serviceuuid","TagValue":"1353e5e1-84dd-4b74-83f9-f21bd7e41309"}]},{"Resource":"qcs::clb:ap-singapore:uin\/100000750436:clb\/lb-bypd04o6","Tags":[{"TagKey":"tke-clusterId","TagValue":"cls-4bqctahq"},{"TagKey":"tke-createdBy-flag","TagValue":"yes"},{"TagKey":"tke-lb-serviceuuid","TagValue":"66d99ee9-ab69-4eea-b852-21e2f21c9487"}]},{"Resource":"qcs::clb:ap-singapore:uin\/100000750436:clb\/lb-h8tc4gem","Tags":[{"TagKey":"tke-clusterId","TagValue":"cls-4bqctahq"},{"TagKey":"tke-createdBy-flag","TagValue":"yes"},{"TagKey":"tke-lb-serviceuuid","TagValue":"6dea2184-5c1b-4543-b20a-51db4f3353c9"}]}],"RequestId":"9471e951-cbab-4f50-bdf5-c08663462207"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '908'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 18 Oct 2022 07:07:53 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"ResourceList": ["qcs::clb:ap-singapore:uin/100000750436:clb/lb-n6g4mc26"]}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '76'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetResources
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"","ResourceTagMappingList":[{"Resource":"qcs::clb:ap-singapore:uin\/100000750436:clb\/lb-n6g4mc26","Tags":[{"TagKey":"tke-created","TagValue":"yes"},{"TagKey":"tke-name","TagValue":"grafana-00004abbf1fa-grafana-4gohjl7g\/grafana-4gohjl7g-grafana"},{"TagKey":"tke-kind","TagValue":"service"},{"TagKey":"tke-clusterId","TagValue":"cls-57vn5lu8"}]}],"RequestId":"2c6432e1-e451-4b6a-85b3-2308ea26eb3f"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '431'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 18 Oct 2022 07:07:53 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"Namespace": "QCE/LB_PUBLIC", "MetricName": "TotalReq", "Period": 3600,
+      "StartTime": "2022-09-18T07:07:46+00:00", "EndTime": "2022-10-18T07:07:46+00:00",
+      "Instances": [{"Dimensions": [{"Name": "vip", "Value": "43.134.149.139"}]},
+      {"Dimensions": [{"Name": "vip", "Value": "43.134.149.189"}]}]}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '293'
+      Content-Type:
+      - application/json
+      Host:
+      - monitor.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetMonitorData
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2018-07-24'
+    method: POST
+    uri: https://monitor.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"StartTime":"2022-09-18T07:00:00+00:00","EndTime":"2022-10-18T07:00:00+00:00","Period":3600,"MetricName":"TotalReq","DataPoints":[{"Dimensions":[{"Name":"vip","Value":"43.134.149.139"}],"Timestamps":[],"Values":[]},{"Dimensions":[{"Name":"vip","Value":"43.134.149.189"}],"Timestamps":[1663484400,1663488000,1663491600,1663495200,1663498800,1663502400,1663506000,1663509600,1663513200,1663516800,1663520400,1663524000,1663527600,1663531200,1663534800,1663538400,1663542000,1663545600,1663549200,1663552800,1663556400,1663560000,1663563600,1663567200,1663570800,1663574400,1663578000,1663581600,1663585200,1663588800,1663592400,1663596000,1663599600,1663603200,1663606800,1663610400,1663614000,1663617600,1663621200,1663624800,1663628400,1663632000,1663635600,1663639200,1663642800,1663646400,1663650000,1663653600,1663657200,1663660800,1663664400,1663668000,1663671600,1663675200,1663678800,1663682400,1663686000,1663689600,1663693200,1663696800,1663700400,1663704000,1663707600,1663711200,1663714800,1663718400,1663722000,1663725600,1663729200,1663732800,1663736400,1663740000,1663743600,1663747200,1663750800,1663754400,1663758000,1663761600,1663765200,1663768800,1663772400,1663776000,1663779600,1663783200,1663786800,1663790400,1663794000,1663797600,1663801200,1663804800,1663808400,1663812000,1663815600,1663819200,1663822800,1663826400,1663830000,1663833600,1663837200,1663840800,1663844400,1663848000,1663851600,1663855200,1663858800,1663862400,1663866000,1663869600,1663873200,1663876800,1663880400,1663884000,1663887600,1663891200,1663894800,1663898400,1663902000,1663905600,1663909200,1663912800,1663916400,1663920000,1663923600,1663927200,1663930800,1663934400,1663938000,1663941600,1663945200,1663948800,1663952400,1663956000,1663959600,1663963200,1663966800,1663970400,1663974000,1663977600,1663981200,1663984800,1663988400,1663992000,1663995600,1663999200,1664002800,1664006400,1664010000,1664013600,1664017200,1664020800,1664024400,1664028000,1664031600,1664035200,1664038800,1664042400,1664046000,1664049600,1664053200,1664056800,1664060400,1664064000,1664067600,1664071200,1664074800,1664078400,1664082000,1664085600,1664089200,1664092800,1664096400,1664100000,1664103600,1664107200,1664110800,1664114400,1664118000,1664121600,1664125200,1664128800,1664132400,1664136000,1664139600,1664143200,1664146800,1664150400,1664154000,1664157600,1664161200,1664164800,1664168400,1664172000,1664175600,1664179200,1664182800,1664186400,1664190000,1664193600,1664197200,1664200800,1664204400,1664208000,1664211600,1664215200,1664218800,1664222400,1664226000,1664229600,1664233200,1664236800,1664240400,1664244000,1664247600,1664251200,1664254800,1664258400,1664262000,1664265600,1664269200,1664272800,1664276400,1664280000,1664283600,1664287200,1664290800,1664294400,1664298000,1664301600,1664305200,1664308800,1664312400,1664316000,1664319600,1664323200,1664326800,1664330400,1664334000,1664337600,1664341200,1664344800,1664348400,1664352000,1664355600,1664359200,1664362800,1664366400,1664370000,1664373600,1664377200,1664380800,1664384400,1664388000,1664391600,1664395200,1664398800,1664402400,1664406000,1664409600,1664413200,1664416800,1664420400,1664424000,1664427600,1664431200,1664434800,1664438400,1664442000,1664445600,1664449200,1664452800,1664456400,1664460000,1664463600,1664467200,1664470800,1664474400,1664478000,1664481600,1664485200,1664488800,1664492400,1664496000,1664499600,1664503200,1664506800,1664510400,1664514000,1664517600,1664521200,1664524800,1664528400,1664532000,1664535600,1664539200,1664542800,1664546400,1664550000,1664553600,1664557200,1664560800,1664564400,1664568000,1664571600,1664575200,1664578800,1664582400,1664586000,1664589600,1664593200,1664596800,1664600400,1664604000,1664607600,1664611200,1664614800,1664618400,1664622000,1664625600,1664629200,1664632800,1664636400,1664640000,1664643600,1664647200,1664650800,1664654400,1664658000,1664661600,1664665200,1664668800,1664672400,1664676000,1664679600,1664683200,1664686800,1664690400,1664694000,1664697600,1664701200,1664704800,1664708400,1664712000,1664715600,1664719200,1664722800,1664726400,1664730000,1664733600,1664737200,1664740800,1664744400,1664748000,1664751600,1664755200,1664758800,1664762400,1664766000,1664769600,1664773200,1664776800,1664780400,1664784000,1664787600,1664791200,1664794800,1664798400,1664802000,1664805600,1664809200,1664812800,1664816400,1664820000,1664823600,1664827200,1664830800,1664834400,1664838000,1664841600,1664845200,1664848800,1664852400,1664856000,1664859600,1664863200,1664866800,1664870400,1664874000,1664877600,1664881200,1664884800,1664888400,1664892000,1664895600,1664899200,1664902800,1664906400,1664910000,1664913600,1664917200,1664920800,1664924400,1664928000,1664931600,1664935200,1664938800,1664942400,1664946000,1664949600,1664953200,1664956800,1664960400,1664964000,1664967600,1664971200,1664974800,1664978400,1664982000,1664985600,1664989200,1664992800,1664996400,1665000000,1665003600,1665007200,1665010800,1665014400,1665018000,1665021600,1665025200,1665028800,1665032400,1665036000,1665039600,1665043200,1665046800,1665050400,1665054000,1665057600,1665061200,1665064800,1665068400,1665072000,1665075600,1665079200,1665082800,1665086400,1665090000,1665093600,1665097200,1665100800,1665104400,1665108000,1665111600,1665115200,1665118800,1665122400,1665126000,1665129600,1665133200,1665136800,1665140400,1665144000,1665147600,1665151200,1665154800,1665158400,1665162000,1665165600,1665169200,1665172800,1665176400,1665180000,1665183600,1665187200,1665190800,1665194400,1665198000,1665201600,1665205200,1665208800,1665212400,1665216000,1665219600,1665223200,1665226800,1665230400,1665234000,1665237600,1665241200,1665244800,1665248400,1665252000,1665255600,1665259200,1665262800,1665266400,1665270000,1665273600,1665277200,1665280800,1665284400,1665288000,1665291600,1665295200,1665298800,1665302400,1665306000,1665309600,1665313200,1665316800,1665320400,1665324000,1665327600,1665331200,1665334800,1665338400,1665342000,1665345600,1665349200,1665352800,1665356400,1665360000,1665363600,1665367200,1665370800,1665374400,1665378000,1665381600,1665385200,1665388800,1665392400,1665396000,1665399600,1665403200,1665406800,1665410400,1665414000,1665417600,1665421200,1665424800,1665428400,1665432000,1665435600,1665439200,1665442800,1665446400,1665450000,1665453600,1665457200,1665460800,1665464400,1665468000,1665471600,1665475200,1665478800,1665482400,1665486000,1665489600,1665493200,1665496800,1665500400,1665504000,1665507600,1665511200,1665514800,1665518400,1665522000,1665525600,1665529200,1665532800,1665536400,1665540000,1665543600,1665547200,1665550800,1665554400,1665558000,1665561600,1665565200,1665568800,1665572400,1665576000,1665579600,1665583200,1665586800,1665590400,1665594000,1665597600,1665601200,1665604800,1665608400,1665612000,1665615600,1665619200,1665622800,1665626400,1665630000,1665633600,1665637200,1665640800,1665644400,1665648000,1665651600,1665655200,1665658800,1665662400,1665666000,1665669600,1665673200,1665676800,1665680400,1665684000,1665687600,1665691200,1665694800,1665698400,1665702000,1665705600,1665709200,1665712800,1665716400,1665720000,1665723600,1665727200,1665730800,1665734400,1665738000,1665741600,1665745200,1665748800,1665752400,1665756000,1665759600,1665763200,1665766800,1665770400,1665774000,1665777600,1665781200,1665784800,1665788400,1665792000,1665795600,1665799200,1665802800,1665806400,1665810000,1665813600,1665817200,1665820800,1665824400,1665828000,1665831600,1665835200,1665838800,1665842400,1665846000,1665849600,1665853200,1665856800,1665860400,1665864000,1665867600,1665871200,1665874800,1665878400,1665882000,1665885600,1665889200,1665892800,1665896400,1665900000,1665903600,1665907200,1665910800,1665914400,1665918000,1665921600,1665925200,1665928800,1665932400,1665936000,1665939600,1665943200,1665946800,1665950400,1665954000,1665957600,1665961200,1665964800,1665968400,1665972000,1665975600,1665979200,1665982800,1665986400,1665990000,1665993600,1665997200,1666000800,1666004400,1666008000,1666011600,1666015200,1666018800,1666022400,1666026000,1666029600,1666033200,1666036800,1666040400,1666044000,1666047600,1666051200,1666054800,1666058400,1666062000,1666065600,1666069200,1666072800,1666076400],"Values":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1.166,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.016,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1.166,0,0,0.733,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.016,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.033,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.016,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.016,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.033,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]}],"RequestId":"976a4fdb-e8ad-4ddc-b45a-ba7e94e03457","Msg":""}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '9782'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 18 Oct 2022 07:07:54 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"Namespace": "QCE/LB_PUBLIC", "MetricName": "TotalReq", "Period": 3600,
+      "StartTime": "2022-09-18T07:07:46+00:00", "EndTime": "2022-10-18T07:07:46+00:00",
+      "Instances": [{"Dimensions": [{"Name": "vip", "Value": "43.134.151.61"}]}, {"Dimensions":
+      [{"Name": "vip", "Value": "101.33.51.229"}]}]}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '291'
+      Content-Type:
+      - application/json
+      Host:
+      - monitor.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetMonitorData
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2018-07-24'
+    method: POST
+    uri: https://monitor.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"StartTime":"2022-09-18T07:00:00+00:00","EndTime":"2022-10-18T07:00:00+00:00","Period":3600,"MetricName":"TotalReq","DataPoints":[{"Dimensions":[{"Name":"vip","Value":"43.134.151.61"}],"Timestamps":[],"Values":[]},{"Dimensions":[{"Name":"vip","Value":"101.33.51.229"}],"Timestamps":[],"Values":[]}],"RequestId":"73acf3b0-6090-4821-93c6-fc2bbdbf86b6","Msg":""}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '373'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 18 Oct 2022 07:07:54 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"Namespace": "QCE/LB_PUBLIC", "MetricName": "TotalReq", "Period": 3600,
+      "StartTime": "2022-09-18T07:07:46+00:00", "EndTime": "2022-10-18T07:07:46+00:00",
+      "Instances": [{"Dimensions": [{"Name": "vip", "Value": "101.32.104.223"}]},
+      {"Dimensions": [{"Name": "vip", "Value": "101.32.111.45"}]}]}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '292'
+      Content-Type:
+      - application/json
+      Host:
+      - monitor.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetMonitorData
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2018-07-24'
+    method: POST
+    uri: https://monitor.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"StartTime":"2022-09-18T07:00:00+00:00","EndTime":"2022-10-18T07:00:00+00:00","Period":3600,"MetricName":"TotalReq","DataPoints":[{"Dimensions":[{"Name":"vip","Value":"101.32.104.223"}],"Timestamps":[],"Values":[]},{"Dimensions":[{"Name":"vip","Value":"101.32.111.45"}],"Timestamps":[],"Values":[]}],"RequestId":"7282ad24-5e44-44a7-b103-992384b4f35f","Msg":""}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '374'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 18 Oct 2022 07:07:54 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"Namespace": "QCE/LB_PUBLIC", "MetricName": "TotalReq", "Period": 3600,
+      "StartTime": "2022-09-18T07:07:46+00:00", "EndTime": "2022-10-18T07:07:46+00:00",
+      "Instances": [{"Dimensions": [{"Name": "vip", "Value": "101.32.172.102"}]},
+      {"Dimensions": [{"Name": "vip", "Value": "43.134.149.219"}]}]}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '293'
+      Content-Type:
+      - application/json
+      Host:
+      - monitor.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetMonitorData
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2018-07-24'
+    method: POST
+    uri: https://monitor.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"StartTime":"2022-09-18T07:00:00+00:00","EndTime":"2022-10-18T07:00:00+00:00","Period":3600,"MetricName":"TotalReq","DataPoints":[{"Dimensions":[{"Name":"vip","Value":"101.32.172.102"}],"Timestamps":[],"Values":[]},{"Dimensions":[{"Name":"vip","Value":"43.134.149.219"}],"Timestamps":[],"Values":[]}],"RequestId":"6de79c7d-943b-4c9b-bffe-4fa3b5bf9e2e","Msg":""}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '375'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 18 Oct 2022 07:07:54 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"Namespace": "QCE/LB_PRIVATE", "MetricName": "TotalReq", "Period": 3600,
+      "StartTime": "2022-09-18T07:07:46+00:00", "EndTime": "2022-10-18T07:07:46+00:00",
+      "Instances": [{"Dimensions": [{"Name": "vip", "Value": "10.0.1.10"}, {"Name":
+      "vpcId", "Value": "vpc-aik1957f"}]}, {"Dimensions": [{"Name": "vip", "Value":
+      "172.22.32.16"}, {"Name": "vpcId", "Value": "vpc-3aajxqgr"}]}]}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '375'
+      Content-Type:
+      - application/json
+      Host:
+      - monitor.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetMonitorData
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2018-07-24'
+    method: POST
+    uri: https://monitor.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"StartTime":"2022-09-18T07:00:00+00:00","EndTime":"2022-10-18T07:00:00+00:00","Period":3600,"MetricName":"TotalReq","DataPoints":[{"Dimensions":[{"Name":"vip","Value":"10.0.1.10"},{"Name":"vpcId","Value":"vpc-aik1957f"}],"Timestamps":[],"Values":[]},{"Dimensions":[{"Name":"vip","Value":"172.22.32.16"},{"Name":"vpcId","Value":"vpc-3aajxqgr"}],"Timestamps":[],"Values":[]}],"RequestId":"b2ce1a36-d9ff-46d7-9d1c-5f26da339729","Msg":""}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '448'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 18 Oct 2022 07:07:55 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+version: 1

@@ -1,46 +1,38 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
         "Policy": {
-            "PolicyName": "AWSHealthFullAccess", 
-            "Description": "Allows full access to the AWS Health Apis and Notifications and the Personal Health Dashboard", 
+            "PolicyName": "AWSHealthFullAccess",
+            "PolicyId": "ANPAI3CUMPCPEUPCSXC4Y",
+            "Arn": "arn:aws:iam::aws:policy/AWSHealthFullAccess",
+            "Path": "/",
+            "DefaultVersionId": "v3",
+            "AttachmentCount": 0,
+            "PermissionsBoundaryUsageCount": 0,
+            "IsAttachable": true,
+            "Description": "Allows full access to the AWS Health Apis and Notifications and the Personal Health Dashboard",
             "CreateDate": {
-                "hour": 12, 
-                "__class__": "datetime", 
-                "month": 12, 
-                "second": 31, 
-                "microsecond": 0, 
-                "year": 2016, 
-                "day": 6, 
-                "minute": 30
-            }, 
-            "AttachmentCount": 1, 
-            "IsAttachable": true, 
-            "PolicyId": "ANPAI3CUMPCPEUPCSXC4Y", 
-            "DefaultVersionId": "v1", 
-            "Path": "/", 
-            "Arn": "arn:aws:iam::aws:policy/AWSHealthFullAccess", 
+                "__class__": "datetime",
+                "year": 2016,
+                "month": 12,
+                "day": 6,
+                "hour": 12,
+                "minute": 30,
+                "second": 31,
+                "microsecond": 0
+            },
             "UpdateDate": {
-                "hour": 12, 
-                "__class__": "datetime", 
-                "month": 12, 
-                "second": 31, 
-                "microsecond": 0, 
-                "year": 2016, 
-                "day": 6, 
-                "minute": 30
-            }
-        }, 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "14a8da87-e865-11e6-a572-dddd468753c8", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "14a8da87-e865-11e6-a572-dddd468753c8", 
-                "date": "Wed, 01 Feb 2017 09:59:10 GMT", 
-                "content-length": "808", 
-                "content-type": "text/xml"
-            }
-        }
+                "__class__": "datetime",
+                "year": 2020,
+                "month": 11,
+                "day": 16,
+                "hour": 18,
+                "minute": 11,
+                "second": 34,
+                "microsecond": 0
+            },
+            "Tags": []
+        },
+        "ResponseMetadata": {}
     }
 }

@@ -1,0 +1,72 @@
+{
+    "status_code": 200,
+    "data": {
+        "LoadBalancerDescriptions": [
+            {
+                "Subnets": [
+                    "subnet-0395e24b",
+                    "subnet-1c952346",
+                    "subnet-51d6c234",
+                    "subnet-d679c7fa",
+                    "subnet-ef7a49d3"
+                ],
+                "CanonicalHostedZoneNameID": "Z35SXDOTRQ7X7K",
+                "CanonicalHostedZoneName": "elb1-1615075513.us-east-1.elb.amazonaws.com",
+                "ListenerDescriptions": [
+                    {
+                        "Listener": {
+                            "InstancePort": 80,
+                            "LoadBalancerPort": 80,
+                            "Protocol": "HTTP",
+                            "InstanceProtocol": "HTTP"
+                        },
+                        "PolicyNames": []
+                    }
+                ],
+                "HealthCheck": {
+                    "HealthyThreshold": 10,
+                    "Interval": 30,
+                    "Target": "HTTP:80/index.html",
+                    "Timeout": 5,
+                    "UnhealthyThreshold": 2
+                },
+                "VPCId": "vpc-db49f7a2",
+                "BackendServerDescriptions": [],
+                "Instances": [],
+                "DNSName": "elb1-1615075513.us-east-1.elb.amazonaws.com",
+                "SecurityGroups": [
+                    "sg-dd11bfac"
+                ],
+                "Policies": {
+                    "LBCookieStickinessPolicies": [],
+                    "AppCookieStickinessPolicies": [],
+                    "OtherPolicies": []
+                },
+                "LoadBalancerName": "elb1",
+                "CreatedTime": {
+                    "hour": 19,
+                    "__class__": "datetime",
+                    "month": 6,
+                    "second": 24,
+                    "microsecond": 30000,
+                    "year": 2017,
+                    "day": 26,
+                    "minute": 31
+                },
+                "AvailabilityZones": [
+                    "us-east-1a",
+                    "us-east-1b",
+                    "us-east-1c",
+                    "us-east-1d",
+                    "us-east-1e"
+                ],
+                "Scheme": "internet-facing",
+                "SourceSecurityGroup": {
+                    "OwnerAlias": "297650311398",
+                    "GroupName": "default"
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

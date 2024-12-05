@@ -1,16 +1,5 @@
-# Copyright 2019 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 from gcp_common import BaseTest
 
@@ -31,6 +20,11 @@ class AppEngineAppTest(BaseTest):
         resources = policy.run()
         self.assertEqual(resources[0]['name'], app_name)
 
+        self.assertEqual(
+            policy.resource_manager.get_urns(resources),
+            ["gcp:appengine:europe-west3:cloud-custodian:app/cloud-custodian"],
+        )
+
     def test_app_get(self):
         project_id = 'cloud-custodian'
         app_name = 'apps/' + project_id
@@ -45,6 +39,11 @@ class AppEngineAppTest(BaseTest):
         resource = policy.resource_manager.get_resource(
             {'resourceName': app_name})
         self.assertEqual(resource['name'], app_name)
+
+        self.assertEqual(
+            policy.resource_manager.get_urns([resource]),
+            ["gcp:appengine:europe-west3:cloud-custodian:app/cloud-custodian"],
+        )
 
 
 class AppEngineCertificateTest(BaseTest):
@@ -67,6 +66,11 @@ class AppEngineCertificateTest(BaseTest):
         self.assertEqual(resources[0]['name'], certificate_name)
         self.assertEqual(resources[0][parent_annotation_key]['name'], app_name)
 
+        self.assertEqual(
+            policy.resource_manager.get_urns(resources),
+            ["gcp:appengine:europe-west3:cloud-custodian:certificate/12277184"],
+        )
+
     def test_certificate_get(self):
         project_id = 'cloud-custodian'
         app_name = 'apps/' + project_id
@@ -85,6 +89,11 @@ class AppEngineCertificateTest(BaseTest):
             {'resourceName': certificate_name})
         self.assertEqual(resource['name'], certificate_name)
         self.assertEqual(resource[parent_annotation_key]['name'], app_name)
+
+        self.assertEqual(
+            policy.resource_manager.get_urns([resource]),
+            ["gcp:appengine:europe-west3:cloud-custodian:certificate/12277184"],
+        )
 
 
 class AppEngineDomainTest(BaseTest):
@@ -107,6 +116,11 @@ class AppEngineDomainTest(BaseTest):
         self.assertEqual(resources[0]['name'], domain_name)
         self.assertEqual(resources[0][parent_annotation_key]['name'], app_name)
 
+        self.assertEqual(
+            policy.resource_manager.get_urns(resources),
+            ["gcp:appengine:europe-west3:cloud-custodian:domain/gcp-li.ga"],
+        )
+
 
 class AppEngineDomainMappingTest(BaseTest):
 
@@ -128,6 +142,11 @@ class AppEngineDomainMappingTest(BaseTest):
         self.assertEqual(resources[0]['name'], domain_mapping_name)
         self.assertEqual(resources[0][parent_annotation_key]['name'], app_name)
 
+        self.assertEqual(
+            policy.resource_manager.get_urns(resources),
+            ["gcp:appengine:europe-west3:cloud-custodian:domain-mapping/alex.gcp-li.ga"],
+        )
+
     def test_domain_mapping_get(self):
         project_id = 'cloud-custodian'
         app_name = 'apps/' + project_id
@@ -146,6 +165,11 @@ class AppEngineDomainMappingTest(BaseTest):
             {'resourceName': domain_mapping_name})
         self.assertEqual(resource['name'], domain_mapping_name)
         self.assertEqual(resource[parent_annotation_key]['name'], app_name)
+
+        self.assertEqual(
+            policy.resource_manager.get_urns([resource]),
+            ["gcp:appengine:europe-west3:cloud-custodian:domain-mapping/alex.gcp-li.ga"],
+        )
 
 
 class AppEngineFirewallIngressRuleTest(BaseTest):
@@ -167,6 +191,11 @@ class AppEngineFirewallIngressRuleTest(BaseTest):
         self.assertEqual(resources[0]['priority'], rule_priority)
         self.assertEqual(resources[0][parent_annotation_key]['name'], app_name)
 
+        self.assertEqual(
+            policy.resource_manager.get_urns(resources),
+            ["gcp:appengine:europe-west3:cloud-custodian:firewall-ingress-rule/2147483647"],
+        )
+
     def test_firewall_ingress_rule_get(self):
         project_id = 'cloud-custodian'
         app_name = 'apps/{}'.format(project_id)
@@ -185,3 +214,81 @@ class AppEngineFirewallIngressRuleTest(BaseTest):
             {'resourceName': rule_priority_full})
         self.assertEqual(resource['priority'], rule_priority)
         self.assertEqual(resource[parent_annotation_key]['name'], app_name)
+
+        self.assertEqual(
+            policy.resource_manager.get_urns([resource]),
+            ["gcp:appengine:europe-west3:cloud-custodian:firewall-ingress-rule/2147483647"],
+        )
+
+
+class AppEngineServiceTest(BaseTest):
+
+    def test_service_query(self):
+        project_id = 'cloud-custodian'
+        app_name = 'apps/{}'.format(project_id)
+        service_id = '12277184'
+        service_name = '{}/services/{}'.format(app_name, service_id)
+        session_factory = self.replay_flight_data(
+            'app-engine-service-query', project_id=project_id)
+
+        policy = self.load_policy(
+            {'name': 'gcp-app-engine-service-run',
+             'resource': 'gcp.app-engine-service'},
+            session_factory=session_factory)
+        parent_annotation_key = policy.resource_manager.resource_type.get_parent_annotation_key()
+
+        resources = policy.run()
+        self.assertEqual(resources[0]['name'], service_name)
+        self.assertEqual(resources[0][parent_annotation_key]['name'], app_name)
+
+        self.assertEqual(
+            policy.resource_manager.get_urns(resources),
+            ["gcp:appengine:europe-west3:cloud-custodian:service/12277184"],
+        )
+
+    def test_service_get(self):
+        project_id = 'cloud-custodian'
+        app_name = 'apps/' + project_id
+        service_id = '12277184'
+        service_name = '{}/services/{}'.format(app_name, service_id)
+        session_factory = self.replay_flight_data(
+            'app-engine-service-get', project_id=project_id)
+
+        policy = self.load_policy(
+            {'name': 'gcp-app-engine-service-run',
+             'resource': 'gcp.app-engine-service'},
+            session_factory=session_factory)
+        parent_annotation_key = policy.resource_manager.resource_type.get_parent_annotation_key()
+
+        resource = policy.resource_manager.get_resource(
+            {'resourceName': service_name})
+        self.assertEqual(resource['name'], service_name)
+        self.assertEqual(resource[parent_annotation_key]['name'], app_name)
+
+        self.assertEqual(
+            policy.resource_manager.get_urns([resource]),
+            ["gcp:appengine:europe-west3:cloud-custodian:service/12277184"],
+        )
+
+
+class AppEngineServiceVersionTest(BaseTest):
+
+    def test_service_version(self):
+        project_id = 'cloud-custodian'
+        app_name = 'apps/{}'.format(project_id)
+        service_id = '12277184'
+        version_id = 'v3'
+        service_name = '{}/services/{}'.format(app_name, service_id)
+        version = '{}/services/{}/versions/{}'.format(app_name, service_id, version_id)
+        session_factory = self.replay_flight_data(
+            'app-engine-service-version', project_id=project_id)
+
+        policy = self.load_policy(
+            {'name': 'gcp-app-engine-service-version-run',
+             'resource': 'gcp.app-engine-service-version'},
+            session_factory=session_factory)
+        parent_annotation_key = policy.resource_manager.resource_type.get_parent_annotation_key()
+
+        resources = policy.run()
+        self.assertEqual(resources[0]['name'], version)
+        self.assertEqual(resources[0][parent_annotation_key]['name'], service_name)

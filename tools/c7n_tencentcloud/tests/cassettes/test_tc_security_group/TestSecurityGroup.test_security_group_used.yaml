@@ -1,0 +1,353 @@
+interactions:
+- request:
+    body: '{"SecurityGroupIds": ["sg-jep2pqxk"], "Offset": "0", "Limit": "20"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '67'
+      Content-Type:
+      - application/json
+      Host:
+      - vpc.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - DescribeSecurityGroups
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2017-03-12'
+    method: POST
+    uri: https://vpc.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: "{\n    \"Response\": {\n        \"SecurityGroupSet\": [\n            {\n
+        \               \"SecurityGroupId\": \"sg-jep2pqxk\",\n                \"SecurityGroupName\":
+        \"\u653E\u901A22\uFF0C80\uFF0C443\uFF0C3389\u7AEF\u53E3\u548CICMP\u534F\u8BAE-2023031411351396373\",\n
+        \               \"SecurityGroupDesc\": \"\u516C\u7F51\u653E\u901A\u4E91\u4E3B\u673A\u5E38\u7528\u767B\u5F55\u53CAweb\u670D\u52A1\u7AEF\u53E3\uFF0C\u5185\u7F51\u5168\u653E\u901A\u3002\",\n
+        \               \"ProjectId\": \"0\",\n                \"IsDefault\": false,\n
+        \               \"CreatedTime\": \"2023-03-14 11:35:38\",\n                \"UpdateTime\":
+        \"2023-03-14 11:35:39\",\n                \"TagSet\": [\n                    {\n
+        \                       \"Key\": \"test_resource\",\n                        \"Value\":
+        \"test_resource\"\n                    }\n                ],\n                \"Region\":
+        \"ap-singapore\"\n            }\n        ],\n        \"TotalCount\": 1,\n
+        \       \"RegionStatistics\": [\n            {\n                \"TotalCount\":
+        1,\n                \"Region\": \"ap-singapore\"\n            }\n        ],\n
+        \       \"RequestId\": \"09c92d9d-6790-41f9-9d09-215011b3193b\"\n    }\n}"
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '999'
+      Content-Type:
+      - application/json
+      Date:
+      - Fri, 17 Mar 2023 07:08:54 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"ResourceList": ["qcs::security-group:ap-singapore:uin/100000750436:sg/sg-jep2pqxk"]}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '86'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetResources
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"","ResourceTagMappingList":[],"RequestId":"882c041c-d826-4a46-b6a4-37f96bfec4ce"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '114'
+      Content-Type:
+      - application/json
+      Date:
+      - Fri, 17 Mar 2023 07:08:54 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"SecurityGroupId": "sg-jep2pqxk"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '34'
+      Content-Type:
+      - application/json
+      Host:
+      - vpc.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - DescribeSecurityGroupPolicies
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2017-03-12'
+    method: POST
+    uri: https://vpc.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: "{\n    \"Response\": {\n        \"SecurityGroupPolicySet\": {\n            \"Ingress\":
+        [\n                {\n                    \"PolicyIndex\": 0,\n                    \"Port\":
+        \"3389\",\n                    \"CidrBlock\": \"0.0.0.0/0\",\n                    \"Ipv6CidrBlock\":
+        \"\",\n                    \"SecurityGroupId\": \"\",\n                    \"Action\":
+        \"ACCEPT\",\n                    \"ModifyTime\": \"2023-03-14 11:35:39\",\n
+        \                   \"PolicyDescription\": \"\u653E\u901AWindows\u8FDC\u7A0B\u767B\u5F55\",\n
+        \                   \"Protocol\": \"tcp\",\n                    \"ServiceTemplate\":
+        {\n                        \"ServiceId\": \"\",\n                        \"ServiceGroupId\":
+        \"\"\n                    },\n                    \"AddressTemplate\": {\n
+        \                       \"AddressId\": \"\",\n                        \"AddressGroupId\":
+        \"\"\n                    }\n                },\n                {\n                    \"PolicyIndex\":
+        1,\n                    \"Port\": \"3389\",\n                    \"CidrBlock\":
+        \"\",\n                    \"Ipv6CidrBlock\": \"::/0\",\n                    \"SecurityGroupId\":
+        \"\",\n                    \"Action\": \"ACCEPT\",\n                    \"ModifyTime\":
+        \"2023-03-14 11:35:39\",\n                    \"PolicyDescription\": \"\u653E\u901AWindows\u8FDC\u7A0B\u767B\u5F55\",\n
+        \                   \"Protocol\": \"tcp\",\n                    \"ServiceTemplate\":
+        {\n                        \"ServiceId\": \"\",\n                        \"ServiceGroupId\":
+        \"\"\n                    },\n                    \"AddressTemplate\": {\n
+        \                       \"AddressId\": \"\",\n                        \"AddressGroupId\":
+        \"\"\n                    }\n                },\n                {\n                    \"PolicyIndex\":
+        2,\n                    \"Port\": \"22\",\n                    \"CidrBlock\":
+        \"0.0.0.0/0\",\n                    \"Ipv6CidrBlock\": \"\",\n                    \"SecurityGroupId\":
+        \"\",\n                    \"Action\": \"ACCEPT\",\n                    \"ModifyTime\":
+        \"2023-03-14 11:35:39\",\n                    \"PolicyDescription\": \"\u653E\u901ALinux
+        SSH\u767B\u5F55\",\n                    \"Protocol\": \"tcp\",\n                    \"ServiceTemplate\":
+        {\n                        \"ServiceId\": \"\",\n                        \"ServiceGroupId\":
+        \"\"\n                    },\n                    \"AddressTemplate\": {\n
+        \                       \"AddressId\": \"\",\n                        \"AddressGroupId\":
+        \"\"\n                    }\n                },\n                {\n                    \"PolicyIndex\":
+        3,\n                    \"Port\": \"22\",\n                    \"CidrBlock\":
+        \"\",\n                    \"Ipv6CidrBlock\": \"::/0\",\n                    \"SecurityGroupId\":
+        \"\",\n                    \"Action\": \"ACCEPT\",\n                    \"ModifyTime\":
+        \"2023-03-14 11:35:39\",\n                    \"PolicyDescription\": \"\u653E\u901ALinux
+        SSH\u767B\u5F55\",\n                    \"Protocol\": \"tcp\",\n                    \"ServiceTemplate\":
+        {\n                        \"ServiceId\": \"\",\n                        \"ServiceGroupId\":
+        \"\"\n                    },\n                    \"AddressTemplate\": {\n
+        \                       \"AddressId\": \"\",\n                        \"AddressGroupId\":
+        \"\"\n                    }\n                },\n                {\n                    \"PolicyIndex\":
+        4,\n                    \"Port\": \"80,443\",\n                    \"CidrBlock\":
+        \"0.0.0.0/0\",\n                    \"Ipv6CidrBlock\": \"\",\n                    \"SecurityGroupId\":
+        \"\",\n                    \"Action\": \"ACCEPT\",\n                    \"ModifyTime\":
+        \"2023-03-14 11:35:39\",\n                    \"PolicyDescription\": \"\u653E\u901AWeb\u670D\u52A1\u7AEF\u53E3\",\n
+        \                   \"Protocol\": \"tcp\",\n                    \"ServiceTemplate\":
+        {\n                        \"ServiceId\": \"\",\n                        \"ServiceGroupId\":
+        \"\"\n                    },\n                    \"AddressTemplate\": {\n
+        \                       \"AddressId\": \"\",\n                        \"AddressGroupId\":
+        \"\"\n                    }\n                },\n                {\n                    \"PolicyIndex\":
+        5,\n                    \"Port\": \"80,443\",\n                    \"CidrBlock\":
+        \"\",\n                    \"Ipv6CidrBlock\": \"::/0\",\n                    \"SecurityGroupId\":
+        \"\",\n                    \"Action\": \"ACCEPT\",\n                    \"ModifyTime\":
+        \"2023-03-14 11:35:39\",\n                    \"PolicyDescription\": \"\u653E\u901AWeb\u670D\u52A1\u7AEF\u53E3\",\n
+        \                   \"Protocol\": \"tcp\",\n                    \"ServiceTemplate\":
+        {\n                        \"ServiceId\": \"\",\n                        \"ServiceGroupId\":
+        \"\"\n                    },\n                    \"AddressTemplate\": {\n
+        \                       \"AddressId\": \"\",\n                        \"AddressGroupId\":
+        \"\"\n                    }\n                },\n                {\n                    \"PolicyIndex\":
+        6,\n                    \"Port\": \"ALL\",\n                    \"CidrBlock\":
+        \"0.0.0.0/0\",\n                    \"Ipv6CidrBlock\": \"\",\n                    \"SecurityGroupId\":
+        \"\",\n                    \"Action\": \"ACCEPT\",\n                    \"ModifyTime\":
+        \"2023-03-14 11:35:39\",\n                    \"PolicyDescription\": \"\u653E\u901APing\u670D\u52A1\",\n
+        \                   \"Protocol\": \"icmp\",\n                    \"ServiceTemplate\":
+        {\n                        \"ServiceId\": \"\",\n                        \"ServiceGroupId\":
+        \"\"\n                    },\n                    \"AddressTemplate\": {\n
+        \                       \"AddressId\": \"\",\n                        \"AddressGroupId\":
+        \"\"\n                    }\n                },\n                {\n                    \"PolicyIndex\":
+        7,\n                    \"Port\": \"ALL\",\n                    \"CidrBlock\":
+        \"\",\n                    \"Ipv6CidrBlock\": \"::/0\",\n                    \"SecurityGroupId\":
+        \"\",\n                    \"Action\": \"ACCEPT\",\n                    \"ModifyTime\":
+        \"2023-03-14 11:35:39\",\n                    \"PolicyDescription\": \"\u653E\u901APing\u670D\u52A1\",\n
+        \                   \"Protocol\": \"icmpv6\",\n                    \"ServiceTemplate\":
+        {\n                        \"ServiceId\": \"\",\n                        \"ServiceGroupId\":
+        \"\"\n                    },\n                    \"AddressTemplate\": {\n
+        \                       \"AddressId\": \"\",\n                        \"AddressGroupId\":
+        \"\"\n                    }\n                },\n                {\n                    \"PolicyIndex\":
+        8,\n                    \"Port\": \"ALL\",\n                    \"CidrBlock\":
+        \"10.0.0.0/8\",\n                    \"Ipv6CidrBlock\": \"\",\n                    \"SecurityGroupId\":
+        \"\",\n                    \"Action\": \"ACCEPT\",\n                    \"ModifyTime\":
+        \"2023-03-14 11:35:39\",\n                    \"PolicyDescription\": \"\u653E\u901A\u5185\u7F51\",\n
+        \                   \"Protocol\": \"ALL\",\n                    \"ServiceTemplate\":
+        {\n                        \"ServiceId\": \"\",\n                        \"ServiceGroupId\":
+        \"\"\n                    },\n                    \"AddressTemplate\": {\n
+        \                       \"AddressId\": \"\",\n                        \"AddressGroupId\":
+        \"\"\n                    }\n                },\n                {\n                    \"PolicyIndex\":
+        9,\n                    \"Port\": \"ALL\",\n                    \"CidrBlock\":
+        \"172.16.0.0/12\",\n                    \"Ipv6CidrBlock\": \"\",\n                    \"SecurityGroupId\":
+        \"\",\n                    \"Action\": \"ACCEPT\",\n                    \"ModifyTime\":
+        \"2023-03-14 11:35:39\",\n                    \"PolicyDescription\": \"\u653E\u901A\u5185\u7F51\",\n
+        \                   \"Protocol\": \"ALL\",\n                    \"ServiceTemplate\":
+        {\n                        \"ServiceId\": \"\",\n                        \"ServiceGroupId\":
+        \"\"\n                    },\n                    \"AddressTemplate\": {\n
+        \                       \"AddressId\": \"\",\n                        \"AddressGroupId\":
+        \"\"\n                    }\n                },\n                {\n                    \"PolicyIndex\":
+        10,\n                    \"Port\": \"ALL\",\n                    \"CidrBlock\":
+        \"192.168.0.0/16\",\n                    \"Ipv6CidrBlock\": \"\",\n                    \"SecurityGroupId\":
+        \"\",\n                    \"Action\": \"ACCEPT\",\n                    \"ModifyTime\":
+        \"2023-03-14 11:35:39\",\n                    \"PolicyDescription\": \"\u653E\u901A\u5185\u7F51\",\n
+        \                   \"Protocol\": \"ALL\",\n                    \"ServiceTemplate\":
+        {\n                        \"ServiceId\": \"\",\n                        \"ServiceGroupId\":
+        \"\"\n                    },\n                    \"AddressTemplate\": {\n
+        \                       \"AddressId\": \"\",\n                        \"AddressGroupId\":
+        \"\"\n                    }\n                }\n            ],\n            \"Egress\":
+        [\n                {\n                    \"PolicyIndex\": 0,\n                    \"Port\":
+        \"ALL\",\n                    \"CidrBlock\": \"0.0.0.0/0\",\n                    \"Ipv6CidrBlock\":
+        \"\",\n                    \"SecurityGroupId\": \"\",\n                    \"Action\":
+        \"ACCEPT\",\n                    \"ModifyTime\": \"2023-03-14 11:35:39\",\n
+        \                   \"PolicyDescription\": \"\",\n                    \"Protocol\":
+        \"ALL\",\n                    \"ServiceTemplate\": {\n                        \"ServiceId\":
+        \"\",\n                        \"ServiceGroupId\": \"\"\n                    },\n
+        \                   \"AddressTemplate\": {\n                        \"AddressId\":
+        \"\",\n                        \"AddressGroupId\": \"\"\n                    }\n
+        \               },\n                {\n                    \"PolicyIndex\":
+        1,\n                    \"Port\": \"ALL\",\n                    \"CidrBlock\":
+        \"\",\n                    \"Ipv6CidrBlock\": \"::/0\",\n                    \"SecurityGroupId\":
+        \"\",\n                    \"Action\": \"ACCEPT\",\n                    \"ModifyTime\":
+        \"2023-03-14 11:35:39\",\n                    \"PolicyDescription\": \"\",\n
+        \                   \"Protocol\": \"ALL\",\n                    \"ServiceTemplate\":
+        {\n                        \"ServiceId\": \"\",\n                        \"ServiceGroupId\":
+        \"\"\n                    },\n                    \"AddressTemplate\": {\n
+        \                       \"AddressId\": \"\",\n                        \"AddressGroupId\":
+        \"\"\n                    }\n                }\n            ],\n            \"Version\":
+        \"1\"\n        },\n        \"RequestId\": \"b7daf183-b90c-4f94-a64b-d0e0e955b30e\"\n
+        \   }\n}"
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '9796'
+      Content-Type:
+      - application/json
+      Date:
+      - Fri, 17 Mar 2023 07:08:54 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"SecurityGroupIds": ["sg-jep2pqxk"]}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '37'
+      Content-Type:
+      - application/json
+      Host:
+      - vpc.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - DescribeSecurityGroupAssociationStatistics
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2017-03-12'
+    method: POST
+    uri: https://vpc.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: "{\n    \"Response\": {\n        \"SecurityGroupAssociationStatisticsSet\":
+        [\n            {\n                \"SecurityGroupId\": \"sg-jep2pqxk\",\n
+        \               \"CDB\": 0,\n                \"CVM\": 2,\n                \"ENI\":
+        0,\n                \"SG\": 0,\n                \"CLB\": 0,\n                \"InstanceStatistics\":
+        [\n                    {\n                        \"InstanceType\": \"CDB\",\n
+        \                       \"InstanceCount\": 0\n                    },\n                    {\n
+        \                       \"InstanceType\": \"CVM\",\n                        \"InstanceCount\":
+        2\n                    },\n                    {\n                        \"InstanceType\":
+        \"ENI\",\n                        \"InstanceCount\": 0\n                    },\n
+        \                   {\n                        \"InstanceType\": \"CLB\",\n
+        \                       \"InstanceCount\": 0\n                    },\n                    {\n
+        \                       \"InstanceType\": \"DCDB\",\n                        \"InstanceCount\":
+        0\n                    },\n                    {\n                        \"InstanceType\":
+        \"HSM\",\n                        \"InstanceCount\": 0\n                    },\n
+        \                   {\n                        \"InstanceType\": \"MongoDB\",\n
+        \                       \"InstanceCount\": 0\n                    },\n                    {\n
+        \                       \"InstanceType\": \"Mariadb\",\n                        \"InstanceCount\":
+        0\n                    },\n                    {\n                        \"InstanceType\":
+        \"Redis\",\n                        \"InstanceCount\": 0\n                    },\n
+        \                   {\n                        \"InstanceType\": \"TBASE\",\n
+        \                       \"InstanceCount\": 0\n                    },\n                    {\n
+        \                       \"InstanceType\": \"SQLSERVER\",\n                        \"InstanceCount\":
+        0\n                    },\n                    {\n                        \"InstanceType\":
+        \"CHC\",\n                        \"InstanceCount\": 0\n                    },\n
+        \                   {\n                        \"InstanceType\": \"CTSDBI\",\n
+        \                       \"InstanceCount\": 0\n                    },\n                    {\n
+        \                       \"InstanceType\": \"POSTGRES\",\n                        \"InstanceCount\":
+        0\n                    },\n                    {\n                        \"InstanceType\":
+        \"CYNOSDBPG\",\n                        \"InstanceCount\": 0\n                    },\n
+        \                   {\n                        \"InstanceType\": \"TDAPG\",\n
+        \                       \"InstanceCount\": 0\n                    },\n                    {\n
+        \                       \"InstanceType\": \"ELASTICSEARCH\",\n                        \"InstanceCount\":
+        0\n                    },\n                    {\n                        \"InstanceType\":
+        \"NATGW\",\n                        \"InstanceCount\": 0\n                    },\n
+        \                   {\n                        \"InstanceType\": \"ENDPOINT\",\n
+        \                       \"InstanceCount\": 0\n                    },\n                    {\n
+        \                       \"InstanceType\": \"CASB\",\n                        \"InstanceCount\":
+        0\n                    },\n                    {\n                        \"InstanceType\":
+        \"CVP\",\n                        \"InstanceCount\": 0\n                    },\n
+        \                   {\n                        \"InstanceType\": \"KONISGRAPH\",\n
+        \                       \"InstanceCount\": 0\n                    },\n                    {\n
+        \                       \"InstanceType\": \"TDSTORE\",\n                        \"InstanceCount\":
+        0\n                    },\n                    {\n                        \"InstanceType\":
+        \"LB-WAN\",\n                        \"InstanceCount\": 0\n                    },\n
+        \                   {\n                        \"InstanceType\": \"CVD\",\n
+        \                       \"InstanceCount\": 0\n                    },\n                    {\n
+        \                       \"InstanceType\": \"EKS\",\n                        \"InstanceCount\":
+        0\n                    },\n                    {\n                        \"InstanceType\":
+        \"LB-LAN\",\n                        \"InstanceCount\": 0\n                    }\n
+        \               ],\n                \"TotalCount\": 2\n            }\n        ],\n
+        \       \"RequestId\": \"1dc03ee6-252e-494a-abaa-9b98649e3bcb\"\n    }\n}"
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '4161'
+      Content-Type:
+      - application/json
+      Date:
+      - Fri, 17 Mar 2023 07:08:55 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+version: 1

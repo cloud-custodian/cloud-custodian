@@ -1,18 +1,6 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "744e5716-59da-5708-8c5e-0681fc9060cc", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "744e5716-59da-5708-8c5e-0681fc9060cc", 
-                "content-length": "211", 
-                "server": "Server", 
-                "connection": "keep-alive", 
-                "date": "Thu, 18 May 2017 13:35:06 GMT", 
-                "content-type": "text/xml"
-            }
-        }
+        "ResponseMetadata": {}
     }
 }

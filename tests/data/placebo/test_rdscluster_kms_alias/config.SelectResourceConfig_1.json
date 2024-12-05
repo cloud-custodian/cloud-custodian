@@ -1,0 +1,23 @@
+{
+    "status_code": 200,
+    "data": {
+        "Results": [
+            "{\"resourceId\":\"cluster-H6LU56TOHIKJLGS5GVL52DBOOE\",\"configuration\":{\"crossAccountClone\":false,\"allocatedStorage\":1.0,\"customEndpoints\":[],\"enabledCloudwatchLogsExports\":[],\"dbclusterArn\":\"arn:aws:rds:us-east-2:644160558196:cluster:test-cluster-2-cluster\",\"databaseName\":\"testdb\",\"associatedRoles\":[],\"availabilityZones\":[{\"value\":\"us-east-2a\"},{\"value\":\"us-east-2b\"},{\"value\":\"us-east-2c\"}],\"preferredBackupWindow\":\"07:00-09:00\",\"capacity\":1.0,\"deletionProtection\":false,\"endpoint\":{\"value\":\"test-cluster-2-cluster.cluster-cdx07s0u1win.us-east-2.rds.amazonaws.com\"},\"iamdatabaseAuthenticationEnabled\":false,\"dbclusterParameterGroup\":\"default.aurora-mysql5.7\",\"engineMode\":\"serverless\",\"engine\":\"aurora-mysql\",\"scalingConfigurationInfo\":{\"timeoutAction\":\"RollbackCapacityChange\",\"maxCapacity\":64.0,\"secondsUntilAutoPause\":300.0,\"minCapacity\":1.0,\"autoPause\":false},\"readReplicaIdentifiers\":[],\"clusterCreateTime\":1.611066134335E12,\"activityStreamStatus\":\"stopped\",\"engineVersion\":\"5.7.mysql_aurora.2.07.1\",\"masterUsername\":\"testing\",\"multiAZ\":false,\"domainMemberships\":[],\"storageEncrypted\":true,\"vpcSecurityGroups\":[{\"vpcSecurityGroupId\":\"sg-0a77acb83e940aa53\",\"status\":\"active\"}],\"hostedZoneId\":\"Z2XHWR1WZ565X2\",\"httpEndpointEnabled\":false,\"tagList\":[],\"dbsubnetGroup\":\"test\",\"dbclusterIdentifier\":\"test-cluster-2-cluster\",\"port\":3306.0,\"preferredMaintenanceWindow\":\"mon:09:10-mon:09:40\",\"backupRetentionPeriod\":5.0,\"kmsKeyId\":\"arn:aws:kms:us-east-2:644160558196:key/72c87446-729b-4624-9faa-137b26402e0f\",\"dbclusterMembers\":[],\"dbClusterResourceId\":\"cluster-H6LU56TOHIKJLGS5GVL52DBOOE\",\"copyTagsToSnapshot\":true,\"dbclusterOptionGroupMemberships\":[],\"status\":\"available\"},\"supplementaryConfiguration\":{\"Tags\":[]}}",
+            "{\"resourceId\":\"cluster-MPL6FOB4KMWTPPCZB3YS7RUSYM\",\"configuration\":{\"crossAccountClone\":false,\"allocatedStorage\":1.0,\"customEndpoints\":[],\"enabledCloudwatchLogsExports\":[],\"dbclusterArn\":\"arn:aws:rds:us-east-2:644160558196:cluster:test-cluster\",\"databaseName\":\"testdb\",\"associatedRoles\":[],\"availabilityZones\":[{\"value\":\"us-east-2a\"},{\"value\":\"us-east-2b\"},{\"value\":\"us-east-2c\"}],\"preferredBackupWindow\":\"07:00-09:00\",\"deletionProtection\":false,\"endpoint\":{\"value\":\"test-cluster.cluster-cdx07s0u1win.us-east-2.rds.amazonaws.com\"},\"iamdatabaseAuthenticationEnabled\":false,\"dbclusterParameterGroup\":\"default.aurora-mysql5.7\",\"engineMode\":\"provisioned\",\"engine\":\"aurora-mysql\",\"readerEndpoint\":\"test-cluster.cluster-ro-cdx07s0u1win.us-east-2.rds.amazonaws.com\",\"readReplicaIdentifiers\":[],\"clusterCreateTime\":1.609306416945E12,\"activityStreamStatus\":\"stopped\",\"engineVersion\":\"5.7.mysql_aurora.2.07.2\",\"masterUsername\":\"testing\",\"multiAZ\":true,\"domainMemberships\":[],\"storageEncrypted\":false,\"vpcSecurityGroups\":[{\"vpcSecurityGroupId\":\"sg-0a77acb83e940aa53\",\"status\":\"active\"}],\"hostedZoneId\":\"Z2XHWR1WZ565X2\",\"httpEndpointEnabled\":false,\"tagList\":[],\"dbsubnetGroup\":\"testing\",\"dbclusterIdentifier\":\"test-cluster\",\"port\":3306.0,\"preferredMaintenanceWindow\":\"mon:09:10-mon:09:40\",\"backupRetentionPeriod\":5.0,\"dbclusterMembers\":[{\"clusterWriter\":false,\"dbclusterParameterGroupStatus\":\"in-sync\",\"dbinstanceIdentifier\":\"test-cluster-instance-1\",\"promotionTier\":0.0,\"isClusterWriter\":false},{\"clusterWriter\":true,\"dbclusterParameterGroupStatus\":\"in-sync\",\"dbinstanceIdentifier\":\"test-cluster-instance-0\",\"promotionTier\":0.0,\"isClusterWriter\":true}],\"dbClusterResourceId\":\"cluster-MPL6FOB4KMWTPPCZB3YS7RUSYM\",\"copyTagsToSnapshot\":false,\"dbclusterOptionGroupMemberships\":[],\"status\":\"available\"},\"supplementaryConfiguration\":{\"Tags\":[]}}"
+        ],
+        "QueryInfo": {
+            "SelectFields": [
+                {
+                    "Name": "resourceId"
+                },
+                {
+                    "Name": "configuration"
+                },
+                {
+                    "Name": "supplementaryConfiguration"
+                }
+            ]
+        },
+        "ResponseMetadata": {}
+    }
+}

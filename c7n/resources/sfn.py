@@ -1,22 +1,19 @@
-# Copyright 2015-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 from c7n.actions import Action
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, TypeInfo
-from c7n.tags import Tag, RemoveTag
+from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, ConfigSource
+from c7n.tags import Tag, RemoveTag, universal_augment
 from c7n.utils import type_schema, local_session, dumps, chunks
+from c7n.filters.kms import KmsRelatedFilter
+
+
+class DescribeStepFunction(DescribeSource):
+
+    def augment(self, resources):
+        resources = super().augment(resources)
+        return universal_augment(self.manager, resources)
 
 
 @resources.register('step-machine')
@@ -28,13 +25,74 @@ class StepFunction(QueryResourceManager):
         permission_prefix = 'states'
         enum_spec = ('list_state_machines', 'stateMachines', None)
         arn = id = 'stateMachineArn'
+        arn_service = 'states'
         arn_type = 'stateMachine'
-        cfn_type = 'AWS::StepFunctions::StateMachine'
+        cfn_type = config_type = 'AWS::StepFunctions::StateMachine'
         name = 'name'
         date = 'creationDate'
         detail_spec = (
             "describe_state_machine", "stateMachineArn",
             'stateMachineArn', None)
+        permissions_augment = ("states:ListTagsForResource",)
+
+    source_mapping = {
+        'describe': DescribeStepFunction,
+        'config': ConfigSource
+    }
+
+
+class DescribeActivity(DescribeSource):
+
+    def augment(self, resources):
+        resources = super().augment(resources)
+        return universal_augment(self.manager, resources)
+
+
+@resources.register('sfn-activity')
+class Activity(QueryResourceManager):
+    """AWS Step Functions Activity
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: activity-encrypted-cmk
+                resource: sfn-activity
+                filters:
+                  - not:
+                    - type: kms-key
+                      key: c7n:AliasName
+                      value: alias/test/sfn/encrypted
+              - name: activity-tag-untagged
+                resource: sfn-activity
+                filters:
+                  - "tag:target-tag": absent
+                actions:
+                  - type: tag
+                    key: target-tag
+                    value: target-tag-value
+    """
+
+    class resource_type(TypeInfo):
+        service = 'stepfunctions'
+        permission_prefix = 'states'
+        enum_spec = ('list_activities', 'activities', None)
+        arn = id = 'activityArn'
+        arn_type = 'activity'
+        cfn_type = config_type = 'AWS::StepFunctions::Activity'
+        name = 'name'
+        date = 'creationDate'
+        detail_spec = (
+            "describe_activity", "activityArn",
+            'activityArn', None)
+        universal_taggable = object()
+        permissions_augment = ("states:ListTagsForResource",)
+
+    source_mapping = {
+            'describe': DescribeActivity,
+            'config': ConfigSource
+        }
 
 
 class InvokeStepFunction(Action):
@@ -146,14 +204,14 @@ class TagStepFunction(Tag):
     permissions = ('states:TagResource',)
 
     def process_resource_set(self, client, resources, tags):
-
+        mid = self.manager.resource_type.arn
         tags_lower = []
 
         for tag in tags:
             tags_lower.append({k.lower(): v for k, v in tag.items()})
 
         for r in resources:
-            client.tag_resource(resourceArn=r['stateMachineArn'], tags=tags_lower)
+            client.tag_resource(resourceArn=r[mid], tags=tags_lower)
 
 
 @StepFunction.action_registry.register('remove-tag')
@@ -175,6 +233,13 @@ class UnTagStepFunction(RemoveTag):
     permissions = ('states:UntagResource',)
 
     def process_resource_set(self, client, resources, tag_keys):
-
+        mid = self.manager.resource_type.arn
         for r in resources:
-            client.untag_resource(resourceArn=r['stateMachineArn'], tagKeys=tag_keys)
+            client.untag_resource(resourceArn=r[mid], tagKeys=tag_keys)
+
+
+@Activity.filter_registry.register('kms-key')
+@StepFunction.filter_registry.register('kms-key')
+class StepFunctionKmsFilter(KmsRelatedFilter):
+
+    RelatedIdsExpression = "encryptionConfiguration.kmsKeyId"

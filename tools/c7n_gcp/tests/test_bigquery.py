@@ -1,18 +1,8 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 from gcp_common import BaseTest, event_data
+import time
 
 
 class BigQueryDataSetTest(BaseTest):
@@ -31,12 +21,35 @@ class BigQueryDataSetTest(BaseTest):
         self.assertTrue('access' in dataset)
         self.assertEqual(dataset['labels'], {'env': 'dev'})
 
+        self.assertEqual(
+            p.resource_manager.get_urns([dataset]),
+            ["gcp:bigquery::cloud-custodian:dataset/devxyz"],
+        )
+
+    def test_dataset_delete(self):
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data('bq-dataset-delete', project_id=project_id)
+        p = self.load_policy(
+            {
+                'name': 'bq-dataset-delete',
+                'resource': 'gcp.bq-dataset',
+                'filters': [{'tag:delete_me': 'yes'}],
+                'actions': [
+                    'delete'
+                ]
+            },
+            session_factory=factory
+        )
+        resources = p.run()
+        if self.recording:
+            time.sleep(1)
+        self.assertEqual(len(resources), 1)
+
 
 class BigQueryJobTest(BaseTest):
 
     def test_query(self):
-        project_id = 'cloud-custodian'
-        factory = self.replay_flight_data('bq-job-query', project_id=project_id)
+        factory = self.replay_flight_data('bq-job-query')
         p = self.load_policy({
             'name': 'bq-job-get',
             'resource': 'gcp.bq-job'},
@@ -45,7 +58,13 @@ class BigQueryJobTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['status']['state'], 'DONE')
         self.assertEqual(resources[0]['jobReference']['location'], 'US')
-        self.assertEqual(resources[0]['jobReference']['projectId'], project_id)
+        self.assertEqual(resources[0]['jobReference']['projectId'], 'cloud-custodian')
+
+        # NOTE: confirm is a global resource
+        self.assertEqual(
+            p.resource_manager.get_urns(resources),
+            ["gcp:bigquery::cloud-custodian:job/US/bquxjob_4c28c9a7_16958c2791d"],
+        )
 
     def test_job_get(self):
         project_id = 'cloud-custodian'
@@ -68,26 +87,17 @@ class BigQueryJobTest(BaseTest):
         self.assertEqual(job[0]['jobReference']['projectId'], project_id)
         self.assertEqual(job[0]['id'], "{}:{}.{}".format(project_id, location, job_id))
 
-
-class BigQueryProjectTest(BaseTest):
-
-    def test_query(self):
-        factory = self.replay_flight_data('bq-project-query')
-        p = self.load_policy({
-            'name': 'bq-get',
-            'resource': 'gcp.bq-project'},
-            session_factory=factory)
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['friendlyName'], 'test project')
-        self.assertEqual(resources[0]['id'], 'cloud-custodian')
+        # NOTE: confirm is a global resource
+        self.assertEqual(
+            p.resource_manager.get_urns(job),
+            ["gcp:bigquery::cloud-custodian:job/US/bquxjob_4c28c9a7_16958c2791d"],
+        )
 
 
 class BigQueryTableTest(BaseTest):
 
     def test_query(self):
-        project_id = 'cloud-custodian'
-        factory = self.replay_flight_data('bq-table-query', project_id=project_id)
+        factory = self.replay_flight_data('bq-table-query')
         p = self.load_policy({
             'name': 'bq-table-query',
             'resource': 'gcp.bq-table'},
@@ -96,9 +106,13 @@ class BigQueryTableTest(BaseTest):
         self.assertIn('tableReference', resources[0].keys())
         self.assertEqual('TABLE', resources[0]['type'])
 
+        self.assertEqual(
+            p.resource_manager.get_urns(resources),
+            ["gcp:bigquery::cloud-custodian:table/test/test"],
+        )
+
     def test_table_get(self):
-        project_id = 'cloud-custodian'
-        factory = self.replay_flight_data('bq-table-get', project_id=project_id)
+        factory = self.replay_flight_data('bq-table-get')
         p = self.load_policy({
             'name': 'bq-table-get',
             'resource': 'gcp.bq-table',
@@ -111,3 +125,27 @@ class BigQueryTableTest(BaseTest):
         event = event_data('bq-table-create.json')
         job = exec_mode.run(event, None)
         self.assertIn('tableReference', job[0].keys())
+
+        self.assertEqual(
+            p.resource_manager.get_urns(job),
+            ["gcp:bigquery::cloud-custodian:table/qqqqqqqqqqqqq/test"],
+        )
+
+    def test_table_delete(self):
+        project_id = 'premise-governance-rd'
+        factory = self.replay_flight_data('bq-table-delete', project_id=project_id)
+        p = self.load_policy(
+            {
+                'name': 'bq-table-delete',
+                'resource': 'gcp.bq-table',
+                'filters': [{'tag:delete_me': 'yes'}],
+                'actions': [
+                    'delete'
+                ]
+            },
+            session_factory=factory
+        )
+        resources = p.run()
+        if self.recording:
+            time.sleep(1)
+        self.assertEqual(len(resources), 1)

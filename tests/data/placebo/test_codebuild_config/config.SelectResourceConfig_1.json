@@ -1,0 +1,19 @@
+{
+    "status_code": 200,
+    "data": {
+        "Results": [
+            "{\"configuration\":{\"logsConfig\":{\"cloudWatchLogs\":{\"groupName\":\"log-group\",\"streamName\":\"log-stream\",\"status\":\"ENABLED\"},\"s3Logs\":{\"status\":\"DISABLED\"}},\"cache\":{\"type\":\"NO_CACHE\"},\"sourceVersion\":\"master\",\"serviceRole\":\"arn:aws:iam::644160558196:role/example\",\"description\":\"test_codebuild_project\",\"source\":[{\"buildSpec\":\"\",\"reportBuildStatus\":false,\"gitSubmodulesConfig\":{\"fetchSubmodules\":true},\"location\":\"https://github.com/mitchellh/packer.git\",\"type\":\"GITHUB\",\"gitCloneDepth\":1.0}],\"encryptionKey\":\"arn:aws:kms:us-east-1:644160558196:alias/aws/s3\",\"tags\":[{\"value\":\"Test\",\"key\":\"Environment\"}],\"environment\":{\"image\":\"aws/codebuild/standard:1.0\",\"computeType\":\"BUILD_GENERAL1_SMALL\",\"imagePullCredentialsType\":\"CODEBUILD\",\"environmentVariables\":[{\"name\":\"SOME_KEY1\",\"type\":\"PLAINTEXT\",\"value\":\"******\"},{\"name\":\"SOME_KEY2\",\"type\":\"PARAMETER_STORE\",\"value\":\"SOME_VALUE2\"}],\"privilegedMode\":false,\"type\":\"LINUX_CONTAINER\"},\"vpcConfig\":{\"securityGroupIds\":[\"sg-0d4546977e35db448\"],\"vpcId\":\"vpc-0ef5a04184aee6026\",\"subnets\":[{\"buildFleetAZ\":\"us-east-1a\",\"subnet\":\"subnet-06a50bc476820b18c\",\"customerAZ\":\"us-east-1d\"}]},\"name\":\"test-project\",\"timeoutInMinutes\":5.0,\"queuedtimeoutInMinutes\":480.0,\"artifacts\":[{\"type\":\"NO_ARTIFACTS\",\"overrideArtifactName\":false}]},\"supplementaryConfiguration\":{}}"
+        ],
+        "QueryInfo": {
+            "SelectFields": [
+                {
+                    "Name": "configuration"
+                },
+                {
+                    "Name": "supplementaryConfiguration"
+                }
+            ]
+        },
+        "ResponseMetadata": {}
+    }
+}

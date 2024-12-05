@@ -1,0 +1,378 @@
+{
+  "body": {
+    "items": {
+      "zones/us-east1-b": {
+        "instances": [
+          {
+            "status": "TERMINATED", 
+            "cpuPlatform": "Unknown CPU Platform", 
+            "kind": "compute#instance", 
+            "machineType": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-east1-b/machineTypes/n1-standard-1", 
+            "description": "", 
+            "zone": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-east1-b", 
+            "tags": {
+              "items": [
+                "custodian", 
+                "dev", 
+                "http-server", 
+                "https-server"
+              ], 
+              "fingerprint": "64R2DbCkcGg="
+            }, 
+            "name": "custodian-dev", 
+            "labelFingerprint": "42WmSpB8rSM=", 
+            "disks": [
+              {
+                "index": 0, 
+                "kind": "compute#attachedDisk", 
+                "autoDelete": true, 
+                "deviceName": "custodian-dev", 
+                "boot": true, 
+                "source": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-east1-b/disks/custodian-dev", 
+                "mode": "READ_WRITE", 
+                "interface": "SCSI", 
+                "licenses": [
+                  "https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/licenses/ubuntu-1604-xenial"
+                ], 
+                "type": "PERSISTENT"
+              }
+            ], 
+            "id": "4158127351007949610", 
+            "deletionProtection": false, 
+            "scheduling": {
+              "automaticRestart": true, 
+              "preemptible": false, 
+              "onHostMaintenance": "MIGRATE"
+            }, 
+            "canIpForward": false, 
+            "serviceAccounts": [
+              {
+                "scopes": [
+                  "https://www.googleapis.com/auth/cloud-platform"
+                ], 
+                "email": "628364681111-compute@developer.gserviceaccount.com"
+              }
+            ], 
+            "networkInterfaces": [
+              {
+                "kind": "compute#networkInterface", 
+                "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default", 
+                "accessConfigs": [
+                  {
+                    "kind": "compute#accessConfig", 
+                    "type": "ONE_TO_ONE_NAT", 
+                    "name": "External NAT"
+                  }
+                ], 
+                "networkIP": "10.142.0.3", 
+                "fingerprint": "wbsB3SaM7JQ=", 
+                "subnetwork": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-east1/subnetworks/default-07bf749b4b0e8db2", 
+                "name": "nic0"
+              }
+            ], 
+            "creationTimestamp": "2017-05-01T12:34:32.859-07:00", 
+            "startRestricted": false, 
+            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-east1-b/instances/custodian-dev", 
+            "metadata": {
+              "kind": "compute#metadata", 
+              "fingerprint": "yKr6py6Xll8="
+            }
+          }
+        ]
+      }, 
+      "zones/us-central1-b": {
+        "instances": [
+          {
+            "status": "RUNNING", 
+            "cpuPlatform": "Intel Haswell", 
+            "kind": "compute#instance", 
+            "machineType": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-b/machineTypes/n1-standard-1", 
+            "description": "", 
+            "zone": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-b", 
+            "tags": {
+              "items": [
+                "https-server"
+              ], 
+              "fingerprint": "nNZ0SA7CJyk="
+            }, 
+            "name": "c7n-jenkins", 
+            "labelFingerprint": "42WmSpB8rSM=", 
+            "disks": [
+              {
+                "index": 0, 
+                "kind": "compute#attachedDisk", 
+                "autoDelete": true, 
+                "deviceName": "c7n-jenkins", 
+                "boot": true, 
+                "guestOsFeatures": [
+                  {
+                    "type": "VIRTIO_SCSI_MULTIQUEUE"
+                  }
+                ], 
+                "source": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-b/disks/c7n-jenkins", 
+                "mode": "READ_WRITE", 
+                "interface": "SCSI", 
+                "licenses": [
+                  "https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/licenses/ubuntu-1804-lts"
+                ], 
+                "type": "PERSISTENT"
+              }
+            ], 
+            "id": "2966820606951926687", 
+            "deletionProtection": false, 
+            "scheduling": {
+              "automaticRestart": true, 
+              "preemptible": false, 
+              "onHostMaintenance": "MIGRATE"
+            }, 
+            "canIpForward": false, 
+            "serviceAccounts": [
+              {
+                "scopes": [
+                  "https://www.googleapis.com/auth/devstorage.read_only", 
+                  "https://www.googleapis.com/auth/logging.write", 
+                  "https://www.googleapis.com/auth/monitoring.write", 
+                  "https://www.googleapis.com/auth/servicecontrol", 
+                  "https://www.googleapis.com/auth/service.management.readonly", 
+                  "https://www.googleapis.com/auth/trace.append"
+                ], 
+                "email": "628364681111-compute@developer.gserviceaccount.com"
+              }
+            ], 
+            "networkInterfaces": [
+              {
+                "kind": "compute#networkInterface", 
+                "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default", 
+                "accessConfigs": [
+                  {
+                    "kind": "compute#accessConfig", 
+                    "type": "ONE_TO_ONE_NAT", 
+                    "name": "External NAT", 
+                    "natIP": "104.154.233.11"
+                  }
+                ], 
+                "networkIP": "10.128.0.3", 
+                "fingerprint": "LVfKg4FlPDs=", 
+                "subnetwork": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/subnetworks/default-48aec19374439812", 
+                "name": "nic0"
+              }
+            ], 
+            "creationTimestamp": "2018-05-19T05:15:46.024-07:00", 
+            "startRestricted": false, 
+            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-b/instances/c7n-jenkins", 
+            "metadata": {
+              "kind": "compute#metadata", 
+              "fingerprint": "yKr6py6Xll8="
+            }
+          }, 
+          {
+            "status": "TERMINATED", 
+            "cpuPlatform": "Unknown CPU Platform", 
+            "kind": "compute#instance", 
+            "machineType": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-b/machineTypes/n1-standard-1", 
+            "description": "", 
+            "zone": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-b", 
+            "tags": {
+              "items": [
+                "http-server", 
+                "https-server"
+              ], 
+              "fingerprint": "6smc4R4d39I="
+            }, 
+            "name": "drone", 
+            "labelFingerprint": "42WmSpB8rSM=", 
+            "disks": [
+              {
+                "index": 0, 
+                "kind": "compute#attachedDisk", 
+                "autoDelete": true, 
+                "deviceName": "drone", 
+                "boot": true, 
+                "source": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-b/disks/drone", 
+                "mode": "READ_WRITE", 
+                "interface": "SCSI", 
+                "licenses": [
+                  "https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/licenses/ubuntu-1604-xenial"
+                ], 
+                "type": "PERSISTENT"
+              }, 
+              {
+                "index": 1, 
+                "kind": "compute#attachedDisk", 
+                "autoDelete": false, 
+                "deviceName": "drone-11-1", 
+                "boot": false, 
+                "source": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-b/disks/drone-11-1", 
+                "mode": "READ_WRITE", 
+                "interface": "SCSI", 
+                "licenses": [
+                  "https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/licenses/ubuntu-1404-trusty"
+                ], 
+                "type": "PERSISTENT"
+              }
+            ], 
+            "id": "4913675096949006093", 
+            "deletionProtection": false, 
+            "scheduling": {
+              "automaticRestart": true, 
+              "preemptible": false, 
+              "onHostMaintenance": "MIGRATE"
+            }, 
+            "canIpForward": false, 
+            "serviceAccounts": [
+              {
+                "scopes": [
+                  "https://www.googleapis.com/auth/servicecontrol", 
+                  "https://www.googleapis.com/auth/service.management.readonly", 
+                  "https://www.googleapis.com/auth/logging.write", 
+                  "https://www.googleapis.com/auth/monitoring.write", 
+                  "https://www.googleapis.com/auth/trace.append", 
+                  "https://www.googleapis.com/auth/devstorage.read_write"
+                ], 
+                "email": "628364689111-compute@developer.gserviceaccount.com"
+              }
+            ], 
+            "networkInterfaces": [
+              {
+                "kind": "compute#networkInterface", 
+                "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default", 
+                "accessConfigs": [
+                  {
+                    "kind": "compute#accessConfig", 
+                    "type": "ONE_TO_ONE_NAT", 
+                    "name": "External NAT"
+                  }
+                ], 
+                "networkIP": "10.128.0.2", 
+                "fingerprint": "taUvjbNj9Jg=", 
+                "subnetwork": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/subnetworks/default-48aec19374439812", 
+                "name": "nic0"
+              }
+            ], 
+            "creationTimestamp": "2017-11-01T03:28:50.885-07:00", 
+            "startRestricted": false, 
+            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-b/instances/drone", 
+            "metadata": {
+              "kind": "compute#metadata", 
+              "fingerprint": "yKr6py6Xll8="
+            }
+          }
+        ]
+      }, 
+      "zones/us-east1-d": {
+        "instances": [
+          {
+            "status": "RUNNING", 
+            "cpuPlatform": "Intel Haswell", 
+            "kind": "compute#instance", 
+            "disks": [
+              {
+                "index": 0, 
+                "kind": "compute#attachedDisk", 
+                "autoDelete": true, 
+                "deviceName": "custodian", 
+                "boot": true, 
+                "source": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-east1-d/disks/custodian", 
+                "mode": "READ_WRITE", 
+                "interface": "SCSI", 
+                "licenses": [
+                  "https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/licenses/ubuntu-1404-trusty"
+                ], 
+                "type": "PERSISTENT"
+              }
+            ], 
+            "machineType": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-east1-d/machineTypes/n1-standard-2", 
+            "description": "", 
+            "zone": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-east1-d", 
+            "tags": {
+              "items": [
+                "http-server", 
+                "https-server", 
+                "ci", 
+                "drone", 
+                "custodian"
+              ], 
+              "fingerprint": "YLj7N4sJwYI="
+            }, 
+            "name": "custodian", 
+            "labelFingerprint": "YLj7N4sJwYI=", 
+            "labels": {
+              "http-server": "", 
+              "https-server": "", 
+              "ci": "", 
+              "drone": "", 
+              "custodian": ""
+            }, 
+            "id": "4179518482904332734", 
+            "deletionProtection": false, 
+            "scheduling": {
+              "automaticRestart": true, 
+              "preemptible": false, 
+              "onHostMaintenance": "MIGRATE"
+            }, 
+            "canIpForward": false, 
+            "serviceAccounts": [
+              {
+                "scopes": [
+                  "https://www.googleapis.com/auth/bigquery", 
+                  "https://www.googleapis.com/auth/cloud.useraccounts.readonly", 
+                  "https://www.googleapis.com/auth/devstorage.read_only", 
+                  "https://www.googleapis.com/auth/logging.write", 
+                  "https://www.googleapis.com/auth/monitoring.write", 
+                  "https://www.googleapis.com/auth/pubsub"
+                ], 
+                "email": "628364681111-compute@developer.gserviceaccount.com"
+              }
+            ], 
+            "networkInterfaces": [
+              {
+                "kind": "compute#networkInterface", 
+                "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default", 
+                "accessConfigs": [
+                  {
+                    "kind": "compute#accessConfig", 
+                    "type": "ONE_TO_ONE_NAT", 
+                    "name": "External NAT", 
+                    "natIP": "104.196.149.1"
+                  }
+                ], 
+                "networkIP": "10.142.0.2", 
+                "fingerprint": "u4ioByJWIjQ=", 
+                "subnetwork": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-east1/subnetworks/default-07bf749b4b0e8db2", 
+                "name": "nic0"
+              }
+            ], 
+            "creationTimestamp": "2016-04-24T01:44:01.573-07:00", 
+            "startRestricted": false, 
+            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-east1-d/instances/custodian", 
+            "metadata": {
+              "kind": "compute#metadata", 
+              "fingerprint": "yKr6py6Xll8="
+            }
+          }
+        ]
+      }
+    }, 
+    "kind": "compute#instanceAggregatedList", 
+    "id": "projects/cloud-custodian/aggregated/instances", 
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/aggregated/instances"
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "23509", 
+    "x-xss-protection": "1; mode=block", 
+    "content-location": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/aggregated/instances?alt=json", 
+    "x-content-type-options": "nosniff", 
+    "transfer-encoding": "chunked", 
+    "expires": "Tue, 05 Jun 2018 21:49:39 GMT", 
+    "vary": "Origin, X-Origin", 
+    "server": "GSE", 
+    "-content-encoding": "gzip", 
+    "etag": "\"dLU3ttbJ5Mh6hJSRk-Gjiq7lx0w=/-tgowH3t_UbZPG_jLR-EzY6mQ3Q=\"", 
+    "cache-control": "private, max-age=0, must-revalidate, no-transform", 
+    "date": "Tue, 05 Jun 2018 21:49:39 GMT", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"43,42,41,39,35\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}

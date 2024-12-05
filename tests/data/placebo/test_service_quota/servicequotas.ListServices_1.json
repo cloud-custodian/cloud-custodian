@@ -1,0 +1,31 @@
+{
+    "status_code": 200,
+    "data": {
+        "Services": [
+            {
+                "ServiceCode": "ec2",
+                "ServiceName": "Amazon Elastic Compute Cloud (Amazon EC2)"
+            },
+            {
+                "ServiceCode": "firehose",
+                "ServiceName": "Amazon Kinesis Data Firehose"
+            },
+            {
+                "ServiceCode": "logs",
+                "ServiceName": "Amazon CloudWatch Logs"            
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "2292521a-3dcb-4277-8d0f-331aa73ba274",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Thu, 31 Oct 2019 17:52:30 GMT",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "1578",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "2292521a-3dcb-4277-8d0f-331aa73ba274"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

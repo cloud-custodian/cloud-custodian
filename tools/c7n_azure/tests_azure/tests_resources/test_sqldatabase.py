@@ -1,18 +1,7 @@
-# Copyright 2015-2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from azure.mgmt.sql.models import DatabaseUpdate, Sku
-from ..azure_common import BaseTest, arm_template, requires_arm_polling
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
+from azure.mgmt.sql.models import DatabaseUpdate, Sku, BackupShortTermRetentionPolicy
+from ..azure_common import BaseTest, arm_template, cassette_name, requires_arm_polling
 from c7n_azure.resources.sqldatabase import (
     BackupRetentionPolicyHelper, ShortTermBackupRetentionPolicyAction)
 from c7n_azure.session import Session
@@ -76,7 +65,7 @@ class SqlDatabaseTest(BaseTest):
         self.assertEqual(db.get('name'), 'cctestdb')
 
     @arm_template('sqlserver.json')
-    @patch('azure.mgmt.sql.operations.DatabasesOperations.update')
+    @patch('azure.mgmt.sql.operations.DatabasesOperations.begin_update')
     def test_resize_action(self, update_mock):
         p = self.load_policy({
             'name': 'resize-sqldatabase',
@@ -107,11 +96,47 @@ class SqlDatabaseTest(BaseTest):
                                             max_size_bytes=21474836480)
 
         update_mock.assert_called_once()
-        name, args, kwargs = update_mock.mock_calls[0]
+        _, args, _ = update_mock.mock_calls[0]
         self.assertEqual('test_sqlserver', args[0])
         self.assertEqual(parent_id, args[1])
         self.assertEqual('cctestdb', args[2])
         self.assertEqual(expected_db_update, args[3])
+
+    def test_data_encryption_filter(self):
+        p = self.load_policy({
+            'name': 'test-azure-sql-database',
+            'resource': 'azure.sql-database',
+            'filters': [
+                {
+                    'type': 'value',
+                    'key': 'name',
+                    'value': 'cctestdb'
+                },
+                {
+                    'type': 'transparent-data-encryption',
+                    'enabled': True
+                }],
+        })
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+
+    def test_data_masking_filter(self):
+        p = self.load_policy({
+            'name': 'test-azure-sql-database',
+            'resource': 'azure.sql-database',
+            'filters': [
+                {
+                    'type': 'value',
+                    'key': 'name',
+                    'value': 'cctestdb'
+                },
+                {
+                    'type': 'data-masking-policy',
+                    'enabled': False
+                }],
+        })
+        resources = p.run()
+        self.assertEqual(1, len(resources))
 
 
 class ShortTermBackupRetentionPolicyFilterTest(BaseTest):
@@ -355,8 +380,8 @@ class ShortTermBackupRetentionPolicyActionTest(BaseTest):
     def tearDown(self, *args, **kwargs):
         super(ShortTermBackupRetentionPolicyActionTest, self).tearDown(*args, **kwargs)
         args = list(self.retention_policy_context)
-        args.append(14)
-        reverted_policy = ShortTermBackupRetentionPolicyActionTest.client.create_or_update(
+        args.append(BackupShortTermRetentionPolicy(retention_days=14))
+        reverted_policy = ShortTermBackupRetentionPolicyActionTest.client.begin_create_or_update(
             *args).result()
         self.assertEqual(reverted_policy.retention_days, 14)
 
@@ -436,7 +461,7 @@ class LongTermBackupRetentionPolicyActionTest(BaseTest):
 
         params = list(self.retention_policy_context)
         params.append(default_long_term_policy)
-        reverted_policy = LongTermBackupRetentionPolicyActionTest.client.create_or_update(
+        reverted_policy = LongTermBackupRetentionPolicyActionTest.client.begin_create_or_update(
             *params).result()
 
         self.assertEqual(reverted_policy.weekly_retention, 'P1M')
@@ -542,3 +567,21 @@ class LongTermBackupRetentionPolicyActionTest(BaseTest):
             *self.retention_policy_context
         )
         self.assertEqual(getattr(current_retention_period, retention_property), period)
+
+
+class SqlDatabaseDataEncryptionFilterTest(BaseTest):
+
+    @cassette_name('data_encryption_filter')
+    @arm_template('sqlserver.json')
+    def test_filter(self):
+        p = self.load_policy({
+            'name': 'test-azure-sql-data-encryption',
+            'resource': 'azure.sql-database',
+            'filters': [
+                {'type': 'data-encryption',
+                 'enabled': False}],
+        })
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+        self.assertEqual('9958f24e-907d-4b98-8b89-a8ac1d748225',
+                         resources[0]['properties']['databaseId'])

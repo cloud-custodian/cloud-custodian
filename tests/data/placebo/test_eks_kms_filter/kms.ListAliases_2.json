@@ -1,0 +1,34 @@
+{
+    "status_code": 200,
+    "data": {
+        "Aliases": [
+            {
+                "AliasName": "alias/eks",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/eks",
+                "TargetKeyId": "361001ad-9c5e-42cb-9a09-5de1e80e822f",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 8,
+                    "day": 30,
+                    "hour": 16,
+                    "minute": 53,
+                    "second": 47,
+                    "microsecond": 431000
+                },
+                "LastUpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 8,
+                    "day": 30,
+                    "hour": 16,
+                    "minute": 53,
+                    "second": 47,
+                    "microsecond": 431000
+                }
+            }
+        ],
+        "Truncated": false,
+        "ResponseMetadata": {}
+    }
+}

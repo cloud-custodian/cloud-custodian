@@ -1,0 +1,51 @@
+{
+    "status_code": 200,
+    "data": {
+        "graphqlApis": [
+            {
+                "name": "My AppSync Api1",
+                "apiId": "lopd6grtrnctrfi7g7ywvfkzta",
+                "authenticationType": "API_KEY",
+                "arn": "arn:aws:appsync:us-east-1:012345678912:apis/lopd6grtrnctrfi7g7ywvfkzta",
+                "uris": {
+                    "REALTIME": "wss://az5joslekdcedka43ordq3fcvq.appsync-realtime-api.us-east-1.amazonaws.com/graphql",
+                    "GRAPHQL": "https://az5joslekdcedka43ordq3fcvq.appsync-api.us-east-1.amazonaws.com/graphql"
+                },
+                "tags": {
+                    "waf": "test"
+                },
+                "xrayEnabled": false,
+                "wafWebAclArn": "arn:aws:wafv2:us-east-1:012345678912:regional/webacl/FMManagedWebACLV2-FMS-TEST-1656966584517/96494e83-ee49-4505-9f68-9103c6cd9406"
+            },
+            {
+                "name": "My AppSync Api2",
+                "apiId": "mlpaw0grtrnctrfi7g7ywvfk908",
+                "authenticationType": "API_KEY",
+                "arn": "arn:aws:appsync:us-east-1:012345678912:apis/mlpaw0grtrnctrfi7g7ywvfk908",
+                "uris": {
+                    "REALTIME": "wss://kslwp0lekdcedka43ordq3fcvq.appsync-realtime-api.us-east-1.amazonaws.com/graphql",
+                    "GRAPHQL": "https://kslwp0lekdcedka43ordq3fcvq.appsync-api.us-east-1.amazonaws.com/graphql"
+                },
+                "tags": {
+                    "waf": "test"
+                },
+                "xrayEnabled": false
+            },
+            {
+                "name": "My AppSync Api3",
+                "apiId": "p012w0grtrnctrfi7g7ywvf4y67",
+                "authenticationType": "API_KEY",
+                "arn": "arn:aws:appsync:us-east-1:012345678912:apis/p012w0grtrnctrfi7g7ywvf4y67",
+                "uris": {
+                    "REALTIME": "wss://pqlap0lekdcedka43ordq3fcvq.appsync-realtime-api.us-east-1.amazonaws.com/graphql",
+                    "GRAPHQL": "https://pqlap0lekdcedka43ordq3fcvq.appsync-api.us-east-1.amazonaws.com/graphql"
+                },
+                "tags": {
+                    "waf": "test"
+                },
+                "xrayEnabled": false,
+                "wafWebAclArn": "arn:aws:wafv2:us-east-1:012345678912:regional/webacl/WebACL_TESTv2/887bbaec-c70b-4884-b290-ec7c7b5a43kl"
+            }
+        ]
+    }
+}

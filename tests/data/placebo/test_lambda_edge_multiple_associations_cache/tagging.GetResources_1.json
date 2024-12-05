@@ -1,0 +1,27 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:lambda:us-east-1:644160558196:function:c7n-lambda-edge-new",
+                "Tags": [
+                    {
+                        "Key": "lambda-console:blueprint",
+                        "Value": "cloudfront-http-redirect"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:lambda:us-east-1:644160558196:function:test-lambda-edge",
+                "Tags": [
+                    {
+                        "Key": "lambda-console:blueprint",
+                        "Value": "cloudfront-modify-response-header"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -5,13 +5,16 @@ AWS Config
 
 Custodian has deep integration with config, a custodian policy:
 
-- Can be deployed as config-rule.
+- Can be deployed as config-rule for any resource type supported by config.
 
-- Can use config as resource database instead of. Custodian supports
-  querying resources with Config's SQL expression language.
+- Can use config as resource database instead of querying service
+  describe apis. Custodian supports server side querying resources
+  with Config's SQL expression language.
 
 - Can filter resources based on their compliance with one or more config rules.
 
+- Can be deployed as a config-poll-rule against any resource type supported
+  by cloudformation.
 
 Custodian does the legwork of normalizing the resource description
 from config's idiosyncratic format to one that looks like describe api
@@ -58,8 +61,8 @@ lambda.
         role: MyLambdaConfigRole
       filters:
         - type: image
-          tag: "NotSupported"
-	  value: absent
+          key: "tag:NotSupported"
+          value: absent
 
 
 Filter
@@ -81,3 +84,36 @@ with other config-rules.
          - stop
 
 
+Config Poll Rule
+++++++++++++++++
+
+For resources not supported natively by AWS Config, an execution mode
+of type: config-poll-rule can be used for any resource supported by
+CloudFormation.  This is effectively a periodic policy that queries
+the resource's service api and filters resources to evaluate
+compliance/non-compliance and then records results to AWS Config.
+CloudFormation resources are only partially supported by AWS Config,
+and are not supported for ``source: config`` nor do they support resource
+timeline or resource attributes.
+
+.. code-block:: yaml
+
+   policies:
+     - name: kinesis-one-stream
+       resource: aws.kinesis
+       mode:
+         type: config-poll-rule
+         role: custodian-config-role
+         schedule: Three_Hours
+       filters:
+         - tag:App: Dev
+
+For resource types with native AWS Config support, the ``config-rule``
+mode is typically a better fit because it avoids running policies when
+resources haven't changed. For those resource types, the ``config-poll-rule``
+mode will raise an error like this by default::
+
+  custodian.commands:ERROR Policy: kinesis-one-stream is invalid: resource:aws.kinesis fully supported by config and should use mode: config-rule
+
+Adding ``ignore_support_check: true`` to a policy's ``mode`` block
+can bypass that error and force ``config-poll-rule`` mode to succeed.

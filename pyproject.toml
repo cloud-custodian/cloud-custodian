@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "c7n"
-version = "0.9.1"
+version = "0.9.42"
 description = "Cloud Custodian - Policy Rules Engine"
 authors = ["Cloud Custodian Project"]
 readme = "README.md"
@@ -11,6 +11,7 @@ license = "Apache-2.0"
 packages = [
     { include = "c7n" }]
 classifiers=[
+   "License :: OSI Approved :: Apache Software License",
    "Topic :: System :: Systems Administration",
    "Topic :: System :: Distributed Computing"]
 
@@ -21,31 +22,79 @@ classifiers=[
 custodian = 'c7n.cli:main'
 
 [tool.poetry.dependencies]
-python = "^3.6"
+cryptography = "<46"
+python = "^3.8"
 boto3 = "^1.12.31"
-jsonschema = "^3.2.0"
-argcomplete = "^1.11.1"
-python-dateutil = "^2.8.1"
-pyyaml = "^5.3"
-tabulate = "^0.8.6"
-importlib-metadata = "^1.5.0;python_version<3.8"
+jsonschema = ">=4.18"
+argcomplete = ">=1.12.3"
+python-dateutil = "^2.8.2"
+pyyaml = ">=5.4.0"
+tabulate = "^0.9.0"
+docutils = ">=0.18, <0.19"
 
-[tool.poetry.dev-dependencies]
-pytest = "~5.3.5"
-coverage = "^5.0.3"
-placebo = "^0.9.0"
-pytest-xdist = "^1.31.0"
-pytest-cov = "^2.8.1"
-mock = "^4.0.1"
-vcrpy = "^4.0.2"
+# some issue in c7n_gcp libraries, possibly a bug in poetry, even with this specification
+# importlib-metadata = ">=6,<9"
+# we're picking up a release behind on 8.4 vs 8.5 and to avoid incompatible package installs,
+# we're pinning for now. time to explore uv workspaces perhaps.
+importlib-metadata = "==8.4"
+
+# temporary work around for 
+# https://github.com/cloud-custodian/poetry-plugin-freeze/issues/18
+urllib3 = "<2"
+
+# temporary work around for
+# https://github.com/p1c2u/jsonschema-path/issues/98
+# which gets pulled in via moto
+referencing = "==0.35.1"
+
+[tool.poetry.group.dev.dependencies]
+ruff = ">=0.3,<0.6"
+docker = {extras = ["websockets"], version = "^7.1.0"}
+black = ">=23.1,<25.0"
+pytest = "<8"
+coverage = "^7"
+placebo = "^0"
+pytest-xdist = "^3.0"
+pytest-cov = ">=3,<6"
+pytest-terraform = ">=0.6,<0.8"
+vcrpy = ">=4.0.2"
 aws-xray-sdk = "^2.5.0"
-flake8 = "^3.7.9"
-tox = "^3.14.5"
 jsonpatch = "^1.25"
-psutil = "^5.7.0"
-# wheel = "==0.30.0"
-twine = "^3.1.1"
-pytest-sugar = "^0.9.2"
+psutil = ">=5.7,<7.0"
+twine = ">=3.1.1,<6.0.0"
+pytest-sugar = ">=0.9.2,<1.1.0"
+click = "^8.0"
+freezegun = "^1.2.2"
+pytest-recording = ">=0.12.1,<0.14.0"
+moto = "^5.0"
+openapi-spec-validator = "^0.7.1"
 
 [tool.black]
 skip-string-normalization = true
+line-length = 100
+
+[tool.ruff]
+line-length = 100
+exclude = ["__init__.py"]
+
+[tool.ruff.lint]
+preview = true
+select = ["E", "F", "W"]
+# E741 - single char variables
+# E401 - multiple imports in a single line
+ignore = ["E741", "E401"]
+
+[tool.pytest.ini_options]
+junit_family = "xunit2"
+addopts = "--tb=native"
+markers = ["functional", "skiplive", "audited"]
+python_files = "test_*.py"
+norecursedirs = ["data", "cassettes", "templates", "terraform"]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning"
+]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

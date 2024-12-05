@@ -1,16 +1,5 @@
-# Copyright 2015-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from .common import BaseTest
 
 from c7n.exceptions import PolicyValidationError
@@ -222,7 +211,7 @@ class SSLPolicyTest(BaseTest):
                 "filters": [
                     {
                         "type": "ssl-policy",
-                        "whitelist": ["AES128-SHA256", "Protocol-TLSv1"],
+                        "blacklist": ["Protocol-SSLv3", "Protocol-TLSv1"],
                     },
                     {
                         "type": "value",
@@ -235,7 +224,7 @@ class SSLPolicyTest(BaseTest):
                     {
                         "type": "set-ssl-listener-policy",
                         "name": "testpolicy",
-                        "attributes": ["AES128-SHA256", "Protocol-TLSv1"],
+                        "attributes": ["Protocol-TLSv1.2", "AES128-SHA256"],
                     }
                 ],
             },
@@ -263,11 +252,79 @@ class SSLPolicyTest(BaseTest):
         self.assertEqual(
             curr_pol,
             [
-                "AWSConsole-LBCookieStickinessPolicy-test-elb-1493748038333",
                 "testpolicy-1493768308000",
             ],
         )
-        self.assertEqual(active_ciphers, ["Protocol-TLSv1", "AES128-SHA256"])
+        self.assertEqual(active_ciphers, ["Protocol-TLSv1.2", "AES128-SHA256"])
+
+    def test_set_ssl_listener_policy_predefined(self):
+        session_factory = self.replay_flight_data("test_set_ssl_listener_predefined")
+        client = session_factory().client("elb")
+        policy = self.load_policy(
+            {
+                "name": "test-set-ssl-listerner",
+                "resource": "elb",
+                "filters": [
+                    {
+                        "type": "ssl-policy",
+                        "blacklist": ["Protocol-SSLv3", "Protocol-TLSv1", "Protocol-TLSv1.1"],
+                    },
+                    {
+                        "type": "value",
+                        "key": "LoadBalancerName",
+                        "value": "test-elb",
+                        "op": "eq",
+                    },
+                ],
+                "actions": [
+                    {
+                        "type": "set-ssl-listener-policy",
+                        "name": "testpolicy",
+                        "attributes": {
+                            "Reference-Security-Policy": "ELBSecurityPolicy-TLS-1-2-2017-01"
+                        },
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        policy.run()
+        response_pol = client.describe_load_balancers(LoadBalancerNames=["test-elb"])
+
+        response_ciphers = client.describe_load_balancer_policies(
+            LoadBalancerName="test-elb", PolicyNames=["testpolicy-1493768308000"]
+        )
+        curr_pol = response_pol["LoadBalancerDescriptions"][0]["ListenerDescriptions"][
+            0
+        ][
+            "PolicyNames"
+        ]
+
+        curr_ciphers = []
+        for x in response_ciphers["PolicyDescriptions"][0][
+            "PolicyAttributeDescriptions"
+        ]:
+            curr_ciphers.append({str(k): str(v) for k, v in x.items()})
+        active_ciphers = [
+            x["AttributeName"] for x in curr_ciphers if x["AttributeValue"] == "true"
+        ]
+        self.assertEqual(
+            curr_pol,
+            [
+                "testpolicy-1493768308000",
+            ],
+        )
+        self.assertEqual(
+            active_ciphers,
+            [
+                'Protocol-TLSv1.2', 'Server-Defined-Cipher-Order',
+                'ECDHE-ECDSA-AES128-GCM-SHA256', 'ECDHE-RSA-AES128-GCM-SHA256',
+                'ECDHE-ECDSA-AES128-SHA256', 'ECDHE-RSA-AES128-SHA256',
+                'ECDHE-ECDSA-AES256-GCM-SHA384', 'ECDHE-RSA-AES256-GCM-SHA384',
+                'ECDHE-ECDSA-AES256-SHA384', 'ECDHE-RSA-AES256-SHA384', 'AES128-GCM-SHA256',
+                'AES128-SHA256', 'AES256-GCM-SHA384', 'AES256-SHA256'
+            ]
+        )
 
     def test_ssl_matching(self):
         session_factory = self.replay_flight_data("test_ssl_ciphers")
@@ -613,4 +670,217 @@ class TestElbIsNotLoggingFilter(BaseTest):
 
         self.assertGreater(
             len(resources), 0, "Should find elb not logging " "to otherbucket"
+        )
+
+
+class TestElbAttributeFilter(BaseTest):
+
+    def test_is_connection_draining(self):
+        """ replicate
+            - name: elb-is-connection-draining-test
+              resource: elb
+              filters:
+                - type: attributes
+                  key: ConnectionDraining.Enabled
+                  value: true
+                  op: eq
+        """
+        session_factory = self.replay_flight_data("test_elb_attribute_filter")
+        policy = self.load_policy(
+            {
+                "name": "elb-is-connection-draining-test",
+                "resource": "elb",
+                "filters": [
+                        {
+                            "type": "attributes",
+                            "key": "ConnectionDraining.Enabled",
+                            "value": True,
+                            "op": "eq"
+                        }
+                ],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = policy.run()
+
+        self.assertEqual(
+            len(resources), 1, "Test should find one elb connection draining"
+        )
+
+        self.assertEqual(
+            resources[0]['Attributes']['ConnectionDraining']['Enabled'], True
+        )
+
+    def test_is_not_connection_draining(self):
+        """ replicate
+            - name: elb-is-not-connection-draining-test
+              resource: elb
+              filters:
+                - type: attributes
+                  key: ConnectionDraining.Enabled
+                  value: true
+                  op: eq
+        """
+        session_factory = self.replay_flight_data("test_elb_attribute_filter")
+        policy = self.load_policy(
+            {
+                "name": "elb-is-not-connection-draining-test",
+                "resource": "elb",
+                "filters": [
+                    {
+                        "type": "attributes",
+                        "key": "ConnectionDraining.Enabled",
+                        "value": False,
+                        "op": "eq"
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = policy.run()
+
+        self.assertEqual(
+            len(resources), 0, "Test should find no elbs without connection draining "
+        )
+
+    def test_is_cross_zone_load_balancing(self):
+        """ replicate
+            - name: elb-is-cross-zone-load-balancing-test
+              resource: elb
+              filters:
+                - type: attributes
+                  key: CrossZoneLoadBalancing.Enabled
+                  value: true
+                  op: eq
+        """
+        session_factory = self.replay_flight_data("test_elb_attribute_filter")
+        policy = self.load_policy(
+            {
+                "name": "elb-is-cross-zone-load-balancing-test",
+                "resource": "elb",
+                "filters": [
+                    {
+                        "type": "attributes",
+                        "key": "CrossZoneLoadBalancing.Enabled",
+                        "value": True,
+                        "op": "eq"
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = policy.run()
+
+        self.assertEqual(
+            len(resources), 1, "Test should find one elb cross zone load balancing"
+        )
+
+        self.assertEqual(
+            resources[0]['Attributes']['CrossZoneLoadBalancing']['Enabled'], True
+        )
+
+    def test_is_not_cross_zone_load_balancing(self):
+        """ replicate
+            - name: elb-is-not-cross-zone-load-balancing
+              resource: elb
+              filters:
+                - type: attributes
+                  key: CrossZoneLoadBalancing.Enabled
+                  value: false
+                  op: eq
+        """
+        session_factory = self.replay_flight_data("test_elb_attribute_filter")
+        policy = self.load_policy(
+            {
+                "name": "elb-is-not-cross-zone-load-balancing-test",
+                "resource": "elb",
+                "filters": [
+                    {
+                        "type": "attributes",
+                        "key": "CrossZoneLoadBalancing.Enabled",
+                        "value": False,
+                        "op": "eq"
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = policy.run()
+
+        self.assertEqual(
+            len(resources), 0, "Test should find no elbs not cross zone load balancing"
+        )
+
+    def test_idle_time_greater_than_30(self):
+        """ replicate
+            - name: elb-idle-timeout-test
+              resource: elb
+              filters:
+                - type: attributes
+                  key: ConnectionSettings.IdleTimeout
+                  value: 30
+                  op: gt
+        """
+        session_factory = self.replay_flight_data("test_elb_attribute_filter")
+        policy = self.load_policy(
+            {
+                "name": "elb-idle-timeout-greater-than-30",
+                "resource": "elb",
+                "filters": [
+                    {
+                        "type": "attributes",
+                        "key": "ConnectionSettings.IdleTimeout",
+                        "value": 30,
+                        "op": "gt"
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = policy.run()
+
+        self.assertEqual(
+            len(resources), 1, "Test should find 1 elb with idle timeout > 30 seconds"
+        )
+
+        self.assertGreater(
+            resources[0]['Attributes']['ConnectionSettings']['IdleTimeout'], 30
+        )
+
+    def test_idle_time_less_than_30(self):
+        """ replicate
+            - name: elb-idle-timeout-test
+              resource: elb
+              filters:
+                - type: attributes
+                  key: ConnectionSettings.IdleTimeout
+                  value: 30
+                  op: lt
+        """
+        session_factory = self.replay_flight_data("test_elb_attribute_filter")
+        policy = self.load_policy(
+            {
+                "name": "elb-idle-timeout-less-than-30",
+                "resource": "elb",
+                "filters": [
+                    {
+                        "type": "attributes",
+                        "key": "ConnectionSettings.IdleTimeout",
+                        "value": 30,
+                        "op": "lt"
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = policy.run()
+
+        self.assertEqual(
+            len(resources), 0, "Test should find 0 elbs with idle timeout < 30 seconds"
         )

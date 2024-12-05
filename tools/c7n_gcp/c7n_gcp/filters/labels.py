@@ -1,16 +1,5 @@
-# Copyright 2019 Karol Lassak
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 from datetime import datetime, timedelta
 
@@ -79,6 +68,8 @@ class LabelActionFilter(Filter):
             raise FilterValidationError(
                 "Invalid timezone specified '%s' in %s" % (
                     self.data.get('tz'), self.manager.data))
+        self.valid_actions = sorted(
+            self.manager.action_registry.keys(), key=lambda k: len(k), reverse=True)
         return self
 
     def process(self, resources, event=None):
@@ -89,6 +80,17 @@ class LabelActionFilter(Filter):
         self.tz = Time.get_tz(self.data.get('tz', 'utc'))
         return super(LabelActionFilter, self).process(resources, event)
 
+    def parse(self, v: str):
+        remainder, action_date = v.rsplit('-', 1)
+        found = False
+        msg = ""
+        for a in self.valid_actions:
+            if remainder.endswith(a):
+                found = a
+                msg = remainder[:-len(a) - 1]
+                break
+        return msg, found, action_date
+
     def __call__(self, i):
         v = i.get('labels', {}).get(self.label, None)
 
@@ -97,9 +99,9 @@ class LabelActionFilter(Filter):
         if '-' not in v or '_' not in v:
             return False
 
-        msg, action, action_date_str = v.rsplit('-', 2)
+        _, action, action_date_str = self.parse(v)
 
-        if action != self.op:
+        if action != self.op or not action:
             return False
 
         try:

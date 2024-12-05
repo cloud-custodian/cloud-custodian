@@ -1,19 +1,9 @@
-# Copyright 2019 Microsoft Corporation
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from ..azure_common import BaseTest, arm_template, cassette_name
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
+from ..azure_common import BaseTest, arm_template, cassette_name, DEFAULT_SUBSCRIPTION_ID
 from c7n_azure.storage_utils import StorageUtilities
 from mock import patch
+from c7n_azure.constants import CONTAINER_EVENT_TRIGGER_MODE
 from c7n_azure.session import Session
 from c7n_azure.utils import local_session
 
@@ -78,10 +68,32 @@ class StorageContainerTest(BaseTest):
             }, validate=True)
 
             p.run()
-            args, kwargs = update_container_mock.call_args_list[0]
+            args, _ = update_container_mock.call_args_list[0]
             self.assertEqual('test_storage', args[0])
             self.assertTrue(args[1].startswith('cctstorage'))
-            self.assertEqual('None', kwargs['public_access'])
+            self.assertEqual('containerone', args[2])
+            self.assertEqual('None', args[3].public_access)
+
+    @arm_template('storage.json')
+    def test_event(self):
+        p = self.load_policy({
+            'name': 'test-azure-container-event',
+            'mode':
+                {'type': CONTAINER_EVENT_TRIGGER_MODE,
+                 'events': ['StorageContainerWrite']},
+            'resource': 'azure.storage-container'})
+
+        account = self.setup_account()
+
+        event = {"subject": "/subscriptions/" + DEFAULT_SUBSCRIPTION_ID + "/resourceGroups/"
+                            "test_storage/providers/Microsoft.Storage/storageAccounts"
+                            "/" + account.name + "/blobServices/default/containers/containerone",
+                "eventTime": "2019-07-16T18:30:43.3595255Z",
+                "id": "619d2674-b396-4356-9619-6c5a52fe4e88"}
+
+        resources = p.push(event, None)
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], 'containerone')
 
     def _get_storage_management_client_api_string(self):
         return local_session(Session)\

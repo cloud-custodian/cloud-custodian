@@ -44,7 +44,7 @@ import (
 const containerHome string = "/home/custodian/"
 const defaultImageName string = "cloudcustodian/c7n:latest"
 const imageOverrideEnv = "CUSTODIAN_IMAGE"
-const updateInterval = time.Hour
+const updateInterval = time.Hour * 12
 
 var version string
 
@@ -110,8 +110,6 @@ func update(ctx context.Context, image string, dockerClient *client.Client) {
 
 		// Skip image pull if we have an image already
 		if len(images) > 0 {
-			fmt.Printf("Skipped image pull - Last checked %d minutes ago.\n\n",
-				uint(now.Sub(info.ModTime()).Minutes()))
 			return
 		}
 	}
@@ -158,6 +156,7 @@ func create(ctx context.Context, image string, dockerClient *client.Client) stri
 			Binds:       binds,
 			NetworkMode: "host",
 		},
+		nil,
 		nil,
 		"")
 	if err != nil {
@@ -274,7 +273,7 @@ func generateEnvs() []string {
 	var envs []string
 
 	// Bulk include matching variables
-	var re = regexp.MustCompile(`^AWS|^AZURE_|^MSI_|^GOOGLE|CLOUDSDK`)
+	var re = regexp.MustCompile(`^AWS|^AZURE_|^MSI_|^TENCENTCLOUD_|^GOOGLE|CLOUDSDK`)
 	for _, s := range os.Environ() {
 		if re.MatchString(s) {
 			envs = append(envs, s)
@@ -357,7 +356,19 @@ func updateMarkerFilename(image string) string {
 	sha := sha1.New()
 	sha.Write([]byte(image))
 	hash := hex.EncodeToString(sha.Sum(nil))
-	return filepath.Join(os.TempDir(), "custodian-cask-update-"+hash[0:5])
+
+	userCacheDir, err := os.UserCacheDir()
+	if err != nil {
+		log.Fatalf("Unable to get user cache directory. %v", err)
+	}
+
+	cacheDir := filepath.Join(userCacheDir, "custodian-cask")
+
+	err = os.Mkdir(cacheDir, 0750)
+	if err != nil && !os.IsExist(err) {
+		log.Fatalf("Unable to create user cache directory. %v", err)
+	}
+	return filepath.Join(cacheDir, "cask-update-"+hash[0:5])
 }
 
 func handleSignals(ctx context.Context, id string, dockerClient *client.Client) {
@@ -367,8 +378,8 @@ func handleSignals(ctx context.Context, id string, dockerClient *client.Client) 
 	go func() {
 		sig := <-gracefulExit
 		fmt.Printf("Received %v, stopping container\n", sig)
-		timeout := 0 * time.Second
-		err := dockerClient.ContainerStop(ctx, id, &timeout)
+		timeout := 0
+		err := dockerClient.ContainerStop(ctx, id, container.StopOptions{Timeout: &timeout})
 		if err != nil {
 			fmt.Printf("Error stopping container: %v\n", err)
 		}

@@ -1,0 +1,197 @@
+{
+    "status_code": 200,
+    "data": {
+        "DBClusters": [
+            {
+                "AllocatedStorage": 1,
+                "AvailabilityZones": [
+                    "us-east-1d",
+                    "us-east-1a",
+                    "us-east-1b"
+                ],
+                "BackupRetentionPeriod": 7,
+                "DatabaseName": "",
+                "DBClusterIdentifier": "database-1",
+                "DBClusterParameterGroup": "default.aurora-postgresql10",
+                "DBSubnetGroup": "default",
+                "Status": "available",
+                "EarliestRestorableTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 12,
+                    "day": 2,
+                    "hour": 7,
+                    "minute": 20,
+                    "second": 39,
+                    "microsecond": 547000
+                },
+                "Endpoint": "database-1.cluster-cz6wy8cci3uf.us-east-1.rds.amazonaws.com",
+                "MultiAZ": false,
+                "Engine": "aurora-postgresql",
+                "EngineVersion": "10.12",
+                "LatestRestorableTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 12,
+                    "day": 9,
+                    "hour": 14,
+                    "minute": 10,
+                    "second": 8,
+                    "microsecond": 564000
+                },
+                "Port": 5432,
+                "MasterUsername": "postgres",
+                "PreferredBackupWindow": "07:08-07:38",
+                "PreferredMaintenanceWindow": "wed:05:38-wed:06:08",
+                "ReadReplicaIdentifiers": [],
+                "DBClusterMembers": [],
+                "VpcSecurityGroups": [
+                    {
+                        "VpcSecurityGroupId": "sg-6c7fa917",
+                        "Status": "active"
+                    }
+                ],
+                "HostedZoneId": "Z2R2ITUGPM61AM",
+                "StorageEncrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/b10f842a-feb7-4318-92d5-0640a75b7688",
+                "DbClusterResourceId": "cluster-NCSP75A6Z36KOFQRT4SDHYMS3I",
+                "DBClusterArn": "arn:aws:rds:us-east-1:644160558196:cluster:database-1",
+                "AssociatedRoles": [],
+                "IAMDatabaseAuthenticationEnabled": false,
+                "ClusterCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 10,
+                    "day": 20,
+                    "hour": 15,
+                    "minute": 53,
+                    "second": 59,
+                    "microsecond": 560000
+                },
+                "Capacity": 2,
+                "EngineMode": "serverless",
+                "ScalingConfigurationInfo": {
+                    "MinCapacity": 2,
+                    "MaxCapacity": 2,
+                    "AutoPause": false,
+                    "SecondsUntilAutoPause": 300,
+                    "TimeoutAction": "RollbackCapacityChange"
+                },
+                "DeletionProtection": false,
+                "HttpEndpointEnabled": false,
+                "ActivityStreamStatus": "stopped",
+                "CopyTagsToSnapshot": true,
+                "CrossAccountClone": false,
+                "DomainMemberships": [],
+                "TagList": [
+                    {
+                        "Key": "c7n-resource-classification",
+                        "Value": "net-new"
+                    },
+                    {
+                        "Key": "Owner",
+                        "Value": "Mc-Mcslice"
+                    },
+                    {
+                        "Key": "ASV",
+                        "Value": "ASVMCNASTY"
+                    },
+                    {
+                        "Key": "ResourceCreator",
+                        "Value": "john-hillegass"
+                    },
+                    {
+                        "Key": "c7n-ResourceCreatedTime",
+                        "Value": "2020-10-20 15:52:44.809783"
+                    }
+                ]
+            },
+            {
+                "AllocatedStorage": 1,
+                "AvailabilityZones": [
+                    "us-east-1d",
+                    "us-east-1e",
+                    "us-east-1a"
+                ],
+                "BackupRetentionPeriod": 1,
+                "DBClusterIdentifier": "test-rds-cluster-param-group",
+                "DBClusterParameterGroup": "default.neptune1",
+                "DBSubnetGroup": "default",
+                "Status": "available",
+                "EarliestRestorableTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 12,
+                    "day": 8,
+                    "hour": 5,
+                    "minute": 54,
+                    "second": 48,
+                    "microsecond": 30000
+                },
+                "Endpoint": "test-rds-cluster-param-group.cluster-cz6wy8cci3uf.us-east-1.neptune.amazonaws.com",
+                "ReaderEndpoint": "test-rds-cluster-param-group.cluster-ro-cz6wy8cci3uf.us-east-1.neptune.amazonaws.com",
+                "MultiAZ": false,
+                "Engine": "neptune",
+                "EngineVersion": "1.0.4.0",
+                "LatestRestorableTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 12,
+                    "day": 9,
+                    "hour": 15,
+                    "minute": 4,
+                    "second": 53,
+                    "microsecond": 454000
+                },
+                "Port": 8182,
+                "MasterUsername": "admin",
+                "PreferredBackupWindow": "05:42-06:12",
+                "PreferredMaintenanceWindow": "sat:09:57-sat:10:27",
+                "ReadReplicaIdentifiers": [],
+                "DBClusterMembers": [
+                    {
+                        "DBInstanceIdentifier": "test-rds-cluster-param-group-instance-1",
+                        "IsClusterWriter": true,
+                        "DBClusterParameterGroupStatus": "in-sync",
+                        "PromotionTier": 1
+                    }
+                ],
+                "VpcSecurityGroups": [
+                    {
+                        "VpcSecurityGroupId": "sg-6c7fa917",
+                        "Status": "active"
+                    }
+                ],
+                "HostedZoneId": "ZUFXD4SLT2LS7",
+                "StorageEncrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/b10f842a-feb7-4318-92d5-0640a75b7688",
+                "DbClusterResourceId": "cluster-D5B6YSO2TZMX3UXUMBWZA3L3CA",
+                "DBClusterArn": "arn:aws:rds:us-east-1:644160558196:cluster:test-rds-cluster-param-group",
+                "AssociatedRoles": [],
+                "IAMDatabaseAuthenticationEnabled": false,
+                "ClusterCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 11,
+                    "day": 9,
+                    "hour": 15,
+                    "minute": 59,
+                    "second": 7,
+                    "microsecond": 70000
+                },
+                "EnabledCloudwatchLogsExports": [
+                    "audit"
+                ],
+                "EngineMode": "provisioned",
+                "DeletionProtection": false,
+                "HttpEndpointEnabled": false,
+                "ActivityStreamStatus": "stopped",
+                "CopyTagsToSnapshot": false,
+                "CrossAccountClone": false,
+                "DomainMemberships": [],
+                "TagList": []
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

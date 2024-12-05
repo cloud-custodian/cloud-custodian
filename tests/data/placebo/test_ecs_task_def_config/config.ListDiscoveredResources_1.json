@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "resourceIdentifiers": [
+            {
+                "resourceType": "AWS::ECS::TaskDefinition",
+                "resourceId": "TEST:1",
+                "resourceName": "TEST:1"
+            },
+            {
+                "resourceType": "AWS::ECS::TaskDefinition",
+                "resourceId": "app-fargate-task:2",
+                "resourceName": "app-fargate-task:2"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

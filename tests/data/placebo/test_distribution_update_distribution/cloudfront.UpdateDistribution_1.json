@@ -1,31 +1,19 @@
 {
     "status_code": 200,
     "data": {
-        "ResponseMetadata": {
-            "RequestId": "b1d631b0-64d2-4536-94d4-fde33b5e2042",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "b1d631b0-64d2-4536-94d4-fde33b5e2042",
-                "etag": "E51JMM89BDP7",
-                "content-type": "text/xml",
-                "content-length": "2757",
-                "vary": "Accept-Encoding",
-                "date": "Fri, 28 Feb 2020 17:58:16 GMT"
-            },
-            "RetryAttempts": 0
-        },
-        "ETag": "E51JMM89BDP7",
+        "ResponseMetadata": {},
+        "ETag": "E3SPE6T0EJSAA4",
         "Distribution": {
-            "Id": "E1FBPN9VF9FG4X",
-            "ARN": "arn:aws:cloudfront::12346789012:distribution/E1FBPN9VF9FG4X",
+            "Id": "E1OQK8XICQK4UM",
+            "ARN": "arn:aws:cloudfront::123456789012:distribution/E1OQK8XICQK4UM",
             "Status": "InProgress",
             "DistributionConfig": {
-                "CallerReference": "1582867337153",
+                "CallerReference": "6441605581961",
                 "Comment": "",
                 "Logging": {
                     "Enabled": true,
                     "IncludeCookies": false,
-                    "Bucket": "test-enable-logging-c7n.s3.amazonaws.com",
+                    "Bucket": "test-logging.s3.amazonaws.com",
                     "Prefix": ""
                 },
                 "Enabled": true

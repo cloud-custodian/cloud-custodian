@@ -1,0 +1,21 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:states:us-east-1:644160558196:stateMachine:Helloworld",
+                "Tags": []
+            },
+            {
+                "ResourceARN": "arn:aws:states:us-east-1:644160558196:stateMachine:MyStateMachine-fd0bt36ac",
+                "Tags": []
+            },
+            {
+                "ResourceARN": "arn:aws:states:us-east-1:644160558196:stateMachine:Waitstate",
+                "Tags": []
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,13 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "BrokerSummaries": [
+            {
+                "BrokerArn": "arn:aws:mq:us-east-1:alias/aws/mq:broker:test:b-1d171add-07ff-4f34-9cc1-78d3d9d55ed0",
+                "BrokerId": "b-1d171add-07ff-4f34-9cc1-78d3d9d55ed0",
+                "BrokerName": "test"
+            }
+        ]
+    }
+}

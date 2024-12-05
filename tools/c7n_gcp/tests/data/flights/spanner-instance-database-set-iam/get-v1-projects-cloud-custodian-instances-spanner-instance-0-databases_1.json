@@ -1,0 +1,29 @@
+{
+  "body": {
+    "databases": [
+      {
+        "state": "READY", 
+        "name": "projects/cloud-custodian/instances/spanner-instance-0/databases/custodian-database-0"
+      }, 
+      {
+        "state": "READY", 
+        "name": "projects/cloud-custodian/instances/spanner-instance-0/databases/custodian-database-1"
+      }
+    ]
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "318", 
+    "x-xss-protection": "0", 
+    "content-location": "https://spanner.googleapis.com/v1/projects/cloud-custodian/instances/spanner-instance-0/databases?alt=json", 
+    "transfer-encoding": "chunked", 
+    "vary": "Origin, X-Origin, Referer", 
+    "server": "ESF", 
+    "-content-encoding": "gzip", 
+    "cache-control": "private", 
+    "date": "Tue, 18 Jun 2019 11:22:25 GMT", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}

@@ -1,0 +1,115 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.RedHatOpenShift/openShiftClusters?api-version=2022-09-04",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json"
+                    ],
+                    "date": [
+                        "Wed, 05 Apr 2023 14:34:51 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "4123"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/aro-eastus/providers/Microsoft.RedHatOpenShift/openShiftClusters/environment-64ozd",
+                                "name": "environment-64ozd",
+                                "type": "Microsoft.RedHatOpenShift/openShiftClusters",
+                                "location": "eastus",
+                                "systemData": {
+                                    "createdBy": "da8a6cd5-7d29-40b6-8865-ee5307b315ea",
+                                    "createdByType": "Application",
+                                    "createdAt": "2023-04-04T11:12:52.007597Z",
+                                    "lastModifiedBy": "da8a6cd5-7d29-40b6-8865-ee5307b315ea",
+                                    "lastModifiedByType": "Application",
+                                    "lastModifiedAt": "2023-04-04T11:12:52.007597Z"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "clusterProfile": {
+                                        "domain": "environment-64ozd",
+                                        "version": "4.10.40",
+                                        "resourceGroupId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/aro-environment-64ozd",
+                                        "fipsValidatedModules": "Disabled"
+                                    },
+                                    "consoleProfile": {
+                                        "url": "https://console-openshift-console.apps.environment-64ozd.eastus.aroapp.io/"
+                                    },
+                                    "servicePrincipalProfile": {
+                                        "clientId": "6075e286-b6ab-409d-8ca0-b32fc273626a"
+                                    },
+                                    "networkProfile": {
+                                        "podCidr": "10.128.0.0/14",
+                                        "serviceCidr": "172.30.0.0/16"
+                                    },
+                                    "masterProfile": {
+                                        "vmSize": "Standard_D8s_v3",
+                                        "subnetId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/aro-eastus/providers/Microsoft.Network/virtualNetworks/environment-64ozd-vnet/subnets/environment-64ozd-master-subnet",
+                                        "encryptionAtHost": "Disabled"
+                                    },
+                                    "workerProfiles": [
+                                        {
+                                            "name": "environment-64ozd-vfhkt-worker-eastus1",
+                                            "vmSize": "Standard_D4s_v3",
+                                            "diskSizeGB": 128,
+                                            "subnetId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/aro-eastus/providers/Microsoft.Network/virtualNetworks/environment-64ozd-vnet/subnets/environment-64ozd-worker-subnet",
+                                            "count": 1,
+                                            "encryptionAtHost": "Disabled"
+                                        },
+                                        {
+                                            "name": "environment-64ozd-vfhkt-worker-eastus2",
+                                            "vmSize": "Standard_D4s_v3",
+                                            "diskSizeGB": 128,
+                                            "subnetId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/aro-eastus/providers/Microsoft.Network/virtualNetworks/environment-64ozd-vnet/subnets/environment-64ozd-worker-subnet",
+                                            "count": 1,
+                                            "encryptionAtHost": "Disabled"
+                                        },
+                                        {
+                                            "name": "environment-64ozd-vfhkt-worker-eastus3",
+                                            "vmSize": "Standard_D4s_v3",
+                                            "diskSizeGB": 128,
+                                            "subnetId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/aro-eastus/providers/Microsoft.Network/virtualNetworks/environment-64ozd-vnet/subnets/environment-64ozd-worker-subnet",
+                                            "count": 1,
+                                            "encryptionAtHost": "Disabled"
+                                        }
+                                    ],
+                                    "apiserverProfile": {
+                                        "visibility": "Public",
+                                        "url": "https://api.environment-64ozd.eastus.aroapp.io:6443/",
+                                        "ip": "104.211.6.176"
+                                    },
+                                    "ingressProfiles": [
+                                        {
+                                            "name": "default",
+                                            "visibility": "Public",
+                                            "ip": "104.211.11.29"
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

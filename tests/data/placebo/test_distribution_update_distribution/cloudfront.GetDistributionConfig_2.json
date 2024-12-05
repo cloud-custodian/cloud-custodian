@@ -1,28 +1,16 @@
 {
     "status_code": 200,
     "data": {
-        "ResponseMetadata": {
-            "RequestId": "4bab1034-442e-4706-a513-bd2073dd9fe1",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "4bab1034-442e-4706-a513-bd2073dd9fe1",
-                "etag": "E51JMM89BDP7",
-                "content-type": "text/xml",
-                "content-length": "2337",
-                "vary": "Accept-Encoding",
-                "date": "Fri, 28 Feb 2020 17:58:16 GMT"
-            },
-            "RetryAttempts": 0
-        },
-        "ETag": "E51JMM89BDP7",
+        "ResponseMetadata": {},
+        "ETag": "ETAPGKTC9B1VZ",
         "DistributionConfig": {
-            "CallerReference": "1582867337153",
+            "CallerReference": "6441605581961",
             "Comment": "",
             "Enabled": true,
             "Logging": {
-                "Enabled": true,
+                "Enabled": false,
                 "IncludeCookies": false,
-                "Bucket": "test-enable-logging-c7n.s3.amazonaws.com",
+                "Bucket": "",
                 "Prefix": ""
             }
         }

@@ -1,0 +1,9 @@
+{
+    "status_code": 200,
+    "data": {
+        "taskDefinitionArns": [
+            "arn:aws:ecs:us-east-1:644160558196:task-definition/test-delete-definition:2"
+        ],
+        "ResponseMetadata": {}
+    }
+}

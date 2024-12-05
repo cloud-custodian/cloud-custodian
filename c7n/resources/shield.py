@@ -1,16 +1,5 @@
-# Copyright 2015-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from botocore.exceptions import ClientError
 from botocore.paginate import Paginator
 
@@ -55,7 +44,7 @@ def get_protections_paginator(client):
         client.meta.service_model.operation_model('ListProtections'))
 
 
-def get_type_protections(client, model):
+def get_type_protections(client, arn_type):
     pager = get_protections_paginator(client)
     pager.PAGE_ITERATOR_CLS = RetryPageIterator
     try:
@@ -63,13 +52,26 @@ def get_type_protections(client, model):
     except client.exceptions.ResourceNotFoundException:
         # shield is not enabled in the account, so all resources are not protected
         return []
-    return [p for p in protections if model.arn_type in p['ResourceArn']]
+    return [p for p in protections if arn_type in p['ResourceArn']]
 
 
 ShieldRetry = get_retry(('ThrottlingException',))
 
 
-class IsShieldProtected(Filter):
+class ProtectedResource:
+    """Base class with helper methods for dealing with
+    ARNs of resources protected by Shield
+    """
+
+    def get_arns(self, resources):
+        return self.manager.get_arns(resources)
+
+    @property
+    def arn_type(self):
+        return self.manager.get_model().arn_type
+
+
+class IsShieldProtected(Filter, ProtectedResource):
 
     permissions = ('shield:ListProtections',)
     schema = type_schema('shield-enabled', state={'type': 'boolean'})
@@ -78,22 +80,23 @@ class IsShieldProtected(Filter):
         client = local_session(self.manager.session_factory).client(
             'shield', region_name='us-east-1')
 
-        protections = get_type_protections(client, self.manager.get_model())
+        protections = get_type_protections(client, self.arn_type)
         protected_resources = {p['ResourceArn'] for p in protections}
 
         state = self.data.get('state', False)
         results = []
 
-        for arn, r in zip(self.manager.get_arns(resources), resources):
+        for arn, r in zip(self.get_arns(resources), resources):
             r['c7n:ShieldProtected'] = shielded = arn in protected_resources
             if shielded and state:
                 results.append(r)
             elif not shielded and not state:
                 results.append(r)
+
         return results
 
 
-class SetShieldProtection(BaseAction):
+class SetShieldProtection(BaseAction, ProtectedResource):
     """Enable shield protection on applicable resource.
 
     setting `sync` parameter will also clear out stale shield protections
@@ -109,14 +112,14 @@ class SetShieldProtection(BaseAction):
         client = local_session(self.manager.session_factory).client(
             'shield', region_name='us-east-1')
         model = self.manager.get_model()
-        protections = get_type_protections(client, self.manager.get_model())
+        protections = get_type_protections(client, self.arn_type)
         protected_resources = {p['ResourceArn']: p for p in protections}
         state = self.data.get('state', True)
 
         if self.data.get('sync', False):
             self.clear_stale(client, protections)
 
-        for arn, r in zip(self.manager.get_arns(resources), resources):
+        for arn, r in zip(self.get_arns(resources), resources):
             if state and arn in protected_resources:
                 continue
             if state is False and arn in protected_resources:
@@ -153,3 +156,34 @@ class SetShieldProtection(BaseAction):
         for s in stale:
             ShieldRetry(
                 client.delete_protection, ProtectionId=pmap[s]['Id'])
+
+
+class ProtectedEIP:
+    """Contains helper methods for dealing with Elastic IP within Shield API calls.
+    The Elastic IP resource type as described in IAM is "elastic-ip":
+    https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonec2.html#amazonec2-elastic-ip
+
+    But Shield requires the resource type to be "eip-allocation":
+    https://docs.aws.amazon.com/waf/latest/DDOSAPIReference/API_CreateProtection.html
+    """
+
+    def get_arns(self, resources):
+        arns = [
+            arn.replace(':elastic-ip', ':eip-allocation')
+            if ':elastic-ip' in arn else arn
+            for arn in
+            self.manager.get_arns(resources)
+        ]
+        return arns
+
+    @property
+    def arn_type(self):
+        return 'eip-allocation'
+
+
+class IsEIPShieldProtected(ProtectedEIP, IsShieldProtected):
+    pass
+
+
+class SetEIPShieldProtection(ProtectedEIP, SetShieldProtection):
+    pass

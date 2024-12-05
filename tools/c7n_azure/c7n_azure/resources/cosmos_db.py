@@ -1,16 +1,5 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 import logging
 from itertools import groupby
@@ -35,10 +24,7 @@ from netaddr import IPSet
 from c7n.filters import ValueFilter
 from c7n.utils import type_schema
 
-try:
-    from functools import lru_cache
-except ImportError:
-    from backports.functools_lru_cache import lru_cache
+from functools import lru_cache
 
 
 max_workers = constants.DEFAULT_MAX_THREAD_WORKERS
@@ -49,7 +35,7 @@ PORTAL_IPS = ['104.42.195.92',
               '52.176.6.30',
               '52.169.50.45',
               '52.187.184.26']
-AZURE_CLOUD_IPS = ['0.0.0.0']
+AZURE_CLOUD_IPS = ['0.0.0.0']  # nosec
 
 
 @resources.register('cosmosdb')
@@ -94,15 +80,16 @@ class CosmosDB(ArmResourceManager):
 class CosmosDBFirewallRulesFilter(FirewallRulesFilter):
 
     def _query_rules(self, resource):
-        ip_range_string = resource['properties']['ipRangeFilter']
+        ip_rules = resource['properties'].get('ipRules', [])
+
         is_virtual_network_filter_enabled = resource['properties']['isVirtualNetworkFilterEnabled']
-        if not ip_range_string:
+        if ip_rules == []:
             if is_virtual_network_filter_enabled:
                 return IPSet()
             else:
                 return IPSet(['0.0.0.0/0'])
 
-        parts = set(ip_range_string.replace(' ', '').split(','))
+        parts = set([ipRule['ipAddressOrRange'] for ipRule in ip_rules])
 
         # Exclude magic strings representing Portal and Azure Cloud
         if set(PORTAL_IPS).issubset(parts):
@@ -111,7 +98,6 @@ class CosmosDBFirewallRulesFilter(FirewallRulesFilter):
             parts = parts - set(AZURE_CLOUD_IPS)
 
         resource_rules = IPSet(filter(None, parts))
-
         return resource_rules
 
 
@@ -140,15 +126,16 @@ class CosmosFirewallBypassFilter(FirewallBypassFilter):
     schema = FirewallBypassFilter.schema(['AzureCloud', 'Portal'])
 
     def _query_bypass(self, resource):
-        ip_range_string = resource['properties']['ipRangeFilter']
+        ip_rules = resource['properties'].get('ipRules', [])
+
         is_virtual_network_filter_enabled = resource['properties']['isVirtualNetworkFilterEnabled']
-        if not ip_range_string:
+        if ip_rules == []:
             if is_virtual_network_filter_enabled:
                 return []
             else:
                 return ['AzureCloud', 'Portal']
 
-        parts = set(ip_range_string.replace(' ', '').split(','))
+        parts = set([ipRule['ipAddressOrRange'] for ipRule in ip_rules])
 
         result = []
         if set(AZURE_CLOUD_IPS).issubset(parts):
@@ -211,7 +198,7 @@ class CosmosDBDatabase(CosmosDBChildResource):
 
     """
 
-    def enumerate_resources(self, parent_resource, type_info, **params):
+    def enumerate_resources(self, parent_resource, type_info, vault_url=None, **params):
         data_client = self.get_data_client(parent_resource)
 
         try:
@@ -291,7 +278,7 @@ class CosmosDBCollection(CosmosDBChildResource):
     def tag_operation_enabled(self, resource_type):
         return True
 
-    def enumerate_resources(self, parent_resource, type_info, **params):
+    def enumerate_resources(self, parent_resource, type_info, vault_url=None, **params):
         data_client = self.get_data_client(parent_resource)
 
         try:
@@ -381,7 +368,6 @@ class CosmosDBOfferFilter(ValueFilter):
     """
 
     schema = type_schema('offer', rinherit=ValueFilter.schema)
-    schema_alias = True
 
     def process(self, resources, event=None):
         return OfferHelper.execute_in_parallel_grouped_by_account(
@@ -770,7 +756,8 @@ class CosmosSetFirewallAction(SetFirewallAction):
     def _process_resource(self, resource):
 
         # IP rules
-        existing_ip = list(filter(None, resource['properties'].get('ipRangeFilter', '').split(',')))
+        existing_ip = [ip_rule['ipAddressOrRange']
+                       for ip_rule in resource['properties'].get('ipRules', [])]
         if self.data.get('ip-rules') is not None:
             ip_rules = self._build_ip_rules(existing_ip, self.data.get('ip-rules', []))
         else:
@@ -819,12 +806,12 @@ class CosmosSetFirewallAction(SetFirewallAction):
                  'failover_priority': loc['failoverPriority'],
                  'is_zone_redundant': loc.get('isZoneRedundant', False)})
 
-        resource['properties']['ipRangeFilter'] = ','.join(ip_rules)
+        resource['properties']['ipRules'] = [{'ipAddressOrRange': ip} for ip in ip_rules]
         resource['properties']['virtualNetworkRules'] = \
             [VirtualNetworkRule(id=r) for r in vnet_rules]
 
         # Update resource
-        self.client.database_accounts.create_or_update(
+        self.client.database_accounts.begin_create_or_update(
             resource['resourceGroup'],
             resource['name'],
             create_update_parameters=resource

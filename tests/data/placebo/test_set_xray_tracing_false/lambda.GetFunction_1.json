@@ -1,0 +1,33 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Configuration": {
+            "FunctionName": "function1",
+            "FunctionArn": "arn:aws:lambda:us-east-1:123456789:function:function1",
+            "Runtime": "python2.7",
+            "Role": "arn:aws:iam::123456789:role/lambdaToLogs",
+            "Handler": "lambda_function.handler",
+            "CodeSize": 648,
+            "Description": "",
+            "Timeout": 3,
+            "MemorySize": 128,
+            "LastModified": "2022-08-30T05:44:25.000+0000",
+            "CodeSha256": "bdHO4LM2pZ8deuK4MAbhonLEoXxppbY143gxzeu7alo=",
+            "Version": "$LATEST",
+            "TracingConfig": {
+                "Mode": "PassThrough"
+            },
+            "RevisionId": "0c21fdc9-123-42b0-123-fcbda77a2f33",
+            "State": "Active",
+            "LastUpdateStatus": "Successful",
+            "PackageType": "Zip",
+            "Architectures": [
+                "x86_64"
+            ],
+            "EphemeralStorage": {
+                "Size": 512
+            }
+        }
+    }
+}

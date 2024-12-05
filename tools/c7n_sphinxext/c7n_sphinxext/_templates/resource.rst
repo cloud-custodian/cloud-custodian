@@ -5,11 +5,12 @@
 
 {% if resource.__doc__ %}{{edoc(resource)}}{% endif %}
 
+
 Filters
 -------
 
 {% for f in filters %}{% if f.schema_alias %}
-  - :ref:`{{ename(f)}} <{{provider_name}}.common.filters.{{ename(f)}}>`
+  - :ref:`{{ename(f)}} <{{provider_type}}.common.filters.{{ename(f)}}>`
   {% else %}
   - :ref:`{{ename(f)}} <{{resource_name}}.filters.{{ename(f)}}>`
 {% endif %}{% endfor %}
@@ -21,6 +22,11 @@ Filters
 {{underline(ename(f), '+')}}
 {{edoc(f)}}
 {{eschema(f)}}
+
+{% set permissions = eperm(f, resource) %}
+{% if permissions %}
+Permissions - {{ permissions | join(", ") }}
+{% endif %}
 {% endif %}{% endfor %}
 
 
@@ -28,7 +34,7 @@ Actions
 -------
 
 {% for a in actions %}{% if a.schema_alias %}
-  - :ref:`{{ename(a)}} <{{provider_name}}.common.actions.{{ename(a)}}>`
+  - :ref:`{{ename(a)}} <{{provider_type}}.common.actions.{{ename(a)}}>`
   {% else %}
   - :ref:`{{ename(a)}} <{{resource_name}}.actions.{{ename(a)}}>`
 {% endif %}{% endfor %}
@@ -41,4 +47,9 @@ Actions
 {{underline(ename(a), '+')}}
 {{edoc(a)}}
 {{eschema(a)}}
+
+{% set permissions = eperm(a, resource) %}
+{% if permissions %}
+Permissions - {{ permissions | join(", ") }}
+{% endif %}
 {% endif %}{% endfor %}

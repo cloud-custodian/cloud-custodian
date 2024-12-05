@@ -1,0 +1,44 @@
+{
+    "version": "1.3",
+    "accountId": "644160558196",
+    "configurationItemCaptureTime": "2020-11-15T17:24:05.822000-05:00",
+    "configurationItemStatus": "OK",
+    "configurationStateId": "1605479045822",
+    "configurationItemMD5Hash": "",
+    "arn": "arn:aws:codepipeline:us-east-2:644160558196:burnifyPipeline",
+    "resourceType": "AWS::CodePipeline::Pipeline",
+    "resourceId": "burnifyPipeline",
+    "resourceName": "burnifyPipeline",
+    "awsRegion": "us-east-2",
+    "availabilityZone": "Not Applicable",
+    "resourceCreationTime": "2020-11-15T16:21:54.605000-05:00",
+    "tags": {},
+    "relatedEvents": [],
+    "relationships": [
+        {
+            "resourceType": "AWS::S3::Bucket",
+            "resourceId": "mypipe-artifactbucketstore-4ebot00zlvbv",
+            "resourceName": "mypipe-artifactbucketstore-4ebot00zlvbv",
+            "relationshipName": "Is attached to "
+        },
+        {
+            "resourceType": "AWS::CodeBuild::Project",
+            "resourceName": "burnifyBuild",
+            "relationshipName": "Is associated with "
+        },
+        {
+            "resourceType": "AWS::IAM::Role",
+            "resourceName": "mypipe-CodePipelineRole-1MVD6071LRP5R",
+            "relationshipName": "Is associated with "
+        },
+        {
+            "resourceType": "AWS::CloudFormation::Stack",
+            "resourceName": "burnifyBetaStack",
+            "relationshipName": "Is associated with "
+        }
+    ],
+    "configuration": "{\"pipeline\":{\"name\":\"burnifyPipeline\",\"roleArn\":\"arn:aws:iam::644160558196:role/mypipe-CodePipelineRole-1MVD6071LRP5R\",\"artifactStore\":{\"type\":\"S3\",\"location\":\"mypipe-artifactbucketstore-4ebot00zlvbv\"},\"stages\":[{\"name\":\"Source\",\"actions\":[{\"name\":\"Source\",\"actionTypeId\":{\"category\":\"Source\",\"owner\":\"AWS\",\"provider\":\"CodeCommit\",\"version\":\"1\"},\"runOrder\":1,\"configuration\":{\"RepositoryName\":\"burnify\",\"BranchName\":\"master\"},\"outputArtifacts\":[{\"name\":\"SourceRepo\"}],\"inputArtifacts\":[]}]},{\"name\":\"Build\",\"actions\":[{\"name\":\"CodeBuild\",\"actionTypeId\":{\"category\":\"Build\",\"owner\":\"AWS\",\"provider\":\"CodeBuild\",\"version\":\"1\"},\"runOrder\":1,\"configuration\":{\"ProjectName\":\"burnifyBuild\"},\"outputArtifacts\":[{\"name\":\"CompiledCFNTemplate\"}],\"inputArtifacts\":[{\"name\":\"SourceRepo\"}]}]},{\"name\":\"Beta\",\"actions\":[{\"name\":\"CreateBetaChangeSet\",\"actionTypeId\":{\"category\":\"Deploy\",\"owner\":\"AWS\",\"provider\":\"CloudFormation\",\"version\":\"1\"},\"runOrder\":1,\"configuration\":{\"TemplatePath\":\"CompiledCFNTemplate::transformed.yaml\",\"ActionMode\":\"CHANGE_SET_REPLACE\",\"Capabilities\":\"CAPABILITY_IAM\",\"ChangeSetName\":\"burnifyChangeSet\",\"RoleArn\":\"arn:aws:iam::644160558196:role/mypipe-CFNDeployRole-I9O4V8I7J671\",\"StackName\":\"burnifyBetaStack\"},\"outputArtifacts\":[],\"inputArtifacts\":[{\"name\":\"CompiledCFNTemplate\"}]},{\"name\":\"ExecuteChangeSet\",\"actionTypeId\":{\"category\":\"Deploy\",\"owner\":\"AWS\",\"provider\":\"CloudFormation\",\"version\":\"1\"},\"runOrder\":2,\"configuration\":{\"ActionMode\":\"CHANGE_SET_EXECUTE\",\"OutputFileName\":\"StackOutputs.json\",\"ChangeSetName\":\"burnifyChangeSet\",\"StackName\":\"burnifyBetaStack\"},\"outputArtifacts\":[{\"name\":\"AppDeploymentValues\"}],\"inputArtifacts\":[]}]},{\"name\":\"Prod\",\"actions\":[{\"name\":\"OneMoreTime\",\"actionTypeId\":{\"category\":\"Build\",\"owner\":\"AWS\",\"provider\":\"CodeBuild\",\"version\":\"1\"},\"runOrder\":1,\"configuration\":{\"ProjectName\":\"burnifyBuild\"},\"outputArtifacts\":[],\"inputArtifacts\":[{\"name\":\"SourceRepo\"}],\"region\":\"us-east-2\"}]}],\"version\":2},\"metadata\":{\"pipelineArn\":\"arn:aws:codepipeline:us-east-2:644160558196:burnifyPipeline\",\"created\":1605475314605}}",
+    "supplementaryConfiguration": {
+        "unsupportedResources": "[{\"resourceType\":\"AWS::CodeCommit::Repository\",\"resourceName\":\"burnify\"}]"
+    }
+}

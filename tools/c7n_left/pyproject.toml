@@ -1,0 +1,35 @@
+[tool.poetry]
+name = "c7n_left"
+version = "0.3.28"
+description = "Custodian policies for IAAC definitions"
+authors = ["Cloud Custodian Project"]
+license = "Apache-2"
+readme = "README.md"
+homepage = "https://cloudcustodian.io"
+repository = "https://github.com/cloud-custodian/cloud-custodian"
+documentation = "https://cloudcustodian.io/docs/"
+classifiers = [
+   "License :: OSI Approved :: Apache Software License",
+   "Topic :: System :: Systems Administration",
+   "Topic :: System :: Distributed Computing"
+]
+
+[tool.poetry.scripts]
+c7n-left = 'c7n_left.cli:cli'
+
+[tool.poetry.dependencies]
+python = "^3.8"
+c7n = {path = "../..", develop = true}
+
+click = ">=8.0"
+rich = "^13.1"
+tfparse = "^0.6"
+python-hcl2 = "^4.3.2"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "<8.0"
+pytest-terraform = "^0.7.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

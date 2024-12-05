@@ -1,16 +1,5 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import unittest
 import time
 
@@ -38,7 +27,7 @@ class SentrySenderTests(unittest.TestCase):
             'id': config['account_id'], 'username': config['account_name']})
 
     def test_preserve_full_message(self):
-        emsg, error = c7nsentry.parse_traceback(msg2)
+        _, error = c7nsentry.parse_traceback(msg2)
         self.assertIn(
             "FinalDBSnapshotIdentifier is not a valid identifier",
             error['value'])
@@ -48,7 +37,7 @@ msg = """2016-07-07 19:14:24,160 - ERROR - custodian.output - Error while execut
 
 
 msg2 = """
-2016-08-09 19:16:28,943 - ERROR - custodian.output - Error while executing policy Traceback (most recent call last):\n  File "/usr/local/custodian/lib/python2.7/site-packages/c7n/policy.py", line 234, in poll\n results = a.process(resources)\n File "/usr/local/custodian/lib/python2.7/site-packages/c7n/resources/rds.py", line 291, in process\n client.delete_db_instance(**params)\n  File "/usr/local/custodian/lib/python2.7/site-packages/botocore/client.py", line 278, in _api_call\n return self._make_api_call(operation_name, kwargs)\n File "/usr/local/custodian/lib/python2.7/site-packages/botocore/client.py", line 572, in _make_api_call\n raise ClientError(parsed_response, operation_name)\m ClientError: An error occurred (InvalidParameterValue) when calling the DeleteDBInstance operation: The parameter FinalDBSnapshotIdentifier is not a valid identifier. Identifiers must begin with a letter; must contain only ASCII letters, digits, and hyphens; and must not end with a hyphen or contain two consecutive hyphens.""" # NOQA
+2016-08-09 19:16:28,943 - ERROR - custodian.output - Error while executing policy Traceback (most recent call last):\n  File "/usr/local/custodian/lib/python2.7/site-packages/c7n/policy.py", line 234, in poll\n results = a.process(resources)\n File "/usr/local/custodian/lib/python2.7/site-packages/c7n/resources/rds.py", line 291, in process\n client.delete_db_instance(**params)\n  File "/usr/local/custodian/lib/python2.7/site-packages/botocore/client.py", line 278, in _api_call\n return self._make_api_call(operation_name, kwargs)\n File "/usr/local/custodian/lib/python2.7/site-packages/botocore/client.py", line 572, in _make_api_call\n raise ClientError(parsed_response, operation_name)\n ClientError: An error occurred (InvalidParameterValue) when calling the DeleteDBInstance operation: The parameter FinalDBSnapshotIdentifier is not a valid identifier. Identifiers must begin with a letter; must contain only ASCII letters, digits, and hyphens; and must not end with a hyphen or contain two consecutive hyphens.""" # NOQA
 
 if __name__ == '__main__':
     unittest.main()

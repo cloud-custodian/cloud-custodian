@@ -1,23 +1,10 @@
-# Copyright 2019 Microsoft Corporation
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 try:
     import certifi
 except ImportError:
     certifi = None
-
-import jmespath
 
 import urllib3
 from urllib import parse
@@ -90,7 +77,8 @@ class Webhook(EventAction):
             'region': self.manager.config.region,
             'execution_id': self.manager.ctx.execution_id,
             'execution_start': self.manager.ctx.start_time,
-            'policy': self.manager.data
+            'policy': self.manager.data,
+            'event': event
         }
 
         self.http = self._build_http_manager()
@@ -139,7 +127,7 @@ class Webhook(EventAction):
             return urllib3.PoolManager(**pool_kwargs)
 
     def _build_headers(self, resource):
-        return {k: jmespath.search(v, resource) for k, v in self.headers.items()}
+        return {k: utils.jmespath_search(v, resource) for k, v in self.headers.items()}
 
     def _build_url(self, resource):
         """
@@ -152,7 +140,9 @@ class Webhook(EventAction):
         if not self.query_params:
             return self.url
 
-        evaluated_params = {k: jmespath.search(v, resource) for k, v in self.query_params.items()}
+        evaluated_params = {
+            k: utils.jmespath_search(v, resource) for k, v in self.query_params.items()
+        }
 
         url_parts = list(parse.urlparse(self.url))
         query = dict(parse.parse_qsl(url_parts[4]))
@@ -167,4 +157,4 @@ class Webhook(EventAction):
         if not self.body:
             return None
 
-        return utils.dumps(jmespath.search(self.body, resource)).encode('utf-8')
+        return utils.dumps(utils.jmespath_search(self.body, resource)).encode('utf-8')

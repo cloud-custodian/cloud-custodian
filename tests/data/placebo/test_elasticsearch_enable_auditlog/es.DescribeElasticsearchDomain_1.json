@@ -1,0 +1,89 @@
+{
+    "status_code": 200, 
+    "data": {
+        "DomainStatus": {
+            "DomainId": "123456789012/test-es-dom",
+            "DomainName": "test-es-dom",
+            "ARN": "arn:aws:es:us-east-1:123456789012:domain/test-es-dom",
+            "Created": true,
+            "Deleted": false,
+            "Endpoint": "search-test-es-dom-e5e6r7t8y6543gh56789.us-east-1.es.amazonaws.com",
+            "Processing": false,
+            "UpgradeProcessing": false,
+            "ElasticsearchVersion": "OpenSearch_2.3",
+            "ElasticsearchClusterConfig": {
+                "InstanceType": "r6g.large.elasticsearch",
+                "InstanceCount": 1,
+                "DedicatedMasterEnabled": false,
+                "ZoneAwarenessEnabled": false,
+                "WarmEnabled": false,
+                "ColdStorageOptions": {
+                    "Enabled": false
+                }
+            },
+            "EBSOptions": {
+                "EBSEnabled": true,
+                "VolumeType": "gp3",
+                "VolumeSize": 10,
+                "Iops": 3000
+            },
+            "AccessPolicies": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Deny\",\"Principal\":{\"AWS\":\"*\"},\"Action\":\"es:*\",\"Resource\":\"arn:aws:es:us-east-1:189491959391:domain/test-es-dom/*\"}]}",
+            "SnapshotOptions": {},
+            "CognitoOptions": {
+                "Enabled": false
+            },
+            "EncryptionAtRestOptions": {
+                "Enabled": true,
+                "KmsKeyId": "arn:aws:kms:us-east-1:123456789012:key/65cd52ed-5eee-5ed0-444b-123456789"
+            },
+            "NodeToNodeEncryptionOptions": {
+                "Enabled": true
+            },
+            "AdvancedOptions": {
+                "indices.fielddata.cache.size": "",
+                "override_main_response_version": "false",
+                "rest.action.multi.allow_explicit_index": "true"
+            },
+            "LogPublishingOptions": {
+                "AUDIT_LOGS": {
+                    "CloudWatchLogsLogGroupArn": "arn:aws:logs:us-east-1:123456789012:log-group:/aws/domains/test-es-dom/audit-logs:*",
+                    "Enabled": true
+                }
+            },
+            "ServiceSoftwareOptions": {
+                "CurrentVersion": "R20221114-P1",
+                "NewVersion": "",
+                "UpdateAvailable": false,
+                "Cancellable": false,
+                "UpdateStatus": "COMPLETED",
+                "Description": "There is no software update available for this domain.",
+                "AutomatedUpdateDate": "1969-12-31T16:00:00-08:00",
+                "OptionalDeployment": true
+            },
+            "DomainEndpointOptions": {
+                "EnforceHTTPS": true,
+                "TLSSecurityPolicy": "Policy-Min-TLS-1-0-2019-07",
+                "CustomEndpointEnabled": false
+            },
+            "AdvancedSecurityOptions": {
+                "Enabled": true,
+                "InternalUserDatabaseEnabled": true,
+                "AnonymousAuthEnabled": false
+            },
+            "AutoTuneOptions": {
+                "State": "DISABLED"
+            }
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "6d259b75-477b-11e7-8992-3f6840925921", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "6d259b75-477b-11e7-8992-3f6840925921", 
+                "date": "Fri, 02 Jun 2017 10:08:28 GMT", 
+                "content-length": "744", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

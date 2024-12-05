@@ -1,19 +1,8 @@
-# Copyright 2015-2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from mock import patch
 
-from ..azure_common import BaseTest
+from ..azure_common import BaseTest, cassette_name
 
 
 class SubscriptionTest(BaseTest):
@@ -83,3 +72,35 @@ class SubscriptionTest(BaseTest):
         policy = client.policy_assignments.get(scope, 'cctestpolicy_sub')
 
         self.assertEqual('cctestpolicy_sub', policy.name)
+
+
+class SubscriptionDiagnosticSettingsFilterTest(BaseTest):
+    @cassette_name('diag')
+    def test_filter_match(self):
+        p = self.load_policy({
+            'name': 'test-sub-diag-filter-match',
+            'resource': 'azure.subscription',
+            'filters': [{
+                'type': 'diagnostic-settings',
+                'key': "properties.logs[?category == 'Security'].enabled",
+                'op': 'contains',
+                'value': True
+            }]
+        }, validate=True)
+
+        self.assertEqual(1, len(p.run()))
+
+    @cassette_name('diag')
+    def test_filter_no_match(self):
+        p = self.load_policy({
+            'name': 'test-sub-diag-filter-match',
+            'resource': 'azure.subscription',
+            'filters': [{
+                'type': 'diagnostic-settings',
+                'key': "properties.logs[?category == 'Alert'].enabled",
+                'op': 'contains',
+                'value': True
+            }]
+        }, validate=True)
+
+        self.assertEqual(0, len(p.run()))

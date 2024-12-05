@@ -1,0 +1,160 @@
+{
+    "status_code": 200,
+    "data": {
+        "Vpcs": [
+            {
+                "CidrBlock": "10.0.0.0/24",
+                "DhcpOptionsId": "dopt-24ff1940",
+                "State": "available",
+                "VpcId": "vpc-0a59f94e3fca9fbc0",
+                "OwnerId": "644160558196",
+                "InstanceTenancy": "default",
+                "CidrBlockAssociationSet": [
+                    {
+                        "AssociationId": "vpc-cidr-assoc-07bd86efac3732a5b",
+                        "CidrBlock": "10.0.0.0/24",
+                        "CidrBlockState": {
+                            "State": "associated"
+                        }
+                    }
+                ],
+                "IsDefault": false,
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "implied"
+                    }
+                ]
+            },
+            {
+                "CidrBlock": "10.205.0.0/18",
+                "DhcpOptionsId": "dopt-24ff1940",
+                "State": "available",
+                "VpcId": "vpc-03005fb9b8740263d",
+                "OwnerId": "644160558196",
+                "InstanceTenancy": "default",
+                "CidrBlockAssociationSet": [
+                    {
+                        "AssociationId": "vpc-cidr-assoc-0f6765530d80dc044",
+                        "CidrBlock": "10.205.0.0/18",
+                        "CidrBlockState": {
+                            "State": "associated"
+                        }
+                    }
+                ],
+                "IsDefault": false,
+                "Tags": [
+                    {
+                        "Key": "Owner",
+                        "Value": "c7n"
+                    },
+                    {
+                        "Key": "Name",
+                        "Value": "testing-vpc"
+                    }
+                ]
+            },
+            {
+                "CidrBlock": "192.168.0.0/16",
+                "DhcpOptionsId": "dopt-24ff1940",
+                "State": "available",
+                "VpcId": "vpc-01a1ffc078406ab62",
+                "OwnerId": "644160558196",
+                "InstanceTenancy": "default",
+                "CidrBlockAssociationSet": [
+                    {
+                        "AssociationId": "vpc-cidr-assoc-08a949c48a6dbd293",
+                        "CidrBlock": "192.168.0.0/16",
+                        "CidrBlockState": {
+                            "State": "associated"
+                        }
+                    }
+                ],
+                "IsDefault": false,
+                "Tags": [
+                    {
+                        "Key": "aws:cloudformation:stack-id",
+                        "Value": "arn:aws:cloudformation:us-east-1:644160558196:stack/eksctl-sanjay-cluster/ad933be0-88bf-11ea-8212-1208f0f76cbf"
+                    },
+                    {
+                        "Key": "DontTurnOff",
+                        "Value": "CloudCustodian"
+                    },
+                    {
+                        "Key": "Name",
+                        "Value": "eksctl-sanjay-cluster/VPC"
+                    },
+                    {
+                        "Key": "aws:cloudformation:logical-id",
+                        "Value": "VPC"
+                    },
+                    {
+                        "Key": "alpha.eksctl.io/eksctl-version",
+                        "Value": "0.18.0"
+                    },
+                    {
+                        "Key": "aws:cloudformation:stack-name",
+                        "Value": "eksctl-sanjay-cluster"
+                    },
+                    {
+                        "Key": "alpha.eksctl.io/cluster-name",
+                        "Value": "sanjay"
+                    },
+                    {
+                        "Key": "eksctl.cluster.k8s.io/v1alpha1/cluster-name",
+                        "Value": "sanjay"
+                    }
+                ]
+            },
+            {
+                "CidrBlock": "172.31.0.0/16",
+                "DhcpOptionsId": "dopt-24ff1940",
+                "State": "available",
+                "VpcId": "vpc-d2d616b5",
+                "OwnerId": "644160558196",
+                "InstanceTenancy": "default",
+                "CidrBlockAssociationSet": [
+                    {
+                        "AssociationId": "vpc-cidr-assoc-33669f5a",
+                        "CidrBlock": "172.31.0.0/16",
+                        "CidrBlockState": {
+                            "State": "associated"
+                        }
+                    }
+                ],
+                "IsDefault": true,
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "FlowLogTest"
+                    }
+                ]
+            },
+            {
+                "CidrBlock": "10.0.0.0/16",
+                "DhcpOptionsId": "dopt-24ff1940",
+                "State": "available",
+                "VpcId": "vpc-072f438c953672ace",
+                "OwnerId": "644160558196",
+                "InstanceTenancy": "default",
+                "CidrBlockAssociationSet": [
+                    {
+                        "AssociationId": "vpc-cidr-assoc-0194dd85e1c73db14",
+                        "CidrBlock": "10.0.0.0/16",
+                        "CidrBlockState": {
+                            "State": "associated"
+                        }
+                    }
+                ],
+                "IsDefault": false,
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "public with private"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

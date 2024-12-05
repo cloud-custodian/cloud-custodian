@@ -1,23 +1,13 @@
-# Copyright 2015-2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from azure.mgmt.storage.models import StorageAccount
 from c7n_azure.constants import FUNCTION_EVENT_TRIGGER_MODE, FUNCTION_TIME_TRIGGER_MODE, \
     CONTAINER_EVENT_TRIGGER_MODE, CONTAINER_TIME_TRIGGER_MODE
 from c7n_azure.policy import AzureEventGridMode, AzureFunctionMode, AzureModeCommon
 from mock import mock, patch, Mock
 
-from c7n.exceptions import PolicyValidationError
+from c7n.config import Bag
+from c7n.exceptions import PolicyValidationError, PolicyExecutionError
 from .azure_common import BaseTest, DEFAULT_SUBSCRIPTION_ID, arm_template, cassette_name
 
 
@@ -282,6 +272,61 @@ class AzurePolicyModeTest(BaseTest):
             }, validate=True)
             self.assertTrue(p)
 
+    def test_azure_function_uai_sans_id(self):
+        with self.assertRaises(PolicyValidationError) as em:
+            self.load_policy({
+                'name': 'something',
+                'resource': 'azure.vm',
+                'mode': {
+                    'type': FUNCTION_EVENT_TRIGGER_MODE,
+                    'events': ['VmWrite'],
+                    'provision-options': {
+                        'identity': {'type': 'UserAssigned'}}}},
+                validate=True)
+        self.assertIn(
+            'policy:something user assigned identity requires specifying id',
+            str(em.exception))
+
+    def test_azure_function_unresolved_uai_identity(self):
+        session = mock.MagicMock()
+        p = self.load_policy({
+            'name': 'sm',
+            'resource': 'azure.vm',
+            'mode': {
+                'type': FUNCTION_EVENT_TRIGGER_MODE,
+                'events': ['VmWrite'],
+                'provision-options': {
+                    'identity': {'type': 'UserAssigned', 'id': 'mike'}}}})
+        exec_mode = p.get_execution_mode()
+        with self.assertRaises(PolicyExecutionError) as em:
+            exec_mode._get_identity(session)
+        self.assertIn(
+            'policy:sm Could not find the user assigned identity mike',
+            str(em.exception))
+
+    def test_azure_function_resolved_uai_identity(self):
+        session = mock.MagicMock()
+        p = self.load_policy({
+            'name': 'sm',
+            'resource': 'azure.vm',
+            'mode': {
+                'type': FUNCTION_EVENT_TRIGGER_MODE,
+                'events': ['VmWrite'],
+                'provision-options': {
+                    'identity': {'type': 'UserAssigned', 'id': 'mike'}}}})
+        exec_mode = p.get_execution_mode()
+        uai = dict(
+            name='mike', id='/subscriptions/xyz/userAssignedIdentities/foo',
+            client_id='bob')
+        session.client(
+            'azure.mgmt.msi.ManagedServiceIdentityClient'
+        ).user_assigned_identities.list_by_subscription.return_value = [Bag(uai)]
+        identity = exec_mode._get_identity(session)
+        self.assertEqual(identity, {
+            'type': 'UserAssigned',
+            'client_id': 'bob',
+            'id': '/subscriptions/xyz/userAssignedIdentities/foo'})
+
     def test_init_azure_function_mode_with_service_plan(self):
         p = self.load_policy({
             'name': 'test-azure-serverless-mode',
@@ -314,7 +359,7 @@ class AzurePolicyModeTest(BaseTest):
         self.assertEqual(params.app_insights['resource_group_name'], 'test')
         self.assertEqual(params.service_plan['resource_group_name'], "test")
 
-        self.assertTrue(params.function_app_name.startswith('test-azure-serverless-mode-'))
+        self.assertTrue(params.function_app['name'].startswith('test-azure-serverless-mode-'))
 
     def test_init_azure_function_mode_no_service_plan_name(self):
         p = self.load_policy({
@@ -342,7 +387,7 @@ class AzurePolicyModeTest(BaseTest):
         self.assertEqual(params.storage_account['location'], "eastus")
         self.assertEqual(params.storage_account['resource_group_name'], 'cloud-custodian')
 
-        self.assertTrue(params.function_app_name.startswith('test-azure-serverless-mode-'))
+        self.assertTrue(params.function_app['name'].startswith('test-azure-serverless-mode-'))
 
     def test_init_azure_function_mode_invalid_policy_name(self):
         p = self.load_policy({
@@ -368,7 +413,7 @@ class AzurePolicyModeTest(BaseTest):
 
         function_mode = AzureFunctionMode(p)
         params = function_mode.get_function_app_params()
-        self.assertRegex(params.function_app_name, "invalid-policy-name1-[a-zA-Z0-9]+")
+        self.assertRegex(params.function_app['name'], "invalid-policy-name1-[a-zA-Z0-9]+")
 
     def test_init_azure_function_mode_with_resource_ids(self):
         ai_id = '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups' \
@@ -407,7 +452,7 @@ class AzurePolicyModeTest(BaseTest):
         self.assertEqual(params.service_plan['name'], "testsp")
         self.assertEqual(params.service_plan['resource_group_name'], "testrg")
 
-        self.assertTrue(params.function_app_name.startswith('test-azure-serverless-mode-'))
+        self.assertTrue(params.function_app['name'].startswith('test-azure-serverless-mode-'))
 
     def test_event_grid_mode_creates_advanced_filtered_subscription(self):
         p = self.load_policy({
@@ -424,7 +469,7 @@ class AzurePolicyModeTest(BaseTest):
             event_mode.target_subscription_ids = [DEFAULT_SUBSCRIPTION_ID]
             event_mode._create_event_subscription(storage_account, 'some_queue', None)
 
-            name, args, kwargs = mock_create.mock_calls[0]
+            _, args, _ = mock_create.mock_calls[0]
 
             # verify the advanced filter created
             event_filter = args[4].advanced_filters[0]
@@ -452,7 +497,7 @@ class AzurePolicyModeTest(BaseTest):
             event_mode.target_subscription_ids = [DEFAULT_SUBSCRIPTION_ID]
             event_mode._create_event_subscription(storage_account, 'some_queue', None)
 
-            name, args, kwargs = mock_create.mock_calls[0]
+            _, args, _ = mock_create.mock_calls[0]
 
             # verify the advanced filter created
             event_filter = args[4].advanced_filters[0]

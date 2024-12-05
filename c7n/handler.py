@@ -1,16 +1,5 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 """
 Cloud-Custodian AWS Lambda Entry Point
 """
@@ -21,6 +10,7 @@ import json
 from c7n.config import Config
 from c7n.structure import StructureParser
 from c7n.resources import load_resources
+from c7n.resources.aws import AWS
 from c7n.policy import PolicyCollection
 from c7n.utils import format_event, get_account_id_from_sts, local_session
 
@@ -111,7 +101,7 @@ def init_config(policy_config):
 
     # a cli local directory doesn't translate to lambda
     if not exec_options.get('output_dir', '').startswith('s3'):
-        exec_options['output_dir'] = '/tmp'
+        exec_options['output_dir'] = '/tmp'  # nosec
 
     account_id = None
     # we can source account id from the cli parameters to avoid the sts call
@@ -139,7 +129,8 @@ def init_config(policy_config):
        and exec_options['metrics_enabled']:
         exec_options['metrics_enabled'] = 'aws'
 
-    return Config.empty(**exec_options)
+    config = Config.empty(**exec_options)
+    return AWS().initialize(config)
 
 
 # One time initilization of global environment settings
@@ -147,6 +138,9 @@ init_env_globals()
 
 
 def dispatch_event(event, context):
+    # default event.detail for EB Scheduler is '{}', not {}
+    if event.get('detail') == '{}':
+        event['detail'] = {}
     error = event.get('detail', {}).get('errorCode')
     if error and C7N_SKIP_EVTERR:
         log.debug("Skipping failed operation: %s" % error)

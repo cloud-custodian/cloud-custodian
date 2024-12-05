@@ -1,0 +1,10 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "CrossAccountAuthorizations": [
+            "arn:aws:iam::111111111111:root",
+            "arn:aws:iam::222222222222:root"
+        ]
+    }
+}

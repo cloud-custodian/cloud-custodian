@@ -1,36 +1,28 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import datetime
 import functools
 import io
-import jmespath
 import json
 import logging
 import os
 import re
 import shutil
 import tempfile
+import textwrap
 import unittest
+from unittest import mock
 
 import pytest
-import mock
 import yaml
 
-from c7n import policy
+from c7n.vendored.distutils.util import strtobool
+
+from c7n import deprecated, policy
+from c7n.exceptions import DeprecationError
 from c7n.loader import PolicyLoader
 from c7n.ctx import ExecutionContext
-from c7n.utils import reset_session_cache
+from c7n.utils import reset_session_cache, jmespath_search
 from c7n.config import Bag, Config
 
 
@@ -38,6 +30,8 @@ C7N_VALIDATE = bool(os.environ.get("C7N_VALIDATE", ""))
 skip_if_not_validating = unittest.skipIf(
     not C7N_VALIDATE, reason="We are not validating schemas.")
 functional = pytest.mark.functional
+
+C7N_FUNCTIONAL = strtobool(os.environ.get('C7N_FUNCTIONAL', 'no'))
 
 
 class CustodianTestCore:
@@ -91,6 +85,7 @@ class CustodianTestCore:
             output_dir='null://',
             log_group='null://',
             cache=False,
+            allow_deprecations=True,
     ):
         pdata = {'policies': [data]}
         if not (config and isinstance(config, Config)):
@@ -105,6 +100,12 @@ class CustodianTestCore:
             config=config)
         # policy non schema validation is also lazy initialization
         [p.validate() for p in collection]
+        if not allow_deprecations:
+            for p in collection:
+                r = deprecated.Report(p)
+                if r:
+                    raise DeprecationError(
+                        f"policy {p.name} contains deprecated usage\n{r.format()}")
         return list(collection)[0]
 
     def _get_policy_config(self, **kw):
@@ -202,8 +203,18 @@ class CustodianTestCore:
             raise self.failureException(msg)
 
     def assertJmes(self, expr, instance, expected):
-        value = jmespath.search(expr, instance)
+        value = jmespath_search(expr, instance)
         self.assertEqual(value, expected)
+
+    def assertDeprecation(self, policy, expected):
+        """Fail if the deprecations aren't found, or doesn't match.
+
+        The expected string is multiline and processed with dedent so the report
+        expected value can line up with the rest of the test.
+        """
+        report = deprecated.report(policy)
+        self.assertTrue(report)
+        self.assertEqual(report.format(), textwrap.dedent(expected).strip())
 
 
 class _TestUtils(unittest.TestCase):

@@ -73,7 +73,13 @@
                     "us-east-1b", 
                     "us-east-1e"
                 ], 
-                "Port": 3306
+                "Port": 3306,
+                "TagList": [
+                    {
+                        "Value": "cbar", 
+                        "Key": "cfoo"
+                    }
+                ]
             }
         ], 
         "ResponseMetadata": {

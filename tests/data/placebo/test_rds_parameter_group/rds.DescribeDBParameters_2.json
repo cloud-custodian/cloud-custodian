@@ -1,0 +1,19 @@
+{
+    "status_code": 200,
+    "data": {
+        "Parameters": [
+
+            {
+                "ParameterName": "tls_version",
+                "Description": "The protocols permitted by the server for encrypted connections.",
+                "Source": "engine-default",
+                "ApplyType": "static",
+                "DataType": "list",
+                "AllowedValues": "TLSv1,TLSv1.1,TLSv1.2,TLSv1.3",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

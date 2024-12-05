@@ -1,0 +1,24 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "LoadBalancerAttributes": {
+            "ConnectionDraining": {
+                "Enabled": true,
+                "Timeout": 300
+            },
+            "CrossZoneLoadBalancing": {
+                "Enabled": true
+            },
+            "ConnectionSettings": {
+                "IdleTimeout": 60
+            },
+            "AccessLog": {
+                "S3BucketPrefix": "elblogs",
+                "EmitInterval": 5,
+                "Enabled": true,
+                "S3BucketName": "elbv2logtest"
+            }
+        }
+    }
+}

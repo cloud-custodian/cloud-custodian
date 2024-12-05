@@ -1,0 +1,11 @@
+{
+    "status_code": 400,
+    "data": {
+        "Error": {
+            "Message": "Invalid keyId 'auto'",
+            "Code": "NotFoundException"
+        },
+        "ResponseMetadata": {},
+        "message": "Invalid keyId 'auto'"
+    }
+}

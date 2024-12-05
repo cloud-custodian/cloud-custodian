@@ -1,0 +1,39 @@
+{
+    "status_code": 200, 
+    "data": {
+        "resourcePolicy": {
+            "policyName": "OpenSearchCloudwatchLogPermissions", 
+            "policyDocument": {
+                "Version": "2012-10-17", 
+                "Statement": [
+                    {
+                        "Sid": "OpenSearchCloudWatchLogs", 
+                        "Effect": "Allow", 
+                        "Principal": {
+                            "Service": [
+                                "es.amazonaws.com"
+                            ]
+                        }, 
+                        "Action": [
+                            "logs:PutLogEvents", 
+                            "logs:CreateLogStream"
+                        ], 
+                        "Resource": "arn:aws:logs:us-east-1:123456789012:log-group:/aws/domains/test-es-dom/audit-logs"
+                    }
+                ]
+            }, 
+            "lastUpdatedTime": 1675208216374
+        }, 
+        "ResponseMetadata": {
+            "RequestId": "7fba1fe3-0923-4599-80de-3bd30d0b0abb", 
+            "HTTPStatusCode": 200, 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "7fba1fe3-0923-4599-80de-3bd30d0b0abb", 
+                "content-type": "application/x-amz-json-1.1", 
+                "content-length": "468", 
+                "date": "Tue, 31 Jan 2023 23:36:55 GMT"
+            }, 
+            "RetryAttempts": 0
+        }
+    }
+}

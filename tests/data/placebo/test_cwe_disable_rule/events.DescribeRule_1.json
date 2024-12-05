@@ -1,0 +1,13 @@
+{
+    "status_code": 200,
+    "data": {
+        "Name": "test",
+        "Arn": "arn:aws:events:us-east-1:<ACCOUNT_ID>:rule/test",
+        "EventPattern": "{\"source\":[\"aws.config\",\"aws.macie\"],\"detail-type\":[\"Config Rules Compliance Change\",\"Macie Finding\"]}",
+        "State": "DISABLED",
+        "Description": "test",
+        "EventBusName": "default",
+        "CreatedBy": "<ACCOUNT_ID>",
+        "ResponseMetadata": {}
+    }
+}

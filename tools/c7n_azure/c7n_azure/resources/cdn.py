@@ -1,19 +1,10 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
+from c7n.filters import Filter
+from c7n.utils import type_schema
 
 
 @resources.register('cdnprofile')
@@ -51,3 +42,35 @@ class CdnProfile(ArmResourceManager):
             'sku.name'
         )
         resource_type = 'Microsoft.Cdn/profiles'
+
+
+@CdnProfile.filter_registry.register('waf')
+class WebAppFirewallFilter(Filter):
+    """Check waf enabled/disabled on cdn profiles
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: test-waf-not-enabled
+            resource: azure.cdnprofile
+            filters:
+                - type: waf
+                  state: Disabled
+    """
+    schema = type_schema(
+        'waf',
+        required=['state'],
+        state={'type': 'string', 'enum': ['Enabled', 'Disabled']})
+
+    def process(self, resources, event=None):
+        client = self.manager.get_client()
+        matched = []
+        for profiles in resources:
+            policies = list(client.security_policies.list_by_profile(
+                profiles["resourceGroup"], profiles["name"]))
+            if (self.data.get('state') == 'Disabled' and not policies) \
+               or (self.data.get('state') == 'Enabled' and policies):
+                matched.append(profiles)
+        return matched

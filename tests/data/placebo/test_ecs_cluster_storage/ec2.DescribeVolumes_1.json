@@ -1,0 +1,90 @@
+{
+    "status_code": 200,
+    "data": {
+        "Volumes": [
+            {
+                "Attachments": [
+                    {
+                        "AttachTime": {
+                            "__class__": "datetime",
+                            "year": 2023,
+                            "month": 2,
+                            "day": 23,
+                            "hour": 19,
+                            "minute": 55,
+                            "second": 49,
+                            "microsecond": 0
+                        },
+                        "Device": "/dev/xvda",
+                        "InstanceId": "i-017dc2df46511d9b8",
+                        "State": "attached",
+                        "VolumeId": "vol-017557887808dd16e",
+                        "DeleteOnTermination": true
+                    }
+                ],
+                "AvailabilityZone": "us-east-1c",
+                "CreateTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 2,
+                    "day": 23,
+                    "hour": 19,
+                    "minute": 55,
+                    "second": 49,
+                    "microsecond": 115000
+                },
+                "Encrypted": false,
+                "KmsKeyId": "arn:aws:kms:us-east-1:123456789012:key/63c12883-3544-4d7b-9e9e-2f7bce8da7cd",
+                "Size": 30,
+                "SnapshotId": "snap-042931ae5061e6cda",
+                "State": "in-use",
+                "VolumeId": "vol-017557887808dd16e",
+                "Iops": 100,
+                "VolumeType": "gp2",
+                "MultiAttachEnabled": false
+            },
+            {
+                "Attachments": [
+                    {
+                        "AttachTime": {
+                            "__class__": "datetime",
+                            "year": 2023,
+                            "month": 2,
+                            "day": 23,
+                            "hour": 19,
+                            "minute": 55,
+                            "second": 49,
+                            "microsecond": 0
+                        },
+                        "Device": "/dev/sdc",
+                        "InstanceId": "i-017dc2df46511d9b8",
+                        "State": "attached",
+                        "VolumeId": "vol-0fa1ff9e3910a7a5c",
+                        "DeleteOnTermination": true
+                    }
+                ],
+                "AvailabilityZone": "us-east-1c",
+                "CreateTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 2,
+                    "day": 23,
+                    "hour": 19,
+                    "minute": 55,
+                    "second": 49,
+                    "microsecond": 271000
+                },
+                "Encrypted": false,
+                "KmsKeyId": "arn:aws:kms:us-east-1:123456789012:key/63c12883-3544-4d7b-9e9e-2f7bce8da7cd",
+                "Size": 2,
+                "SnapshotId": "",
+                "State": "in-use",
+                "VolumeId": "vol-0fa1ff9e3910a7a5c",
+                "Iops": 100,
+                "VolumeType": "gp2",
+                "MultiAttachEnabled": false
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

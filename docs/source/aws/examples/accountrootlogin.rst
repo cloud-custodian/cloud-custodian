@@ -36,8 +36,8 @@ to see if and when someone logs in as root is very important.
            subject: "Root User Login Detected! - [custodian {{ account }} - {{ region }}]"
            violation_desc: "A User Has Logged Into the AWS Console With The Root User:"
            action_desc: |
-               "Please investigate and if needed revoke the root users session along
-               with any other restrictive actions if it's an unapproved root login"
+               Please investigate and if needed revoke the root users session along
+               with any other restrictive actions if it's an unapproved root login
            to:
              - CloudAdmins@Company.com
              - SecurityTeam@Company.com

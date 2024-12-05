@@ -42,7 +42,21 @@
                 "EngineVersion": "9.4.5",
                 "SnapshotType": "manual",
                 "Port": 5432,
-                "DBInstanceIdentifier": "abc-restore"
+                "DBInstanceIdentifier": "abc-restore",
+                "TagList": [
+                    {
+                        "Value": "other",
+                        "Key": "workload-type"
+                    },
+                    {
+                        "Value": "test-value",
+                        "Key": "test-key"
+                    },
+                    {
+                        "Value": "Resource does not meet policy: delete@12/12/2012",
+                        "Key": "maid_status"
+                    }
+                ]
             }
         ]
     }

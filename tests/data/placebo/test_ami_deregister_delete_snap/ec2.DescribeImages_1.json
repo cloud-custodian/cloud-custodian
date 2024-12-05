@@ -39,6 +39,38 @@
                 "RootDeviceType": "ebs",
                 "SriovNetSupport": "simple",
                 "VirtualizationType": "hvm"
+            },
+            {
+                "Architecture": "arm64",
+                "CreationDate": "2020-10-08T13:31:46.000Z",
+                "ImageId": "ami-x9734234283242343",
+                "ImageLocation": "112233445566/my-image",
+                "ImageType": "machine",
+                "Public": false,
+                "OwnerId": "112233445566",
+                "PlatformDetails": "Linux/UNIX",
+                "UsageOperation": "RunInstances",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/sda1",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-0234384234bds8dfc",
+                            "VolumeSize": 8,
+                            "VolumeType": "gp2",
+                            "Encrypted": false
+                        }
+                    }
+                ],
+                "Description": "",
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "my-image",
+                "RootDeviceName": "/dev/sda1",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "VirtualizationType": "hvm"
             }
         ],
         "ResponseMetadata": {

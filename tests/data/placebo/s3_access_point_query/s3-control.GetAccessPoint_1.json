@@ -1,0 +1,25 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Name": "c7n-ap-liberal-anemone",
+        "Bucket": "c7n-ap-liberal-anemone",
+        "NetworkOrigin": "Internet",
+        "PublicAccessBlockConfiguration": {
+            "BlockPublicAcls": true,
+            "IgnorePublicAcls": true,
+            "BlockPublicPolicy": false,
+            "RestrictPublicBuckets": false
+        },
+        "CreationDate": {
+            "__class__": "datetime",
+            "year": 2021,
+            "month": 11,
+            "day": 22,
+            "hour": 17,
+            "minute": 24,
+            "second": 5,
+            "microsecond": 0
+        }
+    }
+}

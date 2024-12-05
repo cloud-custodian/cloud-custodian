@@ -1,0 +1,13 @@
+{
+    "status_code": 200,
+    "data": {
+        "InsightRules": [
+            {
+                "Name": "test",
+                "State": "DISABLED",
+                "Schema": "CloudWatchLogRule/1"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

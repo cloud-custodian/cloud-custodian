@@ -1,17 +1,6 @@
 {
-    "status_code": 204, 
+    "status_code": 204,
     "data": {
-        "ResponseMetadata": {
-            "HTTPStatusCode": 204, 
-            "RetryAttempts": 0, 
-            "HostId": "zRLS+fOjkW7BMCCSU/meT9xQBzoc8BieH34NqKPjPy3tlp2wKJE//ld5uqb/qqkVTCr+Ll/lwMU=", 
-            "RequestId": "266280E3485C3EFC", 
-            "HTTPHeaders": {
-                "x-amz-id-2": "zRLS+fOjkW7BMCCSU/meT9xQBzoc8BieH34NqKPjPy3tlp2wKJE//ld5uqb/qqkVTCr+Ll/lwMU=", 
-                "date": "Wed, 15 Nov 2017 16:16:01 GMT", 
-                "x-amz-request-id": "266280E3485C3EFC", 
-                "server": "AmazonS3"
-            }
-        }
+        "ResponseMetadata": {}
     }
 }

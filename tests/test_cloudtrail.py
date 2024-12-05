@@ -1,22 +1,21 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import time
-
 from .common import BaseTest
 
 
 class CloudTrail(BaseTest):
+
+    def test_trail_tag_augment(self):
+        factory = self.replay_flight_data('test_trail_tag_augment')
+        p = self.load_policy({
+            'name': 'resource',
+            'resource': 'aws.cloudtrail',
+            'filters': [{'tag:App': 'c7n'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['Name'], 'skunk-trails')
 
     def test_trail_status(self):
         factory = self.replay_flight_data('test_cloudtrail_status')
@@ -29,20 +28,27 @@ class CloudTrail(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertTrue('c7n:TrailStatus' in resources[0])
 
-    def test_org_trail_status(self):
-        factory = self.replay_flight_data('test_cloudtrail_org_trail_status_skip')
-        output = self.capture_logging('custodian')
+    def test_event_selectors(self):
+        factory = self.replay_flight_data('test_cloudtrail_event_selectors')
         p = self.load_policy({
             'name': 'resource',
             'resource': 'cloudtrail',
-            'filters': [{'type': 'status', 'key': 'IsLogging', 'value': True}]},
+            'filters': [{
+                'type': 'event-selectors',
+                'key': 'EventSelectors[].IncludeManagementEvents',
+                'op': 'contains',
+                'value': True
+            }]},
             session_factory=factory)
         resources = p.run()
-        self.assertIn(
-            ("found 1 org cloud trail from different"
-             " account that cant be processed"),
-            output.getvalue())
-        self.assertEqual(len(resources), 0)
+        self.assertEqual(len(resources), 4)
+
+        for resource in resources:
+            self.assertTrue('c7n:TrailEventSelectors' in resource)
+            selectors = resource['c7n:TrailEventSelectors']['EventSelectors']
+            self.assertEqual(len(selectors), 1)
+            self.assertTrue('IncludeManagementEvents' in selectors[0])
+            self.assertTrue(selectors[0]['IncludeManagementEvents'])
 
     def test_trail_update(self):
         factory = self.replay_flight_data('test_cloudtrail_update')

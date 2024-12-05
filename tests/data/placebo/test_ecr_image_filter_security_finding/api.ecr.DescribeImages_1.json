@@ -1,0 +1,29 @@
+{
+    "status_code": 200,
+    "data": {
+        "imageDetails": [
+            {
+                "registryId": "644160558196",
+                "repositoryName": "sas-log4j-test",
+                "imageDigest": "sha256:1a65e73f85a7e2fc26ca1baa4cc9d4fbdbe9bbb46f7a2bf32db01de22759df94",
+                "imageTags": [
+                    "latest"
+                ],
+                "imageSizeInBytes": 89561688,
+                "imagePushedAt": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 1,
+                    "day": 17,
+                    "hour": 10,
+                    "minute": 2,
+                    "second": 58,
+                    "microsecond": 0
+                },
+                "imageManifestMediaType": "application/vnd.docker.distribution.manifest.v2+json",
+                "artifactMediaType": "application/vnd.docker.container.image.v1+json"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,24 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "ControlPanels": [
+            {
+                "ClusterArn": "arn:aws:route53-recovery-control::644160558196:cluster/a9724724-2ac9-4ec0-a405-9208dd74b835",
+                "ControlPanelArn": "arn:aws:route53-recovery-control::644160558196:controlpanel/fd5a6bfc73364a0dbd48d3915867a306",
+                "DefaultControlPanel": true,
+                "Name": "DefaultControlPanel",
+                "RoutingControlCount": 1,
+                "Status": "DEPLOYED"
+            },
+            {
+                "ClusterArn": "arn:aws:route53-recovery-control::644160558196:cluster/a9724724-2ac9-4ec0-a405-9208dd74b835",
+                "ControlPanelArn": "arn:aws:route53-recovery-control::644160558196:controlpanel/7a721a1a44014ad1973539b3d83161ff",
+                "DefaultControlPanel": false,
+                "Name": "test-panel-2",
+                "RoutingControlCount": 0,
+                "Status": "DEPLOYED"
+            }
+        ]
+    }
+}

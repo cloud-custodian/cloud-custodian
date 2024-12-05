@@ -1,0 +1,41 @@
+{
+    "status_code": 200,
+    "data": {
+        "Groups": [
+            {
+                "Path": "/",
+                "GroupName": "test1",
+                "GroupId": "AGPAY5Y4D45RFZP34ODAF",
+                "Arn": "arn:aws:iam::644160558196:group/test1",
+                "CreateDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 12,
+                    "day": 15,
+                    "hour": 13,
+                    "minute": 34,
+                    "second": 34,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Path": "/",
+                "GroupName": "test2",
+                "GroupId": "AGPAY5Y4D45RJTOJYVPSR",
+                "Arn": "arn:aws:iam::644160558196:group/test2",
+                "CreateDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 12,
+                    "day": 15,
+                    "hour": 13,
+                    "minute": 34,
+                    "second": 41,
+                    "microsecond": 0
+                }
+            }
+        ],
+        "IsTruncated": false,
+        "ResponseMetadata": {}
+    }
+}

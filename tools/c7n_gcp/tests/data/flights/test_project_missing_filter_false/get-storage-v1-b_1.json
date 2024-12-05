@@ -1,0 +1,100 @@
+{
+  "body": {
+    "items": [
+      {
+        "kind": "storage#bucket", 
+        "name": "staging.cloud-custodian.appspot.com",
+        "timeCreated": "2019-02-28T14:45:53.549Z", 
+        "updated": "2019-02-28T14:45:53.549Z", 
+        "projectNumber": "518122731295", 
+        "defaultObjectAcl": [
+          {
+            "kind": "storage#objectAccessControl", 
+            "projectTeam": {
+              "projectNumber": "518122731295", 
+              "team": "owners"
+            }, 
+            "role": "OWNER", 
+            "etag": "CAE=", 
+            "entity": "project-owners-518122731295"
+          }, 
+          {
+            "kind": "storage#objectAccessControl", 
+            "projectTeam": {
+              "projectNumber": "518122731295", 
+              "team": "editors"
+            }, 
+            "role": "OWNER", 
+            "etag": "CAE=", 
+            "entity": "project-editors-518122731295"
+          }, 
+          {
+            "kind": "storage#objectAccessControl", 
+            "projectTeam": {
+              "projectNumber": "518122731295", 
+              "team": "viewers"
+            }, 
+            "role": "READER", 
+            "etag": "CAE=", 
+            "entity": "project-viewers-518122731295"
+          }
+        ], 
+        "metageneration": "1", 
+        "location": "EU", 
+        "iamConfiguration": {
+          "bucketPolicyOnly": {
+            "enabled": false
+          }
+        }, 
+        "owner": {
+          "entity": "project-owners-518122731295"
+        }, 
+        "etag": "CAE=", 
+        "lifecycle": {
+          "rule": [
+            {
+              "action": {
+                "type": "Delete"
+              }, 
+              "condition": {
+                "age": 15
+              }
+            }
+          ]
+        }, 
+        "acl": [
+          {
+            "kind": "storage#bucketAccessControl", 
+            "bucket": "staging.cloud-custodian.appspot.com",
+            "entity": "project-owners-518122731295", 
+            "etag": "CAE=", 
+            "role": "OWNER", 
+            "projectTeam": {
+              "projectNumber": "518122731295", 
+              "team": "owners"
+            }, 
+            "id": "staging.cloud-custodian.appspot.com/project-owners-518122731295",
+            "selfLink": "https://www.googleapis.com/storage/v1/b/staging.cloud-custodian.appspot.com/acl/project-owners-518122731295"
+          }
+        ], 
+        "id": "staging.cloud-custodian.appspot.com",
+        "selfLink": "https://www.googleapis.com/storage/v1/b/staging.cloud-custodian.appspot.com",
+        "storageClass": "STANDARD"
+      }
+    ], 
+    "kind": "storage#buckets"
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "5925", 
+    "content-location": "https://www.googleapis.com/storage/v1/b?project=cloud-custodian&alt=json&projection=full",
+    "cache-control": "private, max-age=0, must-revalidate, no-transform", 
+    "expires": "Thu, 07 Mar 2019 11:45:31 GMT", 
+    "vary": "Origin, X-Origin", 
+    "server": "UploadServer", 
+    "x-guploader-uploadid": "AEnB2UpSR4IxdUFknZKIuoaduRvzAopNX4xp8naqUMiEoJLbFtIEXsOiwruUHPaErWHiW4XvHgE0UfjPHI2uzlZpKfMi2S6Cow", 
+    "date": "Thu, 07 Mar 2019 11:45:31 GMT", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}

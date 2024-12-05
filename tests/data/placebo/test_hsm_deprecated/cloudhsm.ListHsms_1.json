@@ -1,0 +1,12 @@
+{
+    "status_code": 400,
+    "data": {
+        "Error": {
+            "Message": "This service is unavailable.  Please see https://aws.amazon.com/cloudhsm/faqs-classic/",
+            "Code": "CloudHsmServiceException"
+        },
+        "ResponseMetadata": {},
+        "message": "This service is unavailable.  Please see https://aws.amazon.com/cloudhsm/faqs-classic/",
+        "retryable": false
+    }
+}

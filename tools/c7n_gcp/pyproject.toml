@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "c7n_gcp"
-version = "0.4.0"
+version = "0.4.41"
 description = "Cloud Custodian - Google Cloud Provider"
 readme = "readme.md"
 homepage = "https://cloudcustodian.io"
@@ -9,23 +9,28 @@ documentation = "https://cloudcustodian.io/docs/"
 authors = ["Cloud Custodian Project"]
 license = "Apache-2.0"
 classifiers = [
+   "License :: OSI Approved :: Apache Software License",
    "Topic :: System :: Systems Administration",
    "Topic :: System :: Distributed Computing"
 ]
 
 [tool.poetry.dependencies]
-python = "^3.6"
-retrying = "^1.3.3"
-google-api-python-client = "^1.7"
-google-cloud-logging = "^1.14"
-google-auth = "^1.11.0"
-ratelimiter = "^1.2.0"
-google-cloud-monitoring = "^0.34.0"
-
-[tool.poetry.dev-dependencies]
-pytest = "~5.3.5"
+python = "^3.8"
 c7n = {path = "../..", develop = true}
 
+retrying = "^1.3.3"
+google-api-python-client = "^2.0"
+google-cloud-logging = "^3.2"
+google-auth = "^2.1.0"
+google-cloud-monitoring = "^2.5.0"
+google-cloud-storage = "^2.7"
+pyrate-limiter = "^2.8.4"
+
+[tool.poetry.group.dev.dependencies]
+freezegun = "^1.2.2"
+pytest = "<8.0"
+pytest-terraform = "^0.7.0"
+
 [build-system]
-requires = ["poetry>=0.12"]
-build-backend = "poetry.masonry.api"
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

@@ -1,0 +1,442 @@
+{
+    "status_code": 200,
+    "data": {
+        "ConfigRules": [
+            {
+                "ConfigRuleName": "securityhub-access-keys-rotated-f26d3a50",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-qr3xdv",
+                "ConfigRuleId": "config-rule-qr3xdv",
+                "Description": "Checks whether the active access keys are rotated within the number of days specified in maxAccessKeyAge",
+                "Scope": {
+                    "ComplianceResourceTypes": []
+                },
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "ACCESS_KEYS_ROTATED"
+                },
+                "InputParameters": "{\"maxAccessKeyAge\":\"90\"}",
+                "MaximumExecutionFrequency": "Twelve_Hours",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-alb-http-to-https-redirection-check-38d2ccc5",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-wcliqa",
+                "ConfigRuleId": "config-rule-wcliqa",
+                "Description": "Checks whether HTTP to HTTPS redirection is configured on all HTTP listeners of Application Load Balancers. The rule is NON_COMPLIANT if one or more HTTP listeners of Application Load Balancers do not have HTTP to HTTPS redirection configured.",
+                "Scope": {
+                    "ComplianceResourceTypes": []
+                },
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "ALB_HTTP_TO_HTTPS_REDIRECTION_CHECK"
+                },
+                "InputParameters": "{}",
+                "MaximumExecutionFrequency": "Twelve_Hours",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-api-gw-cache-encrypted-87f8820d",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-sbxxle",
+                "ConfigRuleId": "config-rule-sbxxle",
+                "Description": "This control checks whether all methods in Amazon API Gateway REST API stages that have cache enabled are encrypted. The control fails if any method in API Gateway REST API stage is configured to cache and the cache is not encrypted.",
+                "Scope": {
+                    "ComplianceResourceTypes": [
+                        "AWS::ApiGateway::Stage"
+                    ]
+                },
+                "Source": {
+                    "Owner": "CUSTOM_LAMBDA",
+                    "SourceIdentifier": "arn:aws:lambda:us-east-1:644160558196:function:SecurityHubConfigRule",
+                    "SourceDetails": [
+                        {
+                            "EventSource": "aws.config",
+                            "MessageType": "ConfigurationItemChangeNotification"
+                        }
+                    ]
+                },
+                "InputParameters": "{}",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-api-gw-ssl-enabled-63dc8c41",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-yr81mc",
+                "ConfigRuleId": "config-rule-yr81mc",
+                "Description": "Checks if a REST API stage uses an Secure Sockets Layer (SSL) certificate. This rule is NON_COMPLIANT if the REST API stage does not have an associated SSL certificate.",
+                "Scope": {},
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "API_GW_SSL_ENABLED"
+                },
+                "InputParameters": "{}",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-autoscaling-group-elb-healthcheck-required-2d5a6ad0",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-iadvuh",
+                "ConfigRuleId": "config-rule-iadvuh",
+                "Description": "Checks whether your Auto Scaling groups that are associated with a load balancer are using Elastic Load Balancing health checks.",
+                "Scope": {
+                    "ComplianceResourceTypes": [
+                        "AWS::AutoScaling::AutoScalingGroup"
+                    ]
+                },
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "AUTOSCALING_GROUP_ELB_HEALTHCHECK_REQUIRED"
+                },
+                "InputParameters": "{}",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-beanstalk-enhanced-health-reporting-enabled-3cd8fabc",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-pofqbn",
+                "ConfigRuleId": "config-rule-pofqbn",
+                "Description": "Checks for Elastic Beanstalk environment is configured for 'enhanced' health reporting and NON_COMPLIANT if configured for 'basic' health reporting.",
+                "Scope": {},
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "BEANSTALK_ENHANCED_HEALTH_REPORTING_ENABLED"
+                },
+                "InputParameters": "{}",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-cloudfront-default-root-object-configured-5f819e3d",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-o8s9vi",
+                "ConfigRuleId": "config-rule-o8s9vi",
+                "Description": "Checks if an Amazon CloudFront distribution is configured to return a specific object that is the default root object. The rule is NON_COMPLIANT if CloudFront distribution does not have a default root object configured.",
+                "Scope": {},
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "CLOUDFRONT_DEFAULT_ROOT_OBJECT_CONFIGURED"
+                },
+                "InputParameters": "{}",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-cloudfront-origin-access-identity-enabled-29ec54cd",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-i2sjag",
+                "ConfigRuleId": "config-rule-i2sjag",
+                "Description": "Checks that Amazon CloudFront distribution with Amazon S3 Origin type has Origin Access Identity (OAI) configured.",
+                "Scope": {},
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "CLOUDFRONT_ORIGIN_ACCESS_IDENTITY_ENABLED"
+                },
+                "InputParameters": "{}",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-cmk-backing-key-rotation-enabled-9f83d77c",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-vc6n5v",
+                "ConfigRuleId": "config-rule-vc6n5v",
+                "Description": "Checks that key rotation is enabled for customer created customer master key (CMK)",
+                "Scope": {
+                    "ComplianceResourceTypes": [
+                        "AWS::KMS::Key"
+                    ]
+                },
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "CMK_BACKING_KEY_ROTATION_ENABLED"
+                },
+                "InputParameters": "{}",
+                "MaximumExecutionFrequency": "Twelve_Hours",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-codebuild-project-envvar-awscred-check-8b50af67",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-mu7n4n",
+                "ConfigRuleId": "config-rule-mu7n4n",
+                "Description": "Checks whether the project contains environment variables AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY.",
+                "Scope": {
+                    "ComplianceResourceTypes": [
+                        "AWS::CodeBuild::Project"
+                    ]
+                },
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "CODEBUILD_PROJECT_ENVVAR_AWSCRED_CHECK"
+                },
+                "InputParameters": "{}",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-codebuild-project-source-repo-url-check-47c85a11",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-oxcp7f",
+                "ConfigRuleId": "config-rule-oxcp7f",
+                "Description": "Checks whether the GitHub or Bitbucket source repository URL contains either personal access tokens or user name and password.",
+                "Scope": {
+                    "ComplianceResourceTypes": [
+                        "AWS::CodeBuild::Project"
+                    ]
+                },
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "CODEBUILD_PROJECT_SOURCE_REPO_URL_CHECK"
+                },
+                "InputParameters": "{}",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-dax-encryption-enabled-d2bb4e30",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-biwg1z",
+                "ConfigRuleId": "config-rule-biwg1z",
+                "Description": "Checks that DynamoDB Accelerator (DAX) clusters are encrypted. The rule is NON_COMPLIANT if a DAX cluster is not encrypted.",
+                "Scope": {},
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "DAX_ENCRYPTION_ENABLED"
+                },
+                "InputParameters": "{}",
+                "MaximumExecutionFrequency": "Twelve_Hours",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-dms-replication-not-public-ae5ec4a0",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-hduivd",
+                "ConfigRuleId": "config-rule-hduivd",
+                "Description": "Checks whether AWS Database Migration Service replication instances are public. The rule is NON_COMPLIANT if PubliclyAccessible field is true.",
+                "Scope": {
+                    "ComplianceResourceTypes": [
+                        "AWS::DMS::ReplicationInstance"
+                    ]
+                },
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "DMS_REPLICATION_NOT_PUBLIC"
+                },
+                "InputParameters": "{}",
+                "MaximumExecutionFrequency": "Twelve_Hours",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-dynamodb-pitr-enabled-f66363e6",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-wmavit",
+                "ConfigRuleId": "config-rule-wmavit",
+                "Description": "Checks that point in time recovery (PITR) is enabled for Amazon DynamoDB tables. The rule is NON_COMPLIANT if point in time recovery is not enabled for Amazon DynamoDB tables",
+                "Scope": {},
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "DYNAMODB_PITR_ENABLED"
+                },
+                "InputParameters": "{}",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-ec2-ebs-encryption-by-default-f75d5eaf",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-org9vk",
+                "ConfigRuleId": "config-rule-org9vk",
+                "Description": "Checks that Amazon Elastic Block Store (EBS) encryption is enabled by default. The rule is NON_COMPLIANT if the encryption is not enabled.",
+                "Scope": {},
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "EC2_EBS_ENCRYPTION_BY_DEFAULT"
+                },
+                "InputParameters": "{}",
+                "MaximumExecutionFrequency": "Twelve_Hours",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-ec2-imdsv2-check-2c4bae6e",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-uhgi3k",
+                "ConfigRuleId": "config-rule-uhgi3k",
+                "Description": "Checks whether your Amazon Elastic Compute Cloud (Amazon EC2) instance metadata version is configured with Instance Metadata Service Version 2 (IMDSv2).",
+                "Scope": {},
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "EC2_IMDSV2_CHECK"
+                },
+                "InputParameters": "{}",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-ec2-stopped-instance-c7e6e42b",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-scmmhs",
+                "ConfigRuleId": "config-rule-scmmhs",
+                "Description": "Checks whether there are instances stopped for more than the allowed number of days.",
+                "Scope": {},
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "EC2_STOPPED_INSTANCE"
+                },
+                "InputParameters": "{\"AllowedDays\":\"30\"}",
+                "MaximumExecutionFrequency": "Twelve_Hours",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-ecs-service-assign-public-ip-disabled-7c70554d",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-vsbkcy",
+                "ConfigRuleId": "config-rule-vsbkcy",
+                "Description": "This control checks whether ECS services are configured to automatically assign public IP addresses. This control fails if AssignPublicIP is ENABLED.",
+                "Scope": {
+                    "ComplianceResourceTypes": [
+                        "AWS::ECS::Service"
+                    ]
+                },
+                "Source": {
+                    "Owner": "CUSTOM_LAMBDA",
+                    "SourceIdentifier": "arn:aws:lambda:us-east-1:644160558196:function:SecurityHubConfigRule",
+                    "SourceDetails": [
+                        {
+                            "EventSource": "aws.config",
+                            "MessageType": "ConfigurationItemChangeNotification"
+                        }
+                    ]
+                },
+                "InputParameters": "{\"version\":\"1.1\"}",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-ecs-task-definition-user-for-host-mode-check-ca820c41",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-3on5qw",
+                "ConfigRuleId": "config-rule-3on5qw",
+                "Description": "This control checks if an Amazon ECS Task Definition with host networking mode has \"privileged\" or \"user\" container definitions. The control fails with host network mode and container definitions are privileged=false or empty and user=root or empty.",
+                "Scope": {},
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "ECS_TASK_DEFINITION_USER_FOR_HOST_MODE_CHECK"
+                },
+                "InputParameters": "{\"SkipInactiveTaskDefinitions\":\"true\"}",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-efs-encrypted-check-20daaceb",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-3pfrel",
+                "ConfigRuleId": "config-rule-3pfrel",
+                "Description": "Elastic File System should be configured to encrypt file data at-rest using AWS KMS.",
+                "Scope": {
+                    "ComplianceResourceTypes": [
+                        "AWS::EFS::FileSystem"
+                    ]
+                },
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "EFS_ENCRYPTED_CHECK"
+                },
+                "InputParameters": "{}",
+                "MaximumExecutionFrequency": "Twelve_Hours",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-eip-attached-97f76f9b",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-anwexf",
+                "ConfigRuleId": "config-rule-anwexf",
+                "Description": "Checks whether all Elastic IP addresses that are allocated to a VPC are attached to EC2 instances or in-use elastic network interfaces (ENIs).",
+                "Scope": {
+                    "ComplianceResourceTypes": [
+                        "AWS::EC2::EIP"
+                    ]
+                },
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "EIP_ATTACHED"
+                },
+                "InputParameters": "{}",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-elastic-beanstalk-managed-updates-enabled-e959c118",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-b0iwkp",
+                "ConfigRuleId": "config-rule-b0iwkp",
+                "Description": "Checks if managed platform updates in an AWS Elastic Beanstalk environment is enabled. The rule is NON_COMPLIANT if the value for \u2018ManagedActionsEnabled\u2019 is set to false or if a parameter is provided whose value does not match the existing configurations.",
+                "Scope": {},
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "ELASTIC_BEANSTALK_MANAGED_UPDATES_ENABLED"
+                },
+                "InputParameters": "{}",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-elasticsearch-audit-logging-enabled-f5fa2de9",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-xqhsdr",
+                "ConfigRuleId": "config-rule-xqhsdr",
+                "Description": "This control checks whether Elasticsearch domains have audit logging enabled. This control fails if an Elasticsearch domain does not have audit logging enabled.",
+                "Scope": {
+                    "ComplianceResourceTypes": [
+                        "AWS::Elasticsearch::Domain"
+                    ]
+                },
+                "Source": {
+                    "Owner": "CUSTOM_LAMBDA",
+                    "SourceIdentifier": "arn:aws:lambda:us-east-1:644160558196:function:SecurityHubConfigRule",
+                    "SourceDetails": [
+                        {
+                            "EventSource": "aws.config",
+                            "MessageType": "ConfigurationItemChangeNotification"
+                        }
+                    ]
+                },
+                "InputParameters": "{}",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-elasticsearch-encrypted-at-rest-d1570b05",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-fakvzq",
+                "ConfigRuleId": "config-rule-fakvzq",
+                "Description": "Checks whether Elasticsearch domains have encryption at rest configuration enabled.",
+                "Scope": {
+                    "ComplianceResourceTypes": []
+                },
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "ELASTICSEARCH_ENCRYPTED_AT_REST"
+                },
+                "InputParameters": "{}",
+                "MaximumExecutionFrequency": "Twelve_Hours",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "securityhub-elasticsearch-https-required-a3fe1b06",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/securityhub.amazonaws.com/config-rule-eyceff",
+                "ConfigRuleId": "config-rule-eyceff",
+                "Description": "This control checks whether connections to Elasticsearch domains are required to use TLS 1.2.  The check fails if the Elasticsearch domain TLSSecurityPolicy is not Policy-Min-TLS-1-2-2019-07.",
+                "Scope": {
+                    "ComplianceResourceTypes": [
+                        "AWS::Elasticsearch::Domain"
+                    ]
+                },
+                "Source": {
+                    "Owner": "CUSTOM_LAMBDA",
+                    "SourceIdentifier": "arn:aws:lambda:us-east-1:644160558196:function:SecurityHubConfigRule",
+                    "SourceDetails": [
+                        {
+                            "EventSource": "aws.config",
+                            "MessageType": "ConfigurationItemChangeNotification"
+                        }
+                    ]
+                },
+                "InputParameters": "{}",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "securityhub.amazonaws.com"
+            }
+        ],
+        "NextToken": "eyJlbmNyeXB0ZWREYXRhIjpbOSwtNTgsLTEyNywtOTAsMjQsLTEwMiwtMTgsOTIsOTUsOCwtNCwtNDYsMTIsLTk5LDMxLC0xMjYsNjEsLTE2LC05OCwyMiwtNDksMTExLC03MiwtMTI2LDEyNywtMTksLTM4LC0xMTEsODQsLTEyNCwtMTA2LC0yNiwxOSwtNDcsODksLTk3LDUsMTIwLDExNSw3MiwxMjMsNTEsMTE2LC0xMDQsNjUsLTExOCw5OSw2NywtNzAsLTEwNCwzLC03MSw3LC01LDEwOSwyNCwtNzcsLTIxLC0xNSwxMDIsODAsMTE3LC0xMDAsNjksMzAsLTQ5LC01LC00OSwtMzAsLTEsLTMyLDYwLC0xMDIsMTI3LDIxLC0xMTcsMzcsMTE0LDEwNiwzMiwtODAsLTEwNSwtOTMsLTY0LDEyNiwxMDYsODIsODQsNzIsLTEwNiw1NSw0MywxMDMsLTE1LDY1LC01MywtNzQsLTExNSwxMDgsNzgsLTExNiwtNTcsNDgsLTExMCw3OSwyNCwxMDAsLTEyMCwtOTYsLTczLC0zMiwtMTEyLC0xMywtMzgsNzgsLTg5LC04NCwtODEsOTMsMjIsMTE5LC02NywtODcsLTMzLC0xMjcsLTY2LC03NCw1MCw3LC05MiwyMiwtNjMsLTEwOSwxMjEsMTExLC04MCw1MSwtMTIzLDQ3LC03MiwyMywtODksMTQsLTEyNiw0NywxMTYsLTEyNiw3NCwtOTUsLTY1LDI1LC0yMywtNjYsNzQsNjksOTYsMyw3NSwxMDUsLTg1LC03NywxMjUsMzUsLTk2LDksLTEyNSwtMTcsLTExMCw4MiwtMzAsLTkwLC03NywtOTEsOTksMTA4LDEsLTY2LC05NiwtMTA3LC02NiwtNjcsNSw3NSwxMjUsLTEyNSw5OSw2LC01Myw1LC0zNCwtNDQsLTMwLC04LC01MSwtMTAwLDExOCwtMTEzLC0zMSwtMTA2LDIyLDI0LC03OCwtNjQsLTc3LC01MCwxMDEsLTU3LC0xMTksLTY2LDgzLDI0LC0xMjQsLTYwLC03NywxMDUsMTIxLDM2LDY1LDExNywtNTEsLTEwMSwyOCw3LC0zNywyNywtMTE4LDExNCwxMTAsLTEwMiw1LDc4LC03OSwtODIsNjIsLTU0LDc1LC0xMTcsNTYsMjksLTEwNSw1NywtMzMsMTIzLC0zOCwtNDIsNzNdLCJtYXRlcmlhbFNldFNlcmlhbE51bWJlciI6MSwiaXZQYXJhbWV0ZXJTcGVjIjp7Iml2IjpbLTQ3LDEyNywtNCwtODQsNiwtODIsMzIsNTUsLTIsMzgsMzUsMTIsODUsLTg5LC0yNCwxMTFdfX0=",
+        "ResponseMetadata": {}
+    }
+}

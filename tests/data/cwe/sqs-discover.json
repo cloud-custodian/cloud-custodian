@@ -1,0 +1,53 @@
+{
+  "version": "0",
+  "id": "47a37318-9c13-1eb8-33a6-607f6b881a9c",
+  "detail-type": "Config Configuration Item Change",
+  "source": "aws.config",
+  "account": "662108712480",
+  "time": "2020-10-06T22:39:24Z",
+  "region": "us-east-1",
+  "resources": [
+    "arn:aws:sqs:us-east-1:644160558196:config-changes"
+  ],
+  "detail": {
+    "recordVersion": "1.3",
+    "messageType": "ConfigurationItemChangeNotification",
+    "configurationItemDiff": {
+      "changedProperties": {},
+      "changeType": "CREATE"
+    },
+    "notificationCreationTime": "2020-10-06T22:39:24.385Z",
+    "configurationItem": {
+      "relatedEvents": [],
+      "relationships": [],
+      "configuration": {
+        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"events.amazonaws.com\"},\"Action\":\"sqs:SendMessage\",\"Resource\":\"arn:aws:sqs:us-east-1:644160558196:config-changes\"}]}",
+        "ReceiveMessageWaitTimeSeconds": "0",
+        "CreatedTimestamp": "1602023249",
+        "DelaySeconds": "0",
+        "MessageRetentionPeriod": "345600",
+        "MaximumMessageSize": "262144",
+        "VisibilityTimeout": "30",
+        "LastModifiedTimestamp": "1602023249",
+        "QueueArn": "arn:aws:sqs:us-east-1:644160558196:config-changes"
+      },
+      "supplementaryConfiguration": {
+        "Tags": {}
+      },
+      "tags": {},
+      "configurationItemVersion": "1.3",
+      "configurationItemCaptureTime": "2020-10-06T22:39:22.579Z",
+      "configurationStateId": 1602023962579,
+      "awsAccountId": "662108712480",
+      "configurationItemStatus": "ResourceDiscovered",
+      "resourceType": "AWS::SQS::Queue",
+      "resourceId": "https://sqs.us-east-1.amazonaws.com/644160558196/config-changes",
+      "resourceName": "config-changes",
+      "ARN": "arn:aws:sqs:us-east-1:662108712480:config-changes",
+      "awsRegion": "us-east-1",
+      "availabilityZone": "Not Applicable",
+      "configurationStateMd5Hash": "",
+      "resourceCreationTime": "2020-10-06T22:27:29.000Z"
+    }
+  }
+}

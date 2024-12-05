@@ -1,23 +1,21 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 import bz2
 import json
 import os
+import re
 from urllib.parse import urlparse
 
 from httplib2 import Http, Response
+
+
+PROJECT_ID = "cloud-custodian"
+
+
+def sanitize_project_name(dirty_str):
+    sanitized = 'projects/{}/'.format(PROJECT_ID)
+    return re.sub(r'projects/([0-9a-zA-Z_-]+)/', sanitized, dirty_str)
 
 
 class FlightRecorder(Http):
@@ -29,6 +27,7 @@ class FlightRecorder(Http):
         super(FlightRecorder, self).__init__()
 
     def get_next_file_path(self, uri, method, record=True):
+        uri = sanitize_project_name(uri)
         base_name = "%s%s" % (
             method.lower(), urlparse(uri).path.replace('/', '-').replace(':', '-'))
         data_dir = self._data_path
@@ -88,7 +87,7 @@ class HttpRecorder(FlightRecorder):
             if not content:
                 content = '{}'
             recorded['body'] = json.loads(content)
-            fh.write(json.dumps(recorded, indent=2).encode('utf8'))
+            fh.write(sanitize_project_name(json.dumps(recorded, indent=2)).encode('utf8'))
 
         return response, content
 

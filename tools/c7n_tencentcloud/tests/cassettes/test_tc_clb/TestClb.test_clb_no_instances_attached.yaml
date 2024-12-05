@@ -1,0 +1,148 @@
+interactions:
+- request:
+    body: '{"LoadBalancerIds": ["lb-aqsfvh8m"], "Offset": 0, "Limit": 20}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '62'
+      Content-Type:
+      - application/json
+      Host:
+      - clb.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - DescribeLoadBalancers
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2018-03-17'
+    method: POST
+    uri: https://clb.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: "{\"Response\": {\"TotalCount\": 1, \"LoadBalancerSet\": [{\"LoadBalancerId\":
+        \"lb-aqsfvh8m\", \"LoadBalancerName\": \"lb-63230854\", \"Forward\": 1, \"Domain\":
+        \"\", \"LoadBalancerVips\": [\"43.134.149.139\"], \"AddressIPv6\": null, \"AddressIPVersion\":
+        \"ipv4\", \"IPv6Mode\": null, \"LoadBalancerType\": \"OPEN\", \"Status\":
+        1, \"CreateTime\": \"2022-09-21 11:38:40\", \"StatusTime\": \"2022-09-21 11:38:42\",
+        \"ProjectId\": 0, \"OpenBgp\": 0, \"Snat\": false, \"Isolation\": 0, \"Log\":
+        \"\", \"AnycastZone\": \"\", \"VpcId\": \"vpc-2hxl6jir\", \"NumericalVpcId\":
+        9493687, \"TargetRegionInfo\": {\"Region\": \"ap-singapore\", \"VpcId\": \"vpc-2hxl6jir\"},
+        \"SubnetId\": \"\", \"SecureGroups\": [], \"Tags\": [], \"MasterZone\": {\"ZoneId\":
+        900002, \"Zone\": \"ap-singapore-2\", \"ZoneName\": \"\u65B0\u52A0\u5761\u4E8C\u533A\",
+        \"ZoneRegion\": \"ap-singapore\", \"LocalZone\": false}, \"BackupZoneSet\":
+        null, \"IsolatedTime\": null, \"ExpireTime\": \"2022-10-21 11:38:40\", \"ChargeType\":
+        \"POSTPAID_BY_HOUR\", \"NetworkAttributes\": {\"InternetChargeType\": \"TRAFFIC_POSTPAID_BY_HOUR\",
+        \"InternetMaxBandwidthOut\": 1, \"BandwidthpkgSubType\": null}, \"PrepaidAttributes\":
+        null, \"ExtraInfo\": null, \"LogSetId\": \"\", \"LogTopicId\": \"\", \"LoadBalancerPassToTarget\":
+        false, \"IsDDos\": false, \"ConfigId\": \"\", \"ExclusiveCluster\": {}, \"SnatPro\":
+        false, \"SnatIps\": [], \"IsBlock\": false, \"IsBlockTime\": \"\", \"SlaType\":
+        \"\", \"ClusterTag\": null, \"LocalBgp\": false, \"MixIpTarget\": false, \"Zones\":
+        null, \"NfvInfo\": \"\", \"HealthLogSetId\": \"\", \"HealthLogTopicId\": \"\",
+        \"ClusterIds\": null, \"AttributeFlags\": [], \"VipIsp\": \"BGP\"}], \"RequestId\":
+        \"1105c677-6497-410a-8e2c-3f20cdcfcd5a\"}}"
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1531'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 29 Sep 2022 12:51:42 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"ResourceList": ["qcs::clb:ap-singapore:uin/100000750436:clb/lb-aqsfvh8m"]}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '76'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetResources
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"","ResourceTagMappingList":[],"RequestId":"1fef28f9-9d99-4455-9620-e572c15edc31"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '114'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 29 Sep 2022 12:51:42 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"LoadBalancerId": "lb-aqsfvh8m"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '33'
+      Content-Type:
+      - application/json
+      Host:
+      - clb.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - DescribeTargets
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2018-03-17'
+    method: POST
+    uri: https://clb.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response": {"Listeners": [], "RequestId": "8efa9f67-cf95-44b6-87d1-a31d99aca8e2"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '84'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 29 Sep 2022 12:51:43 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+version: 1

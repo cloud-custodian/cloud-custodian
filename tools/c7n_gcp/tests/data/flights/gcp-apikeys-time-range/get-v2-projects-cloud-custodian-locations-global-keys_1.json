@@ -1,0 +1,41 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 21 Jul 2022 12:16:28 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "780",
+    "-content-encoding": "gzip",
+    "content-location": "https://apikeys.googleapis.com/v2/projects/cloud-custodian/locations/global/keys?alt=json"
+  },
+  "body": {
+    "keys": [
+      {
+        "name": "projects/cloud-custodian/locations/global/keys/5fdd3f25-37dc-44e8-9f81-10095abaded7",
+        "displayName": "API key 2",
+        "createTime": "2021-02-05T13:15:57.459257Z",
+        "uid": "5fdd3f25-37dc-44e8-9f81-10095abaded7",
+        "updateTime": "2021-04-05T13:16:41.438557Z",
+        "etag": "W/\"T69GOlKIiYC6g3Dl2hitlA==\""
+      },
+      {
+        "name": "projects/cloud-custodian/locations/global/keys/03b651c2-718a-4702-b5d7-9946987cc4da",
+        "displayName": "API key 1",
+        "createTime": "2019-10-08T13:40:25.217Z",
+        "uid": "03b651c2-718a-4702-b5d7-9946987cc4da",
+        "updateTime": "2019-10-08T14:40:25.229135Z",
+        "restrictions": {
+          "androidKeyRestrictions": {}
+        },
+        "etag": "W/\"XLD0ysF3uUF7/zEiWhW22w==\""
+      }
+    ]
+  }
+}

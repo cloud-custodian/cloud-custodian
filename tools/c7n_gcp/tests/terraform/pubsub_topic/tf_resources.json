@@ -1,0 +1,17 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_pubsub_topic": {
+            "test_topic": {
+                "id": "projects/cloud-custodian/topics/test_topic",
+                "kms_key_name": "",
+                "labels": null,
+                "message_storage_policy": [],
+                "name": "test_topic",
+                "project": "c7n-test-target",
+                "timeouts": null
+            }
+        }
+    }
+}

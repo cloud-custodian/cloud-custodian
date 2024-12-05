@@ -1,0 +1,25 @@
+{
+    "status_code": 200,
+    "data": {
+        "PortfolioDetails": [
+            {
+                "Id": "port-srkytozjwbzpc",
+                "ARN": "arn:aws:catalog:us-east-1:644160558196:portfolio/port-srkytozjwbzpc",
+                "DisplayName": "dev",
+                "Description": "dev",
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 5,
+                    "day": 14,
+                    "hour": 11,
+                    "minute": 34,
+                    "second": 1,
+                    "microsecond": 554000
+                },
+                "ProviderName": "kapilt"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,32 @@
+
+  {
+    "notificationConfigName": "organizations/111111111111/notificationConfigs/auto-custodian-scc-firewall",
+    "finding": {
+      "category": "FLOW_LOGS_DISABLED",
+      "createTime": "2021-03-02T18:45:20.121Z",
+      "eventTime": "2021-03-16T20:21:34.229Z",
+      "externalUri": "https://console.cloud.google.com/networking/subnetworks/details/asia-northeast1/default?project=cloud-custodian",
+      "name": "organizations/111111111111/sources/123456789/findings/333333333333",
+      "parent": "organizations/111111111111/sources/123456789",
+      "resourceName": "//compute.googleapis.com/projects/cloud-custodian/regions/asia-northeast1/subnetworks/a22222222222222222",
+      "securityMarks": {
+        "name": "organizations/111111111111/sources/123456789/findings/333333333333/securityMarks"
+      },
+      "severity": "LOW",
+      "sourceProperties": {
+        "ExceptionInstructions": "Add the security mark \"allow_flow_logs_disabled\" to the asset with a value of \"true\" to prevent this finding from being activated again.",
+        "Explanation": "VPC Flow Logs record a sample of network flows sent from and received by VM instances. These logs can be used for network monitoring, forensics, real-time security analysis, and expense optimization. Learn more at: https://cloud.google.com/vpc/docs/using-flow-logs",
+        "ReactivationCount": 0,
+        "Recommendation": "Go to https://console.cloud.google.com/networking/subnetworks/details/asia-northeast1/default?project=cloud-custodian, click \"Edit\", and enable Flow Logs.",
+        "ScannerName": "SUBNETWORK_SCANNER"
+      },
+      "state": "ACTIVE"
+    },
+    "resource": {
+      "name": "//compute.googleapis.com/projects/cloud-custodian/regions/asia-northeast1/subnetworks/a22222222222222222",
+      "parentDisplayName": "cloud-custodian",
+      "parentName": "//cloudresourcemanager.googleapis.com/projects/99999999999",
+      "projectDisplayName": "cloud-custodian",
+      "project": "//cloudresourcemanager.googleapis.com/projects/99999999999"
+    }
+  }

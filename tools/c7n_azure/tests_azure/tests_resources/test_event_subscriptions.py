@@ -1,21 +1,11 @@
-# Copyright 2015-2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from azure.mgmt.eventgrid.models import StorageQueueEventSubscriptionDestination
-from ..azure_common import BaseTest, arm_template
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
+from azure.mgmt.eventgrid.models import \
+    StorageQueueEventSubscriptionDestination
 from c7n_azure.azure_events import AzureEventSubscription
-from c7n_azure.session import Session
 from c7n_azure.storage_utils import StorageUtilities
+
+from ..azure_common import BaseTest, arm_template
 
 
 class AzureEventSubscriptionsTest(BaseTest):
@@ -23,7 +13,6 @@ class AzureEventSubscriptionsTest(BaseTest):
 
     def setUp(self):
         super(AzureEventSubscriptionsTest, self).setUp()
-        self.session = Session()
         account = self.setup_account()
         queue_name = 'cctesteventsub'
         StorageUtilities.create_queue_from_storage_account(account, queue_name, self.session)
@@ -31,7 +20,8 @@ class AzureEventSubscriptionsTest(BaseTest):
             resource_id=account.id, queue_name=queue_name)
         AzureEventSubscription.create(event_sub_destination,
                                       self.event_sub_name,
-                                      self.session.get_subscription_id())
+                                      self.session.get_subscription_id(),
+                                      session=self.session)
 
     def test_event_subscription_schema_validate(self):
         with self.sign_out_patch():
@@ -86,5 +76,6 @@ class AzureEventSubscriptionsTest(BaseTest):
         }, validate=True)
 
         p_delete.run()
+        self.sleep_in_live_mode(5)
         resources_post_delete = p_get.run()
         self.assertEqual(len(resources_post_delete), 0)

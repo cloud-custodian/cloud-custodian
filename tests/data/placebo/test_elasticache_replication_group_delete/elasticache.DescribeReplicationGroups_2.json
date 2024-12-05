@@ -1,0 +1,24 @@
+{
+    "status_code": 200,
+    "data": {
+        "ReplicationGroups": [
+            {
+                "ReplicationGroupId": "c7n-delete",
+                "Description": " ",
+                "GlobalReplicationGroupInfo": {},
+                "Status": "deleting",
+                "PendingModifiedValues": {},
+                "AutomaticFailover": "enabled",
+                "MultiAZ": "enabled",
+                "SnapshotRetentionLimit": 1,
+                "SnapshotWindow": "10:00-11:00",
+                "AuthTokenEnabled": false,
+                "TransitEncryptionEnabled": false,
+                "AtRestEncryptionEnabled": false,
+                "ARN": "arn:aws:elasticache:us-east-1:644160558196:replicationgroup:c7n-delete",
+                "LogDeliveryConfigurations": []
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

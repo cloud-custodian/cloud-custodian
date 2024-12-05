@@ -1,0 +1,12 @@
+{
+    "status_code": 404,
+    "data": {
+        "Error": {
+            "Message": "The specified accesspoint does not exist",
+            "Code": "NoSuchAccessPoint",
+            "AccessPointName": "c7n-ap-liberal-anemone"
+        },
+        "HostId": "vXxC6U5Qfd+31g23s1w4B2B3I9V7pUZB53XKdZtpvpEasjzF0SRV3KiYhPlwkuOCZVObMKlHKCs=",
+        "ResponseMetadata": {}
+    }
+}

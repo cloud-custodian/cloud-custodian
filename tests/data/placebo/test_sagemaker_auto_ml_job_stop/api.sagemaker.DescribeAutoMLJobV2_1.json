@@ -1,0 +1,90 @@
+{
+    "status_code": 200,
+    "data": {
+        "AutoMLJobName": "Canvas-c7n-test",
+        "AutoMLJobArn": "arn:aws:sagemaker:us-east-1:644160558196:automl-job/Canvas-c7n-test",
+        "AutoMLJobInputDataConfig": [
+            {
+                "ChannelType": "training",
+                "ContentType": "text/csv;header=present",
+                "CompressionType": "None",
+                "DataSource": {
+                    "S3DataSource": {
+                        "S3DataType": "S3Prefix",
+                        "S3Uri": "s3://sagemaker-us-east-1-644160558196/Canvas/default-20240412t112301/Datasets/a6c86c44-d9fe-4e4c-b390-d8b40052b70b/1712940448.499768/output_1712940451"
+                    }
+                }
+            }
+        ],
+        "OutputDataConfig": {
+            "S3OutputPath": "s3://sagemaker-us-east-1-644160558196/Canvas/default-20240412t112301/Training/output/"
+        },
+        "RoleArn": "arn:aws:iam::644160558196:role/service-role/AmazonSageMaker-ExecutionRole-20240412T112301",
+        "AutoMLJobObjective": {
+            "MetricName": "AverageWeightedQuantileLoss"
+        },
+        "AutoMLProblemTypeConfig": {
+            "TimeSeriesForecastingJobConfig": {
+                "FeatureSpecificationS3Uri": "s3://sagemaker-us-east-1-644160558196/Canvas/default-20240412t112301/Canvas1712940464696/feature_specification.json",
+                "ForecastFrequency": "M",
+                "ForecastHorizon": 1,
+                "ForecastQuantiles": [
+                    "p10",
+                    "p50",
+                    "p90"
+                ],
+                "Transformations": {
+                    "Filling": {
+                        "demand": {
+                            "backfill": "zero",
+                            "middlefill": "zero"
+                        },
+                        "price": {
+                            "backfill": "median",
+                            "futurefill": "median",
+                            "middlefill": "median"
+                        }
+                    },
+                    "Aggregation": {
+                        "demand": "sum"
+                    }
+                },
+                "TimeSeriesConfig": {
+                    "TargetAttributeName": "demand",
+                    "TimestampAttributeName": "time_stamp",
+                    "ItemIdentifierAttributeName": "item_id",
+                    "GroupingAttributeNames": [
+                        "Location"
+                    ]
+                }
+            }
+        },
+        "AutoMLProblemTypeConfigName": "TimeSeriesForecasting",
+        "CreationTime": {
+            "__class__": "datetime",
+            "year": 2024,
+            "month": 4,
+            "day": 12,
+            "hour": 12,
+            "minute": 47,
+            "second": 45,
+            "microsecond": 40000
+        },
+        "LastModifiedTime": {
+            "__class__": "datetime",
+            "year": 2024,
+            "month": 4,
+            "day": 12,
+            "hour": 12,
+            "minute": 47,
+            "second": 49,
+            "microsecond": 37000
+        },
+        "AutoMLJobStatus": "Stopping",
+        "AutoMLJobSecondaryStatus": "PreTraining",
+        "SecurityConfig": {
+            "EnableInterContainerTrafficEncryption": true
+        },
+        "ResponseMetadata": {}
+    }
+}

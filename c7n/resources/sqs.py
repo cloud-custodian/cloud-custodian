@@ -1,23 +1,15 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from botocore.exceptions import ClientError
 
 import json
+import re
 
 from c7n.actions import RemovePolicyBase, ModifyPolicyBase
 from c7n.filters import CrossAccountAccessFilter, MetricsFilter
+from c7n.filters.core import Filter
 from c7n.filters.kms import KmsRelatedFilter
+import c7n.filters.policystatement as polstmt_filter
 from c7n.manager import resources
 from c7n.utils import local_session
 from c7n.query import ConfigSource, DescribeSource, QueryResourceManager, TypeInfo
@@ -25,13 +17,14 @@ from c7n.actions import BaseAction
 from c7n.utils import type_schema
 from c7n.tags import universal_augment
 
+from c7n.resources.aws import Arn
 from c7n.resources.securityhub import PostFinding
 
 
 class DescribeQueue(DescribeSource):
 
     def augment(self, resources):
-        client = local_session(self.manager.session_factory).client('sqs')
+        client = self.manager.get_client()
 
         def _augment(r):
             try:
@@ -40,11 +33,12 @@ class DescribeQueue(DescribeSource):
                     QueueUrl=r,
                     AttributeNames=['All'])['Attributes']
                 queue['QueueUrl'] = r
+                queue['QueueName'] = queue['QueueArn'].rsplit(':', 1)[-1]
             except ClientError as e:
                 if e.response['Error']['Code'] == 'AWS.SimpleQueueService.NonExistentQueue':
                     return
                 if e.response['Error']['Code'] == 'AccessDenied':
-                    self.log.warning("Denied access to sqs %s" % r)
+                    self.manager.log.warning("Denied access to sqs %s" % r)
                     return
                 raise
             return queue
@@ -54,13 +48,21 @@ class DescribeQueue(DescribeSource):
                 self.manager, list(filter(None, w.map(_augment, resources))))
 
 
+class QueueConfigSource(ConfigSource):
+
+    def load_resource(self, item):
+        resource = super().load_resource(item)
+        resource['QueueUrl'] = item['resourceId']
+        return resource
+
+
 @resources.register('sqs')
 class SQS(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'sqs'
         arn_type = ""
-        enum_spec = ('list_queues', 'QueueUrls', None)
+        enum_spec = ('list_queues', 'QueueUrls', {'MaxResults': 1000})
         detail_spec = ("get_queue_attributes", "QueueUrl", None, "Attributes")
         cfn_type = config_type = 'AWS::SQS::Queue'
         id = 'QueueUrl'
@@ -71,6 +73,7 @@ class SQS(QueryResourceManager):
         date = 'CreatedTimestamp'
         dimension = 'QueueName'
         universal_taggable = object()
+        permissions_augment = ("sqs:ListQueueTags",)
         default_report_fields = (
             'QueueArn',
             'CreatedTimestamp',
@@ -79,8 +82,31 @@ class SQS(QueryResourceManager):
 
     source_mapping = {
         'describe': DescribeQueue,
-        'config': ConfigSource
+        'config': QueueConfigSource
     }
+
+    def get_client(self):
+        # Work around the fact that boto picks a legacy endpoint by default
+        # which leads to queue urls pointing to legacy instead of standard
+        # which is at odds with config's resource id for the queues.
+        # additionally we need the standard endpoint to work with vpc endpoints.
+        #
+        # sqs canonoical endpoints
+        #  https://docs.aws.amazon.com/general/latest/gr/sqs-service.html
+        # boto3 bug
+        #  https://github.com/boto/botocore/issues/2683 - index of several other bugs
+        #  https://github.com/boto/boto3/issues/1900
+        #
+        # boto3 is transitioning to standard urls per https://github.com/boto/botocore/issues/2705
+        #
+        endpoint = 'https://sqs.{region}.amazonaws.com'.format(region=self.config.region)
+        # these only seem to have the legacy endpoints, so fall through to boto behavior.
+        if self.config.region in ('cn-north-1', 'cn-northwest-1'):
+            endpoint = None
+        params = {}
+        if endpoint:
+            params['endpoint_url'] = endpoint
+        return local_session(self.session_factory).client('sqs', **params)
 
     def get_permissions(self):
         perms = super(SQS, self).get_permissions()
@@ -94,7 +120,8 @@ class SQS(QueryResourceManager):
                 ids_normalized.append(i)
                 continue
             ids_normalized.append(i.rsplit('/', 1)[-1])
-        return super(SQS, self).get_resources(ids_normalized, cache)
+        resources = super(SQS, self).get_resources(ids_normalized, cache)
+        return [r for r in resources if Arn.parse(r['QueueArn']).resource in ids_normalized]
 
 
 @SQS.filter_registry.register('metrics')
@@ -125,29 +152,7 @@ class SQSCrossAccount(CrossAccountAccessFilter):
 
 @SQS.filter_registry.register('kms-key')
 class KmsFilter(KmsRelatedFilter):
-    """
-    Filter a resource by its associcated kms key and optionally the aliasname
-    of the kms key by using 'c7n:AliasName'
-    The KmsMasterId returned for SQS sometimes has the alias name directly in the value.
 
-    :example:
-
-        .. code-block:: yaml
-
-            policies:
-                - name: sqs-kms-key-filters
-                  resource: aws.sqs
-                  filters:
-                    - or:
-                      - type: value
-                        key: KmsMasterKeyId
-                        value: "^(alias/aws/)"
-                        op: regex
-                      - type: kms-key
-                        key: c7n:AliasName
-                        value: "^(alias/aws/)"
-                        op: regex
-    """
     RelatedIdsExpression = 'KmsMasterKeyId'
 
 
@@ -168,6 +173,16 @@ class SQSPostFinding(PostFinding):
             payload['KmsDataKeyReusePeriodSeconds'] = int(
                 payload['KmsDataKeyReusePeriodSeconds'])
         return envelope
+
+
+@SQS.filter_registry.register('has-statement')
+class HasStatementFilter(polstmt_filter.HasStatementFilter):
+    def get_std_format_args(self, queue):
+        return {
+            'queue_arn': queue['QueueArn'],
+            'account_id': self.manager.config.account_id,
+            'region': self.manager.config.region
+        }
 
 
 @SQS.action_registry.register('remove-statements')
@@ -192,7 +207,7 @@ class RemovePolicyStatement(RemovePolicyBase):
 
     def process(self, resources):
         results = []
-        client = local_session(self.manager.session_factory).client('sqs')
+        client = self.manager.get_client()
         for r in resources:
             try:
                 results += filter(None, [self.process_resource(client, r)])
@@ -207,7 +222,7 @@ class RemovePolicyStatement(RemovePolicyBase):
             return
 
         p = json.loads(resource['Policy'])
-        statements, found = self.process_policy(
+        _, found = self.process_policy(
             p, resource, CrossAccountAccessFilter.annotation_key)
 
         if not found:
@@ -251,7 +266,7 @@ class ModifyPolicyStatement(ModifyPolicyBase):
 
     def process(self, resources):
         results = []
-        client = local_session(self.manager.session_factory).client('sqs')
+        client = self.manager.get_client()
         for r in resources:
             policy = json.loads(r.get('Policy') or '{}')
             policy_statements = policy.setdefault('Statement', [])
@@ -303,7 +318,7 @@ class DeleteSqsQueue(BaseAction):
     permissions = ('sqs:DeleteQueue',)
 
     def process(self, queues):
-        client = local_session(self.manager.session_factory).client('sqs')
+        client = self.manager.get_client()
         for q in queues:
             self.process_queue(client, q)
 
@@ -318,6 +333,9 @@ class DeleteSqsQueue(BaseAction):
 @SQS.action_registry.register('set-encryption')
 class SetEncryption(BaseAction):
     """Action to set encryption key on SQS queue
+
+    you can also optionally set data key 'reuse-period', or use with
+    the service managed encryption by not specifying a key.
 
     :example:
 
@@ -334,26 +352,48 @@ class SetEncryption(BaseAction):
     """
     schema = type_schema(
         'set-encryption',
-        key={'type': 'string'}, required=('key',))
+        **{
+            "enabled": {'type': 'boolean'},
+            "reuse-period": {'type': 'integer', 'minimum': 60, 'maximum': 86400},
+            "key": {'type': 'string'}}
+    )
 
     permissions = ('sqs:SetQueueAttributes',)
+    uuid_regex = re.compile('[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}')
 
     def process(self, queues):
-        # get KeyId
-        key = "alias/" + self.data.get('key')
-        session = local_session(self.manager.session_factory)
-        key_id = session.client(
-            'kms').describe_key(KeyId=key)['KeyMetadata']['KeyId']
-        client = session.client('sqs')
+        # compatibility, if key is given and not arn/key id/ or prefixed with
+        # alias, add alias to it.
+        key = self.data.get('key', None)
+        if (key
+            and not key.startswith('alias')
+            and not key.startswith('arn:')
+                and not self.uuid_regex.search(key)):
+            key = "alias/" + key
+
+        client = self.manager.get_client()
+
+        reuse_period = self.data.get('reuse-period', 300)
+        params = {}
+        if not self.data.get('enabled', True):
+            params['SqsManagedSseEnabled'] = 'false'
+            params['KmsMasterKeyId'] = ''
+        elif self.data.get('enable', True) and not key:
+            params['SqsManagedSseEnabled'] = 'true'
+            params['KmsMasterKeyId'] = ''
+        elif self.data.get('enable', True) and key:
+            params['SqsManagedSseEnabled'] = 'false'
+            params['KmsMasterKeyId'] = key
+            params['KmsDataKeyReusePeriodSeconds'] = str(reuse_period)
 
         for q in queues:
-            self.process_queue(client, q, key_id)
+            self.process_queue(client, q, params)
 
-    def process_queue(self, client, queue, key_id):
+    def process_queue(self, client, queue, params):
         try:
             client.set_queue_attributes(
                 QueueUrl=queue['QueueUrl'],
-                Attributes={'KmsMasterKeyId': key_id}
+                Attributes=params
             )
         except (client.exceptions.QueueDoesNotExist,) as e:
             self.log.exception(
@@ -387,10 +427,54 @@ class SetRetentionPeriod(BaseAction):
     permissions = ('sqs:SetQueueAttributes',)
 
     def process(self, queues):
-        client = local_session(self.manager.session_factory).client('sqs')
+        client = self.manager.get_client()
         period = str(self.data.get('period', 345600))
         for q in queues:
             client.set_queue_attributes(
                 QueueUrl=q['QueueUrl'],
                 Attributes={
                     'MessageRetentionPeriod': period})
+
+
+@SQS.filter_registry.register('dead-letter')
+class DeadLetterFilter(Filter):
+    """
+    Filter for sqs queues that are dead letter queues
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+         - name: find-dead-letter-queues
+           resource: aws.sqs
+           filters:
+             - type: dead-letter
+    """
+
+    schema = type_schema('dead-letter')
+    permissions = ()
+
+    def process(self, resources, event=None):
+        # we need to inspect all the queues regardless of any filters that
+        # may have been applied earlier
+        all_resources = self.manager.get_resource_manager("sqs").resources()
+        all_queue_arn_map = {r['QueueArn']: r for r in all_resources}
+        queue_arn_map = {r['QueueArn']: r for r in resources}
+        has_redrive = []
+        for r in all_resources:
+            if r.get("RedrivePolicy"):
+                has_redrive.append(r['QueueArn'])
+        result = []
+        # dead letter queues must exist in the same region and account as the
+        # original queue so it should be safe to look for them in our existing
+        # resources
+        for r in all_resources:
+            if r['QueueArn'] in has_redrive:
+                queue = all_queue_arn_map[r['QueueArn']]
+                target = json.loads(queue['RedrivePolicy']).get('deadLetterTargetArn')
+                if queue_arn_map.get(target):
+                    result.append(target)
+        # in case there are multiple queues pointing at the same dead letter queue
+        # we need to only return the unique queues
+        return [queue_arn_map[r] for r in set(result)]

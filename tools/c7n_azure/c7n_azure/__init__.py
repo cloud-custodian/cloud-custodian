@@ -1,22 +1,23 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import logging
+import warnings
 
 import adal
+
+# two azure packages seem to have this issue on invalid escape
+# sequence on their generated code w/ python 3.12
+# (azure.mgmt.resource, azure.mgmt.resourcgraph)
+warnings.filterwarnings("ignore", category=SyntaxWarning)
+
 
 # Quiet logging from dependencies
 adal.set_logging_options({'level': 'WARNING'})
 logging.getLogger("msrest").setLevel(logging.ERROR)
 logging.getLogger("keyring").setLevel(logging.WARNING)
 logging.getLogger("azure.storage.common.storageclient").setLevel(logging.WARNING)
+logging.getLogger("azure.cosmosdb.table.common.storageclient").setLevel(logging.WARNING)
+
+# This logger is spamming INFO with a bunch of requests data
+logging.getLogger('azure.identity').setLevel(logging.WARNING)
+logging.getLogger('azure.core.pipeline.policies.http_logging_policy').setLevel(logging.WARNING)

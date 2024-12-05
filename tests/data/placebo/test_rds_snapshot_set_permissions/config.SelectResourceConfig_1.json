@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "Results": [
+            "{\"resourceId\":\"testing\",\"configuration\":{\"allocatedStorage\":5.0,\"availabilityZone\":\"us-east-2b\",\"dbiResourceId\":\"db-YOIV3STYJIHNL2ASADGMMJI3TA\",\"dBInstanceIdentifier\":\"demodb\",\"engine\":\"mysql\",\"vpcId\":\"vpc-00e3a582e54e7f09a\",\"percentProgress\":100.0,\"iAMDatabaseAuthenticationEnabled\":false,\"dBSnapshotIdentifier\":\"testing\",\"optionGroupName\":\"demodb-20201216173045036600000003\",\"engineVersion\":\"5.7.19\",\"masterUsername\":\"user\",\"snapshotType\":\"manual\",\"instanceCreateTime\":\"2020-12-16T17:34:24.037Z\",\"dBSnapshotArn\":\"arn:aws:rds:us-east-2:644160558196:snapshot:testing\",\"processorFeatures\":[],\"tagList\":[],\"encrypted\":false,\"port\":3306.0,\"snapshotCreateTime\":\"2020-12-30T05:34:38.901Z\",\"licenseModel\":\"general-public-license\",\"storageType\":\"gp2\",\"status\":\"available\"},\"supplementaryConfiguration\":{\"DBSnapshotAttributes\":[{\"attributeValues\":[\"644160558196\",\"644160558196\",\"644160558196\",\"644160558196\"],\"attributeName\":\"restore\"}],\"Tags\":[]}}"
+        ],
+        "QueryInfo": {
+            "SelectFields": [
+                {
+                    "Name": "resourceId"
+                },
+                {
+                    "Name": "configuration"
+                },
+                {
+                    "Name": "supplementaryConfiguration"
+                }
+            ]
+        },
+        "ResponseMetadata": {}
+    }
+}

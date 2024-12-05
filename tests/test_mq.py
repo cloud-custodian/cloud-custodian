@@ -1,16 +1,5 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import time
 
 from .common import BaseTest
@@ -57,6 +46,28 @@ class MessageQueue(BaseTest):
         self.assertEqual(resources[0]['BrokerName'], 'dev')
         self.assertTrue('c7n.metrics' in resources[0])
 
+    def test_mq_message_broker_kms_filter(self):
+        session_factory = self.replay_flight_data('test_mq_message_broker_kms_filter')
+        kms = session_factory().client('kms')
+        p = self.load_policy(
+            {
+                'name': 'test-message-broker-kms-filter',
+                'resource': 'message-broker',
+                'filters': [
+                    {
+                        'type': 'kms-key',
+                        'key': 'c7n:AliasName',
+                        'value': 'alias/aws/mq'
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        aliases = kms.list_aliases(KeyId=resources[0]['EncryptionOptions']['KmsKeyId'])
+        self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/aws/mq')
+
     def test_delete_mq(self):
         factory = self.replay_flight_data("test_mq_delete")
         p = self.load_policy(
@@ -94,7 +105,7 @@ class MessageQueue(BaseTest):
             session_factory=factory,
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         client = factory().client("mq")
         if self.recording:
             time.sleep(1)
@@ -106,3 +117,31 @@ class MessageQueue(BaseTest):
             tags,
             {'Env': 'Dev',
              'maid_status': 'Resource does not meet policy: delete@2019/01/31'})
+
+    def test_mq_config_tagging(self):
+        factory = self.replay_flight_data("test_mq_config_tagging")
+        p = self.load_policy(
+            {
+                "name": "mark-unused-mq-delete",
+                "resource": "message-config",
+                'filters': [{'tag:Role': 'Dev'}],
+                "actions": [
+                    {'type': 'tag',
+                     'tags': {'Env': 'Dev'}},
+                    {'type': 'remove-tag',
+                     'tags': ['Role']}]},
+            config={'region': 'us-east-1'},
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = factory().client("mq")
+        if self.recording:
+            time.sleep(1)
+        tags = client.list_tags(ResourceArn=resources[0]["Arn"])["Tags"]
+        self.assertEqual(
+            {t['Key']: t['Value'] for t in resources[0]['Tags']},
+            {'Role': 'Dev'})
+        self.assertEqual(
+            tags,
+            {'Env': 'Dev'})

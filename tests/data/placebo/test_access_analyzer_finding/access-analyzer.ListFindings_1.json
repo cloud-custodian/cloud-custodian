@@ -1,0 +1,188 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "findings": [
+            {
+                "id": "6d1a2533-bfac-4e07-82b2-7540f68cad26",
+                "principal": {
+                    "AWS": "arn:aws:iam::644160558196:role/service-role/resource-check-role-6qxf8l2j"
+                },
+                "action": [
+                    "sts:AssumeRole"
+                ],
+                "resource": "arn:aws:iam::644160558196:role/aws-RecorderRoleC4E33A-TSABEY6UXXXX",
+                "isPublic": false,
+                "resourceType": "AWS::IAM::Role",
+                "condition": {},
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 7,
+                    "day": 1,
+                    "hour": 16,
+                    "minute": 17,
+                    "second": 22,
+                    "microsecond": 667000
+                },
+                "analyzedAt": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 7,
+                    "day": 5,
+                    "hour": 8,
+                    "minute": 32,
+                    "second": 24,
+                    "microsecond": 886000
+                },
+                "updatedAt": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 7,
+                    "day": 5,
+                    "hour": 8,
+                    "minute": 32,
+                    "second": 24,
+                    "microsecond": 886000
+                },
+                "status": "RESOLVED",
+                "resourceOwnerAccount": "644160558196"
+            },
+            {
+                "id": "de234567-65aa-4290-9699-50d59ec5d8ae",
+                "principal": {
+                    "AWS": "arn:aws:sts::644160558196:assumed-role/resource-check-role-6qxf8l2j/resource-check"
+                },
+                "action": [
+                    "sts:AssumeRole"
+                ],
+                "resource": "arn:aws:iam::644160558196:role/aws-RecorderRoleC4E33C-TSABEY6UXXXX",
+                "isPublic": false,
+                "resourceType": "AWS::IAM::Role",
+                "condition": {},
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 7,
+                    "day": 1,
+                    "hour": 16,
+                    "minute": 15,
+                    "second": 9,
+                    "microsecond": 48000
+                },
+                "analyzedAt": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 7,
+                    "day": 5,
+                    "hour": 8,
+                    "minute": 32,
+                    "second": 24,
+                    "microsecond": 886000
+                },
+                "updatedAt": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 7,
+                    "day": 5,
+                    "hour": 8,
+                    "minute": 32,
+                    "second": 24,
+                    "microsecond": 886000
+                },
+                "status": "RESOLVED",
+                "resourceOwnerAccount": "644160558196"
+            },
+            {
+                "id": "532ef930-f3f7-4389-a9f0-6ae323bfa899",
+                "principal": {
+                    "AWS": "644160558196"
+                },
+                "action": [
+                    "sts:AssumeRole"
+                ],
+                "resource": "arn:aws:iam::644160558196:role/aws-RecorderRoleC4E33B-TSABEY6UXXXX",
+                "isPublic": true,
+                "resourceType": "AWS::IAM::Role",
+                "condition": {},
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 7,
+                    "day": 5,
+                    "hour": 8,
+                    "minute": 32,
+                    "second": 24,
+                    "microsecond": 886000
+                },
+                "analyzedAt": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 9,
+                    "day": 2,
+                    "hour": 11,
+                    "minute": 15,
+                    "second": 5,
+                    "microsecond": 967000
+                },
+                "updatedAt": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 7,
+                    "day": 5,
+                    "hour": 13,
+                    "minute": 48,
+                    "second": 10,
+                    "microsecond": 546000
+                },
+                "status": "ACTIVE",
+                "resourceOwnerAccount": "644160558196"
+            },
+            {
+                "id": "56a4bd74-f5d1-4fa0-968c-111f1cdeeaf8",
+                "principal": {
+                    "AWS": "644160558196"
+                },
+                "action": [
+                    "sts:AssumeRole"
+                ],
+                "resource": "arn:aws:iam::644160558196:role/aws-pe-RecorderRoleC4E33A-3B9W2DM0TNW",
+                "isPublic": false,
+                "resourceType": "AWS::IAM::Role",
+                "condition": {},
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 8,
+                    "day": 10,
+                    "hour": 9,
+                    "minute": 20,
+                    "second": 18,
+                    "microsecond": 792000
+                },
+                "analyzedAt": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 9,
+                    "day": 2,
+                    "hour": 11,
+                    "minute": 15,
+                    "second": 5,
+                    "microsecond": 967000
+                },
+                "updatedAt": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 8,
+                    "day": 10,
+                    "hour": 9,
+                    "minute": 24,
+                    "second": 46,
+                    "microsecond": 267000
+                },
+                "status": "ACTIVE",
+                "resourceOwnerAccount": "644160558196"
+            }
+        ]
+    }
+}

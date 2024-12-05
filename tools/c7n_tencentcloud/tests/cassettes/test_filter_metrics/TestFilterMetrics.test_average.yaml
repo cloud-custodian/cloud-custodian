@@ -1,0 +1,134 @@
+interactions:
+- request:
+    body: '{"InstanceIds": ["ins-dq1dmpgk", "ins-n198q4gc"], "Offset": 0, "Limit":
+      20}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '75'
+      Content-Type:
+      - application/json
+      Host:
+      - cvm.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - DescribeInstances
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2017-03-12'
+    method: POST
+    uri: https://cvm.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: "{\"Response\": {\"TotalCount\": 2, \"InstanceSet\": [{\"Placement\":
+        {\"Zone\": \"ap-singapore-4\", \"HostId\": null, \"ProjectId\": 0}, \"InstanceId\":
+        \"ins-dq1dmpgk\", \"Uuid\": \"2e56464f-5d8c-4449-960f-75ad37e5a625\", \"OperatorUin\":
+        \"\", \"InstanceState\": \"RUNNING\", \"RestrictState\": \"NORMAL\", \"InstanceType\":
+        \"SA2.MEDIUM4\", \"CPU\": 2, \"Memory\": 4, \"InstanceName\": \"arron_cvm\",
+        \"InstanceChargeType\": \"POSTPAID_BY_HOUR\", \"SystemDisk\": {\"DiskType\":
+        \"CLOUD_BSSD\", \"DiskId\": \"disk-86s0fjos\", \"DiskSize\": 50, \"Encrypt\":
+        false, \"KmsKeyId\": null, \"ThroughputPerformance\": 0, \"CdcId\": null},
+        \"DataDisks\": [], \"PrivateIpAddresses\": [\"192.168.0.11\"], \"PublicIpAddresses\":
+        [\"43.156.31.218\"], \"IPv6Addresses\": null, \"InternetAccessible\": {\"InternetMaxBandwidthOut\":
+        10, \"InternetChargeType\": \"TRAFFIC_POSTPAID_BY_HOUR\"}, \"VirtualPrivateCloud\":
+        {\"VpcId\": \"vpc-rdsfj6ot\", \"SubnetId\": \"subnet-9hl8a56w\", \"AsVpcGateway\":
+        false}, \"SecurityGroupIds\": [\"sg-0tifsp1w\", \"sg-cj259yog\"], \"LoginSettings\":
+        {\"KeyIds\": [\"skey-0uvvu4xh\"]}, \"ImageId\": \"img-eb30mz89\", \"OsName\":
+        \"TencentOS Server 3.1 (TK4)\", \"DefaultLoginUser\": \"root\", \"DefaultLoginPort\":
+        22, \"RenewFlag\": null, \"CreatedTime\": \"2022-09-14T02:09:47Z\", \"ExpiredTime\":
+        null, \"Tags\": [], \"PlatformProjectId\": null, \"DisasterRecoverGroupId\":
+        \"\", \"DedicatedClusterId\": \"\", \"CamRoleName\": \"\", \"LatestOperation\":
+        \"ModifyInstancesAttribute.SecurityGroups\", \"LatestOperationState\": \"SUCCESS\",
+        \"LatestOperationRequestId\": \"76438a01-31a9-4e8e-a112-8acf49ff4aca\", \"IsolatedSource\":
+        \"NOTISOLATED\", \"HpcClusterId\": \"\", \"DisableApiTermination\": false,
+        \"RdmaIpAddresses\": null, \"LicenseType\": \"TencentCloud\", \"StopChargingMode\":
+        \"NOT_APPLICABLE\"}, {\"Placement\": {\"Zone\": \"ap-singapore-1\", \"HostId\":
+        null, \"ProjectId\": 1000000511}, \"InstanceId\": \"ins-n198q4gc\", \"Uuid\":
+        \"507d7ee0-bb64-48ff-82b1-960f03ad904f\", \"OperatorUin\": \"\", \"InstanceState\":
+        \"RUNNING\", \"RestrictState\": \"NORMAL\", \"InstanceType\": \"S5.LARGE8\",
+        \"CPU\": 4, \"Memory\": 8, \"InstanceName\": \"Unnamed\", \"InstanceChargeType\":
+        \"POSTPAID_BY_HOUR\", \"SystemDisk\": {\"DiskType\": \"CLOUD_PREMIUM\", \"DiskId\":
+        \"disk-2xu821gm\", \"DiskSize\": 50, \"Encrypt\": false, \"KmsKeyId\": null,
+        \"ThroughputPerformance\": 0, \"CdcId\": null}, \"DataDisks\": [], \"PrivateIpAddresses\":
+        [\"10.0.1.8\"], \"PublicIpAddresses\": [\"43.156.4.43\"], \"IPv6Addresses\":
+        null, \"InternetAccessible\": {\"InternetMaxBandwidthOut\": 5, \"InternetChargeType\":
+        \"TRAFFIC_POSTPAID_BY_HOUR\"}, \"VirtualPrivateCloud\": {\"VpcId\": \"vpc-aik1957f\",
+        \"SubnetId\": \"subnet-5k1ixnpo\", \"AsVpcGateway\": false}, \"SecurityGroupIds\":
+        [\"sg-b3fnpwk6\"], \"LoginSettings\": {\"KeyIds\": null}, \"ImageId\": \"img-9id7emv7\",
+        \"OsName\": \"Windows Server 2016 \u6570\u636E\u4E2D\u5FC3\u7248 64\u4F4D\u4E2D\u6587\u7248\",
+        \"DefaultLoginUser\": \"Administrator\", \"DefaultLoginPort\": 3389, \"RenewFlag\":
+        null, \"CreatedTime\": \"2022-06-20T06:24:35Z\", \"ExpiredTime\": null, \"Tags\":
+        [], \"PlatformProjectId\": null, \"DisasterRecoverGroupId\": \"\", \"DedicatedClusterId\":
+        \"\", \"CamRoleName\": \"\", \"LatestOperation\": null, \"LatestOperationState\":
+        null, \"LatestOperationRequestId\": null, \"IsolatedSource\": \"NOTISOLATED\",
+        \"HpcClusterId\": \"\", \"DisableApiTermination\": false, \"RdmaIpAddresses\":
+        null, \"LicenseType\": \"TencentCloud\", \"StopChargingMode\": \"NOT_APPLICABLE\"}],
+        \"RequestId\": \"28e7ea01-0ee3-4de0-9b43-1ae77317f8b5\"}}"
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '3235'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 29 Sep 2022 01:59:31 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"Namespace": "QCE/CVM", "MetricName": "CPUUsage", "Period": 3600, "StartTime":
+      "2022-09-26T09:59:29+08:00", "EndTime": "2022-09-29T09:59:29+08:00", "Instances":
+      [{"Dimensions": [{"Name": "InstanceId", "Value": "ins-dq1dmpgk"}]}, {"Dimensions":
+      [{"Name": "InstanceId", "Value": "ins-n198q4gc"}]}]}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '297'
+      Content-Type:
+      - application/json
+      Host:
+      - monitor.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetMonitorData
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2018-07-24'
+    method: POST
+    uri: https://monitor.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"StartTime":"2022-09-26 09:00:00","EndTime":"2022-09-29
+        09:00:00","Period":3600,"MetricName":"CPUUsage","DataPoints":[{"Dimensions":[{"Name":"InstanceId","Value":"ins-dq1dmpgk"}],"Timestamps":[1664154000,1664157600,1664161200,1664164800,1664168400,1664172000,1664175600,1664179200,1664182800,1664186400,1664190000,1664193600,1664197200,1664200800,1664204400,1664208000,1664211600,1664215200,1664218800,1664222400,1664226000,1664229600,1664233200,1664236800,1664240400,1664244000,1664247600,1664251200,1664254800,1664258400,1664262000,1664265600,1664269200,1664272800,1664276400,1664280000,1664283600,1664287200,1664290800,1664294400,1664298000,1664301600,1664305200,1664308800,1664312400,1664316000,1664319600,1664323200,1664326800,1664330400,1664334000,1664337600,1664341200,1664344800,1664348400,1664352000,1664355600,1664359200,1664362800,1664366400,1664370000,1664373600,1664377200,1664380800,1664384400,1664388000,1664391600,1664395200,1664398800,1664402400,1664406000,1664409600],"Values":[1.05,0.966,1.366,0.816,1.316,0.816,0.866,0.833,0.983,0.916,0.95,0.933,0.9,0.85,0.883,1.25,2.266,2.35,0.966,0.833,0.883,0.85,1.033,0.85,0.833,0.866,1.25,0.966,0.916,0.866,0.883,0.983,0.85,0.85,0.85,1.316,1.449,1.216,0.883,0.916,2.166,0.916,0.833,0.916,0.866,0.9,0.85,1.333,0.85,0.866,1.166,0.883,0.866,0.833,0.833,0.866,0.933,0.933,0.85,0.883,1.1,0.866,1.033,0.966,2.366,0.9,0.85,0.833,0.866,0.883,0.833,0.8]},{"Dimensions":[{"Name":"InstanceId","Value":"ins-n198q4gc"}],"Timestamps":[1664154000,1664157600,1664161200,1664164800,1664168400,1664172000,1664175600,1664179200,1664182800,1664186400,1664190000,1664193600,1664197200,1664200800,1664204400,1664208000,1664211600,1664215200,1664218800,1664222400,1664226000,1664229600,1664233200,1664236800,1664240400,1664244000,1664247600,1664251200,1664254800,1664258400,1664262000,1664265600,1664269200,1664272800,1664276400,1664280000,1664283600,1664287200,1664290800,1664294400,1664298000,1664301600,1664305200,1664308800,1664312400,1664316000,1664319600,1664323200,1664326800,1664330400,1664334000,1664337600,1664341200,1664344800,1664348400,1664352000,1664355600,1664359200,1664362800,1664366400,1664370000,1664373600,1664377200,1664380800,1664384400,1664388000,1664391600,1664395200,1664398800,1664402400,1664406000,1664409600],"Values":[0,0.333,0.166,0,0,0.5,0.166,0.166,0,0,0,0.166,0,0,0.166,1.833,1.666,0.166,0.333,0.166,0.166,0.166,0.166,0.333,0.166,0,0.166,0.166,0,0,0,0.166,0,0.333,0.166,0,0.166,0.166,0,1.833,0.166,1.833,0.166,0.166,0,0.166,0,0.166,0,0.166,0.166,0,0.166,0.166,0,0.166,0,0,0,0,0.166,0,0.166,1.833,1.666,0,0.166,0.333,0.166,0.166,0.333,0.166]}],"RequestId":"9711a757-5e97-4246-92fe-c07df39aceef"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '2677'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 29 Sep 2022 01:59:40 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+version: 1

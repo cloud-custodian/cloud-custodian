@@ -1,0 +1,29 @@
+name: "Publish Docs"
+description: "Publish docs to cloudcustodian.io"
+inputs:
+  aws-role:
+    description: 'AWS Credential Access Role'
+    required: true
+  aws-region:
+    default: 'us-east-1'
+  docs-dir:
+    required: true
+  bucket-url:
+    default: s3://cloudcustodian.io/docs
+runs:
+  using: "composite"
+  steps:
+    - uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ inputs.aws-role }}
+        aws-region: ${{ inputs.aws-region }}
+
+    - name: Install Deps
+      shell: bash
+      run: |
+        pip install -U awscli --index-url https://pypi.org/simple
+
+    - name: Publish
+      shell: bash
+      run: |
+        aws s3 sync ${{ inputs.docs-dir }} ${{ inputs.bucket-url }}

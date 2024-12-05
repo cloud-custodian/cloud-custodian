@@ -4,7 +4,7 @@
         {
             "request": {
                 "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resources?$filter=resourceType%20eq%20%27Microsoft.KeyVault%2Fvaults%27&api-version=2015-11-01",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.KeyVault/vaults?api-version=2019-09-01",
                 "body": null,
                 "headers": {}
             },
@@ -14,37 +14,46 @@
                     "message": "OK"
                 },
                 "headers": {
+                    "date": [
+                        "Wed, 12 Oct 2022 15:05:34 GMT"
+                    ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
-                    "date": [
-                        "Thu, 02 May 2019 19:32:49 GMT"
-                    ],
-                    "content-length": [
-                        "539"
-                    ],
                     "cache-control": [
                         "no-cache"
+                    ],
+                    "content-length": [
+                        "851"
                     ]
                 },
                 "body": {
                     "data": {
                         "value": [
                             {
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_keyvault/providers/Microsoft.KeyVault/vaults/cckeyvault1c6ra5qqpkhceo",
-                                "name": "cckeyvault1c6ra5qqpkhceo",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_keyvault-no-policies/providers/Microsoft.KeyVault/vaults/cckeyvault2ev2qnehi4dtyy",
+                                "name": "cckeyvault2ev2qnehi4dtyy",
                                 "type": "Microsoft.KeyVault/vaults",
                                 "location": "southcentralus",
-                                "tags": {}
-                            },
-                            {
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_keyvault-no-policies/providers/Microsoft.KeyVault/vaults/cckeyvault2kme24fgeaqvqk",
-                                "name": "cckeyvault2kme24fgeaqvqk",
-                                "type": "Microsoft.KeyVault/vaults",
-                                "location": "southcentralus",
-                                "tags": {}
+                                "tags": {
+                                    "product_id": "13742"
+                                },
+                                "properties": {
+                                    "sku": {
+                                        "family": "A",
+                                        "name": "Standard"
+                                    },
+                                    "tenantId": "00000000-0000-0000-0000-000000000003",
+                                    "accessPolicies": [],
+                                    "enabledForDeployment": false,
+                                    "enabledForDiskEncryption": false,
+                                    "enabledForTemplateDeployment": false,
+                                    "vaultUri": "https://cckeyvault2ev2qnehi4dtyy.vault.azure.net/",
+                                    "provisioningState": "Succeeded"
+                                }
                             }
-                        ]
+                        ],
+                        "nextLink": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.KeyVault/vaults?api-version=2019-09-01&$skiptoken=dGVzdF9rZXl2YXVsdC1uby1wb2xpY2llc3xjY2tleXZhdWx0MmV2MnFuZWhpNGR0eXk="
                     }
                 }
             }
@@ -52,7 +61,7 @@
         {
             "request": {
                 "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_keyvault-no-policies/providers/Microsoft.KeyVault/vaults/cckeyvault2kme24fgeaqvqk?api-version=2018-02-14",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.KeyVault/vaults?api-version=2019-09-01&$skiptoken=dGVzdF9rZXl2YXVsdC1uby1wb2xpY2llc3xjY2tleXZhdWx0MmV2MnFuZWhpNGR0eXk=",
                 "body": null,
                 "headers": {}
             },
@@ -62,40 +71,72 @@
                     "message": "OK"
                 },
                 "headers": {
+                    "date": [
+                        "Wed, 12 Oct 2022 15:05:34 GMT"
+                    ],
                     "content-type": [
                         "application/json; charset=utf-8"
-                    ],
-                    "date": [
-                        "Thu, 02 May 2019 19:32:50 GMT"
-                    ],
-                    "x-ms-keyvault-service-version": [
-                        "1.1.0.244"
                     ],
                     "cache-control": [
                         "no-cache"
                     ],
                     "content-length": [
-                        "587"
+                        "12"
                     ]
                 },
                 "body": {
                     "data": {
-                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_keyvault-no-policies/providers/Microsoft.KeyVault/vaults/cckeyvault2kme24fgeaqvqk",
-                        "name": "cckeyvault2kme24fgeaqvqk",
+                        "value": []
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_keyvault-no-policies/providers/Microsoft.KeyVault/vaults/cckeyvault2ev2qnehi4dtyy?api-version=2019-09-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Wed, 12 Oct 2022 15:05:35 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "607"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_keyvault-no-policies/providers/Microsoft.KeyVault/vaults/cckeyvault2ev2qnehi4dtyy",
+                        "name": "cckeyvault2ev2qnehi4dtyy",
                         "type": "Microsoft.KeyVault/vaults",
                         "location": "southcentralus",
-                        "tags": {},
+                        "tags": {
+                            "product_id": "13742"
+                        },
                         "properties": {
                             "sku": {
                                 "family": "A",
                                 "name": "Standard"
                             },
-                            "tenantId": "72f988bf-86f1-41af-91ab-2d7cd011db47",
+                            "tenantId": "00000000-0000-0000-0000-000000000003",
                             "accessPolicies": [],
                             "enabledForDeployment": false,
                             "enabledForDiskEncryption": false,
                             "enabledForTemplateDeployment": false,
-                            "vaultUri": "https://cckeyvault2kme24fgeaqvqk.vault.azure.net/",
+                            "vaultUri": "https://cckeyvault2ev2qnehi4dtyy.vault.azure.net/",
                             "provisioningState": "Succeeded"
                         }
                     }

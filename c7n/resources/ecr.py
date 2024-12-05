@@ -1,25 +1,29 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import json
 
-from c7n.actions import RemovePolicyBase, Action
+from c7n.actions import RemovePolicyBase, Action, ModifyPolicyBase
 from c7n.exceptions import PolicyValidationError
-from c7n.filters import CrossAccountAccessFilter, Filter, ValueFilter
+from c7n.filters import CrossAccountAccessFilter, Filter, ValueFilter, MetricsFilter
 from c7n.manager import resources
-from c7n.query import ConfigSource, DescribeSource, QueryResourceManager, TypeInfo
+from c7n.query import (
+    ConfigSource, DescribeSource, QueryResourceManager, TypeInfo,
+    ChildResourceManager, ChildDescribeSource, ChildResourceQuery, sources)
 from c7n import tags
 from c7n.utils import local_session, type_schema
+
+
+class ConfigECR(ConfigSource):
+
+    def load_resource(self, item):
+        resource = super().load_resource(item)
+        for configk, servicek in {
+                'RepositoryName': 'repositoryName',
+                'Arn': 'repositoryArn',
+                'RepositoryUri': 'repositoryUri',
+                'RepositoryPolicyText': 'Policy'}.items():
+            resource[servicek] = resource.pop(configk, None)
+        return resource
 
 
 class DescribeECR(DescribeSource):
@@ -43,17 +47,185 @@ class ECR(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'ecr'
         enum_spec = ('describe_repositories', 'repositories', None)
-        name = "repositoryName"
-        arn = id = "repositoryArn"
+        id = name = "repositoryName"
+        arn = "repositoryArn"
         arn_type = 'repository'
         filter_name = 'repositoryNames'
         filter_type = 'list'
-        cfn_type = 'AWS::ECR::Repository'
+        config_type = cfn_type = 'AWS::ECR::Repository'
+        dimension = 'RepositoryName'
+        permissions_augment = ("ecr:ListTagsForResource",)
 
     source_mapping = {
         'describe': DescribeECR,
-        'config': ConfigSource
+        'config': ConfigECR
     }
+
+
+@ECR.filter_registry.register('metrics')
+class ECRMetricsFilter(MetricsFilter):
+    def get_dimensions(self, resource):
+        return [{"Name": "RepositoryName", "Value": resource['repositoryName']}]
+
+
+class ECRImageQuery(ChildResourceQuery):
+
+    def get(self, resource_manager, identities):
+        m = self.resolve(resource_manager.resource_type)
+        params = {}
+        resources = self.filter(resource_manager, **params)
+        resources = [r for r in resources if "{}/{}".format(r[0], r[1][m.id]) in identities]
+
+        return resources
+
+
+@sources.register('describe-ecr-image')
+class RepositoryImageDescribeSource(ChildDescribeSource):
+
+    resource_query_factory = ECRImageQuery
+
+    def get_query(self):
+        return super().get_query(capture_parent_id=True)
+
+    def augment(self, resources):
+        results = []
+        client = local_session(self.manager.session_factory).client('ecr')
+        for repositoryName, image in resources:
+            repoArn = client.describe_repositories(
+                repositoryNames=[repositoryName])['repositories'][0]['repositoryArn']
+            imageArn = "{}/{}".format(repoArn, image["imageDigest"])
+            image["imageArn"] = imageArn
+            results.append(image)
+        return results
+
+
+@resources.register('ecr-image')
+class RepositoryImage(ChildResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'ecr'
+        parent_spec = ('ecr', 'repositoryName', None)
+        enum_spec = ('describe_images', 'imageDetails', None)
+        id = 'imageDigest'
+        name = 'repositoryName'
+        arn = "imageArn"
+        arn_type = 'repository'
+
+    source_mapping = {
+        'describe-child': RepositoryImageDescribeSource,
+        'describe': RepositoryImageDescribeSource,
+    }
+
+
+ECR_POLICY_SCHEMA = {
+    'type': 'object',
+    'properties': {
+        'Sid': {'type': 'string'},
+        'Effect': {'type': 'string', 'enum': ['Allow', 'Deny']},
+        'Principal': {'anyOf': [
+            {'type': 'string'},
+            {'type': 'object'}, {'type': 'array'}]},
+        'NotPrincipal': {'anyOf': [{'type': 'object'}, {'type': 'array'}]},
+        'Action': {'anyOf': [{'type': 'string', 'pattern': '^ecr:([a-zA-Z]*|[*])$'},
+            {'type': 'array', 'items': {'type': 'string', 'pattern': '^ecr:([a-zA-Z]*|[*])$'}}]},
+        'NotAction': {'anyOf': [{'type': 'string', 'pattern': '^ecr:([a-zA-Z]*|[*])$'},
+            {'type': 'array', 'items': {'type': 'string', 'pattern': '^ecr:([a-zA-Z]*|[*])$'}}]},
+        'Resource': {'anyOf': [{'type': 'string'}, {'type': 'array'}]},
+        'NotResource': {'anyOf': [{'type': 'string'}, {'type': 'array'}]},
+        'Condition': {'type': 'object'}
+    },
+    'required': ['Sid', 'Effect'],
+    'oneOf': [
+        {'required': ['Principal', 'Action']},
+        {'required': ['NotPrincipal', 'Action']},
+        {'required': ['Principal', 'NotAction']},
+        {'required': ['NotPrincipal', 'NotAction']}
+    ]
+}
+
+
+@RepositoryImage.action_registry.register('modify-ecr-policy')
+@ECR.action_registry.register('modify-ecr-policy')
+class ModifyPolicyStatement(ModifyPolicyBase):
+    """Action to modify ECR policy statements.
+
+    :example:
+
+    .. code-block:: yaml
+
+           policies:
+              - name: ecr-image-prevent-pull
+                resource: ecr-image
+                filters:
+                  - type: finding
+                actions:
+                  - type: modify-ecr-policy
+                    add-statements: [{
+                        "Sid": "ReplaceWithMe",
+                        "Effect": "Deny",
+                        "Principal": "*",
+                        "Action": ["ecr:BatchGetImage"]
+                            }]
+                    remove-statements: "*"
+    """
+    permissions = ('ecr:GetRepositoryPolicy', 'ecr:SetRepositoryPolicy')
+    schema = type_schema(
+        'modify-ecr-policy', schema_alias=False,
+        **{
+            'add-statements': {
+                'type': 'array',
+                'items': ECR_POLICY_SCHEMA,
+            },
+            'remove-statements': {
+                'type': ['array', 'string'],
+                'oneOf': [
+                    {'enum': ['matched', '*']},
+                    {'type': 'array', 'items': {'type': 'string'}}
+                ],
+            }
+        })
+
+    def process(self, resources):
+        results = []
+        client = local_session(self.manager.session_factory).client('ecr')
+        for r in resources:
+            try:
+                policy = json.loads(
+                    client.get_repository_policy(
+                        repositoryName=r["repositoryName"])["policyText"])
+            except client.exceptions.RepositoryPolicyNotFoundException:
+                policy = {}
+            policy_statements = policy.setdefault('Statement', [])
+            new_policy, removed = self.remove_statements(
+                policy_statements, r, CrossAccountAccessFilter.annotation_key)
+            if new_policy is None:
+                new_policy = policy_statements
+            new_policy, added = self.add_statements(new_policy)
+
+            if not removed and not added:
+                continue
+            elif not new_policy:
+                client.delete_repository_policy(
+                    repositoryName=r['repositoryName'])
+            else:
+                cleaned = []
+                for statement in new_policy:
+                    if "Resource" in statement:
+                        del statement["Resource"]
+                        cleaned.append(statement)
+                    else:
+                        cleaned.append(statement)
+                policy['Statement'] = cleaned
+                client.set_repository_policy(
+                    repositoryName=r['repositoryName'],
+                    policyText=json.dumps(policy))
+            results += {
+                'Name': r['repositoryName'],
+                'State': 'PolicyModified',
+                'Statements': new_policy
+            }
+
+        return results
 
 
 @ECR.action_registry.register('tag')
@@ -153,6 +325,8 @@ class ECRCrossAccountAccessFilter(CrossAccountAccessFilter):
         client = local_session(self.manager.session_factory).client('ecr')
 
         def _augment(r):
+            if r.get('Policy') is not None:
+                return r
             try:
                 r['Policy'] = client.get_repository_policy(
                     repositoryName=r['repositoryName'])['policyText']

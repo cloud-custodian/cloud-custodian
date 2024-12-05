@@ -1,0 +1,27 @@
+{
+    "status_code": 200,
+    "data": {
+        "Parameters": [
+            {
+                "Name": "not_secret",
+                "Type": "String",
+                "LastModifiedDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 5,
+                    "day": 29,
+                    "hour": 13,
+                    "minute": 27,
+                    "second": 6,
+                    "microsecond": 475000
+                },
+                "LastModifiedUser": "arn:aws:iam::644160558196:user/kapil",
+                "Version": 1,
+                "Tier": "Standard",
+                "Policies": [],
+                "DataType": "text"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

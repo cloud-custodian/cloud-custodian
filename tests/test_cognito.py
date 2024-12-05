@@ -1,16 +1,5 @@
-# Copyright 2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from .common import BaseTest
 
 
@@ -26,6 +15,9 @@ class UserPool(BaseTest):
             sorted([n["Name"] for n in resources]),
             ["c7nusers", "origin_userpool_MOBILEHUB_1667653900"],
         )
+        # Confirm that our augment pass has tag information and detail
+        # from describe_user_pool
+        self.assertLessEqual({"Id", "Tags", "SchemaAttributes"}, set(resources[0]))
 
     def test_delete_user_pool(self):
         factory = self.replay_flight_data("test_cognito-user-pool_delete")
@@ -58,6 +50,12 @@ class IdentityPool(BaseTest):
         self.assertEqual(
             sorted([n["IdentityPoolName"] for n in resources]),
             ["origin_MOBILEHUB_1667653900", "test_delete_id_pool"],
+        )
+        # Confirm that our augment pass has tag information and detail
+        # from describe_identity_pool
+        self.assertLessEqual(
+            {"IdentityPoolId", "Tags", "CognitoIdentityProviders"},
+            set(resources[0])
         )
 
     def test_delete_identity_pool(self):

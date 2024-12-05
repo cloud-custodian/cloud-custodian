@@ -1,0 +1,46 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 12 Nov 2020 15:55:58 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "server-timing": "gfet4t7; dur=65",
+    "alt-svc": "h3-Q050=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "432",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "ancestor": [
+      {
+        "resourceId": {
+          "type": "project",
+          "id": "practical-truck-276716"
+        }
+      },
+      {
+        "resourceId": {
+          "type": "folder",
+          "id": "389734459213"
+        }
+      },
+      {
+        "resourceId": {
+          "type": "folder",
+          "id": "264112811077"
+        }
+      },
+      {
+        "resourceId": {
+          "type": "organization",
+          "id": "11144"
+        }
+      }
+    ]
+  }
+}

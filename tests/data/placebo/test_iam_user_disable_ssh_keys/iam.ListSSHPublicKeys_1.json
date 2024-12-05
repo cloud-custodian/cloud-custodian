@@ -1,0 +1,39 @@
+{
+    "status_code": 200,
+    "data": {
+        "SSHPublicKeys": [
+            {
+                "UserName": "testuser-8aa8c470",
+                "SSHPublicKeyId": "APKAY5Y4D45RIUTJRHG5",
+                "Status": "Active",
+                "UploadDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 12,
+                    "day": 22,
+                    "hour": 2,
+                    "minute": 55,
+                    "second": 4,
+                    "microsecond": 0
+                }
+            },
+            {
+                "UserName": "testuser-8aa8c470",
+                "SSHPublicKeyId": "APKAY5Y4D45RD4AB6MY4",
+                "Status": "Inactive",
+                "UploadDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 12,
+                    "day": 22,
+                    "hour": 2,
+                    "minute": 55,
+                    "second": 4,
+                    "microsecond": 0
+                }
+            }
+        ],
+        "IsTruncated": false,
+        "ResponseMetadata": {}
+    }
+}

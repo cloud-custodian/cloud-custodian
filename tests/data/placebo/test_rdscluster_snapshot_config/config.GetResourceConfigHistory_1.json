@@ -1,0 +1,63 @@
+{
+    "status_code": 200,
+    "data": {
+        "configurationItems": [
+            {
+                "version": "1.3",
+                "accountId": "644160558196",
+                "configurationItemCaptureTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 5,
+                    "day": 19,
+                    "hour": 8,
+                    "minute": 28,
+                    "second": 14,
+                    "microsecond": 760000
+                },
+                "configurationItemStatus": "ResourceDiscovered",
+                "configurationStateId": "6441605581960",
+                "configurationItemMD5Hash": "",
+                "arn": "arn:aws:rds:us-east-1:644160558196:cluster-snapshot:rds:database-1-2020-05-19-05-58",
+                "resourceType": "AWS::RDS::DBClusterSnapshot",
+                "resourceId": "rds:database-1-2020-05-19-05-58",
+                "resourceName": "rds:database-1-2020-05-19-05-58",
+                "awsRegion": "us-east-1",
+                "availabilityZone": "Multiple Availability Zones",
+                "resourceCreationTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 5,
+                    "day": 19,
+                    "hour": 1,
+                    "minute": 58,
+                    "second": 37,
+                    "microsecond": 785000
+                },
+                "tags": {
+                    "Owner": "kapil"
+                },
+                "relatedEvents": [],
+                "relationships": [
+                    {
+                        "resourceType": "AWS::EC2::VPC",
+                        "resourceId": "vpc-d2d616b5",
+                        "relationshipName": "Is associated with "
+                    },
+                    {
+                        "resourceType": "AWS::RDS::DBCluster",
+                        "resourceName": "database-1",
+                        "relationshipName": "Is associated with "
+                    }
+                ],
+                "configuration": "{\"availabilityZones\":[\"us-east-1a\",\"us-east-1b\",\"us-east-1d\"],\"snapshotCreateTime\":6441605581965,\"engine\":\"aurora-postgresql\",\"allocatedStorage\":0,\"status\":\"available\",\"port\":0,\"vpcId\":\"vpc-d2d616b5\",\"clusterCreateTime\":6441605581960,\"masterUsername\":\"postgres\",\"engineVersion\":\"10.serverless_7\",\"licenseModel\":\"postgresql-license\",\"snapshotType\":\"automated\",\"percentProgress\":100,\"storageEncrypted\":true,\"kmsKeyId\":\"arn:aws:kms:us-east-1:644160558196:key/b10f842a-feb7-4318-92d5-0640a75b7688\",\"dbclusterIdentifier\":\"database-1\",\"dbclusterSnapshotIdentifier\":\"rds:database-1-2020-05-19-05-58\",\"iamdatabaseAuthenticationEnabled\":false,\"dbclusterSnapshotArn\":\"arn:aws:rds:us-east-1:644160558196:cluster-snapshot:rds:database-1-2020-05-19-05-58\"}",
+                "supplementaryConfiguration": {
+                    "DBClusterSnapshotAttributes": "[{\"attributeName\":\"restore\",\"attributeValues\":[]}]",
+                    "Tags": "[{\"key\":\"Owner\",\"value\":\"kapil\"}]"
+                }
+            }
+        ],
+        "nextToken": "eyJlbmNyeXB0ZWREYXRhIjpbMTIwLDYzLDg2LDk2LC0xMjAsNzMsMTE2LC0xMjAsLTcwLDEzLC05NiwtMjIsMTI3LC0zMCwxMjQsLTYxLDExOSwxMTUsMTI3LC03MywtNTMsLTUwLC0yMSwxMjYsNDQsNTYsNDMsLTQ0LC0xMTcsNjMsLTg2LC05OSw2Nyw5OSw2OSwxNiw0OCw2MSwxMDksMTE5LC03NiwtNTAsLTExNCwtMTI1LC0xMjMsLTU3LDg0LC0xMDcsMTEyLDE4LDUxLC01LC05NiwtMTI0LDMxLDY5LC0xMjEsNDEsNDYsLTEyLC00MywtMTAxLC04LC00MywtOTYsODgsLTI4LDgwLC0xMjMsLTI1LC0xMSw4NSwtOCwtNTcsMzgsMjUsLTExNywtNTUsLTEwMywyNyw4LDU2LDU0LC02MywtODcsMTI2LDUsLTYxLDEyMCwtODUsNjEsLTEyNiwtMTIwLC0xMjEsODgsLTQ2LC05Myw4MCw5NCwwLDYyLDUsODgsNzMsLTk2LC03NiwtNDUsLTM0LDk2LDcxLC02LC03OSw4NiwtMTE2LC0xMSwtNjgsMzcsLTU1LC0xNSwtNDIsLTEwOCwtMTI3LDUwLC0xMjgsLTE1LDgyLDc5LC0yOSw3NSwtMTEzLC0zMiw4MywtOTEsLTc3LDY2LDMsMjMsMjksODIsNDMsLTk3LC03MSwyMiwtNTYsMjAsMTIwLC04MCwtMzgsLTI2LC0xNywyLC00OCw0Nyw3OCwtMTEsLTkzLDQzLDEwMywzNCwzMCwtMTI2LDIxLDExNCwxMjMsNzgsMzRdLCJtYXRlcmlhbFNldFNlcmlhbE51bWJlciI6MSwiaXZQYXJhbWV0ZXJTcGVjIjp7Iml2IjpbMTE0LDMsLTQ1LDQ4LDYyLDM1LDExMSwxMSwtNzUsLTM3LC03LC0yMSwyMSwtNzAsMTIsLTEwMF19fQ==",
+        "ResponseMetadata": {}
+    }
+}

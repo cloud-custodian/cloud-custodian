@@ -1,0 +1,34 @@
+{
+    "status_code": 200,
+    "data": {
+        "Databases": [
+            {
+                "Arn": "arn:aws:timestream:us-east-1:644160558196:database/ljlkjlkj",
+                "DatabaseName": "ljlkjlkj",
+                "TableCount": 1,
+                "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/eb703ede-7c05-4cfc-b650-5c6f31b8e019",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 1,
+                    "day": 13,
+                    "hour": 15,
+                    "minute": 11,
+                    "second": 46,
+                    "microsecond": 947000
+                },
+                "LastUpdatedTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 1,
+                    "day": 13,
+                    "hour": 15,
+                    "minute": 11,
+                    "second": 46,
+                    "microsecond": 941000
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

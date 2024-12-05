@@ -1,0 +1,12 @@
+{
+    "status_code": 200,
+    "data": {
+        "Firewalls": [
+            {
+                "FirewallName": "unicron",
+                "FirewallArn": "arn:aws:network-firewall:us-east-2:644160558196:firewall/unicron"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

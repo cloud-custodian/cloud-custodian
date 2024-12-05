@@ -1,0 +1,11 @@
+{
+    "status_code": 404,
+    "data": {
+        "Error": {
+            "Type": "Sender",
+            "Code": "NoSuchEntity",
+            "Message": "Unable to retrieve specified IAM entity."
+        },
+        "ResponseMetadata": {}
+    }
+}

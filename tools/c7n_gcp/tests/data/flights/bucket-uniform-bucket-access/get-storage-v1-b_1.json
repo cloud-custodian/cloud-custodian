@@ -1,0 +1,256 @@
+{
+  "headers": {
+    "x-guploader-uploadid": "AAANsUkSMY7-HCVKwcvfmbkE-XY2f9XPYZMK8NmCIU3WRyD9LRTxEnD14okro-IFkAc0OIIRXuMnJDHwFiFtbO10rQ",
+    "content-type": "application/json; charset=UTF-8",
+    "date": "Sat, 09 May 2020 09:01:34 GMT",
+    "vary": "Origin, X-Origin",
+    "cache-control": "private, max-age=0, must-revalidate, no-transform",
+    "expires": "Sat, 09 May 2020 09:01:34 GMT",
+    "content-length": "7949",
+    "server": "UploadServer",
+    "alt-svc": "h3-27=\":443\"; ma=2592000,h3-25=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q049=\":443\"; ma=2592000,h3-Q048=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
+    "status": "200",
+    "content-location": "https://storage.googleapis.com/storage/v1/b?project=custodian-1291&projection=full&alt=json"
+  },
+  "body": {
+    "kind": "storage#buckets",
+    "items": [
+      {
+        "kind": "storage#bucket",
+        "selfLink": "https://www.googleapis.com/storage/v1/b/artifacts.custodian-1291.appspot.com",
+        "id": "artifacts.custodian-1291.appspot.com",
+        "name": "artifacts.custodian-1291.appspot.com",
+        "projectNumber": "628364689359",
+        "metageneration": "1",
+        "location": "US",
+        "storageClass": "STANDARD",
+        "etag": "CAE=",
+        "timeCreated": "2016-08-19T03:03:32.589Z",
+        "updated": "2016-08-19T03:03:32.589Z",
+        "acl": [
+          {
+            "kind": "storage#bucketAccessControl",
+            "id": "artifacts.custodian-1291.appspot.com/project-owners-628364689359",
+            "selfLink": "https://www.googleapis.com/storage/v1/b/artifacts.custodian-1291.appspot.com/acl/project-owners-628364689359",
+            "bucket": "artifacts.custodian-1291.appspot.com",
+            "entity": "project-owners-628364689359",
+            "role": "OWNER",
+            "etag": "CAE=",
+            "projectTeam": {
+              "projectNumber": "628364689359",
+              "team": "owners"
+            }
+          },
+          {
+            "kind": "storage#bucketAccessControl",
+            "id": "artifacts.custodian-1291.appspot.com/project-editors-628364689359",
+            "selfLink": "https://www.googleapis.com/storage/v1/b/artifacts.custodian-1291.appspot.com/acl/project-editors-628364689359",
+            "bucket": "artifacts.custodian-1291.appspot.com",
+            "entity": "project-editors-628364689359",
+            "role": "OWNER",
+            "etag": "CAE=",
+            "projectTeam": {
+              "projectNumber": "628364689359",
+              "team": "editors"
+            }
+          },
+          {
+            "kind": "storage#bucketAccessControl",
+            "id": "artifacts.custodian-1291.appspot.com/project-viewers-628364689359",
+            "selfLink": "https://www.googleapis.com/storage/v1/b/artifacts.custodian-1291.appspot.com/acl/project-viewers-628364689359",
+            "bucket": "artifacts.custodian-1291.appspot.com",
+            "entity": "project-viewers-628364689359",
+            "role": "READER",
+            "etag": "CAE=",
+            "projectTeam": {
+              "projectNumber": "628364689359",
+              "team": "viewers"
+            }
+          }
+        ],
+        "defaultObjectAcl": [
+          {
+            "kind": "storage#objectAccessControl",
+            "entity": "project-owners-628364689359",
+            "role": "OWNER",
+            "etag": "CAE=",
+            "projectTeam": {
+              "projectNumber": "628364689359",
+              "team": "owners"
+            }
+          },
+          {
+            "kind": "storage#objectAccessControl",
+            "entity": "project-editors-628364689359",
+            "role": "OWNER",
+            "etag": "CAE=",
+            "projectTeam": {
+              "projectNumber": "628364689359",
+              "team": "editors"
+            }
+          },
+          {
+            "kind": "storage#objectAccessControl",
+            "entity": "project-viewers-628364689359",
+            "role": "READER",
+            "etag": "CAE=",
+            "projectTeam": {
+              "projectNumber": "628364689359",
+              "team": "viewers"
+            }
+          }
+        ],
+        "owner": {
+          "entity": "project-owners-628364689359"
+        },
+        "locationType": "multi-region"
+      },
+      {
+        "kind": "storage#bucket",
+        "selfLink": "https://www.googleapis.com/storage/v1/b/c7n-dev-test",
+        "id": "c7n-dev-test",
+        "name": "c7n-dev-test",
+        "projectNumber": "628364689359",
+        "metageneration": "1",
+        "location": "US-EAST1",
+        "storageClass": "REGIONAL",
+        "etag": "CAE=",
+        "timeCreated": "2018-07-29T18:48:09.999Z",
+        "updated": "2018-07-29T18:48:09.999Z",
+        "acl": [
+          {
+            "kind": "storage#bucketAccessControl",
+            "id": "c7n-dev-test/project-owners-628364689359",
+            "selfLink": "https://www.googleapis.com/storage/v1/b/c7n-dev-test/acl/project-owners-628364689359",
+            "bucket": "c7n-dev-test",
+            "entity": "project-owners-628364689359",
+            "role": "OWNER",
+            "etag": "CAE=",
+            "projectTeam": {
+              "projectNumber": "628364689359",
+              "team": "owners"
+            }
+          },
+          {
+            "kind": "storage#bucketAccessControl",
+            "id": "c7n-dev-test/project-editors-628364689359",
+            "selfLink": "https://www.googleapis.com/storage/v1/b/c7n-dev-test/acl/project-editors-628364689359",
+            "bucket": "c7n-dev-test",
+            "entity": "project-editors-628364689359",
+            "role": "OWNER",
+            "etag": "CAE=",
+            "projectTeam": {
+              "projectNumber": "628364689359",
+              "team": "editors"
+            }
+          },
+          {
+            "kind": "storage#bucketAccessControl",
+            "id": "c7n-dev-test/project-viewers-628364689359",
+            "selfLink": "https://www.googleapis.com/storage/v1/b/c7n-dev-test/acl/project-viewers-628364689359",
+            "bucket": "c7n-dev-test",
+            "entity": "project-viewers-628364689359",
+            "role": "READER",
+            "etag": "CAE=",
+            "projectTeam": {
+              "projectNumber": "628364689359",
+              "team": "viewers"
+            }
+          }
+        ],
+        "defaultObjectAcl": [
+          {
+            "kind": "storage#objectAccessControl",
+            "entity": "project-owners-628364689359",
+            "role": "OWNER",
+            "etag": "CAE=",
+            "projectTeam": {
+              "projectNumber": "628364689359",
+              "team": "owners"
+            }
+          },
+          {
+            "kind": "storage#objectAccessControl",
+            "entity": "project-editors-628364689359",
+            "role": "OWNER",
+            "etag": "CAE=",
+            "projectTeam": {
+              "projectNumber": "628364689359",
+              "team": "editors"
+            }
+          },
+          {
+            "kind": "storage#objectAccessControl",
+            "entity": "project-viewers-628364689359",
+            "role": "READER",
+            "etag": "CAE=",
+            "projectTeam": {
+              "projectNumber": "628364689359",
+              "team": "viewers"
+            }
+          }
+        ],
+        "owner": {
+          "entity": "project-owners-628364689359"
+        },
+        "iamConfiguration": {
+          "bucketPolicyOnly": {
+            "enabled": false
+          },
+          "uniformBucketLevelAccess": {
+            "enabled": false
+          }
+        },
+        "locationType": "region"
+      },
+      {
+        "kind": "storage#bucket",
+        "selfLink": "https://www.googleapis.com/storage/v1/b/custodian-gce-global-trail",
+        "id": "custodian-gce-global-trail",
+        "name": "custodian-gce-global-trail",
+        "projectNumber": "628364689359",
+        "metageneration": "12",
+        "location": "US",
+        "storageClass": "MULTI_REGIONAL",
+        "etag": "CAw=",
+        "timeCreated": "2016-12-23T17:53:06.954Z",
+        "updated": "2020-05-08T21:56:21.394Z",
+        "iamConfiguration": {
+          "bucketPolicyOnly": {
+            "enabled": true,
+            "lockedTime": "2020-08-06T21:56:21.195Z"
+          },
+          "uniformBucketLevelAccess": {
+            "enabled": true,
+            "lockedTime": "2020-08-06T21:56:21.195Z"
+          }
+        },
+        "locationType": "multi-region"
+      },
+      {
+        "kind": "storage#bucket",
+        "selfLink": "https://www.googleapis.com/storage/v1/b/custodian-gce-trail",
+        "id": "custodian-gce-trail",
+        "name": "custodian-gce-trail",
+        "projectNumber": "628364689359",
+        "metageneration": "4",
+        "location": "US-EAST1",
+        "storageClass": "REGIONAL",
+        "etag": "CAQ=",
+        "timeCreated": "2016-12-23T17:44:36.441Z",
+        "updated": "2020-05-05T21:57:42.576Z",
+        "iamConfiguration": {
+          "bucketPolicyOnly": {
+            "enabled": true,
+            "lockedTime": "2020-08-03T21:57:42.558Z"
+          },
+          "uniformBucketLevelAccess": {
+            "enabled": true,
+            "lockedTime": "2020-08-03T21:57:42.558Z"
+          }
+        },
+        "locationType": "region"
+      }
+    ]
+  }
+}

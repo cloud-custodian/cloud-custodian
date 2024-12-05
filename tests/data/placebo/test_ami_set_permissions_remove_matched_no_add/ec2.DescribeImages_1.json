@@ -1,0 +1,33 @@
+{
+    "status_code": 200,
+    "data": {
+        "Images": [
+            {
+                "Architecture": "x86_64",
+                "CreationDate": "2023-02-24T23:10:38.000Z",
+                "ImageId": "ami-085aca20aa1721a4d",
+                "ImageLocation": "amis-for-644160558196-in-us-east-1-oqsuxtha/ami-085aca20aa1721a4d-test-ami/elasticbamboo-6.27-x86_64-1625663983749.manifest.xml",
+                "ImageType": "machine",
+                "Public": false,
+                "KernelId": "aki-5c21674b",
+                "OwnerId": "644160558196",
+                "PlatformDetails": "Linux/UNIX",
+                "UsageOperation": "RunInstances",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "sdb",
+                        "VirtualName": "ephemeral0"
+                    }
+                ],
+                "Description": "[Copied ami-052968d3b353588da from us-east-1] undefined",
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "test-ami",
+                "RootDeviceType": "instance-store",
+                "VirtualizationType": "paravirtual"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,18 +1,7 @@
 {
     "status_code": 200,
     "data": {
-        "ResponseMetadata": {
-            "RequestId": "3f9b9bca-cc65-49c3-8ef7-fe2112ae7f5d",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "3f9b9bca-cc65-49c3-8ef7-fe2112ae7f5d",
-                "content-type": "text/xml",
-                "content-length": "2481",
-                "vary": "Accept-Encoding",
-                "date": "Fri, 28 Feb 2020 17:58:16 GMT"
-            },
-            "RetryAttempts": 0
-        },
+        "ResponseMetadata": {},
         "DistributionList": {
             "Marker": "",
             "MaxItems": 100,
@@ -20,8 +9,8 @@
             "Quantity": 1,
             "Items": [
                 {
-                    "Id": "E1FBPN9VF9FG4X",
-                    "ARN": "arn:aws:cloudfront::123456789012:distribution/E1FBPN9VF9FG4X",
+                    "Id": "E1OQK8XICQK4UM",
+                    "ARN": "arn:aws:cloudfront::123456789012:distribution/E1OQK8XICQK4UM",
                     "Status": "InProgress",
                     "Comment": "",
                     "Enabled": true

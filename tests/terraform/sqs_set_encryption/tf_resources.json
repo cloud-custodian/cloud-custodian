@@ -1,0 +1,51 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_kms_alias": {
+            "test_key_alias": {
+                "arn": "arn:aws:kms:us-west-2:644160558196:alias/4c7cdf06-bc5c-a647-1e2b-a8c76370477d",
+                "id": "alias/4c7cdf06-bc5c-a647-1e2b-a8c76370477d",
+                "name": "alias/4c7cdf06-bc5c-a647-1e2b-a8c76370477d",
+                "name_prefix": null,
+                "target_key_arn": "arn:aws:kms:us-west-2:644160558196:key/73d5da2e-80ec-46be-8fd8-d9a50b4b2191",
+                "target_key_id": "73d5da2e-80ec-46be-8fd8-d9a50b4b2191"
+            }
+        },
+        "aws_kms_key": {
+            "test_key": {
+                "arn": "arn:aws:kms:us-west-2:644160558196:key/73d5da2e-80ec-46be-8fd8-d9a50b4b2191",
+                "customer_master_key_spec": "SYMMETRIC_DEFAULT",
+                "deletion_window_in_days": null,
+                "description": "",
+                "enable_key_rotation": false,
+                "id": "73d5da2e-80ec-46be-8fd8-d9a50b4b2191",
+                "is_enabled": true,
+                "key_id": "73d5da2e-80ec-46be-8fd8-d9a50b4b2191",
+                "key_usage": "ENCRYPT_DECRYPT",
+                "policy": "{\"Id\":\"key-default-1\",\"Statement\":[{\"Action\":\"kms:*\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::644160558196:root\"},\"Resource\":\"*\",\"Sid\":\"Enable IAM User Permissions\"}],\"Version\":\"2012-10-17\"}",
+                "tags": null
+            }
+        },
+        "aws_sqs_queue": {
+            "test_sqs": {
+                "arn": "arn:aws:sqs:us-west-2:644160558196:4f300077-bffd-f1ce-7930-fc21b29cbf49",
+                "content_based_deduplication": false,
+                "delay_seconds": 0,
+                "fifo_queue": false,
+                "id": "https://sqs.us-west-2.amazonaws.com/644160558196/4f300077-bffd-f1ce-7930-fc21b29cbf49",
+                "kms_data_key_reuse_period_seconds": 300,
+                "kms_master_key_id": "",
+                "max_message_size": 262144,
+                "message_retention_seconds": 345600,
+                "name": "4f300077-bffd-f1ce-7930-fc21b29cbf49",
+                "name_prefix": null,
+                "policy": "",
+                "receive_wait_time_seconds": 0,
+                "redrive_policy": "",
+                "tags": null,
+                "visibility_timeout_seconds": 30
+            }
+        }
+    }
+}

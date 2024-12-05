@@ -1,0 +1,16 @@
+{
+    "status_code": 200,
+    "data": {
+        "Subscriptions": [
+            {
+                "SubscriptionArn": "arn:aws:sns:us-east-1:123456789012:test:a72e3629-67d2-4f9f-bf54-f8cecf38a114",
+                "Owner": "123456789012",
+                "Protocol": "email",
+                "Endpoint": "test@test.com",
+                "TopicArn": "arn:aws:sns:us-east-1:123456789012:test"
+            }
+        ],
+        "NextToken": "AAHzN8s/tt6VglGOMISokVWAgS8MkssMztzRcuigQF4AIg==",
+        "ResponseMetadata": {}
+    }
+}

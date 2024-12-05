@@ -1,0 +1,34 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 05 Nov 2020 16:18:18 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "server-timing": "gfet4t7; dur=92",
+    "alt-svc": "h3-Q050=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-T050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "301",
+    "-content-encoding": "gzip",
+    "content-location": "https://cloudresourcemanager.googleapis.com/v1/projects?filter=id%3Ahautomation&alt=json"
+  },
+  "body": {
+    "projects": [
+      {
+        "projectNumber": "518122731295",
+        "projectId": "hautomation",
+        "lifecycleState": "ACTIVE",
+        "name": "hautomation",
+        "createTime": "2020-10-23T02:19:32.329Z",
+        "parent": {
+          "type": "folder",
+          "id": "389734459213"
+        }
+      }
+    ]
+  }
+}

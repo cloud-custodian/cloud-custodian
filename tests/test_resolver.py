@@ -1,16 +1,5 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import csv
 import json
 import pickle
@@ -22,8 +11,11 @@ from urllib.request import urlopen
 from .common import BaseTest, ACCOUNT_ID, Bag
 from .test_s3 import destroyBucket
 
+from c7n.cache import SqlKvCache
 from c7n.config import Config
 from c7n.resolver import ValuesFrom, URIResolver
+
+from pytest_terraform import terraform
 
 
 class FakeCache:
@@ -41,6 +33,18 @@ class FakeCache:
         self.saves += 1
         self.state[pickle.dumps(key)] = data
 
+    def load(self):
+        return True
+
+    def close(self):
+        pass
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args, **kw):
+        return
+
 
 class FakeResolver:
 
@@ -49,8 +53,39 @@ class FakeResolver:
             contents = contents.decode("utf8")
         self.contents = contents
 
-    def resolve(self, uri):
+    def resolve(self, uri, headers):
         return self.contents
+
+
+@terraform('dynamodb_resolver')
+def test_dynamodb_resolver(test, dynamodb_resolver):
+    factory = test.replay_flight_data("test_dynamodb_resolver")
+    manager = Bag(session_factory=factory, _cache=None,
+                  config=Bag(account_id="123", region="us-east-1"))
+    resolver = ValuesFrom({
+        "url": "dynamodb",
+        "query": f'select app_name from "{dynamodb_resolver["aws_dynamodb_table.apps.name"]}"',
+    }, manager)
+
+    values = resolver.get_values()
+    assert values == ["cicd", "app1"]
+
+
+@terraform('dynamodb_resolver_multi')
+def test_dynamodb_resolver_multi(test, dynamodb_resolver_multi):
+    factory = test.replay_flight_data("test_dynamodb_resolver_multi")
+    manager = Bag(session_factory=factory, _cache=None,
+                  config=Bag(account_id="123", region="us-east-1"))
+    resolver = ValuesFrom({
+        "url": "dynamodb",
+        "query": (
+            f'select app_name, env from "{dynamodb_resolver_multi["aws_dynamodb_table.apps.name"]}"'
+        ),
+        "expr": "[].env"
+    }, manager)
+
+    values = resolver.get_values()
+    assert set(values) == {"shared", "prod"}
 
 
 class ResolverTest(BaseTest):
@@ -74,7 +109,7 @@ class ResolverTest(BaseTest):
         cache = FakeCache()
         resolver = URIResolver(session_factory, cache)
         uri = "s3://%s/resource.json?RequestPayer=requestor" % bname
-        data = resolver.resolve(uri)
+        data = resolver.resolve(uri, {})
         self.assertEqual(content, data)
         self.assertEqual(list(cache.state.keys()), [pickle.dumps(("uri-resolver", uri))])
 
@@ -98,7 +133,19 @@ class ResolverTest(BaseTest):
             self.addCleanup(os.unlink, fh.name)
             fh.write(content)
             fh.flush()
-            self.assertEqual(resolver.resolve("file:%s" % fh.name), content)
+            self.assertEqual(resolver.resolve("file:%s" % fh.name, {'auth': 'token'}), content)
+
+
+def test_value_from_sqlkv(tmp_path):
+
+    kv = SqlKvCache(Bag(cache=tmp_path / "cache.db", cache_period=60))
+    config = Config.empty(account_id=ACCOUNT_ID)
+    mgr = Bag({"session_factory": None, "_cache": kv, "config": config})
+    values = ValuesFrom(
+        {"url": "moon", "expr": "[].bean", "format": "json"}, mgr)
+    values.resolver = FakeResolver(json.dumps([{"bean": "magic"}]))
+    assert values.get_values() == {"magic"}
+    assert values.get_values() == {"magic"}
 
 
 class UrlValueTest(BaseTest):
@@ -117,12 +164,26 @@ class UrlValueTest(BaseTest):
         values.resolver = FakeResolver(content)
         return values
 
+    def test_none_json_expr(self):
+        values = self.get_values_from(
+            {"url": "moon", "expr": "mars", "format": "json"},
+            json.dumps([{"bean": "magic"}]),
+        )
+        self.assertEqual(values.get_values(), None)
+
+    def test_empty_json_expr(self):
+        values = self.get_values_from(
+            {"url": "moon", "expr": "[].mars", "format": "json"},
+            json.dumps([{"bean": "magic"}]),
+        )
+        self.assertEqual(values.get_values(), set())
+
     def test_json_expr(self):
         values = self.get_values_from(
             {"url": "moon", "expr": "[].bean", "format": "json"},
             json.dumps([{"bean": "magic"}]),
         )
-        self.assertEqual(values.get_values(), ["magic"])
+        self.assertEqual(values.get_values(), {"magic"})
 
     def test_invalid_format(self):
         values = self.get_values_from({"url": "mars"}, "")
@@ -135,7 +196,7 @@ class UrlValueTest(BaseTest):
         with open("resolver_test.txt", "rb") as out:
             values = self.get_values_from({"url": "letters.txt"}, out.read())
         os.remove("resolver_test.txt")
-        self.assertEqual(values.get_values(), ["a", "b", "c", "d"])
+        self.assertEqual(values.get_values(), {"a", "b", "c", "d"})
 
     def test_csv_expr(self):
         with open("test_expr.csv", "w") as out:
@@ -146,7 +207,18 @@ class UrlValueTest(BaseTest):
                 {"url": "sun.csv", "expr": "[*][2]"}, out.read()
             )
         os.remove("test_expr.csv")
-        self.assertEqual(values.get_values(), ["2", "2", "2", "2", "2"])
+        self.assertEqual(values.get_values(), {"2"})
+
+    def test_csv_none_expr(self):
+        with open("test_expr.csv", "w") as out:
+            writer = csv.writer(out)
+            writer.writerows([range(5) for r in range(5)])
+        with open("test_expr.csv", "rb") as out:
+            values = self.get_values_from(
+                {"url": "sun.csv", "expr": "DNE"}, out.read()
+            )
+        os.remove("test_expr.csv")
+        self.assertEqual(values.get_values(), None)
 
     def test_csv_expr_using_dict(self):
         with open("test_dict.csv", "w") as out:
@@ -160,6 +232,30 @@ class UrlValueTest(BaseTest):
         os.remove("test_dict.csv")
         self.assertEqual(values.get_values(), "1")
 
+    def test_csv_none_expr_using_dict(self):
+        with open("test_dict.csv", "w") as out:
+            writer = csv.writer(out)
+            writer.writerow(["aa", "bb", "cc", "dd", "ee"])  # header row
+            writer.writerows([range(5) for r in range(5)])
+        with open("test_dict.csv", "rb") as out:
+            values = self.get_values_from(
+                {"url": "sun.csv", "expr": "ff", "format": "csv2dict"}, out.read()
+            )
+        os.remove("test_dict.csv")
+        self.assertEqual(values.get_values(), None)
+
+    def test_csv_no_expr_using_dict(self):
+        with open("test_dict.csv", "w") as out:
+            writer = csv.writer(out)
+            writer.writerow(["aa", "bb", "cc", "dd", "ee"])  # header row
+            writer.writerows([range(5) for r in range(5)])
+        with open("test_dict.csv", "rb") as out:
+            values = self.get_values_from(
+                {"url": "sun.csv", "format": "csv2dict"}, out.read()
+            )
+        os.remove("test_dict.csv")
+        self.assertEqual(values.get_values(), {"0", "1", "2", "3", "4"})
+
     def test_csv_column(self):
         with open("test_column.csv", "w") as out:
             writer = csv.writer(out)
@@ -167,7 +263,7 @@ class UrlValueTest(BaseTest):
         with open("test_column.csv", "rb") as out:
             values = self.get_values_from({"url": "sun.csv", "expr": 1}, out.read())
         os.remove("test_column.csv")
-        self.assertEqual(values.get_values(), ["1", "1", "1", "1", "1"])
+        self.assertEqual(values.get_values(), {"1"})
 
     def test_csv_raw(self):
         with open("test_raw.csv", "w") as out:
@@ -176,14 +272,14 @@ class UrlValueTest(BaseTest):
         with open("test_raw.csv", "rb") as out:
             values = self.get_values_from({"url": "sun.csv"}, out.read())
         os.remove("test_raw.csv")
-        self.assertEqual(values.get_values(), [["3"], ["3"], ["3"], ["3"], ["3"]])
+        self.assertEqual(values.get_values(), {"3"})
 
     def test_value_from_vars(self):
         values = self.get_values_from(
             {"url": "{account_id}", "expr": '["{region}"][]', "format": "json"},
             json.dumps({"us-east-1": "east-resource"}),
         )
-        self.assertEqual(values.get_values(), ["east-resource"])
+        self.assertEqual(values.get_values(), {"east-resource"})
         self.assertEqual(values.data.get("url", ""), ACCOUNT_ID)
 
     def test_value_from_caching(self):
@@ -193,8 +289,8 @@ class UrlValueTest(BaseTest):
             json.dumps({"us-east-1": "east-resource"}),
             cache=cache,
         )
-        self.assertEqual(values.get_values(), ["east-resource"])
-        self.assertEqual(values.get_values(), ["east-resource"])
-        self.assertEqual(values.get_values(), ["east-resource"])
+        self.assertEqual(values.get_values(), {"east-resource"})
+        self.assertEqual(values.get_values(), {"east-resource"})
+        self.assertEqual(values.get_values(), {"east-resource"})
         self.assertEqual(cache.saves, 1)
         self.assertEqual(cache.gets, 3)

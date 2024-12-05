@@ -1,16 +1,5 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from c7n.resources.elasticache import _cluster_eligible_for_snapshot
 
 from .common import BaseTest
@@ -214,6 +203,7 @@ class TestElastiCacheCluster(BaseTest):
 
     def test_elasticache_cluster_delete(self):
         session_factory = self.replay_flight_data("test_elasticache_cluster_delete")
+        log_output = self.capture_logging('custodian.actions')
         p = self.load_policy(
             {
                 "name": "elasticache-cluster-delete",
@@ -225,6 +215,24 @@ class TestElastiCacheCluster(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 3)
+        assert "Deleted ElastiCache replication group: myec" in log_output.getvalue()
+
+    def test_elasticache_cluster_skip_delete_if_not_empty(self):
+        session_factory = self.replay_flight_data("test_elasticache_cluster_skip_delete")
+        log_output = self.capture_logging('custodian.actions')
+        p = self.load_policy(
+            {
+                "name": "elasticache-cluster-skip-delete",
+                "resource": "cache-cluster",
+                "filters": [{"type": "value", "key": "CacheClusterId", "value": "myec-001"}],
+                "actions": [{"type": "delete"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        assert "Deleted ElastiCache replication group: myec" not in log_output.getvalue()
+        assert "myec is not empty" in log_output.getvalue()
 
     def test_elasticache_cluster_snapshot(self):
         session_factory = self.replay_flight_data("test_elasticache_cluster_snapshot")
@@ -238,6 +246,27 @@ class TestElastiCacheCluster(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 3)
+
+    def test_elasticache_global_ds_cluster_delete(self):
+        session_factory = self.replay_flight_data("test_elasticache_global_ds_cluster_delete")
+        log_output = self.capture_logging('custodian.actions')
+        p = self.load_policy(
+            {
+                "name": "elasticache-cluster-delete",
+                "resource": "cache-cluster",
+                "filters": [{
+                    "type": "value",
+                    "key": "CacheParameterGroup.CacheParameterGroupName",
+                    "value": "global-datastore",
+                    "op": "contains"}],
+                "actions": [{"type": "delete"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['CacheClusterId'], 'c7n-test-global-001')
+        assert "Skipping c7n-test-global-001" in log_output.getvalue()
 
 
 class TestElastiCacheSubnetGroup(BaseTest):
@@ -468,3 +497,146 @@ class TestElastiCacheReplicationGroup(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['ReplicationGroupId'], 'test-c7n-rg')
+
+    def test_elasticache_replication_group_delete(self):
+        session_factory = self.replay_flight_data("test_elasticache_replication_group_delete")
+        p = self.load_policy(
+            {
+                "name": "replication-group-enc-delete",
+                "resource": "elasticache-group",
+                "filters": [{"type": "value", "key": "AtRestEncryptionEnabled", "value": False}],
+                "actions": [{"type": "delete", "snapshot": True}],
+            },
+            session_factory=session_factory,)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['ReplicationGroupId'], 'c7n-delete')
+        client = session_factory().client("elasticache")
+        response = client.describe_replication_groups(ReplicationGroupId='c7n-delete')
+        self.assertEqual(response.get('ReplicationGroups')[0].get('Status'), 'deleting')
+
+    def test_elasticache_replication_group_tag(self):
+        # the elasticache resource uses the universal_taggable wrapper for the AWS
+        # resource tagging API - this test ensures that API works for RGs
+        session_factory = self.replay_flight_data(
+            "test_elasticache_replication_group_tag")
+        p = self.load_policy(
+            {
+                "name": "tag-ElastiCacheReplicationGroup",
+                "resource": "elasticache-group",
+                "filters": [{"tag:Tagging": "absent"}],
+                "actions": [{"type": "tag", "key": "Tagging", "value": "added"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = session_factory().client("elasticache")
+        response = client.describe_replication_groups(ReplicationGroupId='c7n-tagging')
+        while response.get('ReplicationGroups')[0].get('Status') == 'modifying':
+            response = client.describe_replication_groups(ReplicationGroupId='c7n-tagging')
+        arn = p.resource_manager.get_arns(resources)[0]
+        tags = client.list_tags_for_resource(ResourceName=arn)["TagList"]
+        self.assertEqual(tags[0]["Value"], "added")
+
+    def test_replication_group_global_ds_cluster_delete(self):
+        session_factory = self.replay_flight_data("test_replication_group_global_ds_cluster_delete")
+        log_output = self.capture_logging('custodian.actions')
+        p = self.load_policy(
+            {
+                "name": "elasticache-cluster-delete",
+                "resource": "aws.elasticache-group",
+                "filters": [{
+                    "type": "value",
+                    "key": "GlobalReplicationGroupInfo.GlobalReplicationGroupId",
+                    "value": "ldgnf-c7n-test-global",
+                    "op": "eq"}],
+                "actions": [{"type": "delete"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['ReplicationGroupId'], 'c7n-test-global')
+        assert "Skipping c7n-test-global" in log_output.getvalue()
+
+
+class TestElastiCacheUser(BaseTest):
+
+    def test_elasticache_user(self):
+        session_factory = self.replay_flight_data("test_elasticache_user")
+        client = session_factory().client("elasticache")
+        p = self.load_policy(
+            {
+                "name": "elasticache-user-tag",
+                "resource": "elasticache-user",
+                "filters": [{"type": "value", "key": "UserId", "value": "c7n-user"}],
+                "actions": [{"type": "tag", "key": "test-tag", "value": "test-value"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['UserId'], 'c7n-user')
+
+        p = self.load_policy(
+            {
+                "name": "elasticache-user-untag",
+                "resource": "elasticache-user",
+                "filters": [{"type": "value", "key": "tag:test-tag", "value": "test-value"}],
+                "actions": [{"type": "remove-tag", "tags": ["test-tag"]}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['UserId'], 'c7n-user')
+        tags = client.list_tags_for_resource(
+            ResourceName='arn:aws:elasticache:us-east-1:123456789012:user:c7n-user')["TagList"]
+        assert len(tags) == 0
+
+    def test_elasticache_user_modify(self):
+        session_factory = self.replay_flight_data("test_elasticache_user_modify")
+        client = session_factory().client("elasticache")
+        p = self.load_policy(
+            {
+                "name": "elasticache-user-modify",
+                "resource": "elasticache-user",
+                "filters": [{"type": "value", "key": "UserId", "value": "c7n-user"}],
+                "actions": [{
+                    "type": "modify",
+                    "attributes": {
+                        "AccessString": "on +@all",
+                        "AuthenticationMode": {
+                            "Type": "password",
+                            "Passwords": ["c7n-user-password"]
+                        }
+                    }
+                }],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        users = client.describe_users(UserId='c7n-user')["Users"]
+        assert users[0]["AccessString"] == "on +@all"
+        assert users[0]["Authentication"]["Type"] == "password"
+        assert users[0]["Authentication"]["PasswordCount"] == 1
+
+    def test_elasticache_user_delete(self):
+        session_factory = self.replay_flight_data("test_elasticache_user_delete")
+        client = session_factory().client("elasticache")
+        p = self.load_policy(
+            {
+                "name": "elasticache-user-delete",
+                "resource": "elasticache-user",
+                "filters": [{"type": "value", "key": "UserId", "value": "c7n-user"}],
+                "actions": [{"type": "delete"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        users = client.describe_users(UserId='c7n-user')["Users"]
+        assert users[0]["Status"] == "deleting"

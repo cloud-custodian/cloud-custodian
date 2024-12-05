@@ -1,20 +1,9 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-import jmespath
-
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
+from c7n.utils import type_schema, jmespath_search
 from c7n_gcp.query import QueryResourceManager, TypeInfo, ChildTypeInfo, ChildResourceManager
 from c7n_gcp.provider import resources
+from c7n_gcp.actions import MethodAction
 
 
 @resources.register('bq-dataset')
@@ -34,6 +23,12 @@ class DataSet(QueryResourceManager):
         default_report_fields = [
             id, name, "description",
             "creationTime", "lastModifiedTime"]
+        asset_type = "bigquery.googleapis.com/Dataset"
+        scc_type = "google.cloud.bigquery.Dataset"
+        metric_key = "resource.labels.dataset_id"
+        permissions = ('bigquery.datasets.get',)
+        urn_component = "dataset"
+        urn_id_path = "datasetReference.datasetId"
 
         @staticmethod
         def get(client, event):
@@ -44,7 +39,7 @@ class DataSet(QueryResourceManager):
                     raise RuntimeError("unknown event %s" % event)
                 expr = 'protoPayload.serviceData.dataset{}Response.resource.datasetName'.format(
                     method.capitalize())
-                ref = jmespath.search(expr, event)
+                ref = jmespath_search(expr, event)
             else:
                 ref = event
             return client.execute_query('get', verb_arguments=ref)
@@ -69,36 +64,27 @@ class BigQueryJob(QueryResourceManager):
         service = 'bigquery'
         version = 'v2'
         component = 'jobs'
-        enum_spec = ('list', 'jobs[]', {'allUsers': True})
+        enum_spec = ('list', 'jobs[]', {'allUsers': True, 'projection': 'full'})
         get_requires_event = True
         scope = 'project'
         scope_key = 'projectId'
         name = id = 'id'
         default_report_fields = ["id", "user_email", "status.state"]
+        urn_component = "job"
 
         @staticmethod
         def get(client, event):
             return client.execute_query('get', {
-                'projectId': jmespath.search('resource.labels.project_id', event),
-                'jobId': jmespath.search(
+                'projectId': jmespath_search('resource.labels.project_id', event),
+                'jobId': jmespath_search(
                     'protoPayload.metadata.tableCreation.jobName', event
                 ).rsplit('/', 1)[-1]
             })
 
-
-@resources.register('bq-project')
-class BigQueryProject(QueryResourceManager):
-    """GCP resource: https://cloud.google.com/bigquery/docs/reference/rest/v2/projects
-    """
-    class resource_type(TypeInfo):
-        service = 'bigquery'
-        version = 'v2'
-        component = 'projects'
-        enum_spec = ('list', 'projects[]', None)
-        scope = 'global'
-        id = 'id'
-        name = "friendlyName"
-        default_report_fields = [id, name]
+        @classmethod
+        def _get_urn_id(cls, resource):
+            jobRef = resource['jobReference']
+            return f"{jobRef['location']}/{jobRef['jobId']}"
 
 
 @resources.register('bq-table')
@@ -126,6 +112,14 @@ class BigQueryTable(ChildResourceManager):
                 ('tableReference.datasetId', 'datasetId'),
             ]
         }
+        asset_type = "bigquery.googleapis.com/Table"
+        urn_component = "table"
+        urn_id_path = "tableReference.tableId"
+
+        @classmethod
+        def _get_urn_id(cls, resource):
+            tableRef = resource['tableReference']
+            return f"{tableRef['datasetId']}/{tableRef['tableId']}"
 
         @staticmethod
         def get(client, event):
@@ -134,3 +128,42 @@ class BigQueryTable(ChildResourceManager):
                 'datasetId': event['dataset_id'],
                 'tableId': event['resourceName'].rsplit('/', 1)[-1]
             })
+
+    def augment(self, resources):
+        client = self.get_client()
+        results = []
+        for r in resources:
+            ref = r['tableReference']
+            results.append(
+                client.execute_query(
+                    'get', verb_arguments=ref))
+        return results
+
+
+@BigQueryTable.action_registry.register('delete')
+class DeleteBQTable(MethodAction):
+    schema = type_schema('delete')
+    method_spec = {'op': 'delete'}
+    permissions = ('bigquery.tables.get', 'bigquery.tables.delete')
+
+    @staticmethod
+    def get_resource_params(model, r):
+        return {
+            'projectId': r['tableReference']['projectId'],
+            'datasetId': r['tableReference']['datasetId'],
+            'tableId': r['tableReference']['tableId']
+        }
+
+
+@DataSet.action_registry.register('delete')
+class DeleteDataSet(MethodAction):
+    schema = type_schema('delete')
+    method_spec = {'op': 'delete'}
+    permissions = ('bigquery.datasets.get', 'bigquery.datasets.delete')
+
+    @staticmethod
+    def get_resource_params(model, r):
+        return {
+            'projectId': r['datasetReference']['projectId'],
+            'datasetId': r['datasetReference']['datasetId']
+        }

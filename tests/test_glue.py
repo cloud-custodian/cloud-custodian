@@ -1,18 +1,10 @@
-# Copyright 2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from .common import BaseTest
 import time
+import json
+from c7n.exceptions import PolicyValidationError
+from .common import event_data
 
 
 class TestGlueConnections(BaseTest):
@@ -79,11 +71,62 @@ class TestGlueConnections(BaseTest):
         connections = client.get_connections()["ConnectionList"]
         self.assertFalse(connections)
 
+    def test_connection_password_hidden(self):
+        session_factory = self.replay_flight_data("test_connection_password_hidden")
+        p = self.load_policy(
+            {
+                "name": "glue-connection",
+                "resource": "glue-connection",
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual('PASSWORD' in resources[0].get('ConnectionProperties'), False)
+
+    def test_glue_connection_tag_untag(self):
+        session_factory = self.replay_flight_data("test_glue_connection_tag_untag")
+        p = self.load_policy(
+            {
+                "name": "glue-connection-tags",
+                "resource": "glue-connection",
+                "filters": [{"tag:owner": "pratyush"}],
+                "actions": [{"type": "remove-tag", 'tags': ['owner']}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client("glue")
+        arn = p.resource_manager.generate_arn(resources[0]['Name'])
+        tags = client.get_tags(ResourceArn=arn)
+        self.assertEqual(tags.get('Tags'), {})
+
+    def test_glue_query_resources_no_subnet(self):
+        session_factory = self.replay_flight_data("test_glue_query_resources_no_subnet")
+        p = self.load_policy(
+            {
+                "name": "list-glue-connections",
+                "resource": "glue-connection",
+                "filters": [
+                    {
+                        "type": "subnet",
+                        "key": "tag:c7n-internal",
+                        "op": "ne",
+                        "value": "True",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
 
 class TestGlueDevEndpoints(BaseTest):
 
     def test_dev_endpoints_query(self):
-        session_factory = self.replay_flight_data("test_glue_query_resources")
+        session_factory = self.replay_flight_data("test_dev_endpoints_query")
         p = self.load_policy(
             {"name": "list-glue-dev-endpoints", "resource": "glue-dev-endpoint"},
             session_factory=session_factory,
@@ -284,6 +327,54 @@ class TestGlueJobs(BaseTest):
         jobs = client.get_jobs()["Jobs"]
         self.assertFalse(jobs)
 
+    def test_enable_metrics(self):
+        session_factory = self.replay_flight_data("test_glue_job_enable_metrics")
+        p = self.load_policy(
+            {
+                "name": "glue-job-enable-metrics",
+                "resource": "glue-job",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": 'DefaultArguments."--enable-metrics"',
+                        "value": "absent",
+                    }
+                ],
+                "actions": [{"type": "toggle-metrics", "enabled": True}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 3)
+        client = session_factory().client("glue")
+        jobs = client.get_jobs()["Jobs"]
+        for job in jobs:
+            self.assertIn("--enable-metrics", job["DefaultArguments"])
+
+    def test_disable_metrics(self):
+        session_factory = self.replay_flight_data("test_glue_job_disable_metrics")
+        p = self.load_policy(
+            {
+                "name": "glue-job-disable-metrics",
+                "resource": "glue-job",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": 'DefaultArguments."--enable-metrics"',
+                        "value": "present",
+                    }
+                ],
+                "actions": [{"type": "toggle-metrics", "enabled": False}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 3)
+        client = session_factory().client("glue")
+        jobs = client.get_jobs()["Jobs"]
+        for job in jobs:
+            self.assertNotIn("--enable-metrics", job["DefaultArguments"])
+
 
 class TestGlueCrawlers(BaseTest):
 
@@ -444,6 +535,30 @@ class TestGlueSecurityConfiguration(BaseTest):
         self.assertFalse("test" in [t.get("Name")
             for t in security_configrations.get("SecurityConfigurations", [])])
 
+    def test_kms_alias(self):
+        factory = self.replay_flight_data("test_glue_security_configuration_kms_key_filter")
+        p = self.load_policy(
+            {
+                "name": "glue-security-configuration-s3-kms-alias",
+                "resource": "glue-security-configuration",
+                "filters": [
+                    {
+                        "type": "kms-key",
+                        "key": "c7n:AliasName",
+                        "value": "^(alias/)",
+                        "op": "regex",
+                        "key-type": "cloudwatch"
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['EncryptionConfiguration']['CloudWatchEncryption']['KmsKeyArn'],
+            'arn:aws:kms:us-east-1:0123456789012:key/358f7699-4ea5-455a-9c78-1c868301e5a8')
+
 
 class TestGlueTriggers(BaseTest):
 
@@ -524,6 +639,53 @@ class TestGlueDataCatalog(BaseTest):
             'EncryptionAtRest'),
             {'CatalogEncryptionMode': 'SSE-KMS', 'SseAwsKmsKeyId': 'alias/skunk/glue/encrypted'})
 
+    def test_glue_datacat_key_alias_apply_enc(self):
+        session_factory = self.replay_flight_data("test_glue_datacat_key_alias_apply_enc")
+        c = session_factory().client('kms')
+        key_id = 'arn:aws:kms:us-east-1:644160558196:key/7d9388c0-8c78-4acb-ad3c-b9d1764522b2'
+        key_alias = c.list_aliases(KeyId=key_id)
+        self.assertEqual(key_alias.get('Aliases')[0].get('AliasName'), 'alias/data-sync-kms-key')
+        client = session_factory().client('glue')
+        enc_setting = client.get_data_catalog_encryption_settings()
+        self.assertEqual(enc_setting.get('DataCatalogEncryptionSettings').get(
+            'EncryptionAtRest').get('SseAwsKmsKeyId'), key_id)
+        self.assertEqual(enc_setting.get('DataCatalogEncryptionSettings').get(
+            'ConnectionPasswordEncryption').get(
+              'ReturnConnectionPasswordEncrypted'), False)
+        p = self.load_policy(
+            {
+                'name': 'glue-catalog-encryption',
+                "resource": 'glue-catalog',
+                'filters': [{
+                    'type': 'kms-key',
+                    'key-type': 'EncryptionAtRest',
+                    'key': 'c7n:AliasName',
+                    'value': 'alias/data-sync-kms-key',
+                    'op': 'eq'},
+                ],
+                'actions': [{
+                    'type': 'set-encryption',
+                    'attributes': {
+                        'ConnectionPasswordEncryption': {
+                            'ReturnConnectionPasswordEncrypted': True,
+                            'AwsKmsKeyId': 'alias/skunk/glue/encrypted'},
+                    },
+                }]
+            },
+            session_factory=session_factory,)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client("glue")
+        datacatlog = client.get_data_catalog_encryption_settings()
+        self.assertEqual(datacatlog.get('DataCatalogEncryptionSettings').get(
+            'EncryptionAtRest'),
+            {'CatalogEncryptionMode': 'SSE-KMS', 'SseAwsKmsKeyId': key_id})
+        self.assertEqual(datacatlog.get('DataCatalogEncryptionSettings').get(
+            'ConnectionPasswordEncryption'),
+            {'ReturnConnectionPasswordEncrypted': True,
+             'AwsKmsKeyId': 'alias/skunk/glue/encrypted'})
+
     def test_glue_catalog_cross_account(self):
         session_factory = self.replay_flight_data("test_glue_catalog_cross_account")
         p = self.load_policy(
@@ -536,3 +698,151 @@ class TestGlueDataCatalog(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_catalog_remove_matched(self):
+        session_factory = self.replay_flight_data("test_catalog_remove_matched")
+        client = session_factory().client("glue")
+        client.put_resource_policy(PolicyInJson=json.dumps(
+            {
+                "Version": "2012-10-17",
+                "Statement": [
+                    {
+                        "Sid": "SpecificAllow",
+                        "Effect": "Allow",
+                        "Principal": {"AWS": "arn:aws:iam::644160558196:root"},
+                        "Action": "glue:GetDatabase",
+                        "Resource": "arn:aws:glue:us-east-1:644160558196:catalog"
+                    },
+                    {
+                        "Sid": "CrossAccount",
+                        "Effect": "Allow",
+                        "Principal": {"AWS": "arn:aws:iam::123456789123:root"},
+                        "Action": "glue:GetDatabase",
+                        "Resource": "arn:aws:glue:us-east-1:644160558196:catalog"
+                    },
+                ]
+            }))
+        p = self.load_policy(
+            {
+                "name": "glue-catalog-rm-matched",
+                "resource": "glue-catalog",
+                "filters": [{"type": "cross-account"}],
+                "actions": [{"type": "remove-statements", "statement_ids": "matched"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        data = json.loads(client.get_resource_policy().get("PolicyInJson"))
+        self.assertEqual(len(data.get('Statement')), 1)
+        self.assertEqual([s['Sid'] for s in data.get('Statement')], ["SpecificAllow"])
+
+    def test_remove_statements_validation_error(self):
+        self.assertRaises(
+            PolicyValidationError,
+            self.load_policy,
+            {
+                "name": "glue-catalog-remove-matched",
+                "resource": "glue-catalog",
+                "actions": [{"type": "remove-statements", "statement_ids": "matched"}],
+            }
+        )
+
+    def test_catalog_change_encryption_event(self):
+        session_factory = self.replay_flight_data("test_catalog_change_encryption_event")
+        session = session_factory()
+        client = session.client("glue")
+        before_cat_setting = client.get_data_catalog_encryption_settings()
+        self.assertJmes(
+            'DataCatalogEncryptionSettings.EncryptionAtRest.CatalogEncryptionMode',
+            before_cat_setting,
+            'DISABLED'
+        )
+        self.assertJmes(
+            'DataCatalogEncryptionSettings.EncryptionAtRest.SseAwsKmsKeyId',
+            before_cat_setting,
+            None
+        )
+        p = self.load_policy(
+            {
+                "name": "net-change-rbp-cross-account",
+                "resource": "glue-catalog",
+                "mode": {
+                    "type": "cloudtrail",
+                    "role": "arn:aws:iam::644160558196:role/CloudCustodianRole",
+                    "events": [
+                        {
+                            "source": "glue.amazonaws.com",
+                            "event": "PutDataCatalogEncryptionSettings",
+                            "ids": "userIdentity.accountId"
+                        }
+                    ],
+                },
+                'filters': [{
+                    'type': 'value',
+                    'key': 'DataCatalogEncryptionSettings.EncryptionAtRest.SseAwsKmsKeyId',
+                    'value': 'alias/skunk/trails',
+                    'op': 'ne'},
+                ],
+                "actions": [
+                    {
+                        "type": "set-encryption",
+                        "attributes": {
+                            "EncryptionAtRest": {
+                                "CatalogEncryptionMode": "SSE-KMS"
+                            }
+                        }
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        p.push(event_data("event-cloud-trail-catalog-set-encryption.json"), None)
+        after_cat_setting = client.get_data_catalog_encryption_settings()
+        self.assertJmes(
+            'DataCatalogEncryptionSettings.EncryptionAtRest.CatalogEncryptionMode',
+            after_cat_setting,
+            'SSE-KMS'
+        )
+        self.assertJmes(
+            'DataCatalogEncryptionSettings.EncryptionAtRest.SseAwsKmsKeyId',
+            after_cat_setting,
+            'alias/aws/glue'
+        )
+
+    def test_catalog_change_rbp_event(self):
+        session_factory = self.replay_flight_data("test_catalog_change_rbp_event")
+        session = session_factory()
+        client = session.client("glue")
+        before_cat_setting = client.get_resource_policy()
+        assert 'o-4amkskbcf3' in before_cat_setting.get('PolicyInJson')
+        p = self.load_policy(
+            {
+                "name": "net-change-rbp-cross-account",
+                "resource": "glue-catalog",
+                "mode": {
+                    "type": "cloudtrail",
+                    "role": "arn:aws:iam::644160558196:role/CloudCustodianRole",
+                    "events": [
+                        {
+                            "source": "glue.amazonaws.com",
+                            "event": "PutResourcePolicy",
+                            "ids": "awsRegion"
+                        }
+                    ],
+                },
+                "filters": [
+                    {
+                        "type": "cross-account",
+                        "whitelist_orgids": [
+                            "o-4amkskbcf1"
+                        ]
+                    }
+                ],
+                "actions": [{"type": "remove-statements", "statement_ids": "matched"}],
+            },
+            session_factory=session_factory,
+        )
+        p.push(event_data("event-cloud-trail-catalog-put-resource-policy.json"), None)
+        after_cat_setting = client.get_resource_policy()
+        assert 'o-4amkskbcf3' not in after_cat_setting.get('PolicyInJson')

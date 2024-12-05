@@ -1,16 +1,5 @@
-# Copyright 2018-2019 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 """
 
 TODO: provider policy execution initialization for outputs
@@ -19,14 +8,26 @@ TODO: provider policy execution initialization for outputs
 """
 import datetime
 import logging
-import os
-import tempfile
 import time
+
+try:
+    from google.cloud.storage import Bucket, Client as StorageClient
+except ImportError:
+    Bucket, StorageClient = None, None
+
+try:
+    from google.cloud.logging import Client as LogClient
+    from google.cloud.logging.handlers import CloudLoggingHandler
+    from google.cloud.logging import Resource
+except ImportError:
+    LogClient = None
+
 
 from c7n.output import (
     blob_outputs,
+    log_outputs,
     metrics_outputs,
-    DirectoryOutput,
+    BlobOutput,
     Metrics,
     LogOutput)
 from c7n.utils import local_session
@@ -47,21 +48,21 @@ class StackDriverMetrics(Metrics):
 
     METRICS_DESCRIPTORS = {
         'resourcecount': {
-            'type': '%s/%'.format(METRICS_PREFIX, 'resourcecount'),
+            'type': '{}/{}'.format(METRICS_PREFIX, 'resourcecount'),
             'valueType': 'INT64',
             'units': 'items',
             'description': 'Number of resources that matched the given policy',
             'displayName': 'Resources',
         },
         'resourcetime': {
-            'type': '%s/%s'.format(METRICS_PREFIX, 'resourcetime'),
+            'type': '{}/{}'.format(METRICS_PREFIX, 'resourcetime'),
             'valueType': 'DOUBLE',
             'units': 's',
             'description': 'Time to query the resources for a given policy',
             'displayName': 'Query Time',
         },
         'actiontime': {
-            'type': '%s/%s'.format(METRICS_PREFIX, 'actiontime'),
+            'type': '{}/{}'.format(METRICS_PREFIX, 'actiontime'),
             'valueType': 'DOUBLE',
             'units': 's',
             'description': 'Time to perform actions for a given policy',
@@ -137,31 +138,30 @@ class StackDriverMetrics(Metrics):
         client.execute_command('create', params)
 
 
+@log_outputs.register('gcp', condition=bool(LogClient))
 class StackDriverLogging(LogOutput):
 
+    def get_log_group(self):
+        log_group = self.config.netloc
+        if log_group:
+            log_group = "custodian-%s-%s" % (log_group, self.ctx.policy.name)
+        else:
+            log_group = "custodian-%s" % self.ctx.policy.name
+        return log_group
+
     def get_handler(self):
-        # gcp has three independent implementation of api bindings for python.
-        # The one used by logging is not yet supported by our test recording.
-
         # TODO drop these grpc variants for the REST versions, and we can drop
-        # protobuf/grpc deps, and also so we can record tests..
-        # gcp has three different python sdks all independently maintained .. hmmm...
-        # and random monkey shims on top of those :-(
+        # protobuf/grpc deps, and also so we can record tests.
 
-        from google.cloud.logging import Client as LogClient
-        from google.cloud.logging.handlers import CloudLoggingHandler
-        from google.cloud.logging.resource import Resource
-
-        log_group = self.ctx.options.log_group
-        if log_group.endswith('*'):
-            log_group = "%s%s" % (log_group[:-1], self.ctx.policy.name)
-
+        log_group = self.get_log_group()
         project_id = local_session(self.ctx.session_factory).get_default_project()
         client = LogClient(project_id)
-
         return CloudLoggingHandler(
             client,
             log_group,
+            labels={
+                'policy': self.ctx.policy.name,
+                'resource': self.ctx.policy.resource_type},
             resource=Resource(type='project', labels={'project_id': project_id}))
 
     def leave_log(self):
@@ -171,47 +171,13 @@ class StackDriverLogging(LogOutput):
         self.handler.transport.worker.stop()
 
 
-@blob_outputs.register('gs')
-class GCPStorageOutput(DirectoryOutput):
+@blob_outputs.register('gs', condition=bool(StorageClient))
+class GCPStorageOutput(BlobOutput):
 
     def __init__(self, ctx, config=None):
-        super(GCPStorageOutput, self).__init__(ctx, config)
-        self.date_path = datetime.datetime.now().strftime('%Y/%m/%d/%H')
-        self.gs_path, self.bucket, self.key_prefix = parse_gs(
-            self.ctx.output_path)
-        self.root_dir = tempfile.mkdtemp()
+        super().__init__(ctx, config)
+        self.bucket = Bucket(StorageClient(), self.bucket)
 
-    def __repr__(self):
-        return "<%s to bucket:%s prefix:%s>" % (
-            self.__class__.__name__,
-            self.bucket,
-            "%s/%s" % (self.key_prefix, self.date_path))
-
-    def upload(self):
-        for root, dirs, files in os.walk(self.root_dir):
-            for f in files:
-                key = "%s/%s%s" % (
-                    self.key_prefix,
-                    self.date_path,
-                    "%s/%s" % (
-                        root[len(self.root_dir):], f))
-                key = key.strip('/')
-                self.transfer.upload_file(
-                    os.path.join(root, f), self.bucket, key,
-                    extra_args={
-                        'ServerSideEncryption': 'AES256'})
-
-
-def parse_gs(gs_path):
-    if not gs_path.startswith('gs://'):
-        raise ValueError("Invalid gs path")
-    ridx = gs_path.find('/', 5)
-    if ridx == -1:
-        ridx = None
-    bucket = gs_path[5:ridx]
-    gs_path = gs_path.rstrip('/')
-    if ridx is None:
-        key_prefix = ""
-    else:
-        key_prefix = gs_path[gs_path.find('/', 5):]
-    return gs_path, bucket, key_prefix
+    def upload_file(self, path, key):
+        blob = self.bucket.blob(key)
+        blob.upload_from_filename(path)

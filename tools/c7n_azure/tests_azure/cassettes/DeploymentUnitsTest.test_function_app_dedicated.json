@@ -387,7 +387,7 @@
                                 "properties": [
                                     {
                                         "name": "LinuxFxVersion",
-                                        "value": "DOCKER|mcr.microsoft.com/azure-functions/python:2.0-python3.6-appservice"
+                                        "value": "python|3.8"
                                     },
                                     {
                                         "name": "WindowsFxVersion",
@@ -521,7 +521,7 @@
                             "phpVersion": "",
                             "pythonVersion": "",
                             "nodeVersion": "",
-                            "linuxFxVersion": "DOCKER|mcr.microsoft.com/azure-functions/python:2.0-python3.6-appservice",
+                            "linuxFxVersion": "python|3.8",
                             "windowsFxVersion": null,
                             "requestTracingEnabled": false,
                             "remoteDebuggingEnabled": false,

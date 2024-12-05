@@ -1,0 +1,23 @@
+{
+    "status_code": 200,
+    "data": {
+        "ProgressEvent": {
+            "TypeName": "AWS::Logs::LogGroup",
+            "Identifier": "/aws/apigateway/welcome",
+            "RequestToken": "be14b0b2-2aa8-4b3b-9bd5-9be1df7bcaaa",
+            "Operation": "DELETE",
+            "OperationStatus": "IN_PROGRESS",
+            "EventTime": {
+                "__class__": "datetime",
+                "year": 2022,
+                "month": 1,
+                "day": 17,
+                "hour": 12,
+                "minute": 8,
+                "second": 32,
+                "microsecond": 514000
+            }
+        },
+        "ResponseMetadata": {}
+    }
+}

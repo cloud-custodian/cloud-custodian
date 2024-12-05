@@ -3,7 +3,7 @@
       {
          "fallback":"Cloud Custodian Policy Violation",
          "title":"Custodian",
-         "color":"danger",
+         "color":"{{ action['slack_msg_color']|default("danger") }}",
          "fields":[
             {
                "title":"Resources",

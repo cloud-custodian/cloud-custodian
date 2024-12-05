@@ -1,11 +1,21 @@
 Tag Compliance Across Resources (EC2, ASG, ELB, S3, etc)
 ========================================================
 
-Tag
-  Tags instances matching filters with a 'c7n_status' tag by
-  default and configurable value.
+Add or Change Tag Values
+~~~~~~~~~~~~~~~~~~~~~~~~
 
-  Here's an example of renaming an extant tag
+  The ``tag`` action can apply a tag to a resource. If that
+  tag already exists, the value will be updated.
+
+  .. note::
+
+    Cloud Custodian tagging operations operate on tag keys specified
+    in the policy. If a policy *doesn't* specify a tag key,
+    Custodian will use the ``maid_status`` tag by default.
+
+    Prefer explicitly specifying tag keys to avoid confusion.
+
+  Here's an example of changing the value of an extant ``CostCenter`` tag.
 
   .. code-block:: yaml
 
@@ -22,6 +32,11 @@ Tag
 
 
 Report on Tag Compliance
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+  This policy matches any EC2 instances that don't have ``Owner``, ``CostCenter``, or ``Project``
+  tags defined.
+
   .. code-block:: yaml
 
      policies:
@@ -37,106 +52,120 @@ Report on Tag Compliance
                - "tag:Project": absent
 
 
-Enforce Tag Compliance
-  All EC2 non-AutoScaling instances that do not have the three required tags (CostCenter, Owner, Project)
+Enforce Tag Compliance - EC2
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  All EC2 non-AutoScaling instances that do not have the three required tags (``CostCenter``, ``Owner``, ``Project``)
   will be stopped hourly after 2 days, and terminated after 5 days.
+
+  This set of policies uses the ``c7n_status`` tag to plan and execute delayed actions.
 
   .. code-block:: yaml
 
-     policies:
+    policies:
 
-     - name: ec2-tag-compliance-mark
-       resource: ec2
-       comment: |
-         Find all (non-ASG) instances that are not conformant
-         to tagging policies, and tag them for stoppage in 1 days.
-       filters:
-         - "tag:aws:autoscaling:groupName": absent
-         - "tag:c7n_status": absent
-         - or:
-             - "tag:Owner": absent
-             - "tag:CostCenter": absent
-             - "tag:Project": absent
-       actions:
-         - type: mark-for-op
-           op: stop
-           days: 1
+    - name: ec2-tag-compliance-mark
+      resource: ec2
+      comment: |
+        Find all (non-ASG) instances that are not conformant
+        to tagging policies, and tag them for stoppage in 1 days.
+      filters:
+        - "tag:aws:autoscaling:groupName": absent
+        - "tag:c7n_status": absent
+        - or:
+            - "tag:Owner": absent
+            - "tag:CostCenter": absent
+            - "tag:Project": absent
+      actions:
+        - type: mark-for-op
+          tag: c7n_status
+          op: stop
+          days: 1
 
-     - name: ec2-tag-compliance-unmark
-       resource: ec2
-       comment: |
-         Any instances which have previously been marked as
-         non compliant with tag policies, that are now compliant
-         should be unmarked as non-compliant.
-       filters:
-         - "tag:Owner": not-null
-         - "tag:CostCenter": not-null
-         - "tag:Project": not-null
-         - "tag:c7n_status": not-null
-       actions:
-         - unmark
-         - start
+    - name: ec2-tag-compliance-unmark
+      resource: ec2
+      comment: |
+        Any instances which have previously been marked as
+        non compliant with tag policies, that are now compliant
+        should be unmarked as non-compliant.
+      filters:
+        - "tag:Owner": not-null
+        - "tag:CostCenter": not-null
+        - "tag:Project": not-null
+        - "tag:c7n_status": not-null
+      actions:
+        - type: remove-tag
+          tags:
+            - c7n_status
 
-     - name: ec2-tag-compliance-stop
-       resource: ec2
-       comment: |
-         Stop all non autoscaling group instances previously marked
-         for stoppage by today's date, and schedule termination in
-         2 days. Also verify that they continue to not meet tagging
-         policies.
-       filters:
-         - "tag:aws:autoscaling:groupName": absent
-         - type: marked-for-op
-           op: stop
-         - or:
-             - "tag:Owner": absent
-             - "tag:CostCenter": absent
-             - "tag:Project": absent
-       actions:
-         - stop
-         - type: mark-for-op
-           op: terminate
-           days: 3
+    - name: ec2-tag-compliance-stop
+      resource: ec2
+      comment: |
+        Stop all non autoscaling group instances previously marked
+        for stoppage by today's date, and schedule termination in
+        2 days. Also verify that they continue to not meet tagging
+        policies.
+      filters:
+        - "tag:aws:autoscaling:groupName": absent
+        - type: marked-for-op
+          tag: c7n_status
+          op: stop
+        - or:
+            - "tag:Owner": absent
+            - "tag:CostCenter": absent
+            - "tag:Project": absent
+      actions:
+        - stop
+        - type: mark-for-op
+          tag: c7n_status
+          op: terminate
+          days: 3
 
-     - name: ec2-tag-compliance-terminate
-       resource: ec2
-       comment: |
-         Terminate all stopped instances marked for termination
-         by today's date.
-       filters:
-         - "tag:aws:autoscaling:groupName": absent
-         - type: marked-for-op
-           op: terminate
-         - or:
-             - "tag:Owner": absent
-             - "tag:CostCenter": absent
-             - "tag:Project": absent
-       actions:
-         - type: terminate
-           force: true
+    - name: ec2-tag-compliance-terminate
+      resource: ec2
+      comment: |
+        Terminate all stopped instances marked for termination
+        by today's date.
+      filters:
+        - "tag:aws:autoscaling:groupName": absent
+        - type: marked-for-op
+          tag: c7n_status
+          op: terminate
+        - or:
+            - "tag:Owner": absent
+            - "tag:CostCenter": absent
+            - "tag:Project": absent
+      actions:
+        - type: terminate
+          force: true
 
-     - name: ec2-tag-compliance-nag-stop
-       resource: ec2
-       comment: |
-         Stop all instances marked for termination every hour
-         starting 1 day before their termination.
-       filters:
-         - "tag:aws:autoscaling:groupName": absent
-         - type: marked-for-op
-           op: terminate
-           skew: 1
-         - or:
-             - "tag:CostCenter": absent
-             - "tag:Owner": absent
-             - "tag:Project": absent
-       actions:
-         - stop
+    - name: ec2-tag-compliance-nag-stop
+      resource: ec2
+      comment: |
+        Stop all instances marked for termination every hour
+        starting 1 day before their termination.
+      filters:
+        - "tag:aws:autoscaling:groupName": absent
+        - type: marked-for-op
+          tag: c7n_status
+          op: terminate
+          skew: 1
+        - or:
+            - "tag:CostCenter": absent
+            - "tag:Owner": absent
+            - "tag:Project": absent
+      actions:
+        - stop
 
-Enforce Tag Compliance
+Enforce Tag Compliance - AutoScaling Groups
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
   All AutoScaling Groups that do not have the 5 required tags:
   (Resource Contact, Billing Cost Center, Environment, Resource Purpose, Business Unit)
-  will be suspended and stopped once after 24 hours and then hourly after 2 days, 
-  and terminated after 3 days.  We are using a custom tag named c7n_tag_compliance
+  will be suspended and stopped once after 24 hours and then hourly after 2 days,
+  and terminated after 3 days.  We are using a custom tag named ``c7n_tag_compliance``
+  to plan delayed actions, and `YAML anchors <https://support.atlassian.com/bitbucket-cloud/docs/yaml-anchors/>`_
+  to reuse the same set of filters across multiple policies in the same file.
 
   .. code-block:: yaml
 
@@ -208,11 +237,8 @@ Enforce Tag Compliance
           and has been resumed if it was in a suspended state.
         filters:
           - "tag:c7n_tag_compliance": not-null
-          - "tag:Resource Contact": not-null
-          - "tag:Billing Cost Center": not-null
-          - "tag:Environment": not-null
-          - "tag:Resource Purpose": not-null
-          - "tag:Business Unit": not-null
+          - not:
+            - or: *tag-compliance-filters
         actions:
           - type: unmark
             key: "c7n_tag_compliance"
@@ -249,7 +275,7 @@ Enforce Tag Compliance
         comments: |
           Your ASG has been suspended and resized to 0 instances as they do not have all
           the required tags on them.  Please login to AWS and add the required tags to your ASG.
-          Starting tomorrow hourly emails and suspensions will start occuring if the ASG is
+          Starting tomorrow hourly emails and suspensions will start occurring if the ASG is
           still not compliant. The following day your ASG will be deleted.
         filters:
           - or: *tag-compliance-filters

@@ -1,0 +1,15 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "connectInstanceConfig": {
+            "connectInstanceId": "25f1514d-14d0-4a06-b28f-9df132d33d3d",
+            "encryptionConfig": {
+                "enabled": true,
+                "encryptionType": "KMS",
+                "keyArn": "arn:aws:kms:us-east-1:644160558196:key/361001ad-9c5e-42cb-9a09-5de1e80e822f"
+            },
+            "serviceLinkedRoleArn": "arn:aws:iam::644160558196:role/aws-service-role/connect-campaigns.amazonaws.com/AWSServiceRoleForConnectCampaigns_qsU0pOCzd3qu0o3DRjqr"
+        }
+    }
+}

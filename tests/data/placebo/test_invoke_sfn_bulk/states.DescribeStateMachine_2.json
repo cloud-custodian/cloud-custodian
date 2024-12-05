@@ -1,0 +1,29 @@
+{
+    "status_code": 200,
+    "data": {
+        "stateMachineArn": "arn:aws:states:us-east-1:644160558196:stateMachine:MyStateMachine-fd0bt36ac",
+        "name": "MyStateMachine-fd0bt36ac",
+        "status": "ACTIVE",
+        "definition": "{\"Comment\":\"A description of my state machine\",\"StartAt\":\"Lambda Invoke\",\"States\":{\"Lambda Invoke\":{\"Type\":\"Task\",\"Resource\":\"arn:aws:states:::lambda:invoke\",\"OutputPath\":\"$.Payload\",\"Parameters\":{\"Payload.$\":\"$\",\"FunctionName\":\"arn:aws:lambda:us-east-1:644160558196:function:test-pratyush:$LATEST\"},\"Retry\":[{\"ErrorEquals\":[\"Lambda.ServiceException\",\"Lambda.AWSLambdaException\",\"Lambda.SdkClientException\",\"Lambda.TooManyRequestsException\"],\"IntervalSeconds\":1,\"MaxAttempts\":3,\"BackoffRate\":2}],\"End\":true}}}",
+        "roleArn": "arn:aws:iam::644160558196:role/service-role/StepFunctions-MyStateMachine-fd0bt36ac-role-v92icbuy0",
+        "type": "STANDARD",
+        "creationDate": {
+            "__class__": "datetime",
+            "year": 2024,
+            "month": 8,
+            "day": 27,
+            "hour": 20,
+            "minute": 42,
+            "second": 7,
+            "microsecond": 111000
+        },
+        "loggingConfiguration": {
+            "level": "OFF",
+            "includeExecutionData": false
+        },
+        "tracingConfiguration": {
+            "enabled": false
+        },
+        "ResponseMetadata": {}
+    }
+}

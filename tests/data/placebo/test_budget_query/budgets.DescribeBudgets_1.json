@@ -1,0 +1,77 @@
+{
+    "status_code": 200,
+    "data": {
+        "Budgets": [
+            {
+                "BudgetName": "budget-ec2-monthly",
+                "BudgetLimit": {
+                    "Amount": "1200.0",
+                    "Unit": "USD"
+                },
+                "CostFilters": {
+                    "Service": [
+                        "Amazon Elastic Compute Cloud - Compute"
+                    ]
+                },
+                "CostTypes": {
+                    "IncludeTax": true,
+                    "IncludeSubscription": true,
+                    "UseBlended": false,
+                    "IncludeRefund": true,
+                    "IncludeCredit": true,
+                    "IncludeUpfront": true,
+                    "IncludeRecurring": true,
+                    "IncludeOtherSubscription": true,
+                    "IncludeSupport": true,
+                    "IncludeDiscount": true,
+                    "UseAmortized": false
+                },
+                "TimeUnit": "MONTHLY",
+                "TimePeriod": {
+                    "Start": {
+                        "__class__": "datetime",
+                        "year": 2017,
+                        "month": 6,
+                        "day": 30,
+                        "hour": 17,
+                        "minute": 0,
+                        "second": 0,
+                        "microsecond": 0
+                    },
+                    "End": {
+                        "__class__": "datetime",
+                        "year": 2087,
+                        "month": 6,
+                        "day": 14,
+                        "hour": 17,
+                        "minute": 0,
+                        "second": 0,
+                        "microsecond": 0
+                    }
+                },
+                "CalculatedSpend": {
+                    "ActualSpend": {
+                        "Amount": "55.096",
+                        "Unit": "USD"
+                    },
+                    "ForecastedSpend": {
+                        "Amount": "242.421",
+                        "Unit": "USD"
+                    }
+                },
+                "BudgetType": "COST",
+                "LastUpdatedTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 8,
+                    "day": 8,
+                    "hour": 5,
+                    "minute": 56,
+                    "second": 25,
+                    "microsecond": 388000
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

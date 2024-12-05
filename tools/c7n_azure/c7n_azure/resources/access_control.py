@@ -1,35 +1,19 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 import logging
 import re
 
-from azure.graphrbac import GraphRbacManagementClient
-from c7n_azure.actions.base import AzureBaseAction
-from c7n_azure.provider import Azure
-from c7n_azure.provider import resources
-from c7n_azure.query import QueryResourceManager, DescribeSource
-from c7n_azure.utils import GraphHelper
-
-from c7n.filters import Filter
-from c7n.filters import FilterValidationError
-from c7n.filters import ValueFilter
+from c7n.filters import Filter, FilterValidationError, ValueFilter
 from c7n.filters.related import RelatedResourceFilter
-from c7n.resources import load_resources
 from c7n.query import sources
-from c7n.utils import local_session
-from c7n.utils import type_schema
+from c7n.resources import load_resources
+from c7n.utils import local_session, type_schema
+from c7n_azure.actions.base import AzureBaseAction
+from c7n_azure.constants import GRAPH_AUTH_ENDPOINT
+from c7n_azure.provider import Azure, resources
+from c7n_azure.query import DescribeSource, QueryResourceManager
+from c7n_azure.utils import GraphHelper
 
 log = logging.getLogger('custodian.azure.access_control')
 
@@ -119,8 +103,8 @@ class RoleAssignment(QueryResourceManager):
         )
 
     def augment(self, resources):
-        s = self.get_session().get_session_for_resource('https://graph.windows.net')
-        graph_client = GraphRbacManagementClient(s.get_credentials(), s.get_tenant_id())
+        s = self.get_session().get_session_for_resource(GRAPH_AUTH_ENDPOINT)
+        graph_client = s.client('azure.graphrbac.GraphRbacManagementClient')
 
         object_ids = list(set(
             resource['properties']['principalId'] for resource in resources

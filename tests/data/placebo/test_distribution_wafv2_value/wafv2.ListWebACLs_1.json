@@ -1,0 +1,16 @@
+{
+    "status_code": 200,
+    "data": {
+        "NextMarker": "djs-test",
+        "WebACLs": [
+            {
+                "Name": "cfb-wyzcrudc",
+                "Id": "8694f54f-1e61-46ca-affa-bd863e6ff318",
+                "Description": "",
+                "LockToken": "b2b7312c-8139-4b6a-9ba0-3037c7c983ec",
+                "ARN": "arn:aws:wafv2:us-east-1:123456789012:global/webacl/cfb-wyzcrudc/8694f54f-1e61-46ca-affa-bd863e6ff318"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

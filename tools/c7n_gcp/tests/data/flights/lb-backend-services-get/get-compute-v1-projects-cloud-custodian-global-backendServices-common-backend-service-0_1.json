@@ -1,0 +1,52 @@
+{
+  "body": {
+    "connectionDraining": {
+      "drainingTimeoutSec": 300
+    }, 
+    "kind": "compute#backendService", 
+    "protocol": "HTTP", 
+    "description": "", 
+    "timeoutSec": 30, 
+    "enableCDN": false, 
+    "loadBalancingScheme": "EXTERNAL", 
+    "affinityCookieTtlSec": 0, 
+    "port": 80, 
+    "backends": [
+      {
+        "maxRatePerInstance": 1.0, 
+        "capacityScaler": 1.0, 
+        "group": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-c/instanceGroups/instance-group-5", 
+        "description": "", 
+        "balancingMode": "RATE"
+      }
+    ], 
+    "fingerprint": "IMJhbmyvR7s=", 
+    "portName": "http", 
+    "healthChecks": [
+      "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/healthChecks/custodain-health-check"
+    ], 
+    "sessionAffinity": "NONE", 
+    "creationTimestamp": "2019-04-30T06:09:15.477-07:00", 
+    "id": "9197255966413157908", 
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/backendServices/common-backend-service-0", 
+    "name": "common-backend-service-0"
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "1005", 
+    "transfer-encoding": "chunked", 
+    "expires": "Fri, 03 May 2019 16:13:44 GMT", 
+    "vary": "Origin, X-Origin", 
+    "-content-encoding": "gzip", 
+    "date": "Fri, 03 May 2019 16:13:44 GMT", 
+    "x-xss-protection": "1; mode=block", 
+    "content-location": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/backendServices/common-backend-service-0?alt=json", 
+    "x-content-type-options": "nosniff", 
+    "server": "GSE", 
+    "etag": "\"V5gSU3f7nKzOGGTHHblfN6POZs8=/Ur0VQZ4gpZIPwUPj1AbgAQXxsYo=\"", 
+    "cache-control": "private, max-age=0, must-revalidate, no-transform", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}

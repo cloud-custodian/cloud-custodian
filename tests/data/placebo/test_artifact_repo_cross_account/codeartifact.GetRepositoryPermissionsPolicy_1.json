@@ -1,0 +1,11 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "policy": {
+            "resourceArn": "arn:aws:codeartifact:us-east-1:644160558196:repository/pizzaspace/dop",
+            "revision": "PLp5GN5dz5L5uSVrW8zAz/FK5WyCYJ2eO4l/J59xjx8=",
+            "document": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::112233445566:root\"},\"Action\":[\"codeartifact:DescribePackageVersion\",\"codeartifact:DescribeRepository\",\"codeartifact:GetPackageVersionReadme\",\"codeartifact:GetRepositoryEndpoint\",\"codeartifact:ListPackages\",\"codeartifact:ListPackageVersions\",\"codeartifact:ListPackageVersionAssets\",\"codeartifact:ListPackageVersionDependencies\",\"codeartifact:ReadFromRepository\"],\"Resource\":\"*\"}]}"
+        }
+    }
+}

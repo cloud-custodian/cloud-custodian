@@ -6,5 +6,7 @@
   "access_token" : "access_token",
   "keyvault_client_id": "kv_client",
   "keyvault_secret_id": "kv_secret",
-  "use_msi": true
+  "use_msi": true,
+  "client_certificate_path": "/certificate",
+  "client_certificate_password": "password"
 }

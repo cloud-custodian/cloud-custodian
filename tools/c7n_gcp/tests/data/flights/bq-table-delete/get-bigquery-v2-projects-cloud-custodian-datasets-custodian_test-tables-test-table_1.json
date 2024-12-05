@@ -1,0 +1,47 @@
+{
+  "headers": {
+    "etag": "+UF+1eV9acZmxlr1V00sxg==",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Tue, 28 Feb 2023 20:28:04 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "920",
+    "-content-encoding": "gzip",
+    "content-location": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/custodian_test/tables/test-table?alt=json"
+  },
+  "body": {
+    "kind": "bigquery#table",
+    "etag": "+UF+1eV9acZmxlr1V00sxg==",
+    "id": "premise-governance-rd:custodian_test.test-table",
+    "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/custodian_test/tables/test-table",
+    "tableReference": {
+      "projectId": "premise-governance-rd",
+      "datasetId": "custodian_test",
+      "tableId": "test-table"
+    },
+    "description": "",
+    "labels": {
+      "delete_me": "yes",
+      "c7n": "c7nstack"
+    },
+    "numBytes": "0",
+    "numLongTermBytes": "0",
+    "numRows": "0",
+    "creationTime": "1677600507108",
+    "lastModifiedTime": "1677616066872",
+    "type": "TABLE",
+    "location": "US",
+    "encryptionConfiguration": {
+      "kmsKeyName": "projects/cloud-custodian/locations/global/keyRings/c7npolicy-keyring-stacklet99/cryptoKeys/c7npolicy-cryptokey-stacklet99"
+    },
+    "numTotalLogicalBytes": "0",
+    "numActiveLogicalBytes": "0",
+    "numLongTermLogicalBytes": "0"
+  }
+}

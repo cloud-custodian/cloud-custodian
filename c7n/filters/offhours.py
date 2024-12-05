@@ -1,16 +1,5 @@
-# Copyright 2015-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 """
 Resource Scheduling Offhours
 ============================
@@ -37,9 +26,12 @@ We provide an `onhour` and `offhour` time filter, each should be used in a
 different policy, they support the same configuration options:
 
  - **weekends**: default true, whether to leave resources off for the weekend
- - **weekend-only**: default false, whether to turn the resource off only on
+ - **weekends-only**: default false, whether to turn the resource off only on
    the weekend
  - **default_tz**: which timezone to utilize when evaluating time **(REQUIRED)**
+ - **fallback-schedule**: If a resource doesn't support tagging or doesn't provide
+   a tag you can supply a default schedule that will be used. When the tag is provided
+   this will be ignored. See :ref:`ScheduleParser Time Specifications <scheduleparser-time-spec>`.
  - **tag**: which resource tag name to use for per-resource configuration
    (schedule and timezone overrides and opt-in/opt-out); default is
    ``maid_offhours``.
@@ -71,6 +63,7 @@ This example policy overrides most of the defaults for an offhour policy:
            opt-out: true
            onhour: 8
            offhour: 20
+
 
 Tag Based Configuration
 =======================
@@ -104,6 +97,9 @@ The value of the tag must be one of the following:
   * ``off=(time spec)`` and/or ``on=(time spec)`` matching time specifications
     supported by :py:class:`c7n.filters.offhours.ScheduleParser` as described
     in the next section.
+
+
+.. _scheduleparser-time-spec:
 
 ScheduleParser Time Specifications
 ----------------------------------
@@ -206,6 +202,25 @@ above. The best current workaround is to define a separate policy with a unique
 resources with that tag name and a value of ``on``. Note that this can only be
 used in opt-in mode, not opt-out.
 
+Another option is to escape the tag value with the following mapping, generated
+with the char's unicode number `"u" + hex(ord(the_char))[2:]`.
+This works for GCP resources as well.
+
+- ( and ) as u28 and u29
+- [ and ] as u5b and u5d
+- , as u2c
+- ; as u3b
+- = as u3d
+- / as u2f
+- - as u2d
+
+**Examples**::
+
+    # off=(M-F,18);tz=Australia/Sydney
+    offu3du28M-Fu2c18u29u3btzu3dAustraliau2fSydney
+    # off=[(M-F,18),(S,13)]
+    off=u5bu28M-Fu2c18u29u2cu28Su2c13u29u5d
+
 Public Holidays
 ===============
 
@@ -266,6 +281,8 @@ class Time(Filter):
         'properties': {
             'tag': {'type': 'string'},
             'default_tz': {'type': 'string'},
+            'fallback-schedule': {'type': 'string'},
+            'fallback_schedule': {'type': 'string'},
             'weekends': {'type': 'boolean'},
             'weekends-only': {'type': 'boolean'},
             'opt-out': {'type': 'boolean'},
@@ -311,6 +328,9 @@ class Time(Filter):
         'nzst': 'Pacific/Auckland',
         'utc': 'Etc/UTC',
     }
+    TAG_RESTRICTIONS = ["(", ")", "[", "]", ",", ";", "=", "/", "-"]
+    # mapping to ['u28', 'u29', 'u5b', 'u5d', 'u2c', 'u3b', 'u3d', 'u2f', "u2d"]
+    TAG_RESTRICTIONS_ESCAPE = ["u" + hex(ord(c))[2:] for c in TAG_RESTRICTIONS]
 
     z_names = list(zoneinfo.get_zonefile_instance().zones)
     non_title_case_zones = (
@@ -326,6 +346,12 @@ class Time(Filter):
         self.weekends_only = self.data.get('weekends-only', False)
         self.opt_out = self.data.get('opt-out', False)
         self.tag_key = self.data.get('tag', self.DEFAULT_TAG).lower()
+        # we originally had fallback_schedule, but the code was looking for
+        # fallback-schedule, we want to deprecate the underscore form.
+        self.fallback_schedule = (
+            self.data.get('fallback-schedule') or
+            self.data.get('fallback_schedule')
+        )
         self.default_schedule = self.get_default_schedule()
         self.parser = ScheduleParser(self.default_schedule)
 
@@ -449,18 +475,28 @@ class Time(Filter):
     def get_tag_value(self, i):
         """Get the resource's tag value specifying its schedule."""
         # Look for the tag, Normalize tag key and tag value
-        found = False
+        found = self.fallback_schedule
         for t in i.get('Tags', ()):
             if t['Key'].lower() == self.tag_key:
                 found = t['Value']
                 break
-        if found is False:
+        # NOTE for GCP resources, eg sql-instance
+        if found == self.fallback_schedule and 'labels' in i:
+            found = i.get('labels', {}).get(self.tag_key) or found
+        if found in (False, None):
             return False
         # enforce utf8, or do translate tables via unicode ord mapping
         value = found.lower().encode('utf8').decode('utf8')
+        value = self.unescape_tag_restrictions(value)
         # Some folks seem to be interpreting the docs quote marks as
         # literal for values.
         value = value.strip("'").strip('"')
+        return value
+
+    @classmethod
+    def unescape_tag_restrictions(cls, value: str):
+        for i, c in enumerate(cls.TAG_RESTRICTIONS_ESCAPE):
+            value = value.replace(c, cls.TAG_RESTRICTIONS[i])
         return value
 
     @classmethod

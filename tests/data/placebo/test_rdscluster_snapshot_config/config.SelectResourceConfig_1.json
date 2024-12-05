@@ -1,0 +1,17 @@
+{
+    "status_code": 200,
+    "data": {
+        "Results": [],
+        "QueryInfo": {
+            "SelectFields": [
+                {
+                    "Name": "configuration"
+                },
+                {
+                    "Name": "supplementaryConfiguration"
+                }
+            ]
+        },
+        "ResponseMetadata": {}
+    }
+}

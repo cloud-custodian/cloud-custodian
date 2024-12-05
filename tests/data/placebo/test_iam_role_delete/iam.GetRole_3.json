@@ -1,0 +1,11 @@
+{
+    "status_code": 404,
+    "data": {
+        "Error": {
+            "Type": "Sender",
+            "Code": "NoSuchEntity",
+            "Message": "The role with name test_role cannot be found."
+        },
+        "ResponseMetadata": {}
+    }
+}

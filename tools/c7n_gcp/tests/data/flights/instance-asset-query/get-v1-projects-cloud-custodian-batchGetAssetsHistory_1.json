@@ -1,0 +1,138 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Fri, 29 May 2020 16:39:31 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3-27=\":443\"; ma=2592000,h3-25=\":443\"; ma=2592000,h3-T050=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q049=\":443\"; ma=2592000,h3-Q048=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "4687",
+    "-content-encoding": "gzip",
+    "content-location": "https://cloudasset.googleapis.com/v1/projects/cloud-custodian:batchGetAssetsHistory?contentType=RESOURCE&assetNames=%2F%2Fcompute.googleapis.com%2Fprojects%2Fcustodian-1291%2Fzones%2Fus-central1-a%2Finstances%2Finstance-1&alt=json"
+  },
+  "body": {
+    "assets": [
+      {
+        "window": {
+          "startTime": "2020-05-29T16:16:39.545214Z",
+          "endTime": "2262-04-11T23:47:16.854775807Z"
+        },
+        "asset": {
+          "name": "//compute.googleapis.com/projects/cloud-custodian/zones/us-central1-a/instances/instance-1",
+          "assetType": "compute.googleapis.com/Instance",
+          "resource": {
+            "version": "v1",
+            "discoveryDocumentUri": "https://www.googleapis.com/discovery/v1/apis/compute/v1/rest",
+            "discoveryName": "Instance",
+            "parent": "//cloudresourcemanager.googleapis.com/projects/1098479648729",
+            "data": {
+              "cpuPlatform": "Unknown CPU Platform",
+              "canIpForward": false,
+              "displayDevice": {
+                "enableDisplay": false
+              },
+              "fingerprint": "VR3/nDvn2mU=",
+              "labels": {
+                "quarantined": "testing"
+              },
+              "deletionProtection": false,
+              "status": "TERMINATED",
+              "name": "instance-1",
+              "machineType": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a/machineTypes/n1-standard-1",
+              "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a/instances/instance-1",
+              "shieldedInstanceConfig": {
+                "enableVtpm": true,
+                "enableSecureBoot": false,
+                "enableIntegrityMonitoring": true
+              },
+              "disks": [
+                {
+                  "autoDelete": true,
+                  "mode": "READ_WRITE",
+                  "index": 0,
+                  "type": "PERSISTENT",
+                  "deviceName": "instance-1",
+                  "guestOsFeatures": [
+                    {
+                      "type": "VIRTIO_SCSI_MULTIQUEUE"
+                    },
+                    {
+                      "type": "UEFI_COMPATIBLE"
+                    }
+                  ],
+                  "diskSizeGb": "10",
+                  "licenses": [
+                    "https://www.googleapis.com/compute/v1/projects/debian-cloud/global/licenses/debian-10-buster"
+                  ],
+                  "interface": "SCSI",
+                  "boot": true,
+                  "source": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a/disks/instance-1"
+                }
+              ],
+              "startRestricted": false,
+              "networkInterfaces": [
+                {
+                  "networkIP": "10.128.0.2",
+                  "subnetwork": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/subnetworks/default",
+                  "fingerprint": "OYkVi+dox1s=",
+                  "accessConfigs": [
+                    {
+                      "name": "External NAT",
+                      "type": "ONE_TO_ONE_NAT",
+                      "networkTier": "PREMIUM"
+                    }
+                  ],
+                  "name": "nic0",
+                  "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default"
+                }
+              ],
+              "shieldedInstanceIntegrityPolicy": {
+                "updateAutoLearnPolicy": true
+              },
+              "labelFingerprint": "Xty5LTmPsGw=",
+              "tags": {
+                "fingerprint": "42WmSpB8rSM="
+              },
+              "id": "642744439277452381",
+              "scheduling": {
+                "onHostMaintenance": "MIGRATE",
+                "automaticRestart": true,
+                "preemptible": false
+              },
+              "allocationAffinity": {
+                "consumeAllocationType": "ANY_ALLOCATION"
+              },
+              "zone": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a",
+              "creationTimestamp": "2020-05-29T01:07:14.742-07:00",
+              "description": "",
+              "serviceAccounts": [
+                {
+                  "scopes": [
+                    "https://www.googleapis.com/auth/devstorage.read_only",
+                    "https://www.googleapis.com/auth/logging.write",
+                    "https://www.googleapis.com/auth/monitoring.write",
+                    "https://www.googleapis.com/auth/servicecontrol",
+                    "https://www.googleapis.com/auth/service.management.readonly",
+                    "https://www.googleapis.com/auth/trace.append"
+                  ],
+                  "email": "1098479648729-compute@developer.gserviceaccount.com"
+                }
+              ]
+            },
+            "location": "us-central1-a"
+          },
+          "ancestors": [
+            "projects/1098479648729",
+            "folders/487100029841",
+            "organizations/111442920246"
+          ]
+        }
+      }
+    ]
+  }
+}

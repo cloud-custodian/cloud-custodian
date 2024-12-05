@@ -1,16 +1,5 @@
-# Copyright 2020 Kapil Thangavelu
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 #
 """
 Build Docker Artifacts
@@ -25,8 +14,10 @@ We also support running functional tests and image cve scanning before pushing.
 
 import logging
 import os
+import time
 import subprocess
 import sys
+import traceback
 from datetime import datetime
 from pathlib import Path
 
@@ -34,40 +25,99 @@ import click
 
 log = logging.getLogger("dockerpkg")
 
-BUILD_STAGE = """\
-# Dockerfiles are generated from tools/dev/dockerpkg.py
+PHASE_1_INSTALL_TMPL = """
+ADD tools/c7n_{pkg}/pyproject.toml tools/c7n_{pkg}/poetry.lock /src/tools/c7n_{pkg}/
+RUN if [[ " ${{providers[*]}} " =~ "{pkg}" ]]; then \
+    . /usr/local/bin/activate && \
+    cd tools/c7n_{pkg} && \
+    poetry install --without dev --no-root; \
+fi
+"""
 
-FROM {base_build_image} as build-env
+PHASE_2_INSTALL_TMPL = """
+ADD tools/c7n_{pkg} /src/tools/c7n_{pkg}
+RUN if [[ " ${{providers[*]}} " =~ "{pkg}" ]]; then \
+    . /usr/local/bin/activate && \
+    cd tools/c7n_{pkg} && \
+    poetry install --only-root; \
+fi
+"""
+
+default_providers = ["gcp", "azure", "kube", "openstack", "tencentcloud", "oci", "awscc"]
+
+PHASE_1_PKG_INSTALL_DEP = """\
+# We include `pyproject.toml` and `poetry.lock` first to allow
+# cache of dependency installs.
+"""
+PHASE_2_PKG_INSTALL_ROOT = """\
+# Now install the root of each provider
+"""
+PHASE_1_PKG_INSTALL_DEP += "\n".join(
+    [PHASE_1_INSTALL_TMPL.format(pkg=pkg) for pkg in default_providers]
+)
+
+PHASE_2_PKG_INSTALL_ROOT += "\n".join(
+    [PHASE_2_INSTALL_TMPL.format(pkg=pkg) for pkg in default_providers]
+)
+
+
+BOOTSTRAP_STAGE = """\
+# Dockerfiles are generated from tools/dev/dockerpkg.py
+FROM {base_build_image} AS build-env
+
+ARG POETRY_VERSION="1.8.3"
+SHELL ["/bin/bash", "-c"]
 
 # pre-requisite distro deps, and build env setup
-RUN adduser --disabled-login --gecos "" custodian
 RUN apt-get --yes update
-RUN apt-get --yes install build-essential curl python3-venv python3-dev --no-install-recommends
+RUN apt-get --yes install --no-install-recommends build-essential \
+    curl python3-venv python3-dev adduser
+# todo: 24.04 is trying to standardize on ubuntu as builtin non root.
+RUN adduser --disabled-login --gecos "" custodian
 RUN python3 -m venv /usr/local
-RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python3
+RUN /usr/local/bin/pip install -U pip setuptools && \
+    /usr/local/bin/pip install "poetry=={poetry_version}"
+ARG PATH="/root/.local/bin:$PATH"
 
 WORKDIR /src
+"""
 
+LEFT_BUILD_STAGE = BOOTSTRAP_STAGE + """\
+ADD pyproject.toml poetry.lock README.md /src
+RUN . /usr/local/bin/activate && poetry install --only main --no-root
+
+ADD c7n /src/c7n/
+RUN . /usr/local/bin/activate && poetry install --only-root
+
+ADD tools/c7n_left /src/tools/c7n_left
+RUN . /usr/local/bin/activate && cd tools/c7n_left && poetry install --only main
+
+RUN mkdir /output
+"""
+
+BUILD_STAGE = BOOTSTRAP_STAGE + """\
 # Add core & aws packages
 ADD pyproject.toml poetry.lock README.md /src/
+RUN . /usr/local/bin/activate && pip install -qU pip wheel aws-xray-sdk psutil jsonpatch
+
+# Ignore root first pass so if source changes we don't have to invalidate
+# dependency install
+RUN . /usr/local/bin/activate && poetry install --without dev --no-root
+
+# Now install the root package, we used to do this after dependencies of other providers
+# but since moving c7n to a main dependency in pyproject toml we have to do this one first.
 ADD c7n /src/c7n/
-RUN . /usr/local/bin/activate && $HOME/.poetry/bin/poetry install --no-dev
-RUN . /usr/local/bin/activate && pip install -q wheel
-RUN . /usr/local/bin/activate && pip install -q aws-xray-sdk psutil jsonpatch
+RUN . /usr/local/bin/activate && poetry install --only-root
 
+ARG providers="{providers}"
 # Add provider packages
-ADD tools/c7n_gcp /src/tools/c7n_gcp
-RUN rm -R tools/c7n_gcp/tests
-ADD tools/c7n_azure /src/tools/c7n_azure
-RUN rm -R tools/c7n_azure/tests_azure
-ADD tools/c7n_kube /src/tools/c7n_kube
-RUN rm -R tools/c7n_kube/tests
+{PHASE_1_PKG_INSTALL_DEP}
 
-# Install requested providers
-ARG providers="azure gcp kube"
-RUN . /usr/local/bin/activate && \\
-    for pkg in $providers; do cd tools/c7n_$pkg && \\
-    $HOME/.poetry/bin/poetry install && cd ../../; done
+{PHASE_2_PKG_INSTALL_ROOT}
+
+# Install c7n_awscc
+ADD tools/c7n_awscc /src/tools/c7n_awscc
+RUN . /usr/local/bin/activate && cd tools/c7n_awscc && poetry install
 
 RUN mkdir /output
 """
@@ -78,15 +128,20 @@ FROM {base_target_image}
 LABEL name="{name}" \\
       repository="http://github.com/cloud-custodian/cloud-custodian"
 
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get --yes update \\
+        && apt-get --yes install python3 python3-venv adduser {packages} --no-install-recommends \\
+        && rm -Rf /var/cache/apt \\
+        && rm -Rf /var/lib/apt/lists/* \\
+        && rm -Rf /var/log/*
+
+# These should remain below any other commands because they will invalidate
+# the layer cache
 COPY --from=build-env /src /src
 COPY --from=build-env /usr/local /usr/local
 COPY --from=build-env /output /output
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get --yes update \\
-        && apt-get --yes install python3 python3-venv --no-install-recommends \\
-        && rm -Rf /var/cache/apt \\
-        && rm -Rf /var/lib/apt/lists/* \\
-        && rm -Rf /var/log/*
 
 RUN adduser --disabled-login --gecos "" custodian
 USER custodian
@@ -119,46 +174,85 @@ ENTRYPOINT ["{entrypoint}"]
 CMD ["--help"]
 """
 
+TARGET_CLI = """\
+LABEL "org.opencontainers.image.title"="cli"
+LABEL "org.opencontainers.image.description"="Cloud Management Rules Engine"
+LABEL "org.opencontainers.image.documentation"="https://cloudcustodian.io/docs"
+"""
+
+TARGET_LEFT = """
+LABEL "org.opencontainers.image.title"="left"
+LABEL "org.opencontainers.image.description"="Cloud Custodian IaC Engine"
+LABEL "org.opencontainers.image.documentation"="https://cloudcustodian.io/docs/tools/c7n-left.html"
+"""
+
+BUILD_KUBE = """\
+# Install c7n-kube
+ADD tools/c7n_kube /src/tools/c7n_kube
+RUN . /usr/local/bin/activate && cd tools/c7n_kube && poetry install
+"""
+
+TARGET_KUBE = """\
+LABEL "org.opencontainers.image.title"="kube"
+LABEL "org.opencontainers.image.description"="Cloud Custodian Kubernetes Hooks"
+LABEL "org.opencontainers.image.documentation"="https://cloudcustodian.io/docs"
+"""
 
 BUILD_ORG = """\
 # Install c7n-org
 ADD tools/c7n_org /src/tools/c7n_org
-RUN . /usr/local/bin/activate && cd tools/c7n_org && $HOME/.poetry/bin/poetry install
+RUN . /usr/local/bin/activate && cd tools/c7n_org && poetry install
+"""
+
+TARGET_ORG = """\
+LABEL "org.opencontainers.image.title"="org"
+LABEL "org.opencontainers.image.description"="Cloud Custodian Management Rules Engine"
+LABEL "org.opencontainers.image.documentation"="https://cloudcustodian.io/docs"
 """
 
 BUILD_MAILER = """\
 # Install c7n-mailer
 ADD tools/c7n_mailer /src/tools/c7n_mailer
-RUN . /usr/local/bin/activate && cd tools/c7n_mailer && $HOME/.poetry/bin/poetry install
+RUN . /usr/local/bin/activate && cd tools/c7n_mailer && poetry install --all-extras
+
+"""
+
+TARGET_MAILER = """\
+LABEL "org.opencontainers.image.title"="mailer"
+LABEL "org.opencontainers.image.description"="Cloud Custodian Notification Delivery"
+LABEL "org.opencontainers.image.documentation"="https://cloudcustodian.io/docs"
 """
 
 BUILD_POLICYSTREAM = """\
-# Compile libgit2
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install wget cmake libssl-dev libffi-dev git
-RUN mkdir build && \\
-    wget -q https://github.com/libgit2/libgit2/releases/download/v1.0.0/libgit2-1.0.0.tar.gz && \\
-    cd build && \\
-    tar xzf ../libgit2-1.0.0.tar.gz && \\
-    cd libgit2-1.0.0 && \\
-    mkdir build && cd build && \\
-    cmake .. && \\
-    make install && \\
-    rm -Rf /src/build
-
 # Install c7n-policystream
 ADD tools/c7n_policystream /src/tools/c7n_policystream
-RUN . /usr/local/bin/activate && cd tools/c7n_policystream && $HOME/.poetry/bin/poetry install
+RUN . /usr/local/bin/activate && cd tools/c7n_policystream && poetry install
+"""
 
-# Verify the install
-#  - policystream is not in ci due to libgit2 compilation needed
-#  - as a sanity check to distributing known good assets / we test here
-RUN . /usr/local/bin/activate && pytest tools/c7n_policystream
+TARGET_POLICYSTREAM = """\
+LABEL "org.opencontainers.image.title"="policystream"
+LABEL "org.opencontainers.image.description"="Custodian policy changes streamed from Git"
+LABEL "org.opencontainers.image.documentation"="https://cloudcustodian.io/docs"
+"""
+
+BUILD_AWSCC = """\
+# Install c7n-awscc
+ADD tools/c7n_awscc /src/tools/c7n_awscc
+RUN . /usr/local/bin/activate && cd tools/c7n_awscc && poetry install
 """
 
 
 class Image:
 
-    defaults = dict(base_build_image="ubuntu:20.04", base_target_image="ubuntu:20.04")
+    defaults = dict(
+        base_build_image="ubuntu:24.04",
+        base_target_image="ubuntu:24.04",
+        poetry_version="${POETRY_VERSION}",
+        packages="",
+        providers=" ".join(default_providers),
+        PHASE_1_PKG_INSTALL_DEP=PHASE_1_PKG_INSTALL_DEP,
+        PHASE_2_PKG_INSTALL_ROOT=PHASE_2_PKG_INSTALL_ROOT,
+    )
 
     def __init__(self, metadata, build, target):
         self.metadata = metadata
@@ -188,7 +282,7 @@ class Image:
 
 
 ImageMap = {
-    "docker/cli": Image(
+    "docker/c7n": Image(
         dict(
             name="cli",
             repo="c7n",
@@ -196,9 +290,19 @@ ImageMap = {
             entrypoint="/usr/local/bin/custodian",
         ),
         build=[BUILD_STAGE],
-        target=[TARGET_UBUNTU_STAGE],
+        target=[TARGET_UBUNTU_STAGE, TARGET_CLI],
     ),
-    "docker/org": Image(
+    "docker/c7n-kube": Image(
+        dict(
+            name="kube",
+            repo="c7n",
+            description="Cloud Custodian Kubernetes Hooks",
+            entrypoint="/usr/local/bin/c7n-kates",
+        ),
+        build=[BUILD_STAGE, BUILD_KUBE],
+        target=[TARGET_UBUNTU_STAGE, TARGET_KUBE],
+    ),
+    "docker/c7n-org": Image(
         dict(
             name="org",
             repo="c7n-org",
@@ -206,7 +310,7 @@ ImageMap = {
             entrypoint="/usr/local/bin/c7n-org",
         ),
         build=[BUILD_STAGE, BUILD_ORG],
-        target=[TARGET_UBUNTU_STAGE],
+        target=[TARGET_UBUNTU_STAGE, TARGET_ORG],
     ),
     "docker/mailer": Image(
         dict(
@@ -215,7 +319,7 @@ ImageMap = {
             entrypoint="/usr/local/bin/c7n-mailer",
         ),
         build=[BUILD_STAGE, BUILD_MAILER],
-        target=[TARGET_UBUNTU_STAGE],
+        target=[TARGET_UBUNTU_STAGE, TARGET_MAILER],
     ),
     "docker/policystream": Image(
         dict(
@@ -224,7 +328,7 @@ ImageMap = {
             entrypoint="/usr/local/bin/c7n-policystream",
         ),
         build=[BUILD_STAGE, BUILD_POLICYSTREAM],
-        target=[TARGET_UBUNTU_STAGE],
+        target=[TARGET_UBUNTU_STAGE, TARGET_POLICYSTREAM],
     ),
 }
 
@@ -285,8 +389,11 @@ def build(provider, registry, tag, image, quiet, push, test, scan, verbose):
     """
     try:
         import docker
-    except ImportError:
+    except ImportError as e:
+        print("import error %s" % e)
+        traceback.print_exc()
         print("python docker client library required")
+        print("python %s" % ("\n".join(sys.path)))
         sys.exit(1)
     if quiet:
         logging.getLogger().setLevel(logging.WARNING)
@@ -319,7 +426,7 @@ def build(provider, registry, tag, image, quiet, push, test, scan, verbose):
         if scan:
             scan_image(":".join(image_refs[0]))
         if push:
-            push_image(client, image_id, image_refs)
+            retry(3, (RuntimeError,), push_image, client, image_id, image_refs)
 
 
 def get_labels(image):
@@ -342,6 +449,19 @@ def get_labels(image):
     if hub_env.get("sha"):
         labels["org.opencontainers.image.revision"] = hub_env["sha"]
     return labels
+
+
+def retry(retry_count, exceptions, func, *args, **kw):
+    attempts = 1
+    while attempts <= retry_count:
+        try:
+            return func(*args, **kw)
+        except exceptions:
+            log.warn('retrying on %s' % func)
+            attempts += 1
+            time.sleep(5)
+            if attempts > retry_count:
+                raise
 
 
 def get_github_env():
@@ -460,7 +580,8 @@ def test_image(image_id, image_name, providers):
     if providers not in (None, ()):
         env["CUSTODIAN_PROVIDERS"] = " ".join(providers)
     subprocess.check_call(
-        [Path(sys.executable).parent / "pytest", "-v", "tests/test_docker.py"],
+        [Path(sys.executable).parent / "pytest", "-p",
+         "no:terraform", "-v", "tests/test_docker.py"],
         env=env,
         stderr=subprocess.STDOUT,
     )
@@ -470,7 +591,7 @@ def push_image(client, image_id, image_refs):
     if "HUB_TOKEN" in os.environ and "HUB_USER" in os.environ:
         log.info("docker hub login %s" % os.environ["HUB_USER"])
         result = client.login(os.environ["HUB_USER"], os.environ["HUB_TOKEN"])
-        if result["Status"] != "Login Succeeded":
+        if result.get("Status", "") != "Login Succeeded":
             raise RuntimeError("Docker Login failed %s" % (result,))
 
     for (repo, tag) in image_refs:
@@ -524,6 +645,7 @@ def build_image(client, image_name, image_def, dfile_path, build_args):
 def generate():
     """Generate dockerfiles"""
     for df_path, image in ImageMap.items():
+        print(df_path)
         p = Path(df_path)
         p.write_text(image.render())
 

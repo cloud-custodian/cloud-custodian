@@ -1,0 +1,26 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:cloudfront::644160558196:distribution/E1XRY7J5866V6G",
+                "Tags": [
+                    {
+                        "Key": "App",
+                        "Value": "cloudfront-testing"
+                    },
+                    {
+                        "Key": "Owner",
+                        "Value": "aj@stacklet.io"
+                    },
+                    {
+                        "Key": "Env",
+                        "Value": "dev"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

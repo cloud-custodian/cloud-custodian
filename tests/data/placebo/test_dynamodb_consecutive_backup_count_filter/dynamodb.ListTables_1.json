@@ -1,0 +1,9 @@
+{
+    "status_code": 200,
+    "data": {
+        "TableNames": [
+            "Test-DDBTable-backup"
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -40,7 +40,8 @@
                     "minute": 46
                 }, 
                 "PerformanceMode": "generalPurpose", 
-                "FileSystemId": "fs-5e7fac17", 
+                "FileSystemId": "fs-5e7fac17",
+                "FileSystemArn": "arn:aws:elasticfilesystem:us-east-1:644160558196:file-system/fs-5e7fac17", 
                 "NumberOfMountTargets": 2, 
                 "LifeCycleState": "available", 
                 "OwnerId": "644160558196"

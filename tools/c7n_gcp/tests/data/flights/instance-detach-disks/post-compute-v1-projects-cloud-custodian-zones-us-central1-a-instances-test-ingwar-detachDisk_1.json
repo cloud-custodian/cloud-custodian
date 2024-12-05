@@ -1,0 +1,32 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Mon, 10 Feb 2020 23:15:32 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,43\",h3-Q050=\":443\"; ma=2592000,h3-Q049=\":443\"; ma=2592000,h3-Q048=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "764",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "id": "8378497511709235963",
+    "name": "operation-1581376532153-59e40ea748515-ab1d82f7-abc42cd4",
+    "zone": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a",
+    "operationType": "detachDisk",
+    "targetLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a/instances/test-ingwar",
+    "targetId": "513480616758239408",
+    "status": "RUNNING",
+    "user": "karol.lassak@optiva.com",
+    "progress": 0,
+    "insertTime": "2020-02-10T15:15:32.496-08:00",
+    "startTime": "2020-02-10T15:15:32.512-08:00",
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a/operations/operation-1581376532153-59e40ea748515-ab1d82f7-abc42cd4",
+    "kind": "compute#operation"
+  }
+}

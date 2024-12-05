@@ -1,0 +1,29 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "ETag": "E1SDZ8L66HNLQJ",
+        "StreamingDistributionConfig": {
+            "CallerReference": "6441605581965",
+            "S3Origin": {
+                "DomainName": "test-pratyush.s3.amazonaws.com",
+                "OriginAccessIdentity": ""
+            },
+            "Aliases": {
+                "Quantity": 0
+            },
+            "Comment": "",
+            "Logging": {
+                "Enabled": false,
+                "Bucket": "",
+                "Prefix": ""
+            },
+            "TrustedSigners": {
+                "Enabled": false,
+                "Quantity": 0
+            },
+            "PriceClass": "PriceClass_All",
+            "Enabled": true
+        }
+    }
+}

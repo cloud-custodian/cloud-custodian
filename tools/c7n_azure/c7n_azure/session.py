@@ -1,18 +1,6 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
-import abc
 import importlib
 import inspect
 import json
@@ -20,60 +8,54 @@ import logging
 import os
 import sys
 import types
-from collections import namedtuple
 
-import jwt
-from azure.common.credentials import (BasicTokenAuthentication,
-                                      ServicePrincipalCredentials)
-from azure.keyvault import KeyVaultAuthentication, AccessToken
-from c7n_azure import constants
-from c7n_azure.utils import (ResourceIdParser, StringUtils, custodian_azure_send_override,
-                             ManagedGroupHelper, get_keyvault_secret)
-from msrest.exceptions import AuthenticationError
-from msrestazure.azure_active_directory import MSIAuthentication
+from azure.common.credentials import BasicTokenAuthentication
+from azure.core.credentials import AccessToken
+from azure.identity import (AzureCliCredential, ClientSecretCredential,
+                            ManagedIdentityCredential, CertificateCredential)
+from azure.identity._credentials.azure_cli import _run_command
+from msrestazure.azure_cloud import AZURE_PUBLIC_CLOUD
 from requests import HTTPError
 
-try:
-    from azure.cli.core._profile import Profile
-    from knack.util import CLIError
-except Exception:
-    Profile = None
-    CLIError = ImportError  # Assign an exception that never happens because of Auth problems
+from c7n_azure import constants
+from c7n_azure.utils import (C7nRetryPolicy, ManagedGroupHelper,
+                             ResourceIdParser, StringUtils,
+                             cost_query_override_api_version,
+                             custodian_azure_send_override,
+                             get_keyvault_auth_endpoint, get_keyvault_secret,
+                             log_response_data)
 
-try:
-    from functools import lru_cache
-except ImportError:
-    from backports.functools_lru_cache import lru_cache
-
+from functools import lru_cache
 
 log = logging.getLogger('custodian.azure.session')
 
 
-class Session:
+class AzureCredential:
+    def __init__(self, cloud_endpoints, authorization_file=None, subscription_id_override=None):
+        # type: (*str, *str) -> None
 
-    def __init__(self, subscription_id=None, authorization_file=None,
-                 resource=constants.RESOURCE_ACTIVE_DIRECTORY):
-        """
-        :param subscription_id: If provided overrides environment variables.
-        :param authorization_file: Path to file populated from 'get_functions_auth_string'
-        :param resource: Resource endpoint for OAuth token.
-        """
+        if authorization_file:
+            with open(authorization_file) as json_file:
+                self._auth_params = json.load(json_file)
+        else:
+            self._auth_params = {
+                'client_id': os.environ.get(constants.ENV_CLIENT_ID),
+                'client_secret': os.environ.get(constants.ENV_CLIENT_SECRET),
+                'access_token': os.environ.get(constants.ENV_ACCESS_TOKEN),
+                'tenant_id': os.environ.get(constants.ENV_TENANT_ID),
+                'use_msi': bool(os.environ.get(constants.ENV_USE_MSI)),
+                'subscription_id': os.environ.get(constants.ENV_SUB_ID),
+                'keyvault_client_id': os.environ.get(constants.ENV_KEYVAULT_CLIENT_ID),
+                'keyvault_secret_id': os.environ.get(constants.ENV_KEYVAULT_SECRET_ID),
+                'client_certificate_path': os.environ.get(
+                    constants.ENV_CLIENT_CERTIFICATE_PATH),
+                'client_certificate_password': os.environ.get(
+                    constants.ENV_CLIENT_CERTIFICATE_PASSWORD),
+                'enable_cli_auth': True
+            }
 
-        self._provider_cache = {}
-        self.subscription_id_override = subscription_id
-        self.credentials = None
-        self.subscription_id = None
-        self.tenant_id = None
-        self.resource_namespace = resource
-        self.authorization_file = authorization_file
-        self._auth_params = {}
+        self._auth_params['authority'] = cloud_endpoints.endpoints.active_directory
 
-    @property
-    def auth_params(self):
-        self._initialize_session()
-        return self._auth_params
-
-    def _authenticate(self):
         keyvault_client_id = self._auth_params.get('keyvault_client_id')
         keyvault_secret_id = self._auth_params.get('keyvault_secret_id')
 
@@ -82,36 +64,117 @@ class Session:
             if keyvault_secret_id:
                 self._auth_params.update(
                     json.loads(
-                        get_keyvault_secret(keyvault_client_id, keyvault_secret_id)))
+                        get_keyvault_secret(
+                            keyvault_client_id,
+                            keyvault_secret_id)
+                    ))
         except HTTPError as e:
             e.message = 'Failed to retrieve SP credential ' \
                         'from Key Vault with client id: {0}'.format(keyvault_client_id)
             raise
 
-        token_providers = [
-            AccessTokenProvider,
-            ServicePrincipalProvider,
-            MSIProvider,
-            CLIProvider
-        ]
+        self._credential = None
+        if self._auth_params.get('access_token') is not None:
+            auth_name = 'Access Token'
+            pass
+        elif (self._auth_params.get('client_id') and
+              self._auth_params.get('client_secret') and
+              self._auth_params.get('tenant_id')
+              ):
+            auth_name = 'Principal'
+            self._credential = ClientSecretCredential(
+                client_id=self._auth_params['client_id'],
+                client_secret=self._auth_params['client_secret'],
+                tenant_id=self._auth_params['tenant_id'],
+                authority=self._auth_params['authority'])
+        elif (self._auth_params.get('client_id') and
+              self._auth_params.get('tenant_id') and
+              self._auth_params.get('client_certificate_path')):
+            auth_name = 'Certificate'
+            self._credential = CertificateCredential(
+                client_id=self._auth_params['client_id'],
+                tenant_id=self._auth_params['tenant_id'],
+                certificate_path=self._auth_params['client_certificate_path'],
+                password=self._auth_params['client_certificate_password'],
+            )
+        elif self._auth_params.get('use_msi'):
+            auth_name = 'MSI'
+            self._credential = ManagedIdentityCredential(
+                client_id=self._auth_params.get('client_id'))
+        elif self._auth_params.get('enable_cli_auth'):
+            auth_name = 'Azure CLI'
+            self._credential = AzureCliCredential()
+            account_info = _run_command('az account show --output json', timeout=10)
+            account_json = json.loads(account_info)
+            self._auth_params['subscription_id'] = account_json['id']
+            self._auth_params['tenant_id'] = account_json['tenantId']
 
-        for provider in token_providers:
-            instance = provider(self._auth_params, self.resource_namespace)
-            if instance.is_available():
-                result = instance.authenticate()
-                self.subscription_id = result.subscription_id
-                self.tenant_id = result.tenant_id
-                self.credentials = result.credential
-                self.token_provider = provider
-                break
+        if subscription_id_override is not None:
+            self._auth_params['subscription_id'] = subscription_id_override
 
-        # Let provided id parameter override everything else
-        if self.subscription_id_override is not None:
-            self.subscription_id = self.subscription_id_override
-
+        self._subscription_id = self._auth_params['subscription_id']
+        self._tenant_id = self._auth_params['tenant_id']
         log.info('Authenticated [%s | %s%s]',
-                 instance.name, self.subscription_id,
-                 ' | Authorization File' if self.authorization_file else '')
+                 auth_name, self.subscription_id,
+                 ' | Authorization File' if authorization_file else '')
+
+    def get_token(self, *scopes, **kwargs):
+        # Access Token is used only in tests realistically because
+        # KeyVault, Storage and mgmt plane requires separate tokens.
+        # TODO: Should we scope this to tests only?
+        if (self._auth_params.get('access_token')):
+            return AccessToken(self._auth_params['access_token'], expires_on=0)
+        try:
+            return self._credential.get_token(*scopes, **kwargs)
+        except Exception as e:
+            log.error('Failed to authenticate.\nMessage: {}'.format(e))
+            exit(1)
+
+    # This is temporary until all SDKs we use are upgraded to Track 2
+    # List of legacy users:
+    #  - DNS
+    #  - Record Set (uses DNS SDK)
+    #  - Azure Graph
+    def legacy_credentials(self, scope):
+        # Track 2 SDKs use tuple
+        token = self.get_token((scope + '.default'))
+        return BasicTokenAuthentication(token={'access_token': token.token})
+
+    @property
+    def tenant_id(self):
+        # type: (None) -> str
+        return self._tenant_id
+
+    @property
+    def auth_params(self):
+        # type: (None) -> str
+        return self._auth_params
+
+    @property
+    def subscription_id(self):
+        # type: (None) -> str
+        return self._subscription_id
+
+
+class Session:
+
+    def __init__(self, subscription_id=None, authorization_file=None,
+                 cloud_endpoints=None, resource_endpoint_type=constants.DEFAULT_AUTH_ENDPOINT):
+        """
+        :param subscription_id: If provided overrides environment variables.
+        :param authorization_file: Path to file populated from 'get_functions_auth_string'
+        :param cloud_endpoints: List of endpoints for specified Azure Cloud. Defaults to public.
+        :param auth_endpoint: Resource endpoint for OAuth token.
+        """
+        self._provider_cache = {}
+        self.subscription_id_override = subscription_id
+        self.credentials = None
+        self.authorization_file = authorization_file
+
+        self.cloud_endpoints = cloud_endpoints or AZURE_PUBLIC_CLOUD
+        self.resource_endpoint_type = resource_endpoint_type
+        self.resource_endpoint = self.get_auth_endpoint(resource_endpoint_type)
+        self.storage_endpoint = self.cloud_endpoints.suffixes.storage_endpoint
 
     def _initialize_session(self):
         """
@@ -122,27 +185,11 @@ class Session:
         if self.credentials is not None:
             return
 
-        if self.authorization_file:
-            with open(self.authorization_file) as json_file:
-                self._auth_params = json.load(json_file)
-            if self.subscription_id_override is not None:
-                self._auth_params['subscription_id'] = self.subscription_id_override
-        else:
-            self._auth_params = {
-                'client_id': os.environ.get(constants.ENV_CLIENT_ID),
-                'client_secret': os.environ.get(constants.ENV_CLIENT_SECRET),
-                'access_token': os.environ.get(constants.ENV_ACCESS_TOKEN),
-                'tenant_id': os.environ.get(constants.ENV_TENANT_ID),
-                'use_msi': bool(os.environ.get(constants.ENV_USE_MSI)),
-                'subscription_id':
-                    self.subscription_id_override or os.environ.get(constants.ENV_SUB_ID),
-                'keyvault_client_id': os.environ.get(constants.ENV_KEYVAULT_CLIENT_ID),
-                'keyvault_secret_id': os.environ.get(constants.ENV_KEYVAULT_SECRET_ID),
-                'enable_cli_auth': True
-            }
-
         try:
-            self._authenticate()
+            self.credentials = AzureCredential(
+                self.cloud_endpoints,
+                authorization_file=self.authorization_file,
+                subscription_id_override=self.subscription_id_override)
         except Exception as e:
             if hasattr(e, 'message'):
                 log.error(e.message)
@@ -154,20 +201,15 @@ class Session:
             log.error('Failed to authenticate.')
             sys.exit(1)
 
-        # Override credential type for KV auth
-        # https://github.com/Azure/azure-sdk-for-python/issues/5096
-        if self.resource_namespace == constants.RESOURCE_VAULT:
-            access_token = AccessToken(token=self.get_bearer_token())
-            self.credentials = KeyVaultAuthentication(lambda _1, _2, _3: access_token)
-
     def get_session_for_resource(self, resource):
         return Session(
             subscription_id=self.subscription_id_override,
             authorization_file=self.authorization_file,
-            resource=resource)
+            cloud_endpoints=self.cloud_endpoints,
+            resource_endpoint_type=resource)
 
     @lru_cache()
-    def client(self, client):
+    def client(self, client, vault_url=None):
         self._initialize_session()
         service_name, client_name = client.rsplit('.', 1)
         svc_module = importlib.import_module(service_name)
@@ -175,20 +217,54 @@ class Session:
 
         klass_parameters = inspect.signature(klass).parameters
 
-        if 'subscription_id' in klass_parameters:
-            client = klass(credentials=self.credentials, subscription_id=self.subscription_id)
+        legacy = False
+
+        if 'credentials' in klass_parameters and 'tenant_id' in klass_parameters:
+            client = klass(credentials=self.credentials.legacy_credentials(self.resource_endpoint),
+                           tenant_id=self.credentials.tenant_id,
+                           base_url=self.resource_endpoint)
+            legacy = True
+        elif 'credentials' in klass_parameters:
+            client = klass(credentials=self.credentials.legacy_credentials(self.resource_endpoint),
+                           subscription_id=self.credentials.subscription_id,
+                           base_url=self.cloud_endpoints.endpoints.resource_manager)
+            legacy = True
         else:
-            client = klass(credentials=self.credentials)
+            client_args = {
+                'credential': self.credentials,
+                'raw_response_hook': log_response_data,
+                'retry_policy': C7nRetryPolicy(),
+                'credential_scopes': [self.resource_endpoint + ".default"]
+            }
 
-        # Override send() method to log request limits & custom retries
-        service_client = client._client
-        service_client.orig_send = service_client.send
-        service_client.send = types.MethodType(custodian_azure_send_override, service_client)
+            # TODO: remove when fixed: https://github.com/Azure/azure-sdk-for-python/issues/17351
+            # This workaround will replace used api-version for costmanagement requests
+            # 2020-06-01 is not supported, but 2019-11-01 is working as expected.
+            if client == 'azure.mgmt.costmanagement.CostManagementClient':
+                client_args['raw_request_hook'] = cost_query_override_api_version
 
-        # Don't respect retry_after_header to implement custom retries
-        service_client.config.retry_policy.policy.respect_retry_after_header = False
+            if 'subscription_id' in klass_parameters:
+                client_args['subscription_id'] = self.subscription_id
+                client_args['base_url'] = self.cloud_endpoints.endpoints.resource_manager
+            elif 'vault_url' in klass_parameters:
+                client_args['vault_url'] = vault_url
+            client = klass(**client_args)
+
+        if legacy:
+            # Override send() method to log request limits & custom retries
+            service_client = client._client
+            service_client.orig_send = service_client.send
+            service_client.send = types.MethodType(custodian_azure_send_override, service_client)
+
+            # Don't respect retry_after_header to implement custom retries
+            service_client.config.retry_policy.policy.respect_retry_after_header = False
 
         return client
+
+    @property
+    def subscription_id(self):
+        self._initialize_session()
+        return self.credentials.subscription_id
 
     def get_credentials(self):
         self._initialize_session()
@@ -196,7 +272,7 @@ class Session:
 
     def get_subscription_id(self):
         self._initialize_session()
-        return self.subscription_id
+        return self.credentials.subscription_id
 
     def get_function_target_subscription_name(self):
         self._initialize_session()
@@ -210,7 +286,7 @@ class Session:
 
         if constants.ENV_FUNCTION_MANAGEMENT_GROUP_NAME in os.environ:
             return ManagedGroupHelper.get_subscriptions_list(
-                os.environ[constants.ENV_FUNCTION_MANAGEMENT_GROUP_NAME], self.get_credentials())
+                os.environ[constants.ENV_FUNCTION_MANAGEMENT_GROUP_NAME], self)
 
         return [os.environ.get(constants.ENV_FUNCTION_SUB_ID, self.subscription_id)]
 
@@ -243,31 +319,13 @@ class Session:
 
     def get_tenant_id(self):
         self._initialize_session()
-        return self.tenant_id
-
-    def get_bearer_token(self):
-        self._initialize_session()
-        return self.token_provider.get_bearer_token(self.credentials)
-
-    def load_auth_file(self, path):
-        with open(path) as json_file:
-            data = json.load(json_file)
-            self.tenant_id = data['credentials']['tenant']
-            return (ServicePrincipalCredentials(
-                client_id=data['credentials']['client_id'],
-                secret=data['credentials']['secret'],
-                tenant=self.tenant_id,
-                resource=self.resource_namespace
-            ), data.get('subscription', None))
+        return self.credentials.tenant_id
 
     def get_functions_auth_string(self, target_subscription_id):
-        """
-        Build auth json string for deploying
-        Azure Functions.  Look for dedicated
-        Functions environment variables or
-        fall back to normal Service Principal
-        variables.
+        """Build auth json string for deploying Azure Functions.
 
+        Look for dedicated Functions environment variables or fall
+        back to normal Service Principal variables.
         """
 
         self._initialize_session()
@@ -280,7 +338,7 @@ class Session:
 
         required_params = ['client_id', 'client_secret', 'tenant_id']
 
-        function_auth_params = {k: v for k, v in self._auth_params.items()
+        function_auth_params = {k: v for k, v in self.credentials.auth_params.items()
                                 if k in required_params and v is not None}
         function_auth_params['subscription_id'] = target_subscription_id
 
@@ -298,169 +356,12 @@ class Session:
 
         return json.dumps(function_auth_params, indent=2)
 
+    def get_auth_endpoint(self, endpoint):
+        if endpoint == constants.VAULT_AUTH_ENDPOINT:
+            return get_keyvault_auth_endpoint(self.cloud_endpoints)
 
-class TokenProvider(metaclass=abc.ABCMeta):
-    AuthenticationResult = namedtuple(
-        'AuthenticationResult', 'credential, subscription_id, tenant_id')
-
-    def __init__(self, parameters, namespace):
-        # type: (dict, str) -> None
-        self.parameters = parameters
-        self.resource_namespace = namespace
-
-    @abc.abstractmethod
-    def is_available(self):
-        # type: () -> bool
-        raise NotImplementedError()
-
-    @abc.abstractmethod
-    def authenticate(self):
-        # type: () -> TokenProvider.AuthenticationResult
-        raise NotImplementedError()
-
-    @property
-    @abc.abstractmethod
-    def name(self):
-        # type: () -> str
-        raise NotImplementedError()
-
-    @staticmethod
-    def get_bearer_token(token):
-        return token.token['access_token']
-
-
-class CLIProvider(TokenProvider):
-    def is_available(self):
-        # type: () -> bool
-        return self.parameters.get('enable_cli_auth', False)
-
-    def authenticate(self):
-        # type: () -> TokenProvider.AuthenticationResult
-
-        try:
-            (credential,
-             subscription_id,
-             tenant_id) = Profile().get_login_credentials(resource=self.resource_namespace)
-        except CLIError as e:
-            e.message = 'Failed to authenticate with CLI credentials. ' + e.args[0]
-            raise
-
-        return TokenProvider.AuthenticationResult(
-            credential=credential,
-            subscription_id=subscription_id,
-            tenant_id=tenant_id
-        )
-
-    @property
-    def name(self):
-        # type: () -> str
-        return "Azure CLI"
-
-    @staticmethod
-    def get_bearer_token(token):
-        return token._token_retriever()[1]
-
-
-class AccessTokenProvider(TokenProvider):
-    def __init__(self, parameters, namespace):
-        super(AccessTokenProvider, self).__init__(parameters, namespace)
-        self.subscription_id = self.parameters.get('subscription_id')
-        self.access_token = self.parameters.get('access_token')
-
-    def is_available(self):
-        # type: () -> bool
-        return self.access_token and self.subscription_id
-
-    def authenticate(self):
-        # type: () -> TokenProvider.AuthenticationResult
-        credential = BasicTokenAuthentication(token={'access_token': self.access_token})
-
-        decoded = jwt.decode(credential.token['access_token'], verify=False)
-
-        return TokenProvider.AuthenticationResult(
-            credential=credential,
-            subscription_id=self.subscription_id,
-            tenant_id=decoded['tid']
-        )
-
-    @property
-    def name(self):
-        # type: () -> str
-        return "Access Token"
-
-
-class ServicePrincipalProvider(TokenProvider):
-    def __init__(self, parameters, namespace):
-        super(ServicePrincipalProvider, self).__init__(parameters, namespace)
-        self.client_id = self.parameters.get('client_id')
-        self.client_secret = self.parameters.get('client_secret')
-        self.tenant_id = self.parameters.get('tenant_id')
-        self.subscription_id = self.parameters.get('subscription_id')
-
-    def is_available(self):
-        # type: () -> bool
-        return (self.client_id and
-                self.client_secret and
-                self.tenant_id and
-                self.subscription_id)
-
-    def authenticate(self):
-        # type: () -> TokenProvider.AuthenticationResult
-        try:
-            credential = ServicePrincipalCredentials(client_id=self.client_id,
-                                                secret=self.client_secret,
-                                                tenant=self.tenant_id,
-                                                resource=self.resource_namespace)
-        except AuthenticationError as e:
-            e.message = 'Failed to authenticate with service principal.\n'\
-                        'Message: {0}'.format(
-                            json.dumps(e.inner_exception.error_response, indent=2))
-            raise
-
-        return TokenProvider.AuthenticationResult(
-            credential=credential,
-            subscription_id=self.subscription_id,
-            tenant_id=self.tenant_id
-        )
-
-    @property
-    def name(self):
-        # type: () -> str
-        return "Principal"
-
-
-class MSIProvider(TokenProvider):
-    def __init__(self, parameters, namespace):
-        super(MSIProvider, self).__init__(parameters, namespace)
-        self.client_id = self.parameters.get('client_id')
-        self.use_msi = self.parameters.get('use_msi')
-        self.subscription_id = self.parameters.get('subscription_id')
-
-    def is_available(self):
-        # type: () -> bool
-        return self.use_msi and self.subscription_id
-
-    def authenticate(self):
-        # type: () -> TokenProvider.AuthenticationResult
-        try:
-            if self.client_id:
-                credential = MSIAuthentication(
-                    client_id=self.client_id,
-                    resource=self.resource_namespace)
-            else:
-                credential = MSIAuthentication(
-                    resource=self.resource_namespace)
-        except HTTPError as e:
-            e.message = 'Failed to authenticate with MSI'
-            raise
-
-        return TokenProvider.AuthenticationResult(
-            credential=credential,
-            subscription_id=self.subscription_id,
-            tenant_id=None
-        )
-
-    @property
-    def name(self):
-        # type: () -> str
-        return "MSI"
+        elif endpoint == constants.STORAGE_AUTH_ENDPOINT:
+            # These endpoints are not Cloud specific, but the suffixes are
+            return constants.STORAGE_AUTH_ENDPOINT
+        else:
+            return getattr(self.cloud_endpoints.endpoints, endpoint)

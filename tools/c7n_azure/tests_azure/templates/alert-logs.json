@@ -1,0 +1,76 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "actionGroups_name": {
+      "type": "string",
+      "defaultValue": "SubHealth"
+    },
+    "activityLogAlerts_name": {
+      "type": "string",
+      "defaultValue": "ServiceHealthActivityLogAlert"
+    },
+    "emailAddress": {
+      "type": "string",
+      "defaultValue": "test@test.com"
+    }
+  },
+  "variables": {
+    "alertScope": "[format('/subscriptions/{0}', subscription().subscriptionId)]"
+  },
+  "resources": [
+    {
+      "type": "microsoft.insights/actionGroups",
+      "apiVersion": "2019-06-01",
+      "name": "[parameters('actionGroups_name')]",
+      "location": "Global",
+      "properties": {
+        "groupShortName": "[parameters('actionGroups_name')]",
+        "enabled": true,
+        "emailReceivers": [
+          {
+            "name": "[parameters('actionGroups_name')]",
+            "emailAddress": "[parameters('emailAddress')]"
+          }
+        ],
+        "smsReceivers": [],
+        "webhookReceivers": []
+      }
+    },
+    {
+      "type": "microsoft.insights/activityLogAlerts",
+      "apiVersion": "2017-04-01",
+      "name": "[parameters('activityLogAlerts_name')]",
+      "location": "Global",
+      "properties": {
+        "scopes": [
+          "[variables('alertScope')]"
+        ],
+        "condition": {
+          "allOf": [
+            {
+              "field": "category",
+              "equals": "ServiceHealth"
+            },
+            {
+              "field": "properties.incidentType",
+              "equals": "Incident"
+            }
+          ]
+        },
+        "actions": {
+          "actionGroups": [
+            {
+              "actionGroupId": "[resourceId('microsoft.insights/actionGroups', parameters('actionGroups_name'))]",
+              "webhookProperties": {}
+            }
+          ]
+        },
+        "enabled": true
+      },
+      "dependsOn": [
+        "[resourceId('microsoft.insights/actionGroups', parameters('actionGroups_name'))]"
+      ]
+    }
+  ]
+}

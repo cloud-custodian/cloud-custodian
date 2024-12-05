@@ -1,0 +1,64 @@
+{
+    "status_code": 200,
+    "data": {
+        "AutoScalingGroups": [
+            {
+                "AutoScalingGroupARN": "arn:aws:autoscaling:us-east-1:123456789012:autoScalingGroup:5fd42b45-825e-45c1-b02a-6a97d9512f30:autoScalingGroupName/c7n.asg.ec2.01",
+                "TargetGroupARNs": [],
+                "SuspendedProcesses": [],
+                "DesiredCapacity": 1,
+                "Tags": [
+                    {
+                        "ResourceType": "auto-scaling-group",
+                        "ResourceId": "CustodianASG",
+                        "PropagateAtLaunch": true,
+                        "Value": "ubuntu",
+                        "Key": "Platform"
+                    }
+                ],
+                "EnabledMetrics": [],
+                "LoadBalancerNames": [],
+                "AutoScalingGroupName": "c7n.asg.ec2.01",
+                "DefaultCooldown": 300,
+                "MinSize": 1,
+                "Instances": [
+                ],
+                "MaxSize": 1,
+                "VPCZoneIdentifier": "subnet-ea6429a3,subnet-2c5dcf01",
+                "HealthCheckGracePeriod": 300,
+                "TerminationPolicies": [
+                    "Default"
+                ],
+                "LaunchConfigurationName": "c7n.asg.01",
+                "CreatedTime": {
+                    "hour": 19,
+                    "__class__": "datetime",
+                    "month": 2,
+                    "second": 3,
+                    "microsecond": 171000,
+                    "year": 2017,
+                    "day": 24,
+                    "minute": 0
+                },
+                "AvailabilityZones": [
+                    "us-east-1a",
+                    "us-east-1b"
+                ],
+                "HealthCheckType": "EC2",
+                "NewInstancesProtectedFromScaleIn": false
+            }
+        ],
+        "ResponseMetadata": {
+            "RetryAttempts": 0,
+            "HTTPStatusCode": 200,
+            "RequestId": "770b2115-fac8-11e6-ac2c-5ff00137fb8b",
+            "HTTPHeaders": {
+                "x-amzn-requestid": "770b2115-fac8-11e6-ac2c-5ff00137fb8b",
+                "vary": "Accept-Encoding",
+                "content-length": "7006",
+                "content-type": "text/xml",
+                "date": "Fri, 24 Feb 2017 19:35:57 GMT"
+            }
+        }
+    }
+}

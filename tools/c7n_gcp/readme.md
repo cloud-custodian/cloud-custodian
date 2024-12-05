@@ -16,7 +16,7 @@ Status - Alpha
 ## via pip
 
 ```
-pip install c7n_gcp
+pip install c7n-gcp
 ```
 
 By default custodian will use credentials associated to the gcloud cli, which will generate
@@ -29,4 +29,12 @@ credentials, which will be picked up via by the custodian cli via setting the
 
 # Serverless
 
-Custodian supports both periodic and api call events for serverless policy execution.
+Custodian supports both periodic and api call events for serverless
+policy execution.
+
+GCP Cloud Functions require cloudbuild api be enabled on the project
+the functions are deployed to.
+
+Periodic execution mode also requires cloudscheduler api be enabled on
+a project. Cloudscheduler usage also requires an app engine instance
+in the same region as the function deployment.

@@ -1,0 +1,57 @@
+{
+    "status_code": 200,
+    "data": {
+        "DBClusterSnapshots": [
+            {
+                "AvailabilityZones": [
+                    "us-east-1a",
+                    "us-east-1b",
+                    "us-east-1d"
+                ],
+                "DBClusterSnapshotIdentifier": "verify",
+                "DBClusterIdentifier": "database-1",
+                "SnapshotCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 10,
+                    "day": 23,
+                    "hour": 16,
+                    "minute": 44,
+                    "second": 39,
+                    "microsecond": 790000
+                },
+                "Engine": "aurora-postgresql",
+                "AllocatedStorage": 0,
+                "Status": "available",
+                "Port": 0,
+                "VpcId": "vpc-d2d616b5",
+                "ClusterCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 10,
+                    "day": 20,
+                    "hour": 10,
+                    "minute": 53,
+                    "second": 28,
+                    "microsecond": 740000
+                },
+                "MasterUsername": "postgres",
+                "EngineVersion": "10.serverless_7",
+                "LicenseModel": "postgresql-license",
+                "SnapshotType": "manual",
+                "PercentProgress": 100,
+                "StorageEncrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/b10f842a-feb7-4318-92d5-0640a75b7688",
+                "DBClusterSnapshotArn": "arn:aws:rds:us-east-1:644160558196:cluster-snapshot:verify",
+                "IAMDatabaseAuthenticationEnabled": false,
+                "TagList": [
+                    {
+                        "Key": "Owner",
+                        "Value": "kapil"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,14 @@
+{
+    "status_code": 200,
+    "data": {
+        "logStreams": [
+            {
+                "logStreamName": "stream1",
+                "creationTime": 1598340680394,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:test-log-group:log-stream:stream1",
+                "storedBytes": 0
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

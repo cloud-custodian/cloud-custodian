@@ -1,0 +1,623 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Buckets": [
+            {
+                "Name": "airflow-test-c7n",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 7,
+                    "day": 14,
+                    "hour": 15,
+                    "minute": 34,
+                    "second": 22,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "amazon-connect-016f4052a489",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 11,
+                    "day": 1,
+                    "hour": 20,
+                    "minute": 41,
+                    "second": 24,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "amazon-connect-2f749fe3fc19",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 9,
+                    "day": 1,
+                    "hour": 18,
+                    "minute": 12,
+                    "second": 51,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "amazon-connect-36f400da5694",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 9,
+                    "day": 6,
+                    "hour": 21,
+                    "minute": 51,
+                    "second": 38,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "amazon-connect-51b45ea69888",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 9,
+                    "day": 15,
+                    "hour": 18,
+                    "minute": 20,
+                    "second": 4,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "amazon-connect-97ff0e2760b9",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 8,
+                    "day": 31,
+                    "hour": 18,
+                    "minute": 34,
+                    "second": 39,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "amazon-connect-d864e52639f5",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 8,
+                    "day": 29,
+                    "hour": 19,
+                    "minute": 39,
+                    "second": 48,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "amazon-connect-feca962ab2b6",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 6,
+                    "day": 30,
+                    "hour": 18,
+                    "minute": 55,
+                    "second": 33,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "aws-athena-query-results-644160558196-us-east-1",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 3,
+                    "day": 19,
+                    "hour": 15,
+                    "minute": 31,
+                    "second": 3,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "aws-codestar-us-east-1-644160558196-c7n-test-pipe",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2018,
+                    "month": 5,
+                    "day": 16,
+                    "hour": 15,
+                    "minute": 7,
+                    "second": 11,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "aws-glue-scripts-644160558196-us-east-1",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 4,
+                    "day": 9,
+                    "hour": 20,
+                    "minute": 11,
+                    "second": 58,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "aws-glue-temporary-644160558196-us-east-1",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 6,
+                    "day": 3,
+                    "hour": 20,
+                    "minute": 1,
+                    "second": 28,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "aws-logs-644160558196-us-east-1",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 6,
+                    "day": 17,
+                    "hour": 16,
+                    "minute": 52,
+                    "second": 56,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "aws-sam-cli-managed-default-samclisourcebucket-1elladfxaxxtv",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 1,
+                    "day": 25,
+                    "hour": 21,
+                    "minute": 58,
+                    "second": 12,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "c7n-codebuild",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2018,
+                    "month": 6,
+                    "day": 18,
+                    "hour": 21,
+                    "minute": 4,
+                    "second": 33,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "c7n-s3-orgid",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2018,
+                    "month": 9,
+                    "day": 5,
+                    "hour": 16,
+                    "minute": 34,
+                    "second": 8,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "c7n-sagemaker-test",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2018,
+                    "month": 10,
+                    "day": 24,
+                    "hour": 17,
+                    "minute": 1,
+                    "second": 38,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "c7n-sandbox-inventory",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 11,
+                    "day": 28,
+                    "hour": 11,
+                    "minute": 8,
+                    "second": 28,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "c7n-ssm",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2018,
+                    "month": 3,
+                    "day": 30,
+                    "hour": 10,
+                    "minute": 21,
+                    "second": 42,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "c7n-ssm-build",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2018,
+                    "month": 4,
+                    "day": 20,
+                    "hour": 13,
+                    "minute": 47,
+                    "second": 24,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "c7n-test-1",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 2,
+                    "day": 2,
+                    "hour": 4,
+                    "minute": 47,
+                    "second": 57,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "c7n-test-abc",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 9,
+                    "day": 18,
+                    "hour": 20,
+                    "minute": 31,
+                    "second": 12,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "c7n-test-arn",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 12,
+                    "day": 15,
+                    "hour": 19,
+                    "minute": 13,
+                    "second": 28,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "c7n-test-arn-invalid",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 12,
+                    "day": 15,
+                    "hour": 19,
+                    "minute": 19,
+                    "second": 8,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "c7n-test-glue",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 3,
+                    "day": 23,
+                    "hour": 15,
+                    "minute": 59,
+                    "second": 5,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "c7n-vpc-flow-logs",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2018,
+                    "month": 10,
+                    "day": 30,
+                    "hour": 18,
+                    "minute": 20,
+                    "second": 39,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "cdk-hnb659fds-assets-644160558196-us-east-1",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 4,
+                    "day": 7,
+                    "hour": 13,
+                    "minute": 51,
+                    "second": 0,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "cf-templates-9c4kee3xbart-us-east-1",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 1,
+                    "day": 29,
+                    "hour": 18,
+                    "minute": 12,
+                    "second": 51,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "codepipeline-us-east-1-644160558196",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 5,
+                    "day": 1,
+                    "hour": 23,
+                    "minute": 26,
+                    "second": 16,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "cof-c7n-sandbox-dev",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 8,
+                    "day": 14,
+                    "hour": 13,
+                    "minute": 33,
+                    "second": 18,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "cof-c7n-serverless",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 8,
+                    "day": 21,
+                    "hour": 14,
+                    "minute": 4,
+                    "second": 47,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "config-bucket-644160558196",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2017,
+                    "month": 9,
+                    "day": 5,
+                    "hour": 17,
+                    "minute": 26,
+                    "second": 39,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "config-rule-code-bucket-644160558196-us-east-1",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 3,
+                    "day": 31,
+                    "hour": 12,
+                    "minute": 11,
+                    "second": 46,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "custodian-skunk-trails",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2017,
+                    "month": 9,
+                    "day": 5,
+                    "hour": 17,
+                    "minute": 26,
+                    "second": 56,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "data-sync-destination-bucket",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 4,
+                    "day": 8,
+                    "hour": 15,
+                    "minute": 49,
+                    "second": 29,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "data-sync-source-bucket",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 4,
+                    "day": 8,
+                    "hour": 15,
+                    "minute": 49,
+                    "second": 46,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "dctlabs-1234",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 9,
+                    "day": 30,
+                    "hour": 1,
+                    "minute": 4,
+                    "second": 32,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "demo-pratyush-s3-bucket-2022",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 3,
+                    "day": 28,
+                    "hour": 1,
+                    "minute": 3,
+                    "second": 17,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "elasticbeanstalk-us-east-1-644160558196",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2018,
+                    "month": 7,
+                    "day": 12,
+                    "hour": 14,
+                    "minute": 46,
+                    "second": 15,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "example-abc-123",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 10,
+                    "day": 17,
+                    "hour": 13,
+                    "minute": 24,
+                    "second": 10,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "gamestonk",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 1,
+                    "day": 29,
+                    "hour": 2,
+                    "minute": 13,
+                    "second": 9,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "more-tests-c7n",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 9,
+                    "day": 17,
+                    "hour": 19,
+                    "minute": 42,
+                    "second": 53,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "nicnoc-logs",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 4,
+                    "day": 18,
+                    "hour": 11,
+                    "minute": 12,
+                    "second": 45,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "reboot-s3-bad-01",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 7,
+                    "day": 25,
+                    "hour": 18,
+                    "minute": 45,
+                    "second": 26,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "repela",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 4,
+                    "day": 21,
+                    "hour": 2,
+                    "minute": 51,
+                    "second": 20,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "sagemaker-labeler-kms",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 5,
+                    "day": 24,
+                    "hour": 23,
+                    "minute": 30,
+                    "second": 30,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "test-streaming-distribution-logging",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 5,
+                    "day": 1,
+                    "hour": 14,
+                    "minute": 33,
+                    "second": 52,
+                    "microsecond": 0
+                }
+            }
+        ],
+        "Owner": {
+            "DisplayName": "mandeep.bal",
+            "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
+        }
+    }
+}

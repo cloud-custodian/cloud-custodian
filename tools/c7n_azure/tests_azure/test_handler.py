@@ -1,3 +1,5 @@
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from .azure_common import BaseTest, CUSTOM_SUBSCRIPTION_ID
 from c7n_azure.handler import run
 from os.path import dirname, join

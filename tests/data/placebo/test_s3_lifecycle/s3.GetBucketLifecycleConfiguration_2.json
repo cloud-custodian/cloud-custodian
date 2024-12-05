@@ -1,31 +1,21 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
+        "ResponseMetadata": {},
         "Rules": [
             {
-                "Status": "Enabled", 
-                "Prefix": "foo/", 
+                "ID": "test-lifecycle",
+                "Filter": {
+                    "Prefix": "foo/"
+                },
+                "Status": "Enabled",
                 "Transitions": [
                     {
-                        "Days": 60, 
+                        "Days": 60,
                         "StorageClass": "GLACIER"
                     }
-                ], 
-                "ID": "test-lifecycle"
+                ]
             }
-        ], 
-        "ResponseMetadata": {
-            "HTTPStatusCode": 200, 
-            "RetryAttempts": 0, 
-            "HostId": "3qQlL4u3lmjM+9l+BzhPKFZfNADu56RgOaFWTpxKrIxYEXx9/YStIuWDKmqrkcGQhoC/hAIYCvw=", 
-            "RequestId": "21DF87BD43B3E42D", 
-            "HTTPHeaders": {
-                "x-amz-id-2": "3qQlL4u3lmjM+9l+BzhPKFZfNADu56RgOaFWTpxKrIxYEXx9/YStIuWDKmqrkcGQhoC/hAIYCvw=", 
-                "date": "Fri, 27 Oct 2017 19:53:58 GMT", 
-                "transfer-encoding": "chunked", 
-                "x-amz-request-id": "21DF87BD43B3E42D", 
-                "server": "AmazonS3"
-            }
-        }
+        ]
     }
 }

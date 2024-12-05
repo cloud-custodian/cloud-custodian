@@ -1,0 +1,31 @@
+{
+    "status_code": 200,
+    "data": {
+        "ScalableTargets": [
+            {
+                "ServiceNamespace": "ecs",
+                "ResourceId": "service/test-cluster/custodian-service-autoscaling-test",
+                "ScalableDimension": "ecs:service:DesiredCount",
+                "MinCapacity": 0,
+                "MaxCapacity": 5,
+                "RoleARN": "arn:aws:iam::644160558196:role/aws-service-role/ecs.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_ECSService",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 3,
+                    "day": 17,
+                    "hour": 14,
+                    "minute": 59,
+                    "second": 20,
+                    "microsecond": 604000
+                },
+                "SuspendedState": {
+                    "DynamicScalingInSuspended": true,
+                    "DynamicScalingOutSuspended": true,
+                    "ScheduledScalingSuspended": true
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

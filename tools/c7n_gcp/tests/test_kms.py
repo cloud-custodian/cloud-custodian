@@ -1,18 +1,7 @@
-# Copyright 2019 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from gcp_common import BaseTest, event_data
+from pytest_terraform import terraform
 
 
 class KmsKeyRingTest(BaseTest):
@@ -32,6 +21,12 @@ class KmsKeyRingTest(BaseTest):
 
         resources = policy.run()
         self.assertEqual(resources[0]['name'], resource_name)
+        self.assertEqual(
+            policy.resource_manager.get_urns(resources),
+            [
+                'gcp:cloudkms:us-central1:cloud-custodian:keyring/cloud-custodian',
+            ],
+        )
 
     def test_kms_keyring_query_array(self):
         project_id = 'cloud-custodian'
@@ -54,6 +49,13 @@ class KmsKeyRingTest(BaseTest):
         resources = policy.run()
         self.assertEqual(resources[0]['name'], resource_name_1)
         self.assertEqual(resources[1]['name'], resource_name_2)
+        self.assertEqual(
+            policy.resource_manager.get_urns(resources),
+            [
+                'gcp:cloudkms:asia-east1:cloud-custodian:keyring/cloud-custodian-asia',
+                'gcp:cloudkms:us-central1:cloud-custodian:keyring/cloud-custodian',
+            ],
+        )
 
     def test_kms_keyring_query(self):
         project_id = 'cloud-custodian'
@@ -71,6 +73,12 @@ class KmsKeyRingTest(BaseTest):
 
         resources = policy.run()
         self.assertEqual(resources[0]['name'], resource_name)
+        self.assertEqual(
+            policy.resource_manager.get_urns(resources),
+            [
+                'gcp:cloudkms:us-central1:cloud-custodian:keyring/cloud-custodian',
+            ],
+        )
 
     def test_kms_keyring_get(self):
         project_id = 'cloud-custodian'
@@ -94,6 +102,32 @@ class KmsKeyRingTest(BaseTest):
         resources = exec_mode.run(event, None)
 
         self.assertEqual(resources[0]['name'], resource_name)
+        self.assertEqual(
+            policy.resource_manager.get_urns(resources),
+            [
+                'gcp:cloudkms:us-central1:cloud-custodian:keyring/cloud-custodian',
+            ],
+        )
+
+    def test_kms_keyring_filter_iam_query(self):
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data('kms-keyring-filter-iam', project_id=project_id)
+        p = self.load_policy({
+            'name': 'kms-keyring-filter-iam',
+            'resource': 'gcp.kms-keyring',
+            'filters': [{
+                'type': 'iam-policy',
+                'doc': {'key': 'bindings[*].members[]',
+                        'op': 'intersect',
+                        'value': ['allUsers', 'allAuthenticatedUsers']}
+            }]
+        }, session_factory=factory)
+        resources = p.run()
+
+        self.assertEqual(1, len(resources))
+        self.assertEqual(
+            'projects/cloud-custodian/locations/us-central1/keyRings/custodian-test-keyring',
+            resources[0]['name'])
 
 
 class KmsCryptoKeyTest(BaseTest):
@@ -127,6 +161,12 @@ class KmsCryptoKeyTest(BaseTest):
         resources = policy.run()
         self.assertEqual(resources[0]['name'], resource_name)
         self.assertEqual(resources[0][parent_annotation_key]['name'], parent_resource_name)
+        self.assertEqual(
+            policy.resource_manager.get_urns(resources),
+            [
+                'gcp:cloudkms:us-central1:cloud-custodian:cryptokey/cloud-custodian/cloud-custodian',  # noqa: E501
+            ],
+        )
 
     def test_kms_cryptokey_get(self):
         project_id = 'cloud-custodian'
@@ -154,6 +194,37 @@ class KmsCryptoKeyTest(BaseTest):
 
         self.assertEqual(resources[0]['name'], resource_name)
         self.assertEqual(resources[0][parent_annotation_key]['name'], parent_resource_name)
+        self.assertEqual(
+            policy.resource_manager.get_urns(resources),
+            [
+                'gcp:cloudkms:us-central1:cloud-custodian:cryptokey/cloud-custodian/cloud-custodian',  # noqa: E501
+            ],
+        )
+
+    def test_kms_cryptokey_iam_policy_filter(self):
+        factory = self.replay_flight_data('kms-cryptokey-iam-policy')
+        p = self.load_policy(
+            {'name': 'resource',
+             'resource': 'gcp.kms-cryptokey',
+             'query': [{'location': 'global'}],
+             'filters': [{
+                 'type': 'iam-policy',
+                 'doc': {'key': 'bindings[*].members[]',
+                 'op': 'intersect',
+                 'value': ['allUsers', 'allAuthenticatedUsers']}
+             }]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+
+        for resource in resources:
+            self.assertTrue('c7n:iamPolicy' in resource)
+            bindings = resource['c7n:iamPolicy']['bindings']
+            members = set()
+            for binding in bindings:
+                for member in binding['members']:
+                    members.add(member)
+            self.assertTrue('allUsers' in members or 'allAuthenticatedUsers' in members)
 
 
 class KmsCryptoKeyVersionTest(BaseTest):
@@ -191,6 +262,13 @@ class KmsCryptoKeyVersionTest(BaseTest):
         self.assertEqual(resources[0]['name'], resource_name)
         self.assertEqual(resources[0][parent_annotation_key]['name'], parent_resource_name)
 
+        self.assertEqual(
+            policy.resource_manager.get_urns(resources),
+            [
+                'gcp:cloudkms:us-central1:cloud-custodian:cryptokey-version/cloud-custodian/cloud-custodian/1',  # noqa: E501
+            ],
+        )
+
     def test_kms_cryptokey_version_get(self):
         project_id = 'cloud-custodian'
         location_name = 'us-central1'
@@ -220,3 +298,44 @@ class KmsCryptoKeyVersionTest(BaseTest):
 
         self.assertEqual(resources[0]['name'], resource_name)
         self.assertEqual(resources[0][parent_annotation_key]['name'], parent_resource_name)
+        self.assertEqual(
+            policy.resource_manager.get_urns(resources),
+            [
+                'gcp:cloudkms:us-central1:cloud-custodian:cryptokey-version/cloud-custodian/cloud-custodian/1',  # noqa: E501
+            ],
+        )
+
+
+@terraform('kms_location')
+def test_kms_keyring_filter(test, kms_location):
+    session_factory = test.replay_flight_data('kms-keyring-filter')
+    policy = test.load_policy({
+        'name': 'kms-location',
+        'resource': 'gcp.kms-location',
+        'filters': [{
+            'name':
+                f'projects/{kms_location["google_kms_key_ring.c7n.project"]}/locations/us-central1'},
+            {
+            'not': [{
+                    'type': 'keyring',
+                    'exist': True}]}]
+    }, session_factory=session_factory)
+
+    resources = policy.run()
+    assert len(resources) == 0
+
+    policy = test.load_policy({
+        'name': 'kms-location',
+        'resource': 'gcp.kms-location',
+        'filters': [{
+            'name':
+                f'projects/{kms_location["google_kms_key_ring.c7n.project"]}/locations/us-west1'},
+            {
+            'not': [{
+                    'type': 'keyring',
+                    'exist': True}]}]
+    }, session_factory=session_factory)
+
+    resources = policy.run()
+    assert len(resources) == 1
+    assert resources[0]['name'] == 'projects/cloud-custodian/locations/us-west1'

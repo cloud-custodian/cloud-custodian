@@ -1,0 +1,25 @@
+{
+    "status_code": 200,
+    "data": {
+        "TransitGateways": [
+            {
+                "TransitGatewayId": "tgw-03dd54sdfe",
+                "TransitGatewayArn": "arn:aws:ec2:ap-southeast-2:...",
+                "State": "available",
+                "OwnerId": "123456789012",
+                "Description": "03dd54sdfe",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 4,
+                    "day": 27,
+                    "hour": 1,
+                    "minute": 53,
+                    "second": 35,
+                    "microsecond": 0
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,428 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Advisor/recommendations?api-version=2020-01-01&$filter=Category%20eq%20%27Cost%27",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "599"
+                    ],
+                    "date": [
+                        "Thu, 27 Jul 2023 17:30:19 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "13297"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "properties": {
+                                    "category": "Cost",
+                                    "impact": "High",
+                                    "impactedField": "Microsoft.Subscriptions/subscriptions",
+                                    "impactedValue": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                                    "lastUpdated": "2023-07-27T10:36:37.2755613Z",
+                                    "recommendationTypeId": "89515250-1243-43d1-b4e7-f9437cedffd8",
+                                    "shortDescription": {
+                                        "problem": "Purchasing a savings plan for compute could unlock lower prices",
+                                        "solution": "Purchasing a savings plan for compute could unlock lower prices"
+                                    },
+                                    "extendedProperties": {
+                                        "subId": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                                        "sku": "Compute_Savings_Plan",
+                                        "scope": "Single",
+                                        "commitment": "0.097",
+                                        "annualSavingsAmount": "817",
+                                        "savingsAmount": "68",
+                                        "savingsCurrency": "USD",
+                                        "term": "P3Y",
+                                        "lookbackPeriod": "30"
+                                    },
+                                    "resourceMetadata": {
+                                        "resourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47"
+                                    }
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Advisor/recommendations/252cc6dd-adf0-c5eb-1cf8-a89e7c624655",
+                                "type": "Microsoft.Advisor/recommendations",
+                                "name": "252cc6dd-adf0-c5eb-1cf8-a89e7c624655"
+                            },
+                            {
+                                "properties": {
+                                    "category": "Cost",
+                                    "impact": "High",
+                                    "impactedField": "Microsoft.Subscriptions/subscriptions",
+                                    "impactedValue": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                                    "lastUpdated": "2023-07-27T10:36:37.2755613Z",
+                                    "recommendationTypeId": "89515250-1243-43d1-b4e7-f9437cedffd8",
+                                    "shortDescription": {
+                                        "problem": "Purchasing a savings plan for compute could unlock lower prices",
+                                        "solution": "Purchasing a savings plan for compute could unlock lower prices"
+                                    },
+                                    "extendedProperties": {
+                                        "subId": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                                        "sku": "Compute_Savings_Plan",
+                                        "scope": "Single",
+                                        "commitment": "0.111",
+                                        "annualSavingsAmount": "469",
+                                        "savingsAmount": "39",
+                                        "savingsCurrency": "USD",
+                                        "term": "P1Y",
+                                        "lookbackPeriod": "30"
+                                    },
+                                    "resourceMetadata": {
+                                        "resourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47"
+                                    }
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Advisor/recommendations/f0ad44e6-b6e6-193a-ede7-b8746d5fbdc8",
+                                "type": "Microsoft.Advisor/recommendations",
+                                "name": "f0ad44e6-b6e6-193a-ede7-b8746d5fbdc8"
+                            },
+                            {
+                                "properties": {
+                                    "category": "Cost",
+                                    "impact": "High",
+                                    "impactedField": "Microsoft.Subscriptions/subscriptions",
+                                    "impactedValue": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                                    "lastUpdated": "2023-07-27T07:49:17.918645Z",
+                                    "recommendationTypeId": "84b1a508-fc21-49da-979e-96894f1665df",
+                                    "shortDescription": {
+                                        "problem": "Consider virtual machine reserved instance to save over your on-demand costs",
+                                        "solution": "Consider virtual machine reserved instance to save over your on-demand costs"
+                                    },
+                                    "extendedProperties": {
+                                        "reservedResourceType": "virtualmachines",
+                                        "subId": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                                        "scope": "Single",
+                                        "sku": "Standard_B4ms",
+                                        "term": "P1Y",
+                                        "annualSavingsAmount": "575",
+                                        "savingsAmount": "47",
+                                        "qty": "1.0",
+                                        "savingsCurrency": "USD",
+                                        "region": "eastus",
+                                        "lookbackPeriod": "60",
+                                        "displayQty": "1.0",
+                                        "targetResourceCount": "1",
+                                        "location": "eastus",
+                                        "vmSize": "Standard_B4ms",
+                                        "displaySKU": "Standard_B4ms"
+                                    },
+                                    "resourceMetadata": {
+                                        "resourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47"
+                                    }
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Advisor/recommendations/eeec32af-7264-a29d-7600-6cf70f6d3246",
+                                "type": "Microsoft.Advisor/recommendations",
+                                "name": "eeec32af-7264-a29d-7600-6cf70f6d3246"
+                            },
+                            {
+                                "properties": {
+                                    "category": "Cost",
+                                    "impact": "High",
+                                    "impactedField": "Microsoft.Subscriptions/subscriptions",
+                                    "impactedValue": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                                    "lastUpdated": "2023-07-27T07:49:17.918645Z",
+                                    "recommendationTypeId": "84b1a508-fc21-49da-979e-96894f1665df",
+                                    "shortDescription": {
+                                        "problem": "Consider virtual machine reserved instance to save over your on-demand costs",
+                                        "solution": "Consider virtual machine reserved instance to save over your on-demand costs"
+                                    },
+                                    "extendedProperties": {
+                                        "reservedResourceType": "virtualmachines",
+                                        "subId": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                                        "scope": "Single",
+                                        "sku": "Standard_B4ms",
+                                        "term": "P3Y",
+                                        "annualSavingsAmount": "880",
+                                        "savingsAmount": "73",
+                                        "qty": "1.0",
+                                        "savingsCurrency": "USD",
+                                        "region": "eastus",
+                                        "lookbackPeriod": "60",
+                                        "displayQty": "1.0",
+                                        "targetResourceCount": "1",
+                                        "location": "eastus",
+                                        "vmSize": "Standard_B4ms",
+                                        "displaySKU": "Standard_B4ms"
+                                    },
+                                    "resourceMetadata": {
+                                        "resourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47"
+                                    }
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Advisor/recommendations/31c834e1-a988-b223-4e18-4103253b3276",
+                                "type": "Microsoft.Advisor/recommendations",
+                                "name": "31c834e1-a988-b223-4e18-4103253b3276"
+                            },
+                            {
+                                "properties": {
+                                    "category": "Cost",
+                                    "impact": "High",
+                                    "impactedField": "Microsoft.Subscriptions/subscriptions",
+                                    "impactedValue": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                                    "lastUpdated": "2023-07-27T16:32:40.9282944Z",
+                                    "recommendationTypeId": "84b1a508-fc21-49da-979e-96894f1665df",
+                                    "shortDescription": {
+                                        "problem": "Consider virtual machine reserved instance to save over your on-demand costs",
+                                        "solution": "Consider virtual machine reserved instance to save over your on-demand costs"
+                                    },
+                                    "extendedProperties": {
+                                        "reservedResourceType": "virtualmachines",
+                                        "subId": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                                        "scope": "Single",
+                                        "sku": "Standard_B4ms",
+                                        "term": "P1Y",
+                                        "annualSavingsAmount": "497",
+                                        "savingsAmount": "41",
+                                        "qty": "1.0",
+                                        "savingsCurrency": "USD",
+                                        "region": "eastus",
+                                        "lookbackPeriod": "7",
+                                        "displayQty": "1.0",
+                                        "targetResourceCount": "1",
+                                        "location": "eastus",
+                                        "vmSize": "Standard_B4ms",
+                                        "displaySKU": "Standard_B4ms"
+                                    },
+                                    "resourceMetadata": {
+                                        "resourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47"
+                                    }
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Advisor/recommendations/2dab5add-0413-e13a-983b-62ff71cc532d",
+                                "type": "Microsoft.Advisor/recommendations",
+                                "name": "2dab5add-0413-e13a-983b-62ff71cc532d"
+                            },
+                            {
+                                "properties": {
+                                    "category": "Cost",
+                                    "impact": "High",
+                                    "impactedField": "Microsoft.Subscriptions/subscriptions",
+                                    "impactedValue": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                                    "lastUpdated": "2023-07-27T16:32:40.9282944Z",
+                                    "recommendationTypeId": "84b1a508-fc21-49da-979e-96894f1665df",
+                                    "shortDescription": {
+                                        "problem": "Consider virtual machine reserved instance to save over your on-demand costs",
+                                        "solution": "Consider virtual machine reserved instance to save over your on-demand costs"
+                                    },
+                                    "extendedProperties": {
+                                        "reservedResourceType": "virtualmachines",
+                                        "subId": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                                        "scope": "Single",
+                                        "sku": "Standard_B4ms",
+                                        "term": "P3Y",
+                                        "annualSavingsAmount": "802",
+                                        "savingsAmount": "66",
+                                        "qty": "1.0",
+                                        "savingsCurrency": "USD",
+                                        "region": "eastus",
+                                        "lookbackPeriod": "7",
+                                        "displayQty": "1.0",
+                                        "targetResourceCount": "1",
+                                        "location": "eastus",
+                                        "vmSize": "Standard_B4ms",
+                                        "displaySKU": "Standard_B4ms"
+                                    },
+                                    "resourceMetadata": {
+                                        "resourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47"
+                                    }
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Advisor/recommendations/aeb03f8d-8666-75cc-f02f-73630e78022d",
+                                "type": "Microsoft.Advisor/recommendations",
+                                "name": "aeb03f8d-8666-75cc-f02f-73630e78022d"
+                            },
+                            {
+                                "properties": {
+                                    "category": "Cost",
+                                    "impact": "High",
+                                    "impactedField": "Microsoft.Subscriptions/subscriptions",
+                                    "impactedValue": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                                    "lastUpdated": "2023-07-27T08:04:03.4837313Z",
+                                    "recommendationTypeId": "84b1a508-fc21-49da-979e-96894f1665df",
+                                    "shortDescription": {
+                                        "problem": "Consider virtual machine reserved instance to save over your on-demand costs",
+                                        "solution": "Consider virtual machine reserved instance to save over your on-demand costs"
+                                    },
+                                    "extendedProperties": {
+                                        "reservedResourceType": "virtualmachines",
+                                        "subId": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                                        "scope": "Single",
+                                        "sku": "Standard_B4ms",
+                                        "term": "P1Y",
+                                        "annualSavingsAmount": "598",
+                                        "savingsAmount": "49",
+                                        "qty": "1.0",
+                                        "savingsCurrency": "USD",
+                                        "region": "eastus",
+                                        "lookbackPeriod": "30",
+                                        "displayQty": "1.0",
+                                        "targetResourceCount": "1",
+                                        "location": "eastus",
+                                        "vmSize": "Standard_B4ms",
+                                        "displaySKU": "Standard_B4ms"
+                                    },
+                                    "resourceMetadata": {
+                                        "resourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47"
+                                    }
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Advisor/recommendations/8be9daab-df3a-b750-08b9-68d68dc856da",
+                                "type": "Microsoft.Advisor/recommendations",
+                                "name": "8be9daab-df3a-b750-08b9-68d68dc856da"
+                            },
+                            {
+                                "properties": {
+                                    "category": "Cost",
+                                    "impact": "High",
+                                    "impactedField": "Microsoft.Subscriptions/subscriptions",
+                                    "impactedValue": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                                    "lastUpdated": "2023-07-27T08:04:03.4837313Z",
+                                    "recommendationTypeId": "84b1a508-fc21-49da-979e-96894f1665df",
+                                    "shortDescription": {
+                                        "problem": "Consider virtual machine reserved instance to save over your on-demand costs",
+                                        "solution": "Consider virtual machine reserved instance to save over your on-demand costs"
+                                    },
+                                    "extendedProperties": {
+                                        "reservedResourceType": "virtualmachines",
+                                        "subId": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                                        "scope": "Single",
+                                        "sku": "Standard_B4ms",
+                                        "term": "P3Y",
+                                        "annualSavingsAmount": "903",
+                                        "savingsAmount": "75",
+                                        "qty": "1.0",
+                                        "savingsCurrency": "USD",
+                                        "region": "eastus",
+                                        "lookbackPeriod": "30",
+                                        "displayQty": "1.0",
+                                        "targetResourceCount": "1",
+                                        "location": "eastus",
+                                        "vmSize": "Standard_B4ms",
+                                        "displaySKU": "Standard_B4ms"
+                                    },
+                                    "resourceMetadata": {
+                                        "resourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47"
+                                    }
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Advisor/recommendations/80aa1b25-20e4-f77c-c49a-bfed0ca36b15",
+                                "type": "Microsoft.Advisor/recommendations",
+                                "name": "80aa1b25-20e4-f77c-c49a-bfed0ca36b15"
+                            },
+                            {
+                                "properties": {
+                                    "category": "Cost",
+                                    "impact": "Medium",
+                                    "impactedField": "MICROSOFT.WEB/SITES",
+                                    "impactedValue": "ASP-jamisonpolicytesting-8dfb",
+                                    "lastUpdated": "2023-07-27T17:09:49.0758427Z",
+                                    "recommendationTypeId": "39a8510f-5bbf-4304-9bcd-4106c996473b",
+                                    "shortDescription": {
+                                        "problem": "Unused/Empty App Service plan",
+                                        "solution": "Unused/Empty App Service plan"
+                                    },
+                                    "extendedProperties": {
+                                        "serverFarmName": "ASP-jamisonpolicytesting-8dfb",
+                                        "siteSku": "PremiumV2"
+                                    },
+                                    "resourceMetadata": {
+                                        "resourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/jamison-policy-testing/providers/Microsoft.Web/serverfarms/ASP-jamisonpolicytesting-8dfb"
+                                    }
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/jamison-policy-testing/providers/Microsoft.Web/serverfarms/ASP-jamisonpolicytesting-8dfb/providers/Microsoft.Advisor/recommendations/1248c52d-967e-502a-fa5c-93a622d4a3a8",
+                                "type": "Microsoft.Advisor/recommendations",
+                                "name": "1248c52d-967e-502a-fa5c-93a622d4a3a8"
+                            },
+                            {
+                                "properties": {
+                                    "category": "Cost",
+                                    "impact": "Medium",
+                                    "impactedField": "Microsoft.Compute/disks",
+                                    "impactedValue": "demo_untagged",
+                                    "lastUpdated": "2023-07-27T07:01:52.7038877Z",
+                                    "recommendationTypeId": "48eda464-1485-4dcf-a674-d0905df5054a",
+                                    "shortDescription": {
+                                        "problem": "You have disks which have not been attached to a VM for more than 30 days. Please evaluate if you still need the disk.",
+                                        "solution": "You have disks which have not been attached to a VM for more than 30 days. Please evaluate if you still need the disk."
+                                    },
+                                    "extendedProperties": {
+                                        "_skuToken": "ManagedDiskS4",
+                                        "_meterIdToken": ""
+                                    },
+                                    "resourceMetadata": {
+                                        "resourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/AJ/providers/Microsoft.Compute/disks/demo_untagged"
+                                    }
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/AJ/providers/Microsoft.Compute/disks/demo_untagged/providers/Microsoft.Advisor/recommendations/f4107114-cbeb-e2ce-245b-047ff9f57695",
+                                "type": "Microsoft.Advisor/recommendations",
+                                "name": "f4107114-cbeb-e2ce-245b-047ff9f57695"
+                            },
+                            {
+                                "properties": {
+                                    "category": "Cost",
+                                    "impact": "Medium",
+                                    "impactedField": "Microsoft.Compute/disks",
+                                    "impactedValue": "demo_tagged",
+                                    "lastUpdated": "2023-07-27T07:01:52.7038877Z",
+                                    "recommendationTypeId": "48eda464-1485-4dcf-a674-d0905df5054a",
+                                    "shortDescription": {
+                                        "problem": "You have disks which have not been attached to a VM for more than 30 days. Please evaluate if you still need the disk.",
+                                        "solution": "You have disks which have not been attached to a VM for more than 30 days. Please evaluate if you still need the disk."
+                                    },
+                                    "extendedProperties": {
+                                        "_skuToken": "ManagedDiskS4",
+                                        "_meterIdToken": ""
+                                    },
+                                    "resourceMetadata": {
+                                        "resourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/AJ/providers/Microsoft.Compute/disks/demo_tagged"
+                                    }
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/AJ/providers/Microsoft.Compute/disks/demo_tagged/providers/Microsoft.Advisor/recommendations/b48d642a-6aee-d0f2-f285-2db7c9e31422",
+                                "type": "Microsoft.Advisor/recommendations",
+                                "name": "b48d642a-6aee-d0f2-f285-2db7c9e31422"
+                            },
+                            {
+                                "properties": {
+                                    "category": "Cost",
+                                    "impact": "Medium",
+                                    "impactedField": "Microsoft.Compute/disks",
+                                    "impactedValue": "JamisonsCMKDisk",
+                                    "lastUpdated": "2023-07-27T07:01:52.7038877Z",
+                                    "recommendationTypeId": "48eda464-1485-4dcf-a674-d0905df5054a",
+                                    "shortDescription": {
+                                        "problem": "You have disks which have not been attached to a VM for more than 30 days. Please evaluate if you still need the disk.",
+                                        "solution": "You have disks which have not been attached to a VM for more than 30 days. Please evaluate if you still need the disk."
+                                    },
+                                    "extendedProperties": {
+                                        "_skuToken": "ManagedDiskP1",
+                                        "_meterIdToken": ""
+                                    },
+                                    "resourceMetadata": {
+                                        "resourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/JAMISON-POLICY-TESTING/providers/Microsoft.Compute/disks/JamisonsCMKDisk"
+                                    }
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/JAMISON-POLICY-TESTING/providers/Microsoft.Compute/disks/JamisonsCMKDisk/providers/Microsoft.Advisor/recommendations/2e6e6212-2564-5654-5cad-ab783b685d2d",
+                                "type": "Microsoft.Advisor/recommendations",
+                                "name": "2e6e6212-2564-5654-5cad-ab783b685d2d"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

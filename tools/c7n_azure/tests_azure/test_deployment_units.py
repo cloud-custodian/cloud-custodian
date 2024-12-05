@@ -1,18 +1,8 @@
-# Copyright 2015-2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import pytest
-from .azure_common import BaseTest, requires_arm_polling
+from azure.core.exceptions import AzureError
+from c7n.utils import local_session
 from c7n_azure import constants
 from c7n_azure.constants import FUNCTION_DOCKER_VERSION
 from c7n_azure.functionapp_utils import FunctionAppUtilities
@@ -21,9 +11,8 @@ from c7n_azure.provisioning.app_service_plan import AppServicePlanUnit
 from c7n_azure.provisioning.function_app import FunctionAppDeploymentUnit
 from c7n_azure.provisioning.storage_account import StorageAccountUnit
 from c7n_azure.session import Session
-from msrestazure.azure_exceptions import CloudError
 
-from c7n.utils import local_session
+from .azure_common import BaseTest, requires_arm_polling
 
 
 @requires_arm_polling
@@ -44,7 +33,7 @@ class DeploymentUnitsTest(BaseTest):
             cls.session = local_session(Session)
             client = cls.session.client('azure.mgmt.resource.ResourceManagementClient')
             client.resource_groups.create_or_update(cls.rg_name, {'location': cls.rg_location})
-        except CloudError:
+        except AzureError:
             pass
 
     @classmethod
@@ -52,8 +41,8 @@ class DeploymentUnitsTest(BaseTest):
         super(DeploymentUnitsTest, cls).tearDownClass()
         try:
             client = cls.session.client('azure.mgmt.resource.ResourceManagementClient')
-            client.resource_groups.delete(cls.rg_name)
-        except CloudError:
+            client.resource_groups.begin_delete(cls.rg_name)
+        except AzureError:
             pass
 
     def _validate(self, unit, params):

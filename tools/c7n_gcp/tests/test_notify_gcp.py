@@ -1,26 +1,18 @@
-# Copyright 2019 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
+
+from unittest import mock
 
 from gcp_common import BaseTest
 from c7n_gcp.client import Session
 
-import mock
-
 
 class NotifyTest(BaseTest):
 
-    def test_pubsub_notify(self):
+    @mock.patch("c7n.ctx.uuid.uuid4", return_value="00000000-0000-0000-0000-000000000000")
+    @mock.patch("c7n.ctx.time.time", return_value=1661883360)
+    @mock.patch("c7n_gcp.actions.notify.version", '0.9.18')
+    def test_pubsub_notify(self, *args, **kwargs):
         factory = self.replay_flight_data("notify-action")
 
         orig_client = Session.client
@@ -65,12 +57,12 @@ class NotifyTest(BaseTest):
                 'topic': 'projects/cloud-custodian/topics/gcptestnotifytopic',
                 'body': {
                     'messages': {
-                        'data': ('eJzdUrtqAzEQ7PUVh+qcjd2EuEqVLl8QgpFXe2cFnVZIq8Bh/O/'
-                                 'RA58vkCqkSrHNDDuPZS9C4ic6lofOJWsfhFQAlBwfjc6YhBSZtFGu3'
-                                 '+2fdvLO/0wGHA25wilrC+DJGpgzcBHSqQkLxRi5d8RmmNtOpBSgUiP4jU'
-                                 '+nmE49kzdQ+MFYxhAz/SZWKj7QBwLHLVhKul+'
-                                 'ybOti3GapYtR8mpi4ivfagHPIRZBnXwXviRgnbxVXVOOgkuXaJRgKhuf'
-                                 'jGZXGUNh9wXPakuRWzbixa1pdc6qSVO1kihieNU3KuA3QJGsgDspFT4Hb'
-                                 'nW6B2iHadon/69K5trguxb+b/OPWq9/6i+/JcvDoDq+'
-                                 'K4Yz6ZfWVTbUcucwX+HoY5Q==')
+                        'data': ('eJzdU8tuwjAQvPsrkM9NgCJRyqmn3voFVYWMvYArx2vZa9QI8e/1g0eo2kv'
+                                 'VUy0lh5ns7Myuc2Ac9mCJL0c2GnPHuJASo6WVVgnj0mBUjYyBUGlh+fWDH1'
+                                 'gPW402k8KYDDg0WvYJODBuRQeZIgjUWCS96WtNwOhlobbStS6uQ1w3hE7Lz'
+                                 'G+0IfAh0a9soOI8voOkMP5iY1wKwzhJ5Ua1TxVjR/ZWIlAyeRGk3hXBqyOC'
+                                 'zhlBBVWwEdFQyeI1ek39agdCgc/sfcaT2+zkHE3b7ahqjWqnIomlHY8B/JP'
+                                 'CTmjbSux4MURe2ODQU53T2VAdRK3O9n8dOsVmxyQDHyBjdnRa7+R0mm9e58'
+                                 'Nv6gKJ4nI6n08Xi9lsPkn0Pm3ntPVJ+9hOF/wy5NtA/3jCg3v8Fzc1yckHu'
+                                 '3wRJHegngd/QFXNC83PJ1zENtA=')
                     }}})

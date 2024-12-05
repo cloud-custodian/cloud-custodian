@@ -1,0 +1,12 @@
+{
+    "status_code": 200,
+    "data": {
+        "TagDescriptions": [
+            {
+                "ResourceArn": "arn:aws:elasticloadbalancing:us-west-2:644160558196:targetgroup/test-tg/cbe6793a05fe2145",
+                "Tags": []
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

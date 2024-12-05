@@ -1,0 +1,30 @@
+{
+  "headers": {
+    "vary": "Origin, X-Origin, Referer",
+    "content-type": "application/json; charset=UTF-8",
+    "date": "Tue, 20 Jun 2023 17:06:10 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "400",
+    "content-length": "412",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "error": {
+      "code": 400,
+      "message": "Labels could not be set due to fingerprint mismatch; try again with the proper fingerprint: incorrect fingerprint supplied was \"dbf4ff9a\", the expected one is \"f086de8f\".",
+      "status": "FAILED_PRECONDITION",
+      "details": [
+        {
+          "@type": "type.googleapis.com/google.rpc.RequestInfo",
+          "requestId": "0xdf93223bbe291575"
+        }
+      ]
+    }
+  }
+}

@@ -1,19 +1,55 @@
-# Copyright 2019 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
+from c7n.resources import load_resources
 from c7n_gcp.query import GcpLocation
+from c7n_gcp.provider import GoogleCloud
+
 from gcp_common import BaseTest
+
+
+def test_gcp_resource_metadata_asset_type():
+    load_resources(('gcp.*',))
+    # asset inventory doesn't support these
+    whitelist = set((
+        'app-engine-domain',
+        'app-engine-certificate',
+        'app-engine-firewall-ingress-rule',
+        'app-engine-domain-mapping',
+        'bigtable-instance-table',
+        'bigtable-instance-cluster-backup',
+        'bigtable-instance',
+        'bigtable-instance-cluster',
+        'artifact-repository',
+        'bq-job',
+        'bq-project',
+        'build',
+        'dataflow-job',
+        'dm-deployment',
+        'datafusion-instance',
+        'instance-group-manager',
+        'secret',
+        'function',
+        'loadbalancer-ssl-policy',
+        'log-exclusion',
+        'ml-job',
+        'ml-model',
+        'notebook',
+        'patch-deployment',
+        'sourcerepo',
+        'sql-backup-run',
+        'sql-ssl-cert',
+        'sql-user',
+        'pubsub-snapshot',
+        'region'
+    ))
+    missing = set()
+    for k, v in GoogleCloud.resources.items():
+        if v.resource_type.asset_type is None:
+            missing.add(k)
+    remainder = missing.difference(whitelist)
+    if remainder:
+        raise ValueError(str(remainder))
 
 
 class GcpLocationTest(BaseTest):

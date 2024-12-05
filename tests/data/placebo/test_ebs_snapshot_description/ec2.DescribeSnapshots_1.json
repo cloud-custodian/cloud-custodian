@@ -1,0 +1,35 @@
+{
+    "status_code": 200,
+    "data": {
+        "Snapshots": [
+            {
+                "Description": "snapshot description",
+                "Encrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/f6d98445-ca15-466d-8552-95397d4ab83d",
+                "OwnerId": "644160558196",
+                "Progress": "100%",
+                "SnapshotId": "snap-00551541dada3dacd",
+                "StartTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 2,
+                    "day": 28,
+                    "hour": 18,
+                    "minute": 51,
+                    "second": 32,
+                    "microsecond": 245000
+                },
+                "State": "completed",
+                "VolumeId": "vol-0cc137cb158adbc32",
+                "VolumeSize": 100,
+                "Tags": [
+                    {
+                        "Key": "custodian_snapshot",
+                        "Value": ""
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

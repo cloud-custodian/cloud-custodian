@@ -1,16 +1,5 @@
-# Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 from .common import BaseTest, load_data
 from c7n.config import Config, Bag
@@ -43,7 +32,7 @@ class TestIamGen(BaseTest):
     def test_iam_permissions_validity(self):
         cfg = Config.empty()
         missing = set()
-        all_invalid = []
+        invalid = []
 
         perms = load_data('iam-actions.json')
         resources.load_available()
@@ -52,7 +41,6 @@ class TestIamGen(BaseTest):
             p = Bag({'name': 'permcheck', 'resource': k, 'provider_name': 'aws'})
             ctx = self.get_context(config=cfg, policy=p)
             mgr = v(ctx, p)
-            invalid = []
             # if getattr(mgr, 'permissions', None):
             #    print(mgr)
 
@@ -62,7 +50,9 @@ class TestIamGen(BaseTest):
                 if s in perms:
                     found = True
             if not found:
-                missing.add("%s->%s" % (k, mgr.resource_type.service))
+                missing.add("%s->%s|%s" % (
+                    k, mgr.resource_type.service,
+                    mgr.resource_type.permission_prefix))
                 continue
             invalid.extend(self.check_permissions(perms, mgr.get_permissions(), k))
 
@@ -82,17 +72,10 @@ class TestIamGen(BaseTest):
                         perms, f({}, mgr).get_permissions(),
                         "{k}.filters.{n}".format(k=k, n=n)))
 
-            if invalid:
-                for k, perm_set in invalid:
-                    perm_set = [i for i in perm_set
-                                if not i.startswith('elasticloadbalancing')]
-                    if perm_set:
-                        all_invalid.append((k, perm_set))
-
         if missing:
             raise ValueError(
                 "resources missing service %s" % ('\n'.join(sorted(missing))))
 
-        if all_invalid:
+        if invalid:
             raise ValueError(
-                "invalid permissions \n %s" % ('\n'.join(sorted(map(str, all_invalid)))))
+                "invalid permissions \n %s" % ('\n'.join(sorted(map(str, invalid)))))

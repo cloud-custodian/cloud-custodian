@@ -1,16 +1,5 @@
-# Copyright 2015-2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import logging
 import isodate
 import operator
@@ -23,15 +12,16 @@ from azure.mgmt.costmanagement.models import (QueryAggregation,
                                               QueryDataset, QueryDefinition,
                                               QueryFilter, QueryGrouping,
                                               QueryTimePeriod, TimeframeType)
-from azure.mgmt.policyinsights import PolicyInsightsClient
 from c7n_azure.tags import TagHelper
 from c7n_azure.utils import (IpRangeHelper, Math, ResourceIdParser,
                              StringUtils, ThreadHelper, now, utcnow, is_resource_group)
 from dateutil.parser import parse
-from msrest.exceptions import HttpOperationError
+from azure.core.exceptions import HttpResponseError
 
+from c7n_azure.provider import resources
 from c7n.filters import Filter, FilterValidationError, ValueFilter
 from c7n.filters.core import PolicyValidationError
+from c7n.filters.related import RelatedResourceFilter
 from c7n.filters.offhours import OffHour, OnHour, Time
 from c7n.utils import chunks, get_annotation_prefix, type_schema
 
@@ -79,6 +69,26 @@ class MetricFilter(Filter):
 
     :example:
 
+    Find VMs with a maximum Percentage CPU at or below 10% over the last 24 hours (note the use of
+    ``no_data_action: to_zero`` to treat missing metric values as zeroes)
+
+    .. code-block:: yaml
+
+        policies:
+          - name: find-underused-vms
+            description: Find VMs with maximum cpu <= 10% over the last 24 hours
+            resource: azure.vm
+            filters:
+              - type: metric
+                metric: Percentage CPU
+                aggregation: maximum
+                op: lte
+                threshold: 10
+                timeframe: 24
+                no_data_action: to_zero
+
+    :example:
+
     Find KeyVaults with more than 1000 API hits in the last hour
 
     .. code-block:: yaml
@@ -123,8 +133,8 @@ class MetricFilter(Filter):
         'average': Math.mean,
         'total': Math.sum,
         'count': Math.sum,
-        'minimum': Math.max,
-        'maximum': Math.min
+        'minimum': Math.min,
+        'maximum': Math.max
     }
 
     schema = {
@@ -140,7 +150,7 @@ class MetricFilter(Filter):
             'interval': {'enum': [
                 'PT1M', 'PT5M', 'PT15M', 'PT30M', 'PT1H', 'PT6H', 'PT12H', 'P1D']},
             'aggregation': {'enum': ['total', 'average', 'count', 'minimum', 'maximum']},
-            'no_data_action': {'enum': ['include', 'exclude']},
+            'no_data_action': {'enum': ['include', 'exclude', 'to_zero']},
             'filter': {'type': 'string'}
         }
     }
@@ -197,7 +207,7 @@ class MetricFilter(Filter):
                 aggregation=self.aggregation,
                 filter=self.get_filter(resource)
             )
-        except HttpOperationError:
+        except HttpResponseError:
             self.log.exception("Could not get metric: %s on %s" % (
                 self.metric, resource['id']))
             return None
@@ -207,6 +217,12 @@ class MetricFilter(Filter):
                 for item in metrics_data.value[0].timeseries[0].data]
         else:
             m = None
+
+        if self.no_data_action == "to_zero":
+            if m is None:
+                m = [0]
+            else:
+                m = [0 if v is None else v for v in m]
 
         self._write_metric_to_resource(resource, metrics_data, m)
 
@@ -333,7 +349,7 @@ class TagActionFilter(Filter):
         if ':' not in v or '@' not in v:
             return False
 
-        msg, tgt = v.rsplit(':', 1)
+        _, tgt = v.rsplit(':', 1)
         action, action_date_str = tgt.strip().split('@', 1)
 
         if action != self.op:
@@ -431,7 +447,9 @@ class DiagnosticSettingsFilter(ValueFilter):
         for resource in resources:
             settings = client.diagnostic_settings.list(resource['id'])
             settings = [s.as_dict() for s in settings.value]
-
+            # put an empty item in when no diag settings, so the absent operator can function
+            if not settings:
+                settings = [{}]
             filtered_settings = super(DiagnosticSettingsFilter, self).process(settings, event=None)
 
             if filtered_settings:
@@ -487,7 +505,7 @@ class PolicyCompliantFilter(Filter):
                               d.name in self.definitions]
 
         # Find non-compliant resources
-        client = PolicyInsightsClient(s.get_credentials())
+        client = s.client('azure.mgmt.policyinsights.PolicyInsightsClient')
         query = client.policy_states.list_query_results_for_subscription(
             policy_states_resource='latest', subscription_id=s.subscription_id).value
         non_compliant = [f.resource_id.lower() for f in query
@@ -558,6 +576,26 @@ class FirewallRulesFilter(Filter, metaclass=ABCMeta):
                         include:
                             - '131.107.160.2-131.107.160.3'
                             - 10.20.20.0/24
+
+    :example:
+
+    For SQL Server and Postresql Server, Azure represents the service bypass as firewall rule
+    allowing traffic from "0.0.0.0" (this allows traffic from all other azure services). By
+    default the firewall filter for these resources ignores this rule during evaluation. To
+    include it in the evaluation set the "include-azure-services" flag to true. For example,
+    to find all Postgresql Servers where traffic is allowed from all Azure services:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: postgres-servers-open-from-azure
+            resource: azure.sqlserver
+            filters:
+              - type: firewall-rules
+                include-azure-services: true
+                equal:
+                  - '0.0.0.0'
+
     """
 
     schema = {
@@ -568,7 +606,8 @@ class FirewallRulesFilter(Filter, metaclass=ABCMeta):
             'include': {'type': 'array', 'items': {'type': 'string'}},
             'any': {'type': 'array', 'items': {'type': 'string'}},
             'only': {'type': 'array', 'items': {'type': 'string'}},
-            'equal': {'type': 'array', 'items': {'type': 'string'}}
+            'equal': {'type': 'array', 'items': {'type': 'string'}},
+            'include-azure-services': {'type': 'boolean'}
         },
         'oneOf': [
             {"required": ["type", "include"]},
@@ -824,13 +863,11 @@ class CostFilter(ValueFilter):
 
         - ``WeekToDate``
         - ``MonthToDate``
-        - ``YearToDate``
 
       - All days in the previous calendar period:
 
-        - ``TheLastWeek``
         - ``TheLastMonth``
-        - ``TheLastYear``
+        - ``TheLastBillingMonth``
 
     :examples:
 
@@ -928,7 +965,7 @@ class CostFilter(ValueFilter):
 
         client = manager.get_client('azure.mgmt.costmanagement.CostManagementClient')
 
-        aggregation = {'totalCost': QueryAggregation(name='PreTaxCost')}
+        aggregation = {'totalCost': QueryAggregation(name='PreTaxCost', function='Sum')}
 
         grouping = [QueryGrouping(type='Dimension',
                                   name='ResourceGroupName' if is_resource_group else 'ResourceId')]
@@ -953,22 +990,24 @@ class CostFilter(ValueFilter):
             timeframe = 'Custom'
             time_period = QueryTimePeriod(from_property=start_time, to=end_time)
 
-        definition = QueryDefinition(timeframe=timeframe, time_period=time_period, dataset=dataset)
+        definition = QueryDefinition(type='ActualCost',
+                                     timeframe=timeframe,
+                                     time_period=time_period,
+                                     dataset=dataset)
 
         subscription_id = manager.get_session().get_subscription_id()
 
         scope = '/subscriptions/' + subscription_id
 
-        query = client.query.usage_by_scope(scope, definition)
+        query = client.query.usage(scope, definition)
 
         if hasattr(query, '_derserializer'):
             original = query._derserializer._deserialize
             query._derserializer._deserialize = lambda target, data: \
                 original(target, self.fix_wrap_rest_response(data))
 
-        result_list = list(query)[0]
-        result_list = [{result_list.columns[i].name: v for i, v in enumerate(row)}
-                       for row in result_list.rows]
+        result_list = [{query.columns[i].name: v for i, v in enumerate(row)}
+                       for row in query.rows]
 
         for r in result_list:
             if 'ResourceGroupName' in r:
@@ -1016,6 +1055,80 @@ class ParentFilter(Filter):
     def process(self, resources, event=None):
         parent_resources = self.parent_filter.process(self.parent_manager.resources())
         parent_resources_ids = [p['id'] for p in parent_resources]
-
         parent_key = self.manager.resource_type.parent_key
         return [r for r in resources if r[parent_key] in parent_resources_ids]
+
+
+class AzureAdvisorFilter(RelatedResourceFilter):
+    """
+    Filter resources by Azure Advisor Recommendations
+
+    Select all categories with 'all'
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: disks-with-cost-recommendations
+            resource: azure.disk
+            filters:
+              - type: advisor-recommendation
+                category: Cost
+                key: '[].properties.recommendationTypeId'
+                op: contains
+                value: '48eda464-1485-4dcf-a674-d0905df5054a'
+    """
+
+    RelatedResource = "c7n_azure.resources.advisor.AdvisorRecommendation"
+    RelatedIdsExpression = "id"
+    AnnotationKey = "AdvisorRecommendation"
+
+    schema = type_schema(
+        "advisor-recommendation",
+        category={'type': 'string'},
+        rinherit=RelatedResourceFilter.schema,
+        required=['category']
+    )
+
+    def _add_annotations(self, related_ids, resource):
+        resource[f"c7n:{self.AnnotationKey}"] = self._recommendation_map[
+            resource['id'].lower()
+        ]
+
+    def get_related(self, resources):
+        """
+        get_related works a little bit differently here compared to other
+        related resource filters namely due to the fact that the parent
+        resource (e.g. disk) doesn't have an attribute pointing to a
+        advisor recommendation. thus, we need to fetch all recommendations
+        first, then map the recommendations to resource ids
+        """
+
+        resource_manager = self.get_resource_manager()
+        category = self.data.get("category")
+
+        if category == 'all':
+            query = None
+        else:
+            query = {'filter': f"Category eq '{category}'"}
+
+        related = resource_manager.resources(query=[query])
+        self._recommendation_map = {}
+
+        for r in related:
+            self._recommendation_map.setdefault(
+                r["properties"]["resourceMetadata"]["resourceId"].lower(), []
+            ).append(r)
+        return self._recommendation_map
+
+    def get_related_ids(self, resource):
+        # normalize to lower case
+        return [i.lower() for i in super().get_related_ids(resource)]
+
+    @classmethod
+    def register_resource(cls, registry, resource_class):
+        resource_class.filter_registry.register("advisor-recommendation", cls)
+
+
+resources.subscribe(AzureAdvisorFilter.register_resource)

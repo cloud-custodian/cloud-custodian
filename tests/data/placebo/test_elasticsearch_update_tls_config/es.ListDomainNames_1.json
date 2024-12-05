@@ -1,0 +1,21 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "6c54de17-477b-11e7-98d1-0d9721a87f47", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "6c54de17-477b-11e7-98d1-0d9721a87f47", 
+                "date": "Fri, 02 Jun 2017 10:08:27 GMT", 
+                "content-length": "43", 
+                "content-type": "application/json"
+            }
+        }, 
+        "DomainNames": [
+            {
+                "DomainName": "test-es"
+            }
+        ]
+    }
+}

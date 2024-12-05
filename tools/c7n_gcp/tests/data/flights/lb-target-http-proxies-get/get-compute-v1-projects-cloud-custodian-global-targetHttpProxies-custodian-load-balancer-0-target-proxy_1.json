@@ -1,0 +1,28 @@
+{
+  "body": {
+    "kind": "compute#targetHttpProxy", 
+    "name": "custodian-load-balancer-0-target-proxy", 
+    "urlMap": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/urlMaps/custodian-load-balancer-0", 
+    "creationTimestamp": "2019-04-30T01:56:16.713-07:00", 
+    "id": "4419192664514474847", 
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/targetHttpProxies/custodian-load-balancer-0-target-proxy"
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "454", 
+    "transfer-encoding": "chunked", 
+    "expires": "Fri, 03 May 2019 16:09:40 GMT", 
+    "vary": "Origin, X-Origin", 
+    "-content-encoding": "gzip", 
+    "date": "Fri, 03 May 2019 16:09:40 GMT", 
+    "x-xss-protection": "1; mode=block", 
+    "content-location": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/targetHttpProxies/custodian-load-balancer-0-target-proxy?alt=json", 
+    "x-content-type-options": "nosniff", 
+    "server": "GSE", 
+    "etag": "\"qULWOe_j_tAR2yTKhY5AaVb80Wc=/2Z9NTb4zNxdW8a6JbGvOA6nD2BQ=\"", 
+    "cache-control": "private, max-age=0, must-revalidate, no-transform", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}

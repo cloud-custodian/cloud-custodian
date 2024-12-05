@@ -1,0 +1,34 @@
+{
+    "status_code": 200,
+    "data": {
+        "SecurityConfigurations": [
+            {
+                "Name": "AtRestEnabled",
+                "CreationDateTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 1,
+                    "day": 18,
+                    "hour": 21,
+                    "minute": 5,
+                    "second": 46,
+                    "microsecond": 879000
+                }
+            },
+            {
+                "Name": "In-Transit",
+                "CreationDateTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 1,
+                    "day": 11,
+                    "hour": 15,
+                    "minute": 55,
+                    "second": 16,
+                    "microsecond": 102000
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -15,21 +15,30 @@ coverage:
         only_pulls: true
     project:
       azure:
-        paths: "tools/c7n_azure"
+        paths: ["tools/c7n_azure"]
         threshold: "1%"
       gcp:
-        paths: "tools/c7n_gcp"
+        paths: ["tools/c7n_gcp"]
         threshold: "1%"
       mailer:
-        paths: "tools/c7n_mailer"
+        paths: ["tools/c7n_mailer"]
         threshold: "3%"
       k8s:
-        paths: "tools/c7n_kube"
+        paths: ["tools/c7n_kube"]
         threshold: "1%"
+      tf:
+        paths: ["tools/c7n_terraform"]
+        threshold: "1%"
+      shiftleft:
+        paths: ["tools/c7n_left"]
+        threshold: "3%"
+      policystream:
+        paths: ["tools/c7n_policystream"]
+        threshold: "3%"        
       # aws is weaved throughout core atm can't easily call it out separately
       custodian:
       # one of the tests is slightly variable coverage due to concurrency (0.01)
-        threshold: "0.05%"
+        threshold: "0.10%"
         paths:
           - "!tools"
       default: off

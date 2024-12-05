@@ -1,0 +1,33 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "items": [
+            {
+                "clientCertificateId": "3kxqri",
+                "description": "Test certificate",
+                "pemEncodedCertificate": "-----BEGIN CERTIFICATE-----\r\nMIIC6TCCAdGgAwIBAgIJAJGrGKG8hmm2MA0GCSqGSIb3DQEBCwUAMDQxCzAJBgNV\r\nBAYTAlVTMRAwDgYDVQQHEwdTZWF0dGxlMRMwEQYDVQQDEwpBcGlHYXRld2F5MB4X\r\nDTIwMTIyNDE2MDEwM1oXDTIxMTIyNDE2MDEwM1owNDELMAkGA1UEBhMCVVMxEDAO\r\nBgNVBAcTB1NlYXR0bGUxEzARBgNVBAMTCkFwaUdhdGV3YXkwggEiMA0GCSqGSIb3\r\nDQEBAQUAA4IBDwAwggEKAoIBAQC7w9E1pHVj3P/Qw07OJI3ta5cZJvrMXF7ijEqg\r\naBXkpou8ZCL6ZmjZIUl5+py78By1P7tmxGKYT18XFH3gsKza1Sh32CC+jtHI4gRG\r\n1LaeD4H154tpd6xLJ1+vR4EIqqiif+2hCxp9a6R/P6Gi6IDeEKhLsc3sXovnCe8y\r\n5irfRfy+2w9P8mZ28KrCTHBy6DSEd52P7TAJuHijEIbQArNdtkEhCoCxtRhzNOiy\r\n66hhI5OC/Rg9x3d6HxfekJS1+S0VPbqNeMkrVWlxcqt4do9vQei/CJWjNyPdfYoS\r\noEbepWWAeNijRMsF/zYyYl4hrM3ERPE70pkB0kxXaIgtdah1AgMBAAEwDQYJKoZI\r\nhvcNAQELBQADggEBAJYEzElxDoKwFD5MXU370PkhZMW4sc7wdxxcLls7/HTAAaAD\r\nb6XkhG7lHSttU+NUn8aM0jzlEpjGtsq71ogFTUnxeN6I9Aa/m1ZpIHJsc9iQ13Bx\r\nFdsiFPMtsVdMlcJWwvG2srXMf6rMO20I0tkH9gDkJx3QQ/XxpY2kXQGIaoaLU5UD\r\n3FnKyth9amLpF0UGCfNvIK1v2aLdwLS3TzX3YMfKGDT8CKP1/FJ4kMeVthkofkLl\r\nfQxPyE5t+WfEEcspPUBBQJ74Tim6sCdF85jh48A3neKjWT+3aqgV0Lcr4kK5o9/i\r\n1p/WuJldRtH6mlShCx7i7ewwYIV4BTCxavtUXXU=\r\n-----END CERTIFICATE-----",
+                "createdDate": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 12,
+                    "day": 24,
+                    "hour": 11,
+                    "minute": 1,
+                    "second": 3,
+                    "microsecond": 0
+                },
+                "expirationDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 12,
+                    "day": 24,
+                    "hour": 11,
+                    "minute": 1,
+                    "second": 3,
+                    "microsecond": 0
+                }
+            }
+        ]
+    }
+}

@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "Name": "In-Transit",
+        "SecurityConfiguration": "{\"EncryptionConfiguration\":{\"InTransitEncryptionConfiguration\":{\"TLSCertificateConfiguration\":{\"CertificateProviderType\":\"PEM\",\"S3Object\":\"s3://openssl-emr/my-certs.zip\"}},\"EnableInTransitEncryption\":true,\"EnableAtRestEncryption\":false}}",
+        "CreationDateTime": {
+            "__class__": "datetime",
+            "year": 2023,
+            "month": 1,
+            "day": 11,
+            "hour": 15,
+            "minute": 55,
+            "second": 16,
+            "microsecond": 102000
+        },
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,40 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "item": [
+            {
+                "deploymentId": "0oox4h",
+                "stageName": "test",
+                "cacheClusterEnabled": false,
+                "cacheClusterStatus": "NOT_AVAILABLE",
+                "methodSettings": {},
+                "tracingEnabled": false,
+                "webAclArn": "arn:aws:wafv2:us-west-2:644160558196:regional/webacl/FMManagedWebACLV2-FMS-Intuit-Only-Compliance-US-WEST-2-1659601035761/421a319f-8bfc-497b-bdce-597ab3337bd2",
+                "tags": {
+                    "set-wafv2": "true"
+                },
+                "createdDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 9,
+                    "day": 22,
+                    "hour": 15,
+                    "minute": 23,
+                    "second": 53,
+                    "microsecond": 0
+                },
+                "lastUpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 9,
+                    "day": 22,
+                    "hour": 15,
+                    "minute": 24,
+                    "second": 35,
+                    "microsecond": 0
+                }
+            }
+        ]
+    }
+}

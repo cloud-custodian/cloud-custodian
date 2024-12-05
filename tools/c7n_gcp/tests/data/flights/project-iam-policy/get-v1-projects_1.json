@@ -1,0 +1,56 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 16 Jun 2021 23:18:01 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "server-timing": "gfet4t7; dur=163",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "303",
+    "-content-encoding": "gzip",
+    "content-location": "https://cloudresourcemanager.googleapis.com/v1/projects?alt=json"
+  },
+  "body": {
+    "projects": [
+      {
+        "projectNumber": "624133384705",
+        "projectId": "custodian-test",
+        "lifecycleState": "ACTIVE",
+        "name": "custodian-test",
+        "createTime": "2019-07-18T09:51:51.823Z",
+        "parent": {
+          "type": "organization",
+          "id": "633447823333"
+        }
+      },
+      {
+        "projectNumber": "694110004704",
+        "projectId": "custodian-test-2",
+        "lifecycleState": "ACTIVE",
+        "name": "custodian-test-2",
+        "createTime": "2020-07-18T09:51:51.823Z",
+        "parent": {
+          "type": "organization",
+          "id": "639999823333"
+        }
+      },
+      {
+        "projectNumber": "698888804704",
+        "projectId": "custodian-test-3",
+        "lifecycleState": "ACTIVE",
+        "name": "custodian-test-3",
+        "createTime": "2021-05-14T09:51:51.823Z",
+        "parent": {
+          "type": "organization",
+          "id": "600002823333"
+        }
+      }
+    ]
+  }
+}

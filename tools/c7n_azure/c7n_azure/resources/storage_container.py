@@ -1,26 +1,17 @@
-# Copyright 2019 Microsoft Corporation
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 from c7n_azure.provider import resources
-from c7n_azure.query import ChildTypeInfo, ChildResourceManager
+from c7n_azure.query import ChildTypeInfo
 from c7n_azure.actions.base import AzureBaseAction
+from c7n_azure.resources.arm import ChildArmResourceManager
 from c7n.filters.core import type_schema
 from c7n_azure.utils import ResourceIdParser
+from msrestazure.tools import parse_resource_id
 
 
 @resources.register('storage-container')
-class StorageContainer(ChildResourceManager):
+class StorageContainer(ChildArmResourceManager):
     """Storage Container Resource
 
     :example:
@@ -49,7 +40,6 @@ class StorageContainer(ChildResourceManager):
         parent_manager_name = 'storage'
         diagnostic_settings_enabled = False
         resource_type = 'Microsoft.Storage/storageAccounts/blobServices/containers'
-        enable_tag_operations = False
         raise_on_exception = False
         default_report_fields = (
             'name',
@@ -61,6 +51,20 @@ class StorageContainer(ChildResourceManager):
         def extra_args(cls, parent_resource):
             return {'resource_group_name': parent_resource['resourceGroup'],
                     'account_name': parent_resource['name']}
+
+    def get_resources(self, resource_ids):
+        client = self.get_client()
+        data = [
+            self.get_storage_container(rid, client)
+            for rid in resource_ids
+        ]
+        return self.augment([r.serialize(True) for r in data])
+
+    def get_storage_container(self, resource_id, client):
+        parsed = parse_resource_id(resource_id)
+        return client.blob_containers.get(parsed.get('resource_group'),
+                                          parsed.get('name'),             # Account name
+                                          parsed.get('resource_name'))    # Container name
 
 
 @StorageContainer.action_registry.register('set-public-access')
@@ -94,18 +98,20 @@ class StorageContainerSetPublicAccessAction(AzureBaseAction):
         }
     )
 
-    schema_alias = True
-
     def _prepare_processing(self):
         self.client = self.manager.get_client()
 
     def _process_resource(self, resource):
         resource_group = ResourceIdParser.get_resource_group(resource['id'])
         account_name = ResourceIdParser.get_resource_name(resource['c7n:parent-id'])
-
+        blob_container = self.client.blob_containers.get(resource_group,
+            account_name,
+            resource['name'],
+        )
+        blob_container.public_access = self.data['value']
         self.client.blob_containers.update(
             resource_group,
             account_name,
             resource['name'],
-            public_access=self.data['value']
+            blob_container
         )

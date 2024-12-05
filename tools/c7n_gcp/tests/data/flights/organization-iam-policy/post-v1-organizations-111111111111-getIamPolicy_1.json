@@ -1,0 +1,83 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Mon, 02 Oct 2023 20:25:34 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "server-timing": "gfet4t7; dur=236",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "14708",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "version": 1,
+    "etag": "BwYGazsSkKc=",
+    "bindings": [
+      {
+        "role": "roles/owner",
+        "members": [
+          "serviceAccount:abc@testproject.iam.gserviceaccount.com",
+          "user:abc@gmail.com"
+        ]
+      },
+      {
+        "role": "roles/editor",
+        "members": [
+          "serviceAccount:def@testproject.iam.gserviceaccount.com"
+        ]
+      },
+      {
+        "role": "roles/viewer",
+        "members": [
+          "user:abc@gmail.com"
+        ]
+      },
+      {
+        "role": "roles/admin",
+        "members": [
+          "group:dummyGroup1",
+          "user:abc@gmail.com"
+        ]
+      },
+      {
+        "role": "roles/editor",
+        "members": [
+          "allUsers",
+          "user:zzz@gmail.com"
+        ]
+      },
+      {
+        "role": "roles/viewer",
+        "members": [
+          "user:abc@gmail.com"
+        ]
+      },
+      {
+        "role": "roles/admin",
+        "members": [
+          "serviceAccount:abc@testproject.iam.gserviceaccount.com",
+          "user:abc@gmail.com",
+          "abcdefg"
+        ]
+      },
+      {
+        "role": "roles/editor",
+        "members": [
+          "serviceAccount:def@testproject.iam.gserviceaccount.com",
+          "user:zzz@gmail.com"
+        ]
+      },
+      {
+        "role": "roles/viewer",
+        "members": [
+          "user:abc@gmail.com"
+        ]
+      }
+    ]
+  }
+}

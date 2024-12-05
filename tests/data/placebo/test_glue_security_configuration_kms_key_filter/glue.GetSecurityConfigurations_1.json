@@ -1,0 +1,28 @@
+{
+    "status_code": 200,
+    "data": {
+        "SecurityConfigurations": [
+            {
+                "Name": "test",
+                "EncryptionConfiguration": {
+                    "S3Encryption": [
+                        {
+                            "S3EncryptionMode": "SSE-KMS",
+                            "KmsKeyArn": "arn:aws:kms:us-east-1:0123456789012:key/d1305425-4cde-46ee-be31-e2043dd4df39"
+                        }
+                    ],
+                    "CloudWatchEncryption": {
+                        "CloudWatchEncryptionMode": "SSE-KMS",
+                        "KmsKeyArn": "arn:aws:kms:us-east-1:0123456789012:key/358f7699-4ea5-455a-9c78-1c868301e5a8"
+                    },
+                    "JobBookmarksEncryption": {
+                        "JobBookmarksEncryptionMode": "CSE-KMS",
+                        "KmsKeyArn": "arn:aws:kms:us-east-1:0123456789012:key/ec3b9189-1247-4ecc-8bfd-c492f07621db"
+                    }
+                }
+            }
+        ],
+        "NextToken": "",
+        "ResponseMetadata": {}
+    }
+}

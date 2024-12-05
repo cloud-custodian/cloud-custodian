@@ -1,0 +1,19 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResourceDataSyncItems": [
+            {
+                "SyncName": "invsync",
+                "S3Destination": {
+                    "BucketName": "c7n-ssm",
+                    "Prefix": "inv",
+                    "SyncFormat": "JsonSerDe",
+                    "Region": "us-east-1"
+                },
+                "LastStatus": "Successful",
+                "LastSyncStatusMessage": "The sync was successfully completed"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

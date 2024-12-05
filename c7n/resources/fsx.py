@@ -1,23 +1,31 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
+
+from __future__ import annotations
+from datetime import datetime, timedelta
 
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, TypeInfo
+from c7n.query import (
+    QueryResourceManager, TypeInfo, DescribeSource, RetryPageIterator)
 from c7n.actions import BaseAction
 from c7n.tags import Tag, TagDelayedAction, RemoveTag, coalesce_copy_user_tags, TagActionFilter
-from c7n.utils import local_session, type_schema
+from c7n.utils import type_schema, local_session, chunks
+from c7n.filters import Filter
 from c7n.filters.kms import KmsRelatedFilter
+from c7n.filters.vpc import SubnetFilter
+from c7n.filters.backup import ConsecutiveAwsBackupsFilter
+
+
+class DescribeFSx(DescribeSource):
+
+    def get_resources(self, ids):
+        """Support server side filtering on arns
+        """
+        for n in range(len(ids)):
+            if ids[n].startswith('arn:'):
+                ids[n] = ids[n].rsplit('/', 1)[-1]
+        params = {'FileSystemIds': ids}
+        return self.query.filter(self.manager, **params)
 
 
 @resources.register('fsx')
@@ -30,6 +38,10 @@ class FSx(QueryResourceManager):
         arn = "ResourceARN"
         date = 'CreationTime'
         cfn_type = 'AWS::FSx::FileSystem'
+
+    source_mapping = {
+        'describe': DescribeFSx
+    }
 
 
 @resources.register('fsx-backup')
@@ -316,43 +328,123 @@ class DeleteFileSystem(BaseAction):
 
 @FSx.filter_registry.register('kms-key')
 class KmsFilter(KmsRelatedFilter):
-    """
-    Filter a resource by its associcated kms key and optionally the aliasname
-    of the kms key by using 'c7n:AliasName'
 
-    :example:
-
-        .. code-block:: yaml
-
-            policies:
-                - name: fsx-kms-key-filters
-                  resource: fsx
-                  filters:
-                    - type: kms-key
-                      key: c7n:AliasName
-                      value: "^(alias/aws/fsx)"
-                      op: regex
-    """
     RelatedIdsExpression = 'KmsKeyId'
 
 
 @FSxBackup.filter_registry.register('kms-key')
 class KmsFilterFsxBackup(KmsRelatedFilter):
-    """
-    Filter a resource by its associcated kms key and optionally the aliasname
-    of the kms key by using 'c7n:AliasName'
 
-    :example:
+    RelatedIdsExpression = 'KmsKeyId'
 
-        .. code-block:: yaml
+
+@FSx.filter_registry.register('consecutive-backups')
+class ConsecutiveBackups(Filter):
+    """Returns consecutive daily FSx backups, which are equal to/or greater than n days.
+    :Example:
+
+    .. code-block:: yaml
 
             policies:
-                - name: fsx-backup-kms-key-filters
-                  resource: fsx-backup
-                  filters:
-                    - type: kms-key
-                      key: c7n:AliasName
-                      value: "^(alias/aws/fsx)"
-                      op: regex
+              - name: fsx-daily-backup-count
+                resource: fsx
+                filters:
+                  - type: consecutive-backups
+                    days: 5
+                actions:
+                  - notify
     """
-    RelatedIdsExpression = 'KmsKeyId'
+    schema = type_schema('consecutive-backups',
+                         days={'type': 'number', 'minimum': 1},
+                         required=['days'])
+    permissions = ('fsx:DescribeBackups', 'fsx:DescribeVolumes',)
+    annotation = 'c7n:FSxBackups'
+
+    def describe_backups(self, client, name=None, filters=[]):
+        desc_backups = []
+        try:
+            paginator = client.get_paginator('describe_backups')
+            paginator.PAGE_ITERATOR_CLS = RetryPageIterator
+            desc_backups = paginator.paginate(Filters=[
+                {
+                    'Name': name,
+                    'Values': filters,
+                }]).build_full_result().get('Backups', [])
+        except Exception as err:
+            self.log.warning(
+                'Unable to describe backups for ids: %s - %s' % (filters, err))
+        return desc_backups
+
+    def ontap_process_resource_set(self, client, resources):
+        ontap_fid_backups = {}
+        ontap_backups = []
+        ontap_fids = [r['FileSystemId'] for r in resources]
+        if ontap_fids:
+            ontap_volumes = client.describe_volumes(Filters=[
+                {
+                    'Name': 'file-system-id',
+                    'Values': ontap_fids,
+                }])
+            ontap_vids = [v['VolumeId'] for v in ontap_volumes['Volumes']]
+            for ovid in chunks(ontap_vids, 20):
+                ontap_backups = self.describe_backups(client, 'volume-id', ovid)
+            if ontap_backups:
+                for ontap in ontap_backups:
+                    ontap_fid_backups.setdefault(ontap['Volume']
+                                           ['FileSystemId'], []).append(ontap)
+        for r in resources:
+            r[self.annotation] = ontap_fid_backups.get(r['FileSystemId'], [])
+
+    def nonontap_process_resource_set(self, client, resources):
+        fid_backups = {}
+        nonontap_backups = []
+        nonontap_fids = [r['FileSystemId'] for r in resources]
+        if nonontap_fids:
+            for nonontap_fid in chunks(nonontap_fids, 20):
+                nonontap_backups = self.describe_backups(client, 'file-system-id', nonontap_fid)
+            if nonontap_backups:
+                for nonontap in nonontap_backups:
+                    fid_backups.setdefault(nonontap['FileSystem']
+                                           ['FileSystemId'], []).append(nonontap)
+        for r in resources:
+            r[self.annotation] = fid_backups.get(r['FileSystemId'], [])
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('fsx')
+        results = []
+        ontap_resource_set, nonontap_resource_set = [], []
+        retention = self.data.get('days')
+        utcnow = datetime.utcnow()
+        expected_dates = set()
+        for days in range(1, retention + 1):
+            expected_dates.add((utcnow - timedelta(days=days)).strftime('%Y-%m-%d'))
+
+        for r in resources:
+            if self.annotation not in r:
+                if r['FileSystemType'] == 'ONTAP':
+                    ontap_resource_set.append(r)
+                else:
+                    nonontap_resource_set.append(r)
+
+        if ontap_resource_set:
+            self.ontap_process_resource_set(client, ontap_resource_set)
+        if nonontap_resource_set:
+            self.nonontap_process_resource_set(client, nonontap_resource_set)
+
+        for r in resources:
+            backup_dates = set()
+            for backup in r[self.annotation]:
+                if backup['Lifecycle'] == 'AVAILABLE':
+                    backup_dates.add(backup['CreationTime'].strftime('%Y-%m-%d'))
+            if expected_dates.issubset(backup_dates):
+                results.append(r)
+        return results
+
+
+@FSx.filter_registry.register('subnet')
+class Subnet(SubnetFilter):
+
+    RelatedIdsExpression = 'SubnetIds[]'
+
+
+FSx.filter_registry.register('consecutive-aws-backups', ConsecutiveAwsBackupsFilter)

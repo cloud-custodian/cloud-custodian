@@ -1,20 +1,8 @@
-# Copyright 2019 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-import jmespath
-
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
+from c7n.utils import jmespath_search
 
 
 @resources.register('ml-model')
@@ -34,11 +22,13 @@ class MLModel(QueryResourceManager):
         default_report_fields = [
             id, name, "description", "onlinePredictionLogging"]
         get_requires_event = True
+        urn_component = "model"
+        urn_id_segments = (-1,)  # Just use the last segment of the id in the URN
 
         @staticmethod
         def get(client, event):
             return client.execute_query(
-                'get', {'name': jmespath.search(
+                'get', {'name': jmespath_search(
                     'protoPayload.response.name', event
                 )})
 
@@ -58,12 +48,13 @@ class MLJob(QueryResourceManager):
         scope_template = 'projects/{}'
         name = id = 'jobId'
         default_report_fields = [
-            "jobId", "status", "createTime", "endTime"]
+            "jobId", "state", "createTime", "endTime"]
         get_requires_event = True
+        urn_component = "job"
 
         @staticmethod
         def get(client, event):
             return client.execute_query(
                 'get', {'name': 'projects/{}/jobs/{}'.format(
-                    jmespath.search('resource.labels.project_id', event),
-                    jmespath.search('protoPayload.response.jobId', event))})
+                    jmespath_search('resource.labels.project_id', event),
+                    jmespath_search('protoPayload.response.jobId', event))})

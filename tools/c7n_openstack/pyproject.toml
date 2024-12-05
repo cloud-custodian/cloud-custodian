@@ -1,0 +1,29 @@
+[tool.poetry]
+name = "c7n_openstack"
+version = "0.1.32"
+description = "Cloud Custodian - OpenStack Provider"
+readme = "readme.md"
+authors = ["Cloud Custodian Project"]
+homepage = "https://cloudcustodian.io"
+repository = "https://github.com/cloud-custodian/cloud-custodian"
+documentation = "https://cloudcustodian.io/docs/"
+license = "Apache-2.0"
+classifiers = [
+   "License :: OSI Approved :: Apache Software License",
+   "Topic :: System :: Systems Administration",
+   "Topic :: System :: Distributed Computing"
+]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+c7n = {path = "../..", develop = true}
+
+openstacksdk = "^0.52.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "<8.0"
+vcrpy = ">=4.0.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

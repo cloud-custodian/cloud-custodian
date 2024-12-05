@@ -1,0 +1,15 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "repositories": [
+            {
+                "name": "pepperoni",
+                "administratorAccount": "644160558196",
+                "domainName": "pizzaspace",
+                "domainOwner": "644160558196",
+                "arn": "arn:aws:codeartifact:us-east-1:644160558196:repository/pizzaspace/pepperoni"
+            }
+        ]
+    }
+}

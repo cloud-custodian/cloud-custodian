@@ -1,20 +1,9 @@
-# Copyright 2019 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
 
-import jmespath
+from c7n.utils import jmespath_search
 
 
 @resources.register('cloudbilling-account')
@@ -28,10 +17,14 @@ class CloudBillingAccount(QueryResourceManager):
         get_requires_event = True
         scope = None
         name = id = 'name'
-        default_report_fields = ['id', 'displayName']
+        default_report_fields = ['name', 'displayName']
+        asset_type = "cloudbilling.googleapis.com/BillingAccount"
+        permissions = ('billing.accounts.list',)
+        urn_component = "account"
+        urn_id_segments = (-1,)  # Just use the last segment of the id in the URN
 
         @staticmethod
         def get(client, event):
             return client.execute_query(
-                'get', {'name': jmespath.search(
+                'get', {'name': jmespath_search(
                     'protoPayload.response.billingAccountInfo.billingAccountName', event)})

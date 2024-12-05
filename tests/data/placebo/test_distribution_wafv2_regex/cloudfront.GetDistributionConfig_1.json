@@ -1,0 +1,113 @@
+{
+    "status_code": 200,
+    "data": {
+        "ETag": "EIZMGDN1LXJRI",
+        "DistributionConfig": {
+            "Comment": "",
+            "CacheBehaviors": {
+                "Quantity": 0
+            },
+            "IsIPV6Enabled": true,
+            "Logging": {
+                "Bucket": "",
+                "Prefix": "",
+                "Enabled": false,
+                "IncludeCookies": false
+            },
+            "WebACLId": "arn:aws:wafv2:us-east-1:012345678912:regional/webacl/FMManagedWebACLV2-FMS-TEST-1656966584517/96494e83-ee49-4505-9f68-9103c6cd9406",
+            "Origins": {
+                "Items": [
+                    {
+                        "S3OriginConfig": {
+                            "OriginAccessIdentity": ""
+                        },
+                        "OriginPath": "",
+                        "CustomHeaders": {
+                            "Quantity": 0
+                        },
+                        "Id": "S3-sns-notify-test",
+                        "DomainName": "sns-notify-test.s3.amazonaws.com"
+                    }
+                ],
+                "Quantity": 1
+            },
+            "DefaultRootObject": "",
+            "PriceClass": "PriceClass_All",
+            "Enabled": true,
+            "DefaultCacheBehavior": {
+                "TrustedSigners": {
+                    "Enabled": false,
+                    "Quantity": 0
+                },
+                "LambdaFunctionAssociations": {
+                    "Quantity": 0
+                },
+                "TargetOriginId": "S3-sns-notify-test",
+                "ViewerProtocolPolicy": "allow-all",
+                "ForwardedValues": {
+                    "Headers": {
+                        "Quantity": 0
+                    },
+                    "Cookies": {
+                        "Forward": "none"
+                    },
+                    "QueryStringCacheKeys": {
+                        "Quantity": 0
+                    },
+                    "QueryString": false
+                },
+                "MaxTTL": 31536000,
+                "SmoothStreaming": false,
+                "DefaultTTL": 86400,
+                "AllowedMethods": {
+                    "Items": [
+                        "HEAD",
+                        "GET"
+                    ],
+                    "CachedMethods": {
+                        "Items": [
+                            "HEAD",
+                            "GET"
+                        ],
+                        "Quantity": 2
+                    },
+                    "Quantity": 2
+                },
+                "MinTTL": 0,
+                "Compress": false
+            },
+            "CallerReference": "1499952607732",
+            "ViewerCertificate": {
+                "CloudFrontDefaultCertificate": true,
+                "MinimumProtocolVersion": "TLSv1",
+                "CertificateSource": "cloudfront"
+            },
+            "CustomErrorResponses": {
+                "Quantity": 0
+            },
+            "HttpVersion": "http2",
+            "Restrictions": {
+                "GeoRestriction": {
+                    "RestrictionType": "none",
+                    "Quantity": 0
+                }
+            },
+            "Aliases": {
+                "Quantity": 0
+            }
+        },
+        "ResponseMetadata": {
+            "RetryAttempts": 0,
+            "HTTPStatusCode": 200,
+            "RequestId": "0755e5c5-a9c9-11e7-82fd-ed12cccaa8d8",
+            "HTTPHeaders": {
+                "x-amzn-requestid": "0755e5c5-a9c9-11e7-82fd-ed12cccaa8d8",
+                "content-length": "2180",
+                "vary": "Accept-Encoding",
+                "etag": "EIZMGDN1LXJRI",
+                "date": "Thu, 05 Oct 2017 12:30:53 GMT",
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

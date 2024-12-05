@@ -14,7 +14,7 @@ For the notify action in the policy to work you must have setup the c7n_mailer t
 https://github.com/cloud-custodian/cloud-custodian/tree/master/tools/c7n_mailer
 
 Mailer Setup Guide:
-https://devops4solutions.com/cloud-custodian-configure-email/
+https://cloudcustodian.io/docs/tools/c7n-mailer.html
 
 
 
@@ -50,9 +50,9 @@ https://devops4solutions.com/cloud-custodian-configure-email/
          - type: notify
            template: default.html
            priority_header: 1
-           subject: "Lambda Function Errors Occuring! - [custodian {{ account }} - {{ region }}]"
+           subject: "Lambda Function Errors Occurring! - [custodian {{ account }} - {{ region }}]"
            violation_desc: |
-              "There has been one or more code errors occuring on this lambda function in the last hour:"
+              "There has been one or more code errors occurring on this lambda function in the last hour:"
            action_desc: |
               "Actions Taken:  Please investigate this lambda function as errors reported.
               To exclude the below function from this scan please add a tag with a Key called

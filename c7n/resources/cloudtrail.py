@@ -1,16 +1,5 @@
-# Copyright 2017-2019 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import logging
 
 from c7n.actions import Action, BaseAction
@@ -32,14 +21,28 @@ class DescribeTrail(DescribeSource):
         return universal_augment(self.manager, resources)
 
 
+def get_trail_groups(session_factory, trails):
+    # returns a dictionary -> key: region value: (client, trails)
+    grouped = {}
+    for t in trails:
+        region = Arn.parse(t['TrailARN']).region
+        client, trails = grouped.setdefault(region, (None, []))
+        trails.append(t)
+        if client is None:
+            client = local_session(session_factory).client(
+                'cloudtrail', region_name=region)
+        grouped[region] = client, trails
+    return grouped
+
+
 @resources.register('cloudtrail')
 class CloudTrail(QueryResourceManager):
-
     class resource_type(TypeInfo):
         service = 'cloudtrail'
         enum_spec = ('describe_trails', 'trailList', None)
         filter_name = 'trailNameList'
         filter_type = 'list'
+        arn_type = 'trail'
         arn = id = 'TrailARN'
         name = 'Name'
         cfn_type = config_type = "AWS::CloudTrail::Trail"
@@ -68,7 +71,7 @@ class IsShadow(Filter):
         trails = [t for t in resources if (self.is_shadow(t) == self.data.get('state', True))]
         if len(trails) != rcount and self.embedded:
             self.log.info("implicitly filtering shadow trails %d -> %d",
-                     rcount, len(trails))
+                          rcount, len(trails))
         return trails
 
     def is_shadow(self, t):
@@ -102,36 +105,56 @@ class Status(ValueFilter):
     annotation_key = 'c7n:TrailStatus'
 
     def process(self, resources, event=None):
-
-        non_account_trails = set()
-
-        for r in resources:
-            region = self.manager.config.region
-            trail_arn = Arn.parse(r['TrailARN'])
-
-            if (r.get('IsOrganizationTrail') and
-                    self.manager.config.account_id != trail_arn.account_id):
-                non_account_trails.add(r['TrailARN'])
-                continue
-            if r.get('HomeRegion') and r['HomeRegion'] != region:
-                region = trail_arn.region
-            if self.annotation_key in r:
-                continue
-            client = local_session(self.manager.session_factory).client(
-                'cloudtrail', region_name=region)
-            status = client.get_trail_status(Name=r['Name'])
-            status.pop('ResponseMetadata')
-            r[self.annotation_key] = status
-
-        if non_account_trails:
-            self.log.warning(
-                'found %d org cloud trail from different account that cant be processed',
-                len(non_account_trails))
-        return super(Status, self).process([
-            r for r in resources if r['TrailARN'] not in non_account_trails])
+        grouped_trails = get_trail_groups(self.manager.session_factory, resources)
+        for region, (client, trails) in grouped_trails.items():
+            for t in trails:
+                if self.annotation_key in t:
+                    continue
+                status = client.get_trail_status(Name=t['TrailARN'])
+                status.pop('ResponseMetadata')
+                t[self.annotation_key] = status
+        return super(Status, self).process(resources)
 
     def __call__(self, r):
-        return self.match(r['c7n:TrailStatus'])
+        return self.match(r[self.annotation_key])
+
+
+@CloudTrail.filter_registry.register('event-selectors')
+class EventSelectors(ValueFilter):
+    """Filter a cloudtrail by its related Event Selectors.
+
+    :example:
+
+    .. code-block:: yaml
+
+      policies:
+        - name: cloudtrail-event-selectors
+          resource: aws.cloudtrail
+          filters:
+          - type: event-selectors
+            key: EventSelectors[].IncludeManagementEvents
+            op: contains
+            value: True
+    """
+
+    schema = type_schema('event-selectors', rinherit=ValueFilter.schema)
+    schema_alias = False
+    permissions = ('cloudtrail:GetEventSelectors',)
+    annotation_key = 'c7n:TrailEventSelectors'
+
+    def process(self, resources, event=None):
+        grouped_trails = get_trail_groups(self.manager.session_factory, resources)
+        for region, (client, trails) in grouped_trails.items():
+            for t in trails:
+                if self.annotation_key in t:
+                    continue
+                selectors = client.get_event_selectors(TrailName=t['TrailARN'])
+                selectors.pop('ResponseMetadata')
+                t[self.annotation_key] = selectors
+        return super(EventSelectors, self).process(resources)
+
+    def __call__(self, r):
+        return self.match(r[self.annotation_key])
 
 
 @CloudTrail.action_registry.register('update-trail')

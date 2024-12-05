@@ -1,29 +1,25 @@
-# Copyright 2015-2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import datetime
 import email.utils as eut
 import json
 import logging
 import os
 import re
-from distutils.util import strtobool
+from c7n.vendored.distutils.util import strtobool
 from functools import wraps
 from time import sleep
 
+import azure.core.polling
 import msrest.polling
-
-from c7n_azure import utils, constants
+from c7n.config import Bag, Config
+from c7n.policy import ExecutionContext
+from c7n.schema import generate
+from c7n.testing import TestUtils
+from c7n.utils import local_session
+# Ensure the azure provider is loaded.
+from c7n_azure import provider  # noqa
+from c7n_azure import constants, utils
 from c7n_azure.session import Session
 from c7n_azure.utils import ThreadHelper
 from mock import patch
@@ -32,15 +28,7 @@ from msrest.serialization import Model
 from msrest.service_client import ServiceClient
 from vcr_unittest import VCRTestCase
 
-from c7n.config import Config, Bag
-from c7n.policy import ExecutionContext
-from c7n.schema import generate
-from c7n.testing import TestUtils
-from c7n.utils import local_session
 from .azure_serializer import AzureSerializer
-
-# Ensure the azure provider is loaded.
-from c7n_azure import provider # noqa
 
 BASE_FOLDER = os.path.dirname(__file__)
 C7N_SCHEMA = generate()
@@ -51,6 +39,7 @@ DEFAULT_TENANT_ID = '00000000-0000-0000-0000-000000000003'
 DEFAULT_INSTRUMENTATION_KEY = '00000000-0000-0000-0000-000000000004'
 DEFAULT_STORAGE_KEY = 'DEC0DEDITtVwMoyAuTz1LioKkC+gB/EpRlQKNIaszQEhVidjWyP1kLW1z+jo'\
                       '/MGFHKc+t+M20PxoraNCslng9w=='
+DEFAULT_AZURE_CLOUD = 'AzureCloud'
 
 GRAPH_RESPONSE = {
     "value": [
@@ -201,8 +190,8 @@ class AzureVCRBaseTest(VCRTestCase):
 
     def _azure_matcher(self, r1, r2):
         """Replace all subscription ID's and ignore api-version"""
-        if [k for k in set(r1.query) if k[0] != 'api-version'] != [
-                k for k in set(r2.query) if k[0] != 'api-version']:
+        if [(k[0].lower(), k[1].lower()) for k in set(r1.query) if k[0] != 'api-version'] != \
+           [(k[0].lower(), k[1].lower()) for k in set(r2.query) if k[0] != 'api-version']:
             return False
 
         r1_path = AzureVCRBaseTest._replace_subscription_id(r1.path)
@@ -226,10 +215,9 @@ class AzureVCRBaseTest(VCRTestCase):
         # Request headers serve no purpose as only URI is read during a playback.
         request.headers = None
 
-        if re.match('https://login.microsoftonline.com/([^/]+)/oauth2/token', request.uri):
+        if re.match('https://login.microsoftonline.com/([^/]+)', request.uri):
             return None
-        if re.match('https://login.microsoftonline.com/([^/]+)/oauth2/token', request.uri):
-            return None
+
         return request
 
     def _response_callback(self, response):
@@ -384,17 +372,10 @@ class BaseTest(TestUtils, AzureVCRBaseTest):
     @classmethod
     def setUpClass(cls, *args, **kwargs):
         super(BaseTest, cls).setUpClass(*args, **kwargs)
-        if os.environ.get(constants.ENV_ACCESS_TOKEN) == "fake_token":
-            cls._token_patch = patch(
-                'c7n_azure.session.jwt.decode',
-                return_value={'tid': DEFAULT_TENANT_ID})
-            cls._token_patch.start()
 
     @classmethod
     def tearDownClass(cls, *args, **kwargs):
         super(BaseTest, cls).tearDownClass(*args, **kwargs)
-        if os.environ.get(constants.ENV_ACCESS_TOKEN) == "fake_token":
-            cls._token_patch.stop()
 
     def setUp(self):
         super(BaseTest, self).setUp()
@@ -420,11 +401,18 @@ class BaseTest(TestUtils, AzureVCRBaseTest):
             else:
                 # Patch Poller with constructor that always disables polling
                 # This breaks blocking on long running operations (resource creation).
-                self._lro_patch = patch.object(msrest.polling.LROPoller,
+                self._lro_patch = patch.object(azure.core.polling.LROPoller,
                                                '__init__',
                                                BaseTest.lro_init)
                 self._lro_patch.start()
                 self.addCleanup(self._lro_patch.stop)
+
+                # We still have a few legacy clients, so keep this code.
+                self._lro_patch_legacy = patch.object(msrest.polling.LROPoller,
+                                                      '__init__',
+                                                      BaseTest.lro_init_legacy)
+                self._lro_patch_legacy.start()
+                self.addCleanup(self._lro_patch_legacy.stop)
 
             if constants.ENV_ACCESS_TOKEN in os.environ:
                 self._tenant_patch = patch('c7n_azure.session.Session.get_tenant_id',
@@ -474,6 +462,26 @@ class BaseTest(TestUtils, AzureVCRBaseTest):
 
     @staticmethod
     def lro_init(self, client, initial_response, deserialization_callback, polling_method):
+        self._client = client
+        self._response = initial_response.response if \
+            isinstance(initial_response, ClientRawResponse) else \
+            initial_response
+        self._callbacks = []  # type List[Callable]
+        self._polling_method = azure.core.polling.NoPolling()
+
+        if isinstance(deserialization_callback, type) and \
+                issubclass(deserialization_callback, Model):
+            deserialization_callback = deserialization_callback.deserialize
+
+        # Might raise a AzureError
+        self._polling_method.initialize(self._client, self._response, deserialization_callback)
+
+        self._thread = None
+        self._done = None
+        self._exception = None
+
+    @staticmethod
+    def lro_init_legacy(self, client, initial_response, deserialization_callback, polling_method):
         self._client = client if isinstance(client, ServiceClient) else client._client
         self._response = initial_response.response if \
             isinstance(initial_response, ClientRawResponse) else \
@@ -497,9 +505,14 @@ class BaseTest(TestUtils, AzureVCRBaseTest):
         Session.client = Session._old_client
 
     @staticmethod
-    def session_client_wrapper(self, client):
+    def session_client_wrapper(self, client, vault_url=None):
         client = Session._old_client(self, client)
-        client.config.long_running_operation_timeout = 0
+        # TODO: Is there a way to override it properly instead of hijacking?
+        if hasattr(client, '_config'):
+            client._config.polling_interval = 0
+        # TODO: Legacy clients.. Just in case
+        if hasattr(client, 'config'):
+            client.config.long_running_operation_timeout = 0
         return client
 
 

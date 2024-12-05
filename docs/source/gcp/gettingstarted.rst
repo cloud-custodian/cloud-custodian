@@ -1,9 +1,9 @@
 .. _gcp_gettingstarted:
 
-Getting Started (Beta)
-======================
+Getting Started
+===============
 
-The GCP provider (Beta) is an optional package which can be installed to enable
+The GCP provider is an optional package which can be installed to enable
 writing policies which interact with GCP related resources.
 
 
@@ -12,9 +12,10 @@ writing policies which interact with GCP related resources.
 Install GCP Plugin
 ------------------
 
-First, ensure you have :ref:`installed the base Cloud Custodian application <install-cc>`. 
-Cloud Custodian is a Python application that supports Python 2 and 3 on Linux and Windows. 
-We recommend using Python 3.6 or higher.
+First, ensure you have :ref:`installed the base Cloud Custodian application
+<install-cc>`. Cloud Custodian is a Python application and must run on an
+`actively supported <https://devguide.python.org/#status-of-python-branches>`_
+version. 
 
 Once the base install is complete, you are now ready to install the GCP provider package
 using one of the following options:
@@ -24,8 +25,8 @@ Option 1: Install released packages to local Python Environment
 
 .. code-block:: bash
 
-    $ pip install c7n
-    $ pip install c7n_gcp
+    pip install c7n
+    pip install c7n-gcp
 
 
 Option 2: Install latest from the repository
@@ -33,9 +34,9 @@ Option 2: Install latest from the repository
 
 .. code-block:: bash
 
-    $ git clone https://github.com/cloud-custodian/cloud-custodian.git
-    $ pip install -e ./cloud-custodian
-    $ pip install -e ./cloud-custodian/tools/c7n_gcp
+    git clone https://github.com/cloud-custodian/cloud-custodian.git
+    pip install -e ./cloud-custodian
+    pip install -e ./cloud-custodian/tools/c7n_gcp
 
 .. _gcp_authenticate:
 
@@ -61,7 +62,7 @@ Then run the following command, substituting your username:
 
 .. code-block:: bash
 
-    gcloud auth application-default login <your_user_name>
+    gcloud auth application-default login
 
 Executing the command will open a browser window with prompts to finish configuring
 your credentials. For more information on this command,
@@ -69,11 +70,31 @@ your credentials. For more information on this command,
 
 Environment Variables
 """""""""""""""""""""
-If you are planning to run Custodian using a service account, then configure your credentials
-using environment variables.
 
-Follow the steps outlined in the 
-`GCP documentation to configure credentials for service accounts. <https://cloud.google.com/docs/authentication/getting-started>`_
+`GOOGLE_CLOUD_PROJECT` should be set to the target project to act on.
+
+If you are planning to run Custodian using a service account, or workload identity federation then
+configure your credentials using environment variables.
+
+`GOOGLE_APPLICATION_CREDENTIALS` should be set to a valid service account file or client config for
+workload federation.
+
+For service account configuration see additional docs `here <https://cloud.google.com/iam/docs/service-account-overview>`_
+
+For workload configuration see additional `docs <https://cloud.google.com/iam/docs/workload-identity-federation-with-other-clouds>`_
+
+If you are planning to impersonate a service account, then you may configure the environment
+variable `GOOGLE_IMPERSONATE_SERVICE_ACCOUNT` with the service account email address, you can also 
+pass this the service account email via `--assume` cli flag.
+
+.. code-block:: bash
+
+    export GOOGLE_IMPERSONATE_SERVICE_ACCOUNT="impersonated-account@_project_.iam.gserviceaccount.com"
+
+If running on gcp compute some of these values can be obtained automatically from metadata server, see
+https://cloud.google.com/python/docs/reference/google-cloud-core/latest/config for precedence and availability
+of different options.
+
 
 .. _gcp_write-policy:
 
@@ -105,7 +126,6 @@ Filename: ``custodian.yml``
           - type: value
             key: name
             value: test
-            op: in
         actions:
           - type: stop
 
@@ -119,7 +139,7 @@ Next, run the following command to execute the policy with Custodian:
 
 .. code-block:: bash
 
-    custodian run --output-dir=. custodian.yml
+    GOOGLE_CLOUD_PROJECT="project-id" custodian run --output-dir=. custodian.yml
 
 If successful, you should see output similar to the following on the command line::
 

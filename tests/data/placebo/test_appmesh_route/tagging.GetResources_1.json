@@ -1,0 +1,35 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:appmesh:us-east-1:644160558196:mesh/m1",
+                "Tags": [
+                    {
+                        "Key": "MODULE_NAME",
+                        "Value": "ecs-cluster"
+                    },
+                    {
+                        "Key": "ECS_CLUSTER",
+                        "Value": "E1"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:appmesh:us-east-1:644160558196:mesh/m2",
+                "Tags": [
+                    {
+                        "Key": "MODULE_NAME",
+                        "Value": "ecs-cluster"
+                    },
+                    {
+                        "Key": "ECS_CLUSTER",
+                        "Value": "E2"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

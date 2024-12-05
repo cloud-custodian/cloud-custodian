@@ -1,0 +1,81 @@
+name: "Install"
+description: "Install Cloud Custodian"
+inputs:
+  python-version:
+    required: true
+  poetry-version:
+    default: "1.8.3"
+outputs:
+  poetry-version:
+    description: "poetry version"
+    value: ${{ steps.echo-poetry-version.outputs.poetry-version }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install poetry
+      shell: bash
+      run: pipx install poetry==${{ inputs.poetry-version }}
+
+    - name: Set up Python ${{ inputs.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python-version }}
+
+    - name: Set up cache
+      uses: actions/cache@v4
+      id: cache
+      with:
+        path: .venv
+        key: venv-${{ runner.os }}-${{ inputs.python-version }}-${{ hashFiles('**/poetry.lock') }}  
+
+    - name: Update PATH
+      shell: bash
+      run: |
+        if [[ "$OSTYPE" == "msys" ]]
+        then
+          echo "$PWD\.venv\Scripts" >> $GITHUB_PATH
+          echo "VIRTUAL_ENV=$PWD\.venv" >> $GITHUB_ENV
+        else
+          echo "$PWD/.venv/bin" >> $GITHUB_PATH
+          echo "VIRTUAL_ENV=$PWD/.venv" >> $GITHUB_ENV
+        fi
+
+    - name: Ensure cache is healthy
+      if: steps.cache.outputs.cache-hit == 'true'
+      id: cache_check
+      shell: bash
+      run: |
+        if poetry run custodian version ; then
+           echo "venv=success" >> $GITHUB_OUTPUT
+           echo "Cache Green"
+        else
+           rm -rf .venv
+           echo "venv==recreate" >> $GITHUB_OUTPUT
+           echo "Cache Red"
+        fi
+
+    - name: Install
+      if: steps.cache.outputs.cache-hit != 'true' || steps.cache_check.outputs.venv != 'success'
+      shell: bash
+      env:
+        CHECK_VENV: ${{ steps.cache_check.outputs.venv }}
+        CACHE_HIT: ${{ steps.cache.outputs.cache-hit }}
+      run: |
+        echo "check venv $CHECK_VENV"
+        echo "cache hit $CACHE_HIT"
+        if [ -d ".venv" ]; then
+          mv .venv .venv-old
+        fi
+        python -m venv .venv
+        make install
+
+    - name: Output Poetry Version
+      shell: bash
+      id: echo-poetry-version
+      run: echo "poetry-version=${{ inputs.poetry-version }}" >> $GITHUB_OUTPUT
+
+    - name: Build awscc data files
+      shell: bash
+      run: cd tools/c7n_awscc && python build.py
+

@@ -1,18 +1,7 @@
 {
     "status_code": 200,
     "data": {
-        "ResponseMetadata": {
-            "RequestId": "a5cb1e25-2672-11e9-8f9a-b5e2e49bb570",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "date": "Fri, 01 Feb 2019 22:42:30 GMT",
-                "content-type": "application/json",
-                "content-length": "34",
-                "connection": "keep-alive",
-                "x-amzn-requestid": "a5cb1e25-2672-11e9-8f9a-b5e2e49bb570"
-            },
-            "RetryAttempts": 0
-        },
+        "ResponseMetadata": {},
         "ReservedConcurrentExecutions": 5
     }
 }

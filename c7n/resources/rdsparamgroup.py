@@ -1,25 +1,17 @@
-# Copyright 2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import logging
+import itertools
 
 from botocore.exceptions import ClientError
 
 from c7n.actions import ActionRegistry, BaseAction
-from c7n.filters import FilterRegistry
+from c7n.filters import FilterRegistry, ValueFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import (type_schema, local_session, chunks)
+from c7n.tags import universal_augment
+from c7n.resources.rds import ParameterFilter
 
 log = logging.getLogger('custodian.rds-param-group')
 
@@ -38,9 +30,14 @@ class RDSParamGroup(QueryResourceManager):
         arn_type = 'pg'
         enum_spec = ('describe_db_parameter_groups', 'DBParameterGroups', None)
         name = id = 'DBParameterGroupName'
+        arn = 'DBParameterGroupArn'
         dimension = 'DBParameterGroupName'
         permissions_enum = ('rds:DescribeDBParameterGroups',)
         cfn_type = 'AWS::RDS::DBParameterGroup'
+        universal_taggable = object()
+        permissions_augment = ("rds:ListTagsForResource",)
+
+    augment = universal_augment
 
     filter_registry = pg_filters
     action_registry = pg_actions
@@ -59,11 +56,15 @@ class RDSClusterParamGroup(QueryResourceManager):
 
         service = 'rds'
         arn_type = 'cluster-pg'
+        arn = 'DBClusterParameterGroupArn'
         enum_spec = ('describe_db_cluster_parameter_groups', 'DBClusterParameterGroups', None)
         name = id = 'DBClusterParameterGroupName'
         dimension = 'DBClusterParameterGroupName'
         permissions_enum = ('rds:DescribeDBClusterParameterGroups',)
         cfn_type = 'AWS::RDS::DBClusterParameterGroup'
+        universal_taggable = object()
+
+    augment = universal_augment
 
     filter_registry = pg_cluster_filters
     action_registry = pg_cluster_actions
@@ -79,6 +80,93 @@ class PGClusterMixin:
 
     def get_pg_name(self, pg):
         return pg['DBClusterParameterGroupName']
+
+
+class ParameterGroupFilter(ParameterFilter):
+    """
+    Applies value type filter on db parameter values.
+
+    """
+
+    schema = type_schema('db-parameter', rinherit=ValueFilter.schema)
+    schema_alias = False
+    permissions = ('rds:DescribeDBParameters',)
+    policy_annotation = 'c7n:MatchedDBParameter'
+
+    def get_pg_values(self, param_group):
+        pgvalues = {}
+        param_list = self.get_param_list(param_group)
+        pgvalues = {
+            p['ParameterName']: ParameterFilter.recast(p['ParameterValue'], p['DataType'])
+            for p in param_list if 'ParameterValue' in p}
+        return pgvalues
+
+    def process(self, resources, event=None):
+        results = []
+        for resource in resources:
+            name = self.get_pg_name(resource)
+            pg_values = self.get_pg_values(name)
+
+            if self.match(pg_values):
+                resource.setdefault(self.policy_annotation, []).append(
+                    self.data.get('key'))
+                results.append(resource)
+
+        return results
+
+
+@pg_filters.register('db-parameter')
+class PGParameterFilter(PGMixin, ParameterGroupFilter):
+    """ Filter by parameters.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: rds-param-group-param-filter
+                resource: rds-param-group
+                filters:
+                  - type: db-parameter
+                    key: someparam
+                    op: eq
+                    value: someval
+    """
+
+    def get_param_list(self, pg):
+        client = local_session(self.manager.session_factory).client('rds')
+        paginator = client.get_paginator('describe_db_parameters')
+        param_list = list(itertools.chain(*[p['Parameters']
+            for p in paginator.paginate(DBParameterGroupName=pg)]))
+
+        return param_list
+
+
+@pg_cluster_filters.register('db-parameter')
+class PGClusterParameterFilter(PGClusterMixin, ParameterGroupFilter):
+    """ Filter by parameters.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: rds-cluster-param-group-param-filter
+                resource: rds-cluster-param-group
+                filters:
+                  - type: db-parameter
+                    key: someparam
+                    op: eq
+                    value: someval
+    """
+
+    def get_param_list(self, pg):
+        client = local_session(self.manager.session_factory).client('rds')
+        paginator = client.get_paginator('describe_db_cluster_parameters')
+        param_list = list(itertools.chain(*[p['Parameters']
+            for p in paginator.paginate(DBClusterParameterGroupName=pg)]))
+
+        return param_list
 
 
 class Copy(BaseAction):

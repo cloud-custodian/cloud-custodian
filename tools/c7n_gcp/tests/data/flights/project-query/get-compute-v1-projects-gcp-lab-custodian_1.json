@@ -1,0 +1,274 @@
+{
+  "headers": {
+    "etag": "DHFS515WAhK2HV9FaXsS3tS9E4c=/mG4poWHBNtxhX5wko-VB-yGXLoA=",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Mon, 03 Apr 2023 22:29:47 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "8814",
+    "-content-encoding": "gzip",
+    "content-location": "https://compute.googleapis.com/compute/v1/projects/gcp-lab-custodian?alt=json"
+  },
+  "body": {
+    "kind": "compute#project",
+    "id": "879501200065641786",
+    "creationTimestamp": "2020-12-18T02:26:29.288-08:00",
+    "name": "gcp-lab-custodian",
+    "commonInstanceMetadata": {
+      "kind": "compute#metadata",
+      "fingerprint": "YDbAMA2kmr0=",
+      "items": [
+        {
+          "key": "enable-guest-attributes",
+          "value": "TRUE"
+        },
+        {
+          "key": "enable-osconfig",
+          "value": "TRUE"
+        },
+        {
+          "key": "ssh-keys",
+          "value": "Anna_Andronnikova:ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDJjMvk2sDN1YPVd67psD87WeT14Oxb8VxwPqYI0G0DrioA60XiVh5vVZn6nytWBjz+8C64kijNV9yDxEhlpjk8GY/xeQrGvfvbhyKFQF4LI6WujglZQmYyRzpAtCRmrrXJO9smDa5SHsVhylEEBa1UKjtsQg/RGZBbb2M1caZGTAanHbO1gYV/O+KFNDiKNCPIbwAs8tm7EztAVoC0PXCwgTYqvXPzGTUsxf1HQnrP/Fzf0JKEyQjh43d1tG/UWa0ASD5ufjPySCc+PBNvTkElEsENAJ0wLnkQR+Khd9RkH+W1aRYBfI9O2M3x5ozPa9dyHotqwTq1l8HCKBPKkuzx KYIV\\Anna_Andronnikova@EPUAKHAW03CD\ngcp_lab_cust1:ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC6d4rBd8NYWvv3lDHXmtwWcSOIuZ4SQxp8HmFEh+yvoGuq1+lpazPhKPsT0RsA4l4/dhYdpd3H3yw/z78Tylcexz6TK40ceK1pXyhXG1G5Rtj7qmwmWKp+RVPtYLoKET4ZMjZzof3Sxw2uIsdCYhlWUDlodmLAqGavYzmf+++/ed3z9DcC0BvXI0fcQw6Ggt8ct1w9Uhpq/flup5Sl4RJqUzy4mKMgsHiT2DAB13eS8G5tr2p6VXAAkB9BXcAGDJIr8vVox7xobP/g2hEI3oGrfm2yBZR1MLVRbv/qINkPrStWsFDqEkoAL6krmXbPlWlf2TsyTDc4SyPUcFwCpwuFfYGfK59LfZAjxgou8x1elIuU1WKv3eKrkHvHO1IsbFQFoknin6KKB8xvSbTfoQWyFyU3E7dw5l0QP8n+HaT4degcyDZkd4ijlKod6FeuqXG03e7gDJyoztgFc6urgG8K6+y9xsWZ724BScLLXLg2LL51xTX+xbPzMqMzqiB35jM= gcp_lab_cust1@cs-157738812742-default\nroot:ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC6d4rBd8NYWvv3lDHXmtwWcSOIuZ4SQxp8HmFEh+yvoGuq1+lpazPhKPsT0RsA4l4/dhYdpd3H3yw/z78Tylcexz6TK40ceK1pXyhXG1G5Rtj7qmwmWKp+RVPtYLoKET4ZMjZzof3Sxw2uIsdCYhlWUDlodmLAqGavYzmf+++/ed3z9DcC0BvXI0fcQw6Ggt8ct1w9Uhpq/flup5Sl4RJqUzy4mKMgsHiT2DAB13eS8G5tr2p6VXAAkB9BXcAGDJIr8vVox7xobP/g2hEI3oGrfm2yBZR1MLVRbv/qINkPrStWsFDqEkoAL6krmXbPlWlf2TsyTDc4SyPUcFwCpwuFfYGfK59LfZAjxgou8x1elIuU1WKv3eKrkHvHO1IsbFQFoknin6KKB8xvSbTfoQWyFyU3E7dw5l0QP8n+HaT4degcyDZkd4ijlKod6FeuqXG03e7gDJyoztgFc6urgG8K6+y9xsWZ724BScLLXLg2LL51xTX+xbPzMqMzqiB35jM= gcp_lab_cust1@cs-157738812742-default\nvitalii_kanivets:ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC6d4rBd8NYWvv3lDHXmtwWcSOIuZ4SQxp8HmFEh+yvoGuq1+lpazPhKPsT0RsA4l4/dhYdpd3H3yw/z78Tylcexz6TK40ceK1pXyhXG1G5Rtj7qmwmWKp+RVPtYLoKET4ZMjZzof3Sxw2uIsdCYhlWUDlodmLAqGavYzmf+++/ed3z9DcC0BvXI0fcQw6Ggt8ct1w9Uhpq/flup5Sl4RJqUzy4mKMgsHiT2DAB13eS8G5tr2p6VXAAkB9BXcAGDJIr8vVox7xobP/g2hEI3oGrfm2yBZR1MLVRbv/qINkPrStWsFDqEkoAL6krmXbPlWlf2TsyTDc4SyPUcFwCpwuFfYGfK59LfZAjxgou8x1elIuU1WKv3eKrkHvHO1IsbFQFoknin6KKB8xvSbTfoQWyFyU3E7dw5l0QP8n+HaT4degcyDZkd4ijlKod6FeuqXG03e7gDJyoztgFc6urgG8K6+y9xsWZ724BScLLXLg2LL51xTX+xbPzMqMzqiB35jM= gcp_lab_cust1@cs-157738812742-default\nvitalii_kanivets:ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDbiqbBHsImgpsDYVYFVD75aN/OXFWm8jXmq/aNDHmzUurQwzOBhsgpZkagfxd5W956hiJyXmBKdD2gjVqOLoMLeplra2awjIjXUqJrYYSxih9jcMrVcS+NbNepIn7HA9My9XwwhdtJRFij4T1JR7CNW+h5XLFhaA82KsHI37oJJYtyjnRArgVy5cs9ukLlxSvGj1H6gL/8JUYv9yoSFeanXt3bbB070Do888a8JrQJee18fGO8dxobnHQ9MTW5UjN3Y3ublGd2R3V0LUth5XqXFz6/N3Y6O4mBDbmU/dKYRJM+hpRAB7u2g93a4jfNHIVPryCn2CnecFE5QXx3E++tr0lmW3Vin+tIIQCQe3lcUT4qyUumhBbRyaocO41xxSodmZLWzZd2l4ImfIlXBjc8EtbyGO9HnQ32hfEwh6+08H5yDc0KgRfF/rigk2tddtFzYtZz7CRec+9dFW0pTqnfbluuZMSwwyvifXUWmsHT3vRvL9mmtAXQOXvIrd7rygM= vitalii_kanivets@cs-9339231426-default\nroot:ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDbiqbBHsImgpsDYVYFVD75aN/OXFWm8jXmq/aNDHmzUurQwzOBhsgpZkagfxd5W956hiJyXmBKdD2gjVqOLoMLeplra2awjIjXUqJrYYSxih9jcMrVcS+NbNepIn7HA9My9XwwhdtJRFij4T1JR7CNW+h5XLFhaA82KsHI37oJJYtyjnRArgVy5cs9ukLlxSvGj1H6gL/8JUYv9yoSFeanXt3bbB070Do888a8JrQJee18fGO8dxobnHQ9MTW5UjN3Y3ublGd2R3V0LUth5XqXFz6/N3Y6O4mBDbmU/dKYRJM+hpRAB7u2g93a4jfNHIVPryCn2CnecFE5QXx3E++tr0lmW3Vin+tIIQCQe3lcUT4qyUumhBbRyaocO41xxSodmZLWzZd2l4ImfIlXBjc8EtbyGO9HnQ32hfEwh6+08H5yDc0KgRfF/rigk2tddtFzYtZz7CRec+9dFW0pTqnfbluuZMSwwyvifXUWmsHT3vRvL9mmtAXQOXvIrd7rygM= vitalii_kanivets@cs-9339231426-default\nvitalii_kanivets:ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC4BKv9sD35UvwcffQs5JIJL+NXkQo4fVYAfZr247KEyhDznQVPvOSquZxLw7x4GLxlAWmPZ7TWGokyxN3pbIK2KM7sET50N9C2PlYt4KPdPUPJ7C5BvCQ3RmjG3wjPiZ3NG4C/Ud61ek6OB3UqrHyC3v101FIa9rfRCJS/DOzIgBmGuMiLwZnn2yZ87qcThCIR/0/Io4T4PqNnCRLHP1KeRmtUYzkWoaFXBfkciHiBSZLTkL7S4TqT3ZY1q6mTQKmT11uWeKtqwxsJmiuZCIr3086qvptj/N4vv8YvEEqxmQO/EJkPmL8w8NuobdKFsdnvQludkB2YGggIampKj346s6i0JkU/p+dOscIj8WnCrP/uqLYm4OpW+xSkSp7iFft9z+yi//r4X6ndgeugrSHwdxhA1KsCV1FUSZB8wKOsj9y8kaPlIsKg1/vEOwNcMGzz8UwTh+DIiSnNjEhP261lzke1lTk3TIVRu3ZDz4Fd9OKTxC23We7MG+zWzbEI11E= vitalii_kanivets@EPUAKHAW0127"
+        },
+        {
+          "key": "sshKeys",
+          "value": ""
+        }
+      ]
+    },
+    "quotas": [
+      {
+        "metric": "SNAPSHOTS",
+        "limit": 5000,
+        "usage": 0
+      },
+      {
+        "metric": "NETWORKS",
+        "limit": 15,
+        "usage": 3
+      },
+      {
+        "metric": "FIREWALLS",
+        "limit": 200,
+        "usage": 6
+      },
+      {
+        "metric": "IMAGES",
+        "limit": 2000,
+        "usage": 0
+      },
+      {
+        "metric": "STATIC_ADDRESSES",
+        "limit": 21,
+        "usage": 0
+      },
+      {
+        "metric": "ROUTES",
+        "limit": 250,
+        "usage": 3
+      },
+      {
+        "metric": "FORWARDING_RULES",
+        "limit": 45,
+        "usage": 0
+      },
+      {
+        "metric": "TARGET_POOLS",
+        "limit": 150,
+        "usage": 0
+      },
+      {
+        "metric": "HEALTH_CHECKS",
+        "limit": 150,
+        "usage": 0
+      },
+      {
+        "metric": "IN_USE_ADDRESSES",
+        "limit": 69,
+        "usage": 0
+      },
+      {
+        "metric": "TARGET_INSTANCES",
+        "limit": 150,
+        "usage": 0
+      },
+      {
+        "metric": "TARGET_HTTP_PROXIES",
+        "limit": 30,
+        "usage": 0
+      },
+      {
+        "metric": "URL_MAPS",
+        "limit": 30,
+        "usage": 0
+      },
+      {
+        "metric": "BACKEND_SERVICES",
+        "limit": 75,
+        "usage": 0
+      },
+      {
+        "metric": "INSTANCE_TEMPLATES",
+        "limit": 300,
+        "usage": 0
+      },
+      {
+        "metric": "TARGET_VPN_GATEWAYS",
+        "limit": 15,
+        "usage": 0
+      },
+      {
+        "metric": "VPN_TUNNELS",
+        "limit": 30,
+        "usage": 0
+      },
+      {
+        "metric": "BACKEND_BUCKETS",
+        "limit": 9,
+        "usage": 0
+      },
+      {
+        "metric": "ROUTERS",
+        "limit": 10,
+        "usage": 0
+      },
+      {
+        "metric": "TARGET_SSL_PROXIES",
+        "limit": 30,
+        "usage": 0
+      },
+      {
+        "metric": "TARGET_HTTPS_PROXIES",
+        "limit": 30,
+        "usage": 0
+      },
+      {
+        "metric": "SSL_CERTIFICATES",
+        "limit": 30,
+        "usage": 0
+      },
+      {
+        "metric": "SUBNETWORKS",
+        "limit": 175,
+        "usage": 0
+      },
+      {
+        "metric": "TARGET_TCP_PROXIES",
+        "limit": 30,
+        "usage": 0
+      },
+      {
+        "metric": "SECURITY_POLICIES",
+        "limit": 10,
+        "usage": 1
+      },
+      {
+        "metric": "SECURITY_POLICY_RULES",
+        "limit": 100,
+        "usage": 9
+      },
+      {
+        "metric": "XPN_SERVICE_PROJECTS",
+        "limit": 1000,
+        "usage": 0
+      },
+      {
+        "metric": "PACKET_MIRRORINGS",
+        "limit": 45,
+        "usage": 0
+      },
+      {
+        "metric": "NETWORK_ENDPOINT_GROUPS",
+        "limit": 300,
+        "usage": 1
+      },
+      {
+        "metric": "INTERCONNECTS",
+        "limit": 6,
+        "usage": 0
+      },
+      {
+        "metric": "GLOBAL_INTERNAL_ADDRESSES",
+        "limit": 5000,
+        "usage": 3
+      },
+      {
+        "metric": "VPN_GATEWAYS",
+        "limit": 15,
+        "usage": 0
+      },
+      {
+        "metric": "MACHINE_IMAGES",
+        "limit": 2000,
+        "usage": 0
+      },
+      {
+        "metric": "SECURITY_POLICY_CEVAL_RULES",
+        "limit": 20,
+        "usage": 9
+      },
+      {
+        "metric": "EXTERNAL_VPN_GATEWAYS",
+        "limit": 15,
+        "usage": 0
+      },
+      {
+        "metric": "PUBLIC_ADVERTISED_PREFIXES",
+        "limit": 1,
+        "usage": 0
+      },
+      {
+        "metric": "PUBLIC_DELEGATED_PREFIXES",
+        "limit": 10,
+        "usage": 0
+      },
+      {
+        "metric": "STATIC_BYOIP_ADDRESSES",
+        "limit": 1024,
+        "usage": 0
+      },
+      {
+        "metric": "NETWORK_FIREWALL_POLICIES",
+        "limit": 30,
+        "usage": 0
+      },
+      {
+        "metric": "INTERNAL_TRAFFIC_DIRECTOR_FORWARDING_RULES",
+        "limit": 45,
+        "usage": 0
+      },
+      {
+        "metric": "GLOBAL_EXTERNAL_MANAGED_FORWARDING_RULES",
+        "limit": 45,
+        "usage": 0
+      },
+      {
+        "metric": "GLOBAL_EXTERNAL_MANAGED_BACKEND_SERVICES",
+        "limit": 75,
+        "usage": 0
+      },
+      {
+        "metric": "GLOBAL_EXTERNAL_PROXY_LB_BACKEND_SERVICES",
+        "limit": 75,
+        "usage": 0
+      },
+      {
+        "metric": "GLOBAL_INTERNAL_TRAFFIC_DIRECTOR_BACKEND_SERVICES",
+        "limit": 500,
+        "usage": 0
+      }
+    ],
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/gcp-lab-custodian",
+    "defaultServiceAccount": "443732426401-compute@developer.gserviceaccount.com",
+    "xpnProjectStatus": "UNSPECIFIED_XPN_PROJECT_STATUS",
+    "defaultNetworkTier": "PREMIUM",
+    "vmDnsSetting": "ZONAL_ONLY"
+  }
+}

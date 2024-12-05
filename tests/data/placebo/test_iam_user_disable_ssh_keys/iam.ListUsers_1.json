@@ -1,0 +1,25 @@
+{
+    "status_code": 200,
+    "data": {
+        "Users": [
+            {
+                "Path": "/",
+                "UserName": "testuser-8aa8c470",
+                "UserId": "AIDAY5Y4D45RG3VTEMRNH",
+                "Arn": "arn:aws:iam::644160558196:user/testuser-8aa8c470",
+                "CreateDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 12,
+                    "day": 22,
+                    "hour": 2,
+                    "minute": 55,
+                    "second": 4,
+                    "microsecond": 0
+                }
+            }
+        ],
+        "IsTruncated": false,
+        "ResponseMetadata": {}
+    }
+}

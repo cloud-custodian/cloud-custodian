@@ -1,0 +1,13 @@
+{
+    "status_code": 200,
+    "data": {
+        "Name": "custodian-test",
+        "Arn": "arn:aws:events:us-east-1:644160558196:rule/custodian-test",
+        "EventPattern": "{\"detail-type\": [\"AWS API Call via CloudTrail\"], \"detail\": {\"eventSource\": [\"ec2.amazonaws.com\"], \"eventName\": [\"RunInstances\"]}}",
+        "State": "DISABLED",
+        "Description": "cloud-custodian lambda policy",
+        "EventBusName": "default",
+        "CreatedBy": "644160558196",
+        "ResponseMetadata": {}
+    }
+}

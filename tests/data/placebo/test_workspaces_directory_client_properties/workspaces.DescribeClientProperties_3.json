@@ -1,0 +1,14 @@
+{
+    "status_code": 200,
+    "data": {
+        "ClientPropertiesList": [
+            {
+                "ResourceId": "d-90675153fc",
+                "ClientProperties": {
+                    "ReconnectEnabled": "DISABLED"
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,31 +1,17 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-from azure.graphrbac import GraphRbacManagementClient
-from c7n_azure.actions.base import AzureBaseAction
-from c7n_azure.filters import FirewallRulesFilter, FirewallBypassFilter
-from c7n_azure.provider import resources
-from c7n_azure.session import Session
-
-from c7n.filters import Filter
-from c7n.utils import type_schema
-from c7n_azure.utils import GraphHelper
-
-from c7n_azure.resources.arm import ArmResourceManager
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 import logging
 
+from c7n.filters import Filter
+from c7n.utils import type_schema
+from c7n_azure.actions.base import AzureBaseAction
+from c7n_azure.constants import GRAPH_AUTH_ENDPOINT
+from c7n_azure.filters import FirewallBypassFilter, FirewallRulesFilter
+from c7n_azure.provider import resources
+from c7n_azure.resources.arm import ArmResourceManager
+from c7n_azure.session import Session
+from c7n_azure.utils import GraphHelper
 from netaddr import IPSet
 
 log = logging.getLogger('custodian.azure.keyvault')
@@ -109,7 +95,7 @@ class KeyVault(ArmResourceManager):
 
         service = 'azure.mgmt.keyvault'
         client = 'KeyVaultManagementClient'
-        enum_spec = ('vaults', 'list', None)
+        enum_spec = ('vaults', 'list_by_subscription', None)
         resource_type = 'Microsoft.KeyVault/vaults'
 
 
@@ -253,8 +239,8 @@ class WhiteListFilter(Filter):
             return access_policies
 
         if self.graph_client is None:
-            s = Session(resource='https://graph.windows.net')
-            self.graph_client = GraphRbacManagementClient(s.get_credentials(), s.get_tenant_id())
+            s = Session(resource_endpoint_type=GRAPH_AUTH_ENDPOINT)
+            self.graph_client = s.client('azure.graphrbac.GraphRbacManagementClient')
 
         # Retrieve graph objects for all object_id
         object_ids = [p['objectId'] for p in access_policies]
@@ -332,7 +318,7 @@ class KeyVaultUpdateAccessPolicyAction(AzureBaseAction):
                 resource_group_name=resource['resourceGroup'],
                 vault_name=resource['name'],
                 operation_kind=operation,
-                properties=access_policies
+                parameters=dict(properties=access_policies),
             )
         except Exception as error:
             log.warning(error)

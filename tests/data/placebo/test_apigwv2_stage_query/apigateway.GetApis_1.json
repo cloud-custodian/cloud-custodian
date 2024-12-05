@@ -1,0 +1,50 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Items": [
+            {
+                "ApiEndpoint": "wss://0mt9yx690a.execute-api.us-east-1.amazonaws.com",
+                "ApiId": "0mt9yx690a",
+                "ApiKeySelectionExpression": "$request.header.x-api-key",
+                "CreatedDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 19,
+                    "hour": 9,
+                    "minute": 59,
+                    "second": 53,
+                    "microsecond": 0
+                },
+                "DisableExecuteApiEndpoint": false,
+                "Name": "dev-2",
+                "ProtocolType": "WEBSOCKET",
+                "RouteSelectionExpression": "$request.body.action",
+                "Tags": {
+                    "custodian_cleanup": "Resource does not meet policy: notify@2022/10/22"
+                }
+            },
+            {
+                "ApiEndpoint": "wss://zzc87ypck1.execute-api.us-east-1.amazonaws.com",
+                "ApiId": "zzc87ypck1",
+                "ApiKeySelectionExpression": "$request.header.x-api-key",
+                "CreatedDate": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 8,
+                    "day": 8,
+                    "hour": 17,
+                    "minute": 9,
+                    "second": 54,
+                    "microsecond": 0
+                },
+                "DisableExecuteApiEndpoint": false,
+                "Name": "example-api-allowed-sheepdog",
+                "ProtocolType": "WEBSOCKET",
+                "RouteSelectionExpression": "$request.body.action",
+                "Tags": {}
+            }
+        ]
+    }
+}

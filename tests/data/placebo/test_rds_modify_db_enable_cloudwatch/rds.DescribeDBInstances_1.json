@@ -1,0 +1,17 @@
+{
+    "status_code": 200,
+    "data": {
+        "DBInstances": [
+            {
+                "DBInstanceIdentifier": "database-2",
+                "DBInstanceArn": "arn:aws:rds:us-east-1:644160558196:db:database-2",                
+                "Engine": "mysql",
+                "EnabledCloudwatchLogsExports": [
+                    "general",
+                    "slowquery"
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

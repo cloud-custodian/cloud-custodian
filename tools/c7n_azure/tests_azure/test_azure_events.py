@@ -1,16 +1,5 @@
-# Copyright 2015-2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from azure.mgmt.eventgrid.models import StorageQueueEventSubscriptionDestination
 from .azure_common import BaseTest
 from c7n_azure.azure_events import AzureEvents, AzureEventSubscription
@@ -54,8 +43,7 @@ class AzureEventsTest(BaseTest):
         self.assertTrue('Microsoft.Compute/virtualMachines/write' in event_operations)
         self.assertTrue('Microsoft.Web/serverFarms/write' in event_operations)
 
-    @patch('azure.mgmt.eventgrid.operations.event_subscriptions_operations.'
-           'EventSubscriptionsOperations.create_or_update')
+    @patch('azure.mgmt.eventgrid.operations.''EventSubscriptionsOperations.begin_create_or_update')
     def test_create_azure_event_subscription(self, create_mock):
         sub_destination = StorageQueueEventSubscriptionDestination(resource_id="cctestid",
                                                                    queue_name="cctestevensub")

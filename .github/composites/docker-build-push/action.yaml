@@ -1,0 +1,143 @@
+name: 'Build and Publish Docker Image'
+description: 'Build and Publish Docker Image'
+inputs:
+  repository:
+    description: 'Docker hub repository'
+    required: true
+    default: 'cloudcustodian'
+  name:
+    description: 'Image name, should match dockerfile name'
+    required: true
+  push:
+    description: 'Push image: true/false'
+    required: true
+    default: false
+  platforms:
+    description: "Platforms to build, e.g. linux/arm64,linux/amd64"
+    default: "linux/amd64"
+runs:
+  using: "composite"
+  steps:
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v3
+
+    - name: Set up Docker Buildx
+      id: buildx
+      uses: docker/setup-buildx-action@v3
+
+    # until we get read only credentials, we'll only login if we're pushing
+    # note that we can hit rate limits on pulling though
+    - name: Login to Docker Hub
+      if: "${{ inputs.push == 'true' }}"
+      uses: docker/login-action@v3
+      with:
+        username: ${{ env.HUB_USER }}
+        password: ${{ env.HUB_TOKEN }}
+
+    - name: Get Tag
+      id: get_tag
+      shell: python
+      run: |
+        import os
+        with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+          # release tags are picked up by docker meta below
+          # we set the alias latest to point to the latest tag.
+          if "${{ github.ref }}".startswith("refs/tags"):
+            print("tag=latest", file=output)
+          elif "${{ github.ref }}" == "refs/heads/main":
+            print("tag=dev", file=output)
+          # Pull requests dont get pushed so this should be fine
+          elif "${{ github.ref }}".startswith("refs/pull"):
+            # ref looks like: refs/pull/$pr_number/merge
+            id = "${{ github.ref }}".split("/")[-2]
+            print(f"tag=pr-{id}", file=output)
+          else:
+            # this should just be the branch
+            id = "${{ github.ref }}".split("/")[-1]
+            print(f"tag={id}", file=output)
+
+    - name: Docker meta
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: |
+          ${{ inputs.repository }}/${{ inputs.name }}
+        tags: |
+          type=ref,event=tag
+          type=raw,value=${{ steps.get_tag.outputs.tag }}
+        sep-tags: ','
+
+    - name: Install Custodian
+      id: install-custodian
+      uses: ./.github/composites/install
+      with:
+        python-version: "3.11"
+
+    # build a single platform image first in order to actually load the image from buildx
+    # manifests are not supported yet
+    # https://github.com/docker/buildx/issues/166
+    # https://github.com/docker/buildx/issues/59
+    - name: Build
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        build-args: |
+          POETRY_VERSION=${{ steps.install-custodian.outputs.poetry-version }}
+        push: false
+        pull: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        # load the image back into docker for tests.
+        load: true
+        file: "docker/${{ inputs.name }}"
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Test
+      shell: bash
+      env:
+        tags: ${{ steps.meta.outputs.tags }}
+      run : |
+        image_var=${{inputs.name}}
+        image_var=CUSTODIAN_${image_var//[-]/_}_IMAGE
+        image_var=${image_var^^}
+        export ${image_var}="$(echo $tags | cut -d ',' -f 1)"
+        TEST_DOCKER=yes poetry run pytest -s -v -p no:terraform -v tests/test_docker.py
+
+    # actually push the multi arch image
+    - name: Push
+      id: "push"
+      if: "${{ inputs.push == 'true' }}"
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        build-args: |
+          POETRY_VERSION=${{ steps.install-custodian.outputs.poetry-version }}
+        push: true
+        pull: true
+        platforms: ${{ inputs.platforms }}
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        file: "docker/${{ inputs.name }}"
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Install cosign
+      if: "${{ inputs.push == 'true' }}"
+      uses: sigstore/cosign-installer@v3
+      with:
+        cosign-release: 'v1.13.6'
+
+    - name: Sign
+      if: "${{ inputs.push == 'true' }}"
+      shell: bash
+      env:
+        COSIGN_EXPERIMENTAL: "true"
+        TAGS: ${{ steps.meta.outputs.tags }}
+      run: |
+        echo "${{ steps.push.outputs.digest }}"
+        tags=(${TAGS//,/ })
+        for i in "${tags[@]}"
+        do
+          cosign sign ${{ inputs.repository }}/${{ inputs.name }}@${{ steps.push.outputs.digest }}
+        done

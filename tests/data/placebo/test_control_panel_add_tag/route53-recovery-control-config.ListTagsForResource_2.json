@@ -1,0 +1,30 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "353e8ae9-8fe9-488a-9b71-c4ab0e0a0f67",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "application/json",
+                "content-length": "34",
+                "connection": "keep-alive",
+                "date": "Tue, 07 Mar 2023 19:55:40 GMT",
+                "x-amzn-requestid": "353e8ae9-8fe9-488a-9b71-c4ab0e0a0f67",
+                "access-control-allow-origin": "*",
+                "access-control-allow-headers": "*,Authorization,Date,X-Amz-Date,X-Amz-Security-Token,X-Amz-Target,content-type,x-amz-content-sha256,x-amz-user-agent,x-amzn-platform-id,x-amzn-trace-id",
+                "x-amz-apigw-id": "BbR9bGD1PHcFc3w=",
+                "access-control-allow-methods": "OPTIONS,POST,GET,PUT,DELETE",
+                "access-control-expose-headers": "x-amzn-errortype,x-amzn-requestid,x-amzn-errormessage,x-amzn-trace-id,x-amzn-requestid,x-amz-apigw-id,date",
+                "x-amzn-trace-id": "Root=1-640796bc-39dccc52263c8d427e509346;Sampled=1",
+                "x-cache": "Miss from cloudfront",
+                "via": "1.1 76d4de5b65bdf749a3f97445d1b9f4d2.cloudfront.net (CloudFront)",
+                "x-amz-cf-pop": "JFK50-P2",
+                "x-amz-cf-id": "Ltkos17aZbaPaTt6w509DkbsmV_VizSg16yw0zYOi9GK626R4IzGzw=="
+            },
+            "RetryAttempts": 0
+        },
+        "Tags": {
+            "TestTag": "TestValue"
+        }
+    }
+}

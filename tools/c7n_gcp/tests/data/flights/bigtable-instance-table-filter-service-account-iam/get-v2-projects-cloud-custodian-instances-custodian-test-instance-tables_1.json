@@ -1,0 +1,28 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 26 Apr 2023 11:39:13 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "257",
+    "-content-encoding": "gzip",
+    "content-location": "https://bigtableadmin.googleapis.com/v2/projects/cloud-custodian/instances/custodian-test-instance/tables?alt=json"
+  },
+  "body": {
+    "tables": [
+      {
+        "name": "projects/cloud-custodian/instances/custodian-test-instance/tables/custodian-table-green"
+      },
+      {
+        "name": "projects/cloud-custodian/instances/custodian-test-instance/tables/custodian-table-red"
+      }
+    ]
+  }
+}

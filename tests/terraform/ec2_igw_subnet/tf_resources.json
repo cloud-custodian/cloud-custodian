@@ -1,0 +1,1018 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_ami": {
+            "amazon_linux": {
+                "architecture": "x86_64",
+                "arn": "arn:aws:ec2:us-east-1::image/ami-06d2a97720664a092",
+                "block_device_mappings": [
+                    {
+                        "device_name": "/dev/xvda",
+                        "ebs": {
+                            "delete_on_termination": "true",
+                            "encrypted": "false",
+                            "iops": "0",
+                            "snapshot_id": "snap-0cf1320c1660490cb",
+                            "throughput": "0",
+                            "volume_size": "8",
+                            "volume_type": "gp2"
+                        },
+                        "no_device": "",
+                        "virtual_name": ""
+                    }
+                ],
+                "boot_mode": "",
+                "creation_date": "2023-04-05T00:00:10.000Z",
+                "deprecation_time": "2025-04-05T00:00:10.000Z",
+                "description": "Amazon Linux AMI 2018.03.0.20230404.0 x86_64 HVM gp2",
+                "ena_support": true,
+                "executable_users": null,
+                "filter": [
+                    {
+                        "name": "name",
+                        "values": [
+                            "amzn-ami-hvm-*-x86_64-gp2"
+                        ]
+                    }
+                ],
+                "hypervisor": "xen",
+                "id": "ami-06d2a97720664a092",
+                "image_id": "ami-06d2a97720664a092",
+                "image_location": "amazon/amzn-ami-hvm-2018.03.0.20230404.0-x86_64-gp2",
+                "image_owner_alias": "amazon",
+                "image_type": "machine",
+                "imds_support": "",
+                "include_deprecated": false,
+                "kernel_id": "",
+                "most_recent": true,
+                "name": "amzn-ami-hvm-2018.03.0.20230404.0-x86_64-gp2",
+                "name_regex": null,
+                "owner_id": "644160558196",
+                "owners": [
+                    "amazon"
+                ],
+                "platform": "",
+                "platform_details": "Linux/UNIX",
+                "product_codes": [],
+                "public": true,
+                "ramdisk_id": "",
+                "root_device_name": "/dev/xvda",
+                "root_device_type": "ebs",
+                "root_snapshot_id": "snap-0cf1320c1660490cb",
+                "sriov_net_support": "simple",
+                "state": "available",
+                "state_reason": {
+                    "code": "UNSET",
+                    "message": "UNSET"
+                },
+                "tags": {},
+                "timeouts": null,
+                "tpm_support": "",
+                "usage_operation": "RunInstances",
+                "virtualization_type": "hvm"
+            }
+        },
+        "aws_instance": {
+            "private_auto_assigned": {
+                "ami": "ami-06d2a97720664a092",
+                "arn": "arn:aws:ec2:us-east-1:644160558196:instance/i-0a716d83bebb7ad43",
+                "associate_public_ip_address": false,
+                "availability_zone": "us-east-1a",
+                "capacity_reservation_specification": [
+                    {
+                        "capacity_reservation_preference": "open",
+                        "capacity_reservation_target": []
+                    }
+                ],
+                "cpu_core_count": 1,
+                "cpu_threads_per_core": 1,
+                "credit_specification": [
+                    {
+                        "cpu_credits": "standard"
+                    }
+                ],
+                "disable_api_stop": false,
+                "disable_api_termination": false,
+                "ebs_block_device": [],
+                "ebs_optimized": false,
+                "enclave_options": [
+                    {
+                        "enabled": false
+                    }
+                ],
+                "ephemeral_block_device": [],
+                "get_password_data": false,
+                "hibernation": false,
+                "host_id": "",
+                "host_resource_group_arn": null,
+                "iam_instance_profile": "",
+                "id": "i-0a716d83bebb7ad43",
+                "instance_initiated_shutdown_behavior": "stop",
+                "instance_state": "running",
+                "instance_type": "t2.micro",
+                "ipv6_address_count": 0,
+                "ipv6_addresses": [],
+                "key_name": "",
+                "launch_template": [],
+                "maintenance_options": [
+                    {
+                        "auto_recovery": "default"
+                    }
+                ],
+                "metadata_options": [
+                    {
+                        "http_endpoint": "enabled",
+                        "http_put_response_hop_limit": 1,
+                        "http_tokens": "optional",
+                        "instance_metadata_tags": "disabled"
+                    }
+                ],
+                "monitoring": false,
+                "network_interface": [],
+                "outpost_arn": "",
+                "password_data": "",
+                "placement_group": "",
+                "placement_partition_number": 0,
+                "primary_network_interface_id": "eni-0c8dd30d87afae233",
+                "private_dns": "ip-10-0-1-98.ec2.internal",
+                "private_dns_name_options": [
+                    {
+                        "enable_resource_name_dns_a_record": false,
+                        "enable_resource_name_dns_aaaa_record": false,
+                        "hostname_type": "ip-name"
+                    }
+                ],
+                "private_ip": "10.0.1.98",
+                "public_dns": "",
+                "public_ip": "",
+                "root_block_device": [
+                    {
+                        "delete_on_termination": true,
+                        "device_name": "/dev/xvda",
+                        "encrypted": false,
+                        "iops": 100,
+                        "kms_key_id": "",
+                        "tags": {},
+                        "throughput": 0,
+                        "volume_id": "vol-0ca6806375b23dc6b",
+                        "volume_size": 8,
+                        "volume_type": "gp2"
+                    }
+                ],
+                "secondary_private_ips": [],
+                "security_groups": [],
+                "source_dest_check": true,
+                "subnet_id": "subnet-00a7ff0f29a2f7dd7",
+                "tags": null,
+                "tags_all": {},
+                "tenancy": "default",
+                "timeouts": null,
+                "user_data": null,
+                "user_data_base64": null,
+                "user_data_replace_on_change": false,
+                "volume_tags": null,
+                "vpc_security_group_ids": [
+                    "sg-00e9d5f50c9013d15"
+                ]
+            },
+            "private_interfacies_only": {
+                "ami": "ami-06d2a97720664a092",
+                "arn": "arn:aws:ec2:us-east-1:644160558196:instance/i-07b1657fdb879c149",
+                "associate_public_ip_address": false,
+                "availability_zone": "us-east-1a",
+                "capacity_reservation_specification": [
+                    {
+                        "capacity_reservation_preference": "open",
+                        "capacity_reservation_target": []
+                    }
+                ],
+                "cpu_core_count": 1,
+                "cpu_threads_per_core": 1,
+                "credit_specification": [
+                    {
+                        "cpu_credits": "standard"
+                    }
+                ],
+                "disable_api_stop": false,
+                "disable_api_termination": false,
+                "ebs_block_device": [],
+                "ebs_optimized": false,
+                "enclave_options": [
+                    {
+                        "enabled": false
+                    }
+                ],
+                "ephemeral_block_device": [],
+                "get_password_data": false,
+                "hibernation": false,
+                "host_id": "",
+                "host_resource_group_arn": null,
+                "iam_instance_profile": "",
+                "id": "i-07b1657fdb879c149",
+                "instance_initiated_shutdown_behavior": "stop",
+                "instance_state": "running",
+                "instance_type": "t2.micro",
+                "ipv6_address_count": 0,
+                "ipv6_addresses": [],
+                "key_name": "",
+                "launch_template": [],
+                "maintenance_options": [
+                    {
+                        "auto_recovery": "default"
+                    }
+                ],
+                "metadata_options": [
+                    {
+                        "http_endpoint": "enabled",
+                        "http_put_response_hop_limit": 1,
+                        "http_tokens": "optional",
+                        "instance_metadata_tags": "disabled"
+                    }
+                ],
+                "monitoring": false,
+                "network_interface": [
+                    {
+                        "delete_on_termination": false,
+                        "device_index": 0,
+                        "network_card_index": 0,
+                        "network_interface_id": "eni-04bdb3c66f9e8b0ad"
+                    },
+                    {
+                        "delete_on_termination": false,
+                        "device_index": 1,
+                        "network_card_index": 0,
+                        "network_interface_id": "eni-02f127c9fa675679d"
+                    }
+                ],
+                "outpost_arn": "",
+                "password_data": "",
+                "placement_group": "",
+                "placement_partition_number": 0,
+                "primary_network_interface_id": "eni-04bdb3c66f9e8b0ad",
+                "private_dns": "ip-10-0-1-152.ec2.internal",
+                "private_dns_name_options": [
+                    {
+                        "enable_resource_name_dns_a_record": false,
+                        "enable_resource_name_dns_aaaa_record": false,
+                        "hostname_type": "ip-name"
+                    }
+                ],
+                "private_ip": "10.0.1.152",
+                "public_dns": "",
+                "public_ip": "",
+                "root_block_device": [
+                    {
+                        "delete_on_termination": true,
+                        "device_name": "/dev/xvda",
+                        "encrypted": false,
+                        "iops": 100,
+                        "kms_key_id": "",
+                        "tags": {},
+                        "throughput": 0,
+                        "volume_id": "vol-03e9b64e91a4f009c",
+                        "volume_size": 8,
+                        "volume_type": "gp2"
+                    }
+                ],
+                "secondary_private_ips": [],
+                "security_groups": [],
+                "source_dest_check": true,
+                "subnet_id": "subnet-00a7ff0f29a2f7dd7",
+                "tags": null,
+                "tags_all": {},
+                "tenancy": "default",
+                "timeouts": null,
+                "user_data": null,
+                "user_data_base64": null,
+                "user_data_replace_on_change": false,
+                "volume_tags": null,
+                "vpc_security_group_ids": [
+                    "sg-0d80b64eab206a948"
+                ]
+            },
+            "public_auto_assigned": {
+                "ami": "ami-06d2a97720664a092",
+                "arn": "arn:aws:ec2:us-east-1:644160558196:instance/i-05799f38ad9df4c34",
+                "associate_public_ip_address": true,
+                "availability_zone": "us-east-1a",
+                "capacity_reservation_specification": [
+                    {
+                        "capacity_reservation_preference": "open",
+                        "capacity_reservation_target": []
+                    }
+                ],
+                "cpu_core_count": 1,
+                "cpu_threads_per_core": 1,
+                "credit_specification": [
+                    {
+                        "cpu_credits": "standard"
+                    }
+                ],
+                "disable_api_stop": false,
+                "disable_api_termination": false,
+                "ebs_block_device": [],
+                "ebs_optimized": false,
+                "enclave_options": [
+                    {
+                        "enabled": false
+                    }
+                ],
+                "ephemeral_block_device": [],
+                "get_password_data": false,
+                "hibernation": false,
+                "host_id": "",
+                "host_resource_group_arn": null,
+                "iam_instance_profile": "",
+                "id": "i-05799f38ad9df4c34",
+                "instance_initiated_shutdown_behavior": "stop",
+                "instance_state": "running",
+                "instance_type": "t2.micro",
+                "ipv6_address_count": 0,
+                "ipv6_addresses": [],
+                "key_name": "",
+                "launch_template": [],
+                "maintenance_options": [
+                    {
+                        "auto_recovery": "default"
+                    }
+                ],
+                "metadata_options": [
+                    {
+                        "http_endpoint": "enabled",
+                        "http_put_response_hop_limit": 1,
+                        "http_tokens": "optional",
+                        "instance_metadata_tags": "disabled"
+                    }
+                ],
+                "monitoring": false,
+                "network_interface": [],
+                "outpost_arn": "",
+                "password_data": "",
+                "placement_group": "",
+                "placement_partition_number": 0,
+                "primary_network_interface_id": "eni-052eccd7377227328",
+                "private_dns": "ip-10-0-2-97.ec2.internal",
+                "private_dns_name_options": [
+                    {
+                        "enable_resource_name_dns_a_record": false,
+                        "enable_resource_name_dns_aaaa_record": false,
+                        "hostname_type": "ip-name"
+                    }
+                ],
+                "private_ip": "10.0.2.97",
+                "public_dns": "",
+                "public_ip": "3.83.45.205",
+                "root_block_device": [
+                    {
+                        "delete_on_termination": true,
+                        "device_name": "/dev/xvda",
+                        "encrypted": false,
+                        "iops": 100,
+                        "kms_key_id": "",
+                        "tags": {},
+                        "throughput": 0,
+                        "volume_id": "vol-02afb14db8ffb7878",
+                        "volume_size": 8,
+                        "volume_type": "gp2"
+                    }
+                ],
+                "secondary_private_ips": [],
+                "security_groups": [],
+                "source_dest_check": true,
+                "subnet_id": "subnet-02e1a5b426e2b16a9",
+                "tags": null,
+                "tags_all": {},
+                "tenancy": "default",
+                "timeouts": null,
+                "user_data": null,
+                "user_data_base64": null,
+                "user_data_replace_on_change": false,
+                "volume_tags": null,
+                "vpc_security_group_ids": [
+                    "sg-00e9d5f50c9013d15"
+                ]
+            },
+            "public_primary_interface": {
+                "ami": "ami-06d2a97720664a092",
+                "arn": "arn:aws:ec2:us-east-1:644160558196:instance/i-0ed351953eb1132ef",
+                "associate_public_ip_address": false,
+                "availability_zone": "us-east-1a",
+                "capacity_reservation_specification": [
+                    {
+                        "capacity_reservation_preference": "open",
+                        "capacity_reservation_target": []
+                    }
+                ],
+                "cpu_core_count": 1,
+                "cpu_threads_per_core": 1,
+                "credit_specification": [
+                    {
+                        "cpu_credits": "standard"
+                    }
+                ],
+                "disable_api_stop": false,
+                "disable_api_termination": false,
+                "ebs_block_device": [],
+                "ebs_optimized": false,
+                "enclave_options": [
+                    {
+                        "enabled": false
+                    }
+                ],
+                "ephemeral_block_device": [],
+                "get_password_data": false,
+                "hibernation": false,
+                "host_id": "",
+                "host_resource_group_arn": null,
+                "iam_instance_profile": "",
+                "id": "i-0ed351953eb1132ef",
+                "instance_initiated_shutdown_behavior": "stop",
+                "instance_state": "running",
+                "instance_type": "t2.micro",
+                "ipv6_address_count": 0,
+                "ipv6_addresses": [],
+                "key_name": "",
+                "launch_template": [],
+                "maintenance_options": [
+                    {
+                        "auto_recovery": "default"
+                    }
+                ],
+                "metadata_options": [
+                    {
+                        "http_endpoint": "enabled",
+                        "http_put_response_hop_limit": 1,
+                        "http_tokens": "optional",
+                        "instance_metadata_tags": "disabled"
+                    }
+                ],
+                "monitoring": false,
+                "network_interface": [
+                    {
+                        "delete_on_termination": false,
+                        "device_index": 0,
+                        "network_card_index": 0,
+                        "network_interface_id": "eni-09406645e06ec9f4c"
+                    },
+                    {
+                        "delete_on_termination": false,
+                        "device_index": 1,
+                        "network_card_index": 0,
+                        "network_interface_id": "eni-0b5372c98213e4976"
+                    }
+                ],
+                "outpost_arn": "",
+                "password_data": "",
+                "placement_group": "",
+                "placement_partition_number": 0,
+                "primary_network_interface_id": "eni-09406645e06ec9f4c",
+                "private_dns": "ip-10-0-2-115.ec2.internal",
+                "private_dns_name_options": [
+                    {
+                        "enable_resource_name_dns_a_record": false,
+                        "enable_resource_name_dns_aaaa_record": false,
+                        "hostname_type": "ip-name"
+                    }
+                ],
+                "private_ip": "10.0.2.115",
+                "public_dns": "",
+                "public_ip": "",
+                "root_block_device": [
+                    {
+                        "delete_on_termination": true,
+                        "device_name": "/dev/xvda",
+                        "encrypted": false,
+                        "iops": 100,
+                        "kms_key_id": "",
+                        "tags": {},
+                        "throughput": 0,
+                        "volume_id": "vol-07f48727dd9f4025c",
+                        "volume_size": 8,
+                        "volume_type": "gp2"
+                    }
+                ],
+                "secondary_private_ips": [],
+                "security_groups": [],
+                "source_dest_check": true,
+                "subnet_id": "subnet-02e1a5b426e2b16a9",
+                "tags": null,
+                "tags_all": {},
+                "tenancy": "default",
+                "timeouts": null,
+                "user_data": null,
+                "user_data_base64": null,
+                "user_data_replace_on_change": false,
+                "volume_tags": null,
+                "vpc_security_group_ids": [
+                    "sg-0d80b64eab206a948"
+                ]
+            },
+            "public_secondary_interface": {
+                "ami": "ami-06d2a97720664a092",
+                "arn": "arn:aws:ec2:us-east-1:644160558196:instance/i-08d26c9b0862f70c8",
+                "associate_public_ip_address": false,
+                "availability_zone": "us-east-1a",
+                "capacity_reservation_specification": [
+                    {
+                        "capacity_reservation_preference": "open",
+                        "capacity_reservation_target": []
+                    }
+                ],
+                "cpu_core_count": 1,
+                "cpu_threads_per_core": 1,
+                "credit_specification": [
+                    {
+                        "cpu_credits": "standard"
+                    }
+                ],
+                "disable_api_stop": false,
+                "disable_api_termination": false,
+                "ebs_block_device": [],
+                "ebs_optimized": false,
+                "enclave_options": [
+                    {
+                        "enabled": false
+                    }
+                ],
+                "ephemeral_block_device": [],
+                "get_password_data": false,
+                "hibernation": false,
+                "host_id": "",
+                "host_resource_group_arn": null,
+                "iam_instance_profile": "",
+                "id": "i-08d26c9b0862f70c8",
+                "instance_initiated_shutdown_behavior": "stop",
+                "instance_state": "running",
+                "instance_type": "t2.micro",
+                "ipv6_address_count": 0,
+                "ipv6_addresses": [],
+                "key_name": "",
+                "launch_template": [],
+                "maintenance_options": [
+                    {
+                        "auto_recovery": "default"
+                    }
+                ],
+                "metadata_options": [
+                    {
+                        "http_endpoint": "enabled",
+                        "http_put_response_hop_limit": 1,
+                        "http_tokens": "optional",
+                        "instance_metadata_tags": "disabled"
+                    }
+                ],
+                "monitoring": false,
+                "network_interface": [
+                    {
+                        "delete_on_termination": false,
+                        "device_index": 0,
+                        "network_card_index": 0,
+                        "network_interface_id": "eni-0ac72d148cf13d80b"
+                    },
+                    {
+                        "delete_on_termination": false,
+                        "device_index": 1,
+                        "network_card_index": 0,
+                        "network_interface_id": "eni-0131bd33be01478d3"
+                    }
+                ],
+                "outpost_arn": "",
+                "password_data": "",
+                "placement_group": "",
+                "placement_partition_number": 0,
+                "primary_network_interface_id": "eni-0ac72d148cf13d80b",
+                "private_dns": "ip-10-0-1-36.ec2.internal",
+                "private_dns_name_options": [
+                    {
+                        "enable_resource_name_dns_a_record": false,
+                        "enable_resource_name_dns_aaaa_record": false,
+                        "hostname_type": "ip-name"
+                    }
+                ],
+                "private_ip": "10.0.1.36",
+                "public_dns": "",
+                "public_ip": "",
+                "root_block_device": [
+                    {
+                        "delete_on_termination": true,
+                        "device_name": "/dev/xvda",
+                        "encrypted": false,
+                        "iops": 100,
+                        "kms_key_id": "",
+                        "tags": {},
+                        "throughput": 0,
+                        "volume_id": "vol-027db7a3d78771885",
+                        "volume_size": 8,
+                        "volume_type": "gp2"
+                    }
+                ],
+                "secondary_private_ips": [],
+                "security_groups": [],
+                "source_dest_check": true,
+                "subnet_id": "subnet-00a7ff0f29a2f7dd7",
+                "tags": null,
+                "tags_all": {},
+                "tenancy": "default",
+                "timeouts": null,
+                "user_data": null,
+                "user_data_base64": null,
+                "user_data_replace_on_change": false,
+                "volume_tags": null,
+                "vpc_security_group_ids": [
+                    "sg-0d80b64eab206a948"
+                ]
+            }
+        },
+        "aws_internet_gateway": {
+            "this": {
+                "arn": "arn:aws:ec2:us-east-1:644160558196:internet-gateway/igw-0186e33a1d5903db5",
+                "id": "igw-0186e33a1d5903db5",
+                "owner_id": "644160558196",
+                "tags": null,
+                "tags_all": {},
+                "timeouts": null,
+                "vpc_id": "vpc-06a22444b7946ea01"
+            }
+        },
+        "aws_network_interface": {
+            "private_interfacies_only_1": {
+                "arn": "arn:aws:ec2:us-east-1:644160558196:network-interface/eni-04bdb3c66f9e8b0ad",
+                "attachment": [],
+                "description": "",
+                "id": "eni-04bdb3c66f9e8b0ad",
+                "interface_type": "interface",
+                "ipv4_prefix_count": 0,
+                "ipv4_prefixes": [],
+                "ipv6_address_count": 0,
+                "ipv6_address_list": [],
+                "ipv6_address_list_enabled": false,
+                "ipv6_addresses": [],
+                "ipv6_prefix_count": 0,
+                "ipv6_prefixes": [],
+                "mac_address": "12:20:9c:e9:ba:73",
+                "outpost_arn": "",
+                "owner_id": "644160558196",
+                "private_dns_name": "",
+                "private_ip": "10.0.1.152",
+                "private_ip_list": [
+                    "10.0.1.152"
+                ],
+                "private_ip_list_enabled": false,
+                "private_ips": [
+                    "10.0.1.152"
+                ],
+                "private_ips_count": 0,
+                "security_groups": [
+                    "sg-0d80b64eab206a948"
+                ],
+                "source_dest_check": true,
+                "subnet_id": "subnet-00a7ff0f29a2f7dd7",
+                "tags": null,
+                "tags_all": {}
+            },
+            "private_interfacies_only_2": {
+                "arn": "arn:aws:ec2:us-east-1:644160558196:network-interface/eni-02f127c9fa675679d",
+                "attachment": [],
+                "description": "",
+                "id": "eni-02f127c9fa675679d",
+                "interface_type": "interface",
+                "ipv4_prefix_count": 0,
+                "ipv4_prefixes": [],
+                "ipv6_address_count": 0,
+                "ipv6_address_list": [],
+                "ipv6_address_list_enabled": false,
+                "ipv6_addresses": [],
+                "ipv6_prefix_count": 0,
+                "ipv6_prefixes": [],
+                "mac_address": "12:19:15:e4:09:3b",
+                "outpost_arn": "",
+                "owner_id": "644160558196",
+                "private_dns_name": "",
+                "private_ip": "10.0.1.77",
+                "private_ip_list": [
+                    "10.0.1.77"
+                ],
+                "private_ip_list_enabled": false,
+                "private_ips": [
+                    "10.0.1.77"
+                ],
+                "private_ips_count": 0,
+                "security_groups": [
+                    "sg-0d80b64eab206a948"
+                ],
+                "source_dest_check": true,
+                "subnet_id": "subnet-00a7ff0f29a2f7dd7",
+                "tags": null,
+                "tags_all": {}
+            },
+            "public_primary_interface_private": {
+                "arn": "arn:aws:ec2:us-east-1:644160558196:network-interface/eni-0b5372c98213e4976",
+                "attachment": [],
+                "description": "",
+                "id": "eni-0b5372c98213e4976",
+                "interface_type": "interface",
+                "ipv4_prefix_count": 0,
+                "ipv4_prefixes": [],
+                "ipv6_address_count": 0,
+                "ipv6_address_list": [],
+                "ipv6_address_list_enabled": false,
+                "ipv6_addresses": [],
+                "ipv6_prefix_count": 0,
+                "ipv6_prefixes": [],
+                "mac_address": "12:4f:c4:6f:11:37",
+                "outpost_arn": "",
+                "owner_id": "644160558196",
+                "private_dns_name": "",
+                "private_ip": "10.0.1.64",
+                "private_ip_list": [
+                    "10.0.1.64"
+                ],
+                "private_ip_list_enabled": false,
+                "private_ips": [
+                    "10.0.1.64"
+                ],
+                "private_ips_count": 0,
+                "security_groups": [
+                    "sg-0d80b64eab206a948"
+                ],
+                "source_dest_check": true,
+                "subnet_id": "subnet-00a7ff0f29a2f7dd7",
+                "tags": null,
+                "tags_all": {}
+            },
+            "public_primary_interface_public": {
+                "arn": "arn:aws:ec2:us-east-1:644160558196:network-interface/eni-09406645e06ec9f4c",
+                "attachment": [],
+                "description": "",
+                "id": "eni-09406645e06ec9f4c",
+                "interface_type": "interface",
+                "ipv4_prefix_count": 0,
+                "ipv4_prefixes": [],
+                "ipv6_address_count": 0,
+                "ipv6_address_list": [],
+                "ipv6_address_list_enabled": false,
+                "ipv6_addresses": [],
+                "ipv6_prefix_count": 0,
+                "ipv6_prefixes": [],
+                "mac_address": "12:0c:c6:94:91:41",
+                "outpost_arn": "",
+                "owner_id": "644160558196",
+                "private_dns_name": "",
+                "private_ip": "10.0.2.115",
+                "private_ip_list": [
+                    "10.0.2.115"
+                ],
+                "private_ip_list_enabled": false,
+                "private_ips": [
+                    "10.0.2.115"
+                ],
+                "private_ips_count": 0,
+                "security_groups": [
+                    "sg-0d80b64eab206a948"
+                ],
+                "source_dest_check": true,
+                "subnet_id": "subnet-02e1a5b426e2b16a9",
+                "tags": null,
+                "tags_all": {}
+            },
+            "public_secondary_interface_private": {
+                "arn": "arn:aws:ec2:us-east-1:644160558196:network-interface/eni-0ac72d148cf13d80b",
+                "attachment": [],
+                "description": "",
+                "id": "eni-0ac72d148cf13d80b",
+                "interface_type": "interface",
+                "ipv4_prefix_count": 0,
+                "ipv4_prefixes": [],
+                "ipv6_address_count": 0,
+                "ipv6_address_list": [],
+                "ipv6_address_list_enabled": false,
+                "ipv6_addresses": [],
+                "ipv6_prefix_count": 0,
+                "ipv6_prefixes": [],
+                "mac_address": "12:d8:28:28:1b:bd",
+                "outpost_arn": "",
+                "owner_id": "644160558196",
+                "private_dns_name": "",
+                "private_ip": "10.0.1.36",
+                "private_ip_list": [
+                    "10.0.1.36"
+                ],
+                "private_ip_list_enabled": false,
+                "private_ips": [
+                    "10.0.1.36"
+                ],
+                "private_ips_count": 0,
+                "security_groups": [
+                    "sg-0d80b64eab206a948"
+                ],
+                "source_dest_check": true,
+                "subnet_id": "subnet-00a7ff0f29a2f7dd7",
+                "tags": null,
+                "tags_all": {}
+            },
+            "public_secondary_interface_public": {
+                "arn": "arn:aws:ec2:us-east-1:644160558196:network-interface/eni-0131bd33be01478d3",
+                "attachment": [],
+                "description": "",
+                "id": "eni-0131bd33be01478d3",
+                "interface_type": "interface",
+                "ipv4_prefix_count": 0,
+                "ipv4_prefixes": [],
+                "ipv6_address_count": 0,
+                "ipv6_address_list": [],
+                "ipv6_address_list_enabled": false,
+                "ipv6_addresses": [],
+                "ipv6_prefix_count": 0,
+                "ipv6_prefixes": [],
+                "mac_address": "12:75:bc:37:2e:9b",
+                "outpost_arn": "",
+                "owner_id": "644160558196",
+                "private_dns_name": "",
+                "private_ip": "10.0.2.57",
+                "private_ip_list": [
+                    "10.0.2.57"
+                ],
+                "private_ip_list_enabled": false,
+                "private_ips": [
+                    "10.0.2.57"
+                ],
+                "private_ips_count": 0,
+                "security_groups": [
+                    "sg-0d80b64eab206a948"
+                ],
+                "source_dest_check": true,
+                "subnet_id": "subnet-02e1a5b426e2b16a9",
+                "tags": null,
+                "tags_all": {}
+            }
+        },
+        "aws_route_table": {
+            "private": {
+                "arn": "arn:aws:ec2:us-east-1:644160558196:route-table/rtb-0ce1e28a01f647d5a",
+                "id": "rtb-0ce1e28a01f647d5a",
+                "owner_id": "644160558196",
+                "propagating_vgws": [],
+                "route": [],
+                "tags": {
+                    "Name": "private"
+                },
+                "tags_all": {
+                    "Name": "private"
+                },
+                "timeouts": null,
+                "vpc_id": "vpc-06a22444b7946ea01"
+            },
+            "public": {
+                "arn": "arn:aws:ec2:us-east-1:644160558196:route-table/rtb-093c0ae5ab7524554",
+                "id": "rtb-093c0ae5ab7524554",
+                "owner_id": "644160558196",
+                "propagating_vgws": [],
+                "route": [
+                    {
+                        "carrier_gateway_id": "",
+                        "cidr_block": "0.0.0.0/0",
+                        "core_network_arn": "",
+                        "destination_prefix_list_id": "",
+                        "egress_only_gateway_id": "",
+                        "gateway_id": "igw-0186e33a1d5903db5",
+                        "instance_id": "",
+                        "ipv6_cidr_block": "",
+                        "local_gateway_id": "",
+                        "nat_gateway_id": "",
+                        "network_interface_id": "",
+                        "transit_gateway_id": "",
+                        "vpc_endpoint_id": "",
+                        "vpc_peering_connection_id": ""
+                    }
+                ],
+                "tags": {
+                    "Name": "public"
+                },
+                "tags_all": {
+                    "Name": "public"
+                },
+                "timeouts": null,
+                "vpc_id": "vpc-06a22444b7946ea01"
+            }
+        },
+        "aws_route_table_association": {
+            "private": {
+                "gateway_id": "",
+                "id": "rtbassoc-0dbbe4eb7b82da103",
+                "route_table_id": "rtb-0ce1e28a01f647d5a",
+                "subnet_id": "subnet-00a7ff0f29a2f7dd7"
+            },
+            "public": {
+                "gateway_id": "",
+                "id": "rtbassoc-0a1406fe54d107160",
+                "route_table_id": "rtb-093c0ae5ab7524554",
+                "subnet_id": "subnet-02e1a5b426e2b16a9"
+            }
+        },
+        "aws_security_group": {
+            "this": {
+                "arn": "arn:aws:ec2:us-east-1:644160558196:security-group/sg-0d80b64eab206a948",
+                "description": "Managed by Terraform",
+                "egress": [],
+                "id": "sg-0d80b64eab206a948",
+                "ingress": [],
+                "name": "example",
+                "name_prefix": "",
+                "owner_id": "644160558196",
+                "revoke_rules_on_delete": false,
+                "tags": null,
+                "tags_all": {},
+                "timeouts": null,
+                "vpc_id": "vpc-06a22444b7946ea01"
+            }
+        },
+        "aws_subnet": {
+            "private": {
+                "arn": "arn:aws:ec2:us-east-1:644160558196:subnet/subnet-00a7ff0f29a2f7dd7",
+                "assign_ipv6_address_on_creation": false,
+                "availability_zone": "us-east-1a",
+                "availability_zone_id": "use1-az2",
+                "cidr_block": "10.0.1.0/24",
+                "customer_owned_ipv4_pool": "",
+                "enable_dns64": false,
+                "enable_resource_name_dns_a_record_on_launch": false,
+                "enable_resource_name_dns_aaaa_record_on_launch": false,
+                "id": "subnet-00a7ff0f29a2f7dd7",
+                "ipv6_cidr_block": "",
+                "ipv6_cidr_block_association_id": "",
+                "ipv6_native": false,
+                "map_customer_owned_ip_on_launch": false,
+                "map_public_ip_on_launch": false,
+                "outpost_arn": "",
+                "owner_id": "644160558196",
+                "private_dns_hostname_type_on_launch": "ip-name",
+                "tags": {
+                    "Name": "private"
+                },
+                "tags_all": {
+                    "Name": "private"
+                },
+                "timeouts": null,
+                "vpc_id": "vpc-06a22444b7946ea01"
+            },
+            "public": {
+                "arn": "arn:aws:ec2:us-east-1:644160558196:subnet/subnet-02e1a5b426e2b16a9",
+                "assign_ipv6_address_on_creation": false,
+                "availability_zone": "us-east-1a",
+                "availability_zone_id": "use1-az2",
+                "cidr_block": "10.0.2.0/24",
+                "customer_owned_ipv4_pool": "",
+                "enable_dns64": false,
+                "enable_resource_name_dns_a_record_on_launch": false,
+                "enable_resource_name_dns_aaaa_record_on_launch": false,
+                "id": "subnet-02e1a5b426e2b16a9",
+                "ipv6_cidr_block": "",
+                "ipv6_cidr_block_association_id": "",
+                "ipv6_native": false,
+                "map_customer_owned_ip_on_launch": false,
+                "map_public_ip_on_launch": false,
+                "outpost_arn": "",
+                "owner_id": "644160558196",
+                "private_dns_hostname_type_on_launch": "ip-name",
+                "tags": {
+                    "Name": "public"
+                },
+                "tags_all": {
+                    "Name": "public"
+                },
+                "timeouts": null,
+                "vpc_id": "vpc-06a22444b7946ea01"
+            }
+        },
+        "aws_vpc": {
+            "this": {
+                "arn": "arn:aws:ec2:us-east-1:644160558196:vpc/vpc-06a22444b7946ea01",
+                "assign_generated_ipv6_cidr_block": false,
+                "cidr_block": "10.0.0.0/16",
+                "default_network_acl_id": "acl-0281583b5bedde4f1",
+                "default_route_table_id": "rtb-0ec6756e539873794",
+                "default_security_group_id": "sg-00e9d5f50c9013d15",
+                "dhcp_options_id": "dopt-a542cadf",
+                "enable_classiclink": false,
+                "enable_classiclink_dns_support": false,
+                "enable_dns_hostnames": false,
+                "enable_dns_support": true,
+                "enable_network_address_usage_metrics": false,
+                "id": "vpc-06a22444b7946ea01",
+                "instance_tenancy": "default",
+                "ipv4_ipam_pool_id": null,
+                "ipv4_netmask_length": null,
+                "ipv6_association_id": "",
+                "ipv6_cidr_block": "",
+                "ipv6_cidr_block_network_border_group": "",
+                "ipv6_ipam_pool_id": "",
+                "ipv6_netmask_length": 0,
+                "main_route_table_id": "rtb-0ec6756e539873794",
+                "owner_id": "644160558196",
+                "tags": null,
+                "tags_all": {}
+            }
+        }
+    }
+}

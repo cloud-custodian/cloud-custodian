@@ -1,0 +1,36 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "ResourceInfoList": [
+            {
+                "ResourceArn": "arn:aws:s3:::reboot-s3-bad-01",
+                "RoleArn": "arn:aws:iam::644160558196:role/aws-service-role/lakeformation.amazonaws.com/AWSServiceRoleForLakeFormationDataAccess",
+                "LastModified": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 5,
+                    "day": 3,
+                    "hour": 14,
+                    "minute": 4,
+                    "second": 0,
+                    "microsecond": 568000
+                }
+            },
+            {
+                "ResourceArn": "arn:aws:s3:::testarena.com",
+                "RoleArn": "arn:aws:iam::644160558196:role/aws-service-role/lakeformation.amazonaws.com/AWSServiceRoleForLakeFormationDataAccess",
+                "LastModified": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 7,
+                    "day": 26,
+                    "hour": 19,
+                    "minute": 57,
+                    "second": 6,
+                    "microsecond": 196000
+                }
+            }
+        ]
+    }
+}

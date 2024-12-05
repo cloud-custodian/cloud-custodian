@@ -1,16 +1,5 @@
-# Copyright 2019 Microsoft Corporation
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 import logging
 import time
@@ -18,7 +7,7 @@ import time
 import click
 import requests
 from c7n_azure.policy import AzureFunctionMode
-from distutils.util import strtobool
+from c7n.vendored.distutils.util import strtobool
 from enum import Enum
 
 from c7n.config import Config
@@ -105,7 +94,7 @@ def cli(**kwargs):
             continue
         try:
             params = AzureFunctionMode(p).get_function_app_params()
-            creds = web_client.web_apps.list_publishing_credentials(
+            creds = web_client.web_apps.begin_list_publishing_credentials(
                 params.function_app_resource_group_name,
                 params.function_app_name).result()
             deployments[p.name] = {'scm_uri': creds.scm_uri, 'status': None}

@@ -1,0 +1,32 @@
+{
+    "status_code": 200,
+    "data": {
+        "Users": [
+            {
+                "Name": "default",
+                "Status": "active",
+                "AccessString": "on ~* &* +@all",
+                "ACLNames": [
+                    "open-access"
+                ],
+                "MinimumEngineVersion": "6.0",
+                "Authentication": {
+                    "Type": "no-password"
+                },
+                "ARN": "arn:aws:memorydb:us-east-1:644160558196:user/default"
+            },
+            {
+                "Name": "test-user",
+                "Status": "active",
+                "AccessString": "on ~* &* +@all",
+                "ACLNames": [],
+                "MinimumEngineVersion": "7.0",
+                "Authentication": {
+                    "Type": "iam"
+                },
+                "ARN": "arn:aws:memorydb:us-east-1:644160558196:user/test-user"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

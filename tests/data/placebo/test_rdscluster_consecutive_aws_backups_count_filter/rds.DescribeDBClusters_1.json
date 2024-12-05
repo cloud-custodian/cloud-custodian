@@ -1,0 +1,75 @@
+{
+    "status_code": 200,
+    "data": {
+        "DBClusters": [
+            {
+                "Status": "available",
+                "Engine": "aurora",
+                "Endpoint": "bbb.cluster-xyz.us-east-1.rds.amazonaws.com",
+                "KmsKeyId": "arn:aws:kms:us-east-1:123456789012:key/k1",
+                "DBClusterIdentifier": "bbb",
+                "MasterUsername": "user1",
+                "EarliestRestorableTime": {
+                    "hour": 8,
+                    "__class__": "datetime",
+                    "month": 7,
+                    "second": 23,
+                    "microsecond": 306000,
+                    "year": 2016,
+                    "day": 12,
+                    "minute": 1
+                },
+                "DbClusterResourceId": "cluster-ABCDEF",
+                "DBClusterArn": "arn:aws:rds:us-west-2:141654562785:cluster:cluster-ABCDEF",
+                "DBClusterMembers": [
+                    {
+                        "IsClusterWriter": true,
+                        "DBClusterParameterGroupStatus": "in-sync",
+                        "PromotionTier": 1,
+                        "DBInstanceIdentifier": "bbb-poolmember-1"
+                    },
+                    {
+                        "IsClusterWriter": false,
+                        "DBClusterParameterGroupStatus": "in-sync",
+                        "PromotionTier": 1,
+                        "DBInstanceIdentifier": "bbb-rds-poolmember-2"
+                    }
+                ],
+                "Port": 3306,
+                "PreferredBackupWindow": "08:00-09:00",
+                "VpcSecurityGroups": [
+                    {
+                        "Status": "active",
+                        "VpcSecurityGroupId": "sg-1"
+                    }
+                ],
+                "DBSubnetGroup": "default-vpc-1",
+                "StorageEncrypted": true,
+                "AllocatedStorage": 1,
+                "EngineVersion": "5.6.10a",
+                "DBClusterParameterGroup": "default.aurora5.6",
+                "BackupRetentionPeriod": 14,
+                "AvailabilityZones": [
+                    "us-east-1a",
+                    "us-east-1b",
+                    "us-east-1c"
+                ],
+                "LatestRestorableTime": {
+                    "hour": 0,
+                    "__class__": "datetime",
+                    "month": 7,
+                    "second": 7,
+                    "microsecond": 80000,
+                    "year": 2016,
+                    "day": 27,
+                    "minute": 59
+                },
+                "PreferredMaintenanceWindow": "sun:07:00-sun:08:00"
+            }
+        ],
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200,
+            "RequestId": "ca5ef80a-5396-11e6-b9e0-ddf0c53d86bf"
+        }
+    }
+}

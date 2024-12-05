@@ -1,0 +1,40 @@
+{
+    "status_code": 200,
+    "data": {
+        "InternetGateways": [
+            {
+                "Attachments": [
+                    {
+                        "State": "available",
+                        "VpcId": "vpc-06fbfb0683669c546"
+                    }
+                ],
+                "InternetGatewayId": "igw-06504e6dde1dff527",
+                "OwnerId": "644160558196",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "sbx"
+                    }
+                ]
+            },
+            {
+                "Attachments": [
+                    {
+                        "State": "available",
+                        "VpcId": "vpc-056651ecc06e0c9d3"
+                    }
+                ],
+                "InternetGatewayId": "igw-0d6b3a79ec7460614",
+                "OwnerId": "644160558196",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "dev"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

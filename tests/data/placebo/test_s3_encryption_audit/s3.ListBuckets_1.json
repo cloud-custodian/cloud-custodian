@@ -1,0 +1,51 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Buckets": [
+            {
+                "Name": "c7n-aws-s3-encryption-audit-test-a",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 2,
+                    "day": 12,
+                    "hour": 13,
+                    "minute": 48,
+                    "second": 0,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "c7n-aws-s3-encryption-audit-test-b",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 2,
+                    "day": 12,
+                    "hour": 13,
+                    "minute": 48,
+                    "second": 0,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "c7n-aws-s3-encryption-audit-test-c",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 2,
+                    "day": 12,
+                    "hour": 13,
+                    "minute": 48,
+                    "second": 0,
+                    "microsecond": 0
+                }
+            }
+        ],
+        "Owner": {
+            "DisplayName": "wayne",
+            "ID": "ed8f0ad562d627dcda7d11c0f27748b03f2c87ba6ab69cbd6e1acd390e5f0047"
+        }
+    }
+}

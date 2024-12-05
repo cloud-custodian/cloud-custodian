@@ -1,0 +1,35 @@
+{
+    "status_code": 200,
+    "data": {
+        "Label": "ResourceCount",
+        "Datapoints": [
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 10,
+                    "day": 30,
+                    "hour": 17,
+                    "minute": 52,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "Maximum": 20.0,
+                "NOTE1": "below Sum is calculated with 60 seconds period",
+                "Sum": 1000.0,
+                "Unit": "None"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "aa43d827-3432-4b2a-a0e1-f54aff753492",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "aa43d827-3432-4b2a-a0e1-f54aff753492",
+                "content-type": "text/xml",
+                "content-length": "493",
+                "date": "Thu, 31 Oct 2019 17:52:39 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

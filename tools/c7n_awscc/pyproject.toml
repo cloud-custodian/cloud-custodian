@@ -1,0 +1,35 @@
+[tool.poetry]
+name = "c7n_awscc"
+version = "0.1.27"
+readme = "readme.md"
+homepage = "https://cloudcustodian.io"
+repository = "https://github.com/cloud-custodian/cloud-custodian"
+description = "Cloud Custodian - AWS Cloud Control Provider"
+documentation = "https://cloudcustodian.io/docs/"
+authors = ["Cloud Custodian Project"]
+license = "Apache-2.0"
+
+classifiers=[
+   "License :: OSI Approved :: Apache Software License",
+   "Topic :: System :: Systems Administration",
+   "Topic :: System :: Distributed Computing"
+]
+
+include = ["c7n_awscc/data/*json"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+click = "^8.0"
+jsonpatch = "^1.32"
+c7n = {path = "../..", develop = true}
+
+[tool.poetry.build]
+generate-setup-file = false
+script = "build.py"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "<8.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0", "boto3"]
+build-backend = "poetry.core.masonry.api"

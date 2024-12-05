@@ -1,20 +1,9 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.from c7n_azure.provider import resources
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 import logging
 
-from azure.keyvault.key_vault_id import KeyVaultId
+from azure.keyvault.keys import KeyProperties
 
 from c7n.filters import Filter
 from c7n.utils import type_schema
@@ -22,7 +11,7 @@ from c7n.utils import type_schema
 from c7n_azure import constants
 from c7n_azure.provider import resources
 from c7n_azure.query import ChildResourceManager, ChildTypeInfo
-from c7n_azure.utils import ThreadHelper, ResourceIdParser, generate_key_vault_url
+from c7n_azure.utils import ThreadHelper, ResourceIdParser
 
 
 log = logging.getLogger('custodian.azure.keyvault.keys')
@@ -90,10 +79,10 @@ class KeyVaultKeys(ChildResourceManager):
     class resource_type(ChildTypeInfo):
         doc_groups = ['Security']
 
-        resource = constants.RESOURCE_VAULT
-        service = 'azure.keyvault'
-        client = 'KeyVaultClient'
-        enum_spec = (None, 'get_keys', None)
+        resource = constants.VAULT_AUTH_ENDPOINT
+        service = 'azure.keyvault.keys'
+        client = 'KeyClient'
+        enum_spec = (None, 'list_properties_of_keys', None)
 
         parent_manager_name = 'keyvault'
         raise_on_exception = False
@@ -107,9 +96,7 @@ class KeyVaultKeys(ChildResourceManager):
             'attributes.recoveryLevel'
         )
 
-        @classmethod
-        def extra_args(cls, parent_resource):
-            return {'vault_base_url': generate_key_vault_url(parent_resource['name'])}
+        keyvault_child = True
 
     def augment(self, resources):
         resources = super(KeyVaultKeys, self).augment(resources)
@@ -155,14 +142,13 @@ class KeyTypeFilter(Filter):
         return resources
 
     def _process_resource_set(self, resources, event):
-        client = self.manager.get_client()
-
         matched = []
         for resource in resources:
             try:
                 if 'c7n:kty' not in resource:
-                    id = KeyVaultId.parse_key_id(resource['kid'])
-                    key = client.get_key(id.vault, id.name, id.version)
+                    id = KeyProperties(key_id=resource['id'])
+                    client = self.manager.get_client(vault_url=id.vault_url)
+                    key = client.get_key(id.name, id.version)
 
                     resource['c7n:kty'] = key.key.kty.lower()
 
@@ -171,4 +157,36 @@ class KeyTypeFilter(Filter):
             except Exception as error:
                 log.warning(error)
 
+        return matched
+
+
+@KeyVaultKeys.filter_registry.register('rotation-policy')
+class KeyVaultKeyRotationFilter(Filter):
+    """Filters keyvault keys for rotation policy
+
+    :example:
+
+    Find all keyvault key that don't have rotation policy enabled
+
+    .. code-block:: yaml
+
+        policies:
+           - name: key-vault-keys-rotation-is-disabled
+             resource: azure.keyvault-keys
+             filters:
+                - type: rotation-policy
+                  state: Disabled
+    """
+    schema = type_schema('rotation-policy', required=['state'],
+                state={'type': 'string', 'enum': ['Enabled', 'Disabled']})
+
+    def process(self, resources, event=None):
+        matched = []
+        for key in resources:
+            id = KeyProperties(key_id=key['id'])
+            client = self.manager.get_client(vault_url=id.vault_url)
+            rotation = client.get_key_rotation_policy(id.name)
+            if (self.data.get('state') == 'Disabled' and not rotation.id) or \
+               (self.data.get('state')  == 'Enabled' and rotation.id):
+                matched.append(key)
         return matched

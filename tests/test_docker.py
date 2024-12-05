@@ -1,16 +1,5 @@
-# Copyright 2020 Kapil Thangavelu
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 """Functional Tests for the Docker
 
 The uses here is a little specialized to be invoked by tools/dev/dockerpkg.py
@@ -29,8 +18,8 @@ except ImportError:
 
 TEST_DOCKER = docker and os.environ.get("TEST_DOCKER", "no") == "yes"
 
-CUSTODIAN_ORG_IMAGE = os.environ.get("CUSTODIAN_ORG_IMAGE")
-CUSTODIAN_IMAGE = os.environ.get("CUSTODIAN_CLI_IMAGE")
+CUSTODIAN_ORG_IMAGE = os.environ.get("CUSTODIAN_C7N_ORG_IMAGE")
+CUSTODIAN_IMAGE = os.environ.get("CUSTODIAN_C7N_IMAGE")
 CUSTODIAN_MAILER_IMAGE = os.environ.get("CUSTODIAN_MAILER_IMAGE")
 CUSTODIAN_PSTREAM_IMAGE = os.environ.get("CUSTODIAN_POLICYSTREAM_IMAGE")
 
@@ -150,9 +139,12 @@ def test_image_metadata(image_name):
         "org.opencontainers.image.description",
         "org.opencontainers.image.documentation",
         "org.opencontainers.image.licenses",
+        "org.opencontainers.image.ref.name",
         "org.opencontainers.image.title",
         "org.opencontainers.image.source",
         "org.opencontainers.image.revision",
+        "org.opencontainers.image.url",
+        "org.opencontainers.image.version",
     }
 
 
@@ -162,7 +154,7 @@ def test_image_metadata(image_name):
 def test_cli_providers_available():
     providers = os.environ.get("CUSTODIAN_PROVIDERS", None)
     if providers is None:
-        providers = {"aws", "azure", "gcp", "k8s"}
+        providers = {"aws", "azure", "gcp", "k8s", "openstack", "tencentcloud", "oci", "awscc"}
     elif providers == "":
         providers = {"aws"}
     else:
@@ -170,6 +162,7 @@ def test_cli_providers_available():
 
     client = docker.from_env()
     output = client.containers.run(CUSTODIAN_IMAGE, "schema", stderr=True)
+    print(output)
     resources = yaml.safe_load(output.strip())["resources"]
     found_providers = {r.split(".", 1)[0] for r in resources}
     assert providers == found_providers

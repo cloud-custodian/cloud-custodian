@@ -1,0 +1,25 @@
+{
+    "status_code": 400,
+    "data": {
+      "Error": {
+        "Code": "OperationNotPermitted",
+        "Message": "The instance 'i-017fc9a2a33b853fe' may not be terminated. Modify its 'disableApiTermination' instance attribute and try again."
+      },
+      "ResponseMetadata": {
+        "RequestId": "aae68c3c-df8a-47ee-a8f3-0078cd2381e0",
+        "HTTPStatusCode": 400,
+        "HTTPHeaders": {
+          "x-amzn-requestid": "aae68c3c-df8a-47ee-a8f3-0078cd2381e0",
+          "cache-control": "no-cache, no-store",
+          "strict-transport-security": "max-age=31536000; includeSubDomains",
+          "vary": "accept-encoding",
+          "content-type": "text/xml;charset=UTF-8",
+          "transfer-encoding": "chunked",
+          "date": "Sun, 06 Nov 2016 11:36:05 GMT",
+          "connection": "close",
+          "server": "AmazonEC2"
+        },
+        "RetryAttempts": 0
+      }
+    }
+  }

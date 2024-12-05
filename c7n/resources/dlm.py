@@ -1,18 +1,8 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
+from c7n.tags import Tag, RemoveTag
 
 
 @resources.register('dlm-policy')
@@ -26,5 +16,40 @@ class DLMPolicy(QueryResourceManager):
         detail_spec = ('get_lifecycle_policy', 'PolicyId', 'PolicyId', 'Policy')
         filter_name = 'PolicyIds'
         filter_type = 'list'
-        arn = False
+        arn = 'PolicyArn'
+        arn_type = 'policy'
         cfn_type = 'AWS::DLM::LifecyclePolicy'
+        # arn:aws:dlm:us-east-1:532725030595:policy/policy-0e23a047d0fdb7761
+
+    def augment(self, resources):
+        super().augment(resources)
+        for r in resources:
+            r['Tags'] = [{'Key': k, 'Value': v} for k, v in r.get('Tags', {}).items()]
+        return resources
+
+
+@DLMPolicy.action_registry.register('tag')
+class TagDLMPolicy(Tag):
+
+    permissions = ('dlm:TagResource', )
+
+    def process_resource_set(self, client, resource_set, tags):
+        arns = self.manager.get_arns(resource_set)
+        for arn in arns:
+            client.tag_resource(
+                ResourceArn=arn,
+                Tags={t['Key']: t['Value'] for t in tags})
+
+
+@DLMPolicy.action_registry.register('remove-tag')
+class DLMPolicyRemoveTag(RemoveTag):
+
+    permissions = ('dlm:UntagResource', )
+
+    def process_resource_set(self, client, resource_set, tag_keys):
+        arns = self.manager.get_arns(resource_set)
+        for arn in arns:
+            client.untag_resource(
+                ResourceArn=arn,
+                TagKeys=tag_keys
+            )
