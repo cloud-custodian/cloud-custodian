@@ -1,0 +1,36 @@
+{
+    "status_code": 201,
+    "data": {
+        "ResponseMetadata": {},
+        "OwnerId": "644160558196",
+        "CreationToken": "4ca2f797-024b-4acd-b124-3667796192e6",
+        "FileSystemId": "fs-08f97433723f431a6",
+        "FileSystemArn": "arn:aws:elasticfilesystem:us-east-1:644160558196:file-system/fs-08f97433723f431a6",
+        "CreationTime": {
+            "__class__": "datetime",
+            "year": 2024,
+            "month": 12,
+            "day": 2,
+            "hour": 23,
+            "minute": 10,
+            "second": 9,
+            "microsecond": 0
+        },
+        "LifeCycleState": "creating",
+        "NumberOfMountTargets": 0,
+        "SizeInBytes": {
+            "Value": 0,
+            "ValueInIA": 0,
+            "ValueInStandard": 0,
+            "ValueInArchive": 0
+        },
+        "PerformanceMode": "generalPurpose",
+        "Encrypted": true,
+        "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/d38e6df4-3a19-4516-9f4b-ab568e9bccc5",
+        "ThroughputMode": "bursting",
+        "Tags": [],
+        "FileSystemProtection": {
+            "ReplicationOverwriteProtection": "ENABLED"
+        }
+    }
+}

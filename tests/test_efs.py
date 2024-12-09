@@ -3,6 +3,7 @@
 from c7n.exceptions import PolicyValidationError
 
 from .common import BaseTest, functional, event_data
+from botocore.exceptions import ClientError
 
 import uuid
 import time
@@ -12,6 +13,7 @@ from c7n.testing import mock_datetime_now
 from dateutil import parser
 import c7n.resources.efs
 import c7n.filters.backup
+import json
 
 
 class ElasticFileSystem(BaseTest):
@@ -351,3 +353,278 @@ class ElasticFileSystem(BaseTest):
         with mock_datetime_now(parser.parse("2022-09-09T00:00:00+00:00"), c7n.filters.backup):
             resources = p.run()
         self.assertEqual(len(resources), 1)
+
+
+class EFSStatementTest(BaseTest):
+
+    @functional
+    def test_efs_remove_matched(self):
+        session_factory = self.replay_flight_data("test_efs_remove_matched")
+        client = session_factory().client("efs")
+        client.create_file_system(Encrypted=True)
+        filesystem_response = client.describe_file_systems()
+        filesystem_id = filesystem_response['FileSystems'][0]['FileSystemId']
+        filesystem_arn = filesystem_response['FileSystems'][0]['FileSystemArn']
+        self.addCleanup(client.delete_file_system, FileSystemId=filesystem_id)
+
+        if self.recording:
+            time.sleep(5)
+
+        client.put_file_system_policy(
+            FileSystemId=filesystem_id,
+            Policy=json.dumps(
+                    {
+                        "Version": "2012-10-17",
+                        "Id": "ExampleEFSResourcePolicy",
+                        "Statement": [
+                            {
+                                "Sid": "PublicAllowAccess",
+                                "Effect": "Allow",
+                                "Principal": {"AWS": "*"},
+                                "Action": "elasticfilesystem:ClientWrite",
+                                "Resource": filesystem_arn,
+                            },
+                            {
+                                "Sid": "SpecificAllow",
+                                "Effect": "Allow",
+                                "Principal": {"AWS": "arn:aws:iam::185106417252:root"},
+                                "Action": "elasticfilesystem:ClientWrite",
+                                "Resource": filesystem_arn,
+                            },
+                        ],
+                    }
+                )
+        )
+
+        p = self.load_policy(
+            {
+                "name": "efs-rm-matched",
+                "resource": "aws.efs",
+                "filters": [
+                    {"FileSystemId": filesystem_id},
+                    {"type": "cross-account", "whitelist": ["185106417252"]},
+                ],
+                "actions": [{"type": "remove-statements", "statement_ids": "matched"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual([r["FileSystemId"] for r in resources], [filesystem_id])
+
+        data = json.loads(
+            client.describe_file_system_policy(FileSystemId=filesystem_id).get(
+                "Policy"
+            )
+        )
+        self.assertEqual(
+            [s["Sid"] for s in data.get("Statement", ())], ["SpecificAllow"]
+        )
+
+    @functional
+    def test_efs_access_denied(self):
+        session_factory = self.replay_flight_data("test_efs_access_denied")
+        client = session_factory().client("efs")
+        client.create_file_system(Encrypted=True)
+        filesystem_response = client.describe_file_systems()
+        filesystem_id = filesystem_response['FileSystems'][0]['FileSystemId']
+        filesystem_arn = filesystem_response['FileSystems'][0]['FileSystemArn']
+        self.addCleanup(client.delete_file_system, FileSystemId=filesystem_id)
+
+        if self.recording:
+            time.sleep(5)
+
+        client.put_file_system_policy(
+            FileSystemId=filesystem_id,
+            Policy=json.dumps(
+                    {
+                        "Version": "2012-10-17",
+                        "Statement": [
+                            {
+                                "Sid": "DenyAllAccess",
+                                "Effect": "Deny",
+                                "Principal": "*",
+                                "Action": [
+                                    "elasticfilesystem:"
+                                    "DescribeFileSystemPolicy",
+                                    "elasticfilesystem:"
+                                    "DescribeFileSystems"
+                                    ],
+                                "Resource": filesystem_arn,
+                            }
+                        ],
+                    }
+                ),
+            BypassPolicyLockoutSafetyCheck=True
+        )
+
+        p = self.load_policy(
+            {
+                "name": "efs-rm-named",
+                "resource": "aws.efs",
+                "filters": [{"FileSystemId": filesystem_id},
+                            {"type": "cross-account", "whitelist": ["185106417252"]},]
+            },
+            session_factory=session_factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+        with self.assertRaises(ClientError) as e:
+            client.describe_file_system_policy(FileSystemId=filesystem_id)
+        self.assertEqual(e.exception.response['Error']['Code'], 'AccessDeniedException')
+
+    @functional
+    def test_efs_client_error(self):
+        session_factory = self.replay_flight_data("test_efs_client_error")
+        client = session_factory().client("efs")
+        client.create_file_system()
+        filesystem_response = client.describe_file_systems()
+        filesystem_id = filesystem_response['FileSystems'][0]['FileSystemId']
+        filesystem_arn = filesystem_response['FileSystems'][0]['FileSystemArn']
+        self.addCleanup(client.delete_file_system, FileSystemId=filesystem_id)
+
+        if self.recording:
+            time.sleep(5)
+
+        client.put_file_system_policy(
+            FileSystemId=filesystem_id,
+            Policy=json.dumps(
+                    {
+                        "Version": "2012-10-17",
+                        "Statement": [
+                            {
+                                "Sid": "WhatIsIt",
+                                "Effect": "Allow",
+                                "Principal": "*",
+                                "Action": [
+                                    "elasticfilesystem:"
+                                        "DescribeFileSystemPolicy",
+                                        "elasticfilesystem:"
+                                            "DescribeFileSystems"
+                                    ],
+                                "Resource": filesystem_arn,
+                            }
+                        ],
+                    }
+                ),
+        )
+
+        p = self.load_policy(
+            {
+                "name": "efs-rm-named",
+                "resource": "aws.efs",
+                "filters": [{"FileSystemId": "fs-095fec21dd6d065fb"}],
+                "actions": [
+                    {"type": "remove-statements", "statement_ids": ["WhatIsIt"]}
+                ],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    @functional
+    def test_efs_remove_named(self):
+        session_factory = self.replay_flight_data("test_efs_remove_named")
+        client = session_factory().client("efs")
+        client.create_file_system()
+        filesystem_response = client.describe_file_systems()
+        filesystem_id = filesystem_response['FileSystems'][0]['FileSystemId']
+        filesystem_arn = filesystem_response['FileSystems'][0]['FileSystemArn']
+        self.addCleanup(client.delete_file_system, FileSystemId=filesystem_id)
+
+        if self.recording:
+            time.sleep(5)
+
+        client.put_file_system_policy(
+            FileSystemId=filesystem_id,
+            Policy=json.dumps(
+                    {
+                        "Version": "2012-10-17",
+                        "Statement": [
+                            {
+                                "Sid": "WhatIsIt",
+                                "Effect": "Allow",
+                                "Principal": "*",
+                                "Action": ["elasticfilesystem:ClientWrite"],
+                                "Resource": filesystem_arn,
+                            }
+                        ],
+                    }
+                ),
+            BypassPolicyLockoutSafetyCheck=True
+        )
+
+        p = self.load_policy(
+            {
+                "name": "efs-rm-named",
+                "resource": "aws.efs",
+                "filters": [{"FileSystemId": filesystem_id}],
+                "actions": [
+                    {"type": "remove-statements", "statement_ids": ["WhatIsIt"]}
+                ],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    @functional
+    def test_efs_remove_statement(self):
+        session_factory = self.replay_flight_data("test_efs_remove_statement")
+        client = session_factory().client("efs")
+
+        client.create_file_system()
+        filesystem_response = client.describe_file_systems()
+        filesystem_id = filesystem_response['FileSystems'][0]['FileSystemId']
+        filesystem_arn = filesystem_response['FileSystems'][0]['FileSystemArn']
+        self.addCleanup(client.delete_file_system, FileSystemId=filesystem_id)
+
+        if self.recording:
+            time.sleep(5)
+
+        client.put_file_system_policy(
+            FileSystemId=filesystem_id,
+            Policy=json.dumps(
+                    {
+                        "Version": "2012-10-17",
+                        "Statement": [
+                            {
+                                "Sid": "SpecificAllow",
+                                "Effect": "Allow",
+                                "Principal": {"AWS": "*"},
+                                "Action": "elasticfilesystem:ClientWrite",
+                                "Resource": filesystem_arn,
+                            },
+                            {
+                                "Sid": "RemoveMe",
+                                "Effect": "Allow",
+                                "Principal": "*",
+                                "Action": ["elasticfilesystem:ClientWrite"],
+                                "Resource": filesystem_arn,
+                            },
+                        ],
+                    }
+                )
+        )
+        p = self.load_policy(
+            {
+                "name": "efs-rm-statement",
+                "resource": "aws.efs",
+                "filters": [{"FileSystemId": filesystem_id}],
+                "actions": [
+                    {"type": "remove-statements", "statement_ids": ["RemoveMe"]}
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        data = json.loads(
+            client.describe_file_system_policy(FileSystemId=filesystem_id).get(
+                "Policy"
+            )
+        )
+        self.assertTrue("RemoveMe" not in [s["Sid"] for s in data.get("Statement", ())])
