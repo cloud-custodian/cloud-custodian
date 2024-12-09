@@ -1,110 +1,117 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
-        "IsTruncated": false, 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "1cecdfec-35e8-11e7-8dba-0776c02973bd", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "1cecdfec-35e8-11e7-8dba-0776c02973bd", 
-                "date": "Thu, 11 May 2017 01:21:09 GMT", 
-                "content-length": "1873", 
-                "content-type": "text/xml"
-            }
-        }, 
         "VirtualMFADevices": [
             {
-                "SerialNumber": "arn:aws:iam::123456789123:mfa/root-account-mfa-device", 
-                "EnableDate": {
-                    "hour": 6, 
-                    "__class__": "datetime", 
-                    "month": 4, 
-                    "second": 36, 
-                    "microsecond": 0, 
-                    "year": 2016, 
-                    "day": 13, 
-                    "minute": 56
-                }
-            }, 
+                "SerialNumber": "arn:aws:iam::644160558196:mfa/test_mfa_device1"
+            },
             {
-                "SerialNumber": "arn:aws:iam::123456789123:mfa/fake.person", 
-                "EnableDate": {
-                    "hour": 3, 
-                    "__class__": "datetime", 
-                    "month": 1, 
-                    "second": 8, 
-                    "microsecond": 0, 
-                    "year": 2016, 
-                    "day": 5, 
-                    "minute": 16
-                }, 
+                "SerialNumber": "arn:aws:iam::644160558196:mfa/test_mfa_device2",
                 "User": {
-                    "UserName": "fake.person", 
-                    "PasswordLastUsed": {
-                        "hour": 22, 
-                        "__class__": "datetime", 
-                        "month": 5, 
-                        "second": 34, 
-                        "microsecond": 0, 
-                        "year": 2017, 
-                        "day": 8, 
-                        "minute": 36
-                    }, 
+                    "UserId": "644160558196",
+                    "Arn": "arn:aws:iam::644160558196:root",
                     "CreateDate": {
-                        "hour": 5, 
-                        "__class__": "datetime", 
-                        "month": 12, 
-                        "second": 8, 
-                        "microsecond": 0, 
-                        "year": 2015, 
-                        "day": 14, 
-                        "minute": 30
-                    }, 
-                    "UserId": "FAKEUSER2", 
-                    "Path": "/", 
-                    "Arn": "arn:aws:iam::123456789123:user/fake.person"
+                        "__class__": "datetime",
+                        "year": 2024,
+                        "month": 4,
+                        "day": 8,
+                        "hour": 10,
+                        "minute": 6,
+                        "second": 43,
+                        "microsecond": 0
+                    },
+                    "PasswordLastUsed": {
+                        "__class__": "datetime",
+                        "year": 2024,
+                        "month": 11,
+                        "day": 25,
+                        "hour": 19,
+                        "minute": 30,
+                        "second": 16,
+                        "microsecond": 0
+                    }
+                },
+                "EnableDate": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 4,
+                    "day": 8,
+                    "hour": 10,
+                    "minute": 21,
+                    "second": 10,
+                    "microsecond": 0
                 }
-            }, 
+            },
             {
-                "SerialNumber": "arn:aws:iam::123456789123:mfa/other.person", 
-                "EnableDate": {
-                    "hour": 1, 
-                    "__class__": "datetime", 
-                    "month": 4, 
-                    "second": 35, 
-                    "microsecond": 0, 
-                    "year": 2017, 
-                    "day": 11, 
-                    "minute": 31
-                }, 
+                "SerialNumber": "arn:aws:iam::644160558196:mfa/root-account-mfa-device",
                 "User": {
-                    "UserName": "other.person", 
-                    "PasswordLastUsed": {
-                        "hour": 1, 
-                        "__class__": "datetime", 
-                        "month": 4, 
-                        "second": 23, 
-                        "microsecond": 0, 
-                        "year": 2017, 
-                        "day": 11, 
-                        "minute": 28
-                    }, 
+                    "Path": "/",
+                    "UserName": "fake_not_root_user",
+                    "UserId": "FAKEUSER1",
+                    "Arn": "arn:aws:iam::644160558196:user/fake_not_root_user",
                     "CreateDate": {
-                        "hour": 0, 
-                        "__class__": "datetime", 
-                        "month": 4, 
-                        "second": 39, 
-                        "microsecond": 0, 
-                        "year": 2017, 
-                        "day": 11, 
-                        "minute": 55
-                    }, 
-                    "UserId": "FAKEUSER3", 
-                    "Path": "/", 
-                    "Arn": "arn:aws:iam::123456789123:user/other.person"
+                        "__class__": "datetime",
+                        "year": 2024,
+                        "month": 4,
+                        "day": 8,
+                        "hour": 10,
+                        "minute": 22,
+                        "second": 53,
+                        "microsecond": 0
+                    },
+                    "PasswordLastUsed": {
+                        "__class__": "datetime",
+                        "year": 2024,
+                        "month": 11,
+                        "day": 25,
+                        "hour": 21,
+                        "minute": 56,
+                        "second": 10,
+                        "microsecond": 0
+                    }
+                },
+                "EnableDate": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 4,
+                    "day": 8,
+                    "hour": 10,
+                    "minute": 26,
+                    "second": 35,
+                    "microsecond": 0
+                }
+            },
+            {
+                "SerialNumber": "arn:aws:iam::644160558196:mfa/test_mfa_device3",
+                "User": {
+                    "Path": "/",
+                    "UserName": "test",
+                    "UserId": "FAKEUSER2",
+                    "Arn": "arn:aws:iam::644160558196:user/other.person",
+                    "CreateDate": {
+                        "__class__": "datetime",
+                        "year": 2024,
+                        "month": 10,
+                        "day": 21,
+                        "hour": 9,
+                        "minute": 4,
+                        "second": 11,
+                        "microsecond": 0
+                    }
+                },
+                "EnableDate": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 11,
+                    "day": 25,
+                    "hour": 21,
+                    "minute": 57,
+                    "second": 6,
+                    "microsecond": 0
                 }
             }
-        ]
+        ],
+        "IsTruncated": false,
+        "ResponseMetadata": {}
     }
 }
