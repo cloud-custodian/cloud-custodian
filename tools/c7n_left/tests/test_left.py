@@ -112,8 +112,12 @@ class PolicyEnv:
         extant["policies"].append(policy)
         policy_file.write_text(json.dumps(extant))
 
-    def run(self, policy_dir=None, terraform_dir=None):
-        config = cli.get_config(terraform_dir or self.policy_dir, policy_dir or self.policy_dir)
+    def run(self, policy_dir=None, terraform_dir=None, terraform_workspace="default"):
+        config = cli.get_config(
+            directory=terraform_dir or self.policy_dir,
+            policy_dir=policy_dir or self.policy_dir,
+            terraform_workspace=terraform_workspace,
+        )
         policies = policy_core.load_policies(config.policy_dir, config)
         reporter = ResultsReporter()
         core.CollectionRunner(policies, config, reporter).run()
@@ -1949,3 +1953,38 @@ def test_selection_policy_filter(policy_env):
 
     selection = policy_env.get_selection("policy=test-a")
     assert {p.name for p in selection.filter_policies(policies)} == {"test-a"}
+
+
+def test_workspace(policy_env):
+    policy_env.write_tf(
+        """
+locals {
+  map = {
+    default = "name-1"
+    other   = "name-2"
+  }
+}
+
+resource "res" "test_res" {
+  name = local.map[terraform.workspace]
+}
+        """
+    )
+    policy_env.write_policy(
+        {
+            "name": "test-a",
+            "resource": "terraform.res",
+            "filters": [{"name": "name-1"}],
+        }
+    )
+    policy_env.write_policy(
+        {
+            "name": "test-b",
+            "resource": "terraform.res",
+            "filters": [{"name": "name-2"}],
+        }
+    )
+    [result] = policy_env.run(terraform_workspace="default")
+    assert result.resource["name"] == "name-1"
+    [result] = policy_env.run(terraform_workspace="other")
+    assert result.resource["name"] == "name-2"
