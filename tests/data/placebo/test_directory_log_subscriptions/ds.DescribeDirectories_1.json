@@ -1,0 +1,62 @@
+{
+    "status_code": 200,
+    "data": {
+        "DirectoryDescriptions": [
+            {
+                "DirectoryId": "d-9067d77ae2",
+                "Name": "custodian.example.com",
+                "ShortName": "custodian",
+                "Size": "Small",
+                "Edition": "Standard",
+                "Alias": "d-9067d77ae2",
+                "AccessUrl": "d-9067d77ae2.awsapps.com",
+                "DnsIpAddrs": [
+                    "172.31.5.185",
+                    "172.31.39.74"
+                ],
+                "Stage": "Active",
+                "LaunchTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 10,
+                    "day": 11,
+                    "hour": 12,
+                    "minute": 39,
+                    "second": 1,
+                    "microsecond": 553000
+                },
+                "StageLastUpdatedDateTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 10,
+                    "day": 11,
+                    "hour": 13,
+                    "minute": 6,
+                    "second": 49,
+                    "microsecond": 370000
+                },
+                "Type": "MicrosoftAD",
+                "VpcSettings": {
+                    "VpcId": "vpc-abc12345",
+                    "SubnetIds": [
+                        "subnet-abc12345",
+                        "subnet-def4567"
+                    ],
+                    "SecurityGroupId": "sg-abc123",
+                    "AvailabilityZones": [
+                        "us-east-1a",
+                        "us-east-1e"
+                    ]
+                },
+                "SsoEnabled": false,
+                "DesiredNumberOfDomainControllers": 2,
+                "RegionsInfo": {
+                    "PrimaryRegion": "us-east-1",
+                    "AdditionalRegions": []
+                },
+                "OsVersion": "SERVER_2019"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

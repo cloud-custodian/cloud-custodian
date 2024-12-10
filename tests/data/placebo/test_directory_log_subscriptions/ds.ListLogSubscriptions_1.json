@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "LogSubscriptions": [
+            {
+                "DirectoryId": "d-9067d77ae2",
+                "LogGroupName": "/aws/directoryservice/d-9067d77ae2-custodian.example.com",
+                "SubscriptionCreatedDateTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 11,
+                    "day": 18,
+                    "hour": 16,
+                    "minute": 18,
+                    "second": 38,
+                    "microsecond": 307000
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
