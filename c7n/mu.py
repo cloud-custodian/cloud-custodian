@@ -1818,6 +1818,12 @@ class ConfigRule(AWSEventBase):
     def __repr__(self):
         return "<ConfigRule>"
 
+    def get_eval_mode(self):
+        eval_mode = self.data.get('evaluation', [])
+        if isinstance(eval_mode, str):
+            eval_mode = [eval_mode]
+        return eval_mode
+
     def get_rule_params(self, func):
         # config does not support versions/aliases on lambda funcs
         func_arn = func.arn
@@ -1860,6 +1866,12 @@ class ConfigRule(AWSEventBase):
                 'MessageType': 'ScheduledNotification'
             }]
             params['MaximumExecutionFrequency'] = self.data['schedule']
+
+        eval_modes = self.get_eval_mode()
+        if 'proactive' in eval_modes:
+            params.pop('Scope', None)
+        if eval_modes:
+            params['EvaluationModes'] = [{'Mode': e.upper()} for e in eval_modes]
         return params
 
     def get(self, rule_name):
