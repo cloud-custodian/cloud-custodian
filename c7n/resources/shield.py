@@ -7,19 +7,30 @@ from c7n.actions import BaseAction
 from c7n.filters import Filter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, RetryPageIterator, TypeInfo
+from c7n.tags import Tag
 from c7n.utils import local_session, type_schema, get_retry
 
 
 @resources.register('shield-protection')
 class ShieldProtection(QueryResourceManager):
-
     class resource_type(TypeInfo):
         service = 'shield'
         enum_spec = ('list_protections', 'Protections', None)
         id = 'Id'
         name = 'Name'
-        arn = False
+        arn = 'ProtectionArn'
         config_type = 'AWS::Shield::Protection'
+
+    def augment(self, resources):
+        client = local_session(self.session_factory).client('shield')
+
+        def _augment(r):
+            tags = self.retry(client.list_tags_for_resource,
+                ResourceARN=r['ProtectionArn'])['Tags']
+            r['Tags'] = tags
+            return r
+        resources = super().augment(resources)
+        return list(map(_augment, resources))
 
 
 @resources.register('shield-attack')
@@ -187,3 +198,33 @@ class IsEIPShieldProtected(ProtectedEIP, IsShieldProtected):
 
 class SetEIPShieldProtection(ProtectedEIP, SetShieldProtection):
     pass
+
+
+@ShieldProtection.action_registry.register('tag')
+class TagResource(Tag):
+    """Action to tag a Shield resources
+    """
+    permissions = ('shield:TagResource',)
+
+    def process_resource_set(self, client, resource_set, tags):
+        mid = self.manager.resource_type.arn
+        for r in resource_set:
+            try:
+                client.tag_resource(ResourceARN=r[mid], Tags=tags)
+            except client.exceptions.ResourceNotFoundException:
+                continue
+
+
+@ShieldProtection.action_registry.register('remove-tag')
+class RemoveTag(Tag):
+    """Action to remove tags from a Shield resource
+    """
+    permissions = ('shield:UntagResource',)
+
+    def process_resource_set(self, client, resource_set, tag_keys):
+        mid = self.manager.resource_type.arn
+        for r in resource_set:
+            try:
+                client.untag_resource(ResourceARN=r[mid], TagKeys=tag_keys)
+            except client.exceptions.ResourceNotFoundException:
+                continue
