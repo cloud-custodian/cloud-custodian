@@ -4,11 +4,28 @@
 import traceback
 
 from .email_delivery import EmailDelivery
+from .jira_delivery import JiraDelivery
 from .utils import decrypt
 
 
 class MessageTargetMixin(object):
     def handle_targets(self, message, sent_timestamp, email_delivery=True, sns_delivery=False):
+        to_list = message.get("action", ()).get("to")
+        if any(to == "jira" or to.startswith("jira://") for to in to_list):
+            # NOTE borrow the 'action' object to carry the delivery result for template rendering
+            # TODO It should be moved out from this jira block if below approach is accepted
+            message["action"].setdefault("result", {})
+
+            try:
+                if "jira_url" not in self.config:
+                    raise Exception("jira_url not found in mailer config")
+                # FIXME JiraDelivery is instantiated for each SQS message, which is not optimal.
+                jira_delivery = JiraDelivery(self.config, self.session, self.logger)
+                jira_delivery.process(message)
+            except Exception as e:
+                self.logger.error(f"Failed to create Jira issue: {str(e)}")
+                message["action"]["result"]["jira_error"] = "Failed to create Jira issue"
+
         # get the map of email_to_addresses to mimetext messages (with resources baked in)
         # and send any emails (to SES or SMTP) if there are email addresses found
         if email_delivery:
@@ -46,7 +63,7 @@ class MessageTargetMixin(object):
                 pass
 
         # this section gets the map of metrics to send to datadog and delivers it
-        if any(e.startswith("datadog") for e in message.get("action", ()).get("to")):
+        if any(e.startswith("datadog") for e in to_list):
             from .datadog_delivery import DataDogDelivery
 
             datadog_delivery = DataDogDelivery(self.config, self.session, self.logger)
@@ -59,7 +76,7 @@ class MessageTargetMixin(object):
                 pass
 
         # this section sends the full event to a Splunk HTTP Event Collector (HEC)
-        if any(e.startswith("splunkhec://") for e in message.get("action", ()).get("to")):
+        if any(e.startswith("splunkhec://") for e in to_list):
             from .splunk_delivery import SplunkHecDelivery
 
             splunk_delivery = SplunkHecDelivery(self.config, self.session, self.logger)

@@ -230,6 +230,9 @@ class EmailDelivery:
     def send_c7n_email(self, sqs_message):
         emails_to_mimetext_map = self.get_emails_to_mimetext_map(sqs_message)
         email_to_addrs = list(emails_to_mimetext_map.keys())
+        if not email_to_addrs:
+            self.logger.warning("Email recipients not found")
+            return
         try:
             # if smtp_server is set in mailer.yml, send through smtp
             if "smtp_server" in self.config:
