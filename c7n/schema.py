@@ -26,6 +26,7 @@ from c7n.policy import execution
 from c7n.provider import clouds
 from c7n.query import sources
 from c7n.resources import load_available
+from c7n.resources.aws import fake_session
 from c7n.resolver import ValuesFrom
 from c7n.filters.core import (
     ValueFilter,
@@ -576,6 +577,61 @@ def resource_vocabulary(cloud_name=None, qualify_name=True, aliases=True):
         vocabulary["mode"][mode_name] = cls
 
     return vocabulary
+
+
+class ExpandedSchemaMeta(type):
+
+    # resource id key passed to api call to be dropped from schema
+    resource_id_key = ''
+    type_map = {
+        'string': 'string',
+        'structure': 'object',
+        'list': 'array',
+        'integer': 'integer',
+        'boolean': 'boolean',
+    }
+
+    def __init__(cls, name, bases, dct):
+        """Expand an element's schema using service model shape data
+
+        Repurpose some of the shape discovery/validation logic in
+        c7n.resources.aws.shape_validate() to dynamically expand
+        element schema using the latest service model shape information.
+
+        Include available properties, their types, and enumerations of
+        possible values where available.  Assumes the use of type_schema().
+        """
+        session = fake_session()._session
+        model = session.get_service_model(cls.service)
+        shape = model.shape_for(cls.shape)
+
+        if getattr(cls, 'attributes_key', None):
+            cls.schema['properties'][cls.attributes_key].update(cls._expand_object_shape(shape))
+        else:
+            cls.schema['properties'].update(cls._expand_object_shape(shape))
+
+    def _expand_object_shape(cls, shape):
+        schema = {}
+        for member, member_shape in shape.members.items():
+            if cls.resource_id_key == member:
+                continue
+            member_schema = {'type': cls.type_map.get(member_shape.type_name)}
+            if enum := getattr(member_shape, 'enum', None):
+                member_schema['enum'] = enum
+            if member_shape.type_name == 'structure':
+                member_schema["properties"] = cls._expand_object_shape(member_shape)
+            elif member_shape.type_name == 'list':
+                if member_shape.member.type_name == 'structure':
+                    member_schema["items"] = {
+                        'type': 'object',
+                        'properties': cls._expand_object_shape(member_shape.member)
+                    }
+                else:
+                    member_schema["items"] = {
+                        'type': cls.type_map.get(member_shape.member.type_name)
+                    }
+            schema[member] = member_schema
+        return schema
 
 
 class ElementSchema:
