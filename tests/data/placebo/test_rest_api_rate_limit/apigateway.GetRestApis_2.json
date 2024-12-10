@@ -1,0 +1,30 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "items": [
+            {
+                "id": "eeqmgfsg4i",
+                "name": "c7n-test",
+                "createdDate": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 12,
+                    "day": 10,
+                    "hour": 13,
+                    "minute": 49,
+                    "second": 45,
+                    "microsecond": 0
+                },
+                "apiKeySource": "HEADER",
+                "endpointConfiguration": {
+                    "types": [
+                        "EDGE"
+                    ]
+                },
+                "disableExecuteApiEndpoint": false,
+                "rootResourceId": "8k1hwlyi80"
+            }
+        ]
+    }
+}

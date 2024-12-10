@@ -1,6 +1,8 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import time
 from botocore.exceptions import ClientError
+from mock import patch
 
 from .common import BaseTest, event_data
 from c7n.exceptions import PolicyValidationError
@@ -228,6 +230,17 @@ class TestRestApi(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['name'], 'c7n-test')
+
+    def test_rest_api_rate_limit(self):
+        session_factory = self.replay_flight_data('test_rest_api_rate_limit')
+        p = self.load_policy(
+            {'name': 'api-rate-limit',
+             'resource': 'aws.rest-api'},
+            session_factory=session_factory
+        )
+        with patch('c7n.utils.time.sleep', new_callable=time.sleep(0)):
+            resources = p.run()
+        self.assertEqual(len(resources), 1)
 
 
 class TestRestResource(BaseTest):
