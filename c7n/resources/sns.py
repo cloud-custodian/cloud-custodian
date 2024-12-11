@@ -457,6 +457,30 @@ class Metrics(MetricsFilter):
                  'Value': resource['TopicArn'].rsplit(':', 1)[-1]}]
 
 
+class DescribeSubscription(DescribeSource):
+
+    def get_resources(self, resource_ids):
+        """Get resource details one at a time rather than client filter of all.
+
+        The list_subscriptions call has no way to provide a server side filter,
+        so the default implementation will fetch all subscriptions and then filter
+        client side. This is a problem if there are millions of resources (which
+        we have seen).
+        """
+        client = local_session(self.manager.session_factory).client('sns')
+        resources = []
+        for r_id in resource_ids:
+            try:
+                result = self.manager.retry(
+                    client.get_subscription_attributes, SubscriptionArn=r_id
+                )
+            except client.exceptions.NotFoundException:
+                continue
+            attributes = result.pop('Attributes')
+            resources.append(attributes)
+        return resources
+
+
 @resources.register('sns-subscription')
 class SNSSubscription(QueryResourceManager):
 
@@ -473,6 +497,11 @@ class SNSSubscription(QueryResourceManager):
             'Endpoint',
             'TopicArn'
         )
+
+    source_mapping = {
+        'describe': DescribeSubscription,
+        'config': ConfigSource,
+    }
 
 
 @SNSSubscription.filter_registry.register('topic')
