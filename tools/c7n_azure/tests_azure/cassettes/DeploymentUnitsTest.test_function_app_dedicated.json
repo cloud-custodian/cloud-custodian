@@ -387,7 +387,7 @@
                                 "properties": [
                                     {
                                         "name": "LinuxFxVersion",
-                                        "value": "python|3.8"
+                                        "value": "python|3.11"
                                     },
                                     {
                                         "name": "WindowsFxVersion",
@@ -521,7 +521,7 @@
                             "phpVersion": "",
                             "pythonVersion": "",
                             "nodeVersion": "",
-                            "linuxFxVersion": "python|3.8",
+                            "linuxFxVersion": "python|3.11",
                             "windowsFxVersion": null,
                             "requestTracingEnabled": false,
                             "remoteDebuggingEnabled": false,
