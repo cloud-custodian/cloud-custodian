@@ -205,3 +205,61 @@ class WAFV2LoggingFilter(ValueFilter):
         return [
             r for r in resources if self.match(
                 r.get(self.annotation_key, {}))]
+
+
+@WAFV2.filter_registry.register('list-all-rules')
+class WAFV2ListAllRulesFilter(ValueFilter):
+    """
+    Return all rules inside the Web ACL, including rules in rule groups.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: list-all-rules-in-web-acl
+            resource: aws.wafv2
+            filters:
+              - type: list-all-rules
+    """
+
+    schema = type_schema('list-all-rules')
+    permissions = ('wafv2:GetRuleGroup',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client(
+            'wafv2', region_name=self.manager.region
+        )
+
+        for resource in resources:
+            all_rules = []
+
+            for rule in resource.get('Rules', []):
+                rule_details = {"Type": "Standalone", "Rule": rule}
+
+                if rule.get("Statement").get('RuleGroupReferenceStatement'):
+                    rule_group_arn = rule['Statement']['RuleGroupReferenceStatement']['ARN']
+                    scope = resource['Scope']
+
+                    try:
+                        rule_group_response = client.get_rule_group(
+                            Name=rule_group_arn.split('/')[-2],
+                            Id=rule_group_arn.split('/')[-1],
+                            Scope=scope
+                        )
+                        rule_group = rule_group_response.get('RuleGroup', {})
+
+                        rule_details = {
+                            "Type": "RuleGroup",
+                            "RuleGroupARN": rule_group_arn,
+                            "Rules": rule_group.get('Rules', [])
+                        }
+                    except Exception as e:
+                        print(f"Error fetching rule group {rule_group_arn}: {e}")
+
+                all_rules.append(rule_details)
+
+            resource['WebACLAllRules'] = all_rules
+
+        print("Resource: ", resources)
+        return resources
