@@ -497,6 +497,7 @@ class SNSSubscription(QueryResourceManager):
             'Endpoint',
             'TopicArn'
         )
+        permissions_augment = ("sns:GetSubscriptionAttributes",)
 
     source_mapping = {
         'describe': DescribeSubscription,
