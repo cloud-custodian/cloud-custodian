@@ -220,6 +220,31 @@ class TestRestApi(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+        p = self.load_policy(
+            {'name': 'api-has-statement',
+             'resource': 'rest-api',
+             'filters': [
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Allow",
+                                "Action": "execute-api:Invoke",
+                                "Principal": {
+                                    "AWS": "arn:aws:iam::123456789012:root",
+                                },
+                                "PartialMatch": ["Action"],
+                                "Resource": "*"
+                            },
+                        ]
+                    },
+                ],
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
 
 class TestRestResource(BaseTest):
 
