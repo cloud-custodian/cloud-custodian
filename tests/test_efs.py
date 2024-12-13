@@ -287,7 +287,7 @@ class ElasticFileSystem(BaseTest):
 
     def test_efs_has_statement(self):
         factory = self.replay_flight_data("test_efs_has_statement", region='us-west-1')
-        region_config={'region': 'us-west-1'}
+        region_config = {'region': 'us-west-1'}
         p = self.load_policy(
             {
                 "name": "efs-has-statement-barbara",
@@ -337,7 +337,7 @@ class ElasticFileSystem(BaseTest):
     def test_efs_has_statement_partial(self):
         factory = self.replay_flight_data("test_efs_has_statement_partial",
                                           region='us-west-1')
-        region_config={'region': 'us-west-1'}
+        region_config = {'region': 'us-west-1'}
 
         # No PartialMatch key as base case, full match.
         p = self.load_policy(
@@ -437,7 +437,6 @@ class ElasticFileSystem(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
-
 
         # Test for expected fail PartialMatch case
         p = self.load_policy(
