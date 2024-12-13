@@ -286,10 +286,11 @@ class ElasticFileSystem(BaseTest):
         self.assertEqual(resources[0]["Name"], "efs-without-secure-transport")
 
     def test_efs_has_statement(self):
-        factory = self.replay_flight_data("test_efs_has_statement")
+        factory = self.replay_flight_data("test_efs_has_statement", region='us-west-1')
+        region_config={'region': 'us-west-1'}
         p = self.load_policy(
             {
-                "name": "efs-has-statement",
+                "name": "efs-has-statement-barbara",
                 "resource": "efs",
                 "filters": [
                     {
@@ -303,8 +304,9 @@ class ElasticFileSystem(BaseTest):
                             }
                         ]
                     }
-                ],
+                ]
             },
+            config=region_config,
             session_factory=factory,
         )
         resources = p.run()
@@ -324,10 +326,141 @@ class ElasticFileSystem(BaseTest):
                             }
                         ]
                     }
-                ],
+                ]
             },
+            config=region_config,
             session_factory=factory,
         )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    def test_efs_has_statement_partial(self):
+        factory = self.replay_flight_data("test_efs_has_statement_partial",
+                                          region='us-west-1')
+        region_config={'region': 'us-west-1'}
+
+        # No PartialMatch key as base case, full match.
+        p = self.load_policy(
+            {
+                "name": "efs-has-statement-partial",
+                "resource": "efs",
+                "filters": [
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Allow",
+                                "Action": ["elasticfilesystem:ClientRootAccess",
+                                            "elasticfilesystem:ClientMount"],
+                            }
+                        ]
+                    }
+                ],
+            },
+            config=region_config,
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        # Test case insensitive and full-match with PartialMatch key
+        p = self.load_policy(
+            {
+                "name": "efs-has-statement-partial",
+                "resource": "efs",
+                "filters": [
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Allow",
+                                "Action": ["elasticFilesystem:clientRootAccess",
+                                            "elasticfilesystem:clientMount"],
+                                "PartialMatch": ["Action"]
+                            }
+                        ]
+                    }
+                ],
+            },
+            config=region_config,
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        # Test for presence of just one partial match.
+        p = self.load_policy(
+            {
+                "name": "efs-has-statement-partial",
+                "resource": "efs",
+                "filters": [
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Allow",
+                                "Action": ["elasticfilesystem:clientRootAccess"],
+                                "PartialMatch": ["Action"]
+                            }
+                        ]
+                    }
+                ],
+            },
+            config=region_config,
+            session_factory=factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        # Test for case-insensitive partial match using wildcard
+        p = self.load_policy(
+            {
+                "name": "efs-has-statement-partial",
+                "resource": "efs",
+                "filters": [
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Allow",
+                                "Action": ["elasticFilesystem:*"],
+                                "PartialMatch": ["Action"]
+                            }
+                        ]
+                    }
+                ],
+            },
+            config=region_config,
+            session_factory=factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+
+        # Test for expected fail PartialMatch case
+        p = self.load_policy(
+            {
+                "name": "efs-has-statement-partial",
+                "resource": "efs",
+                "filters": [
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Allow",
+                                "Action": ["elasticfilesystem:DeleteTags"],
+                                "PartialMatch": ["Action"]
+                            }
+                        ]
+                    }
+                ],
+            },
+            config=region_config,
+            session_factory=factory,
+        )
+
         resources = p.run()
         self.assertEqual(len(resources), 0)
 

@@ -1,0 +1,60 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "FileSystems": [
+            {
+                "OwnerId": "644160558196",
+                "CreationToken": "quickCreated-ed8cc0b4-1133-4213-adbe-e5544a771a55",
+                "FileSystemId": "fs-0c4eafac33c417f78",
+                "FileSystemArn": "arn:aws:elasticfilesystem:us-west-1:644160558196:file-system/fs-0c4eafac33c417f78",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 12,
+                    "day": 9,
+                    "hour": 15,
+                    "minute": 23,
+                    "second": 41,
+                    "microsecond": 0
+                },
+                "LifeCycleState": "available",
+                "Name": "barbara-test",
+                "NumberOfMountTargets": 2,
+                "SizeInBytes": {
+                    "Value": 6144,
+                    "Timestamp": {
+                        "__class__": "datetime",
+                        "year": 2024,
+                        "month": 12,
+                        "day": 10,
+                        "hour": 16,
+                        "minute": 17,
+                        "second": 34,
+                        "microsecond": 0
+                    },
+                    "ValueInIA": 0,
+                    "ValueInStandard": 6144,
+                    "ValueInArchive": 0
+                },
+                "PerformanceMode": "generalPurpose",
+                "Encrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-west-1:644160558196:key/2efff357-0be1-4cf2-bbc2-ba2165717d84",
+                "ThroughputMode": "elastic",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "barbara-test"
+                    },
+                    {
+                        "Key": "aws:elasticfilesystem:default-backup",
+                        "Value": "enabled"
+                    }
+                ],
+                "FileSystemProtection": {
+                    "ReplicationOverwriteProtection": "ENABLED"
+                }
+            }
+        ]
+    }
+}

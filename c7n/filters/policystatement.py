@@ -31,7 +31,9 @@ class HasStatementFilter(Filter):
                         Condition:
                             Bool:
                                 "aws:SecureTransport": "false"
+                        PartialMatch: 'Action'
     """
+    PARTIAL_MATCH_ELEMENTS = ['Action', 'NotAction']
     schema = type_schema(
         'has-statement',
         statement_ids={'type': 'array', 'items': {'type': 'string'}},
@@ -55,7 +57,15 @@ class HasStatementFilter(Filter):
                         'anyOf': [{'type': 'string'}, {'type': 'array'}]},
                     'NotResource': {
                         'anyOf': [{'type': 'string'}, {'type': 'array'}]},
-                    'Condition': {'type': 'object'}
+                    'Condition': {'type': 'object'},
+                    'PartialMatch': {
+                        'anyOf': [
+                            {'type': 'string', "enum": PARTIAL_MATCH_ELEMENTS},
+                            {'type': 'array', 'items': [
+                                {"type": "string", "enum": PARTIAL_MATCH_ELEMENTS}
+                            ]}
+                        ]
+                    }
                 },
                 'required': ['Effect']
             }
@@ -67,15 +77,11 @@ class HasStatementFilter(Filter):
     def action_resource_case_insensitive(self, actions):
         if isinstance(actions, str):
             if len(actions.split(':')) > 1:
-                actionsFormatted = '{}:{}'.format(actions.split(':')[0].lower(),
-                    actions.split(':')[1])
+                actionsFormatted = [actions.lower()]
             else:
-                actionsFormatted = actions
+                actionsFormatted = [actions]
         else:
-            actionsFormatted = []
-            for action in actions:
-                actionsFormatted.append('{}:{}'.format(action.split(':')[0].lower(),
-                action.split(':')[1]))
+            actionsFormatted = [action.lower() for action in actions]
         return set(actionsFormatted)
 
     def process_resource(self, resource):
@@ -85,34 +91,63 @@ class HasStatementFilter(Filter):
             return None
         p = json.loads(p)
 
-        required = list(self.data.get('statement_ids', []))
-        statements = p.get('Statement', [])
-        for s in list(statements):
-            if s.get('Sid') in required:
-                required.remove(s['Sid'])
+        required_ids_not_matched = list(self.data.get('statement_ids', []))
+        resource_statements = p.get('Statement', [])
+        # compare if the resource_statement sid is in the required_ids list
+        for s in list(resource_statements):
+            if s.get('Sid') in required_ids_not_matched:
+                required_ids_not_matched.remove(s['Sid'])
 
-        required_statements = list(self.data.get('statements', []))
+        # required_statements is the filter that we get from the c7n policy
+        required_statements_not_matched = format_string_values(
+            list(self.data.get('statements', [])),
+            **self.get_std_format_args(resource)
+            )
+        for required_statement in required_statements_not_matched:
+            partial_match_elements = required_statement.pop('PartialMatch', [])
 
-        required_statements = format_string_values(list(self.data.get('statements', [])),
-                                                   **self.get_std_format_args(resource))
+            if isinstance(partial_match_elements, str):
+                # If there's only one string value, make the value a list
+                partial_match_elements = [partial_match_elements]
 
-        for required_statement in required_statements:
-            for statement in statements:
+            for resource_statement in resource_statements:
                 found = 0
-                for key, value in required_statement.items():
-                    if key in ['Action', 'NotAction']:
-                        if key in statement and \
-                            self.action_resource_case_insensitive(value) \
-                            == self.action_resource_case_insensitive(statement[key]):
+                for req_key, req_value in required_statement.items():
+                    if req_key in ['Action', 'NotAction']:
+                        resource_statement[req_key] = self.action_resource_case_insensitive(resource_statement[req_key])
+                        req_value = self.action_resource_case_insensitive(req_value)
+
+                    if req_key in partial_match_elements:
+                        if self.match_partial_statement(req_key,
+                                                        req_value,
+                                                        resource_statement):
                             found += 1
                     else:
-                        if key in statement and value == statement[key]:
+                        if req_key in resource_statement and req_value == resource_statement[req_key]:
                             found += 1
                 if found and found == len(required_statement):
-                    required_statements.remove(required_statement)
+                    required_statements_not_matched.remove(required_statement)
                     break
 
-        if (self.data.get('statement_ids', []) and not required) or \
-           (self.data.get('statements', []) and not required_statements):
+        if (self.data.get('statement_ids', []) and not required_ids_not_matched) or \
+           (self.data.get('statements', []) and not required_statements_not_matched):
             return resource
         return None
+
+    def match_partial_statement(self, partial_match_key,
+                                partial_match_value, resource_stmt):
+
+        # TO-DO: Add support for json subset match.
+        if partial_match_key in resource_stmt:
+            if isinstance(partial_match_value, list):
+                return set(partial_match_value).issubset(
+                    resource_stmt[partial_match_key])
+            elif isinstance(partial_match_value, set):
+                return partial_match_value.issubset(resource_stmt[partial_match_key])
+            # elif isinstance(partial_match_value, dict):
+            #     return merge_dict(resource_stmt[partial_match_key],
+            #         partial_match_value) == resource_stmt[partial_match_key]
+            else:
+                return partial_match_value in resource_stmt[partial_match_key]
+        else:
+            return False
