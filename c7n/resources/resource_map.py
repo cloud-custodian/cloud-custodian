@@ -43,6 +43,7 @@ ResourceMap = {
   "aws.cfn": "c7n.resources.cfn.CloudFormation",
   "aws.cloud-directory": "c7n.resources.directory.CloudDirectory",
   "aws.cloudhsm-cluster": "c7n.resources.hsm.CloudHSMCluster",
+  "aws.cloudhsm-backup": "c7n.resources.hsm.CloudHSMBackup",
   "aws.cloudsearch": "c7n.resources.cloudsearch.CloudSearch",
   "aws.cloudtrail": "c7n.resources.cloudtrail.CloudTrail",
   "aws.cloudwatch-dashboard": "c7n.resources.cw.CloudWatchDashboard",
