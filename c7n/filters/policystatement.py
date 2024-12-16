@@ -88,19 +88,23 @@ class HasStatementFilter(Filter):
             return None
         p = json.loads(p)
 
-        required_ids_not_matched = list(self.data.get('statement_ids', []))
+        required_ids = list(self.data.get('statement_ids', []))
+        required_ids_matched = []
         resource_statements = p.get('Statement', [])
         # compare if the resource_statement sid is in the required_ids list
         for s in list(resource_statements):
-            if s.get('Sid') in required_ids_not_matched:
-                required_ids_not_matched.remove(s['Sid'])
+            if s.get('Sid') in required_ids:
+                required_ids_matched.append(s['Sid'])
 
         # required_statements is the filter that we get from the c7n policy
-        required_statements_not_matched = format_string_values(
+        required_statements = format_string_values(
             list(self.data.get('statements', [])),
             **self.get_std_format_args(resource)
             )
-        for required_statement in required_statements_not_matched:
+
+        found_required_statements = []
+
+        for required_statement in required_statements:
             partial_match_elements = required_statement.pop('PartialMatch', [])
 
             if isinstance(partial_match_elements, str):
@@ -126,11 +130,12 @@ class HasStatementFilter(Filter):
                             (req_value == resource_statement[req_key]):
                             found += 1
                 if found and found == len(required_statement):
-                    required_statements_not_matched.remove(required_statement)
+                    found_required_statements.append(required_statement)
                     break
 
-        if (self.data.get('statement_ids', []) and not required_ids_not_matched) or \
-           (self.data.get('statements', []) and not required_statements_not_matched):
+        if (required_ids == required_ids_matched) and \
+           (self.data.get('statements', []) and
+            required_statements == found_required_statements):
             return resource
         return None
 

@@ -292,6 +292,7 @@ ResourceMap = {
   "aws.swf-domain": "c7n.resources.swf.SimpleWorkflowDomain",
   "aws.timestream-database": "c7n.resources.timestream.TimestreamDatabase",
   "aws.timestream-table": "c7n.resources.timestream.TimestreamTable",
+  "aws.timestream-influxdb": "c7n.resources.timestream.TimestreamInfluxDB",
   "aws.transfer-server": "c7n.resources.transfer.TransferServer",
   "aws.transfer-user": "c7n.resources.transfer.TransferUser",
   "aws.transit-attachment": "c7n.resources.vpc.TransitGatewayAttachment",
