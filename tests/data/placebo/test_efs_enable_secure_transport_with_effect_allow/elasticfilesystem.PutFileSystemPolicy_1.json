@@ -1,0 +1,8 @@
+{
+    "status_code": 200,
+    "data": {
+        "FileSystemId": "fs-06f6ce85b4976bd7f",
+        "Policy": "{\n  \"Version\" : \"2012-10-17\",\n  \"Statement\" : [ {\n    \"Sid\" : \"efs-disable-unencrpted-traffic-statement\",\n    \"Effect\" : \"Deny\",\n    \"Principal\" : {\n      \"AWS\" : \"*\"\n    },\n    \"Action\" : \"*\",\n    \"Condition\" : {\n      \"Bool\" : {\n        \"aws:SecureTransport\" : \"false\"\n      }\n    }\n  } ]\n}",
+        "ResponseMetadata": {}
+    }
+}
