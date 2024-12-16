@@ -1,0 +1,7 @@
+{
+    "status_code": 200,
+    "data": {
+        "StackId": "arn:aws:cloudformation:us-east-1:644160558196:stack/c7n-test-template-filter/285a3340-ac17-11ef-8896-0affc56add51",
+        "ResponseMetadata": {}
+    }
+}
