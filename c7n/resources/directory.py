@@ -51,6 +51,28 @@ class DirectoryVpcFilter(VpcFilter):
     RelatedIdsExpression = "VpcSettings.VpcId"
 
 
+@Directory.filter_registry.register('is-log-forwarding')
+class DirectoryLogSubscriptionFilter(Filter):
+
+    annotation_key = "c7n:LogSubscriptions"
+    permissions = ("ds:ListLogSubscriptions",)
+    schema = type_schema('is-log-forwarding')
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('ds')
+        results = []
+        for r in resources:
+            subs = self.manager.retry(
+                client.list_log_subscriptions,
+                DirectoryId=r["DirectoryId"]
+            )["LogSubscriptions"]
+            if subs:
+                r[self.annotation_key] = subs
+                results.append(r)
+
+        return results
+
+
 @Directory.filter_registry.register('ldap')
 class DirectoryLDAPFilter(Filter):
     """Filter directories based on their LDAP status
