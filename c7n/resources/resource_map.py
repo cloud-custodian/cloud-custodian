@@ -203,6 +203,7 @@ ResourceMap = {
   "aws.pinpoint-app": "c7n.resources.pinpoint.PinpointApp",
   "aws.prefix-list": "c7n.resources.vpc.PrefixList",
   "aws.qldb": "c7n.resources.qldb.QLDB",
+  "aws.quicksight-account": "c7n.resources.quicksight.QuicksightAccount",
   "aws.quicksight-group": "c7n.resources.quicksight.QuicksightGroup",
   "aws.quicksight-user": "c7n.resources.quicksight.QuicksightUser",
   "aws.r53domain": "c7n.resources.route53.Route53Domain",
