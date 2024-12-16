@@ -290,7 +290,7 @@ class ElasticFileSystem(BaseTest):
         region_config = {'region': 'us-west-1'}
         p = self.load_policy(
             {
-                "name": "efs-has-statement-barbara",
+                "name": "efs-has-statement",
                 "resource": "efs",
                 "filters": [
                     {

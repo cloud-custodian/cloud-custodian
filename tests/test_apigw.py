@@ -288,6 +288,7 @@ class TestRestApi(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['name'], 'c7n-test')
 
+
 class TestRestResource(BaseTest):
 
     def test_rest_resource_query(self):
