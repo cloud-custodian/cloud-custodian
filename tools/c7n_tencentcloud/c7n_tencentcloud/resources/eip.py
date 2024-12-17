@@ -17,7 +17,7 @@ class EIP(QueryResourceManager):
 
     :example:
 
-    .. code-block::
+    .. code-block:: yaml
 
     policies:
       - name: tencentcloud-eip

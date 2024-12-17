@@ -18,7 +18,11 @@ class DnsRecord(QueryResourceManager):
 
     .. code-block:: yaml
 
-        policies:
+    policies:
+      - name: tencentcloud-dns-record
+        resource: tencentcloud.dns-record
+        filters:
+          - domain: "c7n.tonykai.xyz"
 
     """
 
