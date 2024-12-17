@@ -8,20 +8,20 @@ from c7n_tencentcloud.utils import PageMethod
 
 @resources.register("eip")
 class EIP(QueryResourceManager):
-    """eip
-    Elastic IP address (EIP)
+    """Elastic IP address
+
+    Docs on EIP resource
     https://www.tencentcloud.com/document/product/215/16702
 
     :example:
 
     .. code-block:: yaml
 
-    policies:
-      - name: tencentcloud-eip
-        resource: tencentcloud.eip
-        filters:
-          - AddressIp: "43.159.34.197"
-
+        policies:
+        - name: tencentcloud-eip
+          resource: tencentcloud.eip
+          filters:
+            - AddressIp: "43.159.34.197"
     """
 
     class resource_type(ResourceTypeInfo):

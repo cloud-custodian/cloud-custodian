@@ -7,9 +7,9 @@ from c7n_tencentcloud.utils import PageMethod
 
 @resources.register("dns-record")
 class DnsRecord(QueryResourceManager):
-    """dnspod
+    """DNS Record
 
-    Docs on dnspod
+    Docs on dns record resource
     https://www.tencentcloud.com/document/product/1157/53854
     https://www.tencentcloud.com/document/product/1157/51290
 
@@ -17,12 +17,11 @@ class DnsRecord(QueryResourceManager):
 
     .. code-block:: yaml
 
-    policies:
-      - name: tencentcloud-dns-record
-        resource: tencentcloud.dns-record
-        filters:
-          - domain: "c7n.tonykai.xyz"
-
+        policies:
+        - name: tencentcloud-dns-record
+          resource: tencentcloud.dns-record
+          filters:
+            - domain: "c7n.tonykai.xyz"
     """
 
     class resource_type(ResourceTypeInfo):
