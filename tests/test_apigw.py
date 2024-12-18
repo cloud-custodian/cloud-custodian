@@ -254,6 +254,40 @@ class TestRestApi(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['name'], 'c7n-test')
 
+        p = self.load_policy(
+            {'name': 'api-has-statement',
+             'resource': 'rest-api',
+             'filters': [
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Allow",
+                                "Action": "execute-api:Invoke",
+                                "Principal": {
+                                    "AWS": "arn:aws:iam::123456789012:root",
+                                },
+                                "PartialMatch": ["Action"],
+                            },
+                            {
+                                "Effect": "Allow",
+                                "Action": "execute-api:Invoke",
+                                "Condition": {
+                                    "StringEquals": {
+                                        "aws:SourceVpc": ["vpc-1a2b3c4d", "vpc-abc123"]
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                ],
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], 'c7n-test')
+
 
 class TestRestResource(BaseTest):
 

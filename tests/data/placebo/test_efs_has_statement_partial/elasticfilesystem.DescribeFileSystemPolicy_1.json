@@ -1,0 +1,8 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "FileSystemId": "fs-0c4eafac33c417f78",
+        "Policy": "{\n  \"Version\" : \"2012-10-17\",\n  \"Id\" : \"efs-policy-wizard-00f65492-d562-4c2b-9fa4-d0fe374d27f3\",\n  \"Statement\" : [ {\n    \"Sid\" : \"efs-statement-cb521978-442e-49b0-a8b3-f8501baae220\",\n    \"Effect\" : \"Allow\",\n    \"Principal\" : {\n      \"AWS\" : \"*\"\n    },\n    \"Action\" : [ \"elasticfilesystem:ClientRootAccess\", \"elasticfilesystem:ClientMount\" ],\n    \"Resource\" : \"arn:aws:elasticfilesystem:us-west-1:644160558196:file-system/fs-0c4eafac33c417f78\",\n    \"Condition\" : {\n      \"Bool\" : {\n        \"elasticfilesystem:AccessedViaMountTarget\" : \"true\",\n        \"aws:SecureTransport\" : \"true\"\n      }\n    }\n  }, {\n    \"Sid\" : \"allow-barbara\",\n    \"Effect\" : \"Allow\",\n    \"Principal\" : {\n      \"AWS\" : \"arn:aws:iam::644160558196:user/Barbara\"\n    },\n    \"Action\" : \"elasticfilesystem:*\",\n    \"Resource\" : \"arn:aws:elasticfilesystem:us-west-1:644160558196:file-system/fs-0c4eafac33c417f78\"\n  } ]\n}"
+    }
+}
