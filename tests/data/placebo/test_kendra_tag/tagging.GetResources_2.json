@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:kendra:us-east-1:644160558196:index/2ac89abb-a374-4b0a-853a-f8caefa7c2f1",
+                "Tags": [
+                    {
+                        "Key": "TestTag",
+                        "Value": "c7n"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -153,6 +153,7 @@ ResourceMap = {
   "aws.internet-gateway": "c7n.resources.vpc.InternetGateway",
   "aws.iot": "c7n.resources.iot.IoT",
   "aws.kafka": "c7n.resources.kafka.Kafka",
+  "aws.kendra": "c7n.resources.kendra.KendraIndex",
   "aws.key-pair": "c7n.resources.vpc.KeyPair",
   "aws.kinesis": "c7n.resources.kinesis.KinesisStream",
   "aws.kinesis-analytics": "c7n.resources.kinesis.AnalyticsApp",
