@@ -89,3 +89,22 @@ class WAFTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertTrue('c7n:WafV2LoggingConfiguration' not in resources[0])
+
+    def test_wafv2_list_all_rules_compliant(self):
+        session_factory = self.record_flight_data("test_wafv2_list_all_rules_compliant")
+        policy = {
+            "name": "wafv2_list_all_rules_compliant",
+            "resource": "aws.wafv2",
+            "filters": [
+                {
+                    "type": "list-all-rules",
+                    "key": "WebACLAllRules[].Type",
+                    "value": "RuleGroup",
+                    "op": "equal"
+                }
+            ],
+        }
+        p = self.load_policy(policy, session_factory=session_factory, config={"region": "us-east-1"})
+        resources = p.run()
+
+        print("Response", resources)
