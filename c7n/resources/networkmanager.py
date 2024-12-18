@@ -24,6 +24,7 @@ class CoreNetwork(QueryResourceManager):
         config_type = None
         cfn_type = 'AWS::NetworkManager::CoreNetwork'
         permissions_augment = ("networkmanager:ListTagsForResource",)
+        global_resource = True
 
 
 CoreNetwork.filter_registry.register('marked-for-op', TagActionFilter)
@@ -41,6 +42,7 @@ class GlobalNetwork(QueryResourceManager):
         date = 'CreatedAt'
         config_type = cfn_type = 'AWS::NetworkManager::GlobalNetwork'
         permissions_augment = ("networkmanager:ListTagsForResource",)
+        global_resource = True
 
 
 GlobalNetwork.filter_registry.register('marked-for-op', TagActionFilter)
