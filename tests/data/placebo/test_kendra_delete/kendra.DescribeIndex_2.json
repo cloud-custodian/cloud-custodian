@@ -1,0 +1,237 @@
+{
+    "status_code": 200,
+    "data": {
+        "Name": "c7n-test",
+        "Id": "2ac89abb-a374-4b0a-853a-f8caefa7c2f1",
+        "Edition": "GEN_AI_ENTERPRISE_EDITION",
+        "RoleArn": "arn:aws:iam::123456789012:role/service-role/AmazonKendra-us-east-1-c7n-test",
+        "Status": "DELETING",
+        "CreatedAt": {
+            "__class__": "datetime",
+            "year": 2024,
+            "month": 12,
+            "day": 18,
+            "hour": 14,
+            "minute": 32,
+            "second": 53,
+            "microsecond": 990000
+        },
+        "UpdatedAt": {
+            "__class__": "datetime",
+            "year": 2024,
+            "month": 12,
+            "day": 18,
+            "hour": 15,
+            "minute": 25,
+            "second": 28,
+            "microsecond": 253000
+        },
+        "DocumentMetadataConfigurations": [
+            {
+                "Name": "_authors",
+                "Type": "STRING_LIST_VALUE",
+                "Relevance": {
+                    "Importance": 1
+                },
+                "Search": {
+                    "Facetable": false,
+                    "Searchable": false,
+                    "Displayable": false,
+                    "Sortable": false
+                }
+            },
+            {
+                "Name": "_category",
+                "Type": "STRING_VALUE",
+                "Relevance": {
+                    "Importance": 1,
+                    "ValueImportanceMap": {}
+                },
+                "Search": {
+                    "Facetable": false,
+                    "Searchable": false,
+                    "Displayable": false,
+                    "Sortable": true
+                }
+            },
+            {
+                "Name": "_created_at",
+                "Type": "DATE_VALUE",
+                "Relevance": {
+                    "Freshness": false,
+                    "Importance": 1,
+                    "Duration": "25920000s",
+                    "RankOrder": "ASCENDING"
+                },
+                "Search": {
+                    "Facetable": false,
+                    "Searchable": false,
+                    "Displayable": false,
+                    "Sortable": true
+                }
+            },
+            {
+                "Name": "_data_source_id",
+                "Type": "STRING_VALUE",
+                "Relevance": {
+                    "Importance": 1,
+                    "ValueImportanceMap": {}
+                },
+                "Search": {
+                    "Facetable": false,
+                    "Searchable": false,
+                    "Displayable": false,
+                    "Sortable": true
+                }
+            },
+            {
+                "Name": "_document_title",
+                "Type": "STRING_VALUE",
+                "Relevance": {
+                    "Importance": 2,
+                    "ValueImportanceMap": {}
+                },
+                "Search": {
+                    "Facetable": false,
+                    "Searchable": true,
+                    "Displayable": true,
+                    "Sortable": true
+                }
+            },
+            {
+                "Name": "_excerpt_page_number",
+                "Type": "LONG_VALUE",
+                "Relevance": {
+                    "Importance": 1,
+                    "RankOrder": "ASCENDING"
+                },
+                "Search": {
+                    "Facetable": false,
+                    "Searchable": false,
+                    "Displayable": false,
+                    "Sortable": false
+                }
+            },
+            {
+                "Name": "_faq_id",
+                "Type": "STRING_VALUE",
+                "Relevance": {
+                    "Importance": 1,
+                    "ValueImportanceMap": {}
+                },
+                "Search": {
+                    "Facetable": false,
+                    "Searchable": false,
+                    "Displayable": false,
+                    "Sortable": true
+                }
+            },
+            {
+                "Name": "_file_type",
+                "Type": "STRING_VALUE",
+                "Relevance": {
+                    "Importance": 1,
+                    "ValueImportanceMap": {}
+                },
+                "Search": {
+                    "Facetable": false,
+                    "Searchable": false,
+                    "Displayable": false,
+                    "Sortable": true
+                }
+            },
+            {
+                "Name": "_language_code",
+                "Type": "STRING_VALUE",
+                "Relevance": {
+                    "Importance": 1,
+                    "ValueImportanceMap": {}
+                },
+                "Search": {
+                    "Facetable": false,
+                    "Searchable": false,
+                    "Displayable": false,
+                    "Sortable": true
+                }
+            },
+            {
+                "Name": "_last_updated_at",
+                "Type": "DATE_VALUE",
+                "Relevance": {
+                    "Freshness": false,
+                    "Importance": 1,
+                    "Duration": "25920000s",
+                    "RankOrder": "ASCENDING"
+                },
+                "Search": {
+                    "Facetable": false,
+                    "Searchable": false,
+                    "Displayable": false,
+                    "Sortable": true
+                }
+            },
+            {
+                "Name": "_source_uri",
+                "Type": "STRING_VALUE",
+                "Relevance": {
+                    "Importance": 1,
+                    "ValueImportanceMap": {}
+                },
+                "Search": {
+                    "Facetable": false,
+                    "Searchable": false,
+                    "Displayable": true,
+                    "Sortable": false
+                }
+            },
+            {
+                "Name": "_tenant_id",
+                "Type": "STRING_VALUE",
+                "Relevance": {
+                    "Importance": 1,
+                    "ValueImportanceMap": {}
+                },
+                "Search": {
+                    "Facetable": false,
+                    "Searchable": false,
+                    "Displayable": false,
+                    "Sortable": true
+                }
+            },
+            {
+                "Name": "_version",
+                "Type": "STRING_VALUE",
+                "Relevance": {
+                    "Importance": 1,
+                    "ValueImportanceMap": {}
+                },
+                "Search": {
+                    "Facetable": false,
+                    "Searchable": false,
+                    "Displayable": false,
+                    "Sortable": true
+                }
+            },
+            {
+                "Name": "_view_count",
+                "Type": "LONG_VALUE",
+                "Relevance": {
+                    "Importance": 1,
+                    "RankOrder": "ASCENDING"
+                },
+                "Search": {
+                    "Facetable": false,
+                    "Searchable": false,
+                    "Displayable": false,
+                    "Sortable": true
+                }
+            }
+        ],
+        "CapacityUnits": {
+            "StorageCapacityUnits": 0,
+            "QueryCapacityUnits": 0
+        },
+        "UserContextPolicy": "ATTRIBUTE_FILTER",
+        "ResponseMetadata": {}
+    }
+}

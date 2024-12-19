@@ -1,0 +1,12 @@
+{
+    "status_code": 200,
+    "data": {
+        "Tags": [
+            {
+                "Key": "TestTag",
+                "Value": "c7n"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
