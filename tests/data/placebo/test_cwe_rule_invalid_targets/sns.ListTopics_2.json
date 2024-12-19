@@ -3,10 +3,10 @@
     "data": {
         "Topics": [
             {
-                "TopicArn": "arn:aws:sns:us-east-1:644160558196:aws-controltower-SecurityNotifications"
+                "TopicArn": "arn:aws:sns:us-west-1:644160558196:MyTopic"
             },
             {
-                "TopicArn": "arn:aws:sns:us-east-1:644160558196:test2"
+                "TopicArn": "arn:aws:sns:us-west-1:644160558196:topic-2"
             }
         ],
         "ResponseMetadata": {}

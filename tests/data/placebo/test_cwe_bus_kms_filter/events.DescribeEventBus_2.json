@@ -1,0 +1,29 @@
+{
+    "status_code": 200,
+    "data": {
+        "Name": "c7n-cwe",
+        "Arn": "arn:aws:events:us-east-1:644160558196:event-bus/c7n-cwe",
+        "KmsKeyIdentifier": "arn:aws:kms:us-east-1:644160558196:key/3bd15351-ad10-4cf4-b230-280746ad3dbb",
+        "CreationTime": {
+            "__class__": "datetime",
+            "year": 2024,
+            "month": 10,
+            "day": 28,
+            "hour": 14,
+            "minute": 2,
+            "second": 16,
+            "microsecond": 15000
+        },
+        "LastModifiedTime": {
+            "__class__": "datetime",
+            "year": 2024,
+            "month": 12,
+            "day": 5,
+            "hour": 10,
+            "minute": 0,
+            "second": 35,
+            "microsecond": 715000
+        },
+        "ResponseMetadata": {}
+    }
+}

@@ -4,7 +4,7 @@ import itertools
 from collections import defaultdict
 from concurrent.futures import as_completed
 from datetime import datetime, timedelta
-
+from botocore.paginate import Paginator
 import botocore.exceptions
 
 from c7n.actions import BaseAction
@@ -21,10 +21,24 @@ from c7n.manager import resources
 from c7n.resolver import ValuesFrom
 from c7n.resources import load_resources
 from c7n.resources.aws import ArnResolver
+from c7n.query import RetryPageIterator
 from c7n.tags import universal_augment
 from c7n.utils import type_schema, local_session, chunks, get_retry, jmespath_search
 from botocore.config import Config
 import re
+
+
+# https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/events.html#paginators
+# There is no paginator for list_event_buses. Therefore manual pagination is implemented here.
+def GetEventBuses(client):
+    pager = Paginator(
+        client.list_event_buses,
+        {'input_token': 'NextToken', 'output_token': 'NextToken',
+            'result_key': 'EventBuses'},
+        client.meta.service_model.operation_model('ListEventBuses'))
+    pager.PAGE_ITERATOR_CLS = RetryPageIterator
+    event_buses = pager.paginate().build_full_result().get('EventBuses', [])
+    return event_buses
 
 
 class DescribeAlarm(DescribeSource):
@@ -181,6 +195,7 @@ class EventBus(QueryResourceManager):
         arn_type = 'event-bus'
         arn = 'Arn'
         enum_spec = ('list_event_buses', 'EventBuses', None)
+        detail_spec = ('describe_event_bus', 'Name', 'Name', None)
         config_type = cfn_type = 'AWS::Events::EventBus'
         id = name = 'Name'
         universal_taggable = object()
@@ -235,6 +250,26 @@ class EventBusDelete(BaseAction):
 class RuleDescribe(DescribeSource):
 
     def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('events')
+
+        # Fetch all event buses using manual pagination
+        event_buses = GetEventBuses(client)
+
+        event_buses = [bus for bus in event_buses if bus['Name'] != 'default']
+        paginator = client.get_paginator('list_rules')
+        paginator.PAGE_ITERATOR_CLS = RetryPageIterator
+
+        # Collect rules for all non-default event buses
+        non_default_rules = [
+            rule
+            for event_bus in event_buses
+            for rule in paginator.paginate(EventBusName=event_bus['Name'])
+                    .build_full_result().get('Rules', [])
+        ]
+
+        # Extend the resources list with the collected rules
+        resources.extend(non_default_rules)
+
         return universal_augment(self.manager, resources)
 
 
@@ -243,7 +278,7 @@ class EventRule(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'events'
-        arn_type = 'rule'
+        arn = 'Arn'
         enum_spec = ('list_rules', 'Rules', None)
         name = "Name"
         id = "Name"
@@ -266,8 +301,28 @@ class EventRuleMetrics(MetricsFilter):
         return [{'Name': 'RuleName', 'Value': resource['Name']}]
 
 
+class EventChildResourceFilter(ChildResourceFilter):
+
+    def get_related(self, resources):
+        self.child_resources = {}
+        child_resource_manager = self.get_resource_manager()
+        client = local_session(child_resource_manager.session_factory).client('events')
+        paginator_targets = client.get_paginator('list_targets_by_rule')
+        paginator_targets.PAGE_ITERATOR_CLS = RetryPageIterator
+
+        for r in resources:
+            targets = paginator_targets.paginate(EventBusName=r['EventBusName'], Rule=r['Name']) \
+            .build_full_result().get('Targets', [])
+            for target in targets:
+                target[self.ChildResourceParentKey] = r['Name']
+                self.child_resources.setdefault(target[self.ChildResourceParentKey], []) \
+                .append(target)
+
+        return self.child_resources
+
+
 @EventRule.filter_registry.register('event-rule-target')
-class EventRuleTargetFilter(ChildResourceFilter):
+class EventRuleTargetFilter(EventChildResourceFilter):
 
     """
     Filter event rules by their targets
@@ -294,7 +349,7 @@ class EventRuleTargetFilter(ChildResourceFilter):
 
 
 @EventRule.filter_registry.register('invalid-targets')
-class ValidEventRuleTargetFilter(ChildResourceFilter):
+class ValidEventRuleTargetFilter(EventChildResourceFilter):
     """
     Filter event rules for invalid targets, Use the `all` option to
     find any event rules that have all invalid targets, otherwise
@@ -428,7 +483,7 @@ class EventRuleDelete(BaseAction):
         target_error_msg = "Rule can't be deleted since it has targets."
         for r in resources:
             try:
-                client.delete_rule(Name=r['Name'])
+                client.delete_rule(Name=r['Name'], EventBusName=r['EventBusName'])
             except botocore.exceptions.ClientError as e:
                 if e.response['Error']['Message'] != target_error_msg:
                     raise
@@ -441,8 +496,8 @@ class EventRuleDelete(BaseAction):
                 if not children:
                     children = EventRuleTargetFilter({}, child_manager).get_related(resources)
                 targets = list(set([t['Id'] for t in children.get(r['Name'])]))
-                client.remove_targets(Rule=r['Name'], Ids=targets)
-                client.delete_rule(Name=r['Name'])
+                client.remove_targets(Rule=r['Name'], Ids=targets, EventBusName=r['EventBusName'])
+                client.delete_rule(Name=r['Name'], EventBusName=r['EventBusName'])
 
 
 @EventRule.action_registry.register('set-rule-state')
@@ -507,6 +562,56 @@ class EventRuleTarget(ChildResourceManager):
         parent_spec = ('event-rule', 'Rule', True)
         name = id = 'Id'
 
+    def augment(self, resources):
+        manager = self.get_parent_manager()
+        client = local_session(manager.session_factory).client('events')
+        event_buses = GetEventBuses(client)
+
+        # Initialize paginators with RetryPageIterator
+        paginator_rules = client.get_paginator('list_rules')
+        paginator_rules.PAGE_ITERATOR_CLS = RetryPageIterator
+
+        # Create a dictionary of all rules for each event bus.
+        # It will be used later to enrich event-rule-target json with additional
+        # event-rule information.
+        event_bus_rules = {
+            event_bus['Name']: paginator_rules.paginate(EventBusName=event_bus['Name'])
+                                            .build_full_result().get('Rules', [])
+            for event_bus in event_buses
+        }
+
+        # Filter out the default event bus
+        non_default_event_bus_rules = {
+            bus: rules for bus, rules in event_bus_rules.items() if bus != 'default'
+        }
+        paginator_targets = client.get_paginator('list_targets_by_rule')
+        paginator_targets.PAGE_ITERATOR_CLS = RetryPageIterator
+
+        # Collect all rule targets for non-default event buses with additional fields
+        non_default_rule_targets = [
+            {**target, 'c7n:parent-id': rule['Name']}
+            for event_bus_name, rules in non_default_event_bus_rules.items()
+            for rule in rules
+            for target in paginator_targets.paginate(EventBusName=event_bus_name,
+                Rule=rule['Name']).build_full_result().get('Targets', [])
+        ]
+
+        # Existing resources contain all event rule targets from default event bus.
+        # This will extend the resources with additional event rule targets
+        # from non-default event bus.
+        resources.extend(non_default_rule_targets)
+
+        # Map resources to their corresponding rules
+        for r in resources:
+            parent_id = r.get('c7n:parent-id')
+            for _, rules in event_bus_rules.items():
+                matching_rule = next((rule for rule in rules if rule['Name'] == parent_id), None)
+                if matching_rule:
+                    r['event-rule'] = matching_rule
+                    break
+
+        return resources
+
 
 @EventRuleTarget.filter_registry.register('cross-account')
 class CrossAccountFilter(CrossAccountAccessFilter):
@@ -533,12 +638,15 @@ class DeleteTarget(BaseAction):
         client = local_session(self.manager.session_factory).client('events')
         rule_targets = {}
         for r in resources:
-            rule_targets.setdefault(r['c7n:parent-id'], []).append(r['Id'])
+            event_bus = r['event-rule']['EventBusName']
+            rule_id = r['c7n:parent-id']
+            rule_targets.setdefault((rule_id, event_bus), []).append(r['Id'])
 
-        for rule_id, target_ids in rule_targets.items():
+        for (rule_id, event_bus), target_ids in rule_targets.items():
             client.remove_targets(
                 Ids=target_ids,
-                Rule=rule_id)
+                Rule=rule_id,
+                EventBusName=event_bus)
 
 
 @resources.register('log-group')

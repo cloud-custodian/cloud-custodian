@@ -3,16 +3,8 @@
     "data": {
         "Targets": [
             {
-                "Id": "Id1924056326514",
-                "Arn": "arn:aws:lambda:us-east-1:644160558196:function:test"
-            },
-            {
-                "Id": "Id1934612621092",
-                "Arn": "arn:aws:sns:us-east-1:644160558196:foo"
-            },
-            {
-                "Id": "Id1997611391379",
-                "Arn": "arn:aws:sns:us-east-1:644160558196:test2"
+                "Id": "Ida356d160-176b-41a5-acb1-e3e3c0b02d37",
+                "Arn": "arn:aws:sns:us-west-1:644160558196:MyTopic"
             }
         ],
         "ResponseMetadata": {}

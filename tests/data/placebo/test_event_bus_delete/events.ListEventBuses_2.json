@@ -4,7 +4,7 @@
         "EventBuses": [
             {
                 "Name": "default",
-                "Arn": "arn:aws:events:us-east-1:644160558196:event-bus/default"
+                "Arn": "arn:aws:events:us-west-1:644160558196:event-bus/default"
             }
         ],
         "ResponseMetadata": {}
