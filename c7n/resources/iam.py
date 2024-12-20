@@ -81,7 +81,7 @@ class DescribeRole(DescribeSource):
         client = local_session(self.manager.session_factory).client('iam')
         resources = []
         for rid in resource_ids:
-            if rid.startswith('arn'):
+            if rid.startswith('arn:'):
                 rid = Arn.parse(rid).resource
             try:
                 result = self.manager.retry(client.get_role, RoleName=rid)
