@@ -3,8 +3,8 @@
     "data": {
         "Targets": [
             {
-                "Id": "Compliance-Change-Topic",
-                "Arn": "arn:aws:sns:us-east-1:644160558196:aws-controltower-SecurityNotifications"
+                "Id": "Id12becbb1-35be-4ef6-907d-629c94e6abbb",
+                "Arn": "arn:aws:lambda:us-west-1:644160558196:function:test"
             }
         ],
         "ResponseMetadata": {}

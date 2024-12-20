@@ -1,22 +1,13 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
         "Targets": [
             {
-                "Id": "custodian-stop-night-asg", 
-                "Arn": "arn:aws:lambda:us-east-2:644160558196:function:custodian-stop-night-asg"
+                "Id": "Ide928b09c-d065-49a9-83ff-2a712f97dd21",
+                "Arn": "arn:aws:events:us-east-1:644160558198:event-bus/custom-event-bus",
+                "RoleArn": "arn:aws:iam::644160558196:role/service-role/Amazon_EventBridge_Invoke_Event_Bus_204419053"
             }
-        ], 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "0c4a2973-212a-11e8-abe7-dbc213c8fee7", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "0c4a2973-212a-11e8-abe7-dbc213c8fee7", 
-                "date": "Tue, 06 Mar 2018 10:35:10 GMT", 
-                "content-length": "127", 
-                "content-type": "application/x-amz-json-1.1"
-            }
-        }
+        ],
+        "ResponseMetadata": {}
     }
 }

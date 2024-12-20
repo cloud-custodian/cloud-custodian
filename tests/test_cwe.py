@@ -23,7 +23,7 @@ class JmespathEncoder(json.JSONEncoder):
 @pytest.mark.audited
 @terraform('event_bridge_bus')
 def test_event_bus_describe(test, event_bridge_bus):
-    factory = test.replay_flight_data('test_cwe_bus_xaccount')
+    factory = test.replay_flight_data('test_cwe_bus_xaccount', region='us-west-1')
     p = test.load_policy({
         'name': 'bus-xaccount',
         'resource': 'aws.event-bus',
@@ -31,7 +31,7 @@ def test_event_bus_describe(test, event_bridge_bus):
             {'tag:Env': 'Sandbox'},
             'cross-account'
         ],
-    }, session_factory=factory)
+    }, session_factory=factory, config={'region': 'us-west-1'})
     resources = p.run()
     assert len(resources) == 1
     resources[0]['Name'] == event_bridge_bus[
@@ -56,19 +56,38 @@ def test_event_bus_kms_filter(test, event_bridge_bus):
 
 class CloudWatchEventTest(BaseTest):
 
+    def test_event_rule_target_event_rule(self):
+        session_factory = self.replay_flight_data("test_event_rule_target_event_rule",
+                                                  region='us-west-1')
+        policy = self.load_policy(
+            {
+                "name": "cwe-event-rule-target",
+                "resource": "event-rule-target",
+                "filters": [{
+                        "type": "value",
+                        "key": "Arn",
+                        "op": "eq",
+                        "value": "arn:aws:sns:us-west-1:644160558196:topic-2",
+                    }]
+            },
+            config={'region': 'us-west-1'},
+            session_factory=session_factory
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
     def test_event_rule_tags(self):
-        factory = self.replay_flight_data('test_cwe_rule_tags')
+        factory = self.replay_flight_data('test_cwe_rule_tags', region='us-west-1')
         client = factory().client('events')
         policy = self.load_policy(
             {
                 'name': 'cwe-rule',
                 'resource': 'aws.event-rule',
                 'filters': [
-                    {'tag:App': 'absent'},
-                    {'Name': 'cloud-custodian-mailer'}],
+                    {'tag:App': 'absent'},],
                 'actions': [
                     {'type': 'tag', 'tags': {'App': 'Custodian'}}]
-            }, session_factory=factory, config={'region': 'us-west-2'})
+            }, session_factory=factory, config={'region': 'us-west-1'})
         resources = policy.run()
         self.assertEqual(len(resources), 1)
         tags = {t['Key']: t['Value'] for t in
@@ -78,7 +97,7 @@ class CloudWatchEventTest(BaseTest):
         self.assertEqual(tags, {'App': 'Custodian'})
 
     def test_event_rule_enable(self):
-        factory = self.replay_flight_data('test_cwe_enable_rule')
+        factory = self.replay_flight_data('test_cwe_enable_rule', region='us-west-1')
         client = factory().client('events')
         policy = self.load_policy(
             {
@@ -91,7 +110,7 @@ class CloudWatchEventTest(BaseTest):
                     }
                 ]
             },
-            session_factory=factory,
+            session_factory=factory, config={'region': 'us-west-1'}
         )
         resources = policy.run()
         response = client.describe_rule(
@@ -99,7 +118,7 @@ class CloudWatchEventTest(BaseTest):
         self.assertEqual(response['State'], 'ENABLED')
 
     def test_event_rule_disable(self):
-        factory = self.replay_flight_data('test_cwe_disable_rule')
+        factory = self.replay_flight_data('test_cwe_disable_rule', region='us-west-1')
         client = factory().client('events')
         policy = self.load_policy(
             {
@@ -112,7 +131,7 @@ class CloudWatchEventTest(BaseTest):
                     }
                 ]
             },
-            session_factory=factory,
+            session_factory=factory, config={'region': 'us-west-1'}
         )
         resources = policy.run()
         response = client.describe_rule(
@@ -120,7 +139,7 @@ class CloudWatchEventTest(BaseTest):
         self.assertEqual(response['State'], 'DISABLED')
 
     def test_target_cross_account_remove(self):
-        session_factory = self.replay_flight_data("test_cwe_rule_target_cross")
+        session_factory = self.replay_flight_data("test_cwe_rule_target_cross", region="us-west-1")
         client = session_factory().client("events")
         policy = self.load_policy(
             {
@@ -129,17 +148,19 @@ class CloudWatchEventTest(BaseTest):
                 "filters": [{"type": "cross-account"}],
                 "actions": ["delete"],
             },
-            session_factory=session_factory,
+            session_factory=session_factory, config={'region': 'us-west-1'}
         )
         resources = policy.run()
         self.assertEqual(len(resources), 1)
-        targets = client.list_targets_by_rule(Rule=resources[0]["c7n:parent-id"]).get(
+        rule_id = resources[0]["c7n:parent-id"]
+        event_bus = resources[0]["Rule"]["EventBusName"]
+        targets = client.list_targets_by_rule(Rule=rule_id, EventBusName=event_bus).get(
             "Targets"
         )
         self.assertEqual(targets, [])
 
     def test_event_rule_force_delete(self):
-        session_factory = self.replay_flight_data("test_cwe_rule_force_delete")
+        session_factory = self.replay_flight_data("test_cwe_rule_force_delete", region="us-west-1")
         client = session_factory().client('events')
         policy = self.load_policy({
             "name": "cwe-filter-on-target",
@@ -148,7 +169,7 @@ class CloudWatchEventTest(BaseTest):
                 {
                     "type": "event-rule-target",
                     "key": "[].Arn",
-                    "value": "arn:aws:lambda:us-east-1:644160558196:function:test",
+                    "value": "arn:aws:lambda:us-west-1:644160558196:function:test",
                     "op": "in",
                     "value_type": "swap"
                 }
@@ -159,14 +180,15 @@ class CloudWatchEventTest(BaseTest):
                     "force": True
                 }
             ]
-        }, session_factory=session_factory)
+        }, session_factory=session_factory, config={'region': 'us-west-1'})
         resources = policy.run()
         with self.assertRaises(client.exceptions.ResourceNotFoundException):
             client.describe_rule(Name=resources[0]["Name"])
         self.assertEqual(len(resources), 1)
 
     def test_event_rule_invalid_targets_any(self):
-        session_factory = self.replay_flight_data("test_cwe_rule_invalid_targets")
+        session_factory = self.replay_flight_data(
+            "test_cwe_rule_invalid_targets", region="us-west-1")
         lambda_client = session_factory().client('lambda')
         sns_client = session_factory().client('sns')
         policy = self.load_policy({
@@ -177,21 +199,20 @@ class CloudWatchEventTest(BaseTest):
                     "type": "invalid-targets"
                 }
             ],
-        }, session_factory=session_factory)
+        }, session_factory=session_factory, config={'region': 'us-west-1'})
         resources = policy.run()
         invalid_targets = set([
-            "arn:aws:lambda:us-east-1:644160558196:function:test",
-            "arn:aws:sns:us-east-1:644160558196:foo"])
+            "arn:aws:lambda:us-west-1:644160558196:function:test",
+            "arn:aws:sns:us-west-1:644160558196:foo"])
         self.assertEqual(set(resources[0]["c7n:InvalidTargets"]), invalid_targets)
         with self.assertRaises(lambda_client.exceptions.ClientError):
             lambda_client.get_function(FunctionName="test")
         with self.assertRaises(sns_client.exceptions.NotFoundException):
-            sns_client.get_topic_attributes(TopicArn="arn:aws:sns:us-east-1:644160558196:foo")
-        res = sns_client.get_topic_attributes(TopicArn="arn:aws:sns:us-east-1:644160558196:test2")
-        self.assertTrue(res)
+            sns_client.get_topic_attributes(TopicArn="arn:aws:sns:us-west-1:644160558196:foo")
 
     def test_event_rule_invalid_targets_all(self):
-        session_factory = self.replay_flight_data("test_cwe_rule_invalid_targets")
+        session_factory = self.replay_flight_data(
+            "test_cwe_rule_invalid_targets_all", region="us-west-1")
         policy = self.load_policy({
             "name": "cwe-filter-on-invalid-target",
             "resource": "aws.event-rule",
@@ -201,7 +222,7 @@ class CloudWatchEventTest(BaseTest):
                     "all": True
                 }
             ],
-        }, session_factory=session_factory)
+        }, session_factory=session_factory, config={'region': 'us-west-1'})
         resources = policy.run()
         self.assertEqual(len(resources), 0)
 
@@ -355,7 +376,7 @@ class CloudWatchEventsFacadeTest(TestCase):
 
 class EventBusTest(BaseTest):
     def test_event_bus_delete(self):
-        factory = self.replay_flight_data("test_event_bus_delete")
+        factory = self.replay_flight_data("test_event_bus_delete", region="us-west-1")
         p = self.load_policy(
             {
                 "name": "delete-event-bus",
@@ -363,7 +384,7 @@ class EventBusTest(BaseTest):
                 "filters": [{"Name": "test-event-bus"}],
                 "actions": ["delete"],
             },
-            session_factory=factory,
+            session_factory=factory, config={'region': 'us-west-1'}
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)

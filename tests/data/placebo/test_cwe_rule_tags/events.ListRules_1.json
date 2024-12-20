@@ -3,11 +3,10 @@
     "data": {
         "Rules": [
             {
-                "Name": "cloud-custodian-mailer",
-                "Arn": "arn:aws:events:us-west-2:644160558196:rule/cloud-custodian-mailer",
+                "Name": "rule-1",
+                "Arn": "arn:aws:events:us-west-1:644160558196:rule/rule-1",
+                "EventPattern": "{\"source\":[\"aws.autoscaling\"],\"detail-type\":[\"EC2 Auto Scaling Instance Refresh Checkpoint Reached\",\"EC2 Auto Scaling Instance Refresh Started\",\"EC2 Auto Scaling Instance Refresh Succeeded\",\"EC2 Auto Scaling Instance Refresh Failed\",\"EC2 Auto Scaling Instance Refresh Cancelled\",\"EC2 Auto Scaling Instance Refresh Started Baking\"]}",
                 "State": "ENABLED",
-                "Description": "Cloud Custodian Mailer",
-                "ScheduleExpression": "rate(5 minutes)",
                 "EventBusName": "default"
             }
         ],
