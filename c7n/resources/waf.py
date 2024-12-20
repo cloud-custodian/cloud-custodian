@@ -211,20 +211,40 @@ class WAFV2LoggingFilter(ValueFilter):
 class WAFV2ListAllRulesFilter(ValueFilter):
     """
     Return all rules inside the Web ACL, including rules in rule groups.
+    Allows filtering based on any field within the rules data.
 
     :example:
 
     .. code-block:: yaml
 
         policies:
-          - name: list-all-rules-in-web-acl
+          - name: find-rule-groups
             resource: aws.wafv2
             filters:
               - type: list-all-rules
+                key: Type
+                value: RuleGroup
+
+          - name: find-specific-rule-name
+            resource: aws.wafv2
+            filters:
+              - type: list-all-rules
+                key: "Rules[].Name"
+                value: test-rule
+                op: contains
+
+          - name: find-blocked-countries
+            resource: aws.wafv2
+            filters:
+              - type: list-all-rules
+                key: "Rules[].Statement.GeoMatchStatement.CountryCodes[]"
+                value: AF
+                op: contains
     """
 
-    schema = type_schema('list-all-rules')
+    schema = type_schema('list-all-rules', rinherit=ValueFilter.schema)
     permissions = ('wafv2:GetRuleGroup',)
+    annotation_key = 'c7n:WebACLAllRules'
 
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client(
@@ -241,25 +261,35 @@ class WAFV2ListAllRulesFilter(ValueFilter):
                     rule_group_arn = rule['Statement']['RuleGroupReferenceStatement']['ARN']
                     scope = resource['Scope']
 
-                    try:
-                        rule_group_response = client.get_rule_group(
-                            Name=rule_group_arn.split('/')[-2],
-                            Id=rule_group_arn.split('/')[-1],
-                            Scope=scope
-                        )
-                        rule_group = rule_group_response.get('RuleGroup', {})
+                    rule_group_response = client.get_rule_group(
+                        Name=rule_group_arn.split('/')[-2],
+                        Id=rule_group_arn.split('/')[-1],
+                        Scope=scope
+                    )
+                    rule_group = rule_group_response.get('RuleGroup', {})
 
-                        rule_details = {
-                            "Type": "RuleGroup",
-                            "RuleGroupARN": rule_group_arn,
-                            "Rules": rule_group.get('Rules', [])
-                        }
-                    except Exception as e:
-                        print(f"Error fetching rule group {rule_group_arn}: {e}")
+                    rule_details = {
+                        "Type": "RuleGroup",
+                        "RuleGroupARN": rule_group_arn,
+                        "Rules": rule_group.get('Rules', [])
+                    }
+
 
                 all_rules.append(rule_details)
 
-            resource['WebACLAllRules'] = all_rules
+            resource[self.annotation_key] = all_rules
 
-        print("Resource: ", resources)
-        return resources
+        # print("Resource: ", resources)
+        return [
+            r for r in resources if self.match(
+                r.get(self.annotation_key, {}))]
+
+    def match(self, value):
+        print("value: ", value)
+
+        for rule in value:
+            print("type", type(rule))
+            print("rule", rule)
+            if super().match(rule):
+                return True
+        return False

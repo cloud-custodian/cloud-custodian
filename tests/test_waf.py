@@ -98,7 +98,7 @@ class WAFTest(BaseTest):
             "filters": [
                 {
                     "type": "list-all-rules",
-                    "key": "WebACLAllRules[].Type",
+                    "key": "Type",
                     "value": "RuleGroup",
                     "op": "equal"
                 }
