@@ -1,0 +1,15 @@
+{
+    "status_code": 200,
+    "data": {
+        "Rules": [
+            {
+                "Name": "rule-2",
+                "Arn": "arn:aws:events:us-west-1:644160558196:rule/my-event-bus/rule-2",
+                "EventPattern": "{\"source\":[\"aws.athena\"]}",
+                "State": "ENABLED",
+                "EventBusName": "my-event-bus"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -3,17 +3,9 @@
     "data": {
         "Rules": [
             {
-                "Name": "aws-controltower-ConfigComplianceChangeEventRule",
-                "Arn": "arn:aws:events:us-east-1:644160558196:rule/aws-controltower-ConfigComplianceChangeEventRule",
-                "EventPattern": "{\"detail-type\":[\"Config Rules Compliance Change\"],\"source\":[\"aws.config\"]}",
-                "State": "ENABLED",
-                "Description": "CloudWatch Event Rule to send notification on Config Rule compliance changes.",
-                "EventBusName": "default"
-            },
-            {
-                "Name": "event-rule-test-with-target",
-                "Arn": "arn:aws:events:us-east-1:644160558196:rule/event-rule-test-with-target",
-                "EventPattern": "{\"source\":[\"aws.codestar\"]}",
+                "Name": "rule-1",
+                "Arn": "arn:aws:events:us-west-1:644160558196:rule/rule-1",
+                "EventPattern": "{\"source\":[\"aws.autoscaling\"],\"detail-type\":[\"EC2 Auto Scaling Instance Refresh Checkpoint Reached\",\"EC2 Auto Scaling Instance Refresh Started\",\"EC2 Auto Scaling Instance Refresh Succeeded\",\"EC2 Auto Scaling Instance Refresh Failed\",\"EC2 Auto Scaling Instance Refresh Cancelled\",\"EC2 Auto Scaling Instance Refresh Started Baking\"]}",
                 "State": "ENABLED",
                 "EventBusName": "default"
             }
