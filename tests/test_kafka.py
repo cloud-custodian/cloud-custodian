@@ -150,6 +150,7 @@ class KafkaTest(BaseTest):
         self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/aws/kafka')
 
     def test_kafka_cluster_provisioned_and_serverless(self):
+
         session_factory = self.replay_flight_data(
             'test_kafka_cluster_provisioned_and_serverless')
         p = self.load_policy(
@@ -163,3 +164,32 @@ class KafkaTest(BaseTest):
         self.assertEqual(len(resources), 2)
         self.assertEqual(resources[0]['ClusterType'], 'PROVISIONED')
         self.assertEqual(resources[1]['ClusterType'], 'SERVERLESS')
+
+
+class TestKafkaClusterConfiguration(BaseTest):
+
+    def test_configuration_delete(self):
+        session_factory = self.replay_flight_data("test_kafka_configuration_delete")
+        p = self.load_policy(
+            {
+                "name": "kafka",
+                "resource": "aws.kafka-config",
+                "filters": [{"Arn": "arn:aws:kafka:us-east-1:644160558196:"
+                                "configuration/foo-config/72932df0-5080-40d1-b801-49fa8580952b-7"}],
+                "actions": [{"type": "delete"}]
+            },
+            session_factory=session_factory,
+            config={'region': 'us-east-1'}
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        if self.recording:
+            time.sleep(5)
+
+        client = session_factory().client('kafka', region_name='us-east-1')
+        cluster_configurations = client.list_configurations()
+        self.assertFalse("arn:aws:kafka:us-east-1:644160558196:"
+                            "configuration/foo-config"
+                            "72932df0-5080-40d1-b801-49fa8580952b-7"
+                            in cluster_configurations.get('Configurations'))
