@@ -159,6 +159,23 @@ class DirectoryTests(BaseTest):
         self.assertEqual(len(remainder), 2)
         self.assertEqual(remainder[1]["Stage"], "Deleting")
 
+    def test_directory_log_subscriptions(self):
+        factory = self.replay_flight_data("test_directory_log_subscriptions")
+        p = self.load_policy(
+            {
+                "name": "directory-log-subscriptions",
+                "resource": "directory",
+                "filters": [{
+                    "type": "is-log-forwarding",
+                }],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["DirectoryId"], "d-9067d77ae2")
+        self.assertIn("c7n:LogSubscriptions", resources[0])
+
     def test_directory_ldap_setting_no_settings(self):
         factory = self.replay_flight_data("test_directory_ldap_setting")
         p = self.load_policy(
