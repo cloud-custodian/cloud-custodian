@@ -257,7 +257,8 @@ class WAFV2ListAllRulesFilter(ValueFilter):
             for rule in resource.get('Rules', []):
                 rule_details = {"Type": "Standalone", "Rule": rule}
 
-                if rule.get("Statement").get('RuleGroupReferenceStatement'):
+                # If the rule references a RuleGroup, fetch the details
+                if rule.get("Statement", {}).get('RuleGroupReferenceStatement'):
                     rule_group_arn = rule['Statement']['RuleGroupReferenceStatement']['ARN']
                     scope = resource['Scope']
 
@@ -274,22 +275,36 @@ class WAFV2ListAllRulesFilter(ValueFilter):
                         "Rules": rule_group.get('Rules', [])
                     }
 
-
                 all_rules.append(rule_details)
 
-            resource[self.annotation_key] = all_rules
+            # Flatten all resource and rules data for matching
+            resource['c7n:FlattenedData'] = self.flatten_data(resource, all_rules)
 
-        # print("Resource: ", resources)
+            print("Flattened Data", resource['c7n:FlattenedData'])
+
+        # Filter resources where the flattened data matches
         return [
-            r for r in resources if self.match(
-                r.get(self.annotation_key, {}))]
+            resource for resource in resources
+            if self.match(resource.get('c7n:FlattenedData', []))
+        ]
 
-    def match(self, value):
-        print("value: ", value)
+    def flatten_data(self, resource, all_rules):
+        """Flatten the resource and rules data into a single searchable structure."""
+        flattened_data = []
+        # Include resource-level data
+        flattened_data.append(resource)
+        # Include each rule and its details
+        for rule in all_rules:
+            flattened_data.append(rule)
+            # print("Rule", rule)
+            if isinstance(rule.get('Rules', []), list):
+                print("Rules", rule.get('Rules'))
+                flattened_data.extend(rule.get('Rules'))
+        return flattened_data
 
-        for rule in value:
-            print("type", type(rule))
-            print("rule", rule)
-            if super().match(rule):
+    def match(self, flattened_data):
+        """Match against any item in the flattened data."""
+        for item in flattened_data:
+            if super().match(item):
                 return True
         return False

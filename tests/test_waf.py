@@ -98,9 +98,14 @@ class WAFTest(BaseTest):
             "filters": [
                 {
                     "type": "list-all-rules",
-                    "key": "Type",
-                    "value": "RuleGroup",
-                    "op": "equal"
+                    "key": "`c7n:WebACLAllRules`",
+                    "value_type": "list",
+                    "value": [
+                        {
+                            "Type": "RuleGroup"
+                        }
+                    ],
+                    "op": "contains"
                 }
             ],
         }
