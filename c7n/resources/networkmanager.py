@@ -14,9 +14,7 @@ class CoreNetwork(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'networkmanager'
         enum_spec = ('list_core_networks', 'CoreNetworks', None)
-        detail_spec = (
-            'get_core_network', 'CoreNetworkId',
-            'CoreNetworkId', None)
+
         arn = 'CoreNetworkArn'
         name = 'CoreNetworkId'
         id = 'CoreNetworkId'
@@ -24,6 +22,7 @@ class CoreNetwork(QueryResourceManager):
         config_type = None
         cfn_type = 'AWS::NetworkManager::CoreNetwork'
         permissions_augment = ("networkmanager:ListTagsForResource",)
+        global_resource = True
 
 
 CoreNetwork.filter_registry.register('marked-for-op', TagActionFilter)
@@ -41,6 +40,7 @@ class GlobalNetwork(QueryResourceManager):
         date = 'CreatedAt'
         config_type = cfn_type = 'AWS::NetworkManager::GlobalNetwork'
         permissions_augment = ("networkmanager:ListTagsForResource",)
+        global_resource = True
 
 
 GlobalNetwork.filter_registry.register('marked-for-op', TagActionFilter)
