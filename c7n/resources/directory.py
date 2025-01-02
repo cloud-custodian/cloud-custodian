@@ -172,12 +172,12 @@ class DirectoryTrustFilter(ValueFilter):
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('ds')
         trusts = client.describe_trusts()['Trusts']
+        matched = []
         for r in resources:
             r[self.annotation_key] = [
                 t for t in trusts if t['DirectoryId'] == r['DirectoryId']]
-        matched = []
-        for r in resources:
-            if any((self.match(trust) for trust in r[self.annotation_key])):
+            resource_trusts = r[self.annotation_key] if len(r[self.annotation_key]) >= 1 else [{}]
+            if any((self.match(trust) for trust in resource_trusts)):
                 matched.append(r)
         return matched
 
