@@ -1,0 +1,10 @@
+{
+    "status_code": 403,
+    "data": {
+        "Error": {
+            "Message": "User: arn:aws:sts::644160558196:assumed-role/custodian-no-access/botocore-session-1733979413 is not authorized to perform: apigateway:GET on resource: arn:aws:apigateway:us-east-1::/account because no identity-based policy allows the apigateway:GET action",
+            "Code": "AccessDeniedException"
+        },
+        "ResponseMetadata": {}
+    }
+}

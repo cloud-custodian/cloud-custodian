@@ -69,6 +69,22 @@ class Kinesis(BaseTest):
         ]
         self.assertEqual(stream["EncryptionType"], "KMS")
 
+    def test_stream_cross_account(self):
+        factory = self.replay_flight_data("test_kinesis_cross_account")
+        p = self.load_policy(
+            {
+                "name": "kinesis-cross-account",
+                "resource": "kinesis",
+                "filters": [{"type": "cross-account"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['CrossAccountViolations'][0]['Resource'],
+            'arn:aws:kinesis:us-east-1:644160558196:stream/test-stream-2')
+
     def test_hose_query(self):
         factory = self.replay_flight_data("test_kinesis_hose_query")
         p = self.load_policy(

@@ -1,0 +1,35 @@
+{
+    "status_code": 200,
+    "data": {
+        "Aliases": [
+            {
+                "AliasName": "alias/test/cwe",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/test/cwe",
+                "TargetKeyId": "3bd15351-ad10-4cf4-b230-280746ad3dbb",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 10,
+                    "day": 28,
+                    "hour": 13,
+                    "minute": 56,
+                    "second": 25,
+                    "microsecond": 965000
+                },
+                "LastUpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 10,
+                    "day": 28,
+                    "hour": 13,
+                    "minute": 56,
+                    "second": 25,
+                    "microsecond": 965000
+                }
+            }
+        ],
+        "NextMarker": "",
+        "Truncated": false,
+        "ResponseMetadata": {}
+    }
+}

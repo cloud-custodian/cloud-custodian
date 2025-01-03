@@ -39,6 +39,21 @@ def test_event_bus_describe(test, event_bridge_bus):
     assert 'CrossAccountViolations' in resources[0]
 
 
+@pytest.mark.audited
+@terraform('event_bridge_bus')
+def test_event_bus_kms_filter(test, event_bridge_bus):
+    factory = test.replay_flight_data('test_cwe_bus_kms_filter')
+    p = test.load_policy({
+        'name': 'bus-kms',
+        'resource': 'aws.event-bus',
+        'filters': [
+            {'type': 'kms-key', 'key': 'c7n:AliasName', 'value': 'alias/test/cwe'}],
+    }, session_factory=factory)
+    resources = p.run()
+    assert len(resources) == 1
+    assert len(resources[0]['c7n:matched-kms-key']) == 1
+
+
 class CloudWatchEventTest(BaseTest):
 
     def test_event_rule_tags(self):

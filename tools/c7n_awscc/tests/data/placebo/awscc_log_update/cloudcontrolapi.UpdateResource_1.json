@@ -4,20 +4,20 @@
         "ProgressEvent": {
             "TypeName": "AWS::Logs::LogGroup",
             "Identifier": "/aws/codebuild/custodian-build-python",
-            "RequestToken": "780fb986-08fb-496d-9bbe-0dc969639816",
+            "RequestToken": "26daf9d4-7a63-458c-bb4f-cbd8a53e40f7",
             "Operation": "UPDATE",
             "OperationStatus": "IN_PROGRESS",
             "EventTime": {
                 "__class__": "datetime",
-                "year": 2022,
-                "month": 1,
-                "day": 17,
-                "hour": 15,
-                "minute": 32,
-                "second": 35,
-                "microsecond": 919000
+                "year": 2024,
+                "month": 12,
+                "day": 11,
+                "hour": 23,
+                "minute": 31,
+                "second": 3,
+                "microsecond": 824000
             },
-            "ResourceModel": "{\"RetentionInDays\":7,\"LogGroupName\":\"/aws/codebuild/custodian-build-python\",\"Tags\":[{\"Value\":\"Kapil\",\"Key\":\"Owner\"}]}"
+            "ResourceModel": "{\"FieldIndexPolicies\":[],\"RetentionInDays\":7,\"LogGroupClass\":\"STANDARD\",\"LogGroupName\":\"/aws/codebuild/custodian-build-python\",\"Tags\":[{\"Value\":\"Kapil\",\"Key\":\"Owner\"}],\"DataProtectionPolicy\":{}}"
         },
         "ResponseMetadata": {}
     }

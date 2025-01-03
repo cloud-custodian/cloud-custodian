@@ -95,24 +95,29 @@ class HasStatementFilter(Filter):
 
         required_statements = format_string_values(list(self.data.get('statements', [])),
                                                    **self.get_std_format_args(resource))
-
-        for required_statement in required_statements:
-            for statement in statements:
-                found = 0
-                for key, value in required_statement.items():
-                    if key in ['Action', 'NotAction']:
-                        if key in statement and \
-                            self.action_resource_case_insensitive(value) \
-                            == self.action_resource_case_insensitive(statement[key]):
-                            found += 1
-                    else:
-                        if key in statement and value == statement[key]:
-                            found += 1
-                if found and found == len(required_statement):
-                    required_statements.remove(required_statement)
-                    break
-
-        if (self.data.get('statement_ids', []) and not required) or \
-           (self.data.get('statements', []) and not required_statements):
+        found_required_statements = [
+            s for s in required_statements
+            if self.statement_is_present(s, statements)
+        ]
+        if (self.data.get('statement_ids', []) and not required) or (
+            self.data.get('statements', []) and
+            required_statements == found_required_statements
+        ):
             return resource
         return None
+
+    def statement_is_present(self, required_statement, statements):
+        for statement in statements:
+            found = 0
+            for key, value in required_statement.items():
+                if key in ['Action', 'NotAction']:
+                    if key in statement and \
+                        self.action_resource_case_insensitive(value) \
+                        == self.action_resource_case_insensitive(statement[key]):
+                        found += 1
+                else:
+                    if key in statement and value == statement[key]:
+                        found += 1
+            if found and found == len(required_statement):
+                return True
+        return False

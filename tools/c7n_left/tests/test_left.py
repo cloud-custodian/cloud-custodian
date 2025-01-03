@@ -29,6 +29,7 @@ try:
     )
     from c7n_left.providers.terraform.graph import Resolver
     from c7n_left.providers.terraform.filters import Taggable
+    from c7n_left.providers.terraform.variables import VariableResolver
 
     LEFT_INSTALLED = True
 except ImportError:
@@ -111,8 +112,12 @@ class PolicyEnv:
         extant["policies"].append(policy)
         policy_file.write_text(json.dumps(extant))
 
-    def run(self, policy_dir=None, terraform_dir=None):
-        config = cli.get_config(terraform_dir or self.policy_dir, policy_dir or self.policy_dir)
+    def run(self, policy_dir=None, terraform_dir=None, terraform_workspace="default"):
+        config = cli.get_config(
+            directory=terraform_dir or self.policy_dir,
+            policy_dir=policy_dir or self.policy_dir,
+            terraform_workspace=terraform_workspace,
+        )
         policies = policy_core.load_policies(config.policy_dir, config)
         reporter = ResultsReporter()
         core.CollectionRunner(policies, config, reporter).run()
@@ -635,6 +640,11 @@ def test_graph_merge_function(policy_env):
     resource_types = list(graph.get_resources_by_type("aws_cloudwatch_log_group"))
     log_group = resource_types.pop()[-1][0]
     assert log_group["tags"] == {"Env": "Public", "Component": "application"}
+
+
+def test_variable_type_default():
+    assert VariableResolver.get_type_default("xyz") == ""
+    assert VariableResolver.get_type_default("map of strings") == {}
 
 
 def test_null_tag_value(policy_env):
@@ -1943,3 +1953,38 @@ def test_selection_policy_filter(policy_env):
 
     selection = policy_env.get_selection("policy=test-a")
     assert {p.name for p in selection.filter_policies(policies)} == {"test-a"}
+
+
+def test_workspace(policy_env):
+    policy_env.write_tf(
+        """
+locals {
+  map = {
+    default = "name-1"
+    other   = "name-2"
+  }
+}
+
+resource "res" "test_res" {
+  name = local.map[terraform.workspace]
+}
+        """
+    )
+    policy_env.write_policy(
+        {
+            "name": "test-a",
+            "resource": "terraform.res",
+            "filters": [{"name": "name-1"}],
+        }
+    )
+    policy_env.write_policy(
+        {
+            "name": "test-b",
+            "resource": "terraform.res",
+            "filters": [{"name": "name-2"}],
+        }
+    )
+    [result] = policy_env.run(terraform_workspace="default")
+    assert result.resource["name"] == "name-1"
+    [result] = policy_env.run(terraform_workspace="other")
+    assert result.resource["name"] == "name-2"
