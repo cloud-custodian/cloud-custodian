@@ -22,24 +22,6 @@ class TestNetworkManager(BaseTest):
             self.assertEqual(r["State"], "AVAILABLE")
             self.assertTrue(r["CoreNetworkArn"])
 
-    def test_list_core_networks_error(self):
-        # Test the case where ListCoreNetworks returns a network that
-        # is not found with the GetCoreNetwork API
-        session_factory = self.replay_flight_data("test_networkmanager_core_networks_not_found")
-        p = self.load_policy(
-            {
-                "name": "list-core-networks-not-found",
-                "resource": "networkmanager-core",
-            },
-            session_factory=session_factory,
-        )
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-
-        for r in resources:
-            self.assertEqual(r["State"], "AVAILABLE")
-            self.assertTrue(r["CoreNetworkArn"])
-
     def test_describe_global_networks(self):
         session_factory = self.replay_flight_data("test_networkmanager_describe_global_networks")
         p = self.load_policy(

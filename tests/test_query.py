@@ -164,3 +164,33 @@ class QueryResourceManagerTest(BaseTest):
         self.assertEqual(len(resources), 1)
         resources = p.resource_manager.get_resources(["igw-5bce113f"])
         self.assertEqual(resources, [])
+
+    def test_detail_spec_resource_not_found(self):
+        # Test the case where List* API returns a resource that
+        # is not found with the Get* API.
+
+        # This test case has two CoreNetworks returned by the ListCoreNetworks API
+        # but only one of them is found by the GetCoreNetwork API, the other returns a 404.
+        # So the policy should return the CoreNetwork that was found and
+        # log a warning for the one that was not found.
+        session_factory = self.replay_flight_data("test_networkmanager_core_networks_not_found")
+        p = self.load_policy(
+            {
+                "name": "list-core-networks-not-found",
+                "resource": "networkmanager-core",
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        for r in resources:
+            self.assertTrue(r["CoreNetworkArn"])
+
+        # Check that the warning was logged
+        output = self.capture_logging(
+            name=p.resource_manager.log.name, level=logging.DEBUG
+        )
+        p.run()
+        self.assertTrue("Resource not found: get_core_network using" in output.getvalue())
+        self.assertTrue(resources[0]["CoreNetworkArn"] not in output.getvalue())
