@@ -14,7 +14,9 @@ class CoreNetwork(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'networkmanager'
         enum_spec = ('list_core_networks', 'CoreNetworks', None)
-
+        detail_spec = (
+            'get_core_network', 'CoreNetworkId',
+            'CoreNetworkId', None)
         arn = 'CoreNetworkArn'
         name = 'CoreNetworkId'
         id = 'CoreNetworkId'
