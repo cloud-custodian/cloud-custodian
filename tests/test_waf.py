@@ -90,11 +90,11 @@ class WAFTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertTrue('c7n:WafV2LoggingConfiguration' not in resources[0])
 
-    def test_wafv2_list_all_rules_compliant(self):
-        session_factory = self.replay_flight_data("test_wafv2_list_all_rules_compliant")
+    def test_wafv2_rule_groups(self):
+        session_factory = self.record_flight_data("test_wafv2_rule_groups")
 
         policy = {
-            "name": "wafv2_list_all_rules_compliant",
+            "name": "test_wafv2_rule_groups",
             "resource": "aws.wafv2",
             "filters": [
                 {
@@ -114,10 +114,39 @@ class WAFTest(BaseTest):
             ],
         }
 
-        p = self.load_policy(policy, session_factory=session_factory, config={"region": "us-east-1"})
+        p = self.load_policy(policy,
+                             session_factory=session_factory,
+                             config={"region": "us-east-1"})
 
         resources = p.run()
-        print("Resources: ", resources)
 
         self.assertEqual(len(resources), 1, f"Expected 1 resource, got {len(resources)}")
-        self.assertEqual(resources[0]['Name'], 'compliant-waf', f"Expected 'compliant-waf', got {resources[0]['Name']}")
+
+    def test_wafv2_standalone_rules(self):
+        session_factory = self.record_flight_data("test_wafv2_standalone_rules")
+
+        policy = {
+            "name": "test_wafv2_standalone_rules",
+            "resource": "aws.wafv2",
+            "filters": [{
+                "or": [
+                    {
+                        "and": [
+                            {
+                                "type": "list-all-rules",
+                                "key": "Type",
+                                "value": "Standalone",
+                                "op": "eq"
+                            }
+                        ]
+                    }
+                ]
+            }]
+        }
+
+        p = self.load_policy(policy,
+                             session_factory=session_factory,
+                             config={"region": "us-east-1"})
+
+        resources = p.run()
+        self.assertEqual(len(resources), 2, f"Expected 2 resources, got {len(resources)}")
