@@ -91,25 +91,33 @@ class WAFTest(BaseTest):
         self.assertTrue('c7n:WafV2LoggingConfiguration' not in resources[0])
 
     def test_wafv2_list_all_rules_compliant(self):
-        session_factory = self.record_flight_data("test_wafv2_list_all_rules_compliant")
+        session_factory = self.replay_flight_data("test_wafv2_list_all_rules_compliant")
+
         policy = {
             "name": "wafv2_list_all_rules_compliant",
             "resource": "aws.wafv2",
             "filters": [
                 {
+                    "not": [{
+                        "type": "list-all-rules",
+                        "key": "Type",
+                        "value": "Standalone",
+                        "op": "eq"
+                    }]
+                },
+                {
                     "type": "list-all-rules",
-                    "key": "`c7n:WebACLAllRules`",
-                    "value_type": "list",
-                    "value": [
-                        {
-                            "Type": "RuleGroup"
-                        }
-                    ],
-                    "op": "contains"
+                    "key": "Type",
+                    "value": "RuleGroup",
+                    "op": "in"
                 }
             ],
         }
-        p = self.load_policy(policy, session_factory=session_factory, config={"region": "us-east-1"})
-        resources = p.run()
 
-        print("Response", resources)
+        p = self.load_policy(policy, session_factory=session_factory, config={"region": "us-east-1"})
+
+        resources = p.run()
+        print("Resources: ", resources)
+
+        self.assertEqual(len(resources), 1, f"Expected 1 resource, got {len(resources)}")
+        self.assertEqual(resources[0]['Name'], 'compliant-waf', f"Expected 'compliant-waf', got {resources[0]['Name']}")
