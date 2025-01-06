@@ -224,29 +224,8 @@ class WAFV2ListAllRulesFilter(ValueFilter):
               - type: list-all-rules
                 key: Type
                 value: RuleGroup
+                op: in
 
-          - name: find-standalone-rules
-            resource: aws.wafv2
-            filters:
-              - type: list-all-rules
-                key: Type
-                value: Standalone
-
-          - name: find-specific-rule-name
-            resource: aws.wafv2
-            filters:
-              - type: list-all-rules
-                key: "Rules[].Name"
-                value: test-rule
-                op: contains
-
-          - name: find-blocked-countries
-            resource: aws.wafv2
-            filters:
-              - type: list-all-rules
-                key: "Rules[].Statement.GeoMatchStatement.CountryCodes[]"
-                value: AF
-                op: contains
     """
 
     schema = type_schema('list-all-rules', rinherit=ValueFilter.schema)

@@ -91,7 +91,7 @@ class WAFTest(BaseTest):
         self.assertTrue('c7n:WafV2LoggingConfiguration' not in resources[0])
 
     def test_wafv2_rule_groups(self):
-        session_factory = self.record_flight_data("test_wafv2_rule_groups")
+        session_factory = self.replay_flight_data("test_wafv2_rule_groups")
 
         policy = {
             "name": "test_wafv2_rule_groups",
@@ -123,7 +123,7 @@ class WAFTest(BaseTest):
         self.assertEqual(len(resources), 1, f"Expected 1 resource, got {len(resources)}")
 
     def test_wafv2_standalone_rules(self):
-        session_factory = self.record_flight_data("test_wafv2_standalone_rules")
+        session_factory = self.replay_flight_data("test_wafv2_standalone_rules")
 
         policy = {
             "name": "test_wafv2_standalone_rules",
