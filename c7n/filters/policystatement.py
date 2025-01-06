@@ -109,7 +109,7 @@ class HasStatementFilter(Filter):
             return resource
         return None
 
-    def __action_resource_case_insensitive(self, actions):
+    def action_resource_case_insensitive(self, actions):
         if isinstance(actions, str):
             actionsFormatted = [actions.lower()]
         else:
@@ -130,9 +130,9 @@ class HasStatementFilter(Filter):
                 for req_key, req_value in required_statement.items():
                     if req_key in ['Action', 'NotAction']:
                         resource_statement[req_key] = \
-                            self.__action_resource_case_insensitive(
+                            self.action_resource_case_insensitive(
                                 resource_statement[req_key])
-                        req_value = self.__action_resource_case_insensitive(
+                        req_value = self.action_resource_case_insensitive(
                             req_value)
 
                     if req_key in partial_match_elements:
