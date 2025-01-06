@@ -98,7 +98,7 @@ class HasStatementFilter(Filter):
             **self.get_std_format_args(resource)
             )
 
-        found_required_statements = self.get_matched_statements(
+        found_required_statements = self.__get_matched_statements(
             required_statements,
             resource_statements
         )
@@ -109,14 +109,14 @@ class HasStatementFilter(Filter):
             return resource
         return None
 
-    def action_resource_case_insensitive(self, actions):
+    def __action_resource_case_insensitive(self, actions):
         if isinstance(actions, str):
             actionsFormatted = [actions.lower()]
         else:
             actionsFormatted = [action.lower() for action in actions]
         return set(actionsFormatted)
 
-    def get_matched_statements(self, required_stmts, resource_stmts):
+    def __get_matched_statements(self, required_stmts, resource_stmts):
         matched_statements = []
         for required_statement in required_stmts:
             partial_match_elements = required_statement.pop('PartialMatch', [])
@@ -130,13 +130,13 @@ class HasStatementFilter(Filter):
                 for req_key, req_value in required_statement.items():
                     if req_key in ['Action', 'NotAction']:
                         resource_statement[req_key] = \
-                            self.action_resource_case_insensitive(
+                            self.__action_resource_case_insensitive(
                                 resource_statement[req_key])
-                        req_value = self.action_resource_case_insensitive(
+                        req_value = self.__action_resource_case_insensitive(
                             req_value)
 
                     if req_key in partial_match_elements:
-                        if self.match_partial_statement(req_key,
+                        if self.__match_partial_statement(req_key,
                                                         req_value,
                                                         resource_statement):
                             found += 1
@@ -149,7 +149,7 @@ class HasStatementFilter(Filter):
                     break
         return matched_statements
 
-    def match_partial_statement(self, partial_match_key,
+    def __match_partial_statement(self, partial_match_key,
                                 partial_match_value, resource_stmt):
 
         # TO-DO: Add support for Condition json subset match.
