@@ -18,9 +18,9 @@
             },
             {
                 "CoreNetworkId": "core-network-0d1b38526d74c427d",
-                "CoreNetworkArn": "arn:aws:networkmanager::644160558196:core-network/core-network-0d1b38526d74c427d",
+                "CoreNetworkArn": "arn:aws:networkmanager::123456789010:core-network/core-network-0d1b38526d74c427d",
                 "GlobalNetworkId": "global-network-0fa387ed8fc5f107c",
-                "OwnerAccountId": "644160558196",
+                "OwnerAccountId": "123456789010",
                 "State": "AVAILABLE",
                 "Tags": [
                     {

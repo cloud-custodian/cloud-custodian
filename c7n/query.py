@@ -758,7 +758,7 @@ def _scalar_augment(manager, model, detail_spec, client, resource_set):
                 r.update(response)
             results.append(r)
         except client.exceptions.ResourceNotFoundException:
-            manager.log.debug("Resource not found: %s using %s" % (detail_op, kw))
+            results.append(r)
             continue
     return results
 

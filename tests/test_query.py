@@ -170,9 +170,10 @@ class QueryResourceManagerTest(BaseTest):
         # is not found with the Get* API.
 
         # This test case has two CoreNetworks returned by the ListCoreNetworks API
-        # but only one of them is found by the GetCoreNetwork API, the other returns a 404.
-        # So the policy should return the CoreNetwork that was found and
-        # log a warning for the one that was not found.
+        # but only one of them is found by the GetCoreNetwork API, since one is a Shared
+        # resource from RAM and returns a 404.
+        # So the policy should return the both networks but with the shared one
+        # missing the additional detail_spec attributes.
         session_factory = self.replay_flight_data("test_networkmanager_core_networks_not_found")
         p = self.load_policy(
             {
@@ -182,15 +183,14 @@ class QueryResourceManagerTest(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources), 2)
 
         for r in resources:
             self.assertTrue(r["CoreNetworkArn"])
-
-        # Check that the warning was logged
-        output = self.capture_logging(
-            name=p.resource_manager.log.name, level=logging.DEBUG
-        )
-        p.run()
-        self.assertTrue("Resource not found: get_core_network using" in output.getvalue())
-        self.assertTrue(resources[0]["CoreNetworkArn"] not in output.getvalue())
+            # The shared network should not have the additional detail_spec attributes
+            if r["OwnerAccountId"] == "123456789010":
+                self.assertFalse("Segments" in r)
+                self.assertFalse("Edges" in r)
+            else:
+                self.assertTrue("Segments" in r)
+                self.assertTrue("Edges" in r)
