@@ -7,7 +7,7 @@ from c7n.actions import BaseAction
 from c7n.filters import Filter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, RetryPageIterator, TypeInfo
-from c7n.tags import Tag
+from c7n.tags import RemoveTag, Tag, TagDelayedAction, TagActionFilter
 from c7n.utils import local_session, type_schema, get_retry
 
 
@@ -216,7 +216,7 @@ class TagResource(Tag):
 
 
 @ShieldProtection.action_registry.register('remove-tag')
-class RemoveTag(Tag):
+class RemoveTag(RemoveTag):
     """Action to remove tags from a Shield resource
     """
     permissions = ('shield:UntagResource',)
@@ -228,3 +228,24 @@ class RemoveTag(Tag):
                 client.untag_resource(ResourceARN=r[mid], TagKeys=tag_keys)
             except client.exceptions.ResourceNotFoundException:
                 continue
+
+
+@ShieldProtection.filter_registry.register('marked-for-op', TagActionFilter)
+@ShieldProtection.action_registry.register('mark-for-op')
+class MarkShieldProtectionForOp(TagDelayedAction):
+    """Mark Shield Protection for deferred action
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: shield-protection-invalid-tag-mark
+            resource: shield-protection
+            filters:
+              - "tag:InvalidTag": present
+            actions:
+              - type: mark-for-op
+                op: delete
+                days: 1
+    """
