@@ -31,6 +31,7 @@ class RestAccount(ResourceManager):
 
     filter_registry = FilterRegistry('rest-account.filters')
     action_registry = ActionRegistry('rest-account.actions')
+    retry = staticmethod(get_retry(('TooManyRequestsException',)))
 
     class resource_type(query.TypeInfo):
         service = 'apigateway'
@@ -55,10 +56,11 @@ class RestAccount(ResourceManager):
     def _get_account(self):
         client = utils.local_session(self.session_factory).client('apigateway')
         try:
-            account = client.get_account()
+            account = self.retry(client.get_account)
         except ClientError as e:
             if e.response['Error']['Code'] == 'NotFoundException':
                 return []
+            raise
         account.pop('ResponseMetadata', None)
         account['account_id'] = 'apigw-settings'
         return [account]
