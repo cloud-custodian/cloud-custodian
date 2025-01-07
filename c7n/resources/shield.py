@@ -20,6 +20,7 @@ class ShieldProtection(QueryResourceManager):
         name = 'Name'
         arn = 'ProtectionArn'
         config_type = 'AWS::Shield::Protection'
+        global_resource = True
 
     def augment(self, resources):
         client = local_session(self.session_factory).client('shield')
@@ -46,6 +47,7 @@ class ShieldAttack(QueryResourceManager):
         filter_name = 'ResourceArns'
         filter_type = 'list'
         arn = False
+        global_resource = True
 
 
 def get_protections_paginator(client):

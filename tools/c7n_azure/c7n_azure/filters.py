@@ -146,6 +146,7 @@ class MetricFilter(Filter):
             'metric': {'type': 'string'},
             'op': {'enum': list(scalar_ops.keys())},
             'threshold': {'type': 'number'},
+            'metric_namespace': {'type': 'string'},
             'timeframe': {'type': 'number'},
             'interval': {'enum': [
                 'PT1M', 'PT5M', 'PT15M', 'PT30M', 'PT1H', 'PT6H', 'PT12H', 'P1D']},
@@ -176,6 +177,8 @@ class MetricFilter(Filter):
         self.filter = self.data.get('filter', None)
         # Include or exclude resources if there is no metric data available
         self.no_data_action = self.data.get('no_data_action', 'exclude')
+        # default to no namespace if not passed in
+        self.metricnamespace = self.data.get("metric_namespace", None)
 
     def process(self, resources, event=None):
         # Import utcnow function as it may have been overridden for testing purposes
@@ -205,6 +208,7 @@ class MetricFilter(Filter):
                 interval=self.interval,
                 metricnames=self.metric,
                 aggregation=self.aggregation,
+                metricnamespace=self.metricnamespace,
                 filter=self.get_filter(resource)
             )
         except HttpResponseError:
