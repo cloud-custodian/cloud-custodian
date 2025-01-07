@@ -203,7 +203,7 @@ class SESV2Test(BaseTest):
         self.assertEqual(resources[0]["IdentityName"], "c7n@t.com")
 
     def test_ses_dedicated_ip_pool_query(self):
-        session_factory = self.record_flight_data("test_ses_dedicated_ip_pool_query")
+        session_factory = self.replay_flight_data("test_ses_dedicated_ip_pool_query")
         p = self.load_policy(
             {
                 "name": "ses-dedicated-ip-pool-query",
@@ -213,5 +213,5 @@ class SESV2Test(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         for r in resources:
-            self.assertTrue("SendingPoolName" in r["DeliveryOptions"])
-            self.assertEqual("ses-shared-pool", r["DeliveryOptions"]["SendingPoolName"])
+            self.assertTrue("ScalingMode" in r)
+            self.assertTrue("Tags" in r)

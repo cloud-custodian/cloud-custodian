@@ -230,11 +230,7 @@ class DescribeDedicatedIpPool(DescribeSource):
         resource_list = []
         for r in resources:
             details = client.get_dedicated_ip_pool(PoolName=r)
-            resource_list.append({
-                k: details[k]
-                for k in details
-                if k not in {'ResponseMetadata'}
-            })
+            resource_list.append(details["DedicatedIpPool"])
         return universal_augment(self.manager, resource_list)
 
 
