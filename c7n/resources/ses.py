@@ -71,6 +71,7 @@ class SESConfigurationSetV2(QueryResourceManager):
         arn_type = 'configuration-set'
         universal_taggable = object()
         config_type = "AWS::SES::ConfigurationSet"
+        permission_prefix = 'ses'
         permissions_augment = ("ses:ListTagsForResource",)
 
     source_mapping = {
