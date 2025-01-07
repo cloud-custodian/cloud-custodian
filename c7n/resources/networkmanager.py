@@ -61,6 +61,7 @@ class Link(ChildResourceManager):
         date = 'CreatedAt'
         config_type = 'AWS::NetworkManager::Link'
         cfn_type = 'AWS::NetworkManager::Link'
+        global_resource = True
 
 
 @c7n_resources.register('networkmanager-device')
@@ -76,6 +77,7 @@ class Device(ChildResourceManager):
         date = 'CreatedAt'
         config_type = 'AWS::NetworkManager::Device'
         cfn_type = 'AWS::NetworkManager::Device'
+        global_resource = True
 
 
 @c7n_resources.register('networkmanager-site')
@@ -91,6 +93,7 @@ class Site(ChildResourceManager):
         date = 'CreatedAt'
         config_type = 'AWS::NetworkManager::Site'
         cfn_type = 'AWS::NetworkManager::Site'
+        global_resource = True
 
 
 @GlobalNetwork.action_registry.register('tag')
