@@ -88,7 +88,7 @@ class ShieldTest(BaseTest):
                 "name": "untag-shield-protection",
                 "resource": "shield-protection",
                 "filters": [{"tag:c7n": "test"}],
-                "actions": [{"type": "remove-tag", "key": "c7n"}],
+                "actions": [{"type": "remove-tag", "tags": ["c7n"]}],
             },
             session_factory=session_factory,
         )
