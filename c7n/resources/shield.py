@@ -6,9 +6,23 @@ from botocore.paginate import Paginator
 from c7n.actions import BaseAction
 from c7n.filters import Filter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, RetryPageIterator, TypeInfo
+from c7n.query import (QueryResourceManager, RetryPageIterator, TypeInfo,
+    DescribeSource, ConfigSource)
 from c7n.tags import RemoveTag, Tag, TagDelayedAction, TagActionFilter
 from c7n.utils import local_session, type_schema, get_retry
+
+
+class DescribeShieldProtection(DescribeSource):
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('shield')
+
+        def _augment(r):
+            tags = self.manager.retry(client.list_tags_for_resource,
+                ResourceARN=r['ProtectionArn'])['Tags']
+            r['Tags'] = tags
+            return r
+        resources = super().augment(resources)
+        return list(map(_augment, resources))
 
 
 @resources.register('shield-protection')
@@ -22,16 +36,10 @@ class ShieldProtection(QueryResourceManager):
         config_type = 'AWS::Shield::Protection'
         global_resource = True
 
-    def augment(self, resources):
-        client = local_session(self.session_factory).client('shield')
-
-        def _augment(r):
-            tags = self.retry(client.list_tags_for_resource,
-                ResourceARN=r['ProtectionArn'])['Tags']
-            r['Tags'] = tags
-            return r
-        resources = super().augment(resources)
-        return list(map(_augment, resources))
+    source_mapping = {
+            'describe': DescribeShieldProtection,
+            'config': ConfigSource
+        }
 
 
 @resources.register('shield-attack')
