@@ -29,7 +29,7 @@ to provide feedback directly on developer workstations or within CI pipelines.
 
 Custodian policies are written in simple YAML configuration files that
 enable users to specify policies on a resource type (EC2, ASG, Redshift,
-CosmosDB, PubSub Topic, Tencent-Cloud) and are constructed from a vocabulary of filters
+CosmosDB, PubSub Topic) and are constructed from a vocabulary of filters
 and actions.
 
 It integrates with the cloud native serverless capabilities of each

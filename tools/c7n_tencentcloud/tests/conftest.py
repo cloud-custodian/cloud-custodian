@@ -3,6 +3,7 @@
 
 import pytest
 import json
+import os
 
 from c7n.config import Config
 from c7n.ctx import ExecutionContext
@@ -11,9 +12,9 @@ from c7n_tencentcloud.client import Session
 
 @pytest.fixture(autouse=True)
 def credential_env_vars(monkeypatch):
-    monkeypatch.setenv("TENCENTCLOUD_SECRET_ID", "xyz")
-    monkeypatch.setenv("TENCENTCLOUD_SECRET_KEY", "abc123")
-    monkeypatch.setenv("TENCENTCLOUD_REGION", "na-ashburn")
+    monkeypatch.setenv("TENCENTCLOUD_SECRET_ID", os.environ.get('TENCENTCLOUD_SECRET_ID', "xyz"))
+    monkeypatch.setenv("TENCENTCLOUD_SECRET_KEY", os.environ.get('TENCENTCLOUD_SECRET_KEY', "abc123"))
+    monkeypatch.setenv("TENCENTCLOUD_REGION", os.environ.get('TENCENTCLOUD_REGION', "na-ashburn"))
 
 
 @pytest.fixture(scope="package")
