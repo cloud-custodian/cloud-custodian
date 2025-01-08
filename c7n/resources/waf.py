@@ -325,8 +325,22 @@ class EnableWAFV2Logging(BaseAction):
         log_destination_arn = self.data.get('log_destination_arn')
         redacted_fields_data = self.data.get('redacted_fields', [])
 
+        managed_by_firewall_manager = self.data.get('managed_by_firewall_manager', False)
+        logging_filter = self.data.get('logging_filter')
+        log_type = self.data.get('log_type', 'WAF_LOGS')
+        log_scope = self.data.get('log_scope', 'CUSTOMER')
+
         for r in resources:
-            self.enable_waf_logging(client, r, log_destination_arn, redacted_fields_data)
+            self.enable_waf_logging(
+                client,
+                r,
+                log_destination_arn,
+                redacted_fields_data,
+                managed_by_firewall_manager,
+                logging_filter,
+                log_type,
+                log_scope
+            )
 
     def enable_waf_logging(self, client, resource, log_destination_arn, redacted_fields_data=None,
                        managed_by_firewall_manager=False, logging_filter=None,
@@ -339,9 +353,6 @@ class EnableWAFV2Logging(BaseAction):
         if log_scope and log_scope not in valid_log_scopes:
             raise ValueError(f"Invalid log_scope value: {log_scope}."
                              f" Must be one of {valid_log_scopes}")
-
-        if not log_scope:
-            log_scope = "CUSTOMER"
 
         redacted_fields = []
         if redacted_fields_data:
