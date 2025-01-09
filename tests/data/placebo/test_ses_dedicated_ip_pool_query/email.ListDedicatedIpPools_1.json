@@ -2,6 +2,6 @@
     "status_code": 200,
     "data": {
         "ResponseMetadata": {},
-        "DedicatedIpPools": ["c7n-test"]
+        "DedicatedIpPools": ["c7n-test","c7n-test-2"]
     }
 }
