@@ -1,6 +1,8 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import time
 from botocore.exceptions import ClientError
+from mock import patch
 
 from .common import BaseTest, event_data
 from c7n.exceptions import PolicyValidationError
@@ -74,6 +76,29 @@ class TestRestAccount(BaseTest):
 
         after_account, = p.resource_manager._get_account()
         self.assertEqual(after_account["cloudwatchRoleArn"], log_role)
+
+    def test_rest_account_exception(self):
+        session_factory = self.replay_flight_data('test_rest_account_exception')
+        p = self.load_policy(
+            {'name': 'rest-account-exception',
+             'resource': 'aws.rest-account'},
+            session_factory=session_factory
+        )
+        with self.assertRaises(ClientError) as e:
+            p.run()
+        self.assertEqual(e.exception.response['Error']['Code'], 'AccessDeniedException')
+
+    def test_rest_account_rate_limit(self):
+        session_factory = self.replay_flight_data('test_rest_account_rate_limit')
+        p = self.load_policy(
+            {'name': 'rest-account-rate-limit',
+             'resource': 'aws.rest-account'},
+            session_factory=session_factory
+        )
+        with patch('c7n.utils.time.sleep', new_callable=time.sleep(0)) as func:
+            resources = p.run()
+        self.assertTrue(func.called)
+        self.assertEqual(len(resources), 1)
 
 
 class TestRestApi(BaseTest):

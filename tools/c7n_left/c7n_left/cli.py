@@ -42,25 +42,31 @@ def cli():
     type=click.File("w"),
     default="-",
 )
+@click.option("--terraform-workspace", help="Terraform workspace", default="default")
 @click.option(
     "--output-query",
     default=None,
     help="Use a jmespath expression to filter json output",
 )
-def dump(directory, var_file, output_file, output_query):
+def dump(directory, var_file, output_file, terraform_workspace, output_query):
     """Dump the parsed resource graph or subset"""
     config = get_config(
         directory,
         output="jsongraph",
         output_file=output_file,
         var_file=var_file,
+        terraform_workspace=terraform_workspace,
         output_query=output_query,
     )
     reporter = get_reporter(config)
     config["reporter"] = reporter
     provider = get_provider(config.source_dir)
     provider.initialize(config)
-    graph = provider.parse(config.source_dir, config.var_files)
+    graph = provider.parse(
+        config.source_dir,
+        config.var_files,
+        workspace=terraform_workspace,
+    )
     reporter.on_execution_started([], graph)
     reporter.on_execution_ended()
 
@@ -93,6 +99,7 @@ def dump(directory, var_file, output_file, output_query):
     default=(),
     multiple=True,
 )
+@click.option("--terraform-workspace", help="Terraform workspace", default="default")
 @click.option(
     "--output-query",
     default=None,
@@ -106,6 +113,7 @@ def run(
     output,
     output_file,
     var_file,
+    terraform_workspace,
     output_query,
     summary,
     filters,
@@ -126,6 +134,7 @@ def run(
         output_file=output_file,
         output_query=output_query,
         var_file=var_file,
+        terraform_workspace=terraform_workspace,
         summary=summary,
         warn_on=warn_on,
         filters=filters,
@@ -191,6 +200,7 @@ def get_config(
     output=None,
     output_file=None,
     var_file=(),
+    terraform_workspace="default",
     output_query=None,
     summary=None,
     filters=None,
@@ -202,6 +212,7 @@ def get_config(
         policy_dir=policy_dir and Path(policy_dir),
         output=output,
         output_file=output_file,
+        terraform_workspace=terraform_workspace,
         var_files=var_file,
         output_query=output_query,
         summary=summary,
