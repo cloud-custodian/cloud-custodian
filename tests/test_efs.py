@@ -6,7 +6,6 @@ from .common import BaseTest, functional, event_data
 
 import uuid
 import time
-
 from operator import itemgetter
 from c7n.testing import mock_datetime_now
 from dateutil import parser
@@ -351,3 +350,67 @@ class ElasticFileSystem(BaseTest):
         with mock_datetime_now(parser.parse("2022-09-09T00:00:00+00:00"), c7n.filters.backup):
             resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_enable_secure_transport_with_effect_deny(self):
+        factory = self.replay_flight_data("test_efs_enable_secure_transport_with_effect_deny")
+        p = self.load_policy(
+            {
+                "name": "efs-enable-secure-transport",
+                "resource": "efs",
+                "filters": [{"type": "check-secure-transport"}],
+                "actions": [{"type": "secure-transport", "state": "enable"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["Name"], "efs-without-secure-transport")
+        self.assertEqual(resources[0]["FileSystemId"], "fs-06f6ce85b4976bd7f")
+
+    def test_disable_secure_transport(self):
+        factory = self.replay_flight_data("test_efs_disable_secure_transport")
+        p = self.load_policy(
+            {
+                "name": "efs-disable-secure-transport",
+                "resource": "efs",
+                "filters": [{"not": [{"type": "check-secure-transport"}]}],
+                "actions": [{"type": "secure-transport", "state": "disable"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["Name"], "efs-with-secure-transport")
+        self.assertEqual(resources[0]["FileSystemId"], "fs-06f6ce85b4976bd7f")
+
+    def test_enable_secure_transport_with_effect_allow(self):
+        factory = self.replay_flight_data("test_efs_enable_secure_transport_with_effect_allow")
+        p = self.load_policy(
+            {
+                "name": "efs-enable-secure-transport",
+                "resource": "efs",
+                "filters": [{"type": "check-secure-transport"}],
+                "actions": [{"type": "secure-transport", "state": "enable"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["Name"], "efs-without-secure-transport")
+        self.assertEqual(resources[0]["FileSystemId"], "fs-06f6ce85b4976bd7f")
+
+    def test_enable_secure_transport_with_no_policy(self):
+        factory = self.replay_flight_data("test_efs_enable_secure_transport_with_no_policy")
+        p = self.load_policy(
+            {
+                "name": "efs-enable-secure-transport",
+                "resource": "efs",
+                "filters": [{"type": "check-secure-transport"}],
+                "actions": [{"type": "secure-transport", "state": "enable"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["Name"], "efs-without-secure-transport")
+        self.assertEqual(resources[0]["FileSystemId"], "fs-06f6ce85b4976bd7f")
