@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:swf:us-east-1:123456789012:/domain/c7n-test",
+                "Tags": [
+                    {
+                        "Key": "TestKey",
+                        "Value": "TestValue"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -4,31 +4,8 @@
         "ResponseMetadata": {},
         "items": [
             {
-                "id": "gaaxs9moo3",
-                "name": "PetStore",
-                "description": "Your first API with Amazon API Gateway. This is a sample API that integrates via HTTP with our demo Pet Store endpoints",
-                "createdDate": {
-                    "__class__": "datetime",
-                    "year": 2022,
-                    "month": 12,
-                    "day": 6,
-                    "hour": 14,
-                    "minute": 46,
-                    "second": 9,
-                    "microsecond": 0
-                },
-                "apiKeySource": "HEADER",
-                "endpointConfiguration": {
-                    "types": [
-                        "REGIONAL"
-                    ]
-                },
-                "disableExecuteApiEndpoint": false,
-                "rootResourceId": "0249vgozv7"
-            },
-            {
                 "id": "jt2w8rh6ik",
-                "name": "policy-data-rest-api",
+                "name": "c7n-test",
                 "createdDate": {
                     "__class__": "datetime",
                     "year": 2023,
@@ -45,10 +22,8 @@
                         "EDGE"
                     ]
                 },
-                "policy": "{\\\"Version\\\":\\\"2012-10-17\\\",\\\"Statement\\\":[{\\\"Effect\\\":\\\"Allow\\\",\\\"Principal\\\":{\\\"AWS\\\":\\\"arn:aws:iam::123456789012:root\\\"},\\\"Action\\\":\\\"execute-api:Invoke\\\",\\\"Resource\\\":\\\"*\\\"}]}",
-                "tags": {
-                    "test": "test-val"
-                },
+                "policy": "{\\\"Version\\\":\\\"2012-10-17\\\",\\\"Statement\\\":[{\\\"Sid\\\":\\\"AllowDevEx\\\",\\\"Effect\\\":\\\"Allow\\\",\\\"Principal\\\":\\\"*\\\",\\\"Action\\\":\\\"execute-api:Invoke\\\",\\\"Resource\\\":\\\"arn:aws:execute-api:us-east-1:123456789012:*\\\",\\\"Condition\\\":{\\\"StringEquals\\\":{\\\"aws:SourceVpc\\\":[\\\"vpc-1a2b3c4d\\\",\\\"vpc-abc123\\\"]}}},{\\\"Sid\\\":\\\"AllowIntraAccount\\\",\\\"Effect\\\":\\\"Allow\\\",\\\"Principal\\\":{\\\"AWS\\\":\\\"arn:aws:iam::123456789012:root\\\"},\\\"Action\\\":\\\"execute-api:Invoke\\\",\\\"Resource\\\":\\\"arn:aws:execute-api:us-east-1:123456789012:*\\\"}]}",
+                "tags": {},
                 "disableExecuteApiEndpoint": false,
                 "rootResourceId": "snilzemip4"
             }

@@ -24,6 +24,7 @@ class CoreNetwork(QueryResourceManager):
         config_type = None
         cfn_type = 'AWS::NetworkManager::CoreNetwork'
         permissions_augment = ("networkmanager:ListTagsForResource",)
+        global_resource = True
 
 
 CoreNetwork.filter_registry.register('marked-for-op', TagActionFilter)
@@ -41,6 +42,7 @@ class GlobalNetwork(QueryResourceManager):
         date = 'CreatedAt'
         config_type = cfn_type = 'AWS::NetworkManager::GlobalNetwork'
         permissions_augment = ("networkmanager:ListTagsForResource",)
+        global_resource = True
 
 
 GlobalNetwork.filter_registry.register('marked-for-op', TagActionFilter)
@@ -59,6 +61,7 @@ class Link(ChildResourceManager):
         date = 'CreatedAt'
         config_type = 'AWS::NetworkManager::Link'
         cfn_type = 'AWS::NetworkManager::Link'
+        global_resource = True
 
 
 @c7n_resources.register('networkmanager-device')
@@ -74,6 +77,7 @@ class Device(ChildResourceManager):
         date = 'CreatedAt'
         config_type = 'AWS::NetworkManager::Device'
         cfn_type = 'AWS::NetworkManager::Device'
+        global_resource = True
 
 
 @c7n_resources.register('networkmanager-site')
@@ -89,6 +93,7 @@ class Site(ChildResourceManager):
         date = 'CreatedAt'
         config_type = 'AWS::NetworkManager::Site'
         cfn_type = 'AWS::NetworkManager::Site'
+        global_resource = True
 
 
 @GlobalNetwork.action_registry.register('tag')
