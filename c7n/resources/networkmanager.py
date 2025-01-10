@@ -8,7 +8,6 @@ from c7n.utils import local_session, type_schema
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 
 
-
 class DescribeNetwork(DescribeSource):
 
     def augment(self, resources):
