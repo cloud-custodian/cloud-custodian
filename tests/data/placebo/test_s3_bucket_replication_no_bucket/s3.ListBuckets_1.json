@@ -1,0 +1,25 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Buckets": [
+            {
+                "Name": "c1-replication",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 9,
+                    "day": 25,
+                    "hour": 15,
+                    "minute": 49,
+                    "second": 20,
+                    "microsecond": 0
+                }
+            }
+        ],
+        "Owner": {
+            "DisplayName": "test.1",
+            "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
+        }
+    }
+}

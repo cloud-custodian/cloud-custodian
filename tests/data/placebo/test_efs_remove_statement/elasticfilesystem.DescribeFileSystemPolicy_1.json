@@ -1,0 +1,8 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "FileSystemId": "fs-05b97e2b1be5b25f8",
+        "Policy": "{\n  \"Version\" : \"2012-10-17\",\n  \"Id\" : \"ExampleEFSResourcePolicy\",\n  \"Statement\" : [ {\n    \"Sid\" : \"SpecificAllow\",\n    \"Effect\" : \"Allow\",\n    \"Principal\" : {\n      \"AWS\" : \"*\"\n    },\n    \"Action\" : \"elasticfilesystem:ClientWrite\",\n    \"Resource\" : \"arn:aws:elasticfilesystem:us-east-1:644160558196:file-system/fs-05b97e2b1be5b25f8\"\n  }, {\n    \"Sid\" : \"RemoveMe\",\n    \"Effect\" : \"Allow\",\n    \"Principal\" : {\n      \"AWS\" : \"*\"\n    },\n    \"Action\" : \"elasticfilesystem:ClientWrite\",\n    \"Resource\" : \"arn:aws:elasticfilesystem:us-east-1:644160558196:file-system/fs-05b97e2b1be5b25f8\"\n  } ]\n}"
+    }
+}

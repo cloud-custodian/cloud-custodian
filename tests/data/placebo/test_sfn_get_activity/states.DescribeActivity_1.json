@@ -1,0 +1,23 @@
+{
+    "status_code": 200,
+    "data": {
+        "activityArn": "arn:aws:states:us-east-1:644160558196:activity:test-c7n",
+        "name": "test-c7n",
+        "creationDate": {
+            "__class__": "datetime",
+            "year": 2024,
+            "month": 8,
+            "day": 27,
+            "hour": 11,
+            "minute": 55,
+            "second": 59,
+            "microsecond": 534000
+        },
+        "ResponseMetadata": {},
+        "encryptionConfiguration": { 
+            "kmsDataKeyReusePeriodSeconds": 300,
+            "kmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/44d264df-da6f-45f9-9c18-1fc1beca6db0",
+            "type": "CUSTOMER_MANAGED_KMS"
+         }
+    }
+}

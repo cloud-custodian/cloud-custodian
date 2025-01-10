@@ -484,6 +484,26 @@ class TestWorkspacesWeb(BaseTest):
 
         self.assertEqual(len(resources), 1)
 
+    def test_workspaces_web_subnet(self):
+        session_factory = self.replay_flight_data("test_workspaces_web_subnet")
+        p = self.load_policy(
+            {
+                "name": "test-workspaces-web-subnet",
+                "resource": "workspaces-web",
+                "filters": [
+                    {
+                        "type": "subnet",
+                        "key": "SubnetId",
+                        "value": "subnet-068dfbf3f275a6ae8"
+                    },
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+
     def test_workspaces_web_user_settings(self):
         session_factory = self.replay_flight_data('test_workspaces_web_user_settings')
         p = self.load_policy(
@@ -531,6 +551,42 @@ class TestWorkspacesWeb(BaseTest):
                 ]
             },
             session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    def test_workspaces_web_user_access_logging(self):
+        session_factory = self.replay_flight_data(
+            'test_workspaces_web_user_access_logging'
+        )
+        p = self.load_policy(
+            {
+                'name': 'test-workspaces-web-user-access-logging',
+                'resource': 'workspaces-web',
+                'filters': [
+                    {
+                        'type': 'user-access-logging',
+                        'key': 'kinesisStreamArn',
+                        "value": 'present'
+                    }
+                ]
+            }, session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        p = self.load_policy(
+            {
+                'name': 'test-workspaces-web-user-access-logging',
+                'resource': 'workspaces-web',
+                'filters': [
+                    {
+                        'type': 'user-access-logging',
+                        'key': 'kinesisStreamArn',
+                        "value": 'absent'
+                    }
+                ]
+            }, session_factory=session_factory
         )
         resources = p.run()
         self.assertEqual(len(resources), 0)

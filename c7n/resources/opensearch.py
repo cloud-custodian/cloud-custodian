@@ -139,8 +139,8 @@ class DeleteOpensearchServerless(BaseAction):
                 continue
 
 
-@resources.register('opensearch-injestion')
-class OpensearchInjestion(QueryResourceManager):
+@resources.register('opensearch-ingestion')
+class OpensearchIngestion(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'osis'
         arn_type = 'pipeline'
@@ -152,22 +152,22 @@ class OpensearchInjestion(QueryResourceManager):
         permission_prefix = 'osis'
 
 
-@OpensearchInjestion.filter_registry.register('kms-key')
-class OpensearchInjestionKmsFilter(KmsRelatedFilter):
+@OpensearchIngestion.filter_registry.register('kms-key')
+class OpensearchIngestionKmsFilter(KmsRelatedFilter):
     RelatedIdsExpression = 'EncryptionAtRestOptions.KmsKeyArn'
 
 
-@OpensearchInjestion.action_registry.register('tag')
-class TagOpensearchInjestion(Tag):
-    """Create tags on an OpenSearch Injestion Pipeline
+@OpensearchIngestion.action_registry.register('tag')
+class TagOpensearchIngestion(Tag):
+    """Create tags on an OpenSearch Ingestion Pipeline
 
     :example:
 
     .. code-block:: yaml
 
         policies:
-            - name: tag-opensearch-injestion
-              resource: opensearch-injestion
+            - name: tag-opensearch-ingestion
+              resource: opensearch-ingestion
               actions:
                 - type: tag
                   key: test-key
@@ -181,17 +181,17 @@ class TagOpensearchInjestion(Tag):
             client.tag_resource(Arn=r["PipelineArn"], Tags=tags)
 
 
-@OpensearchInjestion.action_registry.register('remove-tag')
-class RemoveTagOpensearchInjestion(RemoveTag):
-    """Remove tags from an OpenSearch Injestion Pipeline
+@OpensearchIngestion.action_registry.register('remove-tag')
+class RemoveTagOpensearchIngestion(RemoveTag):
+    """Remove tags from an OpenSearch Ingestion Pipeline
 
     :example:
 
     .. code-block:: yaml
 
         policies:
-            - name: remove-tag-opensearch-injestion
-              resource: opensearch-injestion
+            - name: remove-tag-opensearch-ingestion
+              resource: opensearch-ingestion
               actions:
                 - type: remove-tag
                   tags: ["tag-key"]
@@ -203,20 +203,20 @@ class RemoveTagOpensearchInjestion(RemoveTag):
             client.untag_resource(Arn=r['PipelineArn'], TagKeys=tags)
 
 
-OpensearchInjestion.filter_registry.register('marked-for-op', TagActionFilter)
+OpensearchIngestion.filter_registry.register('marked-for-op', TagActionFilter)
 
 
-@OpensearchInjestion.action_registry.register('mark-for-op')
-class MarkOpensearchInjestionForOp(TagDelayedAction):
-    """Mark OpenSearch Injestion Pipeline for deferred action
+@OpensearchIngestion.action_registry.register('mark-for-op')
+class MarkOpensearchIngestionForOp(TagDelayedAction):
+    """Mark OpenSearch Ingestion Pipeline for deferred action
 
     :example:
 
     .. code-block:: yaml
 
         policies:
-          - name: opensearch-injestion-invalid-tag-mark
-            resource: opensearch-injestion
+          - name: opensearch-ingestion-invalid-tag-mark
+            resource: opensearch-ingestion
             filters:
               - "tag:InvalidTag": present
             actions:
@@ -226,17 +226,17 @@ class MarkOpensearchInjestionForOp(TagDelayedAction):
     """
 
 
-@OpensearchInjestion.action_registry.register('delete')
-class DeleteOpensearchInjestion(BaseAction):
-    """Delete an OpenSearch Injestion Pipeline
+@OpensearchIngestion.action_registry.register('delete')
+class DeleteOpensearchIngestion(BaseAction):
+    """Delete an OpenSearch Ingestion Pipeline
 
     :example:
 
     .. code-block:: yaml
 
         policies:
-          - name: delete-opensearch-injestion
-            resource: opensearch-injestion
+          - name: delete-opensearch-ingestion
+            resource: opensearch-ingestion
             actions:
               - type: delete
     """
@@ -257,9 +257,9 @@ class DeleteOpensearchInjestion(BaseAction):
                 continue
 
 
-@OpensearchInjestion.action_registry.register('stop')
-class StopOpensearchInjestion(BaseAction):
-    """Stops an Opensearch Injestion Pipeline
+@OpensearchIngestion.action_registry.register('stop')
+class StopOpensearchIngestion(BaseAction):
+    """Stops an Opensearch Ingestion Pipeline
 
     :example:
 
@@ -267,7 +267,7 @@ class StopOpensearchInjestion(BaseAction):
 
         policies:
           - name: stop-osis-pipeline
-            resource: opensearch-injestion
+            resource: opensearch-ingestion
             filters:
               - PipelineName: c7n-pipeline-1
             actions:
@@ -286,10 +286,10 @@ class StopOpensearchInjestion(BaseAction):
                 pass
 
 
-@OpensearchInjestion.action_registry.register('update')
-class UpdateOpenSearchInjestion(BaseAction):
+@OpensearchIngestion.action_registry.register('update')
+class UpdateOpenSearchIngestion(BaseAction):
     """Modifies MinUnits, MaxUnits, LogPublishingOptions, BufferOptions, and
-    EncryptionAtRestOptions for a given Opensearch Injestion pipeline.
+    EncryptionAtRestOptions for a given Opensearch Ingestion pipeline.
 
     :example:
 
@@ -297,7 +297,7 @@ class UpdateOpenSearchInjestion(BaseAction):
 
             policies:
               - name: update-pipeline
-                resource: aws.opensearch-injestion
+                resource: aws.opensearch-ingestion
                 actions:
                   - type: update
                     LogPublishingOptions:

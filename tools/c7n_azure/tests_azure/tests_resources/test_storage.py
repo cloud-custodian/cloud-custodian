@@ -645,6 +645,47 @@ class StorageTest(BaseTest):
             self.assertEqual(args[2],
                 StorageAccountUpdateParameters(enable_https_traffic_only=True))
 
+    @arm_template("storage.json")
+    def test_storage_settings_require_secure_transfer_min_tls_version(self):
+        p = self.load_policy(
+            {
+                'name': 'my-first-policy',
+                'resource': 'azure.storage',
+                'filters': [
+                    {
+                        'type': 'value',
+                        'key': 'name',
+                        'op': 'glob',
+                        'value_type': 'normalize',
+                        'value': 'cctstorage*'
+                    },
+                    {
+                        "properties.minimumTlsVersion": "TLS1_0"
+                    }
+                ],
+                'actions': [
+                    {
+                        'type': 'require-secure-transfer',
+                        'value': True,
+                        "minimum_tls_version": "TLS1_2",
+                    }
+                ]
+            }
+        )
+        resources = p.run()
+
+        assert len(resources) == 1
+
+        resource_before = resources[0]
+        assert resource_before
+
+        rg = resource_before["resourceGroup"]
+        name = resource_before["name"]
+
+        client = self.session.client("azure.mgmt.storage.StorageManagementClient")
+        account = client.storage_accounts.get_properties(resource_group_name=rg, account_name=name)
+        assert account.minimum_tls_version == "TLS1_2"
+
     def _get_storage_management_client_api_string(self):
         return local_session(Session)\
             .client('azure.mgmt.storage.StorageManagementClient')\
@@ -667,6 +708,26 @@ class StorageTest(BaseTest):
 
         resources = p.run()
         self.assertEqual(1, len(resources))
+
+    def test_storage_management_policy_rules_filter(self):
+        p = self.load_policy({
+            'name': 'test-azure-mp-rules',
+            'resource': 'azure.storage',
+            'filters': [{
+                'type': 'management-policy-rules',
+                'attrs': [{
+                    'type': 'value',
+                    'key': 'definition.actions.baseBlob.delete.daysAfterModificationGreaterThan',
+                    'value': 3,
+                    'op': 'le'
+                }]
+            }]
+        }, validate=True)
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+        self.assertEqual(resources[0]['name'], 'cloudcustodiantest')
+        self.assertEqual(len(resources[0]['c7n:management-policy-rules']), 1)
+        self.assertEqual(resources[0]['c7n:management-policy-rules'][0]['name'], 'test')
 
 
 class StorageFirewallFilterTest(BaseTest):

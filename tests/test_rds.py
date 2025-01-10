@@ -1079,6 +1079,29 @@ class RDSSnapshotTest(BaseTest):
             {"tidx-pub": ["all"], "tidx-rdx": ["619193117841"]},
         )
 
+    def test_rds_snapshot_access_everyone_only(self):
+        factory = self.replay_flight_data("test_rds_snapshot_access")
+        p = self.load_policy(
+            {
+                "name": "rds-snap-access",
+                "resource": "rds-snapshot",
+                "filters": [{
+                    "type": "cross-account",
+                    "everyone_only": True,
+                }],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            {
+                r["DBSnapshotIdentifier"]: r["c7n:CrossAccountViolations"]
+                for r in resources
+            },
+            {"tidx-pub": ["all"]},
+        )
+
     def test_rds_latest_manual(self):
         # preconditions
         # one db with manual and automatic snapshots

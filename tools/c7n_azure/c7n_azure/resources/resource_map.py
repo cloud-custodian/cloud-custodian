@@ -4,6 +4,7 @@ ResourceMap = {
     "azure.advisor-recommendation": "c7n_azure.resources.advisor.AdvisorRecommendation",
     "azure.aks": "c7n_azure.resources.k8s_service.KubernetesService",
     "azure.app-insights": "c7n_azure.resources.appinsights.AzureAppInsights",
+    "azure.app-service-environment": "c7n_azure.resources.app_service_environment.AppServiceEnvironment",  # noqa
     "azure.automation-account": "c7n_azure.resources.automation_account.AutomationAccount",
     "azure.open-shift": "c7n_azure.resources.open_shift.OpenShiftService",
     "azure.api-management": "c7n_azure.resources.apimanagement.ApiManagement",

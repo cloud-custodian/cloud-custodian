@@ -5,7 +5,7 @@ resources that violate those policies, or blocking them altogether.
 
 ## Running the server
 
-c7n-kates can be run and installed via poetry. `poetry install && poetry run c7n-kates`.  
+c7n-kube can be run and installed via poetry. `poetry install && poetry run c7n-kube`.  
 
 | name           | default   | description                                                  |
 |----------------|-----------|--------------------------------------------------------------|
@@ -21,7 +21,7 @@ c7n-kates can be run and installed via poetry. `poetry install && poetry run c7n
 
 After the server is running, you'll need to configure and install the 
 MutatingWebhookConfiguration manually. To generate a webhook configuration, you
-can run `poetry run c7n-kates --generate --endpoint $ENDPOINT_URL --policy-dir $DIR`, and 
+can run `poetry run c7n-kube --generate --endpoint $ENDPOINT_URL --policy-dir $DIR`, and 
 it will generate an appropriate configuration for you, based on your policies.
 
 Note: some modification of the webhook configuration may be required. See the 

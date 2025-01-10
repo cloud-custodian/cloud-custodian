@@ -50,7 +50,7 @@ deploy_resource() {
             exit 1
         fi
 
-        azureAdUserObjectId=$(az ad signed-in-user show --query objectId --output tsv)
+        azureAdUserObjectId=$(az ad signed-in-user show --query id --output tsv)
         az deployment group create --resource-group $rgName --template-file $file \
             --parameters "userObjectId=$azureAdUserObjectId" --output None
 

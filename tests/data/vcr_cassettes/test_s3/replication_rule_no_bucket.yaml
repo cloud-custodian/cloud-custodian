@@ -1,0 +1,31 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Connection:
+      - close
+      Host:
+      - s3.amazonaws.com
+      User-Agent:
+      - Python-urllib/3.11
+    method: HEAD
+    uri: https://s3.amazonaws.com/c1-replication-west
+  response:
+    body:
+      string: ''
+    headers:
+      Connection:
+      - close
+      Content-Type:
+      - application/xml
+      Date:
+      - Wed, 02 Oct 2024 01:43:34 GMT
+      Server:
+      - AmazonS3
+      x-amz-id-2:
+      - kwBD2QO20lzFFdV6bqlWc+OtFWrPUxrfAvl3Sop9VETLjyc/GCiHNaDUGQW0GQpQ6FWUjQP1zRQ=
+      x-amz-request-id:
+      - XEH8HKQ7GF91KDAY
+    status:
+      code: 404
+      message: Not Found

@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:states:us-east-1:644160558196:activity:test-c7n",
+                "Tags": [
+                    {
+                        "Key": "test",
+                        "Value": "c7n-test"
+                    },
+                    {
+                        "Key": "name",
+                        "Value": "test"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

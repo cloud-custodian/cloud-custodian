@@ -206,7 +206,7 @@ class PolicyMetaLint(BaseTest):
             {'account', 's3', 'hostedzone', 'log-group', 'rest-api', 'redshift-snapshot',
              'rest-stage', 'codedeploy-app', 'codedeploy-group', 'fis-template', 'dlm-policy',
              'apigwv2', 'apigwv2-stage', 'apigw-domain-name', 'fis-experiment',
-             'launch-template-version'})
+             'launch-template-version', 'glue-table'})
         if overrides:
             raise ValueError("unknown arn overrides in %s" % (", ".join(overrides)))
 
@@ -651,7 +651,6 @@ class PolicyMetaLint(BaseTest):
             'AWS::AccessAnalyzer::Analyzer',
             'AWS::WorkSpaces::ConnectionAlias',
             'AWS::DMS::ReplicationSubnetGroup',
-            'AWS::StepFunctions::Activity',
             'AWS::Route53Resolver::ResolverEndpoint',
             'AWS::Route53Resolver::ResolverRule',
             'AWS::Route53Resolver::ResolverRuleAssociation',
@@ -723,7 +722,7 @@ class PolicyMetaLint(BaseTest):
     def test_resource_meta_with_class(self):
         missing = set()
         for k, v in manager.resources.items():
-            if k in ('rest-account', 'account'):
+            if k in ('rest-account', 'account', 'quicksight-account'):
                 continue
             if not issubclass(v.resource_type, TypeInfo):
                 missing.add(k)
@@ -734,7 +733,7 @@ class PolicyMetaLint(BaseTest):
         empty = set()
         for k, v in manager.resources.items():
             if k in ('rest-account', 'account', 'codedeploy-deployment', 'sagemaker-cluster',
-                     'networkmanager-core'):
+                     'networkmanager-core', 'quicksight-account'):
                 continue
             for rk, rv in v.resource_type.__dict__.items():
                 if rk[0].isalnum() and rv is None:
@@ -874,7 +873,7 @@ class PolicyMetaLint(BaseTest):
             'snowball-cluster', 'snowball', 'ssm-activation',
             'healthcheck', 'event-rule-target', 'log-metric',
             'support-case', 'transit-attachment', 'config-recorder',
-            'apigw-domain-name', 'backup-job'}
+            'apigw-domain-name', 'backup-job', 'quicksight-account'}
 
         missing_method = []
         for k, v in manager.resources.items():

@@ -159,6 +159,83 @@ class DirectoryTests(BaseTest):
         self.assertEqual(len(remainder), 2)
         self.assertEqual(remainder[1]["Stage"], "Deleting")
 
+    def test_directory_log_subscriptions(self):
+        factory = self.replay_flight_data("test_directory_log_subscriptions")
+        p = self.load_policy(
+            {
+                "name": "directory-log-subscriptions",
+                "resource": "directory",
+                "filters": [{
+                    "type": "is-log-forwarding",
+                }],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["DirectoryId"], "d-9067d77ae2")
+        self.assertIn("c7n:LogSubscriptions", resources[0])
+
+    def test_directory_ldap_setting_no_settings(self):
+        factory = self.replay_flight_data("test_directory_ldap_setting")
+        p = self.load_policy(
+            {
+                "name": "ldap-disabled",
+                "resource": "directory",
+                "filters": [{"type": "ldap", "status": "Disabled"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue("c7n:LDAPSSettings" in resources[0])
+
+    def test_directory_ldap_setting_enabled(self):
+        factory = self.replay_flight_data("test_directory_ldap_setting_enabled")
+        p = self.load_policy(
+            {
+                "name": "ldap-enabled",
+                "resource": "directory",
+                "filters": [{"type": "ldap", "status": "Enabled"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["c7n:LDAPSSettings"][0]['LDAPSStatus'], "Enabled")
+
+    def test_directory_settings(self):
+        factory = self.replay_flight_data("test_directory_settings")
+        p = self.load_policy(
+            {
+                "name": "tls_1_0-enabled",
+                "resource": "directory",
+                "filters": [{"type": "settings", "key": "TLS_1_0", "value": "Enable"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue("c7n:Settings" in resources[0])
+
+    def test_directory_trust_relationship(self):
+        factory = self.replay_flight_data("test_directory_trust_relationship")
+        p = self.load_policy(
+            {
+                "name": "trust-relationship",
+                "resource": "directory",
+                "filters": [{"type": "trust", "key": "RemoteDomainName",
+                        "value": "cloudcustodian.io"},
+                        {"type": "trust", "key": "TrustDirection",
+                            "value": "One-Way: Outgoing"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue("c7n:Trusts" in resources[0])
+        self.assertEqual(resources[0]["c7n:Trusts"][0]['RemoteDomainName'], "cloudcustodian.io")
+
 
 class CloudDirectoryQueryParse(BaseTest):
 

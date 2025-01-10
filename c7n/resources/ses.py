@@ -3,7 +3,9 @@
 import json
 
 from c7n.actions import BaseAction, Action
+from c7n.filters.iamaccess import CrossAccountAccessFilter
 import c7n.filters.policystatement as polstmt_filter
+from c7n.exceptions import PolicyValidationError
 from c7n.manager import resources
 from c7n.query import DescribeSource, QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema, format_string_values
@@ -47,6 +49,38 @@ class SESConfigurationSet(QueryResourceManager):
     }
 
 
+class DescribeConfigurationSetV2(DescribeSource):
+
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('sesv2')
+        resource_list = []
+        for r in resources:
+            details = client.get_configuration_set(ConfigurationSetName=r)
+            resource_list.append({
+                k: details[k]
+                for k in details
+                if k not in {'ResponseMetadata'}
+            })
+        return universal_augment(self.manager, resource_list)
+
+
+@resources.register('ses-configuration-set-v2')
+class SESConfigurationSetV2(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = 'sesv2'
+        enum_spec = ('list_configuration_sets', 'ConfigurationSets', None)
+        name = id = 'ConfigurationSetName'
+        arn_type = 'configuration-set'
+        universal_taggable = object()
+        config_type = "AWS::SES::ConfigurationSet"
+        permission_prefix = 'ses'
+        permissions_augment = ("ses:ListTagsForResource",)
+
+    source_mapping = {
+        'describe': DescribeConfigurationSetV2
+    }
+
+
 @SESConfigurationSet.action_registry.register('set-delivery-options')
 class SetDeliveryOptions(BaseAction):
     """Set the TLS policy for ses
@@ -87,6 +121,34 @@ class SetDeliveryOptions(BaseAction):
             )
 
 
+@SESConfigurationSet.action_registry.register('delete')
+class DeleteSESConfigurationSet(Action):
+    """Delete an SES Configuration Set resource.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: ses-delete-configuration-set
+                resource: aws.ses-configuration-set
+                actions:
+                    - delete
+
+    """
+    schema = type_schema('delete')
+    permissions = ("ses:DeleteConfigurationSet",)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ses')
+        for resource in resources:
+            self.manager.retry(
+                client.delete_configuration_set,
+                ConfigurationSetName=resource['Name'],
+                ignore_err_codes=("ConfigurationSetDoesNotExistException",)
+            )
+
+
 @resources.register('ses-email-identity')
 class SESEmailIdentity(QueryResourceManager):
     class resource_type(TypeInfo):
@@ -99,6 +161,27 @@ class SESEmailIdentity(QueryResourceManager):
         permission_prefix = 'ses'
         arn_service = 'ses'
         cfn_type = 'AWS::SES::EmailIdentity'
+
+
+@SESEmailIdentity.filter_registry.register('cross-account')
+class CrossAccountEmailIdentityFilter(CrossAccountAccessFilter):
+
+    # dummy permission
+    permissions = ('ses:ListEmailIdentities',)
+    policy_attribute = 'Policies'
+
+    def __call__(self, r):
+        policies = self.get_resource_policy(r)
+        if policies is None:
+            return False
+        resource_violations = {}
+        for policy_name, policy in policies.items():
+            violations = self.checker.check(policy)
+            if violations:
+                resource_violations[policy_name] = violations
+        if resource_violations:
+            r[self.annotation_key] = resource_violations
+            return True
 
 
 @SESEmailIdentity.filter_registry.register('has-statement')
@@ -150,6 +233,66 @@ class HasStatementFilter(polstmt_filter.HasStatementFilter):
             if (self.data.get('statement_ids', []) and not required) or \
                (self.data.get('statements', []) and not required_statements):
                 return email_identity
+
+
+@SESEmailIdentity.action_registry.register('remove-policies')
+class RemoveIdentityPolicy(BaseAction):
+    """
+    Action to remove policies from an SES Email Identity
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: ses-remove-policy
+            resource: aws.ses-email-identity
+            filters:
+              - type: cross-account
+            actions:
+              - type: remove-policies
+                policy_names: matched
+    """
+    schema = type_schema('remove-policies', required=['policy_names'],
+        policy_names={'oneOf': [
+            {'enum': ['matched', "*"]},
+            {'type': 'array', 'items': {'type': 'string'}}]})
+
+    permissions = ('ses:DeleteEmailIdentityPolicy',)
+    policy_attribute = 'Policies'
+
+    def validate(self):
+        if self.data.get('policy_names') == 'matched':
+            for f in self.manager.iter_filters():
+                if isinstance(f, CrossAccountEmailIdentityFilter):
+                    return self
+            raise PolicyValidationError(
+                '`remove-policies` may only be used on `matched` policy_names '
+                'in conjunction with `cross-account` filter on %s' %
+                (self.manager.data,)
+            )
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('sesv2')
+        policy_names = self.data.get('policy_names', [])
+        for r in resources:
+            policies_to_remove = []
+            if isinstance(policy_names, list):
+                policies_to_remove = policy_names
+            else:
+                if policy_names == "*":
+                    policies_to_remove = r.get(self.policy_attribute, {}).keys()
+                elif policy_names == "matched":
+                    policies_to_remove = r.get(
+                        CrossAccountEmailIdentityFilter.annotation_key, {}
+                    ).keys()
+
+            for policy in policies_to_remove:
+                self.manager.retry(
+                    client.delete_email_identity_policy,
+                    EmailIdentity=r['IdentityName'],
+                    PolicyName=policy,
+                )
 
 
 @resources.register('ses-receipt-rule-set')

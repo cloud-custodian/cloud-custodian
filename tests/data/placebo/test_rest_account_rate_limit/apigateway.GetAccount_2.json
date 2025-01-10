@@ -1,0 +1,14 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "throttleSettings": {
+            "burstLimit": 5000,
+            "rateLimit": 10000.0
+        },
+        "features": [
+            "UsagePlans"
+        ],
+        "apiKeyVersion": "4"
+    }
+}
