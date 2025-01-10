@@ -747,19 +747,19 @@ def _scalar_augment(manager, model, detail_spec, client, resource_set):
         kw = {param_name: param_key and r[param_key] or r}
         try:
             response = op(*args, **kw)
-            if detail_path:
-                response = response[detail_path]
-            else:
-                response.pop('ResponseMetadata')
-            if param_key is None:
-                response[model.id] = r
-                r = response
-            else:
-                r.update(response)
-            results.append(r)
         except client.exceptions.ResourceNotFoundException:
             manager.log.debug("Resource not found: %s using %s" % (detail_op, kw))
             continue
+        if detail_path:
+            response = response[detail_path]
+        else:
+            response.pop('ResponseMetadata')
+        if param_key is None:
+            response[model.id] = r
+            r = response
+        else:
+            r.update(response)
+        results.append(r)
     return results
 
 
