@@ -164,8 +164,8 @@ class KafkaClusterConfiguration(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'kafka'
         enum_spec = ('list_configurations', 'Configurations', None)
-        name = id = 'Arn'
-        arn = 'Arn'
+        name = 'Name'
+        id = arn = 'Arn'
         date = 'CreationTime'
         permissions_augment = ("kafka:ListConfigurations",)
 
