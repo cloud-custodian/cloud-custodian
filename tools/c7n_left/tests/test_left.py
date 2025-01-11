@@ -112,8 +112,12 @@ class PolicyEnv:
         extant["policies"].append(policy)
         policy_file.write_text(json.dumps(extant))
 
-    def run(self, policy_dir=None, terraform_dir=None):
-        config = cli.get_config(terraform_dir or self.policy_dir, policy_dir or self.policy_dir)
+    def run(self, policy_dir=None, terraform_dir=None, terraform_workspace="default"):
+        config = cli.get_config(
+            directory=terraform_dir or self.policy_dir,
+            policy_dir=policy_dir or self.policy_dir,
+            terraform_workspace=terraform_workspace,
+        )
         policies = policy_core.load_policies(config.policy_dir, config)
         reporter = ResultsReporter()
         core.CollectionRunner(policies, config, reporter).run()
@@ -820,6 +824,56 @@ def test_traverse_multi_resource_nested_or(tmp_path):
         "aws_s3_bucket.owner_enforced",
         "aws_s3_bucket.owner_preferred",
     }
+
+
+def test_traverse_match_values(policy_env, test):
+    policy_env.write_tf(
+        """
+resource "r" "r1" {
+  name = "r-r1"
+}
+
+resource "r" "r2" {
+  label = "r-r2"
+}
+
+resource "rr" "res" {
+  rn = [r.r1.name]
+  rl = [r.r2.label]
+}
+        """
+    )
+    policy_env.write_policy(
+        {
+            "name": "test1",
+            "resource": "terraform.rr",
+            "filters": [
+                {
+                    "type": "traverse",
+                    "resources": "r",
+                    "attrs": [{"name": "r-r1"}],
+                }
+            ],
+        },
+    )
+    policy_env.write_policy(
+        {
+            "name": "test2",
+            "resource": "terraform.rr",
+            "filters": [
+                {
+                    "type": "traverse",
+                    "resources": "r",
+                    "attrs": [{"label": "r-r2"}],
+                }
+            ],
+        },
+    )
+    res1, res2 = (r.as_dict() for r in policy_env.run())
+    assert res1["policy"]["name"] == "test1"
+    assert res1["resource"]["__tfmeta"]["path"] == "rr.res"
+    assert res2["policy"]["name"] == "test2"
+    assert res2["resource"]["__tfmeta"]["path"] == "rr.res"
 
 
 def test_traverse_filter_not_found(tmp_path):
@@ -1949,3 +2003,38 @@ def test_selection_policy_filter(policy_env):
 
     selection = policy_env.get_selection("policy=test-a")
     assert {p.name for p in selection.filter_policies(policies)} == {"test-a"}
+
+
+def test_workspace(policy_env):
+    policy_env.write_tf(
+        """
+locals {
+  map = {
+    default = "name-1"
+    other   = "name-2"
+  }
+}
+
+resource "res" "test_res" {
+  name = local.map[terraform.workspace]
+}
+        """
+    )
+    policy_env.write_policy(
+        {
+            "name": "test-a",
+            "resource": "terraform.res",
+            "filters": [{"name": "name-1"}],
+        }
+    )
+    policy_env.write_policy(
+        {
+            "name": "test-b",
+            "resource": "terraform.res",
+            "filters": [{"name": "name-2"}],
+        }
+    )
+    [result] = policy_env.run(terraform_workspace="default")
+    assert result.resource["name"] == "name-1"
+    [result] = policy_env.run(terraform_workspace="other")
+    assert result.resource["name"] == "name-2"
