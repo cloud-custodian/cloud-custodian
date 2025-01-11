@@ -217,7 +217,7 @@ class EnableWAFV2Logging(BaseAction):
 
     .. code-block:: yaml
 
-    policies:
+      policies:
       - name: enable-wafv2-logging
         resource: aws.wafv2
         actions:
@@ -245,8 +245,8 @@ class EnableWAFV2Logging(BaseAction):
             log_type: WAF_LOGS
             log_scope: CUSTOMER
 
-
     """
+
     schema = type_schema(
         'enable-logging',
         log_destination_arn={'type': 'string'},
