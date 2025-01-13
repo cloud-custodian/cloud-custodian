@@ -1,11 +1,12 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import json
+from botocore.exceptions import ClientError
 
-from c7n.actions import Action, BaseAction
+from c7n.actions import Action, BaseAction, RemovePolicyBase
 from c7n.exceptions import PolicyValidationError
 from c7n.filters.kms import KmsRelatedFilter
-from c7n.filters import Filter
+from c7n.filters import Filter, CrossAccountAccessFilter
 from c7n.manager import resources
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, NetworkLocation
 from c7n.filters.policystatement import HasStatementFilter
@@ -340,6 +341,115 @@ class EFSHasStatementFilter(HasStatementFilter):
             'account_id': self.manager.config.account_id,
             'region': self.manager.config.region
         }
+
+
+@ElasticFileSystem.filter_registry.register('cross-account')
+class EFSCrossAccountFilter(CrossAccountAccessFilter):
+    """Filter EFS file systems which have cross account permissions
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: efs-cross-account
+                resource: aws.efs
+                filters:
+                  - type: cross-account
+    """
+    permissions = ('elasticfilesystem:DescribeFileSystemPolicy',)
+
+    def process(self, resources, event=None):
+        def _augment(r):
+            client = local_session(
+                self.manager.session_factory).client('efs')
+            try:
+                r['Policy'] = client.describe_file_system_policy(
+                    FileSystemId=r['FileSystemId'])['Policy']
+                return r
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'AccessDeniedException':
+                    self.log.warning(
+                        "Access denied getting policy elasticfilesystems:%s",
+                        r['FileSystemId'])
+
+        self.log.debug("fetching policy for %d elasticfilesystems" % len(resources))
+        with self.executor_factory(max_workers=3) as w:
+            resources = list(filter(None, w.map(_augment, resources)))
+
+        return super(EFSCrossAccountFilter, self).process(
+            resources, event)
+
+
+@ElasticFileSystem.action_registry.register('remove-statements')
+class RemovePolicyStatement(RemovePolicyBase):
+    """Action to remove policy statements from EFS
+
+    :example:
+
+    .. code-block:: yaml
+
+           policies:
+              - name: remove-efs-cross-account
+                resource: efs
+                filters:
+                  - type: cross-account
+                actions:
+                  - type: remove-statements
+                    statement_ids: matched
+    """
+
+    schema = type_schema(
+        'remove-statements',
+        required=['statement_ids'],
+        statement_ids={'oneOf': [
+            {'enum': ['matched']},
+            {'type': 'array', 'items': {'type': 'string'}}]})
+
+    permissions = (
+        'elasticfilesystem:DescribeFileSystems', 'elasticfilesystem:DeleteFileSystemPolicy'
+        )
+
+    def process(self, resources):
+        results = []
+        client = local_session(self.manager.session_factory).client('efs')
+        for r in resources:
+            try:
+                results += filter(None, [self.process_resource(client, r)])
+            except Exception:
+                self.log.exception(
+                    "Error processing elasticfilesystem:%s", r['FileSystemId'])
+        return results
+
+    def process_resource(self, client, resource):
+        if 'Policy' not in resource:
+            try:
+                resource['Policy'] = client.describe_file_system_policy(
+                    FileSystemId=resource['FileSystemId']).get('Policy')
+            except ClientError as e:
+                if e.response['Error']['Code'] != "FileSystemNotFound":
+                    raise
+
+        if not resource['Policy']:
+            return
+
+        p = json.loads(resource['Policy'])
+        statements, found = self.process_policy(
+            p, resource, CrossAccountAccessFilter.annotation_key)
+
+        if not found:
+            return
+
+        if not statements:
+            client.delete_file_system_policy(FileSystemId=resource['FileSystemId'])
+        else:
+            client.put_file_system_policy(
+                FileSystemId=resource['FileSystemId'],
+                Policy=json.dumps(p)
+            )
+        return {'Name': resource['FileSystemId'],
+                'State': 'PolicyRemoved',
+                'Statements': found}
 
 
 ElasticFileSystem.filter_registry.register('consecutive-aws-backups', ConsecutiveAwsBackupsFilter)

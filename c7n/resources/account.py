@@ -1273,7 +1273,8 @@ class HasVirtualMFA(Filter):
     permissions = ('iam:ListVirtualMFADevices',)
 
     def mfa_belongs_to_root_account(self, mfa):
-        return mfa['SerialNumber'].endswith(':mfa/root-account-mfa-device')
+        mfa_user = mfa.get('User', {}).get('Arn', '').split(':')[-1]
+        return mfa_user == 'root'
 
     def account_has_virtual_mfa(self, account):
         if not account.get('c7n:VirtualMFADevices'):
