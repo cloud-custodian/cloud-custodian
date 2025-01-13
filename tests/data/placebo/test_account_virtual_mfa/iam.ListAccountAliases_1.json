@@ -1,20 +1,8 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
-        "AccountAliases": [
-            "cloud-custodian"
-        ], 
-        "IsTruncated": false, 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "1c4380c9-35e8-11e7-9a74-23d61355e462", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "1c4380c9-35e8-11e7-9a74-23d61355e462", 
-                "date": "Thu, 11 May 2017 01:21:07 GMT", 
-                "content-length": "391", 
-                "content-type": "text/xml"
-            }
-        }
+        "AccountAliases": [],
+        "IsTruncated": false,
+        "ResponseMetadata": {}
     }
 }

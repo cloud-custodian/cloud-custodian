@@ -574,11 +574,25 @@ class RequireSecureTransferAction(AzureBaseAction):
               actions:
               - type: require-secure-transfer
                 value: True
+
+    You can also set the minimum tls version on a bucket,
+    valid values: TLS1_0, TLS1_1, TLS1_2:
+
+    .. code-block:: yaml
+
+        policies:
+            - name: require-secure-transfer-with-tls-v1-2
+              resource: azure.storage
+              actions:
+              - type: require-secure-transfer
+                value: True
+                minimum_tls_version: TLS1_2
     """
 
     # Default to true assuming user wants secure connection
     schema = type_schema(
         'require-secure-transfer',
+        minimum_tls_version={"type": "string"},
         **{
             'value': {'type': 'boolean', "default": True},
         })
@@ -590,10 +604,18 @@ class RequireSecureTransferAction(AzureBaseAction):
         self.client = self.manager.get_client()
 
     def _process_resource(self, resource):
+        kwargs = {
+            "enable_https_traffic_only": self.data.get("value")
+        }
+
+        if self.data.get("minimum_tls_version"):
+            kwargs["minimum_tls_version"] = self.data.get("minimum_tls_version")
+
+        update_params = StorageAccountUpdateParameters(**kwargs)
         self.client.storage_accounts.update(
             resource['resourceGroup'],
             resource['name'],
-            StorageAccountUpdateParameters(enable_https_traffic_only=self.data.get('value'))
+            update_params,
         )
 
 
