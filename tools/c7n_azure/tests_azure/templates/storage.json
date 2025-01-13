@@ -32,7 +32,7 @@
                 "[parameters('StorageAccountName')]"
             ],
             "properties": {
-                "publicAccess": "Container"
+                "publicAccess": "None"
             }
         },
         {

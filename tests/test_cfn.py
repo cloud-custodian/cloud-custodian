@@ -1,5 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import yaml
+
 from .common import BaseTest
 
 import time
@@ -199,3 +201,55 @@ class TestCFN(BaseTest):
             "Tags"
         ]
         self.assertEqual(len(tags), 0)
+
+    def test_cfn_template_filter(self):
+        session_factory = self.replay_flight_data("test_cfn_template_filter")
+        client = session_factory().client("cloudformation")
+
+        stack_name = "c7n-test-template-filter"
+
+        template_body = yaml.dump({
+            "Resources": {
+                "MyBucket": {
+                    "Type": "AWS::S3::Bucket",
+                    "Properties": {
+                        "BucketName": "c7n-access-key-test-bucket"
+                    }
+                }
+            },
+            "Metadata": {
+                "API_KEY": "API_KEY123456789"
+            }
+        })
+
+        client.create_stack(
+            StackName=stack_name,
+            TemplateBody=template_body,
+            Capabilities=["CAPABILITY_NAMED_IAM"]
+        )
+        self.addCleanup(client.delete_stack, StackName=stack_name)
+
+        if self.recording:
+            time.sleep(30)
+
+        stacks = client.describe_stacks(StackName=stack_name)["Stacks"]
+        self.assertEqual(len(stacks), 1)
+        self.assertEqual(stacks[0]["StackName"], stack_name)
+
+        policy = self.load_policy(
+            {
+                "name": "test-cfn-template-filter",
+                "resource": "cfn",
+                "filters": [
+                    {
+                        "type": "template",
+                        "pattern": "API_KEY[0-9A-Z]",
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = policy.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["StackName"], stack_name)

@@ -2,6 +2,7 @@ from c7n.manager import resources
 from c7n.actions import Action
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
+import c7n.filters.vpc as net_filters
 from c7n.query import DescribeSource, QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema
 from c7n.tags import (
@@ -127,6 +128,8 @@ class TimestreamInfluxDBRemoveTag(RemoveTagAction):
 TimestreamInfluxDB.action_registry.register('mark-for-op', TagDelayedAction)
 
 TimestreamInfluxDB.filter_registry.register('marked-for-op', TagActionFilter)
+
+TimestreamInfluxDB.filter_registry.register('network-location', net_filters.NetworkLocation)
 
 
 @TimestreamInfluxDB.filter_registry.register('security-group')
