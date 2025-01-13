@@ -1,0 +1,26 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "ConfigurationSetName": "test-c7n",
+        "DeliveryOptions": {
+            "TlsPolicy": "OPTIONAL"
+        },
+        "ReputationOptions": {
+            "ReputationMetricsEnabled": false
+        },
+        "SendingOptions": {
+            "SendingEnabled": true
+        },
+        "Tags": [
+            {
+                "Key": "owner",
+                "Value": "c7n"
+            },
+            {
+                "Key": "invalidtag",
+                "Value": ""
+            }
+        ]
+    }
+}
