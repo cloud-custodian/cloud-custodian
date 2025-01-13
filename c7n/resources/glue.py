@@ -364,6 +364,9 @@ class GlueTable(query.ChildResourceManager):
         date = 'CreatedOn'
         arn_type = 'table'
 
+    def get_arns(self, resources):
+        return [self.generate_arn(r['DatabaseName'] + '/' + r['Name']) for r in resources]
+
 
 @query.sources.register('describe-table')
 class DescribeTable(query.ChildDescribeSource):

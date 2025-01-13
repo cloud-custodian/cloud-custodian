@@ -214,3 +214,120 @@ class TestTimestreamTable(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(len(resources[0]['c7n:matched-kms-key']), 1)
+
+
+class TestTimestreamInfluxDB(BaseTest):
+    def test_timestream_influx_db_tag(self):
+        session_factory = self.replay_flight_data('test_timestream_influx_db_tag')
+        p = self.load_policy(
+            {
+                'name': 'test-timestream-influx-db-tag',
+                'resource': 'aws.timestream-influxdb',
+                'filters': [
+                    {
+                        'tag:foo': 'absent'
+                    }
+                ],
+                'actions': [
+                    {
+                        'type': 'tag',
+                        'tags': {'foo': 'bar'}
+                    }
+                ]
+            }, session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client('timestream-influxdb')
+        tags = client.list_tags_for_resource(resourceArn=resources[0]['arn'])['tags']
+        self.assertEqual(len(tags), 1)
+        key, value = next(iter(tags.items()))
+        self.assertEqual(key, 'foo')
+        self.assertEqual(value, 'bar')
+
+    def test_timestream_influx_db_remove_tag(self):
+        session_factory = self.replay_flight_data('test_timestream_influx_db_remove_tag')
+        p = self.load_policy(
+            {
+                'name': 'test-timestream-influx-db-remove-tag',
+                'resource': 'aws.timestream-influxdb',
+                'filters': [
+                    {
+                        'tag:foo': 'present'
+                    }
+                ],
+                'actions': [
+                    {
+                        'type': 'remove-tag',
+                        'tags': ['foo']
+                    }
+                ]
+            }, session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client('timestream-influxdb')
+        tags = client.list_tags_for_resource(resourceArn=resources[0]['arn'])['tags']
+        self.assertEqual(len(tags), 0)
+
+    def test_timestream_influx_db_delete(self):
+        session_factory = self.replay_flight_data('test_timestream_influx_db_delete')
+        p = self.load_policy(
+            {
+                'name': 'test-timestream-influx-db-delete',
+                'resource': 'aws.timestream-influxdb',
+                'actions': [
+                    {
+                        'type': 'delete',
+                    }
+                ]
+            }, session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client('timestream-influxdb')
+        db = client.list_db_instances()['items']
+        instance = client.get_db_instance(identifier=db[0]['id'])
+        self.assertEqual(instance['status'], 'DELETING')
+
+    def test_timestream_influxdb_with_subnet_sg_filter(self):
+        factory = self.replay_flight_data("test_timestream_influx_db_subnet_sg")
+        p = self.load_policy(
+            {
+                "name": "timestream_influx_db_subnet_sg",
+                "resource": "aws.timestream-influxdb",
+                "filters": [
+                    {'type': 'subnet',
+                     'key': 'tag:Internal',
+                     'value': 'False'},
+                    {'type': 'security-group',
+                     'key': 'tag:c7n-public',
+                     'value': 'Policy'}]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_timestream_influxdb_network_location_filter(self):
+        factory = self.replay_flight_data("test_timestream_influxdb_network_location_filter")
+
+        p = self.load_policy(
+            {
+                "name": "test_timestream_influxdb_network_location_filter",
+                "resource": "timestream-influxdb",
+                "filters": [
+                    {
+                        "type": "network-location",
+                        "compare": ["resource", "security-group"],
+                        "key": "tag:c7n-public",
+                        "match": "equal"
+                    }
+                ]
+            },
+            session_factory=factory
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        assert resources[0]['name'] == 'test-db'

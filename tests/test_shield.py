@@ -62,3 +62,40 @@ class ShieldTest(BaseTest):
                     self.assertTrue(
                         mock.call(ProtectionId=str(i)) in delete.call_args_list
                     )
+
+    def test_tag_protection(self):
+        session_factory = self.replay_flight_data("test_shield_tag_protection")
+        p = self.load_policy(
+            {
+                "name": "tag-shield-protection",
+                "resource": "shield-protection",
+                "filters": [{"tag:Owner": "c7n"}],
+                "actions": [{"type": "tag", "key": "c7n", "value": "test"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = session_factory().client("shield")
+        tags = client.list_tags_for_resource(ResourceARN=resources[0]["ResourceArn"])["Tags"]
+        self.assertEqual(tags[1]["Value"], "test")
+
+    def test_untag_protection(self):
+        session_factory = self.replay_flight_data("test_shield_untag_protection")
+        p = self.load_policy(
+            {
+                "name": "untag-shield-protection",
+                "resource": "shield-protection",
+                "filters": [{"tag:c7n": "test"}],
+                "actions": [{"type": "remove-tag", "tags": ["c7n"]}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = session_factory().client("shield")
+        tags = client.list_tags_for_resource(ResourceARN=resources[0]["ResourceArn"])["Tags"]
+        self.assertEqual(len(tags), 1)
+        self.assertTrue(tags[0]["Key"] != "c7n")
