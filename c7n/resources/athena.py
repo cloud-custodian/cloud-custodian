@@ -15,6 +15,7 @@ class AthenaNamedQuery(query.QueryResourceManager):
         id = "NamedQueryId"
         name = "Name"
         cfn_type = "AWS::Athena::NamedQuery"
+        universal_taggable = object()
         permissions_augment = ("athena:ListTagsForResource",)
 
 
@@ -25,10 +26,11 @@ class AthenaWorkGroup(query.QueryResourceManager):
         service = "athena"
         enum_spec = ('list_work_groups', 'WorkGroups', None)
         detail_spec = ('get_work_group', 'Name', 'Name', 'WorkGroup')
-        arn = "Arn"
+        arn_type = "workgroup"
         id = "Name"
         name = "Name"
         cfn_type = "AWS::Athena::WorkGroup"
+        universal_taggable = object()
         permissions_augment = ("athena:ListTagsForResource",)
 
 
@@ -39,22 +41,24 @@ class AthenaDataCatalog(query.QueryResourceManager):
         service = "athena"
         enum_spec = ('list_data_catalogs', 'DataCatalogsSummary', None)
         detail_spec = ('get_data_catalog', 'Name', 'Name', 'DataCatalog')
-        arn = "Arn"
+        arn_type = "datacatalog"
         id = "Name"
         name = "Name"
         cfn_type = "AWS::Athena::DataCatalog"
+        universal_taggable = object()
         permissions_augment = ("athena:ListTagsForResource",)
 
 
-@resource.register('athena-capacity-reservation')
+@resources.register('athena-capacity-reservation')
 class AthenaCapacityReservation(query.QueryResourceManager):
 
     class resource_type(query.TypeInfo):
         service = 'athena'
         enum_spec = ('list_capacity_reservations', 'CapacityReservations', None)
-        detail_spec = ('get_capacity_reservation', 'CapacityReservationId', 'CapacityReservationId', 'CapacityReservation')
-        arn = 'CapacityReservationArn'
-        id = 'CapacityReservationId'
-        name = 'CapacityReservationId'
+        detail_spec = ('get_capacity_reservation', 'Name', 'Name', 'CapacityReservation')
+        arn_type = "capacity-reservation"
+        id = 'Name'
+        name = 'Name'
         cfn_type = 'AWS::Athena::CapacityReservation'
+        universal_taggable = object()
         permissions_augment = ('athena:ListTagsForResource',)
