@@ -176,6 +176,8 @@ class DirectoryTrustFilter(ValueFilter):
         for r in resources:
             r[self.annotation_key] = [
                 t for t in trusts if t['DirectoryId'] == r['DirectoryId']]
+            # When there are no trusts, we pass an empty dictionary so that
+            # self.match can evaluate directories without trusts using the absent value
             resource_trusts = r[self.annotation_key] if len(r[self.annotation_key]) >= 1 else [{}]
             if any((self.match(trust) for trust in resource_trusts)):
                 matched.append(r)
