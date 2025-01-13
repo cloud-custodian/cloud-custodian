@@ -15,8 +15,6 @@ class AthenaNamedQuery(query.QueryResourceManager):
         id = "NamedQueryId"
         name = "Name"
         cfn_type = "AWS::Athena::NamedQuery"
-        universal_taggable = object()
-        permissions_augment = ("athena:ListTagsForResource",)
 
 
 @resources.register("athena-workgroup")
