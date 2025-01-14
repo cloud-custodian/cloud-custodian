@@ -15,5 +15,5 @@ class LexV2Bot(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(
-            resources[0]['CrossAccountViolations'][0]['Resource'], 'arn:aws:lex:us-east-1:644160558196:bot/OTM2WO3PEY')
+        self.assertEqual(resources[0]['CrossAccountViolations'][0]['Resource'], 
+          'arn:aws:lex:us-east-1:644160558196:bot/OTM2WO3PEY')
