@@ -18,6 +18,23 @@ class SESTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_ses_configuration_set_v2_query(self):
+        session_factory = self.replay_flight_data("test_ses_configuration_set_v2_query")
+        p = self.load_policy(
+            {
+                "name": "ses-configuration-set-v2-query-test",
+                "resource": "ses-configuration-set-v2",
+                "filters": [{"type": "value",
+                             "key": "DeliveryOptions.SendingPoolName",
+                             "value": "ses-shared-pool"}]
+            }, session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        for r in resources:
+            self.assertTrue("SendingPoolName" in r["DeliveryOptions"])
+            self.assertEqual("ses-shared-pool", r["DeliveryOptions"]["SendingPoolName"])
+
     def test_ses_configuration_set_delivery_options(self):
         session_factory = self.replay_flight_data("test_ses_configuration_set_delivery_options")
         p = self.load_policy(

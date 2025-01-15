@@ -49,6 +49,38 @@ class SESConfigurationSet(QueryResourceManager):
     }
 
 
+class DescribeConfigurationSetV2(DescribeSource):
+
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('sesv2')
+        resource_list = []
+        for r in resources:
+            details = client.get_configuration_set(ConfigurationSetName=r)
+            resource_list.append({
+                k: details[k]
+                for k in details
+                if k not in {'ResponseMetadata'}
+            })
+        return universal_augment(self.manager, resource_list)
+
+
+@resources.register('ses-configuration-set-v2')
+class SESConfigurationSetV2(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = 'sesv2'
+        enum_spec = ('list_configuration_sets', 'ConfigurationSets', None)
+        name = id = 'ConfigurationSetName'
+        arn_type = 'configuration-set'
+        universal_taggable = object()
+        config_type = "AWS::SES::ConfigurationSet"
+        permission_prefix = 'ses'
+        permissions_augment = ("ses:ListTagsForResource",)
+
+    source_mapping = {
+        'describe': DescribeConfigurationSetV2
+    }
+
+
 @SESConfigurationSet.action_registry.register('set-delivery-options')
 class SetDeliveryOptions(BaseAction):
     """Set the TLS policy for ses
