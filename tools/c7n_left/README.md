@@ -306,6 +306,40 @@ policies:
         value: "cloud-custodian/cloud-custodian"
 ```
 
+### jmespath
+Sometimes you may have JSON encoded strings as part of your terraform.  For
+example if you're working with an AWS ECS Task Definition the
+`container_defintions` key will be a string and not a proper object.  You
+may want to have a policy that prevents environment variables like `JWT_TOKEN`
+or `DATABASE_PASSWORD` from being passed in because you should be using the
+`secrets` parameter instead.
+
+You can do this with the following filter:
+
+```yaml
+policies:
+  - name: ecs-task-definition-with-plaintext-password
+    description: >
+      It's not recommended to use plaintext environment variables for sensitive
+      information, such as credential data. Pass them through the `secrets`
+      parameter instead.
+    resource: terraform.aws_ecs_task_definition
+    metadata:
+      severity: High
+      category: Encryption
+      provider: aws
+    filters:
+      - container_definitions: not-null
+      - type: list-item
+        key: from_json(container_definitions)[].environment[]
+        attrs:
+          - type: value
+            key: name
+            op: regex
+            value: '(?:.|\n)*(password|secret|token|key)'
+```
+
+The key here is teh `from_json` call to convert it from a string to an object.
 
 ## Policy Testing
 
