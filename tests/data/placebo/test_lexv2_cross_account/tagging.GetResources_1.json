@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:lex:us-east-1:644160558196:bot/NPXOSCEEZD",
+                "Tags": [
+                    {
+                        "Key": "Owner",
+                        "Value": "Pratyush"
+                    },
+                    {
+                        "Key": "Hello",
+                        "Value": "World"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
