@@ -1382,7 +1382,7 @@ def test_cli_validate_schema_error(tmp_path, caplog):
     runner = CliRunner()
     result = runner.invoke(cli.cli, ["validate", "-p", str(tmp_path)])
     assert result.exit_code == 1
-    caplog.record_tuples[0] == ('c7n.iac', 40, 'Validation failed with 1 errors')
+    caplog.record_tuples[0] == ("c7n.iac", 40, "Validation failed with 1 errors")
     assert "is not valid under any of the given schemas" in caplog.record_tuples[2][-1]
 
 
@@ -2050,7 +2050,7 @@ def test_from_json_filter(policy_env):
                     "type": "value",
                     "key": "container_definitions",
                     "op": "regex",
-                    "value": "(?:.|\n)*(password|secret|token|key)"
+                    "value": "(?:.|\n)*(password|secret|token|key)",
                 }
             ],
         },
@@ -2064,13 +2064,13 @@ def test_from_json_filter(policy_env):
                     "type": "list-item",
                     "key": "from_json(container_definitions)[].environment[]",
                     "attrs": [
-                       {
-                          "type": "value",
-                          "key": "name",
-                          "op": "regex",
-                          "value": "(?:.|\n)*(password|secret|token|key)",
-                       },
-                    ]
+                        {
+                            "type": "value",
+                            "key": "name",
+                            "op": "regex",
+                            "value": "(?:.|\n)*(password|secret|token|key)",
+                        },
+                    ],
                 }
             ],
         },
