@@ -1,0 +1,119 @@
+{
+  "version": 1,
+  "interactions": [
+    {
+      "request": {
+        "method": "GET",
+        "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Cdn/profiles?api-version=2020-09-01",
+        "body": null,
+        "headers": {}
+      },
+      "response": {
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "headers": {
+          "date": [
+            "Wed, 10 May 2023 23:13:24 GMT"
+          ],
+          "content-type": [
+            "application/json; charset=utf-8"
+          ],
+          "x-ms-ratelimit-remaining-subscription-resource-requests": [
+            "49"
+          ],
+          "cache-control": [
+            "no-cache"
+          ],
+          "content-length": [
+            "1341"
+          ]
+        },
+        "body": {
+          "data": {
+            "value": [
+              {
+                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cfb-vevmhnkx/providers/Microsoft.Cdn/profiles/MyFrontDoor-Success",
+                "type": "Microsoft.Cdn/profiles",
+                "name": "MyFrontDoor-Success",
+                "location": "Global",
+                "kind": "frontdoor",
+                "tags": {
+                  "product_id": "13742",
+                  "created_by": "carol_brothers@mckinsey.com"
+                },
+                "sku": {
+                  "name": "Premium_AzureFrontDoor"
+                },
+                "properties": {
+                  "frontDoorId": "faa236ce-e892-4c16-8115-0d2b047f718f",
+                  "resourceState": "Active",
+                  "provisioningState": "Succeeded"
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-vevmhnkx/providers/Microsoft.Cdn/profiles/MyFrontDoor-Success/customDomains?api-version=2020-09-01",
+        "body": null,
+        "headers": {}
+      },
+      "response": {
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "headers": {
+          "date": [
+            "Wed, 10 May 2023 23:13:25 GMT"
+          ],
+          "content-type": [
+            "application/json; charset=utf-8"
+          ],
+          "cache-control": [
+            "no-cache"
+          ],
+          "content-length": [
+            "12"
+          ]
+        },
+        "body": {
+          "data": {
+            "value": [
+              {
+                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cfb-vevmhnkx/providers/Microsoft.Cdn/profiles/MyFrontDoor-Success/customdomains/test-custom-domain",
+                "name": "test-custom-domain",
+                "type": "Microsoft.Cdn/profiles/customdomains",
+                "properties": {
+                  "tlsSettings": {
+                    "certificateType": "ManagedCertificate",
+                    "minimumTlsVersion": "TLS12"
+                  },
+                  "azureDnsZone": {
+                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-vevmhnkx/providers/Microsoft.Network/dnsZones/sub-domain-green.domain.com"
+                  },
+                  "provisioningState": "Succeeded",
+                  "deploymentStatus": "NotStarted",
+                  "domainValidationState": "Pending",
+                  "hostName": "contosogreen.fabrikam.com",
+                  "validationProperties": {
+                    "validationToken": "_o93h0b9tqoehoaifi99r5ucquw3sy3l",
+                    "expirationDate": "2024-11-21T11:28:37.0854737+00:00"
+                  }
+                },
+                "c7n:parent-id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cfb-vevmhnkx/providers/Microsoft.Cdn/profiles/MyFrontDoor-Success",
+                "resourceGroup": "cfb-vevmhnkx"
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

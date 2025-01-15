@@ -1,0 +1,28 @@
+{
+    "status_code": 200,
+    "data": {
+        "Name": "default",
+        "Arn": "arn:aws:events:us-east-1:644160558196:event-bus/default",
+        "CreationTime": {
+            "__class__": "datetime",
+            "year": 2020,
+            "month": 1,
+            "day": 14,
+            "hour": 15,
+            "minute": 4,
+            "second": 24,
+            "microsecond": 369000
+        },
+        "LastModifiedTime": {
+            "__class__": "datetime",
+            "year": 2020,
+            "month": 1,
+            "day": 14,
+            "hour": 15,
+            "minute": 4,
+            "second": 31,
+            "microsecond": 877000
+        },
+        "ResponseMetadata": {}
+    }
+}

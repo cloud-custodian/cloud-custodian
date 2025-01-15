@@ -1,0 +1,16 @@
+{
+    "status_code": 200,
+    "data": {
+        "Targets": [
+            {
+                "Id": "Id1423d02f-65d6-443a-aa6d-fd6f7c5daf82",
+                "Arn": "arn:aws:lambda:us-west-1:644160558196:function:test"
+            },
+            {
+                "Id": "Id77832e25-81ec-4a23-9cec-eb2889fe030d",
+                "Arn": "arn:aws:sns:us-west-1:644160558196:foo"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

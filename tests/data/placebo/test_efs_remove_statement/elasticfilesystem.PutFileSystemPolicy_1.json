@@ -1,0 +1,8 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "FileSystemId": "fs-05b97e2b1be5b25f8",
+        "Policy": "{\"Version\":\"2012-10-17\",\"Id\":\"ExampleEFSResourcePolicy\",\"Statement\":[{\"Sid\":\"SpecificAllow\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Action\":\"elasticfilesystem:ClientWrite\",\"Resource\":\"arn:aws:elasticfilesystem:us-east-1:644160558196:file-system/fs-05b97e2b1be5b25f8\"}]}"
+    }
+}

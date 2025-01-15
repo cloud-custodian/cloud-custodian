@@ -1,0 +1,1 @@
+{"Id":"DenyAllAccess","Statement":[{"Action":["elasticfilesystem:DescribeFileSystemPolicy","elasticfilesystem:DescribeFileSystems"],"Effect":"Deny","Principal":{"AWS":"*"},"Resource":"arn:aws:elasticfilesystem:us-east-1:644160558196:file-system/fs-0cfc0ddff36f44742","Sid":"DenyAllAccess"}],"Version":"2012-10-17"}
