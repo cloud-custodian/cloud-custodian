@@ -1,18 +1,8 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
-        "FailedEntries": [], 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "0c5e752e-212a-11e8-b2f3-dd3db7485771", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "0c5e752e-212a-11e8-b2f3-dd3db7485771", 
-                "date": "Tue, 06 Mar 2018 10:35:11 GMT", 
-                "content-length": "41", 
-                "content-type": "application/x-amz-json-1.1"
-            }
-        }, 
-        "FailedEntryCount": 0
+        "FailedEntryCount": 0,
+        "FailedEntries": [],
+        "ResponseMetadata": {}
     }
 }
