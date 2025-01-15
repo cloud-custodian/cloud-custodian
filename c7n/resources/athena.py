@@ -20,14 +20,19 @@ class AthenaNamedQuery(query.QueryResourceManager):
 @resources.register("athena-workgroup")
 class AthenaWorkGroup(query.QueryResourceManager):
 
+    source_mapping = {
+        'describe': query.DescribeWithResourceTags,
+        'config': query.ConfigSource
+    }
+
     class resource_type(query.TypeInfo):
         service = "athena"
         enum_spec = ('list_work_groups', 'WorkGroups', None)
-        detail_spec = ('get_work_group', 'Name', 'Name', 'WorkGroup')
+        detail_spec = ('get_work_group', 'WorkGroup', 'Name', 'WorkGroup')
         arn_type = "workgroup"
         id = "Name"
         name = "Name"
-        cfn_type = "AWS::Athena::WorkGroup"
+        config_type = cfn_type = "AWS::Athena::WorkGroup"
         universal_taggable = object()
         permissions_augment = ("athena:ListTagsForResource",)
 
@@ -38,17 +43,18 @@ class AthenaDataCatalog(query.QueryResourceManager):
     class resource_type(query.TypeInfo):
         service = "athena"
         enum_spec = ('list_data_catalogs', 'DataCatalogsSummary', None)
-        detail_spec = ('get_data_catalog', 'Name', 'Name', 'DataCatalog')
         arn_type = "datacatalog"
-        id = "Name"
-        name = "Name"
-        cfn_type = "AWS::Athena::DataCatalog"
-        universal_taggable = object()
-        permissions_augment = ("athena:ListTagsForResource",)
+        id = "CatalogName"
+        name = "CatalogName"
+        config_type = cfn_type = "AWS::Athena::DataCatalog"
 
 
 @resources.register('athena-capacity-reservation')
 class AthenaCapacityReservation(query.QueryResourceManager):
+
+    source_mapping = {
+        'describe': query.DescribeWithResourceTags,
+    }
 
     class resource_type(query.TypeInfo):
         service = 'athena'
