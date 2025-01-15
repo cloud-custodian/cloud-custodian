@@ -1,0 +1,36 @@
+{
+    "status_code": 200,
+    "data": {
+        "EventBuses": [
+            {
+                "Name": "default",
+                "Arn": "arn:aws:events:us-west-1:644160558196:event-bus/default"
+            },
+            {
+                "Name": "my-event-bus",
+                "Arn": "arn:aws:events:us-west-1:644160558196:event-bus/my-event-bus",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 12,
+                    "day": 14,
+                    "hour": 11,
+                    "minute": 32,
+                    "second": 8,
+                    "microsecond": 683000
+                },
+                "LastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 12,
+                    "day": 14,
+                    "hour": 11,
+                    "minute": 32,
+                    "second": 8,
+                    "microsecond": 683000
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
