@@ -112,7 +112,12 @@ class TestCFN(BaseTest):
             {"name": "cfn-query", "resource": "cfn"}, session_factory=factory
         )
         resources = p.run()
-        self.assertEqual(resources, [])
+        self.assertEqual(len(resources), 1)
+        for r in resources:
+            self.assertTrue("arn" in r['StackId'])
+            self.assertTrue("StackName" in r)
+            self.assertTrue("Tags" in r)
+            self.assertEqual(r["Tags"], [])
 
     def test_disable_protection(self):
         factory = self.replay_flight_data("test_cfn_disable_protection")
