@@ -339,7 +339,7 @@ policies:
             value: '(?:.|\n)*(password|secret|token|key)'
 ```
 
-The key here is teh `from_json` call to convert it from a string to an object.
+The key here is the `from_json` call to convert it from a string to an object.
 
 ## Policy Testing
 
