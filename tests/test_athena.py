@@ -17,6 +17,23 @@ def test_athena_catalog(test):
     assert len(resources) == 2
 
 
+def test_athena_work_group_update(test):
+    factory = test.replay_flight_data("test_athena_work_group_update")
+    policy = test.load_policy({
+        "name": "update-workgroup",
+        "resource": "aws.athena-work-group",
+        "filters": [{"Name": "primary"}],
+        "actions": [
+            {"type": "update",
+             "config": {"PublishCloudWatchMetricsEnabled": True}}]},
+        config={'account_id': ACCOUNT_ID},
+        session_factory=factory
+    )
+    policy.run()
+    wg = factory().client('athena').get_work_group(WorkGroup='primary').get("WorkGroup")
+    assert wg["Configuration"]["PublishCloudWatchMetricsEnabled"] is True
+
+
 @terraform("athena_workgroup")
 def test_athena_work_group(test, athena_workgroup):
     factory = test.replay_flight_data("test_athena_work_group")
