@@ -28,7 +28,7 @@ class LexBot(query.QueryResourceManager):
 class LexV2Bot(QueryResourceManager):
     class resource_type(query.TypeInfo):
         service = "lexv2-models"
-        enum_spec = ('list_bots', 'botSummaries', None)
+        enum_spec = ('list_bots', 'botSummaries', {'maxResults': 1000})
         arn_type = "bot"
         arn_service = "lex"
         id = "botId"
