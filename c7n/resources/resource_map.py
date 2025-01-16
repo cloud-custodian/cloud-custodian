@@ -28,7 +28,7 @@ ResourceMap = {
   "aws.athena-capacity-reservation": "c7n.resources.athena.AthenaCapacityReservation",
   "aws.athena-data-catalog": "c7n.resources.athena.AthenaDataCatalog",
   "aws.athena-named-query": "c7n.resources.athena.AthenaNamedQuery",
-  "aws.athena-workgroup": "c7n.resources.athena.AthenaWorkGroup",
+  "aws.athena-work-group": "c7n.resources.athena.AthenaWorkGroup",
   "aws.backup-plan": "c7n.resources.backup.BackupPlan",
   "aws.backup-vault": "c7n.resources.backup.BackupVault",
   "aws.batch-compute": "c7n.resources.batch.ComputeEnvironment",

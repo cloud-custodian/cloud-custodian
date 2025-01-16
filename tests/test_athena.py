@@ -5,12 +5,24 @@ from pytest_terraform import terraform
 from .zpill import ACCOUNT_ID
 
 
+def test_athena_catalog(test):
+    factory = test.replay_flight_data("test_athena_data_catalog")
+    policy = test.load_policy(
+        {"name": "test-athena-catallog",
+         "resource": "aws.athena-data-catalog",
+         },
+        session_factory=factory
+    )
+    resources = policy.run()
+    assert len(resources) == 2
+
+
 @terraform("athena_workgroup")
 def test_athena_work_group(test, athena_workgroup):
     factory = test.replay_flight_data("test_athena_work_group")
     policy = test.load_policy(
         {"name": "test-athena-work-group",
-         "resource": "aws.athena-workgroup",
+         "resource": "aws.athena-work-group",
          "filters": [{"Name": athena_workgroup["aws_athena_workgroup.working.name"]}]
          },
         config={'account_id': ACCOUNT_ID},

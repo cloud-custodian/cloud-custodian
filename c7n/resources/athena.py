@@ -17,7 +17,7 @@ class AthenaNamedQuery(query.QueryResourceManager):
         cfn_type = "AWS::Athena::NamedQuery"
 
 
-@resources.register("athena-workgroup")
+@resources.register("athena-work-group")
 class AthenaWorkGroup(query.QueryResourceManager):
 
     source_mapping = {
