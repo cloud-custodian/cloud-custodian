@@ -147,14 +147,28 @@ class Stop(InstanceAction):
     """
     Caution: `stop` in GCP is closer to terminate in terms of effect.
 
+    The `discard_local_ssd` specifies if local SSD should be discarded or not while stopping the
+    instance. The default behavior from Google Cloud console is to keep the local SSD.
+    Default `discard_local_ssd` is False.
+
     `suspend` is closer to stop in other providers.
 
     See https://cloud.google.com/compute/docs/instances/instance-life-cycle
     """
 
-    schema = type_schema('stop')
+    schema = type_schema('stop',  discard_local_ssd={'type': 'boolean'})
     method_spec = {'op': 'stop'}
     attr_filter = ('status', ('RUNNING',))
+
+    def get_resource_params(self, model, resource):
+        params = super().get_resource_params(model, resource)
+
+        # support stopping instance with local SSD, it requires to pass an additional param to
+        # the stop request to discard local SSD (true/false)
+        discard_local_ssd = self.data.get('discard_local_ssd', False)
+        params['discardLocalSsd'] = discard_local_ssd
+
+        return params
 
 
 @Instance.action_registry.register('suspend')
