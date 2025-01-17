@@ -91,7 +91,7 @@ class AthenaCapacityReservation(query.QueryResourceManager):
 
 @AthenaCapacityReservation.action_registry.register("cancel")
 class DeleteReservation(Action):
-    schema = type_schema("delete")
+    schema = type_schema("cancel")
     permissions = ("athena:CancelCapacityReservation",)
 
     def process(self, resources):
