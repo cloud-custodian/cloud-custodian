@@ -1273,6 +1273,8 @@ def universal_retry(method, ResourceARNList, **kw):
 
     for idx, delay in enumerate(
             utils.backoff_delays(1.5, 2 ** 8, jitter=True)):
+        if not ResourceARNList:
+            break
         response = method(ResourceARNList=ResourceARNList, **kw)
         failures = response.get('FailedResourcesMap', {})
         if not failures:

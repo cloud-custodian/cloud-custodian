@@ -1,0 +1,55 @@
+{
+    "status_code": 200,
+    "data": {
+        "CapacityReservation": {
+            "Name": "testv",
+            "Status": "CANCELLING",
+            "TargetDpus": 0,
+            "AllocatedDpus": 24,
+            "LastAllocation": {
+                "Status": "SUCCEEDED",
+                "RequestTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 1,
+                    "day": 16,
+                    "hour": 11,
+                    "minute": 3,
+                    "second": 7,
+                    "microsecond": 327000
+                },
+                "RequestCompletionTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 1,
+                    "day": 16,
+                    "hour": 11,
+                    "minute": 3,
+                    "second": 59,
+                    "microsecond": 131000
+                }
+            },
+            "LastSuccessfulAllocationTime": {
+                "__class__": "datetime",
+                "year": 2025,
+                "month": 1,
+                "day": 16,
+                "hour": 11,
+                "minute": 3,
+                "second": 59,
+                "microsecond": 131000
+            },
+            "CreationTime": {
+                "__class__": "datetime",
+                "year": 2025,
+                "month": 1,
+                "day": 16,
+                "hour": 11,
+                "minute": 3,
+                "second": 6,
+                "microsecond": 744000
+            }
+        },
+        "ResponseMetadata": {}
+    }
+}
