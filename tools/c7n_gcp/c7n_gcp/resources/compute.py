@@ -156,7 +156,7 @@ class Stop(InstanceAction):
     See https://cloud.google.com/compute/docs/instances/instance-life-cycle
     """
 
-    schema = type_schema('stop',  discard_local_ssd={'type': 'boolean'})
+    schema = type_schema('stop', discard_local_ssd={'type': 'boolean'})
     method_spec = {'op': 'stop'}
     attr_filter = ('status', ('RUNNING',))
 
