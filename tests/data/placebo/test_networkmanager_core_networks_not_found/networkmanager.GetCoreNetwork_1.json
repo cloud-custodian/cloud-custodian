@@ -19,7 +19,7 @@
             "State": "AVAILABLE",
             "Segments": [
                 {
-                    "Name": "core2",
+                    "Name": "c7n-test-2",
                     "EdgeLocations": [
                         "us-east-1"
                     ],

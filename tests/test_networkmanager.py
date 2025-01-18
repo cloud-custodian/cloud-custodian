@@ -21,6 +21,8 @@ class TestNetworkManager(BaseTest):
         for r in resources:
             self.assertEqual(r["State"], "AVAILABLE")
             self.assertTrue(r["CoreNetworkArn"])
+            self.assertTrue("Edges" in r)
+            self.assertTrue("Segments" in r)
 
     def test_describe_global_networks(self):
         session_factory = self.replay_flight_data("test_networkmanager_describe_global_networks")

@@ -3,9 +3,9 @@
     "data": {
         "ResponseMetadata": {},
         "CoreNetwork": {
-            "CoreNetworkId": "core-network-04c02e46aeb73c20d",
-            "CoreNetworkArn": "arn:aws:networkmanager::644160558196:core-network/core-network-04c02e46aeb73c20d",
-            "GlobalNetworkId": "global-network-0f952aba212c3fb47",
+            "CoreNetworkId": "core-network-0d1b38526d74c427d",
+            "CoreNetworkArn": "arn:aws:networkmanager::644160558196:core-network/core-network-0d1b38526d74c427d",
+            "GlobalNetworkId": "global-network-0fa387ed8fc5f107c",
             "CreatedAt": {
                 "__class__": "datetime",
                 "year": 2024,
@@ -19,7 +19,7 @@
             "State": "AVAILABLE",
             "Segments": [
                 {
-                    "Name": "core2",
+                    "Name": "test2",
                     "EdgeLocations": [
                         "us-east-1"
                     ],
@@ -36,7 +36,7 @@
             "Tags": [
                 {
                     "Key": "Name",
-                    "Value": "core-2"
+                    "Value": "test-cloudwan"
                 }
             ]
         }
