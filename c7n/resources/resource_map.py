@@ -171,6 +171,7 @@ ResourceMap = {
   "aws.launch-config": "c7n.resources.asg.LaunchConfig",
   "aws.launch-template-version": "c7n.resources.ec2.LaunchTemplate",
   "aws.lex-bot": "c7n.resources.lex.LexBot",
+  "aws.lexv2-bot": "c7n.resources.lex.LexV2Bot",
   "aws.lightsail-db": "c7n.resources.lightsail.Database",
   "aws.lightsail-elb": "c7n.resources.lightsail.LoadBalancer",
   "aws.lightsail-instance": "c7n.resources.lightsail.Instance",
