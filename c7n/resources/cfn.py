@@ -21,6 +21,7 @@ log = logging.getLogger('custodian.cfn')
 class CloudFormation(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'cloudformation'
+        arn = 'StackId'  # StackId contains the ARN
         arn_type = 'stack'
         enum_spec = ('describe_stacks', 'Stacks[]', None)
         id = 'StackName'
