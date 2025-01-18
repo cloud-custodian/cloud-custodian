@@ -1,0 +1,43 @@
+{
+    "status_code": 200,
+    "data": {
+        "WebACL": {
+            "Name": "compliant-waf",
+            "Id": "12085f42-13fc-4287-b85d-1f443dd64890",
+            "ARN": "arn:aws:wafv2:us-east-1:644160558196:regional/webacl/compliant-waf/12085f42-13fc-4287-b85d-1f443dd64890",
+            "DefaultAction": {
+                "Allow": {}
+            },
+            "Description": "DELETE ME",
+            "Rules": [
+                {
+                    "Name": "delete-me-rule-group",
+                    "Priority": 0,
+                    "Statement": {
+                        "RuleGroupReferenceStatement": {
+                            "ARN": "arn:aws:wafv2:us-east-1:644160558196:regional/rulegroup/test-rule-group/039e783d-9783-43c2-b21f-e08821ab670d"
+                        }
+                    },
+                    "OverrideAction": {
+                        "None": {}
+                    },
+                    "VisibilityConfig": {
+                        "SampledRequestsEnabled": true,
+                        "CloudWatchMetricsEnabled": true,
+                        "MetricName": "delete-me-rule-group"
+                    }
+                }
+            ],
+            "VisibilityConfig": {
+                "SampledRequestsEnabled": true,
+                "CloudWatchMetricsEnabled": true,
+                "MetricName": "compliant-waf"
+            },
+            "Capacity": 1,
+            "ManagedByFirewallManager": false,
+            "LabelNamespace": "awswaf:644160558196:webacl:compliant-waf:"
+        },
+        "LockToken": "8a3925d6-73dc-400f-b77d-0c01b8852b27",
+        "ResponseMetadata": {}
+    }
+}

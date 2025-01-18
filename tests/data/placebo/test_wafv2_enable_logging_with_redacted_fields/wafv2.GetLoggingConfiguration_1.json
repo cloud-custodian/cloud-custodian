@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "LoggingConfiguration": {
+            "ResourceArn": "arn:aws:wafv2:us-east-1:644160558196:regional/webacl/test-custodian-waf/48fbb7cc-c08d-4858-900f-a6072fe1a948",
+            "LogDestinationConfigs": [
+                "arn:aws:s3:::aws-waf-logs-test-custodian-creation"
+            ],
+            "RedactedFields": [
+                {
+                    "SingleHeader": {
+                        "Name": "authorization"
+                    }
+                }
+            ],
+            "ManagedByFirewallManager": false,
+            "LogType": "WAF_LOGS",
+            "LogScope": "CUSTOMER"
+        },
+        "ResponseMetadata": {}
+    }
+}
