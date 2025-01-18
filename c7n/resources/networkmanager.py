@@ -201,3 +201,54 @@ class DeleteGlobalNetwork(BaseAction):
                 client.delete_global_network(GlobalNetworkId=r['GlobalNetworkId'])
             except client.exceptions.ResourceNotFoundException:
                 continue
+
+
+@Site.action_registry.register('delete')
+class DeleteSite(BaseAction):
+    """Action to delete a networkmanager site
+    """
+    schema = type_schema('delete')
+    permissions = ('networkmanager:DeleteSite',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('networkmanager')
+
+        for r in resources:
+            try:
+                client.delete_site(GlobalNetworkId=r['GlobalNetworkId'], SiteId=r['SiteId'])
+            except client.exceptions.ResourceNotFoundException:  # pragma: no cover
+                continue
+
+
+@Device.action_registry.register('delete')
+class DeleteDevice(BaseAction):
+    """Action to delete a networkmanager device
+    """
+    schema = type_schema('delete')
+    permissions = ('networkmanager:DeleteDevice',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('networkmanager')
+
+        for r in resources:
+            try:
+                client.delete_device(GlobalNetworkId=r['GlobalNetworkId'], DeviceId=r['DeviceId'])
+            except client.exceptions.ResourceNotFoundException:  # pragma: no cover
+                continue
+
+
+@Link.action_registry.register('delete')
+class DeleteLink(BaseAction):
+    """Action to delete a networkmanager link
+    """
+    schema = type_schema('delete')
+    permissions = ('networkmanager:DeleteLink',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('networkmanager')
+
+        for r in resources:
+            try:
+                client.delete_link(GlobalNetworkId=r['GlobalNetworkId'], LinkId=r['LinkId'])
+            except client.exceptions.ResourceNotFoundException:  # pragma: no cover
+                continue
