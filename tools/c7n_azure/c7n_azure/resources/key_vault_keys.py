@@ -1,14 +1,17 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+import datetime
+import json
 import logging
 
-from azure.keyvault.keys import KeyProperties
+from azure.keyvault.keys import KeyProperties, KeyReleasePolicy
 
 from c7n.filters import Filter
 from c7n.utils import type_schema
 
 from c7n_azure import constants
+from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.provider import resources
 from c7n_azure.query import ChildResourceManager, ChildTypeInfo
 from c7n_azure.utils import ThreadHelper, ResourceIdParser
@@ -177,8 +180,10 @@ class KeyVaultKeyRotationFilter(Filter):
                 - type: rotation-policy
                   state: Disabled
     """
-    schema = type_schema('rotation-policy', required=['state'],
-                state={'type': 'string', 'enum': ['Enabled', 'Disabled']})
+    schema = type_schema(
+        'rotation-policy', required=['state'],
+        state={'type': 'string', 'enum': ['Enabled', 'Disabled']}
+    )
 
     def process(self, resources, event=None):
         matched = []
@@ -187,6 +192,83 @@ class KeyVaultKeyRotationFilter(Filter):
             client = self.manager.get_client(vault_url=id.vault_url)
             rotation = client.get_key_rotation_policy(id.name)
             if (self.data.get('state') == 'Disabled' and not rotation.id) or \
-               (self.data.get('state')  == 'Enabled' and rotation.id):
+               (self.data.get('state') == 'Enabled' and rotation.id):
                 matched.append(key)
         return matched
+
+
+@KeyVaultKeys.action_registry.register("update")
+class KeyVaultKeyUpdateAction(AzureBaseAction):
+    """
+    Update a key's properties. This does not update its cryptographic material.
+
+    :example:
+
+    .. code-block: yaml
+        policies:
+            - name: update-expires-on
+              resource: azure.keyvault-keys
+              filters:
+                - name: foo
+              actions:
+                - type: update
+                  expires_on: "2025-12-12 00:00:00"
+    """
+
+    schema = type_schema(
+        "update",
+        key_operations={
+            "type": "array",
+            "items": {
+                "type": "string",
+                "enum": [
+                    "decrypt",
+                    "encrypt",
+                    "export",
+                    "import_key",
+                    "sign",
+                    "unwrap_key",
+                    "verify",
+                    "wrap_key"
+                ]
+            },
+        },
+        enabled={"type": "boolean"},
+        tags={"type": "object"},
+        not_before={"type": "string", "format": "date-time"},
+        expires_on={"type": "string", "format": "date-time"},
+        release_policy={"type": "object"},
+    )
+
+    def _process_resource(self, resource):
+        name = resource['name']
+
+        id = KeyProperties(key_id=resource['id'])
+
+        client = self.manager.get_client(vault_url=id.vault_url)
+
+        not_before = self.data.get("not_before")
+        expires_on = self.data.get("expires_on")
+
+        if not_before:
+            not_before = datetime.strptime(not_before)
+
+        if expires_on:
+            expires_on = datetime.strptime(expires_on)
+
+        release_policy = self.data.get("release_policy")
+        if release_policy:
+            release_policy = KeyReleasePolicy(
+                encoded_policy=json.dumps(release_policy).encode("utf-8"),
+                content_type="application/json; charset=utf-8"
+            )
+
+        client.update_key_properties(
+            name=name,
+            key_operations=self.data.get("key_operations"),
+            enabled=self.data.get("enabled"),
+            tags=self.data.get("tags"),
+            not_before=not_before,
+            expires_on=expires_on,
+            release_policy=release_policy,
+        )
