@@ -35,7 +35,7 @@ class Redis(ArmResourceManager):
 
         service = 'azure.mgmt.redis'
         client = 'RedisManagementClient'
-        enum_spec = ('redis', 'list', None)
+        enum_spec = ('redis', 'list_by_subscription', None)
         default_report_fields = (
             'name',
             'location',
