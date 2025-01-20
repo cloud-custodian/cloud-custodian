@@ -2,8 +2,10 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
+from datetime import timedelta
+
 from c7n.executor import MainThreadExecutor
-from c7n.resources.quotas import ServiceQuota
+from c7n.resources.quotas import ServiceQuota, UsageFilter
 from c7n.utils import local_session
 
 from .common import BaseTest
@@ -96,3 +98,33 @@ class TestQuotas(BaseTest):
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 2)
+
+    def test_usage_filter_round_up(self):
+        filter = UsageFilter({})
+        self.assertEqual(filter.round_up(1, 60), 60)
+        self.assertEqual(filter.round_up(59, 60), 60)
+        self.assertEqual(filter.round_up(60, 60), 60)
+        self.assertEqual(filter.round_up(61, 60), 120)
+
+    def test_usage_filter_scale_period(self):
+        filter = UsageFilter({})
+
+        # The provided period is smaller than the minimum one
+        scaled_period, scale = filter.scale_period(timedelta(1).total_seconds(), 1, 60)
+        self.assertEqual(scaled_period, 60)
+        self.assertEqual(scale, 60)
+
+        # The provided period generates too many data points
+        scaled_period, scale = filter.scale_period(timedelta(1).total_seconds(), 1, 1)
+        self.assertEqual(scaled_period, 120)
+        self.assertEqual(scale, 120)
+
+        # The provided is not aligned with AWS pre-defined periods
+        scaled_period, scale = filter.scale_period(timedelta(hours=1).total_seconds(), 30, 1)
+        self.assertEqual(scaled_period, 60)
+        self.assertEqual(scale, 2)
+
+        # The provided period is accepted as-is not generating too many data points
+        scaled_period, scale = filter.scale_period(timedelta(1).total_seconds(), 300, 60)
+        self.assertEqual(scaled_period, 300)
+        self.assertEqual(scale, 1)
