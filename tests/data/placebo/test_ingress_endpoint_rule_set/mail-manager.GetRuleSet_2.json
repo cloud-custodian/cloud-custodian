@@ -1,0 +1,44 @@
+{
+    "status_code": 200,
+    "data": {
+        "CreatedDate": {
+            "__class__": "datetime",
+            "year": 2025,
+            "month": 1,
+            "day": 19,
+            "hour": 16,
+            "minute": 10,
+            "second": 57,
+            "microsecond": 0
+        },
+        "LastModificationDate": {
+            "__class__": "datetime",
+            "year": 2025,
+            "month": 1,
+            "day": 19,
+            "hour": 16,
+            "minute": 25,
+            "second": 3,
+            "microsecond": 0
+        },
+        "RuleSetArn": "arn:aws:ses:us-east-1:644160558196:mailmanager-rule-set/rs-4j4cpzutr4k72asymsbnpwvt",
+        "RuleSetId": "rs-4j4cpzutr4k72asymsbnpwvt",
+        "RuleSetName": "rule-3",
+        "Rules": [
+            {
+                "Actions": [
+                    {
+                        "WriteToS3": {
+                            "RoleArn": "arn:aws:iam::644160558196:role/service-role/AmazonMWAA-MyAirflowEnvironment-5PqvtK",
+                            "S3Bucket": "c7n-test-1"
+                        }
+                    }
+                ],
+                "Conditions": [],
+                "Name": "rule-10",
+                "Unless": []
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

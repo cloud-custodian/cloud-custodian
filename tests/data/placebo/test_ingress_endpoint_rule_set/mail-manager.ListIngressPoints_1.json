@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "IngressPoints": [
+            {
+                "ARecord": "ndwt5yriibyt.fips.wmjb.mail-manager-smtp.amazonaws.com",
+                "IngressPointId": "inp-edq42wan6v45giaoc3lggzk7",
+                "IngressPointName": "test-ingress-endpoint",
+                "Status": "ACTIVE",
+                "Type": "OPEN"
+            },
+            {
+                "ARecord": "rk7uwyzbnrvr.fips.wmjb.mail-manager-smtp.amazonaws.com",
+                "IngressPointId": "inp-yqelk6hyz6j56ck7deiwvf3n",
+                "IngressPointName": "ingress-point-2",
+                "Status": "ACTIVE",
+                "Type": "OPEN"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

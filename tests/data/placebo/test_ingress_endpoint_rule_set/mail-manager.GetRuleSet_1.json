@@ -1,0 +1,68 @@
+{
+    "status_code": 200,
+    "data": {
+        "CreatedDate": {
+            "__class__": "datetime",
+            "year": 2025,
+            "month": 1,
+            "day": 13,
+            "hour": 15,
+            "minute": 33,
+            "second": 42,
+            "microsecond": 0
+        },
+        "LastModificationDate": {
+            "__class__": "datetime",
+            "year": 2025,
+            "month": 1,
+            "day": 19,
+            "hour": 16,
+            "minute": 54,
+            "second": 8,
+            "microsecond": 0
+        },
+        "RuleSetArn": "arn:aws:ses:us-east-1:644160558196:mailmanager-rule-set/rs-uvwnepkn25bop7mqs672elqt",
+        "RuleSetId": "rs-uvwnepkn25bop7mqs672elqt",
+        "RuleSetName": "test-rule-set",
+        "Rules": [
+            {
+                "Actions": [
+                    {
+                        "Archive": {
+                            "TargetArchive": "a-gsjrnllnzbulzd6ppe7p5qmn"
+                        }
+                    }
+                ],
+                "Conditions": [],
+                "Name": "test-rule-1",
+                "Unless": []
+            },
+            {
+                "Actions": [
+                    {
+                        "Archive": {
+                            "TargetArchive": "a-lx5q76dxb65j56qmmcza63wj"
+                        }
+                    }
+                ],
+                "Conditions": [],
+                "Name": "rule-2",
+                "Unless": []
+            },
+            {
+                "Actions": [
+                    {
+                        "WriteToS3": {
+                            "RoleArn": "arn:aws:iam::644160558196:role/AmazonBedrockExecutionRoleForAgents_c7n_test",
+                            "S3Bucket": "c1-rep-1"
+                        }
+                    }
+                ],
+                "Conditions": [],
+                "Name": "abc",
+                "Unless": []
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

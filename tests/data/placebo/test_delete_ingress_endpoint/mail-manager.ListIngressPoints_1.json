@@ -1,0 +1,15 @@
+{
+    "status_code": 200,
+    "data": {
+        "IngressPoints": [
+            {
+                "ARecord": "y3cdir8spda6.fips.wmjb.mail-manager-smtp.amazonaws.com",
+                "IngressPointId": "inp-4xeaozogbjz6aw3l53nx3lvr",
+                "IngressPointName": "test-ingress-point",
+                "Status": "ACTIVE",
+                "Type": "OPEN"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,33 @@
+{
+    "status_code": 200,
+    "data": {
+        "ArchiveArn": "arn:aws:ses:us-east-1:644160558196:mailmanager-archive/a-gsjrnllnzbulzd6ppe7p5qmn",
+        "ArchiveId": "a-gsjrnllnzbulzd6ppe7p5qmn",
+        "ArchiveName": "rewrw",
+        "ArchiveState": "ACTIVE",
+        "CreatedTimestamp": {
+            "__class__": "datetime",
+            "year": 2025,
+            "month": 1,
+            "day": 19,
+            "hour": 16,
+            "minute": 54,
+            "second": 2,
+            "microsecond": 672000
+        },
+        "LastUpdatedTimestamp": {
+            "__class__": "datetime",
+            "year": 2025,
+            "month": 1,
+            "day": 19,
+            "hour": 16,
+            "minute": 54,
+            "second": 2,
+            "microsecond": 672000
+        },
+        "Retention": {
+            "RetentionPeriod": "TEN_YEARS"
+        },
+        "ResponseMetadata": {}
+    }
+}
