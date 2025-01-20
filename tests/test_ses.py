@@ -221,6 +221,28 @@ class SESV2Test(BaseTest):
         self.assertEqual(1, len(resources))
         self.assertEqual(resources[0]["IdentityName"], "c7n@t.com")
 
+    def test_ses_dedicated_ip_pool_query(self):
+        session_factory = self.replay_flight_data("test_ses_dedicated_ip_pool_query")
+        p = self.load_policy(
+            {
+                "name": "ses-dedicated-ip-pool-managed",
+                "resource": "ses-dedicated-ip-pool",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "ScalingMode",
+                        "value": "MANAGED"
+                    }
+                ]
+            }, session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        for r in resources:
+            self.assertTrue("ScalingMode" in r)
+            self.assertTrue(r["ScalingMode"] == "MANAGED")
+            self.assertTrue("Tags" in r)
+
     def test_ses_email_identity_cross_account(self):
         session_factory = self.replay_flight_data("test_ses_email_identity_cross_account")
         p = self.load_policy(
