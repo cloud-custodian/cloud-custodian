@@ -5,7 +5,7 @@ from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 
-from c7n.filters.core import ValueFilter, type_schema
+from c7n.filters.core import ValueFilter, type_schema, ListItemFilter
 from c7n.filters.related import RelatedResourceFilter
 from c7n.utils import local_session
 
@@ -312,6 +312,33 @@ class BackupStatusFilter(ValueFilter):
 
     def __call__(self, r):
         return super().__call__(r[self.backup_annotation_key])
+
+
+@VirtualMachine.filter_registry.register('jit-policy-port')
+class VirtualMachineJitPortsFilter(ListItemFilter):
+    schema = type_schema(
+        'jit-policy-port',
+        attrs={"$ref": "#/definitions/filters_common/list_item_attrs"},
+        count={"type": "number"},
+        count_op={"$ref": "#/definitions/filters_common/comparison_operators"}
+    )
+    annotation_key = 'c7n:JitPolicyPorts'
+
+    def __init__(self, data, manager=None):
+        data['key'] = f'"{self.annotation_key}"'
+        super().__init__(data, manager)
+
+    def process(self, resources, event=None):
+        policies = self.manager.get_resource_manager('azure.defender-jit-policy').resources()
+        vm_id_to_ports = {}
+        for p in policies:
+            for machine in p['properties'].get('virtualMachines', []):
+                for port in machine.get('ports', []):
+                    port['c7n:JitPolicyName'] = p['name']
+                vm_id_to_ports.setdefault(machine['id'].lower(), []).extend(machine.get('ports', []))
+        for r in resources:
+            r[self.annotation_key] = vm_id_to_ports.get(r['id'].lower(), [])
+        return super().process(resources, event)
 
 
 @VirtualMachine.action_registry.register('poweroff')
