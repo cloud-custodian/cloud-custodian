@@ -335,7 +335,9 @@ class VirtualMachineJitPortsFilter(ListItemFilter):
             for machine in p['properties'].get('virtualMachines', []):
                 for port in machine.get('ports', []):
                     port['c7n:JitPolicyName'] = p['name']
-                vm_id_to_ports.setdefault(machine['id'].lower(), []).extend(machine.get('ports', []))
+                vm_id_to_ports.setdefault(machine['id'].lower(), []).extend(
+                    machine.get('ports', [])
+                )
         for r in resources:
             r[self.annotation_key] = vm_id_to_ports.get(r['id'].lower(), [])
         return super().process(resources, event)
