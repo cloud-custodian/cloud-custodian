@@ -487,7 +487,7 @@ class TestWorkspacesWeb(BaseTest):
     # Test for a portal that has disassociated and deleted its browser policy
     # settings.
     def test_workspaces_web_browser_policy_empty(self):
-        session_factory = self.record_flight_data("test_workspaces_web_empty")
+        session_factory = self.replay_flight_data("test_workspaces_web_empty")
         p = self.load_policy(
             {
                 "name": "test-browser-policy-empty",
