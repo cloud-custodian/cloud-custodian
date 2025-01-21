@@ -594,8 +594,6 @@ class PolicyMetaLint(BaseTest):
             'AWS::Transfer::Workflow',
             #
             # 'AWS::ApiGatewayV2::Stage',
-            'AWS::Athena::DataCatalog',
-            'AWS::Athena::WorkGroup',
             'AWS::AutoScaling::ScheduledAction',
             'AWS::Backup::BackupSelection',
             'AWS::Backup::RecoveryPoint',
@@ -656,9 +654,7 @@ class PolicyMetaLint(BaseTest):
             'AWS::Route53Resolver::ResolverRuleAssociation',
             'AWS::DMS::EventSubscription',
             'AWS::GlobalAccelerator::Accelerator',
-            'AWS::Athena::DataCatalog',
             'AWS::EC2::TransitGatewayAttachment',
-            'AWS::Athena::WorkGroup',
             'AWS::GlobalAccelerator::EndpointGroup',
             'AWS::GlobalAccelerator::Listener',
             'AWS::DMS::Certificate',

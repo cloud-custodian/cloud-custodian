@@ -791,19 +791,19 @@ msrest = ">=0.5.0"
 
 [[package]]
 name = "azure-mgmt-machinelearningservices"
-version = "1.0.0"
+version = "2.0.0b2"
 description = "Microsoft Azure Machine Learning Services Management Client Library for Python"
 optional = false
-python-versions = "*"
+python-versions = ">=3.7"
 files = [
-    {file = "azure-mgmt-machinelearningservices-1.0.0.zip", hash = "sha256:89badb0d3517e950964774afcc0f2faf0dd55dd558f9f4cb20cc949dc48b4dfb"},
-    {file = "azure_mgmt_machinelearningservices-1.0.0-py2.py3-none-any.whl", hash = "sha256:6881c55c5634648f1f92a98e7f9dda66ed368392406c71335efe78c8c4c392c7"},
+    {file = "azure-mgmt-machinelearningservices-2.0.0b2.zip", hash = "sha256:51ff30917b9621ed3c2fd93dc31213f1aff8ba3ff8ee58043294ef3dc74177aa"},
+    {file = "azure_mgmt_machinelearningservices-2.0.0b2-py3-none-any.whl", hash = "sha256:8a73d4d71ba84e75b054ce08ac0d8b853f86cc2280ff1cf59408babf045bd7d6"},
 ]
 
 [package.dependencies]
 azure-common = ">=1.1,<2.0"
-azure-mgmt-core = ">=1.2.0,<2.0.0"
-msrest = ">=0.5.0"
+azure-mgmt-core = ">=1.3.2,<2.0.0"
+isodate = ">=0.6.1,<1.0.0"
 
 [[package]]
 name = "azure-mgmt-managementgroups"
@@ -1373,8 +1373,8 @@ files = [
 jmespath = ">=0.7.1,<2.0.0"
 python-dateutil = ">=2.1,<3.0.0"
 urllib3 = [
-    {version = ">=1.25.4,<1.27", markers = "python_version < \"3.10\""},
     {version = ">=1.25.4,<2.2.0 || >2.2.0,<3", markers = "python_version >= \"3.10\""},
+    {version = ">=1.25.4,<1.27", markers = "python_version < \"3.10\""},
 ]
 
 [package.extras]
@@ -2597,8 +2597,8 @@ files = [
 [package.dependencies]
 PyYAML = "*"
 urllib3 = [
-    {version = "<2", markers = "platform_python_implementation == \"PyPy\" or python_version < \"3.10\""},
     {version = "*", markers = "platform_python_implementation != \"PyPy\" and python_version >= \"3.10\""},
+    {version = "<2", markers = "platform_python_implementation == \"PyPy\" or python_version < \"3.10\""},
 ]
 wrapt = "*"
 yarl = "*"
@@ -2833,4 +2833,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "e81507eead1a64332b30d9db3336351d8bc23b91160263ab39ac293107bd65b2"
+content-hash = "2caaead5f139e2ff55c3e6ce248748959677d7c3e64c1bb3125597ca18cb8b7c"
