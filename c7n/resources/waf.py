@@ -205,3 +205,77 @@ class WAFV2LoggingFilter(ValueFilter):
         return [
             r for r in resources if self.match(
                 r.get(self.annotation_key, {}))]
+
+
+@WAFV2.filter_registry.register('list-all-rules')
+class WAFV2ListAllRulesFilter(ValueFilter):
+    """
+    Return all rules inside the Web ACL, including rules in rule groups.
+    Allows filtering based on any field within the rules data.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: find-rule-groups
+            resource: aws.wafv2
+            filters:
+              - type: list-all-rules
+                key: Type
+                value: RuleGroup
+                op: in
+
+    """
+
+    schema = type_schema('list-all-rules', rinherit=ValueFilter.schema)
+    permissions = ('wafv2:GetRuleGroup',)
+    annotation_key = 'c7n:WebACLAllRules'
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client(
+            'wafv2', region_name=self.manager.region
+        )
+
+        for resource in resources:
+            all_rules = []
+
+            for rule in resource.get('Rules', []):
+                if rule.get("Statement", {}).get('RuleGroupReferenceStatement'):
+                    rule_group_arn = rule['Statement']['RuleGroupReferenceStatement']['ARN']
+                    scope = resource['Scope']
+
+                    rule_group_response = client.get_rule_group(
+                        Name=rule_group_arn.split('/')[-2],
+                        Id=rule_group_arn.split('/')[-1],
+                        Scope=scope
+                    )
+                    rule_group = rule_group_response.get('RuleGroup', {})
+
+                    rule_details = {
+                        "Type": "RuleGroup",
+                        "Name": rule.get('Name'),
+                        "RuleGroupARN": rule_group_arn,
+                        "Rules": rule_group.get('Rules', [])
+                    }
+                    all_rules.append(rule_details)
+                else:
+                    rule_details = {
+                        "Type": "Standalone",
+                        "Name": rule.get('Name'),
+                        "Rule": rule
+                    }
+                    all_rules.append(rule_details)
+
+            resource[self.annotation_key] = all_rules
+
+        return [
+            resource for resource in resources
+            if self.match(resource.get(self.annotation_key, []))
+        ]
+
+    def match(self, rules_data):
+        for rule in rules_data:
+            if ValueFilter.match(self, rule):
+                return True
+        return False
