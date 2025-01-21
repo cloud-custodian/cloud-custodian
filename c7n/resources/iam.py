@@ -2957,6 +2957,26 @@ class UserGroupDelete(BaseAction):
             raise error
 
 
+@Group.action_registry.register('detach-managed-policies')
+class DetachManagedPolicies(BaseAction):
+    """
+    Detach all managed IAM policies from an IAM group.
+    """
+    schema = type_schema('detach-managed-policies')
+    permissions = ('iam:DetachGroupPolicy', 'iam:ListAttachedGroupPolicies',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('iam')
+        for r in resources:
+            group_name = r['GroupName']
+            self.log.info(f"Detaching policies from IAM Group: {group_name}")
+            attached_policies = client.list_attached_group_policies(
+                GroupName=group_name)['AttachedPolicies']
+            for policy in attached_policies:
+                self.log.info(f"Detaching policy {policy['PolicyArn']} from group {group_name}")
+                client.detach_group_policy(GroupName=group_name, PolicyArn=policy['PolicyArn'])
+
+
 class SamlProviderDescribe(DescribeSource):
 
     def augment(self, resources):
