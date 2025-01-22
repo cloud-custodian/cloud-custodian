@@ -183,7 +183,7 @@ class QueryResourceManagerTest(BaseTest):
         )
         # Capture logging to check the output
         output = self.capture_logging(
-            name=p.resource_manager.log.name, level=logging.DEBUG
+            name=p.resource_manager.log.name, level=logging.WARNING
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
@@ -193,6 +193,6 @@ class QueryResourceManagerTest(BaseTest):
             self.assertTrue("Segments" in r)
             self.assertTrue("Edges" in r)
 
-        # Check that the debug message was logged
+        # Check that the warning message was logged
         self.assertTrue("Resource not found: get_core_network using" in output.getvalue())
         self.assertTrue(resources[0]["CoreNetworkArn"] not in output.getvalue())

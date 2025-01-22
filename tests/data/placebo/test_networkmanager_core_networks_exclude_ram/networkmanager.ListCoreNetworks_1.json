@@ -18,14 +18,14 @@
             },
             {
                 "CoreNetworkId": "core-network-0d1b38526d74c427d",
-                "CoreNetworkArn": "arn:aws:networkmanager::644160558196:core-network/core-network-0d1b38526d74c427d",
+                "CoreNetworkArn": "arn:aws:networkmanager::1234567890:core-network/core-network-0d1b38526d74c427d",
                 "GlobalNetworkId": "global-network-0fa387ed8fc5f107c",
-                "OwnerAccountId": "644160558196",
+                "OwnerAccountId": "1234567890",
                 "State": "AVAILABLE",
                 "Tags": [
                     {
                         "Key": "Name",
-                        "Value": "test-network-not-found"
+                        "Value": "test-network-shared-from-ram"
                     }
                 ]
             }
