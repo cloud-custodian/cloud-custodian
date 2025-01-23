@@ -1,0 +1,43 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:athena:us-east-1:644160558196:capacity-reservation/testv",
+                "Tags": [
+                    {
+                        "Key": "App",
+                        "Value": "c7n"
+                    },
+                    {
+                        "Key": "Owner",
+                        "Value": "kapil"
+                    },
+                    {
+                        "Key": "Env",
+                        "Value": "Dev"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:athena:us-east-1:644160558196:capacity-reservation/test",
+                "Tags": [
+                    {
+                        "Key": "App",
+                        "Value": "Custodian"
+                    },
+                    {
+                        "Key": "Owner",
+                        "Value": "Kapil"
+                    },
+                    {
+                        "Key": "Env",
+                        "Value": "Dev"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

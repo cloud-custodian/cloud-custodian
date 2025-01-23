@@ -1,0 +1,16 @@
+{
+    "status_code": 200,
+    "data": {
+        "DataCatalogsSummary": [
+            {
+                "CatalogName": "AwsDataCatalog",
+                "Type": "GLUE"
+            },
+            {
+                "CatalogName": "test",
+                "Type": "GLUE"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

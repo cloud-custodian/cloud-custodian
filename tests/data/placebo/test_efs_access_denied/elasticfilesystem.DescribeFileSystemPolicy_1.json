@@ -1,0 +1,10 @@
+{
+    "status_code": 403,
+    "data": {
+        "Error": {
+            "Message": "User: arn:aws:iam::644160558196:user/karthik is not authorized to perform: elasticfilesystem:DescribeFileSystemPolicy on the specified resource",
+            "Code": "AccessDeniedException"
+        },
+        "ResponseMetadata": {}
+    }
+}

@@ -1,8 +1,9 @@
 {
     "status_code": 200,
     "data": {
-        "PaginationToken": "",
-        "ResourceTagMappingList": [],
+        "tags": {
+            "c7n-public": "Policy"
+        },
         "ResponseMetadata": {}
     }
 }

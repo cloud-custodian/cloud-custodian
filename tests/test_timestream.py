@@ -308,3 +308,26 @@ class TestTimestreamInfluxDB(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_timestream_influxdb_network_location_filter(self):
+        factory = self.replay_flight_data("test_timestream_influxdb_network_location_filter")
+
+        p = self.load_policy(
+            {
+                "name": "test_timestream_influxdb_network_location_filter",
+                "resource": "timestream-influxdb",
+                "filters": [
+                    {
+                        "type": "network-location",
+                        "compare": ["resource", "security-group"],
+                        "key": "tag:c7n-public",
+                        "match": "equal"
+                    }
+                ]
+            },
+            session_factory=factory
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        assert resources[0]['name'] == 'test-db'

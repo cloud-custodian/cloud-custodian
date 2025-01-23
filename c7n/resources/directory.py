@@ -51,6 +51,28 @@ class DirectoryVpcFilter(VpcFilter):
     RelatedIdsExpression = "VpcSettings.VpcId"
 
 
+@Directory.filter_registry.register('is-log-forwarding')
+class DirectoryLogSubscriptionFilter(Filter):
+
+    annotation_key = "c7n:LogSubscriptions"
+    permissions = ("ds:ListLogSubscriptions",)
+    schema = type_schema('is-log-forwarding')
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('ds')
+        results = []
+        for r in resources:
+            subs = self.manager.retry(
+                client.list_log_subscriptions,
+                DirectoryId=r["DirectoryId"]
+            )["LogSubscriptions"]
+            if subs:
+                r[self.annotation_key] = subs
+                results.append(r)
+
+        return results
+
+
 @Directory.filter_registry.register('ldap')
 class DirectoryLDAPFilter(Filter):
     """Filter directories based on their LDAP status
@@ -172,12 +194,14 @@ class DirectoryTrustFilter(ValueFilter):
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('ds')
         trusts = client.describe_trusts()['Trusts']
+        matched = []
         for r in resources:
             r[self.annotation_key] = [
                 t for t in trusts if t['DirectoryId'] == r['DirectoryId']]
-        matched = []
-        for r in resources:
-            if any((self.match(trust) for trust in r[self.annotation_key])):
+            # When there are no trusts, we pass an empty dictionary so that
+            # self.match can evaluate directories without trusts using the absent value
+            resource_trusts = r[self.annotation_key] if len(r[self.annotation_key]) >= 1 else [{}]
+            if any((self.match(trust) for trust in resource_trusts)):
                 matched.append(r)
         return matched
 

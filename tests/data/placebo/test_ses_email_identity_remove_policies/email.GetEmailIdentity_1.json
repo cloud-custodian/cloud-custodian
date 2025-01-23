@@ -1,0 +1,54 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "IdentityType": "DOMAIN",
+        "FeedbackForwardingStatus": true,
+        "VerifiedForSendingStatus": false,
+        "DkimAttributes": {
+            "SigningEnabled": true,
+            "Status": "PENDING",
+            "Tokens": [
+                "kuxracydlslqzx736shksslbchiin3w3",
+                "creyaib22wqygtx5yegxirjvyccif2bj",
+                "d5ctrxcgs2po7677zmnt2b6z7qhvoo32"
+            ],
+            "SigningAttributesOrigin": "AWS_SES",
+            "NextSigningKeyLength": "RSA_2048_BIT",
+            "CurrentSigningKeyLength": "RSA_2048_BIT",
+            "LastKeyGenerationTimestamp": {
+                "__class__": "datetime",
+                "year": 2024,
+                "month": 10,
+                "day": 17,
+                "hour": 15,
+                "minute": 31,
+                "second": 5,
+                "microsecond": 195000
+            }
+        },
+        "MailFromAttributes": {
+            "BehaviorOnMxFailure": "USE_DEFAULT_VALUE"
+        },
+        "Policies": {
+            "C7nTestPolicy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"stmt1729266617195\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::123456789012:root\"},\"Action\":\"ses:SendEmail\",\"Resource\":\"arn:aws:ses:us-east-1:123456789012:identity/c7n-test.com\"},{\"Sid\":\"stmt1729266617194\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::111111111111:root\"},\"Action\":\"ses:SendEmail\",\"Resource\":\"arn:aws:ses:us-east-1:123456789012:identity/c7n-test.com\"}]}",
+            "C7nTestPolicy2": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"stmt1729266688400\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::123456789012:root\"},\"Action\":\"ses:GetEmailIdentity\",\"Resource\":\"arn:aws:ses:us-east-1:123456789012:identity/c7n-test.com\"}]}",
+            "Policy-1729266167922": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"stmt1729266179519\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::123456789012:root\"},\"Action\":\"ses:*\",\"Resource\":\"arn:aws:ses:us-east-1:123456789012:identity/c7n-test.com\"}]}"
+        },
+        "Tags": [],
+        "VerificationStatus": "PENDING",
+        "VerificationInfo": {
+            "LastCheckedTimestamp": {
+                "__class__": "datetime",
+                "year": 2024,
+                "month": 10,
+                "day": 18,
+                "hour": 11,
+                "minute": 29,
+                "second": 43,
+                "microsecond": 598000
+            },
+            "ErrorType": "HOST_NOT_FOUND"
+        }
+    }
+}

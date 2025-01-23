@@ -3,6 +3,8 @@ from c7n_azure.query import QueryResourceManager
 from c7n.utils import type_schema
 from c7n.filters import ListItemFilter
 from c7n_azure.utils import ResourceIdParser
+from azure.mgmt.machinelearningservices.models import (ComputeInstanceProperties,
+                                                       AmlComputeProperties)
 
 
 @resources.register('machine-learning-workspace')
@@ -25,7 +27,7 @@ class MachineLearningWorkspace(QueryResourceManager):
         doc_groups = ['ML']
 
         service = 'azure.mgmt.machinelearningservices'
-        client = 'AzureMachineLearningWorkspaces'
+        client = 'MachineLearningServicesMgmtClient'
         enum_spec = ('workspaces', 'list_by_subscription', None)
 
 
@@ -40,8 +42,13 @@ class ComputeInstancesFilter(ListItemFilter):
     annotate_items = True
     item_annotation_key = "c7n:ComputeInstances"
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        ComputeInstanceProperties.enable_additional_properties_sending()
+        AmlComputeProperties.enable_additional_properties_sending()
+
     def get_item_values(self, resource):
-        computes = self.manager.get_client().machine_learning_compute.list_by_workspace(
+        computes = self.manager.get_client().compute.list(
             resource_group_name=ResourceIdParser.get_resource_group(resource['id']),
             workspace_name=resource['name']
         )
