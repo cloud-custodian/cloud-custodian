@@ -207,7 +207,7 @@ class WAFV2LoggingFilter(ValueFilter):
                 r.get(self.annotation_key, {}))]
 
 
-@WAFV2.filter_registry.register('list-all-rules')
+@WAFV2.filter_registry.register('web-acl-rules')
 class WAFV2ListAllRulesFilter(ValueFilter):
     """
     Return all rules inside the Web ACL, including rules in rule groups.
@@ -221,14 +221,14 @@ class WAFV2ListAllRulesFilter(ValueFilter):
           - name: find-rule-groups
             resource: aws.wafv2
             filters:
-              - type: list-all-rules
+              - type: web-acl-rules
                 key: Type
                 value: RuleGroup
                 op: in
 
     """
 
-    schema = type_schema('list-all-rules', rinherit=ValueFilter.schema)
+    schema = type_schema('web-acl-rules', rinherit=ValueFilter.schema)
     permissions = ('wafv2:GetRuleGroup',)
     annotation_key = 'c7n:WebACLAllRules'
 

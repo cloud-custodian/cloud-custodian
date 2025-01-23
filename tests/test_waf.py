@@ -99,14 +99,14 @@ class WAFTest(BaseTest):
             "filters": [
                 {
                     "not": [{
-                        "type": "list-all-rules",
+                        "type": "web-acl-rules",
                         "key": "Type",
                         "value": "Standalone",
                         "op": "eq"
                     }]
                 },
                 {
-                    "type": "list-all-rules",
+                    "type": "web-acl-rules",
                     "key": "Type",
                     "value": "RuleGroup",
                     "op": "in"
@@ -133,7 +133,7 @@ class WAFTest(BaseTest):
                     {
                         "and": [
                             {
-                                "type": "list-all-rules",
+                                "type": "web-acl-rules",
                                 "key": "Type",
                                 "value": "Standalone",
                                 "op": "eq"
