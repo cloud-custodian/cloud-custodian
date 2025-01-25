@@ -1,0 +1,38 @@
+{
+    "status_code": 200,
+    "data": {
+        "Addresses": [
+            {
+                "AllocationId": "eipalloc-089b40a986b3b2954",
+                "AssociationId": "eipassoc-0befab9d52ce99535",
+                "Domain": "vpc",
+                "NetworkInterfaceId": "eni-0d4abd825d8d1a18a",
+                "NetworkInterfaceOwnerId": "123456789012",
+                "PrivateIpAddress": "10.0.1.151",
+                "PublicIpv4Pool": "amazon",
+                "NetworkBorderGroup": "us-west-2",
+                "PublicIp": "100.20.250.96"
+            },
+            {
+                "AllocationId": "eipalloc-0c2e1da5c1bb166f5",
+                "Domain": "vpc",
+                "PublicIpv4Pool": "amazon",
+                "NetworkBorderGroup": "us-west-2",
+                "PublicIp": "35.85.26.59"
+            },
+            {
+                "AllocationId": "eipalloc-0fd809411832cfc28",
+                "AssociationId": "eipassoc-0ccb362267e426a26",
+                "Domain": "vpc",
+                "NetworkInterfaceId": "eni-024ce49b54afbe4f3",
+                "NetworkInterfaceOwnerId": "123456789012",
+                "PrivateIpAddress": "10.0.5.141",
+                "PublicIpv4Pool": "amazon",
+                "NetworkBorderGroup": "us-west-2",
+                "InstanceId": "i-0b9b8387dd8448982",
+                "PublicIp": "52.27.14.199"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
