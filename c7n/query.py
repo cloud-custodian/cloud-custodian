@@ -737,6 +737,7 @@ def _batch_augment(manager, model, detail_spec, client, resource_set):
 def _scalar_augment(manager, model, detail_spec, client, resource_set):
     detail_op, param_name, param_key, detail_path = detail_spec
     op = getattr(client, detail_op)
+    ecodes_acc_denied = ('AuthorizationError', 'AccessDeniedException', 'AuthorizationError',)
     if manager.retry:
         args = (op,)
         op = manager.retry
@@ -745,7 +746,14 @@ def _scalar_augment(manager, model, detail_spec, client, resource_set):
     results = []
     for r in resource_set:
         kw = {param_name: param_key and r[param_key] or r}
-        response = op(*args, **kw)
+        try:
+            response = op(*args, **kw)
+        except ClientError as e:
+            if (e.response['Error']['Code'] in ecodes_acc_denied and
+            e.response['ResponseMetadata']['HTTPStatusCode'] == 403 and
+            'resource-based policy' in e.response['Error']['Message']):
+                manager.log.exception(e)
+                continue
         if detail_path:
             response = response[detail_path]
         else:
