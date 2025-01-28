@@ -3320,10 +3320,10 @@ class UsedByNetworkAddress(Filter):
     permissions = ("ec2:DescribeNetworkInterfaces",)
 
     def process(self, resources, event=None):
-        self.nics = self.manager.get_resource_manager('eni').resources()
+        nics = self.manager.get_resource_manager('eni').resources()
         results = []
         for r in resources:
-            for nic in self.nics:
+            for nic in nics:
                 if r.get('NetworkInterfaceId') == nic['NetworkInterfaceId']:
                     rtype = get_eni_resource_type(nic)
                     if rtype == self.data.get('resource-type'):
