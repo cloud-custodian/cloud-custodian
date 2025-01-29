@@ -22,14 +22,14 @@
             },
             {
                 "AllocationId": "eipalloc-0fd809411832cfc28",
-                "AssociationId": "eipassoc-0ccb362267e426a26",
+                "AssociationId": "eipassoc-0210f966f3702e178",
                 "Domain": "vpc",
-                "NetworkInterfaceId": "eni-024ce49b54afbe4f3",
+                "NetworkInterfaceId": "eni-0c460249c6f383b28",
                 "NetworkInterfaceOwnerId": "123456789012",
-                "PrivateIpAddress": "10.0.5.141",
+                "PrivateIpAddress": "10.0.7.84",
                 "PublicIpv4Pool": "amazon",
                 "NetworkBorderGroup": "us-west-2",
-                "InstanceId": "i-0b9b8387dd8448982",
+                "InstanceId": "i-02bdb80e43cda8576",
                 "PublicIp": "52.27.14.199"
             }
         ],
