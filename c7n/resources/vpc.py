@@ -3323,9 +3323,8 @@ class UsedByNetworkAddress(Filter):
         eni_ids = []
         for r in resources:
             if r.get('NetworkInterfaceId'):
-                 eni_ids.append(r['NetworkInterfaceId'])
+                eni_ids.append(r['NetworkInterfaceId'])
         enis = self.manager.get_resource_manager('eni').get_resources(eni_ids)
-
         results = []
         for r in resources:
             for eni in enis:
@@ -3333,5 +3332,4 @@ class UsedByNetworkAddress(Filter):
                     rtype = get_eni_resource_type(eni)
                     if rtype == self.data.get('resource-type'):
                         results.append(r)
-
         return results
