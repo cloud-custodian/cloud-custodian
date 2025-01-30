@@ -1,0 +1,14 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResolverRuleAssociation": {
+            "Id": "rslvr-rrassoc-a35d1a0bbc724c718",
+            "ResolverRuleId": "rslvr-rr-7b28e551dc5e44d19",
+            "Name": "-",
+            "VPCId": "vpc-00b1cf44b6c724308",
+            "Status": "DELETING",
+            "StatusMessage": "[Trace id: 1-6577aecb-38d0e1437d09f8926657a833] Deleting Association"
+        },
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,33 @@
+{
+    "status_code": 200,
+    "data": {
+        "MaxResults": 30,
+        "ResolverRuleAssociations": [
+            {
+                "Id": "rslvr-autodefined-assoc-vpc-00b1cf44b6c724308-internet-resolver",
+                "ResolverRuleId": "rslvr-autodefined-rr-internet-resolver",
+                "Name": "System Rule Association",
+                "VPCId": "vpc-00b1cf44b6c724308",
+                "Status": "COMPLETE",
+                "StatusMessage": ""
+            },
+            {
+                "Id": "rslvr-rrassoc-a35d1a0bbc724c718",
+                "ResolverRuleId": "rslvr-rr-7b28e551dc5e44d19",
+                "Name": "-",
+                "VPCId": "vpc-00b1cf44b6c724308",
+                "Status": "COMPLETE",
+                "StatusMessage": ""
+            },
+            {
+                "Id": "rslvr-rrassoc-d51b17c53f14c1588",
+                "ResolverRuleId": "rslvr-rr-9a67e96f80a14eb8b",
+                "Name": "-",
+                "VPCId": "vpc-00b1cf44b6c724308",
+                "Status": "COMPLETE",
+                "StatusMessage": ""
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

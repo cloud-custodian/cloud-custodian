@@ -4247,3 +4247,78 @@ def test_vpc_delete(test, vpc_delete):
         "Vpcs"
     ]
     test.assertFalse(vpcs)
+
+
+class ResolverRulesTest(BaseTest):
+
+    def test_vpc_resolver_rules_associate(self):
+        session_factory = self.replay_flight_data('test_vpc_resolver_rules_associate')
+        p = self.load_policy({
+            "name": "vpc-remediate-missing-resolver-rules",
+            "resource": "vpc",
+            "filters": [
+                {
+                    "type": "resolver-rules-associated",
+                    "name": "my-rule.*",
+                    "associated": False
+                }
+            ],
+            "actions": [
+                {
+                    "type": "associate-resolver-rules",
+                    "remove": False
+                }
+            ]
+        },
+        session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        resource = resources[0]
+        vpc_id = resource['VpcId']
+        missing = resource['c7n:MissingResolverRules']
+        self.assertEqual(len(missing), 2)
+
+        client = session_factory().client("route53resolver")
+        associations = client.list_resolver_rule_associations()["ResolverRuleAssociations"]
+        found = 0
+        for a in associations:
+            for ruleId in missing:
+                if ruleId == a['ResolverRuleId']:
+                    self.assertEqual(vpc_id, a['VPCId'])
+                    found += 1
+        self.assertEqual(found, 2)
+
+    def test_vpc_resolver_rules_disassociate(self):
+        session_factory = self.replay_flight_data('test_vpc_resolver_rules_disassociate')
+        p = self.load_policy({
+            "name": "vpc-remediate-matching-resolver-rules",
+            "resource": "vpc",
+            "filters": [
+                {
+                    "type": "resolver-rules-associated",
+                    "name": "my-rule.*",
+                    "associated": True
+                }
+            ],
+            "actions": [
+                {
+                    "type": "associate-resolver-rules",
+                    "remove": True
+                }
+            ]
+        },
+        session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        resource = resources[0]
+        matching = resource['c7n:MatchingResolverRules']
+        self.assertEqual(len(matching), 2)
+
+        client = session_factory().client("route53resolver")
+        associations = client.list_resolver_rule_associations()["ResolverRuleAssociations"]
+        found = 0
+        for a in associations:
+            for ruleId in matching:
+                if ruleId == a['ResolverRuleId']:
+                    found += 1
+        self.assertEqual(found, 0)
