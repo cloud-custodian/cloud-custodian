@@ -3287,3 +3287,49 @@ class CrossAZRouteTable(Filter):
                 results.append(resource)
 
         return results
+
+
+@NetworkAddress.filter_registry.register('used-by')
+class UsedByNetworkAddress(Filter):
+    """Filter Elastic IPs to find the resource type that the network
+    interface that the Elastic IP is associated with is attached to.
+
+    This filter is useful for limiting the types of resources to
+    enable AWS Shield Advanced protection.
+
+    :Example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: eip-shield-advanced-enable
+                resource: aws.elastic-ip
+                filters:
+                  - type: used-by
+                    resource-type: elb-net
+                  - type: shield-enabled
+                    state: false
+                actions:
+                  - type: set-shield
+                    state: true
+    """
+    schema = type_schema(
+        'used-by', required=['resource-type'], **{
+            'resource-type': {'type': 'string'}}
+    )
+    permissions = ("ec2:DescribeNetworkInterfaces",)
+
+    def process(self, resources, event=None):
+        eni_ids = []
+        for r in resources:
+            if r.get('NetworkInterfaceId'):
+                eni_ids.append(r['NetworkInterfaceId'])
+        enis = self.manager.get_resource_manager('eni').get_resources(eni_ids)
+        results = []
+        for r in resources:
+            for eni in enis:
+                if r.get('NetworkInterfaceId') == eni['NetworkInterfaceId']:
+                    rtype = get_eni_resource_type(eni)
+                    if rtype == self.data.get('resource-type'):
+                        results.append(r)
+        return results

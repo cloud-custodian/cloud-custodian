@@ -85,7 +85,7 @@ class LoadBalancingTargetTcpProxy(QueryResourceManager):
         default_report_fields = [
             "name", "description", "creationTimestamp", "service"
         ]
-        asset_type = " compute.googleapis.com/TargetTcpProxy"
+        asset_type = "compute.googleapis.com/TargetTcpProxy"
         urn_component = "target-tcp-proxy"
 
         @staticmethod
