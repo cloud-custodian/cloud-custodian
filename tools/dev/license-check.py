@@ -76,7 +76,6 @@ def main():
         classifiers = [c for c in classifiers if c.startswith('License')]
         delta = set(classifiers).difference(accept_classifiers)
         if (delta or not classifiers) and dname not in whitelist_packages:
-            import pdb; pdb.set_trace()
             found = True
             print(f"{dname}: {d.metadata['License']} {classifiers}")
 
