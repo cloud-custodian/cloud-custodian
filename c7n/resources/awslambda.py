@@ -92,6 +92,41 @@ class AWSLambda(query.QueryResourceManager):
         return super(AWSLambda, self).get_resources(ids, cache, augment)
 
 
+@AWSLambda.filter_registry.register('signing-config')
+class AWSLambdaSigninConfigFilter(Filter):
+    schema = type_schema('signing-config')
+    annotation_key = "CodeSigningConfigArn"
+    permissions = ('lambda:GetFunctionCodeSigningConfig',)
+
+    def _process_resource(self, client, resource):
+        arn = client.get_function_code_signing_config(
+            FunctionName=resource['FunctionName']
+        ).get('CodeSigningConfigArn')
+        if arn:
+            resource[self.annotation_key] = arn
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('lambda')
+        with self.executor_factory(max_workers=3) as w:
+            futures = []
+            for res in resources:
+                if self.annotation_key in res:
+                    continue
+                futures.append(w.submit(self._process_resource, client, res))
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Exception getting function signin config \n %s" % (
+                            f.exception()
+                        )
+                    )
+                    continue
+        return super().process(resources, event)
+
+    def __call__(self, i):
+        return self.annotation_key in i
+
+
 @AWSLambda.filter_registry.register('security-group')
 class SecurityGroupFilter(net_filters.SecurityGroupFilter):
 
