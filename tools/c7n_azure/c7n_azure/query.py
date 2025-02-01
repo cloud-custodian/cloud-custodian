@@ -334,6 +334,19 @@ class ChildResourceManager(QueryResourceManager, metaclass=QueryMeta):
     child_source = 'describe-child-azure'
     parent_manager = None
 
+    @staticmethod
+    def _extract_parent(resource):
+        return resource["managedBy"]
+
+    @staticmethod
+    def extract_parent(resource):
+        """
+        Extract the parent id out of the child resource metadata
+        """
+        if ChildTypeInfo.parent_id in resource:
+            return resource[ChildTypeInfo.parent_id]
+        return ChildResourceManager._extract_parent(resource)
+
     @property
     def source_type(self):
         source = self.data.get('source', self.child_source)
