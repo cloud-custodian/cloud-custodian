@@ -109,6 +109,9 @@ def test_update(test_awscc):
             "arn:aws:logs:us-east-1:644160558196:"
             "log-group:/aws/codebuild/custodian-build-python:*"
         ),
+        "DataProtectionPolicy": {},
+        "FieldIndexPolicies": [],
+        "LogGroupClass": "STANDARD",
         "LogGroupName": "/aws/codebuild/custodian-build-python",
         "RetentionInDays": 7,
         "Tags": [{"Key": "Owner", "Value": "Kapil"}],

@@ -436,6 +436,23 @@ class TestGlueCrawlers(BaseTest):
 
 
 class TestGlueTables(BaseTest):
+
+    def test_arn_format(self):
+        session_factory = self.replay_flight_data("test_glue_table_delete")
+        p = self.load_policy(
+            {
+                "name": "glue-table-query",
+                "resource": "glue-table",
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            p.resource_manager.get_arns(resources)[0],
+            "arn:aws:glue:us-east-1:644160558196:table/test/test"
+        )
+
     def test_tables_delete(self):
         session_factory = self.replay_flight_data("test_glue_table_delete")
         p = self.load_policy(

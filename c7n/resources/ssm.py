@@ -894,7 +894,7 @@ class SSMSessionManager(QueryResourceManager):
         arn_type = 'session'
 
     retry = staticmethod(get_retry(('Throttled',)))
-    permissions = ('ssm:DescribeSessions', 'ssm:TerminateSession', )
+    permissions = ('ssm:DescribeSessions',)
 
     augment = universal_augment
 
@@ -924,9 +924,7 @@ class TerminateSession(Action):
               - terminate
     """
     schema = type_schema('terminate')
-
-    def get_permissions(self):
-        return ('ssm:TerminateSession',)
+    permissions = ('ssm:TerminateSession',)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('ssm')

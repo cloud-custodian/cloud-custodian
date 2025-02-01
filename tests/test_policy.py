@@ -206,7 +206,7 @@ class PolicyMetaLint(BaseTest):
             {'account', 's3', 'hostedzone', 'log-group', 'rest-api', 'redshift-snapshot',
              'rest-stage', 'codedeploy-app', 'codedeploy-group', 'fis-template', 'dlm-policy',
              'apigwv2', 'apigwv2-stage', 'apigw-domain-name', 'fis-experiment',
-             'launch-template-version'})
+             'launch-template-version', 'glue-table'})
         if overrides:
             raise ValueError("unknown arn overrides in %s" % (", ".join(overrides)))
 
@@ -594,8 +594,6 @@ class PolicyMetaLint(BaseTest):
             'AWS::Transfer::Workflow',
             #
             # 'AWS::ApiGatewayV2::Stage',
-            'AWS::Athena::DataCatalog',
-            'AWS::Athena::WorkGroup',
             'AWS::AutoScaling::ScheduledAction',
             'AWS::Backup::BackupSelection',
             'AWS::Backup::RecoveryPoint',
@@ -656,9 +654,7 @@ class PolicyMetaLint(BaseTest):
             'AWS::Route53Resolver::ResolverRuleAssociation',
             'AWS::DMS::EventSubscription',
             'AWS::GlobalAccelerator::Accelerator',
-            'AWS::Athena::DataCatalog',
             'AWS::EC2::TransitGatewayAttachment',
-            'AWS::Athena::WorkGroup',
             'AWS::GlobalAccelerator::EndpointGroup',
             'AWS::GlobalAccelerator::Listener',
             'AWS::DMS::Certificate',
@@ -712,6 +708,7 @@ class PolicyMetaLint(BaseTest):
             'AWS::SageMaker::EndpointConfig',
             'AWS::DMS::ReplicationInstance',
             'AWS::DMS::ReplicationTask',
+            'AWS::SES::MailManagerIngressPoint',
         }
         bad_types = resource_config_types.difference(config_types)
         bad_types = bad_types.difference(invalid_ignore)
@@ -722,7 +719,7 @@ class PolicyMetaLint(BaseTest):
     def test_resource_meta_with_class(self):
         missing = set()
         for k, v in manager.resources.items():
-            if k in ('rest-account', 'account'):
+            if k in ('rest-account', 'account', 'quicksight-account'):
                 continue
             if not issubclass(v.resource_type, TypeInfo):
                 missing.add(k)
@@ -733,7 +730,7 @@ class PolicyMetaLint(BaseTest):
         empty = set()
         for k, v in manager.resources.items():
             if k in ('rest-account', 'account', 'codedeploy-deployment', 'sagemaker-cluster',
-                     'networkmanager-core'):
+                     'networkmanager-core', 'quicksight-account'):
                 continue
             for rk, rv in v.resource_type.__dict__.items():
                 if rk[0].isalnum() and rv is None:
@@ -873,7 +870,7 @@ class PolicyMetaLint(BaseTest):
             'snowball-cluster', 'snowball', 'ssm-activation',
             'healthcheck', 'event-rule-target', 'log-metric',
             'support-case', 'transit-attachment', 'config-recorder',
-            'apigw-domain-name', 'backup-job'}
+            'apigw-domain-name', 'backup-job', 'quicksight-account'}
 
         missing_method = []
         for k, v in manager.resources.items():

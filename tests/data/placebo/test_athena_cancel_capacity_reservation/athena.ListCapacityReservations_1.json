@@ -1,0 +1,106 @@
+{
+    "status_code": 200,
+    "data": {
+        "CapacityReservations": [
+            {
+                "Name": "testv",
+                "Status": "ACTIVE",
+                "TargetDpus": 24,
+                "AllocatedDpus": 24,
+                "LastAllocation": {
+                    "Status": "SUCCEEDED",
+                    "RequestTime": {
+                        "__class__": "datetime",
+                        "year": 2025,
+                        "month": 1,
+                        "day": 16,
+                        "hour": 11,
+                        "minute": 3,
+                        "second": 7,
+                        "microsecond": 327000
+                    },
+                    "RequestCompletionTime": {
+                        "__class__": "datetime",
+                        "year": 2025,
+                        "month": 1,
+                        "day": 16,
+                        "hour": 11,
+                        "minute": 3,
+                        "second": 59,
+                        "microsecond": 131000
+                    }
+                },
+                "LastSuccessfulAllocationTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 1,
+                    "day": 16,
+                    "hour": 11,
+                    "minute": 3,
+                    "second": 59,
+                    "microsecond": 131000
+                },
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 1,
+                    "day": 16,
+                    "hour": 11,
+                    "minute": 3,
+                    "second": 6,
+                    "microsecond": 744000
+                }
+            },
+            {
+                "Name": "test",
+                "Status": "CANCELLED",
+                "TargetDpus": 0,
+                "AllocatedDpus": 0,
+                "LastAllocation": {
+                    "Status": "SUCCEEDED",
+                    "RequestTime": {
+                        "__class__": "datetime",
+                        "year": 2025,
+                        "month": 1,
+                        "day": 16,
+                        "hour": 11,
+                        "minute": 0,
+                        "second": 48,
+                        "microsecond": 346000
+                    },
+                    "RequestCompletionTime": {
+                        "__class__": "datetime",
+                        "year": 2025,
+                        "month": 1,
+                        "day": 16,
+                        "hour": 11,
+                        "minute": 1,
+                        "second": 21,
+                        "microsecond": 34000
+                    }
+                },
+                "LastSuccessfulAllocationTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 1,
+                    "day": 15,
+                    "hour": 12,
+                    "minute": 18,
+                    "second": 48,
+                    "microsecond": 133000
+                },
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 1,
+                    "day": 15,
+                    "hour": 12,
+                    "minute": 17,
+                    "second": 55,
+                    "microsecond": 281000
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

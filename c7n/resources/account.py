@@ -423,7 +423,7 @@ class GuardDutyEnabled(MultiAttrFilter):
 
     annotation = "c7n:guard-duty"
     permissions = (
-        'guardduty:GetMasterAccount',
+        'guardduty:GetAdministratorAccount',
         'guardduty:ListDetectors',
         'guardduty:GetDetector')
 
@@ -450,7 +450,7 @@ class GuardDutyEnabled(MultiAttrFilter):
 
         detector = client.get_detector(DetectorId=detector_id)
         detector.pop('ResponseMetadata', None)
-        master = client.get_master_account(DetectorId=detector_id).get('Master')
+        master = client.get_administrator_account(DetectorId=detector_id).get('Master')
         resource[self.annotation] = r = {'Detector': detector, 'Master': master}
         return r
 
@@ -1273,7 +1273,8 @@ class HasVirtualMFA(Filter):
     permissions = ('iam:ListVirtualMFADevices',)
 
     def mfa_belongs_to_root_account(self, mfa):
-        return mfa['SerialNumber'].endswith(':mfa/root-account-mfa-device')
+        mfa_user = mfa.get('User', {}).get('Arn', '').split(':')[-1]
+        return mfa_user == 'root'
 
     def account_has_virtual_mfa(self, account):
         if not account.get('c7n:VirtualMFADevices'):

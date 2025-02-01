@@ -98,6 +98,12 @@ class DmsEndpoints(QueryResourceManager):
     }
 
 
+@DmsEndpoints.filter_registry.register('kms-key')
+class EndpointKmsFilter(KmsRelatedFilter):
+
+    RelatedIdsExpression = 'KmsKeyId'
+
+
 @ReplicationInstance.filter_registry.register('kms-key')
 class KmsFilter(KmsRelatedFilter):
 

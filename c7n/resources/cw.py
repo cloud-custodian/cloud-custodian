@@ -6,7 +6,7 @@ from concurrent.futures import as_completed
 from datetime import datetime, timedelta
 
 import botocore.exceptions
-
+from c7n import query
 from c7n.actions import BaseAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import Filter, MetricsFilter
@@ -21,6 +21,7 @@ from c7n.manager import resources
 from c7n.resolver import ValuesFrom
 from c7n.resources import load_resources
 from c7n.resources.aws import ArnResolver
+from c7n.query import RetryPageIterator
 from c7n.tags import universal_augment
 from c7n.utils import type_schema, local_session, chunks, get_retry, jmespath_search
 from botocore.config import Config
@@ -181,6 +182,7 @@ class EventBus(QueryResourceManager):
         arn_type = 'event-bus'
         arn = 'Arn'
         enum_spec = ('list_event_buses', 'EventBuses', None)
+        detail_spec = ('describe_event_bus', 'Name', 'Name', None)
         config_type = cfn_type = 'AWS::Events::EventBus'
         id = name = 'Name'
         universal_taggable = object()
@@ -194,6 +196,11 @@ class EventBus(QueryResourceManager):
 class EventBusCrossAccountFilter(CrossAccountAccessFilter):
     # dummy permission
     permissions = ('events:ListEventBuses',)
+
+
+@EventBus.filter_registry.register('kms-key')
+class EventBusKmsFilter(KmsRelatedFilter):
+    RelatedIdsExpression = 'KmsKeyIdentifier'
 
 
 @EventBus.action_registry.register('delete')
@@ -227,19 +234,32 @@ class EventBusDelete(BaseAction):
                     Name=r['Name'])
 
 
-class RuleDescribe(DescribeSource):
+class EventRuleQuery(query.ChildResourceQuery):
+
+    def get_parent_parameters(self, params, parent_id, parent_key):
+        merged_params = dict(params)
+        merged_params[parent_key] = parent_id
+        return merged_params
+
+
+@query.sources.register('event-rule')
+class EventRuleSource(query.ChildDescribeSource):
+
+    resource_query_factory = EventRuleQuery
 
     def augment(self, resources):
         return universal_augment(self.manager, resources)
 
 
 @resources.register('event-rule')
-class EventRule(QueryResourceManager):
+class EventRule(ChildResourceManager):
 
+    child_source = 'event-rule'
     class resource_type(TypeInfo):
         service = 'events'
-        arn_type = 'rule'
+        arn = 'Arn'
         enum_spec = ('list_rules', 'Rules', None)
+        parent_spec = ('event-bus', 'EventBusName', None)
         name = "Name"
         id = "Name"
         filter_name = "NamePrefix"
@@ -247,11 +267,6 @@ class EventRule(QueryResourceManager):
         config_type = cfn_type = 'AWS::Events::Rule'
         universal_taggable = object()
         permissions_augment = ("events:ListTagsForResource",)
-
-    source_mapping = {
-        'config': ConfigSource,
-        'describe': RuleDescribe
-    }
 
 
 @EventRule.filter_registry.register('metrics')
@@ -261,8 +276,30 @@ class EventRuleMetrics(MetricsFilter):
         return [{'Name': 'RuleName', 'Value': resource['Name']}]
 
 
+class EventChildResourceFilter(ChildResourceFilter):
+
+    # This function provides custom functionality to query event-rule-targets
+    # using both event-rule and event-bus information.
+    def get_related(self, resources):
+        self.child_resources = {}
+        child_resource_manager = self.get_resource_manager()
+        client = local_session(child_resource_manager.session_factory).client('events')
+        paginator_targets = client.get_paginator('list_targets_by_rule')
+        paginator_targets.PAGE_ITERATOR_CLS = RetryPageIterator
+
+        for r in resources:
+            targets = paginator_targets.paginate(EventBusName=r['EventBusName'], Rule=r['Name']) \
+            .build_full_result().get('Targets', [])
+            for target in targets:
+                target[self.ChildResourceParentKey] = r['Name']
+                self.child_resources.setdefault(target[self.ChildResourceParentKey], []) \
+                .append(target)
+
+        return self.child_resources
+
+
 @EventRule.filter_registry.register('event-rule-target')
-class EventRuleTargetFilter(ChildResourceFilter):
+class EventRuleTargetFilter(EventChildResourceFilter):
 
     """
     Filter event rules by their targets
@@ -276,8 +313,16 @@ class EventRuleTargetFilter(ChildResourceFilter):
               resource: aws.event-rule
               filters:
                 - type: event-rule-target
-                  key: Arn
-                  value: absent
+                  key: "@"
+                  value: empty
+
+            - name: find-event-rules-by-target-properties
+              resource: aws.event-rule
+              filters:
+                - type: event-rule-target
+                  key: "[].Arn"
+                  op: contains
+                  value: "arn:aws:sqs:us-east-2:111111111111:my-queue"
     """
 
     RelatedResource = "c7n.resources.cw.EventRuleTarget"
@@ -289,7 +334,7 @@ class EventRuleTargetFilter(ChildResourceFilter):
 
 
 @EventRule.filter_registry.register('invalid-targets')
-class ValidEventRuleTargetFilter(ChildResourceFilter):
+class ValidEventRuleTargetFilter(EventChildResourceFilter):
     """
     Filter event rules for invalid targets, Use the `all` option to
     find any event rules that have all invalid targets, otherwise
@@ -423,7 +468,7 @@ class EventRuleDelete(BaseAction):
         target_error_msg = "Rule can't be deleted since it has targets."
         for r in resources:
             try:
-                client.delete_rule(Name=r['Name'])
+                client.delete_rule(Name=r['Name'], EventBusName=r['EventBusName'])
             except botocore.exceptions.ClientError as e:
                 if e.response['Error']['Message'] != target_error_msg:
                     raise
@@ -436,8 +481,8 @@ class EventRuleDelete(BaseAction):
                 if not children:
                     children = EventRuleTargetFilter({}, child_manager).get_related(resources)
                 targets = list(set([t['Id'] for t in children.get(r['Name'])]))
-                client.remove_targets(Rule=r['Name'], Ids=targets)
-                client.delete_rule(Name=r['Name'])
+                client.remove_targets(Rule=r['Name'], Ids=targets, EventBusName=r['EventBusName'])
+                client.delete_rule(Name=r['Name'], EventBusName=r['EventBusName'])
 
 
 @EventRule.action_registry.register('set-rule-state')
@@ -492,8 +537,56 @@ class SetRuleState(BaseAction):
                 continue
 
 
+class EventRuleTargetQuery(query.ChildResourceQuery):
+
+    # This function provides custom functionality to query event-rule-targets
+    # using both event-rule and event-bus information.
+    def filter(self, resource_manager, parent_ids=None, **params):
+        """Query a set of resources."""
+        m = self.resolve(resource_manager.resource_type)
+        client = local_session(self.session_factory).client(m.service)
+
+        enum_op, path, extra_args = m.enum_spec
+        if extra_args:
+            params.update(extra_args)
+
+        parent_type, parent_key, annotate_parent = m.parent_spec
+        parents = self.manager.get_resource_manager(parent_type)
+        parent_resources = []
+        for p in parents.resources(augment=False):
+            parent_resources.append((p))
+
+        # Have to query separately for each parent's children.
+        results = []
+        for parent in parent_resources:
+            params['EventBusName'] = parent['EventBusName']
+            merged_params = self.get_parent_parameters(params, parent['Name'], parent_key)
+            subset = self._invoke_client_enum(
+                client, enum_op, merged_params, path, retry=self.manager.retry)
+            if annotate_parent:
+                for r in subset:
+                    r[self.parent_key] = parent['Name']
+                    r[parent_key] = parent
+            if subset:
+                results.extend(subset)
+        return results
+
+    def get_parent_parameters(self, params, parent_id, parent_key):
+        merged_params = dict(params)
+        merged_params[parent_key] = parent_id
+        return merged_params
+
+
+@query.sources.register('event-rule-target')
+class EventRuleTargetSource(query.ChildDescribeSource):
+
+    resource_query_factory = EventRuleTargetQuery
+
+
 @resources.register('event-rule-target')
 class EventRuleTarget(ChildResourceManager):
+
+    child_source = 'event-rule-target'
     class resource_type(TypeInfo):
         service = 'events'
         arn = False
@@ -528,12 +621,15 @@ class DeleteTarget(BaseAction):
         client = local_session(self.manager.session_factory).client('events')
         rule_targets = {}
         for r in resources:
-            rule_targets.setdefault(r['c7n:parent-id'], []).append(r['Id'])
+            event_bus = r['Rule']['EventBusName']
+            rule_id = r['c7n:parent-id']
+            rule_targets.setdefault((rule_id, event_bus), []).append(r['Id'])
 
-        for rule_id, target_ids in rule_targets.items():
+        for (rule_id, event_bus), target_ids in rule_targets.items():
             client.remove_targets(
                 Ids=target_ids,
-                Rule=rule_id)
+                Rule=rule_id,
+                EventBusName=event_bus)
 
 
 @resources.register('log-group')
@@ -1067,6 +1163,7 @@ class CloudWatchDashboard(QueryResourceManager):
         name = "DashboardName"
         cfn_type = "AWS::CloudWatch::Dashboard"
         universal_taggable = object()
+        global_resource = True
 
     source_mapping = {
        "describe": DescribeWithResourceTags,

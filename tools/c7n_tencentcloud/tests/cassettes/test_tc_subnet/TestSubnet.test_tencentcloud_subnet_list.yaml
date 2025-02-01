@@ -1,0 +1,227 @@
+interactions:
+- request:
+    body: '{"Offset": "0", "Limit": "20"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '30'
+      Content-Type:
+      - application/json
+      Host:
+      - vpc.na-ashburn.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.32.3
+      X-TC-Action:
+      - DescribeSubnets
+      X-TC-Region:
+      - na-ashburn
+      X-TC-TraceId:
+      - fee7ec82-8b42-40cd-88c5-6292c39e36c7
+      X-TC-Version:
+      - '2017-03-12'
+    method: POST
+    uri: https://vpc.na-ashburn.tencentcloudapi.com/
+  response:
+    body:
+      string: "{\n    \"Response\": {\n        \"SubnetSet\": [\n            {\n                \"VpcId\":
+        \"vpc-pyqkrqbp\",\n                \"SubnetId\": \"subnet-8i3da4re\",\n                \"SubnetName\":
+        \"zone2\",\n                \"CidrBlock\": \"10.0.2.0\\/24\",\n                \"Ipv6CidrBlock\":
+        \"\",\n                \"ISPType\": \"\",\n                \"AddressType\":
+        \"\",\n                \"IsDefault\": false,\n                \"IsRemoteVpcSnat\":
+        false,\n                \"EnableBroadcast\": false,\n                \"Zone\":
+        \"na-ashburn-2\",\n                \"RouteTableId\": \"rtb-brq6u09u\",\n                \"NetworkAclId\":
+        \"\",\n                \"HighPriorityRouteTableId\": \"\",\n                \"TotalIpAddressCount\":
+        253,\n                \"AvailableIpAddressCount\": 253,\n                \"CreatedTime\":
+        \"2024-03-11 09:05:25\",\n                \"TagSet\": [\n                    {\n
+        \                       \"Key\": \"Group\",\n                        \"Value\":
+        \"TAM\"\n                    }\n                ],\n                \"LocalZone\":
+        false,\n                \"IsShare\": false,\n                \"GatewaySet\":
+        [\n                    {\n                        \"Address\": \"10.0.2.1\"\n
+        \                   }\n                ],\n                \"CdcId\": \"\",\n
+        \               \"IsCdcSubnet\": 0,\n                \"Region\": \"na-ashburn\"\n
+        \           },\n            {\n                \"VpcId\": \"vpc-pyqkrqbp\",\n
+        \               \"SubnetId\": \"subnet-8uo3a0go\",\n                \"SubnetName\":
+        \"zone1\",\n                \"CidrBlock\": \"10.0.0.0\\/24\",\n                \"Ipv6CidrBlock\":
+        \"\",\n                \"ISPType\": \"\",\n                \"AddressType\":
+        \"\",\n                \"IsDefault\": false,\n                \"IsRemoteVpcSnat\":
+        false,\n                \"EnableBroadcast\": false,\n                \"Zone\":
+        \"na-ashburn-1\",\n                \"RouteTableId\": \"rtb-brq6u09u\",\n                \"NetworkAclId\":
+        \"\",\n                \"HighPriorityRouteTableId\": \"\",\n                \"TotalIpAddressCount\":
+        253,\n                \"AvailableIpAddressCount\": 253,\n                \"CreatedTime\":
+        \"2024-03-11 09:04:40\",\n                \"TagSet\": [\n                    {\n
+        \                       \"Key\": \"Group\",\n                        \"Value\":
+        \"TAM\"\n                    }\n                ],\n                \"LocalZone\":
+        false,\n                \"IsShare\": false,\n                \"GatewaySet\":
+        [\n                    {\n                        \"Address\": \"10.0.0.1\"\n
+        \                   }\n                ],\n                \"CdcId\": \"\",\n
+        \               \"IsCdcSubnet\": 0,\n                \"Region\": \"na-ashburn\"\n
+        \           },\n            {\n                \"VpcId\": \"vpc-iwwhq03v\",\n
+        \               \"SubnetId\": \"subnet-3a91a0ty\",\n                \"SubnetName\":
+        \"nat-msliu-fujiniya\",\n                \"CidrBlock\": \"10.0.1.0\\/24\",\n
+        \               \"Ipv6CidrBlock\": \"\",\n                \"ISPType\": \"\",\n
+        \               \"AddressType\": \"\",\n                \"IsDefault\": false,\n
+        \               \"IsRemoteVpcSnat\": false,\n                \"EnableBroadcast\":
+        false,\n                \"Zone\": \"na-ashburn-1\",\n                \"RouteTableId\":
+        \"rtb-r3b8rcy6\",\n                \"NetworkAclId\": \"\",\n                \"HighPriorityRouteTableId\":
+        \"\",\n                \"TotalIpAddressCount\": 253,\n                \"AvailableIpAddressCount\":
+        253,\n                \"CreatedTime\": \"2023-12-24 10:08:14\",\n                \"TagSet\":
+        [],\n                \"LocalZone\": false,\n                \"IsShare\": false,\n
+        \               \"GatewaySet\": [\n                    {\n                        \"Address\":
+        \"10.0.1.1\"\n                    }\n                ],\n                \"CdcId\":
+        \"\",\n                \"IsCdcSubnet\": 0,\n                \"Region\": \"na-ashburn\"\n
+        \           },\n            {\n                \"VpcId\": \"vpc-8rd05opx\",\n
+        \               \"SubnetId\": \"subnet-g6jzv116\",\n                \"SubnetName\":
+        \"xhhtest\",\n                \"CidrBlock\": \"172.26.0.0\\/24\",\n                \"Ipv6CidrBlock\":
+        \"\",\n                \"ISPType\": \"\",\n                \"AddressType\":
+        \"\",\n                \"IsDefault\": false,\n                \"IsRemoteVpcSnat\":
+        false,\n                \"EnableBroadcast\": false,\n                \"Zone\":
+        \"na-ashburn-2\",\n                \"RouteTableId\": \"rtb-3fmu3an6\",\n                \"NetworkAclId\":
+        \"\",\n                \"HighPriorityRouteTableId\": \"\",\n                \"TotalIpAddressCount\":
+        253,\n                \"AvailableIpAddressCount\": 253,\n                \"CreatedTime\":
+        \"2023-11-21 09:31:24\",\n                \"TagSet\": [],\n                \"LocalZone\":
+        false,\n                \"IsShare\": false,\n                \"GatewaySet\":
+        [\n                    {\n                        \"Address\": \"172.26.0.1\"\n
+        \                   }\n                ],\n                \"CdcId\": \"\",\n
+        \               \"IsCdcSubnet\": 0,\n                \"Region\": \"na-ashburn\"\n
+        \           },\n            {\n                \"VpcId\": \"vpc-eoibr96z\",\n
+        \               \"SubnetId\": \"subnet-i6me01xa\",\n                \"SubnetName\":
+        \"xhtest\",\n                \"CidrBlock\": \"10.0.0.0\\/24\",\n                \"Ipv6CidrBlock\":
+        \"\",\n                \"ISPType\": \"\",\n                \"AddressType\":
+        \"\",\n                \"IsDefault\": false,\n                \"IsRemoteVpcSnat\":
+        false,\n                \"EnableBroadcast\": false,\n                \"Zone\":
+        \"na-ashburn-2\",\n                \"RouteTableId\": \"rtb-7do3831c\",\n                \"NetworkAclId\":
+        \"\",\n                \"HighPriorityRouteTableId\": \"\",\n                \"TotalIpAddressCount\":
+        253,\n                \"AvailableIpAddressCount\": 253,\n                \"CreatedTime\":
+        \"2023-11-21 09:21:25\",\n                \"TagSet\": [],\n                \"LocalZone\":
+        false,\n                \"IsShare\": false,\n                \"GatewaySet\":
+        [\n                    {\n                        \"Address\": \"10.0.0.1\"\n
+        \                   }\n                ],\n                \"CdcId\": \"\",\n
+        \               \"IsCdcSubnet\": 0,\n                \"Region\": \"na-ashburn\"\n
+        \           },\n            {\n                \"VpcId\": \"vpc-iwwhq03v\",\n
+        \               \"SubnetId\": \"subnet-ixik2gdy\",\n                \"SubnetName\":
+        \"fujiniya-msliu-vpc-subnet\",\n                \"CidrBlock\": \"10.0.0.0\\/24\",\n
+        \               \"Ipv6CidrBlock\": \"\",\n                \"ISPType\": \"\",\n
+        \               \"AddressType\": \"\",\n                \"IsDefault\": false,\n
+        \               \"IsRemoteVpcSnat\": false,\n                \"EnableBroadcast\":
+        false,\n                \"Zone\": \"na-ashburn-2\",\n                \"RouteTableId\":
+        \"rtb-r3b8rcy6\",\n                \"NetworkAclId\": \"\",\n                \"HighPriorityRouteTableId\":
+        \"\",\n                \"TotalIpAddressCount\": 253,\n                \"AvailableIpAddressCount\":
+        253,\n                \"CreatedTime\": \"2023-08-04 12:02:01\",\n                \"TagSet\":
+        [],\n                \"LocalZone\": false,\n                \"IsShare\": false,\n
+        \               \"GatewaySet\": [\n                    {\n                        \"Address\":
+        \"10.0.0.1\"\n                    }\n                ],\n                \"CdcId\":
+        \"\",\n                \"IsCdcSubnet\": 0,\n                \"Region\": \"na-ashburn\"\n
+        \           },\n            {\n                \"VpcId\": \"vpc-gzn80von\",\n
+        \               \"SubnetId\": \"subnet-j8m9zoim\",\n                \"SubnetName\":
+        \"p_pttniu_1\",\n                \"CidrBlock\": \"10.0.0.0\\/18\",\n                \"Ipv6CidrBlock\":
+        \"\",\n                \"ISPType\": \"\",\n                \"AddressType\":
+        \"\",\n                \"IsDefault\": false,\n                \"IsRemoteVpcSnat\":
+        false,\n                \"EnableBroadcast\": false,\n                \"Zone\":
+        \"na-ashburn-2\",\n                \"RouteTableId\": \"rtb-pk1eyzuq\",\n                \"NetworkAclId\":
+        \"\",\n                \"HighPriorityRouteTableId\": \"\",\n                \"TotalIpAddressCount\":
+        16381,\n                \"AvailableIpAddressCount\": 16381,\n                \"CreatedTime\":
+        \"2023-04-14 11:40:36\",\n                \"TagSet\": [],\n                \"LocalZone\":
+        false,\n                \"IsShare\": false,\n                \"GatewaySet\":
+        [\n                    {\n                        \"Address\": \"10.0.0.1\"\n
+        \                   }\n                ],\n                \"CdcId\": \"\",\n
+        \               \"IsCdcSubnet\": 0,\n                \"Region\": \"na-ashburn\"\n
+        \           },\n            {\n                \"VpcId\": \"vpc-45u2nmax\",\n
+        \               \"SubnetId\": \"subnet-28zabb6a\",\n                \"SubnetName\":
+        \"Default-Subnet\",\n                \"CidrBlock\": \"10.200.16.0\\/20\",\n
+        \               \"Ipv6CidrBlock\": \"\",\n                \"ISPType\": \"\",\n
+        \               \"AddressType\": \"\",\n                \"IsDefault\": true,\n
+        \               \"IsRemoteVpcSnat\": false,\n                \"EnableBroadcast\":
+        false,\n                \"Zone\": \"na-ashburn-1\",\n                \"RouteTableId\":
+        \"rtb-jc3h9g3y\",\n                \"NetworkAclId\": \"\",\n                \"HighPriorityRouteTableId\":
+        \"\",\n                \"TotalIpAddressCount\": 4093,\n                \"AvailableIpAddressCount\":
+        4093,\n                \"CreatedTime\": \"2020-12-23 09:41:58\",\n                \"TagSet\":
+        [],\n                \"LocalZone\": false,\n                \"IsShare\": false,\n
+        \               \"GatewaySet\": [\n                    {\n                        \"Address\":
+        \"10.200.16.1\"\n                    }\n                ],\n                \"CdcId\":
+        \"\",\n                \"IsCdcSubnet\": 0,\n                \"Region\": \"na-ashburn\"\n
+        \           },\n            {\n                \"VpcId\": \"vpc-45u2nmax\",\n
+        \               \"SubnetId\": \"subnet-30ukchjq\",\n                \"SubnetName\":
+        \"Default-Subnet\",\n                \"CidrBlock\": \"10.200.0.0\\/20\",\n
+        \               \"Ipv6CidrBlock\": \"\",\n                \"ISPType\": \"\",\n
+        \               \"AddressType\": \"\",\n                \"IsDefault\": true,\n
+        \               \"IsRemoteVpcSnat\": false,\n                \"EnableBroadcast\":
+        false,\n                \"Zone\": \"na-ashburn-2\",\n                \"RouteTableId\":
+        \"rtb-jc3h9g3y\",\n                \"NetworkAclId\": \"\",\n                \"HighPriorityRouteTableId\":
+        \"\",\n                \"TotalIpAddressCount\": 4093,\n                \"AvailableIpAddressCount\":
+        4093,\n                \"CreatedTime\": \"2020-05-19 12:10:20\",\n                \"TagSet\":
+        [],\n                \"LocalZone\": false,\n                \"IsShare\": false,\n
+        \               \"GatewaySet\": [\n                    {\n                        \"Address\":
+        \"10.200.0.1\"\n                    }\n                ],\n                \"CdcId\":
+        \"\",\n                \"IsCdcSubnet\": 0,\n                \"Region\": \"na-ashburn\"\n
+        \           }\n        ],\n        \"TotalCount\": 9,\n        \"RegionStatistics\":
+        [\n            {\n                \"TotalCount\": 9,\n                \"Region\":
+        \"na-ashburn\"\n            }\n        ],\n        \"RequestId\": \"03be4a22-1951-4bab-b09e-d4f5745a0418\"\n
+        \   }\n}"
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '10410'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 14 Jan 2025 09:15:44 GMT
+      X-TC-TraceId:
+      - fee7ec82-8b42-40cd-88c5-6292c39e36c7
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"ResourceList": ["qcs::vpc:na-ashburn:uin/100009291175:subnet/subnet-8i3da4re",
+      "qcs::vpc:na-ashburn:uin/100009291175:subnet/subnet-8uo3a0go", "qcs::vpc:na-ashburn:uin/100009291175:subnet/subnet-3a91a0ty",
+      "qcs::vpc:na-ashburn:uin/100009291175:subnet/subnet-g6jzv116", "qcs::vpc:na-ashburn:uin/100009291175:subnet/subnet-i6me01xa",
+      "qcs::vpc:na-ashburn:uin/100009291175:subnet/subnet-ixik2gdy", "qcs::vpc:na-ashburn:uin/100009291175:subnet/subnet-j8m9zoim",
+      "qcs::vpc:na-ashburn:uin/100009291175:subnet/subnet-28zabb6a", "qcs::vpc:na-ashburn:uin/100009291175:subnet/subnet-30ukchjq"]}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '585'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.na-ashburn.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.32.3
+      X-TC-Action:
+      - GetResources
+      X-TC-Region:
+      - na-ashburn
+      X-TC-TraceId:
+      - ad643015-3229-470e-b0bc-cbd70ff23253
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.na-ashburn.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"","ResourceTagMappingList":[{"Resource":"qcs::vpc:na-ashburn:uin\/100009291175:subnet\/subnet-8i3da4re","Tags":[{"TagKey":"Group","TagValue":"TAM","Category":"Custom"}]},{"Resource":"qcs::vpc:na-ashburn:uin\/100009291175:subnet\/subnet-8uo3a0go","Tags":[{"TagKey":"Group","TagValue":"TAM","Category":"Custom"}]}],"RequestId":"c6432fb9-deae-4609-95ad-9dc4f49380a8"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '397'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 14 Jan 2025 09:15:46 GMT
+      X-TC-TraceId:
+      - ad643015-3229-470e-b0bc-cbd70ff23253
+    status:
+      code: 200
+      message: OK
+version: 1

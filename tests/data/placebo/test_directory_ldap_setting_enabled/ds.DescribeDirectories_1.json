@@ -1,0 +1,116 @@
+{
+    "status_code": 200,
+    "data": {
+        "DirectoryDescriptions": [
+            {
+                "DirectoryId": "d-9067d505cf",
+                "Name": "corp.amazonworkspaces.com",
+                "ShortName": "corp",
+                "Size": "Small",
+                "Edition": "Standard",
+                "Alias": "d-9067d505cf",
+                "AccessUrl": "d-9067d505cf.awsapps.com",
+                "DnsIpAddrs": [
+                    "10.0.0.235",
+                    "10.0.1.35"
+                ],
+                "Stage": "Active",
+                "LaunchTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 9,
+                    "day": 26,
+                    "hour": 9,
+                    "minute": 43,
+                    "second": 2,
+                    "microsecond": 942000
+                },
+                "StageLastUpdatedDateTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 9,
+                    "day": 26,
+                    "hour": 10,
+                    "minute": 5,
+                    "second": 46,
+                    "microsecond": 228000
+                },
+                "Type": "MicrosoftAD",
+                "VpcSettings": {
+                    "VpcId": "vpc-0d4f819d13b730139",
+                    "SubnetIds": [
+                        "subnet-0707ce1b2a6305995",
+                        "subnet-0472841b16adf7476"
+                    ],
+                    "SecurityGroupId": "sg-0e8cc43436af25913",
+                    "AvailabilityZones": [
+                        "us-east-1b",
+                        "us-east-1a"
+                    ]
+                },
+                "SsoEnabled": false,
+                "DesiredNumberOfDomainControllers": 2,
+                "RegionsInfo": {
+                    "PrimaryRegion": "us-east-1",
+                    "AdditionalRegions": []
+                },
+                "OsVersion": "SERVER_2019"
+            },
+            {
+                "DirectoryId": "d-9067d505df",
+                "Name": "corp.amazonworkspaces.com",
+                "ShortName": "corp",
+                "Size": "Small",
+                "Edition": "Standard",
+                "Alias": "d-9067d505df",
+                "AccessUrl": "d-9067d505df.awsapps.com",
+                "DnsIpAddrs": [
+                    "10.0.0.235",
+                    "10.0.1.35"
+                ],
+                "Stage": "Active",
+                "LaunchTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 9,
+                    "day": 26,
+                    "hour": 9,
+                    "minute": 43,
+                    "second": 2,
+                    "microsecond": 942000
+                },
+                "StageLastUpdatedDateTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 9,
+                    "day": 26,
+                    "hour": 10,
+                    "minute": 5,
+                    "second": 46,
+                    "microsecond": 228000
+                },
+                "Type": "SimpleAD",
+                "VpcSettings": {
+                    "VpcId": "vpc-0d4f819d13b730139",
+                    "SubnetIds": [
+                        "subnet-0707ce1b2a6305995",
+                        "subnet-0472841b16adf7476"
+                    ],
+                    "SecurityGroupId": "sg-0e8cc43436af25913",
+                    "AvailabilityZones": [
+                        "us-east-1b",
+                        "us-east-1a"
+                    ]
+                },
+                "SsoEnabled": false,
+                "DesiredNumberOfDomainControllers": 2,
+                "RegionsInfo": {
+                    "PrimaryRegion": "us-east-1",
+                    "AdditionalRegions": []
+                },
+                "OsVersion": ""
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

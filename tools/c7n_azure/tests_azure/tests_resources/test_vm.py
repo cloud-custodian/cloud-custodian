@@ -373,3 +373,22 @@ class VMTest(BaseTest):
 
         self.assertEqual(len(resources), 1)
         self.assertEqual('vm1226', resources[0]['name'])
+
+    def test_vm_jit_policy_port_filter(self):
+        p = self.load_policy({
+            'name': 'vm-jit-policy-ports',
+            'resource': 'azure.vm',
+            'filters': [{
+                'type': 'jit-policy-port',
+                'attrs': [{
+                    'type': 'value',
+                    'key': 'number',
+                    'value': 22
+                }],
+                'count': 1
+            }]
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], 'cctestvm')
+        self.assertEqual(resources[0]['c7n:JitPolicyPorts'][0]['number'], 22)
