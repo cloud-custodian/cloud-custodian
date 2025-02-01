@@ -65,9 +65,9 @@ def main():
         dname = d.metadata['Name']
         if dname in seen:
             continue
-        if d.metadata['License'] in accept:
+        if d.metadata.get('License') in accept or d.metadata.get("License-Expression") in accept:
             continue
-        if d.metadata['License'] is not None and ' or ' in d.metadata['License']:
+        if d.metadata.get('License') is not None and ' or ' in d.metadata.get('License'):
             licenses = str(d.metadata['License']).split(' or ')
             if any(i in licenses for i in accept):
                 continue
@@ -76,6 +76,7 @@ def main():
         classifiers = [c for c in classifiers if c.startswith('License')]
         delta = set(classifiers).difference(accept_classifiers)
         if (delta or not classifiers) and dname not in whitelist_packages:
+            import pdb; pdb.set_trace()
             found = True
             print(f"{dname}: {d.metadata['License']} {classifiers}")
 
