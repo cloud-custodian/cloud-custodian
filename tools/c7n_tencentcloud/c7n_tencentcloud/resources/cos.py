@@ -31,7 +31,6 @@ class DescribeCos(DescribeSource):
             return []
         resources = [r for r in resources if r["Location"] == self.resource_manager.config.region]
 
-        self.augment(resources)
         return resources
 
     def get_resource_qcs(self, resources):
