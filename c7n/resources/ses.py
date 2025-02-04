@@ -7,9 +7,13 @@ from c7n.filters.iamaccess import CrossAccountAccessFilter
 import c7n.filters.policystatement as polstmt_filter
 from c7n.exceptions import PolicyValidationError
 from c7n.manager import resources
-from c7n.query import DescribeSource, QueryResourceManager, TypeInfo
+from c7n.query import DescribeSource, QueryResourceManager, TypeInfo, DescribeWithResourceTags
 from c7n.utils import local_session, type_schema, format_string_values
 from c7n.tags import universal_augment
+from c7n.tags import RemoveTag, Tag
+from c7n.filters import (FilterRegistry, ListItemFilter)
+
+filters = FilterRegistry('SESIngressEndpoint.filters')
 
 
 class DescribeConfigurationSet(DescribeSource):
@@ -364,3 +368,183 @@ class SESDedicatedIpPool(QueryResourceManager):
     source_mapping = {
         'describe': DescribeDedicatedIpPool
     }
+
+
+@resources.register('ses-ingress-endpoint')
+class SESIngressEndpoint(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = 'mailmanager'
+        enum_spec = ('list_ingress_points', 'IngressPoints', None)
+        detail_spec = ('get_ingress_point', 'IngressPointId', 'IngressPointId', None)
+        name = 'IngressPointName'
+        id = 'IngressPointId'
+        arn_type = 'mailmanager-ingress-point'
+        arn = 'IngressPointArn'
+        config_type = "AWS::SES::MailManagerIngressPoint"
+        permission_prefix = 'ses'
+
+    source_mapping = {
+        'describe': DescribeWithResourceTags
+    }
+
+
+@SESIngressEndpoint.action_registry.register('tag')
+class TagSESIngressEndpoint(Tag):
+    """Create tags on SES Ingress Endpoint
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+            - name: ses-ingress-endpoint-tag
+              resource: aws.ses-ingress-endpoint
+              actions:
+                - type: tag
+                  key: test
+                  value: something
+    """
+    permissions = ('ses:TagResource',)
+
+    def process_resource_set(self, client, resources, new_tags):
+        for r in resources:
+            client.tag_resource(ResourceArn=r["IngressPointArn"], Tags=new_tags)
+
+
+@SESIngressEndpoint.action_registry.register('remove-tag')
+class RemoveTagSESIngressEndpoint(RemoveTag):
+    """Remove tags from a SES Ingress Endpoint
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+            - name: ingress-endpoint-remove-tag
+              resource: aws.ses-ingress-endpoint
+              actions:
+                - type: remove-tag
+                  tags: ["tag-key"]
+    """
+    permissions = ('ses:UntagResource',)
+
+    def process_resource_set(self, client, resources, tags):
+        for r in resources:
+            client.untag_resource(ResourceArn=r['IngressPointArn'], TagKeys=tags)
+
+
+@SESIngressEndpoint.action_registry.register('delete')
+class DeleteSESIngressEndpoint(Action):
+    """Delete an SES Ingress Endpoint resource.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: ses-delete-ingress-endpoint
+                resource: aws.ses-ingress-endpoint
+                actions:
+                    - delete
+
+    """
+    schema = type_schema('delete')
+    permissions = ("ses:DeleteIngressPoint",)
+
+    def process(self, ingressendpoints):
+        client = local_session(self.manager.session_factory).client('mailmanager')
+        for ingressendpoint in ingressendpoints:
+            self.manager.retry(
+                client.delete_ingress_point,
+                IngressPointId=ingressendpoint["IngressPointId"],
+                ignore_err_codes=("ResourceNotFoundException",)
+            )
+
+
+@SESIngressEndpoint.filter_registry.register('rule-set')
+class SESIngressEndpointRuleSet(ListItemFilter):
+    """Filter for SES Ingress Endpoints to look at rule sets
+
+    The schema to supply to the attrs follows the schema here:
+     https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/mailmanager/client/get_rule_set.html
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: ses-ingress-endpoint-rule-set
+                resource: ses-ingress-endpoint
+                filters:
+                - or:
+                  - not:
+                    - type: rule-set
+                      attrs:
+                        - type: value
+                          key: length(Actions[]|[?Archive])
+                          value: 1
+                  - type: rule-set
+                    attrs:
+                      - type: value
+                        key: "length(Actions[]|[?Archive.TargetArchive \
+                            .Retention.RetentionPeriodInMonth > `5`])"
+                        value: 1
+    """
+    schema = type_schema(
+        'rule-set',
+        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'},
+        count={'type': 'number'},
+        count_op={'$ref': '#/definitions/filters_common/comparison_operators'}
+    )
+
+    permissions = ("ses:GetRuleSet",)
+    annotation_key = 'RuleSet'
+    annotate_items = True
+
+    def __init__(self, data, manager=None):
+        super().__init__(data, manager)
+        self.data['key'] = self.annotation_key
+
+    def get_item_values(self, resource):
+        if self.annotation_key not in resource:
+            client = local_session(self.manager.session_factory).client('mailmanager')
+            response = client.get_rule_set(RuleSetId=resource['RuleSetId'])
+            resource["RuleSetName"] = response["RuleSetName"]
+            resource["RuleSetArn"] = response["RuleSetArn"]
+            rules = response.get('Rules', [])
+            for rule in rules:
+                for action in rule.get("Actions", []):
+                    if "Archive" in action:
+                        target_archive = action["Archive"]["TargetArchive"]
+                        archive_details = client.get_archive(ArchiveId=target_archive)
+                        archive_details.pop("ResponseMetadata")
+                        # Convert retention period to numeric values for easier comparison
+                        action["Archive"]["TargetArchive"] = \
+                            self.convert_retention_period(archive_details)
+            resource[self.annotation_key] = rules
+
+        return resource[self.annotation_key]
+
+    def convert_retention_period(self, archive_details):
+        retention_mapping = {
+            "THREE_MONTHS": 3,
+            "SIX_MONTHS": 6,
+            "NINE_MONTHS": 9,
+            "ONE_YEAR": 12,
+            "EIGHTEEN_MONTHS": 18,
+            "TWO_YEARS": 24,
+            "THIRTY_MONTHS": 30,
+            "THREE_YEARS": 36,
+            "FOUR_YEARS": 48,
+            "FIVE_YEARS": 60,
+            "SIX_YEARS": 72,
+            "SEVEN_YEARS": 84,
+            "EIGHT_YEARS": 96,
+            "NINE_YEARS": 108,
+            "TEN_YEARS": 120,
+            "PERMANENT": 99999  # Very large value to represent "PERMANENT"
+        }
+
+        retention_text = archive_details["Retention"].get("RetentionPeriod")
+        retention_value = retention_mapping.get(retention_text, None)  # Map to numeric value
+        archive_details["Retention"]["RetentionPeriodInMonth"] = retention_value
+        return archive_details

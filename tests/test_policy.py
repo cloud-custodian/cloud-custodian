@@ -708,6 +708,7 @@ class PolicyMetaLint(BaseTest):
             'AWS::SageMaker::EndpointConfig',
             'AWS::DMS::ReplicationInstance',
             'AWS::DMS::ReplicationTask',
+            'AWS::SES::MailManagerIngressPoint',
         }
         bad_types = resource_config_types.difference(config_types)
         bad_types = bad_types.difference(invalid_ignore)

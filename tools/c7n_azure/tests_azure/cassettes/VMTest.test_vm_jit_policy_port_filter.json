@@ -1,0 +1,196 @@
+{
+  "version": 1,
+  "interactions": [
+    {
+      "request": {
+        "method": "GET",
+        "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/virtualMachines?api-version=2020-12-01",
+        "body": null,
+        "headers": {}
+      },
+      "response": {
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "headers": {
+          "cache-control": [
+            "no-cache"
+          ],
+          "content-type": [
+            "application/json; charset=utf-8"
+          ],
+          "content-length": [
+            "7019"
+          ],
+          "date": [
+            "Mon, 24 May 2021 14:41:52 GMT"
+          ],
+          "x-ms-original-request-ids": [
+            "04820a56-2374-430d-8be4-3fd61d5c3351",
+            "648b5e18-6b70-45fc-a953-1d70e65ba801"
+          ]
+        },
+        "body": {
+          "data": {
+            "value": [
+              {
+                "name": "cctestvm",
+                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm",
+                "type": "Microsoft.Compute/virtualMachines",
+                "location": "southcentralus",
+                "tags": {
+                  "testtag": "testvalue",
+                  "schedule": "on=(M-U,8);off=(M-U,18);tz=pt"
+                },
+                "properties": {
+                  "vmId": "f6a6b9b2-9b99-45b0-8a18-025998fc74d0",
+                  "hardwareProfile": {
+                    "vmSize": "Standard_A1_v2"
+                  },
+                  "storageProfile": {
+                    "imageReference": {
+                      "publisher": "Canonical",
+                      "offer": "UbuntuServer",
+                      "sku": "16.04.0-LTS",
+                      "version": "latest",
+                      "exactVersion": "16.04.202104290"
+                    },
+                    "osDisk": {
+                      "osType": "Linux",
+                      "name": "cctestvm_OsDisk_1_517889dc284d4327990247d6d933e390",
+                      "createOption": "FromImage",
+                      "caching": "ReadWrite",
+                      "managedDisk": {
+                        "storageAccountType": "Standard_LRS",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_517889dc284d4327990247d6d933e390"
+                      },
+                      "diskSizeGB": 30
+                    },
+                    "dataDisks": [
+                      {
+                        "lun": 0,
+                        "name": "cctestvm_disk2_c891bbcef098417b9c9eaed9b8af5e86",
+                        "createOption": "Empty",
+                        "caching": "None",
+                        "managedDisk": {
+                          "storageAccountType": "Standard_LRS",
+                          "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_disk2_c891bbcef098417b9c9eaed9b8af5e86"
+                        },
+                        "diskSizeGB": 1023,
+                        "toBeDetached": false
+                      }
+                    ]
+                  },
+                  "osProfile": {
+                    "computerName": "vmmilaytvhe7nwq",
+                    "adminUsername": "testuser",
+                    "linuxConfiguration": {
+                      "disablePasswordAuthentication": false,
+                      "patchSettings": {
+                        "patchMode": "ImageDefault"
+                      }
+                    },
+                    "secrets": []
+                  },
+                  "networkProfile": {
+                    "networkInterfaces": [
+                      {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic"
+                      }
+                    ]
+                  },
+                  "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                      "enabled": true,
+                      "storageUri": "https://milaytvhe7nwqsalinuxvm.blob.core.windows.net/"
+                    }
+                  },
+                  "provisioningState": "Succeeded"
+                },
+                "resources": [
+                  {
+                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm/extensions/script1"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/jitNetworkAccessPolicies?api-version=2020-01-01",
+        "body": null,
+        "headers": {}
+      },
+      "response": {
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "headers": {
+          "date": [
+            "Wed, 11 Aug 2021 12:12:09 GMT"
+          ],
+          "x-ms-ratelimit-remaining-subscription-resource-requests": [
+            "749"
+          ],
+          "cache-control": [
+            "no-cache"
+          ],
+          "content-type": [
+            "application/json; charset=utf-8"
+          ],
+          "x-ms-original-request-ids": [
+            "",
+            "",
+            ""
+          ],
+          "content-length": [
+            "713"
+          ]
+        },
+        "body": {
+          "data": {
+            "value": [
+              {
+                "kind": "Basic",
+                "properties": {
+                  "virtualMachines": [
+                    {
+                      "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm",
+                      "ports": [
+                        {
+                          "number": 22,
+                          "protocol": "*",
+                          "allowedSourceAddressPrefix": "*",
+                          "maxRequestAccessDuration": "PT3H"
+                        },
+                        {
+                          "number": 3389,
+                          "protocol": "*",
+                          "allowedSourceAddressPrefix": "*",
+                          "maxRequestAccessDuration": "PT3H"
+                        }
+                      ]
+                    }
+                  ],
+                  "requests": [],
+                  "provisioningState": "Succeeded",
+                  "appendMode": false
+                },
+                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/VV/providers/Microsoft.Security/locations/eastus/jitNetworkAccessPolicies/VVvm1",
+                "name": "VVvm1",
+                "type": "Microsoft.Security/locations/jitNetworkAccessPolicies",
+                "location": "eastus"
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

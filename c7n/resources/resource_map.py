@@ -279,6 +279,7 @@ ResourceMap = {
   "aws.ses-dedicated-ip-pool": "c7n.resources.ses.SESDedicatedIpPool",
   "aws.ses-email-identity": "c7n.resources.ses.SESEmailIdentity",
   "aws.ses-receipt-rule-set": "c7n.resources.ses.SESReceiptRuleSet",
+  "aws.ses-ingress-endpoint": "c7n.resources.ses.SESIngressEndpoint",
   "aws.shield-attack": "c7n.resources.shield.ShieldAttack",
   "aws.shield-protection": "c7n.resources.shield.ShieldProtection",
   "aws.simpledb": "c7n.resources.simpledb.SimpleDB",

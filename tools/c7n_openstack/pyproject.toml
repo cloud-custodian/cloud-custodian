@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "c7n_openstack"
-version = "0.1.32"
+version = "0.1.33"
 description = "Cloud Custodian - OpenStack Provider"
 readme = "readme.md"
 authors = ["Cloud Custodian Project"]

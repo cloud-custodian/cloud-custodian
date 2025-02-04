@@ -484,6 +484,31 @@ class TestWorkspacesWeb(BaseTest):
 
         self.assertEqual(len(resources), 1)
 
+    # Test for a portal that has disassociated and deleted its browser policy
+    # settings.
+    def test_workspaces_web_browser_policy_empty(self):
+        session_factory = self.replay_flight_data("test_workspaces_web_empty")
+        p = self.load_policy(
+            {
+                "name": "test-browser-policy-empty",
+                "resource": "workspaces-web",
+                "filters": [{
+                    "not": [
+                        {
+                            "type": "browser-policy",
+                            "key": "chromePolicies.AllowDeletingBrowserHistory.value",
+                            "op": "eq",
+                            "value": False
+                        }
+                    ]
+                }]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+
     def test_workspaces_web_subnet(self):
         session_factory = self.replay_flight_data("test_workspaces_web_subnet")
         p = self.load_policy(
