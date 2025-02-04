@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "c7n"
-version = "0.9.42"
+version = "0.9.43"
 description = "Cloud Custodian - Policy Rules Engine"
 authors = ["Cloud Custodian Project"]
 readme = "README.md"
@@ -32,6 +32,12 @@ pyyaml = ">=5.4.0"
 tabulate = "^0.9.0"
 docutils = ">=0.18, <0.19"
 
+# azure msal-extensions pins portalocker < 3, where as pytest-terraform has >= 1.7 to simplify
+# this should be fixed with the next release of https://github.com/AzureAD/microsoft-authentication-extensions-for-python/pull/138
+# this is technically a dev dep, but we'd have to add this block to several package pyproject.tomls for that to have effect. 
+portalocker = ">1,<3"
+
+
 # some issue in c7n_gcp libraries, possibly a bug in poetry, even with this specification
 # importlib-metadata = ">=6,<9"
 # we're picking up a release behind on 8.4 vs 8.5 and to avoid incompatible package installs,
@@ -48,6 +54,7 @@ urllib3 = "<2"
 referencing = "==0.35.1"
 
 [tool.poetry.group.dev.dependencies]
+
 ruff = ">=0.3,<0.6"
 docker = {extras = ["websockets"], version = "^7.1.0"}
 black = ">=23.1,<25.0"
