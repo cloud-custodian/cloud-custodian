@@ -42,7 +42,7 @@ def from_policy(directory, name_glob, output):
     ploader = loader.PolicyLoader(config.Config.empty())
     pdir = Path(directory)
     collections = []
-    for f in pdir.rglob("*.yaml"):
+    for f in pdir.rglob("*.y*ml"):
         collections.append(ploader.load_file(f))
     policies = functools.reduce(lambda x, y: x + y, collections)
     if name_glob:
