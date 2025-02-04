@@ -44,6 +44,9 @@ def from_policy(directory, name_glob, output):
     collections = []
     for f in pdir.rglob("*.y*ml"):
         collections.append(ploader.load_file(f))
+    if not collections:
+        print("No policies found")
+        return
     policies = functools.reduce(lambda x, y: x + y, collections)
     if name_glob:
         policies = policies.filter(name_glob)
