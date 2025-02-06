@@ -7,6 +7,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import re
 import math
+import sys
 
 from concurrent.futures import as_completed
 from datetime import timedelta, datetime
@@ -213,6 +214,7 @@ class UsageFilter(MetricsFilter):
         min_period = max(self.data.get('min_period', 300), self.cloudwatch_min_period)
 
         result = []
+        errors = []
 
         for r in resources:
             metric = r.get('UsageMetric')
@@ -233,20 +235,24 @@ class UsageFilter(MetricsFilter):
             period, metric_scale = self.scale_period(total_seconds, period, min_period)
 
             try:
-                res = client.get_metric_statistics(
-                    Namespace=metric['MetricNamespace'],
-                    MetricName=metric['MetricName'],
-                    Dimensions=self.get_dimensions(metric),
-                    Statistics=[stat],
-                    StartTime=start_time,
-                    EndTime=end_time,
-                    Period=period,
-                )
+                try:
+                    res = client.get_metric_statistics(
+                        Namespace=metric['MetricNamespace'],
+                        MetricName=metric['MetricName'],
+                        Dimensions=self.get_dimensions(metric),
+                        Statistics=[stat],
+                        StartTime=start_time,
+                        EndTime=end_time,
+                        Period=period,
+                    )
+                except Exception as e:
+                    raise Exception(
+                        f'failed to collect metric {metric["MetricName"]}'
+                        f' namespace {metric["MetricNamespace"]}'
+                        f' for service {r.get("ServiceCode")}') from e
             except Exception as e:
-                raise Exception(
-                    f'failed to collect metric {metric["MetricName"]}'
-                    f' namespace {metric["MetricNamespace"]}'
-                    f' for service {r.get("ServiceCode")}') from e
+                errors.append(e)
+                continue
 
             if res['Datapoints']:
                 if self.percentile_regex.match(stat):
@@ -274,6 +280,9 @@ class UsageFilter(MetricsFilter):
                         'metric_scale': metric_scale,
                     }
                     result.append(r)
+        if errors and sys.version_info.minor >= 11:
+            raise ExceptionGroup("usage-metric failure", tuple(errors))
+
         return result
 
 

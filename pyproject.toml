@@ -83,6 +83,7 @@ line-length = 100
 [tool.ruff]
 line-length = 100
 exclude = ["__init__.py"]
+target-version = "py311"
 
 [tool.ruff.lint]
 preview = true
