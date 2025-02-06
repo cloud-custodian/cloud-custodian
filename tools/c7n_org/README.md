@@ -228,9 +228,9 @@ Another enhancement for `c7n-org run-script` is to support a few vars in the scr
 The available vars are `account`, `account_id`, `region` and `output_dir`.
 
 ```shell
-c7n-org run-script -s . -c my-projects.yml gcp_check_{region}.sh
+c7n-org run-script -s . -c my-projects.yml "./gcp_check_{region}.sh"
 # or
-c7n-org run-script -s . -c my-projects.yml use_another_policy_result.sh {output_dir}
+c7n-org run-script -s . -c my-projects.yml './use_another_policy_result.sh "{output_dir}"'
 ```
 
 **Note:** Variable interpolation is sensitive to proper quoting and spacing,

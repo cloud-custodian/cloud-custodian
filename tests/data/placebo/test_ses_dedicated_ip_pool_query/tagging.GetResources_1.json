@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:ses:us-east-1:644160558196:dedicated-ip-pool/c7n-test",
+                "Tags": [
+                    {
+                        "Key": "Owner",
+                        "Value": "Zach"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

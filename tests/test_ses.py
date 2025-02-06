@@ -221,6 +221,28 @@ class SESV2Test(BaseTest):
         self.assertEqual(1, len(resources))
         self.assertEqual(resources[0]["IdentityName"], "c7n@t.com")
 
+    def test_ses_dedicated_ip_pool_query(self):
+        session_factory = self.replay_flight_data("test_ses_dedicated_ip_pool_query")
+        p = self.load_policy(
+            {
+                "name": "ses-dedicated-ip-pool-managed",
+                "resource": "ses-dedicated-ip-pool",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "ScalingMode",
+                        "value": "MANAGED"
+                    }
+                ]
+            }, session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        for r in resources:
+            self.assertTrue("ScalingMode" in r)
+            self.assertTrue(r["ScalingMode"] == "MANAGED")
+            self.assertTrue("Tags" in r)
+
     def test_ses_email_identity_cross_account(self):
         session_factory = self.replay_flight_data("test_ses_email_identity_cross_account")
         p = self.load_policy(
@@ -282,3 +304,79 @@ class SESV2Test(BaseTest):
             EmailIdentity=resources[0]["IdentityName"]
         )["Policies"].keys()
         assert list(policies) == []
+
+
+class SESIngressEndpointTest(BaseTest):
+
+    def test_ses_ingress_endpoint_tag_untag(self):
+        session_factory = self.replay_flight_data('test_ses_ingress_endpoint_tag_untag')
+        tag = {'env': 'dev'}
+        p = self.load_policy(
+            {
+                'name': 'ses-ingress-endpoint-tag-untag',
+                'resource': 'ses-ingress-endpoint',
+                'filters': [{
+                    'tag:team': 'policy'
+                }],
+                'actions': [{
+                    'type': 'tag',
+                    'tags': tag
+                },
+                {
+                    'type': 'remove-tag',
+                    'tags': ['team']
+                }]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+        client = session_factory().client("mailmanager")
+        tags = client.list_tags_for_resource(ResourceArn=resources[0]["IngressPointArn"])["Tags"]
+        self.assertEqual(1, len(tags))
+        new_tag = {}
+        new_tag[tags[0]['Key']] = tags[0]['Value']
+        self.assertEqual(tag, new_tag)
+
+    def test_delete_ingress_endpoint(self):
+        session_factory = self.replay_flight_data("test_delete_ingress_endpoint")
+        p = self.load_policy(
+            {
+                "name": "delete-ingress-endpoint",
+                "resource": "ses-ingress-endpoint",
+                "filters": [{"tag:env": "dev"}],
+                "actions": [{
+                                "type": "delete",
+                            }],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+        self.assertEqual(resources[0]["IngressPointName"], "test-ingress-endpoint")
+
+    def test_ingress_endpoint_rule_set(self):
+        session_factory = self.replay_flight_data("test_ingress_endpoint_rule_set")
+        p = self.load_policy(
+            {
+                "name": "ses-ingress-endpoint-rule-set",
+                "resource": "ses-ingress-endpoint",
+                "filters": [
+                        {
+                "type": "rule-set",
+                "attrs": [
+                    {
+                        "type": "value",
+                        "key": "length(Actions[]|[?Archive.\
+                            TargetArchive.Retention.RetentionPeriodInMonth > `5`])",
+                        "value": 1
+                    }
+                ]
+                        }
+                    ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+        self.assertEqual(resources[0]["IngressPointName"], "test-ingress-endpoint")

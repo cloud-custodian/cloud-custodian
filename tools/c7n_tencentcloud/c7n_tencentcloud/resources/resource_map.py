@@ -19,5 +19,6 @@ ResourceMap = {
     "tencentcloud.mysql": "c7n_tencentcloud.resources.mysql.MySQL",
     "tencentcloud.cos": "c7n_tencentcloud.resources.cos.COS",
     "tencentcloud.eip": "c7n_tencentcloud.resources.eip.EIP",
-    "tencentcloud.dns-record": "c7n_tencentcloud.resources.dns_record.DnsRecord"
+    "tencentcloud.dns-record": "c7n_tencentcloud.resources.dns_record.DnsRecord",
+    "tencentcloud.subnet": "c7n_tencentcloud.resources.subnet.Subnet"
 }

@@ -594,8 +594,6 @@ class PolicyMetaLint(BaseTest):
             'AWS::Transfer::Workflow',
             #
             # 'AWS::ApiGatewayV2::Stage',
-            'AWS::Athena::DataCatalog',
-            'AWS::Athena::WorkGroup',
             'AWS::AutoScaling::ScheduledAction',
             'AWS::Backup::BackupSelection',
             'AWS::Backup::RecoveryPoint',
@@ -656,9 +654,7 @@ class PolicyMetaLint(BaseTest):
             'AWS::Route53Resolver::ResolverRuleAssociation',
             'AWS::DMS::EventSubscription',
             'AWS::GlobalAccelerator::Accelerator',
-            'AWS::Athena::DataCatalog',
             'AWS::EC2::TransitGatewayAttachment',
-            'AWS::Athena::WorkGroup',
             'AWS::GlobalAccelerator::EndpointGroup',
             'AWS::GlobalAccelerator::Listener',
             'AWS::DMS::Certificate',
@@ -712,6 +708,7 @@ class PolicyMetaLint(BaseTest):
             'AWS::SageMaker::EndpointConfig',
             'AWS::DMS::ReplicationInstance',
             'AWS::DMS::ReplicationTask',
+            'AWS::SES::MailManagerIngressPoint',
         }
         bad_types = resource_config_types.difference(config_types)
         bad_types = bad_types.difference(invalid_ignore)
@@ -733,7 +730,7 @@ class PolicyMetaLint(BaseTest):
         empty = set()
         for k, v in manager.resources.items():
             if k in ('rest-account', 'account', 'codedeploy-deployment', 'sagemaker-cluster',
-                     'networkmanager-core', 'quicksight-account'):
+                     'networkmanager-core', 'quicksight-account', 'ses-dedicated-ip-pool'):
                 continue
             for rk, rv in v.resource_type.__dict__.items():
                 if rk[0].isalnum() and rv is None:
