@@ -140,10 +140,11 @@ class HasStatementFilter(Filter):
                                                         req_value,
                                                         resource_statement):
                             found += 1
-                    else:
-                        if (req_key in resource_statement) and \
-                            (req_value == resource_statement[req_key]):
+
+                    elif req_key in resource_statement:
+                        if (req_value == resource_statement[req_key]):
                             found += 1
+
                 if found and found == len(required_statement):
                     matched_statements.append(required_statement)
                     break
