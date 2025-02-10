@@ -164,15 +164,16 @@ class ModifyDiskTypeAction(AzureBaseAction):
     ]
 
     SUPPORTED_STATES = {
-        "Attached": {
+        "Attached": {   # Disks states for attached disks
             constants.DISK_STATE_ATTACHED,
             constants.DISK_STATE_ACTIVE_SAS_FROZEN,
             constants.DISK_STATE_FROZEN,
         },
+        # Disks states for unattached disks
         "Unattached": {constants.DISK_STATE_UNATTACHED, constants.DISK_STATE_RESERVED}
     }
-
-    SKIPPED_STATES = { # Disk states that not allowed to change from due to the VM state the disk is associated with.
+    # Disk states that not allowed to change from due to the VM state the disk is associated with.
+    SKIPPED_STATES = {
         constants.DISK_STATE_ACTIVE_SAS,
         constants.DISK_STATE_ACTIVE_UPLOAD,
         constants.DISK_STATE_READY_TO_UPLOAD,
