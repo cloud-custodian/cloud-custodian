@@ -98,18 +98,28 @@ class WAFTest(BaseTest):
             "resource": "aws.wafv2",
             "filters": [
                 {
-                    "not": [{
-                        "type": "web-acl-rules",
-                        "key": "Type",
-                        "value": "Standalone",
-                        "op": "eq"
-                    }]
+                    "type": "web-acl-rules",
+                    "attrs": [
+                        {
+                            "type": "value",
+                            "key": "Type",
+                            "value": "RuleGroup",
+                            "op": "eq"
+                        }
+                    ]
                 },
                 {
-                    "type": "web-acl-rules",
-                    "key": "Type",
-                    "value": "RuleGroup",
-                    "op": "in"
+                    "not": [{
+                        "type": "web-acl-rules",
+                        "attrs": [
+                            {
+                                "type": "value",
+                                "key": "Type",
+                                "value": "Standalone",
+                                "op": "eq"
+                            }
+                        ]
+                    }]
                 }
             ],
         }
@@ -119,7 +129,6 @@ class WAFTest(BaseTest):
                              config={"region": "us-east-1"})
 
         resources = p.run()
-
         self.assertEqual(len(resources), 1, f"Expected 1 resource, got {len(resources)}")
 
     def test_wafv2_standalone_rules(self):
@@ -128,20 +137,60 @@ class WAFTest(BaseTest):
         policy = {
             "name": "test_wafv2_standalone_rules",
             "resource": "aws.wafv2",
-            "filters": [{
-                "or": [
-                    {
-                        "and": [
+            "filters": [
+                {
+                    "type": "web-acl-rules",
+                    "attrs": [
+                        {
+                            "type": "value",
+                            "key": "Type",
+                            "value": "Standalone",
+                            "op": "eq"
+                        }
+                    ]
+                },
+                {
+                    "not": [{
+                        "type": "web-acl-rules",
+                        "attrs": [
                             {
-                                "type": "web-acl-rules",
+                                "type": "value",
                                 "key": "Type",
-                                "value": "Standalone",
+                                "value": "RuleGroup",
                                 "op": "eq"
                             }
                         ]
-                    }
-                ]
-            }]
+                    }]
+                }
+            ]
+        }
+
+        p = self.load_policy(policy,
+                             session_factory=session_factory,
+                             config={"region": "us-east-1"})
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1, f"Expected 1 resource, got {len(resources)}")
+
+    def test_wafv2_any_standalone_rules(self):
+        session_factory = self.replay_flight_data("test_wafv2_any_standalone_rules")
+
+        policy = {
+            "name": "test_wafv2_any_standalone_rules",
+            "resource": "aws.wafv2",
+            "filters": [
+                {
+                    "type": "web-acl-rules",
+                    "attrs": [
+                        {
+                            "type": "value",
+                            "key": "Type",
+                            "value": "Standalone",
+                            "op": "eq"
+                        }
+                    ]
+                }
+            ]
         }
 
         p = self.load_policy(policy,
