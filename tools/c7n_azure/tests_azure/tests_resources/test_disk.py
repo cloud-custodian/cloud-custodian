@@ -542,7 +542,6 @@ class ModifyDiskTypeTests(BaseTest):
             if exceptions:
                 self.action.manager.log.error(f"Exceptions occurred: {exceptions}")
 
-        # ✅ Assert that the expected log message is captured
         self.assertIn("Exceptions occurred: ['Mock Exception 1', 'Mock Exception 2']", cm.output[0])
 
     # --- TESTING LOGGING ON SKIPPED STATES --- #
