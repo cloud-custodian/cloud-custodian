@@ -4265,3 +4265,38 @@ def test_vpc_delete(test, vpc_delete):
         "Vpcs"
     ]
     test.assertFalse(vpcs)
+
+@terraform("eip_shield_sync", replay=False) # remove the replay once I do it once.
+def test_eip_shield_sync(test, eip_shield_sync):
+    session_factory = test.record_flight_data("test_eip_shield")
+
+    # session_factory = self.replay_flight_data("test_eip_shield")
+
+    shield_client = session_factory().client("shield")
+
+    p = test.load_policy(
+        {
+            "name": "eip-shield",
+            "resource": "network-addr",
+            "filters": [
+                {"type": "shield-enabled", "state": False},
+            ],
+            "actions": [{
+                "type": "set-shield",
+                "state": True,
+                "sync": True
+            }],
+        },
+        session_factory=session_factory,
+    )
+
+    resources = p.run()
+    # make sure that our unprotected EIP is now shield protected
+    test.assertEqual(len(resources), 1)
+
+    # ensure that there are now 2 EIPs that are shield protected
+    protections = shield_client.list_protections()
+    test.assertEqual(len(protections["Protections"]), 2)
+    for protection in protections:
+        protection_info = shield_client.describe_protection(ProtectionId=protection["ProtectionId"])
+        print(protection_info)
