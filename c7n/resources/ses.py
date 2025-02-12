@@ -342,6 +342,34 @@ class Delete(Action):
             )
 
 
+class DescribeDedicatedIpPool(DescribeSource):
+
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('sesv2')
+        resource_list = []
+        for r in resources:
+            details = client.get_dedicated_ip_pool(PoolName=r)
+            resource_list.append(details["DedicatedIpPool"])
+        return universal_augment(self.manager, resource_list)
+
+
+@resources.register('ses-dedicated-ip-pool')
+class SESDedicatedIpPool(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = 'sesv2'
+        enum_spec = ('list_dedicated_ip_pools', 'DedicatedIpPools', None)
+        name = id = 'PoolName'
+        arn_type = 'dedicated-ip-pool'
+        universal_taggable = object()
+        config_type = None
+        permission_prefix = 'ses'
+        permissions_augment = ("ses:ListTagsForResource",)
+
+    source_mapping = {
+        'describe': DescribeDedicatedIpPool
+    }
+
+
 @resources.register('ses-ingress-endpoint')
 class SESIngressEndpoint(QueryResourceManager):
     class resource_type(TypeInfo):

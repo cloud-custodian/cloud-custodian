@@ -276,6 +276,7 @@ ResourceMap = {
   "aws.service-quota-request": "c7n.resources.quotas.ServiceQuotaRequest",
   "aws.ses-configuration-set": "c7n.resources.ses.SESConfigurationSet",
   "aws.ses-configuration-set-v2": "c7n.resources.ses.SESConfigurationSetV2",
+  "aws.ses-dedicated-ip-pool": "c7n.resources.ses.SESDedicatedIpPool",
   "aws.ses-email-identity": "c7n.resources.ses.SESEmailIdentity",
   "aws.ses-receipt-rule-set": "c7n.resources.ses.SESReceiptRuleSet",
   "aws.ses-ingress-endpoint": "c7n.resources.ses.SESIngressEndpoint",
