@@ -8,7 +8,7 @@ from c7n.tags import Tag, RemoveTag
 from c7n.actions import BaseAction
 
 
-class PmtcryptAppJobDescribe(query.DescribeSource):
+class PmtcryptKeyDescribe(query.DescribeSource):
     def augment(self, pmt_crypt_keys):
         client = local_session(self.manager.session_factory).client('payment-cryptography')
         for r in pmt_crypt_keys:
@@ -17,8 +17,8 @@ class PmtcryptAppJobDescribe(query.DescribeSource):
         return pmt_crypt_keys
 
 
-@resources.register('payment-cryptography')
-class PmtcryptApp(query.QueryResourceManager):
+@resources.register('payment-cryptography-key')
+class PmtcryptKey(query.QueryResourceManager):
 
     class resource_type(query.TypeInfo):
         service = 'payment-cryptography'
@@ -30,11 +30,11 @@ class PmtcryptApp(query.QueryResourceManager):
             'get_key', 'KeyIdentifier',
             'KeyArn', 'Key')
 
-    source_mapping = {"describe": PmtcryptAppJobDescribe, }
+    source_mapping = {"describe": PmtcryptKeyDescribe, }
 
 
-@PmtcryptApp.action_registry.register('tag')
-class PmtcryptTag(Tag):
+@PmtcryptKey.action_registry.register('tag')
+class PmtcryptKeyTag(Tag):
     """Action to tag a payment-cryptography-key"""
 
     batch_size = 1
@@ -45,8 +45,8 @@ class PmtcryptTag(Tag):
             self.manager.retry(client.tag_resource, ResourceArn=r["KeyArn"], Tags=tags)
 
 
-@PmtcryptApp.action_registry.register('remove-tag')
-class PmtcryptRemoveTag(RemoveTag):
+@PmtcryptKey.action_registry.register('remove-tag')
+class PmtcryptKeyRemoveTag(RemoveTag):
     """Action to remove tag(s) from a payment-cryptography-key"""
 
     batch_size = 1
@@ -58,8 +58,8 @@ class PmtcryptRemoveTag(RemoveTag):
                 client.untag_resource, ResourceArn=r["KeyArn"], TagKeys=tags)
 
 
-@PmtcryptApp.action_registry.register('delete')
-class PmtcryptDelete(BaseAction):
+@PmtcryptKey.action_registry.register('delete')
+class PmtcryptKeyDelete(BaseAction):
     """Action to delete a payment-cryptography-key
     :example
 
@@ -67,14 +67,13 @@ class PmtcryptDelete(BaseAction):
 
             policies:
                 - name: payment-crpytography-delete
-                  resource: payment-cryptography
+                  resource: payment-cryptography-key
                   filters:
                     - "tag:custodian_cleanup": present
                   actions:
                     - delete
     """
 
-    batch_size = 1
     schema = type_schema('delete')
     permissions = ('payment-cryptography:DeleteKey',)
 

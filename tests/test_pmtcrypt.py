@@ -11,7 +11,7 @@ class PmtcryptTest(BaseTest):
         p = self.load_policy(
             {
                 "name": "tag-payment-cryptography",
-                "resource": "payment-cryptography",
+                "resource": "payment-cryptography-key",
                 "actions": [
                     {"type": "tag", "key": "Department", "value": "International"},
                 ]
@@ -32,7 +32,7 @@ class PmtcryptTest(BaseTest):
         p = self.load_policy(
             {
                 "name": "remove-tag-payment-cryptography",
-                "resource": "payment-cryptography",
+                "resource": "payment-cryptography-key",
                 "actions": [{"type": "remove-tag", "tags": ["ResourceOwner"]}],
             },
             session_factory=session_factory,
@@ -51,7 +51,7 @@ class PmtcryptTest(BaseTest):
         p = self.load_policy(
             {
                 "name": "delete-payment-cryptography",
-                "resource": "payment-cryptography",
+                "resource": "payment-cryptography-key",
                 "filters": [{"tag:Department": "International"}],
                 "actions": [{"type": "delete"}],
             },
