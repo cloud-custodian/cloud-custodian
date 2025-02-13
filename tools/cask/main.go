@@ -31,7 +31,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
@@ -39,6 +38,8 @@ import (
 	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/mattn/go-isatty"
 	"github.com/thoas/go-funk"
+
+	image_types "github.com/docker/docker/api/types/image"
 )
 
 const containerHome string = "/home/custodian/"
@@ -98,7 +99,7 @@ func update(ctx context.Context, image string, dockerClient *client.Client) {
 		listFilters := filters.NewArgs()
 		listFilters.Add("reference", defaultImageName)
 
-		listOptions := types.ImageListOptions{
+		listOptions := image_types.ListOptions{
 			All:     true,
 			Filters: listFilters,
 		}
@@ -115,7 +116,8 @@ func update(ctx context.Context, image string, dockerClient *client.Client) {
 	}
 
 	// Pull the image
-	out, err := dockerClient.ImagePull(ctx, image, types.ImagePullOptions{})
+
+	out, err := dockerClient.ImagePull(ctx, image, image_types.PullOptions{})
 	if err != nil {
 		log.Printf("Image Pull failed, will use cached image if available. %v", err)
 	} else {
@@ -170,13 +172,13 @@ func create(ctx context.Context, image string, dockerClient *client.Client) stri
 // Copy log output to stdout and stderr.
 func run(ctx context.Context, id string, dockerClient *client.Client) {
 	// Docker Run
-	err := dockerClient.ContainerStart(ctx, id, types.ContainerStartOptions{})
+	err := dockerClient.ContainerStart(ctx, id, container.StartOptions{})
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// Output
-	out, err := dockerClient.ContainerLogs(ctx, id, types.ContainerLogsOptions{ShowStdout: true, ShowStderr: true, Follow: true})
+	out, err := dockerClient.ContainerLogs(ctx, id, container.LogsOptions{ShowStdout: true, ShowStderr: true, Follow: true})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -187,7 +189,7 @@ func run(ctx context.Context, id string, dockerClient *client.Client) {
 	}
 
 	err = dockerClient.ContainerRemove(
-		ctx, id, types.ContainerRemoveOptions{RemoveVolumes: true})
+		ctx, id, container.RemoveOptions{RemoveVolumes: true})
 	if err != nil {
 		log.Fatal(err)
 	}
