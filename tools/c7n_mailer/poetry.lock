@@ -978,19 +978,20 @@ typing-extensions = ">=4.6.0"
 
 [[package]]
 name = "azure-mgmt-redis"
-version = "12.0.0"
+version = "14.5.0"
 description = "Microsoft Azure Redis Cache Management Client Library for Python"
 optional = true
-python-versions = "*"
+python-versions = ">=3.8"
 files = [
-    {file = "azure-mgmt-redis-12.0.0.zip", hash = "sha256:8ae563e3df82a2f206d0483ae6f05d93d0d1835111c0bbca7236932521eed356"},
-    {file = "azure_mgmt_redis-12.0.0-py2.py3-none-any.whl", hash = "sha256:5f1a559ab6d342a4b476d80830086435161f5739bc2a5c2ee564ee0668ee974e"},
+    {file = "azure_mgmt_redis-14.5.0-py3-none-any.whl", hash = "sha256:d98fe771a4478920bc520687ae158eb3c0e68faa073e5a27c2b6c65898572028"},
+    {file = "azure_mgmt_redis-14.5.0.tar.gz", hash = "sha256:5c3434c82492688e25b93aaf5113ecff0b92b7ad6da2a4fd4695530f82b152fa"},
 ]
 
 [package.dependencies]
-azure-common = ">=1.1,<2.0"
-azure-mgmt-core = ">=1.2.0,<2.0.0"
-msrest = ">=0.5.0"
+azure-common = ">=1.1"
+azure-mgmt-core = ">=1.3.2"
+isodate = ">=0.6.1"
+typing-extensions = ">=4.6.0"
 
 [[package]]
 name = "azure-mgmt-resource"
@@ -1497,7 +1498,7 @@ azure-mgmt-rdbms = "10.2.0b17"
 azure-mgmt-recoveryservices = "^2.4.0"
 azure-mgmt-recoveryservicesbackup = "^7.0.0"
 azure-mgmt-redhatopenshift = "^1.2.0"
-azure-mgmt-redis = "^12.0.0"
+azure-mgmt-redis = "^14.5.0"
 azure-mgmt-resource = "^16.0.0"
 azure-mgmt-resourcegraph = "^7.0.0"
 azure-mgmt-search = "^8.0.0"
