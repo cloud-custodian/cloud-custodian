@@ -2621,6 +2621,13 @@ class UserDelete(BaseAction):
 class UserRemoveAccessKey(BaseAction):
     """Delete or disable user's access keys.
 
+    NOTE: This does not work well if an IAM user has more than one access key which may
+    show X resources in a dry-run but may impact Y resources in a non-dry-run. It's
+    strongly recommended to use this carefully and start with a notify action and
+    confirm each action prior to allowing it.
+
+    See [issue 5583](https://github.com/cloud-custodian/cloud-custodian/issues/5583).
+
     For example if we wanted to disable keys after 90 days of non-use and
     delete them after 180 days of nonuse:
 
