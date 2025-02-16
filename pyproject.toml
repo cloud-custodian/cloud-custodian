@@ -22,8 +22,8 @@ classifiers=[
 custodian = 'c7n.cli:main'
 
 [tool.poetry.dependencies]
-cryptography = "<46"
-python = "^3.8"
+python = ">=3.9,<4.0.0"
+cryptography = ">=44"
 boto3 = "^1.12.31"
 jsonschema = ">=4.18"
 argcomplete = ">=1.12.3"
