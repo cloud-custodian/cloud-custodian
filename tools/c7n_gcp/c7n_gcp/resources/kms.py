@@ -189,10 +189,6 @@ class KmsCryptoKeyVersion(ChildResourceManager):
         def _get_location(cls, resource):
             return resource["name"].split('/')[3]
 
-        @classmethod
-        def _get_location(cls, resource):
-            return resource["name"].split('/')[3]
-
 
 @resources.register('kms-location')
 class KmsLocation(QueryResourceManager):
