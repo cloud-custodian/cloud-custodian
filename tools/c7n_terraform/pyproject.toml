@@ -14,7 +14,7 @@ classifiers = [
    "Topic :: System :: Distributed Computing"]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = ">=3.9.2,<4.0.0"
 c7n = {path = "../..", develop = true}
 
 click = "^8.0"

@@ -22,7 +22,7 @@ classifiers=[
 custodian = 'c7n.cli:main'
 
 [tool.poetry.dependencies]
-python = ">=3.9,<4.0.0"
+python = ">=3.9.2,<4.0.0"
 cryptography = ">=44"
 boto3 = "^1.12.31"
 jsonschema = ">=4.18"

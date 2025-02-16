@@ -15,7 +15,7 @@ classifiers=[
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.9,<4.0.0"
+python = ">=3.9.2,<4.0.0"
 c7n = {path = "../..", develop = true}
 
 azure-mgmt-authorization = "^1.0.0"

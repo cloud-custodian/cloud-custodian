@@ -18,7 +18,7 @@ readme = "README.md"
 c7n-sphinxext = 'c7n_sphinxext.docgen:main'
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = ">=3.9.2,<4.0.0"
 c7n = {path = "../..", develop = true}
 
 Sphinx = "^7.0"
