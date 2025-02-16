@@ -102,7 +102,7 @@ class ModifyDiskTypeAction(AzureBaseAction):
 
        - Some SKUs may incur different costs and performance implications.
 
-        Check Azure documentationfor details.
+        Check Azure documentation for details.
 
     **Examples**
 
