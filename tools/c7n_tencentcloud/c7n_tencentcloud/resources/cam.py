@@ -83,7 +83,7 @@ class User(QueryResourceManager):
         for item in resources:
             fm = self.resource_type.datetime_fields_format["CreateTime"]
             item["CreateTime"] = isoformat_datetime_str(item["CreateTime"], fm[0], fm[1])
-        return resources
+        return self.source.get_resource_tag(resources)
 
 
 @User.filter_registry.register('group')
@@ -418,6 +418,9 @@ class Policy(QueryResourceManager):
                     for idx, act in enumerate(s["action"]):
                         if act == "*":
                             s["action"][idx] = "*:*"
+
+    def augment(self, resources):
+        return resources
 
 
 @Policy.filter_registry.register('has-allow-all')
