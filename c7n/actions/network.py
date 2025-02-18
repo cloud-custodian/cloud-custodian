@@ -279,12 +279,6 @@ class ModifyVpcSecurityGroupsAction(Action):
             if not rgroups:
                 rgroups = list(isolation_groups)
 
-            if len(rgroups) > 5:
-                raise PolicyExecutionError(self._format_error(
-                    "policy:{policy} - the number of security groups exceeds 5. "
-                    "groups: {rgroups}",
-                    rgroups=rgroups))
-
             return_groups.append(rgroups)
 
         return return_groups
