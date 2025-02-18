@@ -8,7 +8,7 @@ to ec2 (subnets, vpc, security-groups, volumes, instances,
 snapshots) and resources that support Amazon's Resource Groups Tagging API
 
 """
-from collections import Counter
+from collections import Counter, defaultdict
 from concurrent.futures import as_completed
 
 from datetime import datetime, timedelta
@@ -404,14 +404,18 @@ class Tag(Action):
         if msg:
             tags.append({'Key': tag, 'Value': msg})
 
-        self.interpolate_values(tags)
+        tags = self.interpolate_values(tags, resources)
+        tag_batch = defaultdict(list)
+        for (k, v), resource_set in tags.items():
+            tag_batch[tuple(resource_set)].append({'Key': k, 'Value': v})
 
         batch_size = self.data.get('batch_size', self.batch_size)
 
         client = self.get_client()
-        _common_tag_processer(
-            self.executor_factory, batch_size, self.concurrency, client,
-            self.process_resource_set, self.id_key, resources, tags, self.log)
+        for tag_batch, tags in tag_batch.items():
+            _common_tag_processer(
+                self.executor_factory, batch_size, self.concurrency, client,
+                self.process_resource_set, self.id_key, resources, tags, self.log)
 
     def process_resource_set(self, client, resource_set, tags):
         mid = self.manager.get_model().id
@@ -421,20 +425,28 @@ class Tag(Action):
             Tags=tags,
             DryRun=self.manager.config.dryrun)
 
-    def interpolate_single_value(self, tag):
+    def interpolate_single_value(self, tag, resource):
         """Interpolate in a single tag value.
         """
         params = {
+            'resource': utils.FormatResource(resource),
             'account_id': self.manager.config.account_id,
             'now': utils.FormatDate.utcnow(),
             'region': self.manager.config.region}
         return str(tag).format(**params)
 
-    def interpolate_values(self, tags):
+    def interpolate_values(self, tags, resources):
         """Interpolate in a list of tags - 'old' ec2 format
         """
-        for t in tags:
-            t['Value'] = self.interpolate_single_value(t['Value'])
+        resolved_tags = defaultdict(list)
+
+        for r in resources:
+            for t in tags:
+                resolved_tags[t['Key'], self.interpolate_single_value(t['Value'], r)].append(
+                    r[self.manager.get_model().id]
+                )
+
+        return resolved_tags
 
     def get_client(self):
         return utils.local_session(self.manager.session_factory).client(
@@ -863,25 +875,36 @@ class UniversalTag(Tag):
         if msg:
             tags[tag] = msg
 
-        self.interpolate_values(tags)
+        tags = self.interpolate_values(tags, resources)
+        tag_batch = defaultdict(dict)
+        for (k, v), resource_set in tags.items():
+            tag_batch[tuple(resource_set)][k] = v
 
         batch_size = self.data.get('batch_size', self.batch_size)
-        client = self.get_client()
 
-        _common_tag_processer(
-            self.executor_factory, batch_size, self.concurrency, client,
-            self.process_resource_set, self.id_key, resources, tags, self.log)
+        client = self.get_client()
+        for tag_batch, tags in tag_batch.items():
+            _common_tag_processer(
+                self.executor_factory, batch_size, self.concurrency, client,
+                self.process_resource_set, self.id_key, resources, tags, self.log)
 
     def process_resource_set(self, client, resource_set, tags):
         arns = self.manager.get_arns(resource_set)
         return universal_retry(
             client.tag_resources, ResourceARNList=arns, Tags=tags)
 
-    def interpolate_values(self, tags):
+    def interpolate_values(self, tags, resources):
         """Interpolate in a list of tags - 'new' resourcegroupstaggingapi format
         """
-        for key in list(tags.keys()):
-            tags[key] = self.interpolate_single_value(tags[key])
+        resolved_tags = defaultdict(list)
+
+        for r in resources:
+            for key in list(tags.keys()):
+                resolved_tags[key, self.interpolate_single_value(tags[key], r)].append(
+                    r[self.manager.get_model().id]
+                )
+
+        return resolved_tags
 
     def get_client(self):
         # For global resources, manage tags from us-east-1
