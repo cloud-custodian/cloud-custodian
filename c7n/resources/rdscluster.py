@@ -21,6 +21,7 @@ from c7n.utils import (
 
 from c7n.resources.rds import ParameterFilter
 from c7n.filters.backup import ConsecutiveAwsBackupsFilter
+from c7n.resources.rdsparamgroup import PGClusterModify
 
 log = logging.getLogger('custodian.rds-cluster')
 
@@ -763,3 +764,71 @@ class PendingMaintenance(Filter):
                 results.append(r)
 
         return results
+
+
+@RDSCluster.action_registry.register('modify-cluster-pg')
+class ModifyRDSParamGroup(PGClusterModify):
+    """Action to modify a RDS cluster parameter group
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: rds-modify-cluster-param-group
+                resource: rds-cluster
+                filters:
+                  - type: db-cluster-parameter
+                    key: someparam
+                    op: eq
+                    value: someval
+                actions:
+                  - type: modify-cluster-pg
+                    params:
+                      - name: max_connections
+                        value: 1000
+    """
+
+    schema = type_schema(
+        'modify-cluster-pg',
+        **{
+            'required': ['params'],
+            'params': {
+                'type': 'array',
+                'items': {
+                    'type': 'object',
+                    'required': ['name', 'value'],
+                    'name': {'type': 'string'},
+                    'value': {'type': 'string'},
+                    'apply-method': {'type': 'string', 'enum': ['immediate', 'pending-reboot']}
+                },
+            },
+        }
+    )
+    permissions = ('rds:ModifyDBClusterParameterGroup',)
+
+    def process(self, clusters):
+        client = local_session(self.manager.session_factory).client('rds')
+
+        params = []
+        for param in self.data.get('params', []):
+            params.append({
+                'ParameterName': param['name'],
+                'ParameterValue': param['value'],
+                'ApplyMethod': param.get('apply-method', 'immediate'),
+            })
+
+        for cluster in clusters:
+            pgname = cluster.get('DBClusterParameterGroup')
+            cur_params = self.get_current_params(client, pgname)
+            changed_params = []
+            for param in params:
+                param_name = param['ParameterName']
+                if (param_name not in cur_params or
+                   cur_params[param_name]['ParameterValue'] != param['ParameterValue']):
+                    changed_params.append(param)
+            for param_set in chunks(changed_params, 5):
+                self.do_modify(client, pgname, param_set)
+
+            self.log.info('Modified RDS Cluster param group %s (%i params changed, %i unchanged)',
+                          pgname, len(changed_params), len(params) - len(changed_params))
