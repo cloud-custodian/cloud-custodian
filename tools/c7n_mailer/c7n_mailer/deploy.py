@@ -51,6 +51,14 @@ CORE_DEPS = [
     "sendgrid",
     "python_http_client",
     "ellipticcurve",
+    # jira dependencies
+    "jira",
+    "defusedxml",
+    "oauthlib",
+    "packaging",
+    "requests_oauthlib",
+    "requests_toolbelt",
+    "typing_extensions",
 ]
 
 
