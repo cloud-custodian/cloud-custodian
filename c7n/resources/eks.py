@@ -4,6 +4,7 @@ import c7n.filters.vpc as net_filters
 from c7n.actions import Action
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter
 from c7n.manager import resources
+from c7n.schema import ExpandedSchemaMeta
 from c7n import tags, query
 from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, \
     ChildResourceManager, ChildDescribeSource
@@ -169,31 +170,24 @@ class EKSRemoveTag(tags.RemoveTag):
 
 
 @EKS.action_registry.register('update-config')
-class UpdateConfig(Action):
+class UpdateConfig(Action, metaclass=ExpandedSchemaMeta):
 
-    schema = {
-        'type': 'object',
-        'additionalProperties': False,
-        'oneOf': [
+    schema = type_schema('update-config', **{'oneOf': [
             {'required': ['type', 'logging']},
             {'required': ['type', 'resourcesVpcConfig']},
-            {'required': ['type', 'logging', 'resourcesVpcConfig']}],
-        'properties': {
-            'type': {'enum': ['update-config']},
-            'logging': {'type': 'object'},
-            'resourcesVpcConfig': {'type': 'object'}
-        }
-    }
+            {'required': ['type', 'logging', 'resourcesVpcConfig']}]})
 
     permissions = ('eks:UpdateClusterConfig',)
-    shape = 'UpdateClusterConfigRequest'
+    resource_id_param = 'name'
+    shape_name = 'UpdateClusterConfigRequest'
+    service = 'eks'
 
     def validate(self):
         cfg = dict(self.data)
         cfg['name'] = 'validate'
         cfg.pop('type')
         return shape_validate(
-            cfg, self.shape, self.manager.resource_type.service)
+            cfg, self.shape_name, self.manager.resource_type.service)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('eks')
