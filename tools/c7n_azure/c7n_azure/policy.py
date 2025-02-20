@@ -315,49 +315,47 @@ class AzureModeCommon:
     def run_for_event(policy, event=None):
         s = time.time()
 
-        with policy.ctx:
-            resources = policy.resource_manager.get_resources(
-                [AzureModeCommon.extract_resource_id(policy, event)])
+        resources = policy.resource_manager.get_resources(
+            [AzureModeCommon.extract_resource_id(policy, event)]
+        )
 
-            resources = policy.resource_manager.filter_resources(
-                resources, event)
+        resources = policy.resource_manager.filter_resources(resources, event)
+
+        if not resources:
+            policy.log.info(
+                "policy: %s resources: %s no resources found" % (policy.name, policy.resource_type)
+            )
+            return
 
         with policy.ctx as ctx:
             rt = time.time() - s
 
             ctx.metrics.put_metric(
-                'ResourceCount', len(resources), 'Count', Scope="Policy",
-                buffer=False)
-            ctx.metrics.put_metric(
-                "ResourceTime", rt, "Seconds", Scope="Policy")
-            ctx.output.write_file(
-                'resources.json', utils.dumps(resources, indent=2))
-
-            if not resources:
-                policy.log.info(
-                    "policy: %s resources: %s no resources found" % (
-                        policy.name, policy.resource_type))
-                return
+                'ResourceCount', len(resources), 'Count', Scope="Policy", buffer=False
+            )
+            ctx.metrics.put_metric("ResourceTime", rt, "Seconds", Scope="Policy")
+            ctx.output.write_file('resources.json', utils.dumps(resources, indent=2))
 
             at = time.time()
             for action in policy.resource_manager.actions:
                 policy.log.info(
                     "policy: %s invoking action: %s resources: %d",
-                    policy.name, action.name, len(resources))
+                    policy.name,
+                    action.name,
+                    len(resources),
+                )
                 with ctx.tracer.subsegment('action:%s' % action.type):
                     if isinstance(action, EventAction):
                         results = action.process(resources, event)
                     else:
                         results = action.process(resources)
                 try:
-                    ctx.output.write_file(
-                        "action-%s" % action.name, utils.dumps(results))
+                    ctx.output.write_file("action-%s" % action.name, utils.dumps(results))
                 except (TypeError, OverflowError):
                     pass
 
-        policy.ctx.metrics.put_metric(
-            "ActionTime", time.time() - at, "Seconds", Scope="Policy")
-        return resources
+            ctx.metrics.put_metric("ActionTime", time.time() - at, "Seconds", Scope="Policy")
+            return resources
 
 
 @execution.register(FUNCTION_TIME_TRIGGER_MODE)
