@@ -116,12 +116,12 @@ class FunctionModeImpl(FunctionMode):
         if not resources:
             return
 
-        resources = self.policy.resource_manager.filter_resources(
-            resources, event)
+        resources = self.policy.resource_manager.filter_resources(resources, event)
 
         if not resources:
             self.policy.log.info(
-                "policy: %s resources: %s no resources found" % (self.policy.name, self.policy.resource_type)
+                "policy: %s resources: %s no resources found"
+                % (self.policy.name, self.policy.resource_type)
             )
             return
         rt = time.time() - s
@@ -130,8 +130,8 @@ class FunctionModeImpl(FunctionMode):
             self.policy.log.info("Filtered resources %d" % len(resources))
 
             ctx.metrics.put_metric(
-            'ResourceCount', len(resources), 'Count', Scope="Policy",
-            buffer=False)
+                'ResourceCount', len(resources), 'Count', Scope="Policy", buffer=False
+            )
             ctx.metrics.put_metric("ResourceTime", rt, "Seconds", Scope="Policy")
             ctx.output.write_file('resources.json', utils.dumps(resources, indent=2))
 
