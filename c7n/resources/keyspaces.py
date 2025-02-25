@@ -1,6 +1,7 @@
+from c7n.actions import BaseAction
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
-from c7n.actions import BaseAction
+from c7n.resources.aws import shape_schema
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 from c7n.utils import get_retry, local_session, type_schema
 
@@ -109,30 +110,36 @@ class RemoveTagKeyspace(RemoveTag):
 
 @Keyspace.action_registry.register('update')
 class UpdateKeyspace(BaseAction):
+    # schema = type_schema(
+    #     'update',
+    #     required=['replicationSpecification'],
+    #     replicationSpecification={
+    #         'type': 'object',
+    #         'additionalProperties': False,
+    #         'properties': {
+    #             'required': ['replicationStrategy'],
+    #             'replicationStrategy': {'type': {'enum': ['SINGLE_REGION', 'MULTI_REGION']}},
+    #             'regionList': {
+    #                 'type': 'array',
+    #                 'items': {
+    #                     'type': 'string',
+    #                 }
+    #             }
+    #         }
+    #     },
+    #     clientSideTimestamps={
+    #         'type': 'object',
+    #         'additionalProperties': False,
+    #         'properties': {
+    #             'status': {'type': {'enum': ['ENABLED', 'DISABLED']}}
+    #         }
+    #     }
+    # )
+    import pdb; pdb.set_trace()
     schema = type_schema(
-        'update',
-        required=['replicationSpecification'],
-        replicationSpecification={
-            'type': 'object',
-            'additionalProperties': False,
-            'properties': {
-                'required': ['replicationStrategy'],
-                'replicationStrategy': {'type': {'enum': ['SINGLE_REGION', 'MULTI_REGION']}},
-                'regionList': {
-                    'type': 'array',
-                    'items': {
-                        'type': 'string',
-                    }
-                }
-            }
-        },
-        clientSideTimestamps={
-            'type': 'object',
-            'additionalProperties': False,
-            'properties': {
-                'status': {'type': {'enum': ['ENABLED', 'DISABLED']}}
-            }
-        }
+        'update', 
+        **shape_schema('keyspaces', 'UpdateKeyspaceRequest', drop_fields=('keyspaceName')),
+        required=['replicationSpecification'], 
     )
     permissions = ('keyspaces:UpdateKeyspace',)
 
