@@ -207,6 +207,7 @@ ResourceMap = {
   "aws.org-policy": "c7n.resources.org.OrgPolicy",
   "aws.org-unit": "c7n.resources.org.OrgUnit",
   "aws.origin-access-control": "c7n.resources.cloudfront.OriginAccessControl",
+  "aws.payment-cryptography-key": "c7n.resources.pmtcrypt.PmtcryptKey",
   "aws.peering-connection": "c7n.resources.vpc.PeeringConnection",
   "aws.pinpoint-app": "c7n.resources.pinpoint.PinpointApp",
   "aws.prefix-list": "c7n.resources.vpc.PrefixList",

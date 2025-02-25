@@ -874,3 +874,58 @@ def get_service_region_map(regions, resource_types, provider='aws'):
             service_region_map.setdefault(s, []).extend(
                 session.get_available_regions(s, partition_name=partition))
     return service_region_map, resource_service_map
+
+
+def shape_schema(service, shape_name, drop_fields=()):
+    """Expand a shape's schema using service model shape data
+
+        Repurpose some of the shape discovery/validation logic in
+        c7n.resources.aws.shape_validate() to dynamically expand
+        element schema using the latest service model shape information.
+
+        Include available properties, their types, and enumerations of
+        possible values where available.
+
+        Args:
+            service (str): The AWS service for the element. (required)
+            shape_name (str): The service model request shape name. (required)
+            drop_fields (Tuple[str]): List of fields to drop from the schema
+                (e.g. resource_id param).
+     """
+
+    TYPE_MAP = {
+        'string': 'string',
+        'structure': 'object',
+        'list': 'array',
+        'integer': 'integer',
+        'boolean': 'boolean',
+    }
+
+    def _expand_shape_schema(shape):
+        schema = {}
+        for member, member_shape in shape.members.items():
+            if member in drop_fields:
+                continue
+            member_schema = {'type': TYPE_MAP.get(member_shape.type_name)}
+            if enum := getattr(member_shape, 'enum', None):
+                member_schema['enum'] = enum
+            if member_shape.type_name == 'structure':
+                member_schema["properties"] = _expand_shape_schema(member_shape)
+            elif member_shape.type_name == 'list':
+                if member_shape.member.type_name == 'structure':
+                    member_schema["items"] = {
+                        'type': 'object',
+                        'properties': _expand_shape_schema(member_shape.member)
+                    }
+                else:
+                    member_schema["items"] = {
+                        'type': TYPE_MAP.get(member_shape.member.type_name)
+                    }
+            schema[member] = member_schema
+        return schema
+
+    session = fake_session()._session
+    model = session.get_service_model(service)
+    shape = model.shape_for(shape_name)
+
+    return _expand_shape_schema(shape)
