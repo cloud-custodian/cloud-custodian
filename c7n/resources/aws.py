@@ -893,6 +893,7 @@ def shape_schema(service, shape_name, drop_fields=()):
                 (e.g. resource_id param).
      """
 
+    # Mapping of service model shape types to json schema types
     TYPE_MAP = {
         'string': 'string',
         'structure': 'object',
@@ -909,7 +910,7 @@ def shape_schema(service, shape_name, drop_fields=()):
             if member in drop_fields:
                 continue
             if _type := TYPE_MAP.get(member_shape.type_name) is None:
-                raise ValueError(f"Unknown type: {member_shape.type_name}")
+                raise KeyError(f"Unknown type: {member_shape.type_name}")
             member_schema = {'type': _type}
             if enum := getattr(member_shape, 'enum', None):
                 member_schema['enum'] = enum
@@ -933,3 +934,4 @@ def shape_schema(service, shape_name, drop_fields=()):
     shape = model.shape_for(shape_name)
 
     return _expand_shape_schema(shape)
+
