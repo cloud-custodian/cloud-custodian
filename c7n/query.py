@@ -268,8 +268,13 @@ class DescribeSource:
         else:
             client = local_session(self.manager.session_factory).client(
                 model.service, region_name=self.manager.config.region)
+        if getattr(model, 'parent_spec', None):
+            parent_param = getattr(model, 'parent_spec')[1]
+        else:
+            parent_param = None
+        
         _augment = functools.partial(
-            _augment, self.manager, model, detail_spec, client)
+            _augment, self.manager, model, detail_spec, client, parent_param)
         with self.manager.executor_factory(
                 max_workers=self.manager.max_workers) as w:
             results = list(w.map(
@@ -734,7 +739,7 @@ def _batch_augment(manager, model, detail_spec, client, resource_set):
     return response[detail_path]
 
 
-def _scalar_augment(manager, model, detail_spec, client, resource_set):
+def _scalar_augment(manager, model, detail_spec, client, resource_set, parent_param=None):
     detail_op, param_name, param_key, detail_path = detail_spec
     op = getattr(client, detail_op)
     if manager.retry:
@@ -745,6 +750,12 @@ def _scalar_augment(manager, model, detail_spec, client, resource_set):
     results = []
     for r in resource_set:
         kw = {param_name: param_key and r[param_key] or r}
+        if parent_param:
+            try:
+                parent_id = r[parent_param]
+            except KeyError:
+                raise KeyError(f"Parent id {parent_param} not found in resource {r}")
+            kw[parent_param] = parent_id
         try:
             response = op(*args, **kw)
         except client.exceptions.ResourceNotFoundException:

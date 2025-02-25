@@ -899,6 +899,8 @@ def shape_schema(service, shape_name, drop_fields=()):
         'list': 'array',
         'integer': 'integer',
         'boolean': 'boolean',
+        'long': 'number',
+        'double': 'number',
     }
 
     def _expand_shape_schema(shape):
@@ -906,7 +908,9 @@ def shape_schema(service, shape_name, drop_fields=()):
         for member, member_shape in shape.members.items():
             if member in drop_fields:
                 continue
-            member_schema = {'type': TYPE_MAP.get(member_shape.type_name)}
+            if _type := TYPE_MAP.get(member_shape.type_name) is None:
+                raise ValueError(f"Unknown type: {member_shape.type_name}")
+            member_schema = {'type': _type}
             if enum := getattr(member_shape, 'enum', None):
                 member_schema['enum'] = enum
             if member_shape.type_name == 'structure':

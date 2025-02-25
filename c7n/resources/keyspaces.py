@@ -1,6 +1,6 @@
 from c7n.actions import BaseAction
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, TypeInfo
+from c7n.query import ChildResourceManager, QueryResourceManager, TypeInfo
 from c7n.resources.aws import shape_schema
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 from c7n.utils import get_retry, local_session, type_schema
@@ -135,7 +135,6 @@ class UpdateKeyspace(BaseAction):
     #         }
     #     }
     # )
-    import pdb; pdb.set_trace()
     schema = type_schema(
         'update', 
         **shape_schema('keyspaces', 'UpdateKeyspaceRequest', drop_fields=('keyspaceName')),
@@ -169,3 +168,132 @@ class DeleteKeyspace(BaseAction):
                 ignore_err_codes=('ResourceNotFoundException'),
                 keyspaceName=r['keyspaceName'],
             )
+
+
+@resources.register('keyspace-table')
+class Table(ChildResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'keyspaces'
+        parent_spec = ('keyspace', 'keyspaceName', None)
+        enum_spec = ('list_tables', 'tables', None)
+        detail_spec = ('get_table', 'tableName', 'tableName', None)
+        id = 'tableName'
+        arn = 'resourceArn'
+        name = 'tableName'
+        cfn_type = 'AWS::Cassandra::Table'
+
+    retry = staticmethod(get_retry(
+        ("ConflictException", "InternalServerException",)
+    ))
+
+    def augment(self, resources):
+        client = local_session(self.session_factory).client(
+            self.resource_type.service)
+
+        def _augment(r):
+            # details = self.retry(client.get_table, keyspaceName=r['keyspaceName'], tableName=r['tableName'])
+            # r.update(details)
+            
+            tags = self.retry(client.list_tags_for_resource,
+                resourceArn=r['resourceArn'])['tags']
+            r['Tags'] = [
+                {'Key': t['key'], 'Value': t['value']}
+                for t in tags
+            ]
+            return r
+        resources = super().augment(resources)
+        return list(map(_augment, resources))
+
+
+@Table.action_registry.register('tag')
+class TagTable(Tag):
+    permissions = ('keyspaces:TagResource',)
+
+    def process(self, resources):
+        client = self.get_client()
+        for r in resources:
+            client.tag_resource(
+                resourceArn=r['resourceArn'],
+                tags=[{'key': k, 'value': v} for k, v in self.data.get('tags', {}).items()]
+                )
+
+
+@Table.action_registry.register('mark-for-op')
+class TableMark(TagDelayedAction):
+    """Mark a Table for future Custodian action
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: table-mark-for-delete
+                resource: keyspace-table
+                filters:
+                  - type: value
+                    key: encryptionSpecification.type
+                    op: eq
+                    value: AWS_OWNED_KMS_KEY
+                actions:
+                  - type: mark-for-op
+                    op: delete
+                    days: 7
+    """
+
+@Table.action_registry.register('remove-tag')
+class RemoveTagTable(RemoveTag):
+    permissions = ('keyspaces:UntagResource',)
+
+    def process(self, resources):
+        client = self.get_client()
+        tag_keys = self.data.get('tags', [])
+        for r in resources:
+            tags_to_remove = [
+                {'key': t['Key'], 'value': t['Value']}
+                for t in r['Tags'] if t['Key'] in tag_keys
+            ]
+            self.manager.retry(
+                client.untag_resource,
+                resourceArn=r['resourceArn'],
+                tags=tags_to_remove
+            )
+
+
+@Table.action_registry.register('update')
+class UpdateTable(BaseAction):
+    schema = type_schema(
+        'update', 
+        **shape_schema('keyspaces', 'UpdateTableRequest', drop_fields=('keyspaceName', 'tableName')),
+        required=['replicationSpecification'],
+    )
+    permissions = ('keyspaces:UpdateTable',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client(
+            self.manager.resource_type.service)
+        params = dict(self.data)
+        params.pop('type')
+        for r in resources:
+            client.update_table(
+                keyspaceName=r['keyspaceName'],
+                tableName=r['tableName'],
+                **params
+            )
+            
+@Table.action_registry.register('delete')
+class DeleteTable(BaseAction):
+    schema = type_schema('delete')
+    permissions = ('keyspaces:DeleteTable',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client(
+            self.manager.resource_type.service)
+        for r in resources:
+            self.manager.retry(
+                client.delete_table,
+                ignore_err_codes=('ResourceNotFoundException'),
+                keyspaceName=r['keyspaceName'],
+                tableName=r['tableName'],
+            )
+ 
