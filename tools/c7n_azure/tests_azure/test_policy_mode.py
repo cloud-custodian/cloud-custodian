@@ -606,7 +606,7 @@ class AzurePolicyModeTest(BaseTest):
         event = AzurePolicyModeTest.get_sample_event()
 
         resources = p.push(event, None)
-        self.assertEqual(len(resources), 0)
+        assert resources is None
 
     @arm_template('emptyrg.json')
     def test_empty_group_container_scheduled(self):
