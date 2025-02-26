@@ -94,7 +94,7 @@ class FunctionTest(BaseTest):
             'name': 'instance', 'resource': 'gcp.instance'},
             session_factory=factory)
         exec_mode = policy.FunctionMode(p)
-        self.assertRaises(NotImplementedError, exec_mode.resolve_resources, {})
+        self.assertRaises(NotImplementedError, exec_mode.run, {}, None)
         self.assertRaises(NotImplementedError, exec_mode.provision)
         self.assertEqual(None, exec_mode.validate())
 
