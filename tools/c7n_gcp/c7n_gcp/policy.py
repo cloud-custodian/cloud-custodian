@@ -34,8 +34,42 @@ class FunctionMode(ServerlessExecutionMode):
         self.log = logging.getLogger('custodian.gcp.funcexec')
         self.region = policy.options.regions[0] if len(policy.options.regions) else DEFAULT_REGION
 
-    def run(self):
-        raise NotImplementedError("subclass responsibility")
+    def resolve_resources(self, event):
+        raise NotImplementedError("subclass responsibility")  # pragma: no cover
+
+    def run(self, event, context):
+        """Execute a gcp serverless model"""
+        from c7n.actions import EventAction
+
+        s = time.time()
+        resources = self.resolve_resources(event)
+        if not resources:
+            return  # pragma: no cover
+
+        resources = self.policy.resource_manager.filter_resources(resources, event)
+
+        if not resources:  # pragma: no cover
+            self.policy.log.info(
+                "policy: %s resources: %s no resources found"
+                % (self.policy.name, self.policy.resource_type)
+            )
+            return
+        rt = time.time() - s
+
+        with self.policy.ctx as ctx:
+            self.policy.log.info("Filtered resources %d" % len(resources))
+
+            ctx.metrics.put_metric("ResourceCount", len(resources), "Count", Scope="Policy")
+            ctx.metrics.put_metric("ResourceTime", rt, "Seconds", Scope="Policy")
+            ctx.output.write_file("resources.json", utils.dumps(resources, indent=2))
+
+            for action in self.policy.resource_manager.actions:
+                if isinstance(action, EventAction):  # pragma: no cover
+                    action.process(resources, event)
+                else:
+                    action.process(resources)
+
+            return resources
 
     def provision(self):
         self.log.info("Provisioning policy function %s", self.policy.name)
@@ -103,47 +137,8 @@ class PeriodicMode(FunctionMode, PullMode):
         return PullMode.run(self)
 
 
-class FunctionModeImpl(FunctionMode):
-    def resolve_resources(self, event):
-        raise NotImplementedError("subclass responsibility")  # pragma: no cover
-
-    def run(self, event, context):
-        """Execute a gcp serverless model"""
-        from c7n.actions import EventAction
-
-        s = time.time()
-        resources = self.resolve_resources(event)
-        if not resources:
-            return  # pragma: no cover
-
-        resources = self.policy.resource_manager.filter_resources(resources, event)
-
-        if not resources:  # pragma: no cover
-            self.policy.log.info(
-                "policy: %s resources: %s no resources found"
-                % (self.policy.name, self.policy.resource_type)
-            )
-            return
-        rt = time.time() - s
-
-        with self.policy.ctx as ctx:
-            self.policy.log.info("Filtered resources %d" % len(resources))
-
-            ctx.metrics.put_metric("ResourceCount", len(resources), "Count", Scope="Policy")
-            ctx.metrics.put_metric("ResourceTime", rt, "Seconds", Scope="Policy")
-            ctx.output.write_file("resources.json", utils.dumps(resources, indent=2))
-
-            for action in self.policy.resource_manager.actions:
-                if isinstance(action, EventAction):  # pragma: no cover
-                    action.process(resources, event)
-                else:
-                    action.process(resources)
-
-            return resources
-
-
 @execution.register('gcp-audit')
-class ApiAuditMode(FunctionModeImpl):
+class ApiAuditMode(FunctionMode):
     """Custodian policy execution on gcp api audit logs events.
 
     Deploys as a Cloud Function triggered by api calls. This allows
@@ -194,7 +189,7 @@ class ApiAuditMode(FunctionModeImpl):
 
 
 @execution.register('gcp-scc')
-class SecurityCenterMode(FunctionModeImpl):
+class SecurityCenterMode(FunctionMode):
     """Custodian policy execution on GCP Security Command Center (SCC) findings.
 
     Deploys as a Cloud Function triggered by SCC findings. This allows
