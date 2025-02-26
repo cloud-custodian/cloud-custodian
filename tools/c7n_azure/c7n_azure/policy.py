@@ -330,11 +330,9 @@ class AzureModeCommon:
         with policy.ctx as ctx:
             rt = time.time() - s
 
-            ctx.metrics.put_metric(
-                'ResourceCount', len(resources), 'Count', Scope="Policy", buffer=False
-            )
+            ctx.metrics.put_metric("ResourceCount", len(resources), "Count", Scope="Policy")
             ctx.metrics.put_metric("ResourceTime", rt, "Seconds", Scope="Policy")
-            ctx.output.write_file('resources.json', utils.dumps(resources, indent=2))
+            ctx.output.write_file("resources.json", utils.dumps(resources, indent=2))
 
             at = time.time()
             for action in policy.resource_manager.actions:

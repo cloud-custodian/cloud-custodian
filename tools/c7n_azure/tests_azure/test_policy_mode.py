@@ -590,7 +590,7 @@ class AzurePolicyModeTest(BaseTest):
 
     @arm_template('emptyrg.json')
     @cassette_name('resourcegroup')
-    def test_empty_group_container_event_no_resources(self, mock_delete):
+    def test_empty_group_container_event_no_resources(self):
         p = self.load_policy({
             'name': 'test-azure-resource-group',
             'mode':
