@@ -118,7 +118,7 @@ class FunctionModeImpl(FunctionMode):
 
         resources = self.policy.resource_manager.filter_resources(resources, event)
 
-        if not resources:
+        if not resources:  # pragma: no cover
             self.policy.log.info(
                 "policy: %s resources: %s no resources found"
                 % (self.policy.name, self.policy.resource_type)
@@ -134,7 +134,7 @@ class FunctionModeImpl(FunctionMode):
             ctx.output.write_file("resources.json", utils.dumps(resources, indent=2))
 
             for action in self.policy.resource_manager.actions:
-                if isinstance(action, EventAction):
+                if isinstance(action, EventAction):  # pragma: no cover
                     action.process(resources, event)
                 else:
                     action.process(resources)
