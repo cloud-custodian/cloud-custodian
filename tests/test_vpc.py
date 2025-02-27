@@ -4346,7 +4346,7 @@ def test_eip_shield_sync_deleted(test, eip_shield_sync):
     test.assertEqual(len(resources), 1)
     test.assertEqual(resources[0]["Tags"][0]["Value"], "unprotected")
 
-    # ensure that there are now 2 EIPs that are shield protected
+    # ensure that there is only 1 EIP that are shield protected after sync
     protections = shield_client.list_protections(InclusionFilters={"ResourceTypes": ["ELASTIC_IP_ALLOCATION"]})
     test.assertEqual(len(protections["Protections"]), 1)
 
