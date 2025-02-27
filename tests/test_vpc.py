@@ -14,6 +14,7 @@ import pytest
 import jmespath
 from .zpill import ACCOUNT_ID
 
+
 @pytest.mark.audited
 @terraform('sg_used_cross_ref')
 def test_sg_used_cross_ref(test, sg_used_cross_ref):
@@ -4294,7 +4295,9 @@ def test_eip_shield_sync(test, eip_shield_sync):
 
     resources = p.run()
 
-    protections = shield_client.list_protections(InclusionFilters={"ResourceTypes": ["ELASTIC_IP_ALLOCATION"]})
+    protections = shield_client.list_protections(
+        InclusionFilters={"ResourceTypes": ["ELASTIC_IP_ALLOCATION"]}
+    )
     for p in protections["Protections"]:
         if eip_shield_sync["aws_eip.unprotected.allocation_id"] in p["ResourceArn"]:
             test.addCleanup(shield_client.delete_protection, ProtectionId=p["Id"])
@@ -4303,7 +4306,9 @@ def test_eip_shield_sync(test, eip_shield_sync):
     test.assertEqual(resources[0]["Tags"][0]["Value"], "unprotected")
 
     # ensure that there are now 2 EIPs that are shield protected
-    protections = shield_client.list_protections(InclusionFilters={"ResourceTypes": ["ELASTIC_IP_ALLOCATION"]})
+    protections = shield_client.list_protections(
+        InclusionFilters={"ResourceTypes": ["ELASTIC_IP_ALLOCATION"]}
+    )
     test.assertEqual(len(protections["Protections"]), 2)
 
 
@@ -4338,7 +4343,9 @@ def test_eip_shield_sync_deleted(test, eip_shield_sync):
 
     resources = p.run()
 
-    protections = shield_client.list_protections(InclusionFilters={"ResourceTypes": ["ELASTIC_IP_ALLOCATION"]})
+    protections = shield_client.list_protections(
+        InclusionFilters={"ResourceTypes": ["ELASTIC_IP_ALLOCATION"]}
+    )
     for p in protections["Protections"]:
         if eip_shield_sync["aws_eip.unprotected.allocation_id"] in p["ResourceArn"]:
             test.addCleanup(shield_client.delete_protection, ProtectionId=p["Id"])
@@ -4347,10 +4354,7 @@ def test_eip_shield_sync_deleted(test, eip_shield_sync):
     test.assertEqual(resources[0]["Tags"][0]["Value"], "unprotected")
 
     # ensure that there is only 1 EIP that are shield protected after sync
-    protections = shield_client.list_protections(InclusionFilters={"ResourceTypes": ["ELASTIC_IP_ALLOCATION"]})
+    protections = shield_client.list_protections(
+        InclusionFilters={"ResourceTypes": ["ELASTIC_IP_ALLOCATION"]}
+    )
     test.assertEqual(len(protections["Protections"]), 1)
-
-
-
-
-
