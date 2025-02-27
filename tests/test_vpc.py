@@ -12,7 +12,7 @@ from pytest_terraform import terraform
 
 import pytest
 import jmespath
-
+from .zpill import ACCOUNT_ID
 
 @pytest.mark.audited
 @terraform('sg_used_cross_ref')
@@ -4266,17 +4266,17 @@ def test_vpc_delete(test, vpc_delete):
     ]
     test.assertFalse(vpcs)
 
-@terraform("eip_shield_sync", replay=False) # remove the replay once I do it once.
-def test_eip_shield_sync(test, eip_shield_sync):
-    session_factory = test.record_flight_data("test_eip_shield")
 
-    # session_factory = self.replay_flight_data("test_eip_shield")
+@terraform("eip_shield_sync")
+def test_eip_shield_sync(test, eip_shield_sync):
+
+    session_factory = test.replay_flight_data("test_eip_shield_sync_1")
 
     shield_client = session_factory().client("shield")
 
     p = test.load_policy(
         {
-            "name": "eip-shield",
+            "name": "eip-shield-sync",
             "resource": "network-addr",
             "filters": [
                 {"type": "shield-enabled", "state": False},
@@ -4285,18 +4285,72 @@ def test_eip_shield_sync(test, eip_shield_sync):
                 "type": "set-shield",
                 "state": True,
                 "sync": True
-            }],
+            }
+            ],
         },
+        config={"account_id": ACCOUNT_ID},
         session_factory=session_factory,
     )
 
     resources = p.run()
-    # make sure that our unprotected EIP is now shield protected
+
+    protections = shield_client.list_protections(InclusionFilters={"ResourceTypes": ["ELASTIC_IP_ALLOCATION"]})
+    for p in protections["Protections"]:
+        if eip_shield_sync["aws_eip.unprotected.allocation_id"] in p["ResourceArn"]:
+            test.addCleanup(shield_client.delete_protection, ProtectionId=p["Id"])
+
     test.assertEqual(len(resources), 1)
+    test.assertEqual(resources[0]["Tags"][0]["Value"], "unprotected")
 
     # ensure that there are now 2 EIPs that are shield protected
-    protections = shield_client.list_protections()
+    protections = shield_client.list_protections(InclusionFilters={"ResourceTypes": ["ELASTIC_IP_ALLOCATION"]})
     test.assertEqual(len(protections["Protections"]), 2)
-    for protection in protections:
-        protection_info = shield_client.describe_protection(ProtectionId=protection["ProtectionId"])
-        print(protection_info)
+
+
+@terraform("eip_shield_sync")
+def test_eip_shield_sync_deleted(test, eip_shield_sync):
+
+    session_factory = test.replay_flight_data("test_eip_shield_sync_2")
+
+    shield_client = session_factory().client("shield")
+    ec2_client = session_factory().client("ec2")
+
+    # delete the original protected resource
+    ec2_client.release_address(AllocationId=eip_shield_sync["aws_eip.protected.allocation_id"])
+
+    p = test.load_policy(
+        {
+            "name": "eip-shield-sync",
+            "resource": "network-addr",
+            "filters": [
+                {"type": "shield-enabled", "state": False},
+            ],
+            "actions": [{
+                "type": "set-shield",
+                "state": True,
+                "sync": True
+            }
+            ],
+        },
+        config={"account_id": ACCOUNT_ID},
+        session_factory=session_factory,
+    )
+
+    resources = p.run()
+
+    protections = shield_client.list_protections(InclusionFilters={"ResourceTypes": ["ELASTIC_IP_ALLOCATION"]})
+    for p in protections["Protections"]:
+        if eip_shield_sync["aws_eip.unprotected.allocation_id"] in p["ResourceArn"]:
+            test.addCleanup(shield_client.delete_protection, ProtectionId=p["Id"])
+
+    test.assertEqual(len(resources), 1)
+    test.assertEqual(resources[0]["Tags"][0]["Value"], "unprotected")
+
+    # ensure that there are now 2 EIPs that are shield protected
+    protections = shield_client.list_protections(InclusionFilters={"ResourceTypes": ["ELASTIC_IP_ALLOCATION"]})
+    test.assertEqual(len(protections["Protections"]), 1)
+
+
+
+
+

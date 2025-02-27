@@ -1,20 +1,22 @@
-data "aws_availability_zones" "available" {}
-data "aws_region" "current" {}
-data "aws_caller_identity" "current" {}
-
-resource "aws_eip" "first" {
-  domain = "vpc"
+provider "aws" {
+  region = "us-east-1"
 }
 
-resource "aws_eip" "second" {
+resource "aws_eip" "protected" {
   domain = "vpc"
-}
-
-resource "aws_shield_protection" "compliant-shield-advanced-protection" {
-  name         = "compliant-shield-advanced-protection"
-  resource_arn = "arn:aws:ec2:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:eip-allocation/${aws_eip.first.id}"
-
   tags = {
-    Environment = "Dev"
+    c7n-test = "protected"
   }
+}
+
+resource "aws_eip" "unprotected" {
+  domain = "vpc"
+  tags = {
+    c7n-test = "unprotected"
+  }
+}
+
+resource "aws_shield_protection" "shield_protection" {
+  name         = "shield-protection"
+  resource_arn = replace(aws_eip.protected.arn, "elastic-ip", "eip-allocation")
 }
