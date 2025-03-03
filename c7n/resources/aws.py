@@ -934,4 +934,3 @@ def shape_schema(service, shape_name, drop_fields=()):
     shape = model.shape_for(shape_name)
 
     return _expand_shape_schema(shape)
-

@@ -1,0 +1,69 @@
+{
+    "status_code": 200,
+    "data": {
+        "keyspaceName": "c7n_test",
+        "tableName": "c7n_test_table",
+        "resourceArn": "arn:aws:cassandra:us-east-1:644160558196:/keyspace/c7n_test/table/c7n_test_table",
+        "creationTimestamp": {
+            "__class__": "datetime",
+            "year": 2025,
+            "month": 2,
+            "day": 24,
+            "hour": 14,
+            "minute": 54,
+            "second": 9,
+            "microsecond": 282000
+        },
+        "status": "ACTIVE",
+        "schemaDefinition": {
+            "allColumns": [
+                {
+                    "name": "NewColumn",
+                    "type": "ascii"
+                }
+            ],
+            "partitionKeys": [
+                {
+                    "name": "NewColumn"
+                }
+            ],
+            "clusteringKeys": [],
+            "staticColumns": []
+        },
+        "capacitySpecification": {
+            "throughputMode": "PAY_PER_REQUEST",
+            "lastUpdateToPayPerRequestTimestamp": {
+                "__class__": "datetime",
+                "year": 2025,
+                "month": 2,
+                "day": 24,
+                "hour": 14,
+                "minute": 54,
+                "second": 9,
+                "microsecond": 282000
+            }
+        },
+        "encryptionSpecification": {
+            "type": "AWS_OWNED_KMS_KEY"
+        },
+        "pointInTimeRecovery": {
+            "status": "ENABLED",
+            "earliestRestorableTimestamp": {
+                "__class__": "datetime",
+                "year": 2025,
+                "month": 2,
+                "day": 26,
+                "hour": 15,
+                "minute": 52,
+                "second": 2,
+                "microsecond": 977000
+            }
+        },
+        "defaultTimeToLive": 0,
+        "comment": {
+            "message": ""
+        },
+        "replicaSpecifications": [],
+        "ResponseMetadata": {}
+    }
+}

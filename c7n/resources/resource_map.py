@@ -161,7 +161,7 @@ ResourceMap = {
   "aws.kendra": "c7n.resources.kendra.KendraIndex",
   "aws.key-pair": "c7n.resources.vpc.KeyPair",
   "aws.keyspace": "c7n.resources.keyspaces.Keyspace",
-  "aws.keyspace-table": "c7n.resources.keyspaces.KeyspaceTable",
+  "aws.keyspace-table": "c7n.resources.keyspaces.Table",
   "aws.kinesis": "c7n.resources.kinesis.KinesisStream",
   "aws.kinesis-analytics": "c7n.resources.kinesis.AnalyticsApp",
   "aws.kinesis-analyticsv2": "c7n.resources.kinesis.KinesisAnalyticsAppV2",

@@ -6,15 +6,16 @@ from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 from c7n.utils import get_retry, local_session, type_schema
 
 
+SYSTEM_KEYSPACES = [
+    "system",
+    "system_schema",
+    "system_schema_mcs",
+    "system_multiregion_info",
+]
+
+
 @resources.register('keyspace')
 class Keyspace(QueryResourceManager):
-
-    SYSTEM_KEYSPACES = [
-        "system",
-        "system_schema",
-        "system_schema_mcs",
-        "system_multiregion_info",
-    ]
 
     class resource_type(TypeInfo):
         service = 'keyspaces'
@@ -33,7 +34,7 @@ class Keyspace(QueryResourceManager):
     def augment(self, resources):
         resources = [
             r for r in resources
-            if r['keyspaceName'] not in self.SYSTEM_KEYSPACES
+            if r['keyspaceName'] not in SYSTEM_KEYSPACES
         ]
         client = local_session(self.session_factory).client(
             self.resource_type.service)
@@ -110,35 +111,10 @@ class RemoveTagKeyspace(RemoveTag):
 
 @Keyspace.action_registry.register('update')
 class UpdateKeyspace(BaseAction):
-    # schema = type_schema(
-    #     'update',
-    #     required=['replicationSpecification'],
-    #     replicationSpecification={
-    #         'type': 'object',
-    #         'additionalProperties': False,
-    #         'properties': {
-    #             'required': ['replicationStrategy'],
-    #             'replicationStrategy': {'type': {'enum': ['SINGLE_REGION', 'MULTI_REGION']}},
-    #             'regionList': {
-    #                 'type': 'array',
-    #                 'items': {
-    #                     'type': 'string',
-    #                 }
-    #             }
-    #         }
-    #     },
-    #     clientSideTimestamps={
-    #         'type': 'object',
-    #         'additionalProperties': False,
-    #         'properties': {
-    #             'status': {'type': {'enum': ['ENABLED', 'DISABLED']}}
-    #         }
-    #     }
-    # )
     schema = type_schema(
-        'update', 
+        'update',
         **shape_schema('keyspaces', 'UpdateKeyspaceRequest', drop_fields=('keyspaceName')),
-        required=['replicationSpecification'], 
+        required=['replicationSpecification'],
     )
     permissions = ('keyspaces:UpdateKeyspace',)
 
@@ -177,7 +153,6 @@ class Table(ChildResourceManager):
         service = 'keyspaces'
         parent_spec = ('keyspace', 'keyspaceName', None)
         enum_spec = ('list_tables', 'tables', None)
-        detail_spec = ('get_table', 'tableName', 'tableName', None)
         id = 'tableName'
         arn = 'resourceArn'
         name = 'tableName'
@@ -188,13 +163,22 @@ class Table(ChildResourceManager):
     ))
 
     def augment(self, resources):
+        resources = [
+            r for r in resources
+            if r['keyspaceName'] not in SYSTEM_KEYSPACES
+        ]
+
         client = local_session(self.session_factory).client(
             self.resource_type.service)
 
         def _augment(r):
-            # details = self.retry(client.get_table, keyspaceName=r['keyspaceName'], tableName=r['tableName'])
-            # r.update(details)
-            
+            details = self.retry(
+                client.get_table,
+                keyspaceName=r['keyspaceName'],
+                tableName=r['tableName']
+            )
+            r.update(details)
+
             tags = self.retry(client.list_tags_for_resource,
                 resourceArn=r['resourceArn'])['tags']
             r['Tags'] = [
@@ -241,6 +225,7 @@ class TableMark(TagDelayedAction):
                     days: 7
     """
 
+
 @Table.action_registry.register('remove-tag')
 class RemoveTagTable(RemoveTag):
     permissions = ('keyspaces:UntagResource',)
@@ -263,8 +248,11 @@ class RemoveTagTable(RemoveTag):
 @Table.action_registry.register('update')
 class UpdateTable(BaseAction):
     schema = type_schema(
-        'update', 
-        **shape_schema('keyspaces', 'UpdateTableRequest', drop_fields=('keyspaceName', 'tableName')),
+        'update',
+        **shape_schema(
+            'keyspaces', 'UpdateTableRequest',
+            drop_fields=('keyspaceName', 'tableName')
+        ),
         required=['replicationSpecification'],
     )
     permissions = ('keyspaces:UpdateTable',)
@@ -280,7 +268,8 @@ class UpdateTable(BaseAction):
                 tableName=r['tableName'],
                 **params
             )
-            
+
+
 @Table.action_registry.register('delete')
 class DeleteTable(BaseAction):
     schema = type_schema('delete')
@@ -296,4 +285,3 @@ class DeleteTable(BaseAction):
                 keyspaceName=r['keyspaceName'],
                 tableName=r['tableName'],
             )
- 

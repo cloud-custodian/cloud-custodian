@@ -71,10 +71,10 @@ class TestKeyspace(BaseTest):
             time.sleep(45)
         with self.assertRaises(ClientError):
             client.get_keyspace(keyspaceName=resources[0]['keyspaceName'])
-            
-            
+
+
 class TestKeyspaceTable(BaseTest):
-    
+
     def test_keyspace_table_tags(self):
         factory = self.replay_flight_data('test_keyspace_table_tag')
         p = self.load_policy({
@@ -109,27 +109,28 @@ class TestKeyspaceTable(BaseTest):
         p = self.load_policy({
             'name': 'keyspace-table-update',
             'resource': 'keyspace-table',
-            'filters': [{'keyspaceTableName': 'c7n_test'}],
+            'filters': [{'tableName': 'c7n_test_table'}],
             'actions': [
                 {'type': 'update',
-                 'replicationSpecification': {
-                     'replicationStrategy': 'MULTI_REGION',
-                     'regionList': ['us-east-1', 'us-west-2']}, }]},
+                 'pointInTimeRecovery': {
+                     'status': 'DISABLED'}}]},
             session_factory=factory,)
         resources = p.run()
         self.assertEqual(len(resources), 1)
         if self.recording:
             time.sleep(5)
-        keyspace_table = client.get_table(keyspaceName=resources[0]['keyspaceName'], tableName=resources[0]['tableName'])
-        self.assertEqual(keyspace_table['replicationStrategy'], 'MULTI_REGION')
-        self.assertEqual(keyspace_table['replicationRegions'], ['us-east-1', 'us-west-2'])
+        keyspace_table = client.get_table(
+            keyspaceName=resources[0]['keyspaceName'],
+            tableName=resources[0]['tableName']
+        )
+        self.assertEqual(keyspace_table['pointInTimeRecovery']['status'], 'DISABLED')
 
     def test_keyspace_table_delete(self):
         factory = self.replay_flight_data('test_keyspace_table_delete')
         p = self.load_policy({
             'name': 'keyspace-table-delete',
             'resource': 'keyspace-table',
-            'filters': [{'keyspaceTableName': 'c7n_test'}],
+            'filters': [{'tableName': 'c7n_test_table'}],
             'actions': ['delete']},
             session_factory=factory,)
         resources = p.run()
@@ -138,4 +139,7 @@ class TestKeyspaceTable(BaseTest):
         if self.recording:
             time.sleep(45)
         with self.assertRaises(ClientError):
-            client.get_table(keyspaceName=resources[0]['keyspaceName'], tableName=resources[0]['tableName'])
+            client.get_table(
+                keyspaceName=resources[0]['keyspaceName'],
+                tableName=resources[0]['tableName']
+            )
