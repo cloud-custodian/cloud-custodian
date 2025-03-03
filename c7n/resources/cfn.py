@@ -12,7 +12,7 @@ from c7n.actions import BaseAction
 from c7n.filters import Filter, ListItemFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
-from c7n.utils import local_session, type_schema, group_by
+from c7n.utils import local_session, type_schema
 from c7n.tags import RemoveTag, Tag
 
 log = logging.getLogger('custodian.cfn')
