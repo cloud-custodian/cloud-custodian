@@ -297,6 +297,7 @@ class CloudFormationNotificationTopic(ListItemFilter):
     )
     annotation_key = "c7n:SnsTopics"
     FetchThreshold = 10
+    permissions = ('sns:GetTopicAttributes', 'sns:ListTopics')
 
     def __init__(self, data, manager=None):
         data['key'] = f'"{self.annotation_key}"'
