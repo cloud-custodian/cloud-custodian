@@ -909,7 +909,8 @@ def shape_schema(service, shape_name, drop_fields=()):
         for member, member_shape in shape.members.items():
             if member in drop_fields:
                 continue
-            if _type := TYPE_MAP.get(member_shape.type_name) is None:
+            _type = TYPE_MAP.get(member_shape.type_name)
+            if _type is None:
                 raise KeyError(f"Unknown type: {member_shape.type_name}")
             member_schema = {'type': _type}
             if enum := getattr(member_shape, 'enum', None):
