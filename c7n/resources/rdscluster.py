@@ -18,7 +18,7 @@ from c7n.filters.kms import KmsRelatedFilter
 from .aws import shape_validate
 from c7n.exceptions import PolicyValidationError
 from c7n.utils import (
-    type_schema, local_session, snapshot_identifier, chunks, get_retry )
+    type_schema, local_session, snapshot_identifier, chunks, get_retry)
 
 from c7n.resources.rds import ParameterFilter
 from c7n.filters.backup import ConsecutiveAwsBackupsFilter
@@ -765,11 +765,12 @@ class PendingMaintenance(Filter):
 
         return results
 
+
 @RDSClusterSnapshot.action_registry.register('region-copy')
 class RegionCopyClusterSnapshot(BaseAction):
     """Copy an RDS Cluster snapshot across regions.
 
-    
+
     Example::
 
       - name: copy-cluster-snapshots
@@ -825,7 +826,9 @@ class RegionCopyClusterSnapshot(BaseAction):
         p = {
             'TargetDBClusterSnapshotIdentifier': snapshot['DBClusterSnapshotIdentifier'].replace(':', '-'),
             'SourceRegion': self.manager.config.region,
-            'SourceDBClusterSnapshotIdentifier': snapshot['DBClusterSnapshotArn']
+            'SourceDBClusterSnapshotIdentifier': snapshot[
+                'DBClusterSnapshotArn'
+                ]
         }
 
         if key:
@@ -868,4 +871,3 @@ class RegionCopyClusterSnapshot(BaseAction):
                 if tags and self.data.get('copy_tags', True):
                     rtags.extend(r['Tags'])
                 self.process_resource(target_client, target_key, rtags, r)
-
