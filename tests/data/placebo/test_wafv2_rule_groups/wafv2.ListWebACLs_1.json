@@ -1,0 +1,37 @@
+{
+    "status_code": 200,
+    "data": {
+        "NextMarker": "test-custodian-waf",
+        "WebACLs": [
+            {
+                "Name": "compliant-waf",
+                "Id": "12085f42-13fc-4287-b85d-1f443dd64890",
+                "Description": "DELETE ME",
+                "LockToken": "8a3925d6-73dc-400f-b77d-0c01b8852b27",
+                "ARN": "arn:aws:wafv2:us-east-1:644160558196:regional/webacl/compliant-waf/12085f42-13fc-4287-b85d-1f443dd64890"
+            },
+            {
+                "Name": "noncompliant-waf-1",
+                "Id": "dbf1bdc8-38ed-448c-ad81-24335a0d09a8",
+                "Description": "",
+                "LockToken": "6a65edef-e52e-409b-b724-0ab3909c62ca",
+                "ARN": "arn:aws:wafv2:us-east-1:644160558196:regional/webacl/noncompliant-waf-1/dbf1bdc8-38ed-448c-ad81-24335a0d09a8"
+            },
+            {
+                "Name": "noncompliant-waf-2",
+                "Id": "23f8de7c-09ed-4614-b081-4b8031217dd4",
+                "Description": "DELETE ME",
+                "LockToken": "df91aca0-1583-4129-9fd1-74217fb50cfa",
+                "ARN": "arn:aws:wafv2:us-east-1:644160558196:regional/webacl/noncompliant-waf-2/23f8de7c-09ed-4614-b081-4b8031217dd4"
+            },
+            {
+                "Name": "test-custodian-waf",
+                "Id": "48fbb7cc-c08d-4858-900f-a6072fe1a948",
+                "Description": "",
+                "LockToken": "db094f81-64dd-4500-8d13-0e23044019e7",
+                "ARN": "arn:aws:wafv2:us-east-1:644160558196:regional/webacl/test-custodian-waf/48fbb7cc-c08d-4858-900f-a6072fe1a948"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
