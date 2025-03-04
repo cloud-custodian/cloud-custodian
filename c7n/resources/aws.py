@@ -902,6 +902,7 @@ def shape_schema(service, shape_name, drop_fields=()):
         'boolean': 'boolean',
         'long': 'number',
         'double': 'number',
+        'map': 'object'
     }
 
     def _expand_shape_schema(shape):
@@ -911,7 +912,7 @@ def shape_schema(service, shape_name, drop_fields=()):
                 continue
             _type = TYPE_MAP.get(member_shape.type_name)
             if _type is None:
-                raise KeyError(f"Unknown type: {member_shape.type_name}")
+                raise KeyError(f"Unknown type for {member_shape.name}: {member_shape.type_name}")
             member_schema = {'type': _type}
             if enum := getattr(member_shape, 'enum', None):
                 member_schema['enum'] = enum
@@ -927,11 +928,17 @@ def shape_schema(service, shape_name, drop_fields=()):
                     member_schema["items"] = {
                         'type': TYPE_MAP.get(member_shape.member.type_name)
                     }
+            elif member_shape.type_name == 'map':
+                if member_shape.value.type_name in ('structure', 'list'):
+                    member_schema["patternProperties"] = {
+                        "^.*$": _expand_shape_schema(member_shape.value)
+                    }
+                else:
+                    member_schema["patternProperties"] = {
+                        "^.*$": {
+                            'type': TYPE_MAP.get(member_shape.value.type_name)
+                        }
+                    }
+
             schema[member] = member_schema
         return schema
-
-    session = fake_session()._session
-    model = session.get_service_model(service)
-    shape = model.shape_for(shape_name)
-
-    return _expand_shape_schema(shape)
