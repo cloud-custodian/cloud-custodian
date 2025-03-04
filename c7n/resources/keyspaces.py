@@ -20,6 +20,7 @@ class Keyspace(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'keyspaces'
         arn_type = 'keyspace'
+        permission_prefix = 'cassandra'
         enum_spec = ('list_keyspaces', 'keyspaces', None)
         detail_spec = ('get_keyspace', 'keyspaceName', 'keyspaceName', None)
         id = 'keyspaceName'
@@ -56,7 +57,7 @@ Keyspace.filter_registry.register('marked-for-op', TagActionFilter)
 
 @Keyspace.action_registry.register('tag')
 class TagKeyspace(Tag):
-    permissions = ('keyspaces:TagResource',)
+    permissions = ('cassandra:TagResource', 'cassandra:TagMultiRegionResource')
 
     def process(self, resources):
         client = self.get_client()
@@ -92,7 +93,7 @@ class KeyspaceMark(TagDelayedAction):
 
 @Keyspace.action_registry.register('remove-tag')
 class RemoveTagKeyspace(RemoveTag):
-    permissions = ('keyspaces:UntagResource',)
+    permissions = ('cassandra:UntagResource', 'cassandra:UntagMultiRegionResource')
 
     def process(self, resources):
         client = self.get_client()
@@ -116,7 +117,7 @@ class UpdateKeyspace(BaseAction):
         **shape_schema('keyspaces', 'UpdateKeyspaceRequest', drop_fields=('keyspaceName')),
         required=['replicationSpecification'],
     )
-    permissions = ('keyspaces:UpdateKeyspace',)
+    permissions = ('cassandra:Alter', 'cassandra:AleterMultiRegionResource')
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client(
@@ -133,7 +134,7 @@ class UpdateKeyspace(BaseAction):
 @Keyspace.action_registry.register('delete')
 class DeleteKeyspace(BaseAction):
     schema = type_schema('delete')
-    permissions = ('keyspaces:DeleteKeyspace',)
+    permissions = ('cassandra:Drop', 'cassandra:DropMultiRegionResource')
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client(
@@ -151,6 +152,7 @@ class Table(ChildResourceManager):
 
     class resource_type(TypeInfo):
         service = 'keyspaces'
+        permission_prefix = 'cassandra'
         parent_spec = ('keyspace', 'keyspaceName', None)
         enum_spec = ('list_tables', 'tables', None)
         id = 'tableName'
@@ -192,7 +194,7 @@ class Table(ChildResourceManager):
 
 @Table.action_registry.register('tag')
 class TagTable(Tag):
-    permissions = ('keyspaces:TagResource',)
+    permissions = ('cassandra:TagResource', 'cassandra:TagMultiRegionResource')
 
     def process(self, resources):
         client = self.get_client()
@@ -228,7 +230,7 @@ class TableMark(TagDelayedAction):
 
 @Table.action_registry.register('remove-tag')
 class RemoveTagTable(RemoveTag):
-    permissions = ('keyspaces:UntagResource',)
+    permissions = ('cassandra:UntagResource', 'casssandra:UntagMultiRegionResource')
 
     def process(self, resources):
         client = self.get_client()
@@ -255,7 +257,7 @@ class UpdateTable(BaseAction):
         ),
         required=['replicationSpecification'],
     )
-    permissions = ('keyspaces:UpdateTable',)
+    permissions = ('cassandra:Alter', 'cassandra:AlterMultiRegionResource')
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client(
@@ -273,7 +275,7 @@ class UpdateTable(BaseAction):
 @Table.action_registry.register('delete')
 class DeleteTable(BaseAction):
     schema = type_schema('delete')
-    permissions = ('keyspaces:DeleteTable',)
+    permissions = ('cassandra:Drop', 'cassandra:DropMultiRegionResource')
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client(
