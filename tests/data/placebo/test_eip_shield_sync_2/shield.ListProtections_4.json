@@ -1,0 +1,14 @@
+{
+    "status_code": 200,
+    "data": {
+        "Protections": [
+            {
+                "Id": "e2f35be2-846d-49dd-8c4b-9d9eb5ab0173",
+                "Name": "3.230.55.239",
+                "ResourceArn": "arn:aws:ec2:us-east-1:644160558196:eip-allocation/eipalloc-09e3d67a5ace5469f",
+                "ProtectionArn": "arn:aws:shield::644160558196:protection/e2f35be2-846d-49dd-8c4b-9d9eb5ab0173"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

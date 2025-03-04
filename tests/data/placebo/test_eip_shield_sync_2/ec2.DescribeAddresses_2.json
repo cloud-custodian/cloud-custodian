@@ -1,0 +1,21 @@
+{
+    "status_code": 200,
+    "data": {
+        "Addresses": [
+            {
+                "AllocationId": "eipalloc-09e3d67a5ace5469f",
+                "Domain": "vpc",
+                "Tags": [
+                    {
+                        "Key": "c7n-test",
+                        "Value": "unprotected"
+                    }
+                ],
+                "PublicIpv4Pool": "amazon",
+                "NetworkBorderGroup": "us-east-1",
+                "PublicIp": "3.230.55.239"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
