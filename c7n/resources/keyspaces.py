@@ -255,7 +255,6 @@ class UpdateTable(BaseAction):
             'keyspaces', 'UpdateTableRequest',
             drop_fields=('keyspaceName', 'tableName')
         ),
-        required=['replicationSpecification'],
     )
     permissions = ('cassandra:Alter', 'cassandra:AlterMultiRegionResource')
 
