@@ -1,0 +1,7 @@
+{
+    "status_code": 200,
+    "data": {
+        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"StreamReadStatementID\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::851925785330:root\"},\"Action\":[\"kinesis:DescribeStreamSummary\",\"kinesis:GetRecords\",\"kinesis:GetShardIterator\",\"kinesis:ListShards\"],\"Resource\":\"arn:aws:kinesis:us-east-1:644160558196:stream/test-stream-2\"}]}",
+        "ResponseMetadata": {}
+    }
+}

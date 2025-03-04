@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "c7n_sphinxext"
-version = "1.1.40"
+version = "1.1.42"
 description = "Cloud Custodian - Sphinx Extensions"
 authors = ["Cloud Custodian Project"]
 license = "Apache-2.0"

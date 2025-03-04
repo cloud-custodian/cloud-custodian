@@ -9,6 +9,11 @@ import fnmatch
 
 class TestIamGen(BaseTest):
 
+    # cloudhsm classic is gone from commercial regions, but appears to still be extant
+    # in govcloud regions per
+    # https://docs.aws.amazon.com/govcloud-us/latest/UserGuide/govcloud-cloudhsm-classic.html
+    IGNORE_SERVICES = ("cloudhsm",)
+
     def check_permissions(self, perm_db, perm_set, path):
         invalid = []
         for p in perm_set:
@@ -18,6 +23,8 @@ class TestIamGen(BaseTest):
             s, a = p.split(':', 1)
             if s not in perm_db:
                 invalid.append(p)
+                continue
+            elif s in self.IGNORE_SERVICES:
                 continue
             if '*' in a:
                 if not fnmatch.filter(perm_db[s], a):

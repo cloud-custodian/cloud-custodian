@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "c7n_tencentcloud"
-version = "0.1.23"
+version = "0.1.25"
 description = "Cloud Custodian - Tencent Cloud Provider"
 authors = ["Tencent Cloud"]
 license = "Apache-2.0"
@@ -19,6 +19,7 @@ pytz = ">=2022.1"
 retrying = "^1.3.3"
 tencentcloud-sdk-python = "^3.0.783"
 cos-python-sdk-v5 = "^1.9.21"
+freezegun = "^1.5.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "<8.0"

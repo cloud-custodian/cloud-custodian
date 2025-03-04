@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "c7n_kube"
-version = "0.2.40"
+version = "0.2.42"
 description = "Cloud Custodian - Kubernetes Provider"
 readme = "readme.md"
 homepage = "https://cloudcustodian.io"
@@ -30,4 +30,6 @@ requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
+"c7n-kube" = "c7n_kube.cli:cli"
+# backward compatability, keep c7n-kates entrypoint for now
 "c7n-kates" = "c7n_kube.cli:cli"

@@ -1,0 +1,8 @@
+{
+    "status_code": 200,
+    "data": {
+        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"Statement1\",\"Effect\":\"Deny\",\"Principal\":\"*\",\"Action\":\"dynamodb:*\",\"Resource\":\"arn:aws:dynamodb:us-east-1:123456789012:table/c7n-test\",\"Condition\":{\"Bool\":{\"aws:SecureTransport\":\"false\"}}}]}",
+        "RevisionId": "1728230913300",
+        "ResponseMetadata": {}
+    }
+}

@@ -7,6 +7,7 @@ from pathlib import Path
 import re
 import subprocess
 import sys
+import uuid
 from unittest.mock import ANY, patch
 
 from urllib.request import urlopen
@@ -28,6 +29,7 @@ try:
     )
     from c7n_left.providers.terraform.graph import Resolver
     from c7n_left.providers.terraform.filters import Taggable
+    from c7n_left.providers.terraform.variables import VariableResolver
 
     LEFT_INSTALLED = True
 except ImportError:
@@ -110,8 +112,12 @@ class PolicyEnv:
         extant["policies"].append(policy)
         policy_file.write_text(json.dumps(extant))
 
-    def run(self, policy_dir=None, terraform_dir=None):
-        config = cli.get_config(terraform_dir or self.policy_dir, policy_dir or self.policy_dir)
+    def run(self, policy_dir=None, terraform_dir=None, terraform_workspace="default"):
+        config = cli.get_config(
+            directory=terraform_dir or self.policy_dir,
+            policy_dir=policy_dir or self.policy_dir,
+            terraform_workspace=terraform_workspace,
+        )
         policies = policy_core.load_policies(config.policy_dir, config)
         reporter = ResultsReporter()
         core.CollectionRunner(policies, config, reporter).run()
@@ -244,6 +250,19 @@ def test_graph_resolver_id():
     resolver = Resolver()
     assert resolver.is_id_ref("4b3db3ec-98ad-4382-a460-d8e392d128b7") is True
     assert resolver.is_id_ref("a" * 36) is False
+
+
+def test_resolver_refs_sans_tfmeta():
+    resolver = Resolver()
+    buid = str(uuid.uuid4())
+    cuid = str(uuid.uuid4())
+    block = dict(id=str(uuid.uuid4()), bref=buid, cref=cuid, __tfmeta={"label": "xyz"})
+    resolver.visit(block)
+    resolver.visit(dict(id=cuid, __tfmeta={"label": "tree"}))
+    resolver.visit(dict(id=buid, something=1))
+    refs = list(resolver.resolve_refs(block, ("tree",)))
+    assert len(refs) == 1
+    assert refs[0]["id"] == cuid
 
 
 def test_event_env(policy_env, test):
@@ -623,6 +642,11 @@ def test_graph_merge_function(policy_env):
     assert log_group["tags"] == {"Env": "Public", "Component": "application"}
 
 
+def test_variable_type_default():
+    assert VariableResolver.get_type_default("xyz") == ""
+    assert VariableResolver.get_type_default("map of strings") == {}
+
+
 def test_null_tag_value(policy_env):
     policy_env.write_tf(
         """
@@ -800,6 +824,56 @@ def test_traverse_multi_resource_nested_or(tmp_path):
         "aws_s3_bucket.owner_enforced",
         "aws_s3_bucket.owner_preferred",
     }
+
+
+def test_traverse_match_values(policy_env, test):
+    policy_env.write_tf(
+        """
+resource "r" "r1" {
+  name = "r-r1"
+}
+
+resource "r" "r2" {
+  label = "r-r2"
+}
+
+resource "rr" "res" {
+  rn = [r.r1.name]
+  rl = [r.r2.label]
+}
+        """
+    )
+    policy_env.write_policy(
+        {
+            "name": "test1",
+            "resource": "terraform.rr",
+            "filters": [
+                {
+                    "type": "traverse",
+                    "resources": "r",
+                    "attrs": [{"name": "r-r1"}],
+                }
+            ],
+        },
+    )
+    policy_env.write_policy(
+        {
+            "name": "test2",
+            "resource": "terraform.rr",
+            "filters": [
+                {
+                    "type": "traverse",
+                    "resources": "r",
+                    "attrs": [{"label": "r-r2"}],
+                }
+            ],
+        },
+    )
+    res1, res2 = (r.as_dict() for r in policy_env.run())
+    assert res1["policy"]["name"] == "test1"
+    assert res1["resource"]["__tfmeta"]["path"] == "rr.res"
+    assert res2["policy"]["name"] == "test2"
+    assert res2["resource"]["__tfmeta"]["path"] == "rr.res"
 
 
 def test_traverse_filter_not_found(tmp_path):
@@ -1308,7 +1382,7 @@ def test_cli_validate_schema_error(tmp_path, caplog):
     runner = CliRunner()
     result = runner.invoke(cli.cli, ["validate", "-p", str(tmp_path)])
     assert result.exit_code == 1
-    caplog.record_tuples[0] == ('c7n.iac', 40, 'Validation failed with 1 errors')
+    caplog.record_tuples[0] == ("c7n.iac", 40, "Validation failed with 1 errors")
     assert "is not valid under any of the given schemas" in caplog.record_tuples[2][-1]
 
 
@@ -1929,3 +2003,165 @@ def test_selection_policy_filter(policy_env):
 
     selection = policy_env.get_selection("policy=test-a")
     assert {p.name for p in selection.filter_policies(policies)} == {"test-a"}
+
+
+def test_workspace(policy_env):
+    policy_env.write_tf(
+        """
+locals {
+  map = {
+    default = "name-1"
+    other   = "name-2"
+  }
+}
+
+resource "res" "test_res" {
+  name = local.map[terraform.workspace]
+}
+        """
+    )
+    policy_env.write_policy(
+        {
+            "name": "test-a",
+            "resource": "terraform.res",
+            "filters": [{"name": "name-1"}],
+        }
+    )
+    policy_env.write_policy(
+        {
+            "name": "test-b",
+            "resource": "terraform.res",
+            "filters": [{"name": "name-2"}],
+        }
+    )
+    [result] = policy_env.run(terraform_workspace="default")
+    assert result.resource["name"] == "name-1"
+    [result] = policy_env.run(terraform_workspace="other")
+    assert result.resource["name"] == "name-2"
+
+
+def test_from_json_filter(policy_env):
+    policy_env.write_policy(
+        {
+            "name": "ecs-task-definition-with-plaintext-password-string",
+            "resource": "terraform.aws_ecs_task_definition",
+            "filters": [
+                {
+                    "type": "value",
+                    "key": "container_definitions",
+                    "op": "regex",
+                    "value": "(?:.|\n)*(password|secret|token|key)",
+                }
+            ],
+        },
+    )
+    policy_env.write_policy(
+        {
+            "name": "ecs-task-definition-with-plaintext-password-from-json",
+            "resource": "terraform.aws_ecs_task_definition",
+            "filters": [
+                {
+                    "type": "list-item",
+                    "key": "from_json(container_definitions)[].environment[]",
+                    "attrs": [
+                        {
+                            "type": "value",
+                            "key": "name",
+                            "op": "regex",
+                            "value": "(?:.|\n)*(password|secret|token|key)",
+                        },
+                    ],
+                }
+            ],
+        },
+    )
+
+    policy_env.write_tf(
+        """
+data "aws_iam_policy_document" "ecs_assume_role_policy" {
+  statement {
+    actions = ["sts:AssumeRole"]
+    principals {
+      type = "Service"
+      identifiers = [
+        "ecs-tasks.amazonaws.com",
+      ]
+    }
+  }
+}
+resource "aws_secretsmanager_secret" "test_secret" {
+  name                    = "/custodian/test/secret"
+  description             = "The Secret key used to sign and verify JWTs"
+  recovery_window_in_days = 0
+}
+
+locals {
+  secrets = [
+    {
+      valueFrom = aws_secretsmanager_secret.test_secret.arn
+      Name      = "TEST_API_SECRET"
+    }
+  ]
+
+  cubejs_api_container_definition = [
+    {
+      name      = "api"
+      image     = "public.ecr.aws/docker/library/busybox:stable"
+      essential = true
+      portMappings = [
+        {
+          protocol      = "tcp"
+          containerPort = 4000
+          hostPort      = 4000
+        }
+      ]
+      secrets = local.secrets
+      environment = [
+        {
+          name  = "JWT_SECRET"
+          value = "CloudCustodian123!"
+        },
+        {
+          name  = "JWK_ALGS"
+          value = "RS256"
+        },
+      ]
+    }
+  ]
+}
+
+resource "aws_iam_role" "ecs_execution_role" {
+  name                  = "test-execution-role"
+  assume_role_policy    = data.aws_iam_policy_document.ecs_assume_role_policy.json
+  force_detach_policies = true
+}
+
+resource "aws_iam_role" "ecs_task_role" {
+  name                  = "test-exec-role"
+  assume_role_policy    = data.aws_iam_policy_document.ecs_assume_role_policy.json
+  force_detach_policies = true
+}
+
+resource "aws_ecs_task_definition" "test_task_def" {
+  family = "test_task_def"
+
+  requires_compatibilities = ["FARGATE"]
+  network_mode             = "awsvpc"
+  cpu                      = 1
+  memory                   = 512
+  execution_role_arn       = aws_iam_role.ecs_execution_role.arn
+  task_role_arn            = aws_iam_role.ecs_task_role.arn
+
+  container_definitions = jsonencode(local.cubejs_api_container_definition)
+
+  lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
+}
+    """
+    )
+    results = policy_env.run()
+    assert results[0].resource["c7n:MatchedFilters"] == ["container_definitions"]
+    assert results[1].resource["c7n:MatchedFilters"] == ["container_definitions"]

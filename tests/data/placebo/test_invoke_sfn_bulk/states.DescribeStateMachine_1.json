@@ -4,8 +4,9 @@
         "stateMachineArn": "arn:aws:states:us-east-1:644160558196:stateMachine:Helloworld",
         "name": "Helloworld",
         "status": "ACTIVE",
-        "definition": "{\n  \"Comment\": \"A Hello World example of the Amazon States Language using a Pass state\",\n  \"StartAt\": \"HelloWorld\",\n  \"States\": {\n    \"HelloWorld\": {\n      \"Type\": \"Pass\",\n      \"Result\": \"Hello World!\",\n      \"End\": true\n    }\n  }\n}\n",
+        "definition": "{\"Comment\":\"A Hello World example of the Amazon States Language using a Pass state\",\"StartAt\":\"HelloWorld\",\"States\":{\"HelloWorld\":{\"Type\":\"Pass\",\"Result\":\"Hello World!\",\"Next\":\"Step Functions Run Activity\"},\"Step Functions Run Activity\":{\"Type\":\"Task\",\"Resource\":\"arn:aws:states:us-east-1:644160558196:activity:test-c7n\",\"End\":true}}}",
         "roleArn": "arn:aws:iam::644160558196:role/service-role/SfnDev",
+        "type": "STANDARD",
         "creationDate": {
             "__class__": "datetime",
             "year": 2019,
@@ -16,15 +17,14 @@
             "second": 30,
             "microsecond": 570000
         },
-        "ResponseMetadata": {
-            "RequestId": "7a709bcd-969e-11e9-808f-3b46d0d8e481",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "7a709bcd-969e-11e9-808f-3b46d0d8e481",
-                "content-type": "application/x-amz-json-1.0",
-                "content-length": "498"
-            },
-            "RetryAttempts": 0
-        }
+        "loggingConfiguration": {
+            "level": "OFF",
+            "includeExecutionData": false
+        },
+        "tracingConfiguration": {
+            "enabled": false
+        },
+        "revisionId": "4ed2f4b3-f24d-4553-8b71-d34849619828",
+        "ResponseMetadata": {}
     }
 }

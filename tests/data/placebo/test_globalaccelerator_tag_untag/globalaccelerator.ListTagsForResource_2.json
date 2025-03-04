@@ -1,0 +1,12 @@
+{
+    "status_code": 200,
+    "data": {
+        "Tags": [
+            {
+                "Key": "owner",
+                "Value": "delete"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

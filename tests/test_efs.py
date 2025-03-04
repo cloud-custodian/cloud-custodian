@@ -1,8 +1,10 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+
 from c7n.exceptions import PolicyValidationError
 
 from .common import BaseTest, functional, event_data
+from botocore.exceptions import ClientError
 
 import uuid
 import time
@@ -10,8 +12,11 @@ import time
 from operator import itemgetter
 from c7n.testing import mock_datetime_now
 from dateutil import parser
+from pytest_terraform import terraform
 import c7n.resources.efs
 import c7n.filters.backup
+import json
+import pytest
 
 
 class ElasticFileSystem(BaseTest):
@@ -286,7 +291,8 @@ class ElasticFileSystem(BaseTest):
         self.assertEqual(resources[0]["Name"], "efs-without-secure-transport")
 
     def test_efs_has_statement(self):
-        factory = self.replay_flight_data("test_efs_has_statement")
+        factory = self.replay_flight_data("test_efs_has_statement", region='us-west-1')
+        region_config = {'region': 'us-west-1'}
         p = self.load_policy(
             {
                 "name": "efs-has-statement",
@@ -303,8 +309,9 @@ class ElasticFileSystem(BaseTest):
                             }
                         ]
                     }
-                ],
+                ]
             },
+            config=region_config,
             session_factory=factory,
         )
         resources = p.run()
@@ -324,10 +331,140 @@ class ElasticFileSystem(BaseTest):
                             }
                         ]
                     }
-                ],
+                ]
             },
+            config=region_config,
             session_factory=factory,
         )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    def test_efs_has_statement_partial(self):
+        factory = self.replay_flight_data("test_efs_has_statement_partial",
+                                          region='us-west-1')
+        region_config = {'region': 'us-west-1'}
+
+        # No PartialMatch key as base case, full match.
+        p = self.load_policy(
+            {
+                "name": "efs-has-statement-partial",
+                "resource": "efs",
+                "filters": [
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Allow",
+                                "Action": ["elasticfilesystem:ClientRootAccess",
+                                            "elasticfilesystem:ClientMount"],
+                            }
+                        ]
+                    }
+                ],
+            },
+            config=region_config,
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        # Test case insensitive and full-match with PartialMatch key
+        p = self.load_policy(
+            {
+                "name": "efs-has-statement-partial",
+                "resource": "efs",
+                "filters": [
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Allow",
+                                "Action": ["elasticFilesystem:clientRootAccess",
+                                            "elasticfilesystem:clientMount"],
+                                "PartialMatch": ["Action"]
+                            }
+                        ]
+                    }
+                ],
+            },
+            config=region_config,
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        # Test for presence of just one partial match.
+        p = self.load_policy(
+            {
+                "name": "efs-has-statement-partial",
+                "resource": "efs",
+                "filters": [
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Allow",
+                                "Action": ["elasticfilesystem:clientRootAccess"],
+                                "PartialMatch": ["Action"]
+                            }
+                        ]
+                    }
+                ],
+            },
+            config=region_config,
+            session_factory=factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        # Test for case-insensitive partial match using wildcard
+        p = self.load_policy(
+            {
+                "name": "efs-has-statement-partial",
+                "resource": "efs",
+                "filters": [
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Allow",
+                                "Action": ["elasticFilesystem:*"],
+                                "PartialMatch": ["Action"]
+                            }
+                        ]
+                    }
+                ],
+            },
+            config=region_config,
+            session_factory=factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        # Test for expected fail PartialMatch case
+        p = self.load_policy(
+            {
+                "name": "efs-has-statement-partial",
+                "resource": "efs",
+                "filters": [
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Allow",
+                                "Action": ["elasticfilesystem:DeleteTags"],
+                                "PartialMatch": ["Action"]
+                            }
+                        ]
+                    }
+                ],
+            },
+            config=region_config,
+            session_factory=factory,
+        )
+
         resources = p.run()
         self.assertEqual(len(resources), 0)
 
@@ -351,3 +488,142 @@ class ElasticFileSystem(BaseTest):
         with mock_datetime_now(parser.parse("2022-09-09T00:00:00+00:00"), c7n.filters.backup):
             resources = p.run()
         self.assertEqual(len(resources), 1)
+
+
+@terraform('efs_remove_matched', teardown=terraform.TEARDOWN_IGNORE, scope='session')
+def test_efs_remove_matched(test, efs_remove_matched):
+    session_factory = test.replay_flight_data("test_efs_remove_matched")
+    client = session_factory().client("efs")
+    filesystem_id = efs_remove_matched['aws_efs_file_system.example.id']
+
+    if test.recording:
+        time.sleep(5)
+
+    p = test.load_policy(
+        {
+            "name": "efs-rm-matched",
+            "resource": "aws.efs",
+            "filters": [
+                {"FileSystemId": filesystem_id},
+                {"type": "cross-account", "whitelist": ["185106417252"]},
+            ],
+            "actions": [{"type": "remove-statements", "statement_ids": "matched"}],
+        },
+        session_factory=session_factory,
+    )
+    resources = p.run()
+    test.assertEqual([r["FileSystemId"] for r in resources], [filesystem_id])
+
+    data = json.loads(
+        client.describe_file_system_policy(FileSystemId=filesystem_id).get(
+            "Policy"
+        )
+    )
+    test.assertEqual(
+        [s["Sid"] for s in data.get("Statement", ())], ["SpecificAllow"]
+    )
+
+
+@terraform('efs_remove_access_denied', teardown=terraform.TEARDOWN_IGNORE)
+def test_efs_access_denied(test, efs_remove_access_denied):
+    session_factory = test.replay_flight_data("test_efs_access_denied")
+    client = session_factory().client("efs")
+    filesystem_id = efs_remove_access_denied['aws_efs_file_system.example_test.id']
+
+    if test.recording:
+        time.sleep(10)
+
+    p = test.load_policy(
+        {
+            "name": "efs-rm-named",
+            "resource": "aws.efs",
+            "filters": [{"FileSystemId": filesystem_id},
+                        {"type": "cross-account", "whitelist": ["185106417252"]},]
+        },
+        session_factory=session_factory,
+    )
+
+    resources = p.run()
+    test.assertEqual(len(resources), 0)
+
+    with pytest.raises(ClientError) as e:
+        client.describe_file_system_policy(FileSystemId=filesystem_id)
+
+    test.assertTrue('AccessDeniedException' in str(e))
+
+
+@terraform('efs_remove_matched', teardown=terraform.TEARDOWN_IGNORE, scope='session')
+def test_efs_remove_named(test, efs_remove_matched):
+    session_factory = test.replay_flight_data("test_efs_remove_named")
+    filesystem_id = efs_remove_matched['aws_efs_file_system.example_client_error.id']
+
+    if test.recording:
+        time.sleep(5)
+
+    p = test.load_policy(
+        {
+            "name": "efs-rm-named",
+            "resource": "aws.efs",
+            "filters": [{"FileSystemId": filesystem_id}],
+            "actions": [
+                {"type": "remove-statements", "statement_ids": ["WhatIsIt"]}
+            ],
+        },
+        session_factory=session_factory,
+    )
+
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+
+
+@terraform('efs_remove_matched', teardown=terraform.TEARDOWN_IGNORE, scope='session')
+def test_efs_client_error(test, efs_remove_matched):
+    session_factory = test.replay_flight_data("test_efs_client_error")
+
+    if test.recording:
+        time.sleep(5)
+
+    p = test.load_policy(
+        {
+            "name": "efs-rm-named",
+            "resource": "aws.efs",
+            "filters": [{"FileSystemId": "fs-095fec21dd6d065fb"}],
+            "actions": [
+                {"type": "remove-statements", "statement_ids": ["WhatIsIt"]}
+            ],
+        },
+        session_factory=session_factory,
+    )
+
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+
+
+@terraform('efs_remove_matched', teardown=terraform.TEARDOWN_IGNORE, scope='session')
+def test_efs_remove_statement(test, efs_remove_matched):
+    session_factory = test.replay_flight_data("test_efs_remove_statement")
+    client = session_factory().client("efs")
+    filesystem_id = efs_remove_matched['aws_efs_file_system.example_remove_named.id']
+
+    if test.recording:
+        time.sleep(5)
+
+    p = test.load_policy(
+        {
+            "name": "efs-rm-statement",
+            "resource": "aws.efs",
+            "filters": [{"FileSystemId": filesystem_id}],
+            "actions": [
+                {"type": "remove-statements", "statement_ids": ["RemoveMe"]}
+            ],
+        },
+        session_factory=session_factory,
+    )
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+    data = json.loads(
+        client.describe_file_system_policy(FileSystemId=filesystem_id).get(
+            "Policy"
+        )
+    )
+    test.assertTrue("RemoveMe" not in [s["Sid"] for s in data.get("Statement", ())])

@@ -1,0 +1,34 @@
+{
+    "status_code": 200,
+    "data": {
+        "Aliases": [
+        {
+            "AliasName": "alias/test/sfn/encrypted",
+            "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/test/sfn/encrypted",
+            "TargetKeyId": "44d264df-da6f-45f9-9c18-1fc1beca6db0",
+            "CreationDate": {
+                "__class__": "datetime",
+                "year": 2024,
+                "month": 8,
+                "day": 29,
+                "hour": 10,
+                "minute": 56,
+                "second": 31,
+                "microsecond": 505000
+            },
+            "LastUpdatedDate": {
+                "__class__": "datetime",
+                "year": 2024,
+                "month": 8,
+                "day": 29,
+                "hour": 10,
+                "minute": 56,
+                "second": 31,
+                "microsecond": 505000
+            }
+        }
+        ],
+        "Truncated": false,
+        "ResponseMetadata": {}
+    }
+}

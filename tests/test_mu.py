@@ -191,7 +191,6 @@ class PolicyLambdaProvision(Publish):
             {'ConfigRuleName': 'custodian-configx',
              'Description': 'cloud-custodian lambda policy',
              'MaximumExecutionFrequency': 'Three_Hours',
-             'Scope': {'ComplianceResourceTypes': ['AWS::Kinesis::Stream']},
              'Source': {
                  'Owner': 'CUSTOM_LAMBDA',
                  'SourceDetails': [{'EventSource': 'aws.config',

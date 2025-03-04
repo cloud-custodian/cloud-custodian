@@ -86,6 +86,8 @@ class Resolver:
         refs = self._ref_map.get(block["id"], ())
         for rid in refs:
             r = self._id_map[rid]
+            if "__tfmeta" not in r:
+                continue
             rtype = r["__tfmeta"]["label"]
             if r["__tfmeta"].get("type") == "data":
                 rtype = f"data.{rtype}"
@@ -93,7 +95,7 @@ class Resolver:
                 continue
             yield r
 
-    def visit(self, block, root=False):
+    def visit(self, block):
         if not isinstance(block, dict):
             return ()
 
@@ -108,10 +110,14 @@ class Resolver:
                 refs.add(v)
             if isinstance(v, (str, int, float, bool)):
                 continue
-            if isinstance(v, dict) and k != "__tfmeta":
-                refs.update(self.visit(v))
+            if isinstance(v, dict):
+                if k == "__tfmeta":
+                    refs.update(r["id"] for r in v.get("references", ()))
+                else:
+                    refs.update(self.visit(v))
             if isinstance(v, list):
-                list(map(self.visit, v))
+                for entry in v:
+                    self.visit(entry)
 
         if refs and block.get("__tfmeta", {}).get("label"):
             self._ref_map.setdefault(bid, []).extend(refs)

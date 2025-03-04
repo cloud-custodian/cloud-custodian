@@ -81,8 +81,6 @@ html:
 	cp -p tools/c7n_mailer/README.md $(SRCDIR)/tools/c7n-mailer.md
 	cp -p tools/c7n_trailcreator/readme.md $(SRCDIR)/tools/c7n-trailcreator.md
 	cp -p tools/c7n_guardian/readme.md $(SRCDIR)/tools/c7n-guardian.md
-	cp -p tools/omnissm/README.md $(SRCDIR)/tools/omnissm.md
-	cp -p tools/omnissm/assets/omnissm.svg $(SRCDIR)/tools/assets/omnissm.svg
 	cp -p tools/c7n_salactus/README.md $(SRCDIR)/tools/c7n-salactus.md
 	cp -p tools/c7n_logexporter/README.md $(SRCDIR)/tools/c7n-logexporter.md
 	cp -p tools/c7n_left/README.md $(SRCDIR)/tools/c7n-left.md

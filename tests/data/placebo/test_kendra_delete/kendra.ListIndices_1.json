@@ -1,0 +1,34 @@
+{
+    "status_code": 200,
+    "data": {
+        "IndexConfigurationSummaryItems": [
+            {
+                "Name": "c7n-test",
+                "Id": "2ac89abb-a374-4b0a-853a-f8caefa7c2f1",
+                "Edition": "GEN_AI_ENTERPRISE_EDITION",
+                "CreatedAt": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 12,
+                    "day": 18,
+                    "hour": 14,
+                    "minute": 32,
+                    "second": 53,
+                    "microsecond": 990000
+                },
+                "UpdatedAt": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 12,
+                    "day": 18,
+                    "hour": 14,
+                    "minute": 32,
+                    "second": 53,
+                    "microsecond": 990000
+                },
+                "Status": "ACTIVE"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,12 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "FunctionUrl": "https://hello-custodian.lambda-url.us-west-2.on.aws/",
+        "FunctionArn": "arn:aws:lambda:us-west-2:644160558196:function:hello_world",
+        "AuthType": "AWS_IAM",
+        "CreationTime": "2024-10-03T14:27:18.600395Z",
+        "LastModifiedTime": "2024-10-03T14:27:18.600395Z",
+        "InvokeMode": "BUFFERED"
+    }
+}

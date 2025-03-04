@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "c7n_policystream"
-version = "0.4.40"
+version = "0.4.42"
 description = "Cloud Custodian - Git Commits as Logical Policy Changes"
 readme = "README.md"
 homepage = "https://cloudcustodian.io"

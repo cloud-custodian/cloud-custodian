@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:ses:us-east-1:644160558196:mailmanager-ingress-point/inp-xoabcxzsr2kpnh5gubua2naj",
+                "Tags": [
+                    {
+                        "Key": "env",
+                        "Value": "dev"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

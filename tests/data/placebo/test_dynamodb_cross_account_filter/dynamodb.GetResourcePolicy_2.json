@@ -1,0 +1,11 @@
+{
+    "status_code": 400,
+    "data": {
+        "Error": {
+            "Message": "Resource-based policy not found for the provided ResourceArn: arn:aws:dynamodb:us-east-1:123456789012:table/test-1",
+            "Code": "PolicyNotFoundException"
+        },
+        "ResponseMetadata": {},
+        "message": "Resource-based policy not found for the provided ResourceArn: arn:aws:dynamodb:us-east-1:123456789012:table/test-1"
+    }
+}

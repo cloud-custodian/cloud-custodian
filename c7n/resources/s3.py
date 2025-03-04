@@ -55,7 +55,7 @@ from c7n.filters import (
     FilterRegistry, Filter, CrossAccountAccessFilter, MetricsFilter,
     ValueFilter, ListItemFilter)
 from .aws import shape_validate
-import c7n.filters.policystatement as polstmt_filter
+from c7n.filters.policystatement import HasStatementFilter
 from c7n.manager import resources
 from c7n.output import NullBlobOutput
 from c7n import query
@@ -829,7 +829,7 @@ class BucketFinding(PostFinding):
 
 
 @S3.filter_registry.register('has-statement')
-class HasStatementFilter(polstmt_filter.HasStatementFilter):
+class S3HasStatementFilter(HasStatementFilter):
     def get_std_format_args(self, bucket):
         return {
             'account_id': self.manager.config.account_id,
@@ -3870,8 +3870,13 @@ class BucketReplication(ListItemFilter):
 
     def augment_bucket_replication(self, b, replication, client):
         destination_bucket = replication.get('Destination').get('Bucket').split(':')[5]
-        destination_region = inspect_bucket_region(destination_bucket, client.meta.endpoint_url)
+        try:
+            destination_region = inspect_bucket_region(destination_bucket, client.meta.endpoint_url)
+        except ValueError:
+            replication['DestinationBucketAvailable'] = False
+            return
         source_region = get_region(b)
+        replication['DestinationBucketAvailable'] = True
         replication['DestinationRegion'] = destination_region
         replication['CrossRegion'] = destination_region != source_region
 

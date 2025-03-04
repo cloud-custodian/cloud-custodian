@@ -1,0 +1,54 @@
+{
+    "status_code": 200,
+    "data": {
+        "Keys": [
+            {
+                "KeyArn": "arn:aws:payment-cryptography:us-east-1:111111111111:key/e5l4erkydbkw7ypi",
+                "KeyState": "CREATE_COMPLETE",
+                "KeyAttributes": {
+                    "KeyUsage": "TR31_C0_CARD_VERIFICATION_KEY",
+                    "KeyClass": "SYMMETRIC_KEY",
+                    "KeyAlgorithm": "TDES_2KEY",
+                    "KeyModesOfUse": {
+                        "Encrypt": false,
+                        "Decrypt": false,
+                        "Wrap": false,
+                        "Unwrap": false,
+                        "Generate": true,
+                        "Sign": false,
+                        "Verify": true,
+                        "DeriveKey": false,
+                        "NoRestrictions": false
+                    }
+                },
+                "KeyCheckValue": "593703",
+                "Exportable": true,
+                "Enabled": true
+            },
+            {
+                "KeyArn": "arn:aws:payment-cryptography:us-east-1:111111111111:key/abcdeigxuedzuzbwn",
+                "KeyState": "DELETE_PENDING",
+                "KeyAttributes": {
+                    "KeyUsage": "TR31_C0_CARD_VERIFICATION_KEY",
+                    "KeyClass": "SYMMETRIC_KEY",
+                    "KeyAlgorithm": "TDES_2KEY",
+                    "KeyModesOfUse": {
+                        "Encrypt": false,
+                        "Decrypt": false,
+                        "Wrap": false,
+                        "Unwrap": false,
+                        "Generate": true,
+                        "Sign": false,
+                        "Verify": true,
+                        "DeriveKey": false,
+                        "NoRestrictions": false
+                    }
+                },
+                "KeyCheckValue": "8EA237",
+                "Exportable": true,
+                "Enabled": true
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,16 @@
+{
+    "status_code": 200,
+    "data": {
+        "deliveryDestinations": [
+            {
+                "name": "test-destination",
+                "arn": "arn:aws:logs:us-east-1:123456789012:delivery-destination:test-destination",
+                "deliveryDestinationType": "S3",
+                "deliveryDestinationConfiguration": {
+                    "destinationResourceArn": "arn:aws:s3:::c7n-test-s3-bucket"
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

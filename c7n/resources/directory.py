@@ -1,5 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+from c7n.filters.core import Filter, ValueFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema, QueryParser
@@ -50,10 +51,165 @@ class DirectoryVpcFilter(VpcFilter):
     RelatedIdsExpression = "VpcSettings.VpcId"
 
 
+@Directory.filter_registry.register('is-log-forwarding')
+class DirectoryLogSubscriptionFilter(Filter):
+
+    annotation_key = "c7n:LogSubscriptions"
+    permissions = ("ds:ListLogSubscriptions",)
+    schema = type_schema('is-log-forwarding')
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('ds')
+        results = []
+        for r in resources:
+            subs = self.manager.retry(
+                client.list_log_subscriptions,
+                DirectoryId=r["DirectoryId"]
+            )["LogSubscriptions"]
+            if subs:
+                r[self.annotation_key] = subs
+                results.append(r)
+
+        return results
+
+
+@Directory.filter_registry.register('ldap')
+class DirectoryLDAPFilter(Filter):
+    """Filter directories based on their LDAP status
+
+    :example:
+
+        .. code-block:: yaml
+
+            policies:
+              - name: ldap-enabled-directories
+                resource: directory
+                filters:
+                  - type: ldap
+                    status: Disabled
+    """
+    schema = type_schema(
+        'ldap',
+        status={'type': 'string', 'enum': ['Enabled', 'Disabled']},
+        required=['status']
+    )
+
+    permissions = ('ds:DescribeLDAPSSettings',)
+    annotation_key = 'c7n:LDAPSSettings'
+    # Only MicrosoftAD and ADConnector directories have LDAP settings
+    # the other types will throw an UnsupportedOperationException
+    valid_directory_types = ['MicrosoftAD', "ADConnector"]
+
+    def process(self, resources, event=None):
+        resources = self.filter_resources(resources, 'Type', self.valid_directory_types)
+        client = local_session(self.manager.session_factory).client('ds')
+        status = self.data.get('status', 'Enabled')
+        matches = []
+        for r in resources:
+            if self.annotation_key not in r:
+                ldap_settings = client.describe_ldaps_settings(
+                    DirectoryId=r['DirectoryId'])['LDAPSSettingsInfo']
+                r[self.annotation_key] = ldap_settings
+            if status == "Disabled" and len(r[self.annotation_key]) == 0:
+                matches.append(r)
+            else:
+                for setting in r[self.annotation_key]:
+                    if setting['LDAPSStatus'] == status:
+                        matches.append(r)
+                        break
+        return matches
+
+
+@Directory.filter_registry.register('settings')
+class DirectorySettingsFilter(Filter):
+    """Filter directories based on their settings
+
+    :example:
+
+        .. code-block:: yaml
+
+            policies:
+              - name: settings-enabled-directories
+                resource: directory
+                filters:
+                  - type: settings
+                    key: TLS_1_0
+                    value: Enable
+    """
+    schema = type_schema(
+        'settings', rinherit=ValueFilter.schema)
+
+    permissions = ('ds:DescribeSettings',)
+    annotation_key = 'c7n:Settings'
+    # Only MicrosoftAD directories have settings
+    # Other types will throw an InvalidParameterException
+    valid_directory_types = ['MicrosoftAD']
+
+    def process(self, resources, event=None):
+        resources = self.filter_resources(resources, 'Type', self.valid_directory_types)
+        client = local_session(self.manager.session_factory).client('ds')
+        key = self.data.get('key')
+        value = self.data.get('value')
+        matches = []
+        for r in resources:
+            if self.annotation_key not in r:
+                settings = client.describe_settings(
+                    DirectoryId=r['DirectoryId'])['SettingEntries']
+                r[self.annotation_key] = settings
+            for setting in r[self.annotation_key]:
+                if setting['Name'] == key and setting['AppliedValue'] == value:
+                    matches.append(r)
+                    break
+        return matches
+
+
+@Directory.filter_registry.register('trust')
+class DirectoryTrustFilter(ValueFilter):
+    """Filter directories based on their trust relationships
+
+    :example:
+
+        .. code-block:: yaml
+
+            policies:
+              - name: trust-enabled-directories
+                resource: directory
+                filters:
+                  - type: trust
+                    key: TrustState
+                    value: Verified
+              - name: trust-remote-domain
+                resource: directory
+                filters:
+                  - type: trust
+                    key: RemoteDomainName
+                    value: example.com
+    """
+    schema = type_schema(
+        'trust', rinherit=ValueFilter.schema)
+
+    permissions = ('ds:DescribeTrusts',)
+    annotation_key = 'c7n:Trusts'
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('ds')
+        trusts = client.describe_trusts()['Trusts']
+        matched = []
+        for r in resources:
+            r[self.annotation_key] = [
+                t for t in trusts if t['DirectoryId'] == r['DirectoryId']]
+            # When there are no trusts, we pass an empty dictionary so that
+            # self.match can evaluate directories without trusts using the absent value
+            resource_trusts = r[self.annotation_key] if len(r[self.annotation_key]) >= 1 else [{}]
+            if any((self.match(trust) for trust in resource_trusts)):
+                matched.append(r)
+        return matched
+
+
 @Directory.action_registry.register('tag')
 class DirectoryTag(Tag):
     """Add tags to a directory
-
+-
     :example:
 
         .. code-block:: yaml

@@ -548,18 +548,19 @@ class BrowerPolicyFilter(ValueFilter):
         client = local_session(self.manager.session_factory).client('workspaces-web')
         results = []
         for r in resources:
-            if self.policy_annotation not in r:
-                browserSettings = self.manager.retry(
-                    client.get_browser_settings,
-                    browserSettingsArn=r['browserSettingsArn']).get('browserSettings')
-                browserPolicy = json.loads(browserSettings['browserPolicy'])
-                r[self.policy_annotation] = browserPolicy
-            if self.match(r[self.policy_annotation]):
-                if self.matched_policy_annotation not in r:
-                    r[self.matched_policy_annotation] = [self.data.get('key')]
-                else:
-                    r[self.matched_policy_annotation].append(self.data.get('key'))
-                results.append(r)
+            if 'browserSettingsArn' in r:
+                if (self.policy_annotation not in r):
+                    browserSettings = self.manager.retry(
+                        client.get_browser_settings,
+                        browserSettingsArn=r['browserSettingsArn']).get('browserSettings')
+                    browserPolicy = json.loads(browserSettings['browserPolicy'])
+                    r[self.policy_annotation] = browserPolicy
+                if self.match(r[self.policy_annotation]):
+                    if self.matched_policy_annotation not in r:
+                        r[self.matched_policy_annotation] = [self.data.get('key')]
+                    else:
+                        r[self.matched_policy_annotation].append(self.data.get('key'))
+                    results.append(r)
         return results
 
 
