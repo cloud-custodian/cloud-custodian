@@ -4,6 +4,7 @@ import logging
 import itertools
 from concurrent.futures import as_completed
 from datetime import datetime, timedelta
+from botocore.exceptions import ClientError
 
 from c7n.actions import BaseAction
 from c7n.filters import AgeFilter, CrossAccountAccessFilter, Filter, ValueFilter
@@ -17,14 +18,10 @@ from c7n.filters.kms import KmsRelatedFilter
 from .aws import shape_validate
 from c7n.exceptions import PolicyValidationError
 from c7n.utils import (
-    type_schema, local_session, snapshot_identifier, chunks)
+    type_schema, local_session, snapshot_identifier, chunks, get_retry )
 
 from c7n.resources.rds import ParameterFilter
 from c7n.filters.backup import ConsecutiveAwsBackupsFilter
-from c7n.utils import (
-    local_session, type_schema, get_retry, chunks, snapshot_identifier,
-    merge_dict_list, filter_empty, jmespath_search)
-from botocore.exceptions import ClientError
 
 log = logging.getLogger('custodian.rds-cluster')
 
@@ -772,6 +769,7 @@ class PendingMaintenance(Filter):
 class RegionCopyClusterSnapshot(BaseAction):
     """Copy an RDS Cluster snapshot across regions.
 
+    
     Example::
 
       - name: copy-cluster-snapshots
