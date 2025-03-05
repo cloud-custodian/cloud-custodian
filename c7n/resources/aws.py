@@ -931,11 +931,11 @@ def shape_schema(service, shape_name, drop_fields=()):
             elif member_shape.type_name == 'map':
                 if member_shape.value.type_name in ('structure', 'list'):
                     member_schema["patternProperties"] = {
-                        "^.*$": _expand_shape_schema(member_shape.value)
+                        "^.+$": _expand_shape_schema(member_shape.value)
                     }
                 else:
                     member_schema["patternProperties"] = {
-                        "^.*$": {
+                        "^.+$": {
                             'type': TYPE_MAP.get(member_shape.value.type_name)
                         }
                     }
