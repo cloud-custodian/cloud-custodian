@@ -942,7 +942,7 @@ def shape_schema(service, shape_name, drop_fields=()):
 
             schema[member] = member_schema
         return schema
-    
+
     session = fake_session()._session
     model = session.get_service_model(service)
     shape = model.shape_for(shape_name)
