@@ -561,7 +561,7 @@ def test_shape_schema_error():
         "actions": [{
             "type": "update-config",
             "upgradePolicy": {
-                "supportType": "WRONG",
+                "supportType": "STANDARD",
             }
         }],
     }]}
