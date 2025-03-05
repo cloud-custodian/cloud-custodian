@@ -67,6 +67,17 @@ _profile_session = None
 
 
 DEFAULT_NAMESPACE = "CloudMaid"
+# Mapping of service model shape types to json schema types
+MODEL_SCHEMA_TYPE_MAP = {
+    'string': 'string',
+    'structure': 'object',
+    'list': 'array',
+    'integer': 'integer',
+    'boolean': 'boolean',
+    'long': 'number',
+    'double': 'number',
+    'map': 'object'
+}
 
 
 def get_profile_session(options):
@@ -893,24 +904,12 @@ def shape_schema(service, shape_name, drop_fields=()):
                 (e.g. resource_id param).
      """
 
-    # Mapping of service model shape types to json schema types
-    TYPE_MAP = {
-        'string': 'string',
-        'structure': 'object',
-        'list': 'array',
-        'integer': 'integer',
-        'boolean': 'boolean',
-        'long': 'number',
-        'double': 'number',
-        'map': 'object'
-    }
-
     def _expand_shape_schema(shape):
         schema = {}
         for member, member_shape in shape.members.items():
             if member in drop_fields:
                 continue
-            _type = TYPE_MAP.get(member_shape.type_name)
+            _type = MODEL_SCHEMA_TYPE_MAP.get(member_shape.type_name)
             if _type is None:
                 raise KeyError(f"Unknown type for {member_shape.name}: {member_shape.type_name}")
             member_schema = {'type': _type}
@@ -926,7 +925,7 @@ def shape_schema(service, shape_name, drop_fields=()):
                     }
                 else:
                     member_schema["items"] = {
-                        'type': TYPE_MAP.get(member_shape.member.type_name)
+                        'type': MODEL_SCHEMA_TYPE_MAP.get(member_shape.member.type_name)
                     }
             elif member_shape.type_name == 'map':
                 if member_shape.value.type_name in ('structure', 'list'):
@@ -936,7 +935,7 @@ def shape_schema(service, shape_name, drop_fields=()):
                 else:
                     member_schema["patternProperties"] = {
                         "^.+$": {
-                            'type': TYPE_MAP.get(member_shape.value.type_name)
+                            'type': MODEL_SCHEMA_TYPE_MAP.get(member_shape.value.type_name)
                         }
                     }
 

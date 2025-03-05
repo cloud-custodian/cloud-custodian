@@ -553,6 +553,24 @@ def test_shape_schema():
     assert "^.+$" in stage_update_schema["RouteSettings"]["patternProperties"].keys()
 
 
+@patch('c7n.resources.aws.MODEL_SCHEMA_TYPE_MAP', {"string": "string"})
+def test_shape_schema_error():
+    policy_data = {"policies": [{
+        "name": "update-eks-config",
+        "resource": "eks",
+        "actions": [{
+            "type": "update-config",
+            "upgradePolicy": {
+                "supportType": "WRONG",
+            }
+        }],
+    }]}
+    structure = StructureParser()
+    with pytest.raises(KeyError) as e:
+        load_resources(structure.get_resource_types(policy_data))
+    assert "Unknown type for" in str(e.value)
+
+
 @vcr.use_cassette(
     'tests/data/vcr_cassettes/test_output/default_bucket_region_public.yaml')
 def test_default_bucket_region_is_public():
