@@ -1,0 +1,28 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Items": [
+            {
+                "ApiEndpoint": "https://6sgeyg90k0.execute-api.us-east-1.amazonaws.com",
+                "ApiId": "6sgeyg90k0",
+                "ApiKeySelectionExpression": "$request.header.x-api-key",
+                "CreatedDate": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 1,
+                    "day": 27,
+                    "hour": 19,
+                    "minute": 14,
+                    "second": 25,
+                    "microsecond": 0
+                },
+                "DisableExecuteApiEndpoint": false,
+                "Name": "c7n-test",
+                "ProtocolType": "HTTP",
+                "RouteSelectionExpression": "$request.method $request.path",
+                "Tags": {}
+            }
+        ]
+    }
+}
