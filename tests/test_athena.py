@@ -5,17 +5,56 @@ from pytest_terraform import terraform
 from .zpill import ACCOUNT_ID
 
 
-def test_athena_catalog(test):
-    factory = test.replay_flight_data("test_athena_data_catalog")
+def test_athena_catalog_tagging(test):
+    factory = test.replay_flight_data("test_athena_data_catalog_tagging")
     policy = test.load_policy(
         {
-            "name": "test-athena-catallog",
+            "name": "test-athena-catalog-tagging",
             "resource": "aws.athena-data-catalog",
+            "filters": [
+                {
+                    "CatalogName": "c7n-test"
+                }
+            ],
+            "actions": [
+                {
+                    "type": "tag",
+                    "key": "c7n",
+                    "value": "test",
+                }
+            ]
         },
+        config={"account_id": ACCOUNT_ID},
         session_factory=factory,
     )
     resources = policy.run()
-    assert len(resources) == 2
+    assert len(resources) == 1
+
+    policy = test.load_policy(
+        {
+            "name": "test-athena-catalog-tagging",
+            "resource": "aws.athena-data-catalog",
+            "filters": [
+                {
+                    "tag:c7n": "test"
+                }
+            ],
+            "actions": [
+                {
+                    "type": "remove-tag",
+                    "tags": ["c7n"]
+                }
+            ]
+        },
+        config={"account_id": ACCOUNT_ID},
+        session_factory=factory,
+    )
+    resources = policy.run()
+    assert len(resources) == 1
+    client = factory().client("athena")
+    arn = f"arn:aws:athena:us-east-1:{ACCOUNT_ID}:datacatalog/{resources[0]['CatalogName']}"
+    tags = client.list_tags_for_resource(ResourceARN=arn)["Tags"]
+    assert len(tags) == 0
 
 
 def test_athena_cancel_capacity_reservation(test):
