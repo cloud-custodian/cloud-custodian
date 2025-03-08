@@ -104,7 +104,7 @@ class AzureCredential:
         elif self._auth_params.get('enable_cli_auth'):
             auth_name = 'Azure CLI'
             self._credential = AzureCliCredential()
-            account_info = _run_command('az account show --output json', timeout=10)
+            account_info = _run_command('az account show --output json'.split(" "), timeout=10)
             account_json = json.loads(account_info)
             self._auth_params['subscription_id'] = account_json['id']
             self._auth_params['tenant_id'] = account_json['tenantId']
