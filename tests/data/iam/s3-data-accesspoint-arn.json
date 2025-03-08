@@ -1,0 +1,38 @@
+[
+    {
+        "Id": "DataAccessPointArnValid",
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Actions": ["s3:PutObject"],
+                "Principal": ["*"],
+                "StatementId": "cab89702-05f0-4751-818e-ced6e98ef5f9",
+                "Effect": "Allow",
+                "Resource": ["arn:aws:s3:::data-accesspoint/*", "arn:aws:s3:::data-accesspoint"],
+                    "Condition": {
+                        "StringLike": {
+                            "s3:DataAccessPointArn": ["arn:aws:s3:us-east-1:123456789012:accesspoint/*"]
+                        }
+                    }
+            }
+        ]
+    },
+    {
+        "Id": "DataAccessPointArnInvalid",
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Actions": ["s3:PutObject"],
+                "Principal": ["*"],
+                "StatementId": "cab89702-05f0-4751-818e-ced6e98ef5f9",
+                "Effect": "Allow",
+                "Resource": ["arn:aws:s3:::data-accesspoint/*", "arn:aws:s3:::data-accesspoint"],
+                    "Condition": {
+                        "StringLike": {
+                            "s3:DataAccessPointArn": ["arn:aws:s3:us-east-1:444456789012:accesspoint/*"]
+                        }
+                    }
+            }
+        ]
+    } 
+]
