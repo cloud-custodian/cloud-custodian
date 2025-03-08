@@ -1,0 +1,447 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.KeyVault/vaults?api-version=2019-09-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 686302D5943F495D919A0537F15E6E24 Ref B: SJC211051203009 Ref C: 2025-02-22T01:01:29Z"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Sat, 22 Feb 2025 01:01:29 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "content-length": [
+                        "1634"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/c7ntest/providers/Microsoft.KeyVault/vaults/c7ntestvault",
+                                "name": "c7ntestvault",
+                                "type": "Microsoft.KeyVault/vaults",
+                                "location": "eastus",
+                                "tags": {},
+                                "properties": {
+                                    "sku": {
+                                        "family": "A",
+                                        "name": "Standard"
+                                    },
+                                    "tenantId": "00000000-0000-0000-0000-000000000003",
+                                    "networkAcls": {
+                                        "bypass": "None",
+                                        "defaultAction": "Allow",
+                                        "ipRules": [],
+                                        "virtualNetworkRules": []
+                                    },
+                                    "accessPolicies": [],
+                                    "enabledForDeployment": false,
+                                    "enabledForDiskEncryption": false,
+                                    "enabledForTemplateDeployment": false,
+                                    "enableSoftDelete": true,
+                                    "softDeleteRetentionInDays": 90,
+                                    "enableRbacAuthorization": true,
+                                    "vaultUri": "https://c7ntestvault.vault.azure.net/",
+                                    "provisioningState": "Succeeded"
+                                }
+                            }
+                        ],
+                        "nextLink": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.KeyVault/vaults?api-version=2019-09-01&$skiptoken=dGVzdHx0ZXN0LWt2LXVwZGF0ZS1rZXk="
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.KeyVault/vaults?api-version=2019-09-01&$skiptoken=dGVzdHx0ZXN0LWt2LXVwZGF0ZS1rZXk=",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: E8F1DEA3A68F40C88B5C8E240FDFE124 Ref B: SJC211051203009 Ref C: 2025-02-22T01:01:29Z"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Sat, 22 Feb 2025 01:01:30 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "content-length": [
+                        "12"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": []
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://c7ntestvault.vault.azure.net/keys?api-version=7.5",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 401,
+                    "message": "Unauthorized"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Sat, 22 Feb 2025 01:01:30 GMT"
+                    ],
+                    "content-length": [
+                        "97"
+                    ],
+                    "www-authenticate": [
+                        "Bearer authorization=\"https://login.microsoftonline.com/408b7351-82bd-44b5-aed5-59198cd1c1c6\", resource=\"https://vault.azure.net\""
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "error": {
+                            "code": "Unauthorized",
+                            "message": "AKV10000: Request is missing a Bearer or PoP token."
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://c7ntestvault.vault.azure.net/keys?api-version=7.5",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Sat, 22 Feb 2025 01:01:30 GMT"
+                    ],
+                    "x-ms-keyvault-rbac-assignment-id": [
+                        "0a42e235865542c8b0a8e3cb2d88c3e0"
+                    ],
+                    "content-length": [
+                        "264"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "kid": "https://c7ntestvault.vault.azure.net/keys/test",
+                                "attributes": {
+                                    "enabled": true,
+                                    "created": 1740184047,
+                                    "updated": 1740184923,
+                                    "recoveryLevel": "Recoverable+Purgeable",
+                                    "recoverableDays": 90,
+                                    "exportable": false,
+                                    "hsmPlatform": "0"
+                                },
+                                "tags": {}
+                            }
+                        ],
+                        "nextLink": null
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.KeyVault/vaults?api-version=2019-09-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 7FF38652568D48B1BB6B4F9A65B59278 Ref B: SJC211051203009 Ref C: 2025-02-22T01:01:31Z"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Sat, 22 Feb 2025 01:01:32 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "content-length": [
+                        "1634"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/c7ntest/providers/Microsoft.KeyVault/vaults/c7ntestvault",
+                                "name": "c7ntestvault",
+                                "type": "Microsoft.KeyVault/vaults",
+                                "location": "eastus",
+                                "tags": {},
+                                "properties": {
+                                    "sku": {
+                                        "family": "A",
+                                        "name": "Standard"
+                                    },
+                                    "tenantId": "00000000-0000-0000-0000-000000000003",
+                                    "networkAcls": {
+                                        "bypass": "None",
+                                        "defaultAction": "Allow",
+                                        "ipRules": [],
+                                        "virtualNetworkRules": []
+                                    },
+                                    "accessPolicies": [],
+                                    "enabledForDeployment": false,
+                                    "enabledForDiskEncryption": false,
+                                    "enabledForTemplateDeployment": false,
+                                    "enableSoftDelete": true,
+                                    "softDeleteRetentionInDays": 90,
+                                    "enableRbacAuthorization": true,
+                                    "vaultUri": "https://c7ntestvault.vault.azure.net/",
+                                    "provisioningState": "Succeeded"
+                                }
+                            }
+                        ],
+                        "nextLink": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.KeyVault/vaults?api-version=2019-09-01&$skiptoken=dGVzdHx0ZXN0LWt2LXVwZGF0ZS1rZXk="
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.KeyVault/vaults?api-version=2019-09-01&$skiptoken=dGVzdHx0ZXN0LWt2LXVwZGF0ZS1rZXk=",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 9FB837E63631462D9790F0447CD82901 Ref B: SJC211051203009 Ref C: 2025-02-22T01:01:32Z"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Sat, 22 Feb 2025 01:01:32 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "content-length": [
+                        "12"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": []
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "PATCH",
+                "uri": "https://c7ntestvault.vault.azure.net/keys/test/?api-version=7.5",
+                "body": "mock_body",
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Sat, 22 Feb 2025 01:01:32 GMT"
+                    ],
+                    "x-ms-keyvault-rbac-assignment-id": [
+                        "0a42e235865542c8b0a8e3cb2d88c3e0"
+                    ],
+                    "content-length": [
+                        "753"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "key": {
+                            "kid": "https://c7ntestvault.vault.azure.net/keys/test/6e7d3511379e447f816d5d2994c32c93",
+                            "kty": "RSA",
+                            "key_ops": [
+                                "sign",
+                                "verify",
+                                "wrapKey",
+                                "unwrapKey",
+                                "encrypt",
+                                "decrypt"
+                            ],
+                            "n": "035NCxjjUaxeWEsNpH6dcuWGtaq30rKh1-itq4e-TldB4fx-9JylRC626boub3lquIigJH3BAGEBgsHrGgDpZzFiucmOYj7wn_ylSO6cEGKCfsXlKBfT6nDfgpiA3YrzdKSlNPZgzyMTvwTBdDPPB609oQkBB2AT5uB6-68piJ25gvreDbbJ7ByzFdPbuIZtTUMN7vPj4tJpeZiMqZP9Dmo3ntz19wkLusoEYFKD6EmHijnalLo1l61jni0dZUXuMkUe4dpyXRc2NYpYDooYzVVG5hCqPw-gWrk79aqrrFZVdh-SgqDE-Nddc3LiEUKFFuOLY8jsahn-m2QbD2puXQ",
+                            "e": "AQAB"
+                        },
+                        "attributes": {
+                            "enabled": true,
+                            "nbf": 1740787200,
+                            "exp": 1743465600,
+                            "created": 1740184047,
+                            "updated": 1740186092,
+                            "recoveryLevel": "Recoverable+Purgeable",
+                            "recoverableDays": 90,
+                            "exportable": false,
+                            "hsmPlatform": "0"
+                        },
+                        "tags": {}
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://c7ntestvault.vault.azure.net/keys/test/?api-version=7.5",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Sat, 22 Feb 2025 01:01:32 GMT"
+                    ],
+                    "x-ms-keyvault-rbac-assignment-id": [
+                        "0a42e235865542c8b0a8e3cb2d88c3e0"
+                    ],
+                    "content-length": [
+                        "753"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "key": {
+                            "kid": "https://c7ntestvault.vault.azure.net/keys/test/6e7d3511379e447f816d5d2994c32c93",
+                            "kty": "RSA",
+                            "key_ops": [
+                                "sign",
+                                "verify",
+                                "wrapKey",
+                                "unwrapKey",
+                                "encrypt",
+                                "decrypt"
+                            ],
+                            "n": "035NCxjjUaxeWEsNpH6dcuWGtaq30rKh1-itq4e-TldB4fx-9JylRC626boub3lquIigJH3BAGEBgsHrGgDpZzFiucmOYj7wn_ylSO6cEGKCfsXlKBfT6nDfgpiA3YrzdKSlNPZgzyMTvwTBdDPPB609oQkBB2AT5uB6-68piJ25gvreDbbJ7ByzFdPbuIZtTUMN7vPj4tJpeZiMqZP9Dmo3ntz19wkLusoEYFKD6EmHijnalLo1l61jni0dZUXuMkUe4dpyXRc2NYpYDooYzVVG5hCqPw-gWrk79aqrrFZVdh-SgqDE-Nddc3LiEUKFFuOLY8jsahn-m2QbD2puXQ",
+                            "e": "AQAB"
+                        },
+                        "attributes": {
+                            "enabled": true,
+                            "nbf": 1740787200,
+                            "exp": 1743465600,
+                            "created": 1740184047,
+                            "updated": 1740186092,
+                            "recoveryLevel": "Recoverable+Purgeable",
+                            "recoverableDays": 90,
+                            "exportable": false,
+                            "hsmPlatform": "0"
+                        },
+                        "tags": {}
+                    }
+                }
+            }
+        }
+    ]
+}
