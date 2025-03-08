@@ -4,8 +4,8 @@
 """
 Azure Functions
 """
-FUNCTION_DOCKER_VERSION = 'python|3.8'
-FUNCTION_EXT_VERSION = '~3'
+FUNCTION_DOCKER_VERSION = 'python|3.11'
+FUNCTION_EXT_VERSION = '~4'
 FUNCTION_EVENT_TRIGGER_MODE = 'azure-event-grid'
 FUNCTION_TIME_TRIGGER_MODE = 'azure-periodic'
 FUNCTION_KEY_URL = 'hostruntime/admin/host/systemkeys/_master?api-version=2018-02-01'
