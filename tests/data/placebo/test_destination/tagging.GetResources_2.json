@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:123456789012:destination:test-destination",
+                "Tags": [
+                    {
+                        "Key": "test-tag",
+                        "Value": "test-value"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
