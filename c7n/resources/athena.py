@@ -63,6 +63,10 @@ class UpdateWorkGroup(Action):
 
 @resources.register("athena-data-catalog")
 class AthenaDataCatalog(query.QueryResourceManager):
+    source_mapping = {
+        "describe": query.DescribeWithResourceTags,
+    }
+
     class resource_type(query.TypeInfo):
         service = "athena"
         enum_spec = ("list_data_catalogs", "DataCatalogsSummary", None)
@@ -70,6 +74,8 @@ class AthenaDataCatalog(query.QueryResourceManager):
         id = "CatalogName"
         name = "CatalogName"
         config_type = cfn_type = "AWS::Athena::DataCatalog"
+        universal_taggable = object()
+        permissions_augment = ("athena:ListTagsForResource",)
 
 
 @resources.register("athena-capacity-reservation")

@@ -99,3 +99,25 @@ class BucketTest(BaseTest):
                 for member in binding['members']:
                     members.add(member)
             self.assertTrue('allUsers' in members or 'allAuthenticatedUsers' in members)
+
+    def test_bucket_scc_mode(self):
+        project_id = "cloud-custodian"
+        bucket_name = "staging.cloud-custodian.appspot.com"
+        factory = self.replay_flight_data("bucket-get-resource", project_id)
+        p = self.load_policy(
+            {"name": "bucket", "resource": "gcp.bucket", "mode": {"type": "gcp-scc", "org": 12345}},
+            session_factory=factory,
+        )
+        [bucket] = p.push(
+            # Fake a minimal scc finding for a bucket.
+            {"finding": {"resourceName": "//storage.googleapis.com/" + bucket_name}, "resource": {}}
+        )
+
+        assert bucket["name"] == bucket_name
+        assert bucket["id"] == "staging.cloud-custodian.appspot.com"
+        assert bucket["storageClass"] == "STANDARD"
+        assert bucket["location"] == "EU"
+
+        assert p.resource_manager.get_urns([bucket]) == [
+            "gcp:storage::cloud-custodian:bucket/staging.cloud-custodian.appspot.com",
+        ]
