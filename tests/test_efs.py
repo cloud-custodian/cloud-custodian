@@ -339,6 +339,8 @@ class ElasticFileSystem(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 0)
 
+        # Check that NotAction does not throw an error if it does not exist
+        # in the resource's policy statement.
         p = self.load_policy(
             {
                 "name": "efs-has-statement",
@@ -360,7 +362,6 @@ class ElasticFileSystem(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 0)
-
 
     def test_efs_has_statement_partial(self):
         factory = self.replay_flight_data("test_efs_has_statement_partial",
