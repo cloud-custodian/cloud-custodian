@@ -339,6 +339,29 @@ class ElasticFileSystem(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 0)
 
+        p = self.load_policy(
+            {
+                "name": "efs-has-statement",
+                "resource": "efs",
+                "filters": [
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Allow",
+                                "NotAction": "elasticfilesystem:DeleteTags"
+                            }
+                        ]
+                    }
+                ]
+            },
+            config=region_config,
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+
     def test_efs_has_statement_partial(self):
         factory = self.replay_flight_data("test_efs_has_statement_partial",
                                           region='us-west-1')
