@@ -128,12 +128,12 @@ class HasStatementFilter(Filter):
             for resource_statement in resource_stmts:
                 found = 0
                 for req_key, req_value in required_statement.items():
-                    if req_key in ['Action', 'NotAction']:
+                    if req_key in ['Action', 'NotAction'] and \
+                        req_key in resource_statement:
 
-                        if req_key in resource_statement:
-                            resource_statement[req_key] = \
-                                self.action_resource_case_insensitive(
-                                    resource_statement[req_key])
+                        resource_statement[req_key] = \
+                            self.action_resource_case_insensitive(
+                                resource_statement[req_key])
                         req_value = self.action_resource_case_insensitive(
                             req_value)
 
