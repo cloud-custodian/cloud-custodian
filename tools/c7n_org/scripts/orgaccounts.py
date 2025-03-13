@@ -145,7 +145,6 @@ def get_ou_from_path(client, path):
 
 def get_sub_ous(client, ou):
     results = [ou]
-    ignore_regex = r".*Closed Accounts.*"
     ou_pager = client.get_paginator("list_organizational_units_for_parent")
     for sub_ou in (
         ou_pager.paginate(ParentId=ou["Id"])
@@ -153,8 +152,6 @@ def get_sub_ous(client, ou):
         .get("OrganizationalUnits")
     ):
         sub_ou["Path"] = "/%s/%s" % (ou["Path"].strip("/"), sub_ou["Name"])
-        if re.search(ignore_regex, sub_ou["Path"]):
-            continue
         results.extend(get_sub_ous(client, sub_ou))
     return results
 
