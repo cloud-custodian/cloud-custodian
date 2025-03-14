@@ -67,6 +67,7 @@ from c7n.utils import (
 from c7n.resources.kms import ResourceKmsKeyAlias
 from c7n.resources.securityhub import PostFinding
 from c7n.filters.backup import ConsecutiveAwsBackupsFilter
+from c7n.resources.rdsparamgroup import PGModify
 
 log = logging.getLogger('custodian.rds')
 
@@ -2272,3 +2273,68 @@ class PendingMaintenance(Filter):
                 results.append(r)
 
         return results
+
+
+@RDS.action_registry.register('modify-pg')
+class ModifyRDSParamGroup(PGModify):
+    """Modify RDS parameter group
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: rds-modify-param-group
+                resource: rds
+                filters:
+                  - type: default-vpc
+                actions:
+                  - type: modify-pg
+                    params:
+                      - name: max_connections
+                        value: 1000
+    """
+
+    schema = type_schema(
+        'modify-pg',
+        **{
+            'required': ['params'],
+            'params': {
+                'type': 'array',
+                'items': {
+                    'type': 'object',
+                    'required': ['name', 'value'],
+                    'name': {'type': 'string'},
+                    'value': {'type': 'string'},
+                    'apply-method': {'type': 'string', 'enum': ['immediate', 'pending-reboot']}
+                },
+            },
+        }
+    )
+    permissions = ('rds:ModifyDBParameterGroup',)
+
+    def process(self, dbs):
+        client = local_session(self.manager.session_factory).client('rds')
+
+        params = []
+        for param in self.data.get('params', []):
+            params.append({
+                'ParameterName': param['name'],
+                'ParameterValue': param['value'],
+                'ApplyMethod': param.get('apply-method', 'immediate'),
+            })
+
+        for db in dbs:
+            pgname = db['DBParameterGroups'][0]['DBParameterGroupName']
+            cur_params = self.get_current_params(client, pgname)
+            changed_params = []
+            for param in params:
+                param_name = param['ParameterName']
+                if (param_name not in cur_params or
+                   cur_params[param_name]['ParameterValue'] != param['ParameterValue']):
+                    changed_params.append(param)
+            for param_set in chunks(changed_params, 5):
+                self.do_modify(client, pgname, param_set)
+
+            self.log.info('Modified RDS parameter group %s (%i parameters changed, %i unchanged)',
+                          pgname, len(changed_params), len(params) - len(changed_params))
