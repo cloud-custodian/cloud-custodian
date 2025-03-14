@@ -290,6 +290,7 @@ class ElasticFileSystem(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["Name"], "efs-without-secure-transport")
 
+    # This test leverages the "prevent anonymous acccess" template
     def test_efs_has_statement(self):
         factory = self.replay_flight_data("test_efs_has_statement", region='us-west-1')
         region_config = {'region': 'us-west-1'}
@@ -318,6 +319,7 @@ class ElasticFileSystem(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["Name"], "efs-has-statement")
 
+        # No PartialMatch key, full match on Action.
         p = self.load_policy(
             {
                 "name": "efs-has-statement",
@@ -327,7 +329,34 @@ class ElasticFileSystem(BaseTest):
                         "type": "has-statement",
                         "statements": [
                             {
-                                "Effect": "Deny"
+                                "Effect": "Allow",
+                                "Action": ["elasticfilesystem:ClientRootAccess",
+                                            "elasticfilesystem:ClientWrite"],
+                                "Resource": "{fs_arn}"
+                            }
+                        ]
+                    }
+                ],
+            },
+            config=region_config,
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        # Check that Principal does not throw an error if the key does not exist
+        # in the resource's policy statement
+        p = self.load_policy(
+            {
+                "name": "efs-has-statement",
+                "resource": "efs",
+                "filters": [
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Allow",
+                                "Principal": "123456789012"
                             }
                         ]
                     }
@@ -339,11 +368,41 @@ class ElasticFileSystem(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 0)
 
-        # Check that NotAction does not throw an error if it does not exist
-        # in the resource's policy statement.
         p = self.load_policy(
             {
                 "name": "efs-has-statement",
+                "resource": "efs",
+                "filters": [
+                    {
+                        "not": [
+                            {
+                                "type": "has-statement",
+                                "statements": [
+                                    {
+                                        "Effect": "Allow",
+                                        "Principal": [
+                                            "123456789012",
+                                            "555555555555"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            config=region_config,
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["Name"], "efs-has-statement")
+
+        # Check that NotAction does not throw an error if the key does not exist
+        # in the resource's policy statement.
+        p = self.load_policy(
+            {
+                "name": "efs-has-no-statement",
                 "resource": "efs",
                 "filters": [
                     {
@@ -363,15 +422,47 @@ class ElasticFileSystem(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 0)
 
-    def test_efs_has_statement_partial(self):
-        factory = self.replay_flight_data("test_efs_has_statement_partial",
-                                          region='us-west-1')
+    # Test a resource with no resource policy attached
+    def test_efs_has_statement_no_policy(self):
+        factory = self.replay_flight_data("test_efs_has_statement_no_policy", region='us-west-1')
         region_config = {'region': 'us-west-1'}
-
-        # No PartialMatch key as base case, full match.
         p = self.load_policy(
             {
-                "name": "efs-has-statement-partial",
+                "name": "efs-has-no-statement",
+                "resource": "efs",
+                "filters": [
+                    {
+                        "not": [
+                            {
+                            "type": "has-statement",
+                            "statements": [
+                                {
+                                    "Effect": "Allow",
+                                    "Condition":
+                                        {
+                                            "Bool": {
+                                                "elasticfilesystem:AccessedViaMountTarget": "true"
+                                            }
+                                        },
+                                    "Resource": "{fs_arn}"
+                                }
+                            ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            config=region_config,
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["Name"], "efs-has-statement-no-policy")
+
+        # Check that we find zero resources as expected.
+        p = self.load_policy(
+            {
+                "name": "efs-has-no-statement",
                 "resource": "efs",
                 "filters": [
                     {
@@ -380,7 +471,8 @@ class ElasticFileSystem(BaseTest):
                             {
                                 "Effect": "Allow",
                                 "Action": ["elasticfilesystem:ClientRootAccess",
-                                            "elasticfilesystem:ClientMount"],
+                                            "elasticfilesystem:ClientWrite"],
+                                "Resource": "{fs_arn}"
                             }
                         ]
                     }
@@ -390,7 +482,92 @@ class ElasticFileSystem(BaseTest):
             session_factory=factory,
         )
         resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+        # Check that Action does not throw an error if the key does not exist in
+        # the resource's policy statement.
+        p = self.load_policy(
+            {
+                "name": "efs-has-no-statement",
+                "resource": "efs",
+                "filters": [
+                    {
+                        "not": [
+                            {
+                                "type": "has-statement",
+                                "statements": [
+                                    {
+                                        "Effect": "Allow",
+                                        "Action": "elasticfilesystem:ClientRootAccess",
+                                        "Resource": "{fs_arn}"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+
+                ],
+            },
+            config=region_config,
+            session_factory=factory,
+        )
+        resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["Name"], "efs-has-statement-no-policy")
+
+        p = self.load_policy(
+            {
+                "name": "efs-has-no-statement",
+                "resource": "efs",
+                "filters": [
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Deny"
+                            }
+                        ]
+                    }
+                ]
+            },
+            config=region_config,
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+        p = self.load_policy(
+            {
+                "name": "efs-has-no-statement",
+                "resource": "efs",
+                "filters": [
+                    {
+                        "not":
+                        [{
+                            "type": "has-statement",
+                            "statements": [
+                                {
+                                    "Effect": "Allow",
+                                    "Action": "elasticFilesystem:clientRootAccess",
+                                    "PartialMatch": ["Action"]
+                                }
+                            ]
+                        }]
+                    }
+
+                ],
+            },
+            config=region_config,
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["Name"], "efs-has-statement-no-policy")
+
+    def test_efs_has_statement_partial(self):
+        factory = self.replay_flight_data("test_efs_has_statement_partial",
+                                          region='us-west-1')
+        region_config = {'region': 'us-west-1'}
 
         # Test case insensitive and full-match with PartialMatch key
         p = self.load_policy(
