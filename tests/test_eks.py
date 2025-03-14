@@ -6,6 +6,7 @@ import os
 import json
 from botocore.exceptions import ClientError
 from .common import BaseTest
+from c7n.exceptions import PolicyValidationError
 
 from pytest_terraform import terraform
 
@@ -77,6 +78,23 @@ class EKS(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['name'], 'dev')
+
+    def test_update_config_schema_validation(self):
+        with self.assertRaises(PolicyValidationError) as err:
+            self.load_policy(
+                {
+                    "name": "update-eks-config",
+                    "resource": "eks",
+                    "actions": [{
+                        "type": "update-config",
+                        "unknownOption": True,
+                    }],
+                },
+            )
+        self.assertIn(
+            "unknownOption",
+            str(err.exception)
+        )
 
     def test_update_config(self):
         factory = self.replay_flight_data('test_eks_update_config')
