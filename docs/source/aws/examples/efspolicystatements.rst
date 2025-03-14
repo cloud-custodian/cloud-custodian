@@ -46,6 +46,9 @@ returned::
   }
 
 
+PartialMatch
+************
+
 The following example policy workflow uses the `has-statement` filter with the
 `PartialMatch` field which will match any statement that **includes** the
 `Action` listed, rather than only resources that **exactly match** the items in
