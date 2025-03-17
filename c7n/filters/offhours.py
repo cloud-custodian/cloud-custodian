@@ -96,7 +96,10 @@ The value of the tag must be one of the following:
     savings time, if applicable.)*
   * ``off=(time spec)`` and/or ``on=(time spec)`` matching time specifications
     supported by :py:class:`c7n.filters.offhours.ScheduleParser` as described
-    in the next section.
+    in the next section. Additionally, it's possible to specify ``off=disabled``
+    and/or ``on=disabled`` to completly disable offhours stopping (respectively
+    starting) - this way you can have a policy to stop ressources, without starting
+    them (or vice-verse).
 
 
 .. _scheduleparser-time-spec:
@@ -655,10 +658,12 @@ class ScheduleParser:
                 return None
             key, value = kv
             if key != 'tz':
-                value = self.parse_resource_schedule(value)
+                if value != 'disabled':
+                    value = self.parse_resource_schedule(value)
             if value is None:
                 return None
-            schedule[key] = value
+            if value != 'disabled':
+                schedule[key] = value
 
         # add default timezone, if none supplied or blank
         if not schedule.get('tz'):
