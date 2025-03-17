@@ -19,20 +19,10 @@
                     "microsecond": 0
                 },
                 "LifeCycleState": "available",
-                "Name": "efs-has-statement",
+                "Name": "efs-has-statement-no-policy",
                 "NumberOfMountTargets": 2,
                 "SizeInBytes": {
                     "Value": 6144,
-                    "Timestamp": {
-                        "__class__": "datetime",
-                        "year": 2025,
-                        "month": 3,
-                        "day": 14,
-                        "hour": 10,
-                        "minute": 58,
-                        "second": 29,
-                        "microsecond": 0
-                    },
                     "ValueInIA": 0,
                     "ValueInStandard": 6144,
                     "ValueInArchive": 0
@@ -44,7 +34,7 @@
                 "Tags": [
                     {
                         "Key": "Name",
-                        "Value": "efs-has-statement"
+                        "Value": "efs-has-statement-no-policy"
                     },
                     {
                         "Key": "aws:elasticfilesystem:default-backup",
