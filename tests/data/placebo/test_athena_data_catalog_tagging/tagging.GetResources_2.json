@@ -11,14 +11,6 @@
                         "Value": "test"
                     }
                 ]
-            },
-            {
-                "ResourceARN": "arn:aws:athena:us-east-1:644160558196:datacatalog/sbx-u01c8m-athena-data-catalog-compliant",
-                "Tags": []
-            },
-            {
-                "ResourceARN": "arn:aws:athena:us-east-1:644160558196:datacatalog/sbx-u01c8m-athena-data-catalog-noncompliant",
-                "Tags": []
             }
         ],
         "ResponseMetadata": {}
