@@ -216,6 +216,8 @@ ResourceMap = {
   "aws.quicksight-group": "c7n.resources.quicksight.QuicksightGroup",
   "aws.quicksight-user": "c7n.resources.quicksight.QuicksightUser",
   "aws.r53domain": "c7n.resources.route53.Route53Domain",
+  "aws.resource-share-self": "c7n.resources.ram.ResourceShareSelf",
+  "aws.resource-share-other": "c7n.resources.ram.ResourceShareOther",
   "aws.rds": "c7n.resources.rds.RDS",
   "aws.rds-cluster": "c7n.resources.rdscluster.RDSCluster",
   "aws.rds-cluster-param-group": "c7n.resources.rdsparamgroup.RDSClusterParamGroup",

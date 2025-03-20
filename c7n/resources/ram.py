@@ -1,3 +1,4 @@
+from c7n.actions import Action
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import Filter
 from c7n.manager import resources
@@ -6,30 +7,40 @@ from c7n.resolver import ValuesFrom
 from c7n.utils import get_retry, local_session, type_schema
 
 
-class RamResourceShareDescribe(DescribeSource):
-    def get_resources(self, ids, cache=True):
-        resources = super().get_resources(ids, cache)
-        self.manager.switch_enum_specs()
-        resources.extend(super().get_resources(ids, cache))
-        return resources
+class ResourceShareDescribe(DescribeSource):
 
-    def resources(self, query=None):
-        resources = super().resources(query)
-        self.manager.switch_enum_specs()
-        resources.extend(super().resources(query))
-        return resources
+    def augment(self, resources):
+        def _augment(r):
+            r['Tags'] = [{'Key': t['key'], 'Value': t['value']} for t in r.get('tags', [])]
+            return r
+        resources = super().augment(resources)
+        return list(map(_augment, resources))
 
 
-@resources.register('ram-resource-share')
-class RAMResourceShare(QueryResourceManager):
+@resources.register('resource-share-other')
+class ResourceShareOther(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'ram'
-        enum_spec = (
-            'get_resource_shares', 'resourceShares',
-            {"resourceOwner": "SELF", "resourceShareStatus": "ACTIVE"})
-        second_enum_spec = (
-            'get_resource_shares', 'resourceShares',
-            {"resourceOwner": "OTHER-ACCOUNTS", "resourceShareStatus": "ACTIVE"})
+        enum_spec = ('get_resource_shares', 'resourceShares',
+                     {"resourceShareStatus": "ACTIVE", "resourceOwner": "OTHER-ACCOUNTS"})
+        filter_name = 'resourceShareArns'
+        filter_type = 'list'
+        arn = id = 'resourceShareArn'
+        name = 'name'
+        cfn_type = 'AWS::RAM::ResourceShare'
+        date = 'lastUpdatedTime'
+
+    retry = staticmethod(get_retry(
+        ('ServerInternalException', 'ServiceUnavailableException',
+         'ThrottlingException',)))
+
+
+@resources.register('resource-share-self')
+class ResourceShareSelf(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = 'ram'
+        enum_spec = ('get_resource_shares', 'resourceShares',
+                     {"resourceShareStatus": "ACTIVE", "resourceOwner": "SELF"})
         filter_name = 'resourceShareArns'
         filter_type = 'list'
         arn = id = 'resourceShareArn'
@@ -43,16 +54,13 @@ class RAMResourceShare(QueryResourceManager):
          'ThrottlingException',)))
 
     source_mapping = {
-        'describe': RamResourceShareDescribe
+        'describe': ResourceShareDescribe
     }
 
-    def switch_enum_specs(self):
-        self.resource_type.enum_spec = self.resource_type.second_enum_spec
 
-
-@RAMResourceShare.action_registry.register('external-share')
+@ResourceShareSelf.filter_registry.register('external-share')
 class ExternalShareFilter(Filter):
-    """Check a Resource Share's associations for non-whitelisted entities
+    """Check a Resource Share's associations for non-allowlisted entities
 
     :example:
 
@@ -63,73 +71,84 @@ class ExternalShareFilter(Filter):
             resource: ram-resource-share
             filters:
               - type: external-share
-                whitelist_accounts:
+                allowlist_accounts:
                   - "123456789012"
-                whitelist_accounts_from:
+                allowlist_accounts_from:
                     expr: keys(not_null(accounts, `[]`))
                     url: s3://my-bucket/my-aws-accounts.json
     """
 
     schema = type_schema(
         'external-share',
-        whitelist_accounts={'type': 'array', 'items': {'type': 'string'}},
-        whitelist_accounts_from={'$ref': '#/definitions/filters_common/value_from'},
-        whitelist_orgids={'type': 'array', 'items': {'type': 'string'}},
-        whitelist_orgids_from={'$ref': '#/definitions/filters_common/value_from'},
-        whitelist_org_units={'type': 'array', 'items': {'type': 'string'}},
-        whitelist_org_units_from={'$ref': '#/definitions/filters_common/value_from'},
-        whitelist_iam_users={'type': 'array', 'items': {'type': 'string'}},
-        whitelist_iam_users_from={'$ref': '#/definitions/filters_common/value_from'},
-        whitelist_iam_roles={'type': 'array', 'items': {'type': 'string'}},
-        whitelist_iam_roles_from={'$ref': '#/definitions/filters_common/value_from'},
-        whitelist_service_principals={'type': 'array', 'items': {'type': 'string'}},
-        whitelist_service_principals_from={'$ref': '#/definitions/filters_common/value_from'},
+        allowlist_accounts={'type': 'array', 'items': {'type': 'string'}},
+        allowlist_accounts_from={'$ref': '#/definitions/filters_common/value_from'},
+        allowlist_orgids={'type': 'array', 'items': {'type': 'string'}},
+        allowlist_orgids_from={'$ref': '#/definitions/filters_common/value_from'},
+        allowlist_org_units={'type': 'array', 'items': {'type': 'string'}},
+        allowlist_org_units_from={'$ref': '#/definitions/filters_common/value_from'},
+        allowlist_iam_users={'type': 'array', 'items': {'type': 'string'}},
+        allowlist_iam_users_from={'$ref': '#/definitions/filters_common/value_from'},
+        allowlist_iam_roles={'type': 'array', 'items': {'type': 'string'}},
+        allowlist_iam_roles_from={'$ref': '#/definitions/filters_common/value_from'},
+        allowlist_service_principals={'type': 'array', 'items': {'type': 'string'}},
+        allowlist_service_principals_from={'$ref': '#/definitions/filters_common/value_from'},
     )
 
     annotation_key = 'c7n:ExternalShareViolations'
-    associations_attribute = 'c7n:Associations'
+    associations_attribute = 'c7n:PrincipalAssociations'
 
-    def get_share_associations(self, r):
-        if not r.get(self.associations_attribute):
+    def get_share_associations(self, resources):
+        share_arns = [
+            r['resourceShareArn'] for r in resources
+            if self.associations_attribute not in r
+        ]
+        if share_arns:
             client = local_session(
                 self.manager.session_factory
             ).client(self.manager.resource_type.service)
             assocs = self.manager.retry(
                 client.get_resource_share_associations,
                 associationType='PRINCIPAL',
-                resourceShareArn=r['resourceShareArn']
+                resourceShareArns=share_arns
             )["resourceShareAssociations"]
-            r[self.associations_attribute] = assocs
+            associations_map = {}
+            # Have to client-side filter by status - (InvalidParameterException) You cannot use
+            # ResourceShareArns and AssociationStatus in one request.
+            for assoc in [a for a in assocs if a['status'] == 'ASSOCIATED']:
+                associations_map.setdefault(assoc['resourceShareArn'], []).append(assoc)
+            for r in resources:
+                r.setdefault(
+                    self.associations_attribute, []
+                ).extend(
+                    associations_map.get(r['resourceShareArn'], [])
+                )
+        return resources
 
     def process(self, resources, event=None):
         results = []
+        resources = self.get_share_associations(resources)
         for r in resources:
             allowed_entities = set(self.manager.config.account_id)
-            for whitelist in [
+            for allowlist in [
                 p for p in self.schema["properties"]
-                if p.startswith("whitelist") and not p.endswith("from")
+                if p.startswith("allowlist") and not p.endswith("from")
             ]:
-                allowed_entities = allowed_entities.union(self.data.get(whitelist, ()))
-                if f"{whitelist}_from" in self.data:
-                    values = ValuesFrom(self.data[f"{whitelist}_from"], self.manager)
+                allowed_entities = allowed_entities.union(self.data.get(allowlist, ()))
+                if f"{allowlist}_from" in self.data:
+                    values = ValuesFrom(self.data[f"{allowlist}_from"], self.manager)
                     allowed_entities = allowed_entities.union(values.get_values())
-
-            if r['owningAccountId'] not in allowed_entities:
-                # no need to check associated entities if owning account isn't whitelisted
-                violations = [r['owningAccountId']]
-            else:
-                self.get_share_associations(r)
-                share_entities = {r['associatedEntity'] for r in r[self.associations_attribute]}
-                violations = share_entities.difference(allowed_entities)
-
+            violations = [
+                assoc for assoc in r[self.associations_attribute]
+                if assoc['associatedEntity'] not in allowed_entities
+            ]
             if violations:
                 r[self.annotation_key] = violations
                 results.append(r)
         return results
 
 
-@RAMResourceShare.action_registry.register('disassociate')
-class DisassociateResourceShare(Filter):
+@ResourceShareSelf.action_registry.register('disassociate')
+class DisassociateResourceShare(Action):
     """Action to disassociate principals from a Resource Share
     https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ram/client/disassociate_resource_share.html
     :example:
@@ -141,9 +160,9 @@ class DisassociateResourceShare(Filter):
                 resource: ram-resource-share
                 filters:
                 - type: external-share
-                    whitelist_accounts:
+                    allowlist_accounts:
                     - 123456789012
-                    whitelist_orgids:
+                    allowlist_orgids:
                     - o-abcd1234
                 actions:
                 - disassociate
@@ -152,12 +171,8 @@ class DisassociateResourceShare(Filter):
 
     schema = type_schema(
         'disassociate',
-        required={'oneOf': ['principals', 'resource_arns']},
-        principals={'oneOf': [
-            {'enum': ['matched', 'all']},
-            {'type': 'array', 'items': {'type': 'string'}},
-        ]},
-        resource_arns={'type': 'array', 'items': {'type': 'string'}},
+        required=['principals'],
+        principals={'enum': ['matched', 'all']},
     )
     permissions = ('ram:DisassociateResourceShare',)
 
@@ -172,35 +187,38 @@ class DisassociateResourceShare(Filter):
 
     def process(self, resources):
         _all = self.data.get('principals') == 'all'
-        matched = self.data.get('principals') == 'matched'
-        resource_arns = self.data.get('resource_arns', [])
-        principals = self.data.get('principals', [])
 
         client = local_session(
             self.manager.session_factory
         ).client(self.manager.resource_type.service)
 
-        for r in resources:
-            if resource_arns:
-                self.manager.retry(
-                    client.disassociate_resource_share,
-                    resourceShareArn=r['resourceShareArn'],
-                    resourceArns=resource_arns
+        if _all and ExternalShareFilter.associations_attribute not in resources[0]:
+            share_arns = [r['resourceShareArn'] for r in resources]
+            assocs = self.manager.retry(
+                client.get_resource_share_associations,
+                associationType='PRINCIPAL',
+                resourceShareArns=share_arns
+            )['resourceShareAssociations']
+            associations_map = {}
+            for assoc in [a for a in assocs if a['status'] == 'ASSOCIATED']:
+                associations_map.setdefault(assoc['resourceShareArn'], []).append(assoc)
+            for r in resources:
+                r.setdefault(
+                    ExternalShareFilter.associations_attribute, []
+                ).extend(
+                    associations_map.get(r['resourceShareArn'], [])
                 )
 
+        for r in resources:
+            if _all:
+                principals = [
+                    a['associatedEntity']
+                    for a in r[ExternalShareFilter.associations_attribute]
+                ]
+            else:
+                principals = [a['associatedEntity'] for a in r[ExternalShareFilter.annotation_key]]
+
             if principals:
-                if _all:
-                    if ExternalShareFilter.associations_attribute not in resources[0]:
-                        assocs = self.manager.retry(
-                            client.get_resource_share_associations,
-                            associationType='PRINCIPAL',
-                            resourceShareArn=r['resourceShareArn']
-                        )['resourceShareAssociations']
-
-                    principals = [a['associatedEntity'] for a in assocs]
-                elif matched:
-                    principals = r[ExternalShareFilter.annotation_key]
-
                 self.manager.retry(
                     client.disassociate_resource_share,
                     resourceShareArn=r['resourceShareArn'],
@@ -208,8 +226,8 @@ class DisassociateResourceShare(Filter):
                 )
 
 
-@RAMResourceShare.action_registry.register('delete')
-class DeleteResourceShare(Filter):
+@ResourceShareSelf.action_registry.register('delete')
+class DeleteResourceShare(Action):
     """Action to delete a Resource Share
 
     :example:
@@ -221,9 +239,9 @@ class DeleteResourceShare(Filter):
             resource: ram-resource-share
             filters:
             - type: external-share
-              whitelist_accounts:
+              allowlist_accounts:
                 - 123456789012
-              whitelist_orgids:
+              allowlist_orgids:
                 - o-abcd1234
             actions:
                 - delete
