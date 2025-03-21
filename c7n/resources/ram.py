@@ -149,7 +149,7 @@ class DisassociateResourceShare(Action):
 
         policies:
             - name: disassociate-ram-resource-share
-                resource: ram-resource-share
+                resource: ram-resource-share-self
                 filters:
                 - type: external-share
                   allowlist_entities:
