@@ -152,10 +152,9 @@ class DisassociateResourceShare(Action):
                 resource: ram-resource-share
                 filters:
                 - type: external-share
-                    allowlist_accounts:
-                    - 123456789012
-                    allowlist_orgids:
-                    - o-abcd1234
+                  allowlist_entities:
+                  - 123456789012
+                  - o-abcd1234
                 actions:
                 - disassociate
                   principals: matched
@@ -228,12 +227,11 @@ class DeleteResourceShare(Action):
 
         policies:
             - name: delete-ram-resource-share
-            resource: ram-resource-share
+            resource: ram-resource-share-self
             filters:
             - type: external-share
-              allowlist_accounts:
+              allowlist_entities:
                 - 123456789012
-              allowlist_orgids:
                 - o-abcd1234
             actions:
                 - delete
