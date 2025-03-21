@@ -71,31 +71,27 @@ class ExternalShareFilter(Filter):
             resource: ram-resource-share
             filters:
               - type: external-share
-                allowlist_accounts:
-                  - "123456789012"
-                allowlist_accounts_from:
+                allowlist_entities:
+                  - 123456789012
+                  - arn:aws:iam::111111111111:role/MyRole
+                  - o-abcd1234
+                  - ou-ab12-34cd567890ef
+                  - aws:aws:iam::22222222222:user/MyUser
+                  - lambda.amazonaws.com
+                allowlist_entities_from:
                     expr: keys(not_null(accounts, `[]`))
                     url: s3://my-bucket/my-aws-accounts.json
     """
 
     schema = type_schema(
         'external-share',
-        allowlist_accounts={'type': 'array', 'items': {'type': 'string'}},
-        allowlist_accounts_from={'$ref': '#/definitions/filters_common/value_from'},
-        allowlist_orgids={'type': 'array', 'items': {'type': 'string'}},
-        allowlist_orgids_from={'$ref': '#/definitions/filters_common/value_from'},
-        allowlist_org_units={'type': 'array', 'items': {'type': 'string'}},
-        allowlist_org_units_from={'$ref': '#/definitions/filters_common/value_from'},
-        allowlist_iam_users={'type': 'array', 'items': {'type': 'string'}},
-        allowlist_iam_users_from={'$ref': '#/definitions/filters_common/value_from'},
-        allowlist_iam_roles={'type': 'array', 'items': {'type': 'string'}},
-        allowlist_iam_roles_from={'$ref': '#/definitions/filters_common/value_from'},
-        allowlist_service_principals={'type': 'array', 'items': {'type': 'string'}},
-        allowlist_service_principals_from={'$ref': '#/definitions/filters_common/value_from'},
+        allowlist_entities={'type': 'array', 'items': {'type': 'string'}},
+        allowlist_entities_from={'$ref': '#/definitions/filters_common/value_from'},
     )
 
     annotation_key = 'c7n:ExternalShareViolations'
     associations_attribute = 'c7n:PrincipalAssociations'
+    permissions = ('ram:GetResourceShareAssociations',)
 
     def get_share_associations(self, resources):
         share_arns = [
@@ -110,7 +106,7 @@ class ExternalShareFilter(Filter):
                 client.get_resource_share_associations,
                 associationType='PRINCIPAL',
                 resourceShareArns=share_arns
-            )["resourceShareAssociations"]
+            )['resourceShareAssociations']
             associations_map = {}
             # Have to client-side filter by status - (InvalidParameterException) You cannot use
             # ResourceShareArns and AssociationStatus in one request.
@@ -129,14 +125,10 @@ class ExternalShareFilter(Filter):
         resources = self.get_share_associations(resources)
         for r in resources:
             allowed_entities = set(self.manager.config.account_id)
-            for allowlist in [
-                p for p in self.schema["properties"]
-                if p.startswith("allowlist") and not p.endswith("from")
-            ]:
-                allowed_entities = allowed_entities.union(self.data.get(allowlist, ()))
-                if f"{allowlist}_from" in self.data:
-                    values = ValuesFrom(self.data[f"{allowlist}_from"], self.manager)
-                    allowed_entities = allowed_entities.union(values.get_values())
+            allowed_entities = allowed_entities.union(self.data.get('allowlist_entities', ()))
+            if 'allowlist_entities_from' in self.data:
+                values = ValuesFrom(self.data['allowlist_entities_from'], self.manager)
+                allowed_entities = allowed_entities.union(values.get_values())
             violations = [
                 assoc for assoc in r[self.associations_attribute]
                 if assoc['associatedEntity'] not in allowed_entities

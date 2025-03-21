@@ -75,7 +75,7 @@ class TestResourceShare(BaseTest):
                 "filters": [
                     {
                         "type": "external-share",
-                        "allowlist_accounts": ["210987654321"],
+                        "allowlist_entities": ["210987654321"],
                     },
                 ],
                 "actions": [
@@ -135,7 +135,7 @@ class TestResourceShare(BaseTest):
                 "filters": [
                     {
                         "type": "external-share",
-                        "allowlist_accounts": ["111111111111"],
+                        "allowlist_entities": ["111111111111"],
                     },
                 ],
                 "actions": [
