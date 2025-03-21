@@ -297,7 +297,7 @@ class TestECR(BaseTest):
 
     def test_ecr_set_lifecycle(self):
         pass
-    
+
     def test_ecr_image_query(self):
         session_factory = self.replay_flight_data("test_ecr_image_query")
         p = self.load_policy(
