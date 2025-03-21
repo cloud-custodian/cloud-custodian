@@ -377,6 +377,7 @@ LIFECYCLE_RULE_SCHEMA = {
             'required': ['countType', 'countNumber', 'tagStatus'],
             'properties': {
                 'tagStatus': {'enum': ['tagged', 'untagged', 'any']},
+                'tagPatternList': {'type': 'array', 'items': {'type': 'string'}},
                 'tagPrefixList': {'type': 'array', 'items': {'type': 'string'}},
                 'countNumber': {'type': 'integer'},
                 'countUnit': {'enum': ['hours', 'days']},
@@ -394,12 +395,13 @@ def lifecycle_rule_validate(policy, rule):
     #
     # https://docs.aws.amazon.com/AmazonECR/latest/userguide/LifecyclePolicies.html#lp_evaluation_rules
 
-    if (rule['selection']['tagStatus'] == 'tagged' and
-            'tagPrefixList' not in rule['selection']):
-        raise PolicyValidationError(
-            ("{} has invalid lifecycle rule {} tagPrefixList "
-             "required for tagStatus: tagged").format(
-                 policy.name, rule))
+    if rule['selection']['tagStatus'] == 'tagged':
+        if ('tagPrefixList' not in rule['selection'] and
+        'tagPatternList' not in rule['selection']):
+            raise PolicyValidationError(
+                ("{} has invalid lifecycle rule {} tagPrefixList or tagPatternList "
+                "required for tagStatus: tagged").format(
+                    policy.name, rule))
     if (rule['selection']['countType'] == 'sinceImagePushed' and
             'countUnit' not in rule['selection']):
         raise PolicyValidationError(
