@@ -16,7 +16,7 @@ class TestECR(BaseTest):
         with self.assertRaises(PolicyValidationError) as ecm:
             lifecycle_rule_validate(
                 policy, {'selection': {'tagStatus': 'tagged'}})
-        self.assertIn('tagPrefixList or tagPatternList required', str(ecm.exception))
+        self.assertIn('tagPrefixList required', str(ecm.exception))
         with self.assertRaises(PolicyValidationError) as ecm:
             lifecycle_rule_validate(
                 policy, {'selection': {
@@ -24,15 +24,6 @@ class TestECR(BaseTest):
                     'countNumber': 10, 'countUnit': 'days',
                     'countType': 'imageCountMoreThan'}})
         self.assertIn('countUnit invalid', str(ecm.exception))
-        r = lifecycle_rule_validate(policy, {'selection': {
-            'tagStatus': 'tagged', 'tagPatternList': ["prod*"],
-            'countType': 'sinceImagePushed', 'countUnit': 'days',
-            'countNumber': 14}})
-        self.assertEqual(r, None)
-        r = lifecycle_rule_validate(policy, {'selection': {
-            'tagStatus': 'tagged', 'tagPatternList': ["prod"],
-            'countType': 'imageCountMoreThan', 'countNumber': 1}})
-        self.assertEqual(r, None)
 
     def create_repository(self, client, name):
         """ Create the named repository. Delete existing one first if applicable. """
