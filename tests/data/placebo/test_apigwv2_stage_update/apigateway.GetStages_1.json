@@ -1,0 +1,39 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Items": [
+            {
+                "AutoDeploy": true,
+                "CreatedDate": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 1,
+                    "day": 27,
+                    "hour": 19,
+                    "minute": 14,
+                    "second": 25,
+                    "microsecond": 0
+                },
+                "DefaultRouteSettings": {
+                    "DetailedMetricsEnabled": false
+                },
+                "LastDeploymentStatusMessage": "Deployment attempt failed: Unable to deploy API because no valid routes exist in this API",
+                "LastUpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 1,
+                    "day": 27,
+                    "hour": 19,
+                    "minute": 14,
+                    "second": 26,
+                    "microsecond": 0
+                },
+                "RouteSettings": {},
+                "StageName": "$default",
+                "StageVariables": {},
+                "Tags": {}
+            }
+        ]
+    }
+}
