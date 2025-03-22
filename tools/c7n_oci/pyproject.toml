@@ -15,7 +15,7 @@ classifiers=[
 ]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = ">=3.9.2,<4.0.0"
 oci = "^2.106"
 
 [tool.poetry.group.dev.dependencies]
