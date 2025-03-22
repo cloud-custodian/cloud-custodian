@@ -1,0 +1,190 @@
+{
+    "status_code": 200,
+    "data": {
+        "SecurityGroups": [
+            {
+                "GroupId": "sg-6c7fa917",
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1",
+                        "UserIdGroupPairs": [],
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": []
+                    }
+                ],
+                "Tags": [
+                    {
+                        "Key": "ASV",
+                        "Value": "ASVMCNASTY"
+                    },
+                    {
+                        "Key": "Stackable",
+                        "Value": "True"
+                    },
+                    {
+                        "Key": "c7n-public",
+                        "Value": "Policy"
+                    },
+                    {
+                        "Key": "mcymc",
+                        "Value": ""
+                    },
+                    {
+                        "Key": "NetworkLocation",
+                        "Value": "Private"
+                    },
+                    {
+                        "Key": "TestTag",
+                        "Value": "TestValue"
+                    }
+                ],
+                "VpcId": "vpc-d2d616b5",
+                "SecurityGroupArn": "arn:aws:ec2:us-east-1:644160558196:security-group/sg-6c7fa917",
+                "OwnerId": "644160558196",
+                "GroupName": "default",
+                "Description": "default VPC security group",
+                "IpPermissions": [
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": 0,
+                        "ToPort": 65535,
+                        "UserIdGroupPairs": [
+                            {
+                                "UserId": "644160558196",
+                                "GroupId": "sg-6c7fa917"
+                            }
+                        ],
+                        "IpRanges": [],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": []
+                    },
+                    {
+                        "IpProtocol": "-1",
+                        "UserIdGroupPairs": [
+                            {
+                                "UserId": "644160558196",
+                                "GroupId": "sg-6c7fa917"
+                            }
+                        ],
+                        "IpRanges": [
+                            {
+                                "CidrIp": "108.56.181.242/32"
+                            },
+                            {
+                                "CidrIp": "67.166.173.46/32"
+                            }
+                        ],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": []
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": 22,
+                        "ToPort": 22,
+                        "UserIdGroupPairs": [],
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": []
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": 8443,
+                        "ToPort": 8443,
+                        "UserIdGroupPairs": [],
+                        "IpRanges": [
+                            {
+                                "CidrIp": "207.171.167.25/32"
+                            },
+                            {
+                                "CidrIp": "54.240.217.8/29"
+                            },
+                            {
+                                "CidrIp": "72.21.196.64/29"
+                            },
+                            {
+                                "CidrIp": "72.21.198.64/29"
+                            },
+                            {
+                                "CidrIp": "54.240.217.16/29"
+                            },
+                            {
+                                "CidrIp": "54.239.98.0/24"
+                            },
+                            {
+                                "CidrIp": "207.171.167.101/32"
+                            },
+                            {
+                                "CidrIp": "207.171.167.26/32"
+                            },
+                            {
+                                "CidrIp": "72.21.217.0/24"
+                            },
+                            {
+                                "CidrIp": "54.240.217.80/29"
+                            },
+                            {
+                                "CidrIp": "54.240.217.64/28"
+                            },
+                            {
+                                "CidrIp": "207.171.172.6/32"
+                            }
+                        ],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": []
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": 27017,
+                        "ToPort": 27017,
+                        "UserIdGroupPairs": [],
+                        "IpRanges": [
+                            {
+                                "CidrIp": "172.31.16.236/32"
+                            }
+                        ],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": []
+                    },
+                    {
+                        "IpProtocol": "udp",
+                        "FromPort": 0,
+                        "ToPort": 65535,
+                        "UserIdGroupPairs": [
+                            {
+                                "UserId": "644160558196",
+                                "GroupId": "sg-6c7fa917"
+                            }
+                        ],
+                        "IpRanges": [],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": []
+                    },
+                    {
+                        "IpProtocol": "icmp",
+                        "FromPort": -1,
+                        "ToPort": -1,
+                        "UserIdGroupPairs": [
+                            {
+                                "UserId": "644160558196",
+                                "GroupId": "sg-6c7fa917"
+                            }
+                        ],
+                        "IpRanges": [],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": []
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
