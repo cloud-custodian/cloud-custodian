@@ -2100,6 +2100,22 @@ class RDSEventSubscription(BaseTest):
         response = client.describe_event_subscriptions()
         self.assertEqual(len(response.get('EventSubscriptionsList')), 0)
 
+    def test_rds_event_subscription_topic_filter(self):
+        session_factory = self.replay_flight_data("test_rds_event_subscription_topic_filter")
+        p = self.load_policy({
+            "name": "rds-subscriptions-no-confirmed-topics",
+            "resource": "aws.rds-subscription",
+            "filters": [{
+                "type": "topic",
+                "key": "SubscriptionsConfirmed",
+                "value": 0,
+                "value_type": "integer"
+            }],
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["c7n:SnsTopic"]["SubscriptionsConfirmed"], "0")
+
 
 class TestRDSParameterGroupFilterModified(BaseTest):
     def test_param_filter_value_cases(self):
