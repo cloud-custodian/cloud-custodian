@@ -34,7 +34,7 @@ class AccountTests(BaseTest):
                 'or': [
                     {'type': 'check-macie',
                      'value': 'absent',
-                     'key': 'master.accountId'},
+                     'key': 'administrator.accountId'},
                     {'type': 'check-macie',
                      'key': 'status',
                      'value': 'ENABLED'}]}]
@@ -45,6 +45,7 @@ class AccountTests(BaseTest):
             'createdAt': datetime.datetime(
                 2020, 12, 3, 16, 22, 14, 821000, tzinfo=tz.tzutc()),
             'findingPublishingFrequency': 'FIFTEEN_MINUTES',
+            'administrator': {},
             'master': {},
             'serviceRole': ('arn:aws:iam::{}:role/aws-service-role/'
                             'macie.amazonaws.com/'
