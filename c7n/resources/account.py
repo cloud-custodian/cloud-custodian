@@ -1913,11 +1913,9 @@ class EMRBlockPublicAccessConfiguration(ValueFilter):
             'emr', region_name=self.manager.config.region)
 
         for r in resources:
-            try:
-                r[self.annotation_key] = client.get_block_public_access_configuration()
-                r[self.annotation_key].pop('ResponseMetadata')
-            except client.exceptions.NoSuchPublicAccessBlockConfiguration:
-                r[self.annotation_key] = {}
+            r[self.annotation_key] = self.manager.retry(
+                client.get_block_public_access_configuration)
+            r[self.annotation_key].pop('ResponseMetadata')
 
     def __call__(self, r):
         return super(EMRBlockPublicAccessConfiguration, self).__call__(r[self.annotation_key])

@@ -1,0 +1,16 @@
+{
+    "status_code": 200,
+    "data": {
+        "destinations": [
+            {
+                "destinationName": "test-destination",
+                "targetArn": "arn:aws:kinesis:us-east-1:123456789012:stream/RecipientStream",
+                "roleArn": "arn:aws:iam::123456789012:role/CWLtoKinesisRole",
+                "accessPolicy": "{\n  \"Version\" : \"2012-10-17\",\n  \"Statement\" : [\n    {\n      \"Sid\" : \"\",\n      \"Effect\" : \"Allow\",\n      \"Principal\" : {\n        \"AWS\" : \"111111111111\"\n      },\n      \"Action\" : \"logs:PutSubscriptionFilter\",\n      \"Resource\" : \"arn:aws:logs:us-east-1:123456789012:destination:testDestination\"\n    }\n  ]\n}",
+                "arn": "arn:aws:logs:us-east-1:123456789012:destination:test-destination",
+                "creationTime": 1739815186983
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
