@@ -149,15 +149,15 @@ class DisassociateResourceShare(Action):
 
         policies:
             - name: disassociate-ram-resource-share
-                resource: ram-resource-share-self
-                filters:
-                - type: external-share
-                  allowlist_entities:
+              resource: ram-resource-share-self
+              filters:
+              - type: external-share
+                allowlist_entities:
                   - 123456789012
                   - o-abcd1234
-                actions:
-                - disassociate
-                  principals: matched
+              actions:
+              - disassociate
+                principals: matched
     """
 
     schema = type_schema(
