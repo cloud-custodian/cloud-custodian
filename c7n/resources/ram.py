@@ -68,11 +68,11 @@ class ExternalShareFilter(Filter):
 
         policies:
           - name: ram-external-share
-            resource: ram-resource-share
+            resource: resource-share-self
             filters:
               - type: external-share
                 allowlist_entities:
-                  - 123456789012
+                  - "123456789012"
                   - arn:aws:iam::111111111111:role/MyRole
                   - o-abcd1234
                   - ou-ab12-34cd567890ef
@@ -148,16 +148,16 @@ class DisassociateResourceShare(Action):
     .. code-block:: yaml
 
         policies:
-            - name: disassociate-ram-resource-share
-              resource: ram-resource-share-self
-              filters:
-              - type: external-share
-                allowlist_entities:
-                  - 123456789012
-                  - o-abcd1234
-              actions:
-              - disassociate
-                principals: matched
+          - name: disassociate-ram-resource-share
+            resource: resource-share-self
+            filters:
+            - type: external-share
+              allowlist_entities:
+                - "123456789012"
+                - o-abcd1234
+            actions:
+            - type: disassociate
+              principals: matched
     """
 
     schema = type_schema(
@@ -226,15 +226,15 @@ class DeleteResourceShare(Action):
     .. code-block:: yaml
 
         policies:
-            - name: delete-ram-resource-share
-            resource: ram-resource-share-self
+          - name: delete-ram-resource-share
+            resource: resource-share-self
             filters:
             - type: external-share
               allowlist_entities:
-                - 123456789012
-                - o-abcd1234
+              - "123456789012"
+              - o-abcd1234
             actions:
-                - delete
+              - delete
     """
 
     schema = type_schema('delete')
