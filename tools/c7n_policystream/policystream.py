@@ -276,7 +276,7 @@ class PolicyRepo:
         while q:
             t, prefix = q.popleft()
             for fent in t:
-                if fent.type == pygit2.GIT_OBJ_TREE:
+                if fent.type == pygit2.GIT_OBJECT_TREE:
                     q.append((
                         self.repo.get(fent.id),
                         os.path.join(prefix, fent.name)))
@@ -305,7 +305,7 @@ class PolicyRepo:
 
         # Modified
         for f in set(baseline_files).intersection(target_files):
-            if baseline_files[f].hex == target_files[f].hex:
+            if baseline_files[f].id == target_files[f].id:
                 continue
             target_policies += self._policy_file_rev(f, target)
             baseline_policies += self._policy_file_rev(f, baseline)
