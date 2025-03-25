@@ -4,6 +4,7 @@ from botocore.exceptions import ClientError
 
 from c7n.actions import BaseAction
 from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter, VpcFilter
+from c7n.filters import ValueFilter
 from c7n.manager import resources
 from c7n.query import (
     QueryResourceManager, DescribeSource, ConfigSource, TypeInfo, ChildResourceManager)
@@ -407,6 +408,63 @@ class CodeDeployDeploymentGroup(ChildResourceManager):
         for r in resources:
             arns.append(self.generate_arn(r['applicationName'] + '/' + r['deploymentGroupName']))
         return arns
+
+
+@resources.register('codedeploy-config')
+class CodeDeployConfig(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'codedeploy'
+        enum_spec = ('list_deployment_configs', 'deploymentConfigsList', None)
+        detail_spec = ('get_deployment_config', 'deploymentConfigName', None,
+                       'deploymentConfigInfo')
+        id = 'deploymentConfigId'
+        name = 'deploymentConfigName'
+        arn = False
+        cfn_type = config_type = "AWS::CodeDeploy::DeploymentConfig"
+        date = 'createTime'
+        permissions_augment = ("codedeploy:GetDeploymentConfig",)
+
+
+@CodeDeployDeploymentGroup.filter_registry.register('config')
+class CodeDeployDeploymentGroupConfigFilter(ValueFilter):
+    """
+    Filter Code Deploy Groups by their Config
+
+    :example:
+
+    Get all groups where config type is Lambda
+
+        .. code-block:: yaml
+
+                policies:
+                  - name: deploy-groups-where-config-type-lambda
+                    resource: aws.codedeploy-group
+                    filters:
+                      - type: config
+                        key: computePlatform
+                        value: Lambda
+
+    """
+    schema = type_schema('config', rinherit=ValueFilter.schema)
+    permissions = ("codedeploy:GetDeploymentConfig",)
+    annotation_key = 'c7n:DeploymentConfig'
+    FetchThreshold = 10
+
+    def process(self, resources, event=None):
+        cfg = self.manager.get_resource_manager('aws.codedeploy-config')
+        if len(resources) < self.FetchThreshold:
+            configs = cfg.get_resources([r['deploymentConfigName'] for r in resources])
+        else:
+            configs = cfg.resources()
+        model = cfg.get_model()
+        by_name = {c[model.name]: c for c in configs}
+        for res in resources:
+            res[self.annotation_key] = by_name.get(res['deploymentConfigName'])
+        return super().process(resources, event)
+
+    def __call__(self, r):
+        return super().__call__(r.setdefault(self.annotation_key, None))
 
 
 @CodeDeployDeploymentGroup.action_registry.register('delete')
