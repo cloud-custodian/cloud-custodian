@@ -1,0 +1,36 @@
+{
+    "status_code": 200,
+    "data": {
+        "Policy": {
+            "PolicyName": "us-east-1-DynamoPolicy_converted",
+            "PolicyId": "ANPAREF4UTV5OUTQSJ2P3",
+            "Arn": "arn:aws:iam::123456789012:policy/us-east-1-DynamoPolicy_converted",
+            "Path": "/",
+            "DefaultVersionId": "v1",
+            "AttachmentCount": 0,
+            "PermissionsBoundaryUsageCount": 0,
+            "IsAttachable": true,
+            "CreateDate": {
+                "__class__": "datetime",
+                "year": 2023,
+                "month": 1,
+                "day": 13,
+                "hour": 7,
+                "minute": 26,
+                "second": 34,
+                "microsecond": 0
+            },
+            "UpdateDate": {
+                "__class__": "datetime",
+                "year": 2023,
+                "month": 1,
+                "day": 13,
+                "hour": 7,
+                "minute": 26,
+                "second": 34,
+                "microsecond": 0
+            }
+        },
+        "ResponseMetadata": {}
+    }
+}
