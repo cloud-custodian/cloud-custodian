@@ -1,4 +1,5 @@
 import json
+import pathlib
 import subprocess
 
 
@@ -6,11 +7,17 @@ import click
 from jmespath import search
 
 
-@click.command()
-@click.option("--output", type=click.File("w"), default="-")
-def main(output):
-    raw_output = subprocess.getoutput(" ".join(["terraform", "providers", "schema", "-json"]))
-    schemas = json.loads(raw_output)
+class SetSortingEncoder(json.JSONEncoder):
+    """Turn sets into sorted lists during a JSON dump"""
+
+    def default(self, obj):
+        if isinstance(obj, set):
+            return sorted(obj)
+        return super().default(obj)
+
+
+def get_taggable_resources(schema):
+    """Determine taggable resources from a Terraform schema"""
 
     taggable = {}
     provider_modules = [
@@ -25,8 +32,10 @@ def main(output):
         provider = provider_mod.split("/")[-1]
         resource_schemas = search(
             f'provider_schemas."registry.terraform.io/{provider_mod}".resource_schemas',
-            schemas,
+            schema,
         )
+        if not resource_schemas:
+            continue
         rtaggable = []
         for type_name, type_info in resource_schemas.items():
             attrs = search("block.attributes", type_info)
@@ -48,7 +57,31 @@ def main(output):
         taggable[provider] = rtaggable
         # print("%s %d" % (provider, len(rtaggable)))
 
-    output.write(json.dumps(taggable, indent=2))
+    return taggable
+
+
+@click.command()
+@click.option("--output", type=click.File("w"), default="-")
+@click.option("--module-path", type=click.Path(), multiple=True)
+def main(output, module_path):
+    taggable = {}
+    for path in module_path:
+        subprocess.run(["terraform", "init"], cwd=path, check=True)
+        proc = subprocess.run(
+            ["terraform", "providers", "schema", "-json"],
+            cwd=path,
+            check=True,
+            stdout=subprocess.PIPE,
+            text=True,
+        )
+        schema = json.loads(proc.stdout)
+        module_taggable = get_taggable_resources(schema)
+
+        # Build a union of taggable resource types across supported provider versions
+        for provider, taggable_resources in module_taggable.items():
+            taggable.setdefault(provider, set()).update(taggable_resources)
+
+    output.write(json.dumps(taggable, indent=2, cls=SetSortingEncoder))
 
 
 if __name__ == "__main__":
