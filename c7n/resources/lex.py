@@ -3,8 +3,8 @@
 from c7n.manager import resources
 from c7n import query
 from c7n.query import QueryResourceManager
-from c7n.filters import CrossAccountAccessFilter
-from c7n.utils import local_session
+from c7n.filters import CrossAccountAccessFilter, ValueFilter
+from c7n.utils import local_session, type_schema
 
 
 @resources.register("lex-bot")
@@ -38,6 +38,28 @@ class LexV2Bot(QueryResourceManager):
         permission_prefix = "lex"
 
     source_mapping = {"describe": query.DescribeWithResourceTags, "config": query.ConfigSource}
+
+    def describe_bot_alias(self, bot_id, bot_alias_id):
+        client = local_session(self.session_factory).client('lexv2-models')
+        try:
+            response = client.describe_bot_alias(botId=bot_id, botAliasId=bot_alias_id)
+            return response
+        except client.exceptions.ResourceNotFoundException:
+            return None
+
+    def list_bot_aliases(self, bot_id):
+        client = local_session(self.session_factory).client('lexv2-models')
+        aliases = []
+        try:
+            response = client.list_bot_aliases(botId=bot_id)
+            aliases.extend(response['botAliasSummaries'])
+
+            while 'nextToken' in response:
+                response = client.list_bot_aliases(botId=bot_id, nextToken=response['nextToken'])
+                aliases.extend(response['botAliasSummaries'])
+            return aliases
+        except client.exceptions.ResourceNotFoundException:
+            return None
 
 
 @LexV2Bot.filter_registry.register('cross-account')
@@ -73,3 +95,52 @@ class LexV2BotCrossAccountAccessFilter(CrossAccountAccessFilter):
             pol = result.get('policy', None)
             r[self.policy_attribute] = pol
         return pol
+
+
+@LexV2Bot.filter_registry.register('conversationlogs')
+class ContentFilter(ValueFilter):
+    """Filters all LexV2 bots with conversationlogs enabled
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: lex-bot-cross-account
+                resource: lexv2-bot
+                filters:
+                  - type: cross-account
+                    whitelist_from:
+                      expr: "accounts.*.accountNumber"
+                      url: accounts_url
+    """
+
+
+schema = type_schema('conversationlogs', rinherit=ValueFilter.schema)
+schema_alias = False
+
+permissions = ('lex:describe_bot_alias',)
+policy_annotation = 'c7n:BotAlias'
+bot_annotation = "c7n:BotAlias"
+
+
+def process(self, resources, event=None):
+    client = local_session(self.manager.session_factory).client('lexv2-models')
+    results = []
+    for r in resources:
+        if self.bot_annotation not in r:
+            aliases = self.manager.retry(client.list_bot_aliases, botId=r['botId'])
+            if 'botAliasSummaries' in aliases:
+                for alias in aliases['botAliasSummaries']:
+                    bot_alias_id = alias['botAliasId']
+                    doc = self.manager.retry(client.describe_bot_alias, botId=r['botId'], botAliasId=bot_alias_id)
+                    if doc:
+                        doc.pop('ResponseMetadata', None)
+                        r[self.bot_annotation] = doc
+                        r['conversationLogSettings'] = doc.get('conversationLogSettings', {})
+            else:
+                continue
+        if self.match(r[self.bot_annotation]):
+            r[self.policy_annotation] = self.data.get('value')
+            results.append(r)
+    return results
