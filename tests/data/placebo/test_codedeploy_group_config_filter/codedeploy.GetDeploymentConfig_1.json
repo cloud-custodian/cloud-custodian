@@ -1,0 +1,19 @@
+{
+  "status_code": 200,
+  "data": {
+    "deploymentConfigInfo": {
+      "deploymentConfigId": "89536ee3-14b9-4102-9268-57fdb5023b14",
+      "deploymentConfigName": "my-test-configuration",
+      "createTime": 1742846603.254,
+      "computePlatform": "Lambda",
+      "trafficRoutingConfig": {
+        "type": "TimeBasedLinear",
+        "timeBasedLinear": {
+          "linearPercentage": 50,
+          "linearInterval": 1
+        }
+      }
+    },
+    "ResponseMetadata": {}
+  }
+}

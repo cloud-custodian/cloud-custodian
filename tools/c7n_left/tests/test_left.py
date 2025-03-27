@@ -2165,3 +2165,94 @@ resource "aws_ecs_task_definition" "test_task_def" {
     results = policy_env.run()
     assert results[0].resource["c7n:MatchedFilters"] == ["container_definitions"]
     assert results[1].resource["c7n:MatchedFilters"] == ["container_definitions"]
+
+
+@pytest.mark.xfail(reason="https://github.com/cloud-custodian/cloud-custodian/issues/9709")
+def test_traverse_list_members(tmp_path):
+    resources = run_policy(
+        {
+            "name": "launch-template-ami-owner",
+            "resource": "terraform.aws_launch_template",
+            "filters": [
+                {
+                    "type": "traverse",
+                    "resources": "data.aws_ami_ids",
+                    "attrs": [
+                        {
+                            "type": "value",
+                            "key": "owners",
+                            "value": "amazon",
+                            "op": "contains",
+                        }
+                    ],
+                }
+            ],
+        },
+        terraform_dir / "traverse_list_members",
+        tmp_path,
+    )
+    assert len(resources) == 2
+    assert {r.resource.name for r in resources} == {
+        "aws_launch_template.bare_list_reference",
+        "aws_launch_template.parenthesized_list_reference",
+    }
+
+
+@pytest.mark.xfail(reason="https://github.com/cloud-custodian/tfparse/issues/99")
+def test_traverse_multiple_references(tmp_path):
+
+    resources = run_policy(
+        {
+            "name": "azurerm-storage-account-private-endpoint",
+            "resource": ["terraform.azurerm_storage_account"],
+            "filters": [
+                {
+                    "not": [
+                        {
+                            "type": "traverse",
+                            "resources": ["azurerm_private_endpoint"],
+                        },
+                    ]
+                }
+            ],
+        },
+        terraform_dir / "traverse_multiple_references",
+        tmp_path,
+    )
+    assert len(resources) == 2
+
+
+@pytest.mark.xfail(reason="https://github.com/cloud-custodian/tfparse/issues/205")
+def test_merge_null_elements(tmp_path):
+
+    resources = run_policy(
+        {
+            "name": "aws-tags",
+            "resource": ["terraform.aws_*"],
+            "filters": ["taggable", {"tag:Environment": "absent"}],
+        },
+        terraform_dir / "merge_null_elements",
+        tmp_path,
+    )
+    assert len(resources) == 1
+    assert {r.resource.name for r in resources} == {
+        "aws_instance.untagged",
+    }
+
+
+@pytest.mark.xfail(reason="https://github.com/cloud-custodian/tfparse/issues/205")
+def test_merge_locals_with_apply_time_values(tmp_path):
+
+    resources = run_policy(
+        {
+            "name": "aws-tags-using-locals",
+            "resource": ["terraform.aws_*"],
+            "filters": ["taggable", {"tag:Environment": "absent"}],
+        },
+        terraform_dir / "merge_locals_with_apply_time_values",
+        tmp_path,
+    )
+    assert len(resources) == 1
+    assert {r.resource.name for r in resources} == {
+        "aws_instance.untagged",
+    }
