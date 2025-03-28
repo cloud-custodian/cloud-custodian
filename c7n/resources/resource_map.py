@@ -54,6 +54,7 @@ ResourceMap = {
   "aws.codebuild-credential": "c7n.resources.code.CodeBuildSourceCredentials",
   "aws.codecommit": "c7n.resources.code.CodeRepository",
   "aws.codedeploy-app": "c7n.resources.code.CodeDeployApplication",
+  "aws.codedeploy-config": "c7n.resources.code.CodeDeployConfig",
   "aws.codedeploy-deployment": "c7n.resources.code.CodeDeployDeployment",
   "aws.codedeploy-group": "c7n.resources.code.CodeDeployDeploymentGroup",
   "aws.codepipeline": "c7n.resources.code.CodeDeployPipeline",
