@@ -1,0 +1,21 @@
+{
+    "status_code": 200,
+    "data": {
+        "DBShardGroups": [
+            {
+                "DBShardGroupResourceId": "shardgroup-8b5e89f0e7a7469e9cbb868e628aec0f",
+                "DBShardGroupIdentifier": "db-shard-1",
+                "DBClusterIdentifier": "database-shard-1",
+                "MaxACU": 64.0,
+                "MinACU": 16.0,
+                "ComputeRedundancy": 0,
+                "Status": "available",
+                "PubliclyAccessible": false,
+                "Endpoint": "db-shard-1.shardgrp-cz6wy8cci3uf.us-east-1.rds.amazonaws.com",
+                "DBShardGroupArn": "arn:aws:rds:us-east-1:644160558196:shard-group:shardgroup-8b5e89f0e7a7469e9cbb868e628aec0f",
+                "TagList": []
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
