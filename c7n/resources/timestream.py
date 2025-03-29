@@ -12,6 +12,7 @@ from c7n.tags import (
     RemoveTag as RemoveTagAction
 )
 from c7n.filters.backup import ConsecutiveAwsBackupsFilter
+from c7n.filters import ValueFilter
 
 
 class DescribeTimestream(DescribeSource):
@@ -142,6 +143,42 @@ class TimestreamInfluxDBSGFilter(SecurityGroupFilter):
 class TimestreamInfluxDBSubnetFilter(SubnetFilter):
 
     RelatedIdsExpression = "vpcSubnetIds[]"
+
+
+@TimestreamInfluxDB.filter_registry.register('db-parameter')
+class Parameter(ValueFilter):
+    """Filter timestream influxdb instances based on parameter values.
+
+    :example:
+
+    .. code-block:: yaml
+
+       policies:
+         - name: filter-timestream-influxdb-instance
+           resource: aws.timestream-influxdb
+           filters:
+            - type: db-parameter
+              key: fluxLogEnabled
+              value: True
+    """
+    permissions = ('timestream-influxdb:GetDbParameterGroup',)
+    schema = type_schema('db-parameter', rinherit=ValueFilter.schema)
+    annotation_key = 'c7n:MatchedDBParameter'
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('timestream-influxdb')
+        results = []
+        for r in resources:
+            if self.annotation_key not in r and \
+                'dbParameterGroupIdentifier' in r:
+                r[self.annotation_key] = client.get_db_parameter_group(
+                identifier=r['dbParameterGroupIdentifier']) \
+                .get('parameters', {}).get('InfluxDBv2', {})
+
+            if self.match(r.get(self.annotation_key, {})):
+                results.append(r)
+
+        return results
 
 
 @TimestreamTable.action_registry.register('delete')
