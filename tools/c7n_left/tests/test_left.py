@@ -2238,3 +2238,21 @@ def test_merge_null_elements(tmp_path):
     assert {r.resource.name for r in resources} == {
         "aws_instance.untagged",
     }
+
+
+@pytest.mark.xfail(reason="https://github.com/cloud-custodian/tfparse/issues/205")
+def test_merge_locals_with_apply_time_values(tmp_path):
+
+    resources = run_policy(
+        {
+            "name": "aws-tags-using-locals",
+            "resource": ["terraform.aws_*"],
+            "filters": ["taggable", {"tag:Environment": "absent"}],
+        },
+        terraform_dir / "merge_locals_with_apply_time_values",
+        tmp_path,
+    )
+    assert len(resources) == 1
+    assert {r.resource.name for r in resources} == {
+        "aws_instance.untagged",
+    }

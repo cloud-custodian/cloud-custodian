@@ -307,3 +307,39 @@ class CodeDeploy(BaseTest):
             deploymentGroupName=resources[0]['deploymentGroupName'])
         self.assertEqual(
             e.exception.response['Error']['Code'], 'DeploymentGroupDoesNotExistException')
+
+    def test_codedeploy_list_deployment_configs(self):
+        factory = self.replay_flight_data(
+            'test_codedeploy_list_deployment_configs'
+        )
+        p = self.load_policy({
+            "name": "codedeploy-list-deployment-configs",
+            "resource": "aws.codedeploy-config",
+            "filters": [{
+                "type": "value",
+                "key": "computePlatform",
+                "value": "Lambda"
+            }]
+        }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['deploymentConfigId'], 'my-test-configuration')
+        self.assertEqual(resources[0]['deploymentConfigName'], 'my-test-configuration')
+
+    def test_codedeploy_group_config_filter(self):
+        factory = self.replay_flight_data(
+            'test_codedeploy_group_config_filter'
+        )
+        p = self.load_policy({
+            "name": "codedeploy-group-with-lambda-config",
+            "resource": "aws.codedeploy-group",
+            "filters": [{
+                "type": "config",
+                "key": "computePlatform",
+                "value": "Lambda"
+            }]
+        }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['c7n:DeploymentConfig']['deploymentConfigId'],
+                         'my-test-configuration')
