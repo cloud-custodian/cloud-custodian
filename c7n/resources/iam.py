@@ -2621,8 +2621,8 @@ class UserDelete(BaseAction):
 class UserRemoveAccessKey(BaseAction):
     """Delete or disable user's access keys.
 
-    For example if we wanted to disable keys after 90 days of non-use and
-    delete them after 180 days of nonuse:
+    For example if we wanted to disable keys 90 days after creation and
+    delete them 180 days after creation:
 
     :example:
 
