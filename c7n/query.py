@@ -734,7 +734,7 @@ def _batch_augment(manager, model, detail_spec, client, resource_set):
     return response[detail_path]
 
 
-def _scalar_augment(manager, model, detail_spec, client, resource_set, parent_param=None):
+def _scalar_augment(manager, model, detail_spec, client, resource_set):
     detail_op, param_name, param_key, detail_path = detail_spec
     op = getattr(client, detail_op)
     if manager.retry:
