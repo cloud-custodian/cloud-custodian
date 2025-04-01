@@ -106,22 +106,21 @@ class ContentFilter(ValueFilter):
     .. code-block:: yaml
 
             policies:
-              - name: lex-bot-cross-account
+              - name: lex-bot-conversationlogs
                 resource: lexv2-bot
                 filters:
-                  - type: cross-account
-                    whitelist_from:
-                      expr: "accounts.*.accountNumber"
-                      url: accounts_url
+                   - type: conversationlogs
+                     key: conversationLogSettings.textLogSettings [?enabled == `true`]
+                     value: not-null
     """
 
 
-schema = type_schema('conversationlogs', rinherit=ValueFilter.schema)
-schema_alias = False
+    schema = type_schema('conversationlogs', rinherit=ValueFilter.schema)
+    schema_alias = False
 
-permissions = ('lex:describe_bot_alias',)
-policy_annotation = 'c7n:BotAlias'
-bot_annotation = "c7n:BotAlias"
+    permissions = ('lex:describe_bot_alias',)
+    policy_annotation = 'c7n:BotAlias'
+    bot_annotation = "c7n:BotAlias"
 
 
 def process(self, resources, event=None):
