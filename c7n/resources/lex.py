@@ -44,7 +44,8 @@ class LexV2BotAliasDescribe(query.ChildDescribeSource):
     def augment(self, resources):
         for r in resources:
             client = local_session(self.manager.session_factory).client('lexv2-models')
-            r.update(client.describe_bot_alias(botId=r['c7n:parent-id'], botAliasId=r['botAliasId']))
+            r.update(client.describe_bot_alias
+                     (botId=r['c7n:parent-id'], botAliasId=r['botAliasId']))
         return resources
 
 
@@ -108,7 +109,8 @@ def process(self, resources, event=None):
             if 'botAliasSummaries' in aliases:
                 for alias in aliases['botAliasSummaries']:
                     bot_alias_id = alias['botAliasId']
-                    doc = self.manager.retry(client.describe_bot_alias, botId=r['botId'], botAliasId=bot_alias_id)
+                    doc = self.manager.retry(client.describe_bot_alias, botId=r['botId'],
+                                             botAliasId=bot_alias_id)
                     if doc:
                         doc.pop('ResponseMetadata', None)
                         r[self.bot_annotation] = doc

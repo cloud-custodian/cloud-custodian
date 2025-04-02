@@ -29,7 +29,8 @@ class TestLexConversationLogs(BaseTest):
                 "filters": [
                     {
                         "type": "value",
-                        "key": "conversationLogSettings.textLogSettings[?enabled == `true`].enabled",
+                        "key": "conversationLogSettings"
+                        ".textLogSettings[?enabled == `true`].enabled",
                         "value": "not-null",
                     }
                 ],
