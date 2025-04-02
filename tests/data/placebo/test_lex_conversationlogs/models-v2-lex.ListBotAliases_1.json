@@ -1,0 +1,61 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "botAliasSummaries": [
+            {
+                "botAliasId": "0HY6OJM8MM",
+                "botAliasName": "new-alias",
+                "botAliasStatus": "Available",
+                "creationDateTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 1,
+                    "day": 13,
+                    "hour": 23,
+                    "minute": 35,
+                    "second": 49,
+                    "microsecond": 361000
+                },
+                "lastUpdatedDateTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 1,
+                    "day": 13,
+                    "hour": 23,
+                    "minute": 35,
+                    "second": 49,
+                    "microsecond": 393000
+                }
+            },
+            {
+                "botAliasId": "TSTALIASID",
+                "botAliasName": "TestBotAlias",
+                "description": "test bot alias",
+                "botVersion": "DRAFT",
+                "botAliasStatus": "Available",
+                "creationDateTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 1,
+                    "day": 13,
+                    "hour": 22,
+                    "minute": 18,
+                    "second": 28,
+                    "microsecond": 84000
+                },
+                "lastUpdatedDateTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 1,
+                    "day": 13,
+                    "hour": 22,
+                    "minute": 18,
+                    "second": 36,
+                    "microsecond": 3000
+                }
+            }
+        ],
+        "botId": "NPXOSCEEMD"
+    }
+}

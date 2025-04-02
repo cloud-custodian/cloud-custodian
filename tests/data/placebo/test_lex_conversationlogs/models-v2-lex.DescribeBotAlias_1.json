@@ -1,0 +1,30 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "botAliasId": "0HY6OJM8MM",
+        "botAliasName": "new-alias",
+        "botAliasStatus": "Available",
+        "botId": "NPXOSCEEMD",
+        "creationDateTime": {
+            "__class__": "datetime",
+            "year": 2025,
+            "month": 1,
+            "day": 13,
+            "hour": 23,
+            "minute": 35,
+            "second": 49,
+            "microsecond": 361000
+        },
+        "lastUpdatedDateTime": {
+            "__class__": "datetime",
+            "year": 2025,
+            "month": 1,
+            "day": 13,
+            "hour": 23,
+            "minute": 35,
+            "second": 49,
+            "microsecond": 393000
+        }
+    }
+}

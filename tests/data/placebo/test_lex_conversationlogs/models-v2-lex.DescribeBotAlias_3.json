@@ -1,0 +1,82 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "botAliasId": "TSTALIASID",
+        "botAliasName": "TestBotAlias",
+        "description": "test bot alias",
+        "botVersion": "DRAFT",
+        "botAliasLocaleSettings": {
+            "en_US": {
+                "enabled": true
+            }
+        },
+        "conversationLogSettings": {
+            "textLogSettings": [
+                {
+                    "enabled": true,
+                    "destination": {
+                        "cloudWatch": {
+                            "cloudWatchLogGroupArn": "arn:aws:logs:us-east-1:111111111111:log-group:/aws/lambda/xyz-dev",
+                            "logPrefix": "aws/lex/OTM2WO3PEY/TSTALIASID/DRAFT/"
+                        }
+                    },
+                    "selectiveLoggingEnabled": false
+                }
+            ],
+            "audioLogSettings": [
+                {
+                    "enabled": true,
+                    "destination": {
+                        "s3Bucket": {
+                            "kmsKeyArn": "arn:aws:kms:us-east-1:111111111111:key/3bd15351-ad10-4cf4-b230-280746ad3dbb",
+                            "s3BucketArn": "arn:aws:s3:::example-abc-123",
+                            "logPrefix": "aws/lex/OTM2WO3PEY/TSTALIASID/DRAFT/"
+                        }
+                    },
+                    "selectiveLoggingEnabled": false
+                }
+            ]
+        },
+        "sentimentAnalysisSettings": {
+            "detectSentiment": false
+        },
+        "botAliasHistoryEvents": [
+            {
+                "botVersion": "DRAFT",
+                "startDate": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 1,
+                    "day": 13,
+                    "hour": 22,
+                    "minute": 27,
+                    "second": 26,
+                    "microsecond": 25000
+                }
+            }
+        ],
+        "botAliasStatus": "Available",
+        "botId": "OTM2WO3PMY",
+        "creationDateTime": {
+            "__class__": "datetime",
+            "year": 2025,
+            "month": 1,
+            "day": 13,
+            "hour": 22,
+            "minute": 27,
+            "second": 25,
+            "microsecond": 967000
+        },
+        "lastUpdatedDateTime": {
+            "__class__": "datetime",
+            "year": 2025,
+            "month": 3,
+            "day": 28,
+            "hour": 15,
+            "minute": 39,
+            "second": 44,
+            "microsecond": 575000
+        }
+    }
+}

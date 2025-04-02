@@ -3,8 +3,8 @@
 from c7n.manager import resources
 from c7n import query
 from c7n.query import QueryResourceManager
-from c7n.filters import CrossAccountAccessFilter, ValueFilter
-from c7n.utils import local_session, type_schema
+from c7n.filters import CrossAccountAccessFilter
+from c7n.utils import local_session
 
 
 @resources.register("lex-bot")
@@ -39,27 +39,29 @@ class LexV2Bot(QueryResourceManager):
 
     source_mapping = {"describe": query.DescribeWithResourceTags, "config": query.ConfigSource}
 
-    def describe_bot_alias(self, bot_id, bot_alias_id):
-        client = local_session(self.session_factory).client('lexv2-models')
-        try:
-            response = client.describe_bot_alias(botId=bot_id, botAliasId=bot_alias_id)
-            return response
-        except client.exceptions.ResourceNotFoundException:
-            return None
 
-    def list_bot_aliases(self, bot_id):
-        client = local_session(self.session_factory).client('lexv2-models')
-        aliases = []
-        try:
-            response = client.list_bot_aliases(botId=bot_id)
-            aliases.extend(response['botAliasSummaries'])
+class LexV2BotAliasDescribe(query.ChildDescribeSource):
+    def augment(self, resources):
+        for r in resources:
+            client = local_session(self.manager.session_factory).client('lexv2-models')
+            r.update(client.describe_bot_alias(botId=r['c7n:parent-id'], botAliasId=r['botAliasId']))
+        return resources
 
-            while 'nextToken' in response:
-                response = client.list_bot_aliases(botId=bot_id, nextToken=response['nextToken'])
-                aliases.extend(response['botAliasSummaries'])
-            return aliases
-        except client.exceptions.ResourceNotFoundException:
-            return None
+
+@resources.register('lexv2-bot-alias')
+class LexV2BotAlias(query.ChildResourceManager):
+    class resource_type(query.TypeInfo):
+        service = 'lexv2-models'
+        parent_spec = ('lexv2-bot', 'botId', True)
+        enum_spec = ('list_bot_aliases', 'botAliasSummaries', None)
+        name = 'botAliasId'
+        id = 'botAliasId'
+        filter_name = 'botAliasId'
+        date = 'creationDateTime'
+        cfn_type = config_type = "AWS::Lex::Bot"
+        permissions_enum = ('lex:DescribeBotAlias',)
+
+    source_mapping = {'describe-child': LexV2BotAliasDescribe, 'config': query.ConfigSource}
 
 
 @LexV2Bot.filter_registry.register('cross-account')
@@ -97,30 +99,51 @@ class LexV2BotCrossAccountAccessFilter(CrossAccountAccessFilter):
         return pol
 
 
-@LexV2Bot.filter_registry.register('conversationlogs')
-class ContentFilter(ValueFilter):
-    """Filters all LexV2 bots with conversationlogs enabled
+# @LexV2BotAlias.filter_registry.register('conversationlogs')
+# class ContentFilter(ValueFilter):
+#     """Filters all LexV2 bots with conversationlogs enabled
 
-    :example:
+#     :example:
 
-    .. code-block:: yaml
+#     .. code-block:: yaml
 
-            policies:
-              - name: lex-bot-conversationlogs
-                resource: lexv2-bot
-                filters:
-                   - type: conversationlogs
-                     key: conversationLogSettings.textLogSettings [?enabled == `true`]
-                     value: not-null
-    """
+#             policies:
+#               - name: lex-bot-conversationlogs
+#                 resource: lexv2-bot-alias
+#                 filters:
+#                    - type: conversationlogs
+#                      key: conversationLogSettings.textLogSettings [?enabled == `true`]
+#                      value: not-null
+#     """
 
 
-    schema = type_schema('conversationlogs', rinherit=ValueFilter.schema)
-    schema_alias = False
+#     schema = type_schema('conversationlogs', rinherit=ValueFilter.schema)
+#     schema_alias = False
 
-    permissions = ('lex:describe_bot_alias',)
-    policy_annotation = 'c7n:BotAlias'
-    bot_annotation = "c7n:BotAlias"
+#     permissions = ('lex:describe_bot_alias',)
+#     policy_annotation = 'c7n:BotAlias'
+#     bot_annotation = "c7n:BotAlias"
+
+    # def describe_bot_alias(self, bot_id, bot_alias_id):
+    #     client = local_session(self.session_factory).client('lexv2-models')
+    #     try:
+    #         response = client.describe_bot_alias(botId=bot_id, botAliasId=bot_alias_id)
+    #         return response
+    #     except client.exceptions.ResourceNotFoundException:
+    #         return None
+    # def list_bot_aliases(self, bot_id):
+    #     client = local_session(self.session_factory).client('lexv2-models')
+    #     aliases = []
+    #     try:
+    #         response = client.list_bot_aliases(botId=bot_id)
+    #         aliases.extend(response['botAliasSummaries'])
+
+    #         while 'nextToken' in response:
+    #             response = client.list_bot_aliases(botId=bot_id, nextToken=response['nextToken'])
+    #             aliases.extend(response['botAliasSummaries'])
+    #         return aliases
+    #     except client.exceptions.ResourceNotFoundException:
+    #         return None
 
 
 def process(self, resources, event=None):
