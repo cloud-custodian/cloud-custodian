@@ -99,53 +99,6 @@ class LexV2BotCrossAccountAccessFilter(CrossAccountAccessFilter):
         return pol
 
 
-# @LexV2BotAlias.filter_registry.register('conversationlogs')
-# class ContentFilter(ValueFilter):
-#     """Filters all LexV2 bots with conversationlogs enabled
-
-#     :example:
-
-#     .. code-block:: yaml
-
-#             policies:
-#               - name: lex-bot-conversationlogs
-#                 resource: lexv2-bot-alias
-#                 filters:
-#                    - type: conversationlogs
-#                      key: conversationLogSettings.textLogSettings [?enabled == `true`]
-#                      value: not-null
-#     """
-
-
-#     schema = type_schema('conversationlogs', rinherit=ValueFilter.schema)
-#     schema_alias = False
-
-#     permissions = ('lex:describe_bot_alias',)
-#     policy_annotation = 'c7n:BotAlias'
-#     bot_annotation = "c7n:BotAlias"
-
-    # def describe_bot_alias(self, bot_id, bot_alias_id):
-    #     client = local_session(self.session_factory).client('lexv2-models')
-    #     try:
-    #         response = client.describe_bot_alias(botId=bot_id, botAliasId=bot_alias_id)
-    #         return response
-    #     except client.exceptions.ResourceNotFoundException:
-    #         return None
-    # def list_bot_aliases(self, bot_id):
-    #     client = local_session(self.session_factory).client('lexv2-models')
-    #     aliases = []
-    #     try:
-    #         response = client.list_bot_aliases(botId=bot_id)
-    #         aliases.extend(response['botAliasSummaries'])
-
-    #         while 'nextToken' in response:
-    #             response = client.list_bot_aliases(botId=bot_id, nextToken=response['nextToken'])
-    #             aliases.extend(response['botAliasSummaries'])
-    #         return aliases
-    #     except client.exceptions.ResourceNotFoundException:
-    #         return None
-
-
 def process(self, resources, event=None):
     client = local_session(self.manager.session_factory).client('lexv2-models')
     results = []
