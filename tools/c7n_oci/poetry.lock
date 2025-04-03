@@ -92,13 +92,13 @@ pycparser = "*"
 
 [[package]]
 name = "circuitbreaker"
-version = "2.1.0"
+version = "2.1.3"
 description = "Python Circuit Breaker pattern implementation"
 optional = false
 python-versions = "*"
 files = [
-    {file = "circuitbreaker-2.1.0-py2.py3-none-any.whl", hash = "sha256:6a07e9a33bb23a37228155108b50108b4e52611e4c26183c4aa54c255da233cb"},
-    {file = "circuitbreaker-2.1.0.tar.gz", hash = "sha256:b09c3f7a8614df6d43e780cdd80931fad5ccb1d23418dbe4c15bcfe6db12528c"},
+    {file = "circuitbreaker-2.1.3-py3-none-any.whl", hash = "sha256:87ba6a3ed03fdc7032bc175561c2b04d52ade9d5faf94ca2b035fbdc5e6b1dd1"},
+    {file = "circuitbreaker-2.1.3.tar.gz", hash = "sha256:1a4baee510f7bea3c91b194dcce7c07805fe96c4423ed5594b75af438531d084"},
 ]
 
 [[package]]
@@ -185,24 +185,24 @@ test = ["pytest (>=6)"]
 
 [[package]]
 name = "iniconfig"
-version = "2.0.0"
+version = "2.1.0"
 description = "brain-dead simple config-ini parsing"
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 files = [
-    {file = "iniconfig-2.0.0-py3-none-any.whl", hash = "sha256:b6a85871a79d2e3b22d2d1b94ac2824226a63c6b741c88f7ae975f18b6778374"},
-    {file = "iniconfig-2.0.0.tar.gz", hash = "sha256:2d91e135bf72d31a410b17c16da610a82cb55f6b0477d1a902134b24a455b8b3"},
+    {file = "iniconfig-2.1.0-py3-none-any.whl", hash = "sha256:9deba5723312380e77435581c6bf4935c94cbfab9b1ed33ef8d238ea168eb760"},
+    {file = "iniconfig-2.1.0.tar.gz", hash = "sha256:3abbd2e30b36733fee78f9c7f7308f2d0050e88f0087fd25c2645f63c773e1c7"},
 ]
 
 [[package]]
 name = "oci"
-version = "2.149.0"
+version = "2.149.2"
 description = "Oracle Cloud Infrastructure Python SDK"
 optional = false
 python-versions = "*"
 files = [
-    {file = "oci-2.149.0-py3-none-any.whl", hash = "sha256:9ebab1805bfe79613ba79e68540a33b976ce859785262471a73248c2b449f42b"},
-    {file = "oci-2.149.0.tar.gz", hash = "sha256:630f40177bdd26135f5dc209d9697f906fc86a583b451a8ca59ee3be22bb3186"},
+    {file = "oci-2.149.2-py3-none-any.whl", hash = "sha256:adc5f04d55ba8c9517f12c009dab7b62b126e5deef168aa52e597dd41758a9ca"},
+    {file = "oci-2.149.2.tar.gz", hash = "sha256:d8ec8b1bb5cb2ddeaefc8d5da66172bdfc1d3f3c434208ce6d0ac298eabb319e"},
 ]
 
 [package.dependencies]
@@ -306,13 +306,13 @@ six = ">=1.5"
 
 [[package]]
 name = "pytz"
-version = "2025.1"
+version = "2025.2"
 description = "World timezone definitions, modern and historical"
 optional = false
 python-versions = "*"
 files = [
-    {file = "pytz-2025.1-py2.py3-none-any.whl", hash = "sha256:89dd22dca55b46eac6eda23b2d72721bf1bdfef212645d81513ef5d03038de57"},
-    {file = "pytz-2025.1.tar.gz", hash = "sha256:c2db42be2a2518b28e65f9207c4d05e6ff547d1efa4086469ef855e4ab70178e"},
+    {file = "pytz-2025.2-py2.py3-none-any.whl", hash = "sha256:5ddf76296dd8c44c26eb8f4b6f35488f3ccbf6fbbd7adee0b7262d43f0ec2f00"},
+    {file = "pytz-2025.2.tar.gz", hash = "sha256:360b9e3dbb49a209c21ad61809c7fb453643e048b38924c765813546746e81c3"},
 ]
 
 [[package]]

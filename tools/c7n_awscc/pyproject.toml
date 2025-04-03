@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "c7n_awscc"
-version = "0.1.28"
+version = "0.1.29"
 readme = "readme.md"
 homepage = "https://cloudcustodian.io"
 repository = "https://github.com/cloud-custodian/cloud-custodian"
