@@ -145,7 +145,7 @@ class SessionTest(BaseTest):
         So continuing to rely on _run_command() may be more reliable, as long as we
         catch signature changes to avoid accidental breakage.
         """
-        expected_parameters = {"command", "timeout"}
+        expected_parameters = {"command_args", "timeout"}
         actual_parameters = set(signature(azure_cli._run_command).parameters.keys())
         self.assertSetEqual(expected_parameters, actual_parameters)
 

@@ -1,7 +1,12 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+import copy
 import logging
+import inspect
+from typing import get_args, _UnionGenericAlias
+
+from c7n_azure.utils import type_to_jsonschema
 
 from c7n.filters import Filter
 from c7n.utils import type_schema
@@ -331,3 +336,141 @@ class KeyVaultUpdateAccessPolicyAction(AzureBaseAction):
                 "permissions": i['permissions']} for i in access_policies]
 
         return {"accessPolicies": policies}
+
+
+@KeyVault.action_registry.register('update')
+class KeyVaultUpdateAction(AzureBaseAction):
+    """
+    Update a keyvault
+
+    To keep the tenant id the same, set it to "keep"
+    To keep the sku settings the same, set it to {"current": True}
+
+    For more information on Vault properties:
+
+    https://learn.microsoft.com/en-us/python/api/azure-mgmt-keyvault/azure.mgmt.keyvault.v2023_07_01.models.vaultproperties?view=azure-python
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+            - name: keyvault-vault-disable-public-access
+              resource: azure.keyvault
+              filters:
+                - name: test
+              actions:
+                - type: update
+                  configuration:
+                    tenant_id: keep
+                    sku:
+                      current: True
+                    public_network_access: disabled
+    """
+
+    @staticmethod
+    def generate_schema():
+        from azure.mgmt.keyvault import KeyVaultManagementClient
+
+        vault_properties = KeyVaultManagementClient.models().VaultProperties
+        model_signature = inspect.signature(vault_properties)
+
+        schema_dict = {}
+        required = ["tenant_id", "sku"]
+
+        for name, v in model_signature.parameters.items():
+
+            if name == "kwargs":
+                continue
+
+            schema_dict.setdefault(name, {})
+
+            if hasattr(v, "annotation"):
+                if not isinstance(v.annotation, _UnionGenericAlias):
+                    schema_dict[name] = type_to_jsonschema(v.annotation)
+                    continue
+
+                args = get_args(v.annotation)
+
+                if type(None) not in args:
+                    required.append(name)
+                else:
+                    args = list(args)
+                    args.remove(type(None))
+
+                if len(args) == 1:
+                    schema_dict[name]['type'] = args[0]
+
+                schema_dict[name] = type_to_jsonschema(args[0])
+
+        return type_schema(
+            "update",
+            required=["configuration"],
+            **{
+                "configuration": {
+                    "type": "object",
+                    "properties": schema_dict,
+                    "required": required
+                }
+            }
+        )
+
+    schema = generate_schema.__func__()  # python 3.9 compat
+
+    def _prepare_processing(self):
+        self.client = self.manager.get_client()
+
+    def make_access_policy_entry(self, acp):
+        permissions = self.client.models().Permissions(**acp["permissions"])
+        return self.client.models().AccessPolicyEntry(
+            tenant_id=acp["tenant_id"],
+            object_id=acp["object_id"],
+            application_id=acp["application_id"],
+            permissions=permissions
+        )
+
+    def make_network_acl_rule_set(self, acl):
+        ip_rules = [
+            self.client.models().IPRule(**ip_rule)
+            for ip_rule in acl.get("ip_rules", [])
+        ]
+
+        virtual_network_rules = [
+            self.client.models().VirtualNetworkRule(**vn_rule)
+            for vn_rule in acl.get("virtual_network_rules", [])
+        ]
+
+        return self.client.models().NetworkRuleSet(
+            bypass=acl["bypass"],
+            default_action=acl["default_action"],
+            ip_rules=ip_rules,
+            virtual_network_rules=virtual_network_rules,
+        )
+
+    def _process_resource(self, resource):
+        props = copy.deepcopy(self.data["configuration"])
+
+        if props['tenant_id'] == "keep":
+            props["tenant_id"] = resource["properties"]["tenantId"]
+
+        if props["sku"] == {"current": True}:
+            props["sku"] = resource["properties"]["sku"]
+
+        if props.get("access_policies"):
+            props["access_policies"] = [
+                self.make_access_policy_entry(p)
+                for p in props["access_policies"]
+            ]
+
+        if props.get("network_acls"):
+            props["network_acls"] = self.make_network_acl_rule_set(props["network_acls"])
+
+        params = self.client.models().VaultCreateOrUpdateParameters(
+            location=resource["location"],
+            properties=self.client.models().VaultProperties(**props)
+        )
+        self.client.vaults.update(
+            resource_group_name=resource["resourceGroup"],
+            vault_name=resource["name"],
+            parameters=params
+        )
