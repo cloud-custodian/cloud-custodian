@@ -16,6 +16,7 @@ accept = (
     'BSD-3-Clause',
     'Apache-2.0',
     'Apache-2',
+    'PSF-2.0'
 )
 
 accept_classifiers = set(
@@ -77,7 +78,8 @@ def main():
         delta = set(classifiers).difference(accept_classifiers)
         if (delta or not classifiers) and dname not in whitelist_packages:
             found = True
-            print(f"{dname}: {d.metadata['License']} {classifiers}")
+            license = d.metadata.get('License', None) or d.metadata.get('License-Expression', None)
+            print(f"{dname}: license:{license} classifiers:{classifiers}")
 
         seen.add(dname)
 
