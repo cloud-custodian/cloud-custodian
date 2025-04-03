@@ -962,6 +962,13 @@ def test_provider_parse():
         "line_start": 5,
         "line_end": 8,
         "src_dir": Path("tests") / "terraform" / "ec2_stop_protection_disabled",
+        "references": [
+            {
+                "id": ANY,
+                "label": "aws_vpc",
+                "name": "example",
+            }
+        ],
     }
 
 
