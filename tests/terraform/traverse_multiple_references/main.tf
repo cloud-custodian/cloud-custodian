@@ -30,3 +30,8 @@ resource "azurerm_private_endpoint" "single_reference" {
     private_connection_resource_id = "/subscriptions/11111111-1111-1111-1111-111111111111/resourceGroups/use/providers/Microsoft.Storage/storageAccounts/${azurerm_storage_account.single_reference.name}"
   }
 }
+
+resource "azurerm_storage_account" "no_references" {
+  name                          = "private"
+  public_network_access_enabled = "false"
+}
