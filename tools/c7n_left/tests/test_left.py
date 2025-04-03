@@ -2198,7 +2198,6 @@ def test_traverse_list_members(tmp_path):
     }
 
 
-@pytest.mark.xfail(reason="https://github.com/cloud-custodian/tfparse/issues/99")
 def test_traverse_multiple_references(tmp_path):
 
     resources = run_policy(
@@ -2207,12 +2206,8 @@ def test_traverse_multiple_references(tmp_path):
             "resource": ["terraform.azurerm_storage_account"],
             "filters": [
                 {
-                    "not": [
-                        {
-                            "type": "traverse",
-                            "resources": ["azurerm_private_endpoint"],
-                        },
-                    ]
+                    "type": "traverse",
+                    "resources": ["azurerm_private_endpoint"],
                 }
             ],
         },
@@ -2222,7 +2217,6 @@ def test_traverse_multiple_references(tmp_path):
     assert len(resources) == 2
 
 
-@pytest.mark.xfail(reason="https://github.com/cloud-custodian/tfparse/issues/205")
 def test_merge_null_elements(tmp_path):
 
     resources = run_policy(
@@ -2240,7 +2234,6 @@ def test_merge_null_elements(tmp_path):
     }
 
 
-@pytest.mark.xfail(reason="https://github.com/cloud-custodian/tfparse/issues/205")
 def test_merge_locals_with_apply_time_values(tmp_path):
 
     resources = run_policy(
@@ -2254,5 +2247,5 @@ def test_merge_locals_with_apply_time_values(tmp_path):
     )
     assert len(resources) == 1
     assert {r.resource.name for r in resources} == {
-        "aws_instance.untagged",
+        "aws_db_parameter_group.untagged",
     }
