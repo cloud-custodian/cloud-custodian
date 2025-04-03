@@ -1,0 +1,21 @@
+{
+    "status_code": 200,
+    "data": {
+        "FlywheelProperties": {
+            "FlywheelArn": "arn:aws:comprehend:us-east-1:644160558196:flywheel/test-comprehend-flywheel/1",
+            "Status": "ACTIVE",
+            "CreationTime": "2025-04-03T06:05:28.386Z",
+            "LastModifiedTime": "2025-04-03T06:14:27.167Z",
+            "VpcConfig": {
+                "SecurityGroupIds": [
+                    "sg-0d74b07ab0b3288c0"
+                ],
+                "Subnets": [
+                    "subnet-0ebe9abf587c5070c"
+                ]
+            },
+            "DataAccessRoleArn": "arn:aws:iam::644160558196:role/ComprehendFlywheelAccessRole"
+        },
+        "ResponseMetadata": {}
+    }
+}
