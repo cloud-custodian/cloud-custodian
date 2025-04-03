@@ -26,8 +26,15 @@ class Bucket(QueryResourceManager):
 
         @staticmethod
         def get(client, resource_info):
-            return client.execute_command(
-                'get', {'bucket': resource_info['bucket_name']})
+            # pull mode passes the bucket name in the info using bucket_name.
+            # gcp-scc mode passes in the full resourceName
+            if not (bucket_name := resource_info.get("bucket_name")):
+                # There is no nice way to return no resource, so if there is no
+                # resourceName in the info, we will raise a KeyError.
+                prefix = "//storage.googleapis.com/"
+                bucket_name = resource_info["resourceName"].removeprefix(prefix)
+
+            return client.execute_command("get", {"bucket": bucket_name})
 
 
 @Bucket.filter_registry.register('iam-policy')

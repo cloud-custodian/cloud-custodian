@@ -2748,7 +2748,8 @@ class SetInventory(BucketActionBase):
             'Size', 'LastModifiedDate', 'StorageClass', 'ETag',
             'IsMultipartUploaded', 'ReplicationStatus', 'EncryptionStatus',
             'ObjectLockRetainUntilDate', 'ObjectLockMode', 'ObjectLockLegalHoldStatus',
-            'IntelligentTieringAccessTier', 'BucketKeyStatus', 'ChecksumAlgorithm']}})
+            'IntelligentTieringAccessTier', 'BucketKeyStatus', 'ChecksumAlgorithm',
+            'ObjectAccessControlList', 'ObjectOwner']}})
 
     permissions = ('s3:PutInventoryConfiguration', 's3:GetInventoryConfiguration')
 
