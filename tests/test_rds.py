@@ -20,6 +20,7 @@ from c7n.testing import mock_datetime_now
 from dateutil import parser
 from dateutil import tz as tzutil
 import c7n.filters.backup
+import c7n.resources.rdsparamgroup
 
 from .common import BaseTest, event_data
 
@@ -2235,3 +2236,41 @@ class RDSProxy(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["DBProxyName"], "proxy-test-1")
+
+
+class ModifyRDSParamGroupTest(BaseTest):
+    def test_rds_modify_parameter_group(self):
+        session_factory = self.replay_flight_data("test_rds_modify_parameter_group")
+        p = self.load_policy(
+            {
+                "name": "rds-modify-parameter-group",
+                "resource": "rds",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "DBInstanceIdentifier",
+                        "op": "eq",
+                        "value": "mysql-compliance",
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "modify-pg",
+                        "params": [
+                            {"name": "auto_increment_offset", "value": "5"},
+                            {"name": "autocommit", "value": "1"},
+                        ]
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client("rds")
+        response = client.describe_db_parameters(DBParameterGroupName="test")
+        for param in response.get("Parameters"):
+            if param.get("ParameterName") == "auto_increment_offset":
+                self.assertEqual(param.get("ParameterValue"), "5")
+            if param.get("ParameterName") == "autocommit":
+                self.assertEqual(param.get("ParameterValue"), "1")

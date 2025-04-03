@@ -1,0 +1,50 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Marker": "bG9jYWxfaW5maWxl", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "a9f76c51-6521-11e7-af76-fbe81bc5cf0d", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "a9f76c51-6521-11e7-af76-fbe81bc5cf0d", 
+                "vary": "Accept-Encoding", 
+                "content-length": "55693", 
+                "content-type": "text/xml", 
+                "date": "Mon, 10 Jul 2017 03:41:31 GMT"
+            }
+        }, 
+        "Parameters": [             
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Determines the starting point for the AUTO_INCREMENT column value", 
+                "DataType": "integer", 
+                "AllowedValues": "1-65535", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "auto_increment_offset",
+                "ParameterValue": "5",
+                "ApplyType": "dynamic",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            }, 
+            {
+                "ApplyMethod": "pending-reboot", 
+                "Description": "Sets the autocommit mode", 
+                "DataType": "boolean", 
+                "AllowedValues": "0,1", 
+                "Source": "engine-default", 
+                "IsModifiable": true, 
+                "ParameterName": "autocommit",
+                "ParameterValue": "1", 
+                "ApplyType": "dynamic",
+                "SupportedEngineModes": [
+                    "provisioned",
+                    "serverless"
+                ]
+            }
+        ]
+    }
+}

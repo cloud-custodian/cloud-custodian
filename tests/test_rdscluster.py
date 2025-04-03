@@ -9,6 +9,7 @@ from c7n.resources.rdscluster import RDSCluster, _run_cluster_method
 from c7n.testing import mock_datetime_now
 from dateutil import parser
 import c7n.filters.backup
+import c7n.resources.rdsparamgroup
 
 from .common import BaseTest, event_data
 
@@ -807,3 +808,41 @@ class TestRDSClusterParameterGroupFilter(BaseTest):
         )
         resources = policy.resource_manager.resources()
         self.assertEqual(len(resources), 2)
+
+
+class ModifyRDSParamGroupTest(BaseTest):
+    def test_rdscluster_modify_parameter_group(self):
+        session_factory = self.replay_flight_data("test_rdscluster_modify_parameter_group")
+        p = self.load_policy(
+            {
+                "name": "rdscluster-modify-parameter-group",
+                "resource": "rds-cluster",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "DBClusterIdentifier",
+                        "op": "eq",
+                        "value": "aurora-mysql",
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "modify-cluster-pg",
+                        "params": [
+                            {"name": "auto_increment_offset", "value": "5"},
+                            {"name": "autocommit", "value": "1"},
+                        ]
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client("rds")
+        response = client.describe_db_cluster_parameters(DBClusterParameterGroupName="test")
+        for param in response.get("Parameters"):
+            if param.get("ParameterName") == "auto_increment_offset":
+                self.assertEqual(param.get("ParameterValue"), "5")
+            if param.get("ParameterName") == "autocommit":
+                self.assertEqual(param.get("ParameterValue"), "1")
