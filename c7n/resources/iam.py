@@ -3075,6 +3075,39 @@ class OpenIdProviderDelete(BaseAction):
                 ),
             )
 
+@SamlProvider.action_registry.register('delete')
+class SamlProviderDelete(BaseAction):
+    """Delete a SAML IAM Identity Provider
+
+    For example, if you want to automatically delete an SAML IdP for unknown-idp
+
+    :example:
+
+      .. code-block:: yaml
+
+        - name: aws-iam-saml-provider-delete
+          resource: iam-saml-provider
+          filters:
+            - type: value
+              key: Name
+              value: unknown-idp
+          actions:
+            - type: delete
+
+    """
+    schema = type_schema('delete')
+    permissions = ('iam:DeleteSAMLProvider',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('iam')
+        for provider in resources:
+            self.manager.retry(
+                client.delete_saml_provider,
+                SAMLProviderArn=provider['Arn'],
+                ignore_err_codes=(
+                    'NoSuchEntityException',
+                ),
+            )
 
 @InstanceProfile.filter_registry.register('has-specific-managed-policy')
 class SpecificIamProfileManagedPolicy(ValueFilter):
