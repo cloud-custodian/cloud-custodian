@@ -1,0 +1,14 @@
+{
+    "status_code": 200,
+    "data": {
+        "Topics": [
+            {
+                "TopicArn": "arn:aws:sns:us-east-2:644160558196:foo"
+            },
+            {
+                "TopicArn": "arn:aws:sns:us-east-2:644160558196:foo-1"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
