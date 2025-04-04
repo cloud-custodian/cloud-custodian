@@ -1,0 +1,160 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Reservations": [
+            {
+                "OwnerId": "619193117841", 
+                "ReservationId": "r-d123af7f", 
+                "Groups": [], 
+                "Instances": [
+                    {
+                        "Monitoring": {
+                            "State": "disabled"
+                        }, 
+                        "PublicDnsName": "ec2-52-38-73-98.us-west-2.compute.amazonaws.com", 
+                        "State": {
+                            "Code": 16, 
+                            "Name": "running"
+                        }, 
+                        "EbsOptimized": false, 
+                        "LaunchTime": {
+                            "hour": 0, 
+                            "__class__": "datetime", 
+                            "month": 5, 
+                            "second": 21, 
+                            "microsecond": 0, 
+                            "year": 2016, 
+                            "day": 8, 
+                            "minute": 57
+                        }, 
+                        "PublicIpAddress": "52.38.73.98", 
+                        "PrivateIpAddress": "172.31.8.154", 
+                        "ProductCodes": [], 
+                        "VpcId": "vpc-399e3d52", 
+                        "StateTransitionReason": "", 
+                        "InstanceId": "i-1aebf7c0", 
+                        "ImageId": "ami-c229c0a2", 
+                        "PrivateDnsName": "ip-172-31-8-154.us-west-2.compute.internal", 
+                        "KeyName": "HazmatGreenField", 
+                        "SecurityGroups": [
+                            {
+                                "GroupName": "jlxc", 
+                                "GroupId": "sg-47b76f22"
+                            }, 
+                            {
+                                "GroupName": "default", 
+                                "GroupId": "sg-0a08e365"
+                            }
+                        ], 
+                        "ClientToken": "JlRpx1460611049040", 
+                        "SubnetId": "subnet-389e3d53", 
+                        "InstanceType": "m3.medium", 
+                        "NetworkInterfaces": [
+                            {
+                                "Status": "in-use", 
+                                "MacAddress": "0a:d4:67:1f:58:03", 
+                                "SourceDestCheck": true, 
+                                "VpcId": "vpc-399e3d52", 
+                                "Description": "", 
+                                "Association": {
+                                    "PublicIp": "52.38.73.98", 
+                                    "PublicDnsName": "ec2-52-38-73-98.us-west-2.compute.amazonaws.com", 
+                                    "IpOwnerId": "amazon"
+                                }, 
+                                "NetworkInterfaceId": "eni-68d48235", 
+                                "PrivateIpAddresses": [
+                                    {
+                                        "PrivateDnsName": "ip-172-31-8-154.us-west-2.compute.internal", 
+                                        "Association": {
+                                            "PublicIp": "52.38.73.98", 
+                                            "PublicDnsName": "ec2-52-38-73-98.us-west-2.compute.amazonaws.com", 
+                                            "IpOwnerId": "amazon"
+                                        }, 
+                                        "Primary": true, 
+                                        "PrivateIpAddress": "172.31.8.154"
+                                    }
+                                ], 
+                                "PrivateDnsName": "ip-172-31-8-154.us-west-2.compute.internal", 
+                                "Attachment": {
+                                    "Status": "attached", 
+                                    "DeviceIndex": 0, 
+                                    "DeleteOnTermination": true, 
+                                    "AttachmentId": "eni-attach-f1c55f38", 
+                                    "AttachTime": {
+                                        "hour": 5, 
+                                        "__class__": "datetime", 
+                                        "month": 4, 
+                                        "second": 29, 
+                                        "microsecond": 0, 
+                                        "year": 2016, 
+                                        "day": 14, 
+                                        "minute": 17
+                                    }
+                                }, 
+                                "Groups": [
+                                    {
+                                        "GroupName": "jlxc", 
+                                        "GroupId": "sg-47b76f22"
+                                    }, 
+                                    {
+                                        "GroupName": "default", 
+                                        "GroupId": "sg-0a08e365"
+                                    }
+                                ], 
+                                "SubnetId": "subnet-389e3d53", 
+                                "OwnerId": "619193117841", 
+                                "PrivateIpAddress": "172.31.8.154"
+                            }
+                        ], 
+                        "SourceDestCheck": true, 
+                        "Placement": {
+                            "Tenancy": "default", 
+                            "GroupName": "", 
+                            "AvailabilityZone": "us-west-2c"
+                        }, 
+                        "Hypervisor": "xen", 
+                        "BlockDeviceMappings": [
+                            {
+                                "DeviceName": "/dev/xvda", 
+                                "Ebs": {
+                                    "Status": "attached", 
+                                    "DeleteOnTermination": true, 
+                                    "VolumeId": "vol-2b047792", 
+                                    "AttachTime": {
+                                        "hour": 5, 
+                                        "__class__": "datetime", 
+                                        "month": 4, 
+                                        "second": 29, 
+                                        "microsecond": 0, 
+                                        "year": 2016, 
+                                        "day": 14, 
+                                        "minute": 17
+                                    }
+                                }
+                            }
+                        ], 
+                        "Architecture": "x86_64", 
+                        "RootDeviceType": "ebs", 
+                        "RootDeviceName": "/dev/xvda", 
+                        "VirtualizationType": "hvm", 
+                        "Tags": [
+                            {
+                                "Value": "Testing123", 
+                                "Key": "Testing"
+                            }, 
+                            {
+                                "Value": "CompileLambda", 
+                                "Key": "Name"
+                            }
+                        ], 
+                        "AmiLaunchIndex": 0
+                    }
+                ]
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "dadb73c3-1376-469a-a2f5-e46f1d4f91b1"
+        }
+    }
+}
