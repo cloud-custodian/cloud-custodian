@@ -17784,7 +17784,13 @@
     "ListTagsForResource",
     "TagResource",
     "UntagResource",
-    "UpdateDbInstance"
+    "UpdateDbInstance",
+    "CreateDbCluster",
+    "GetDbCluster",
+    "UpdateDbCluster",
+    "DeleteDbCluster",
+    "ListDbClusters",
+    "ListDbInstancesForCluster"
   ],
   "tiros": [
     "CreateQuery",
