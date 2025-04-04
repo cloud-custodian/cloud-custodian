@@ -1,21 +1,56 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import json
+from botocore.exceptions import ClientError
 from c7n.manager import resources
 from c7n.actions import BaseAction, RemovePolicyBase
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import iamaccess
-from c7n.query import QueryResourceManager, TypeInfo
+from c7n.query import QueryResourceManager, TypeInfo, DescribeSource
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction, Action
 from c7n.utils import local_session, type_schema, jmespath_search
 from c7n.filters.policystatement import HasStatementFilter
 
 
+class DescribeSecret(DescribeSource):
+
+    def _augment_secret(self, secret, client):
+        detail_op, param_name, param_key, _ = self.manager.resource_type.detail_spec
+        op = getattr(client, detail_op)
+        kw = {param_name: secret[param_key]}
+
+        try:
+            secret.update(self.manager.retry(
+                op, **kw
+            ))
+        except ClientError as e:
+            code = e.response['Error']['Code']
+            if code != 'AccessDeniedException':
+                raise
+            # Same logic as S3 augment: describe is expected to be restricted
+            # by resource-based policies
+            self.manager.log.warning(
+                "Secret:%s unable to invoke method:%s error:%s ",
+                secret[param_key], detail_op, e.response['Error']['Message']
+            )
+            secret.setdefault('c7n:DeniedMethods', []).append(detail_op)
+
+    def augment(self, secrets):
+        client = local_session(self.manager.session_factory).client(
+            self.manager.resource_type.service
+        )
+        with self.manager.executor_factory(max_workers=self.manager.max_workers) as w:
+            for s in secrets:
+                w.submit(self._augment_secret, s, client)
+
+        return secrets
+
+
 @resources.register('secrets-manager')
 class SecretsManager(QueryResourceManager):
 
-    permissions = ('secretsmanager:ListSecretVersionIds',)
+    permissions = ('secretsmanager:ListSecrets', 'secretsmanager:DescribeSecret')
 
     class resource_type(TypeInfo):
         service = 'secretsmanager'
@@ -24,6 +59,10 @@ class SecretsManager(QueryResourceManager):
         config_type = cfn_type = 'AWS::SecretsManager::Secret'
         name = id = 'Name'
         arn = 'ARN'
+
+    source_mapping = {
+        'describe': DescribeSecret
+    }
 
 
 SecretsManager.filter_registry.register('marked-for-op', TagActionFilter)
