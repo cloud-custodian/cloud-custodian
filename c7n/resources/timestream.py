@@ -12,6 +12,7 @@ from c7n.tags import (
     RemoveTag as RemoveTagAction
 )
 from c7n.filters.backup import ConsecutiveAwsBackupsFilter
+from c7n.filters import ValueFilter
 
 
 class DescribeTimestream(DescribeSource):
@@ -142,6 +143,66 @@ class TimestreamInfluxDBSGFilter(SecurityGroupFilter):
 class TimestreamInfluxDBSubnetFilter(SubnetFilter):
 
     RelatedIdsExpression = "vpcSubnetIds[]"
+
+
+@TimestreamInfluxDB.filter_registry.register('db-parameter')
+class ParameterFilter(ValueFilter):
+    """Filter timestream influxdb instances based on parameter values.
+
+    :example:
+
+    .. code-block:: yaml
+
+       policies:
+         - name: filter-timestream-influxdb-instance
+           resource: aws.timestream-influxdb
+           filters:
+            - type: db-parameter
+              key: fluxLogEnabled
+              value: True
+    """
+    permissions = ('timestream-influxdb:GetDbParameterGroup',)
+    schema = type_schema('db-parameter', rinherit=ValueFilter.schema)
+    annotation_key = 'c7n:MatchedDBParameter'
+    schema_alias = False
+
+    def _get_param_list(self, pg):
+        client = local_session(self.manager.session_factory).client('timestream-influxdb')
+        if pg is None:
+            return {}
+        param_list = client.get_db_parameter_group(identifier=pg) \
+                .get('parameters', {}).get('InfluxDBv2', {})
+        return param_list
+
+    def handle_paramgroup_cache(self, param_groups):
+        pgcache = {}
+        cache = self.manager._cache
+
+        with cache:
+            for pg in param_groups:
+                cache_key = {
+                    'region': self.manager.config.region,
+                    'account_id': self.manager.config.account_id,
+                    'rds-pg': pg}
+                pg_values = cache.get(cache_key)
+                if pg_values is not None:
+                    pgcache[pg] = pg_values
+                    continue
+                pgcache[pg] = self._get_param_list(pg)
+                cache.save(cache_key, pgcache[pg])
+        return pgcache
+
+    def process(self, resources, event=None):
+        results = []
+        parameter_group_list = {db.get('dbParameterGroupIdentifier', None) for db in resources}
+        paramcache = self.handle_paramgroup_cache(parameter_group_list)
+        for r in resources:
+            pg_values = paramcache.get(r.get('dbParameterGroupIdentifier', None), {})
+            if self.match(pg_values):
+                r.setdefault(self.annotation_key, []).append(
+                    self.data.get('key'))
+                results.append(r)
+        return results
 
 
 @TimestreamTable.action_registry.register('delete')
