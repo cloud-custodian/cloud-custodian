@@ -16,6 +16,7 @@ from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.filters.policystatement import HasStatementFilter
 from c7n.filters.related import RelatedResourceFilter
 from c7n.manager import resources, ResourceManager
+from c7n.resources.aws import shape_schema
 from c7n import query, utils
 from c7n.utils import generate_arn, type_schema, get_retry, jmespath_search, get_partition
 
@@ -1199,6 +1200,79 @@ class ApiGwV2(query.QueryResourceManager):
         return self._generate_arn
 
 
+@ApiGwV2.action_registry.register('update')
+class UpdateApiV2(BaseAction):
+    """Update configuration of a WebSocket or HTTP API.
+
+    https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/apigatewayv2/client/update_api.html
+
+    :example:
+
+    .. code-block:: yaml
+
+       policies:
+         - name: apigw-update
+           resource: apigwv2
+           filters:
+             - Name: c7n-test
+           actions:
+             - type: update
+               CorsConfiguration:
+                 AllowCredentials: False
+                 MaxAge: 60
+               Description: My APIv2
+               DisableExecuteApiEndpoint: False
+    """
+
+    permissions = ('apigateway:PATCH',)
+    schema = utils.type_schema(
+        'update',
+        **shape_schema('apigatewayv2', 'UpdateApiRequest', drop_fields=('ApiId'))
+    )
+
+    def process(self, resources):
+        client = utils.local_session(
+            self.manager.session_factory).client('apigatewayv2')
+        params = dict(self.data)
+        params.pop('type')
+        for r in resources:
+            self.manager.retry(client.update_api,
+                ApiId=r['ApiId'],
+                **params
+            )
+
+
+@ApiGwV2.action_registry.register('delete')
+class DeleteApiV2(BaseAction):
+    """Delete an HTTP or WebSocket API.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+        - name: apigwv2-delete
+          resource: apigwv2
+          filters:
+            - Name: empty
+          actions:
+            - type: delete
+    """
+
+    permissions = ('apigateway:DELETE',)
+    schema = type_schema('delete')
+
+    def process(self, resources):
+        client = utils.local_session(
+            self.manager.session_factory).client('apigatewayv2')
+        for r in resources:
+            self.manager.retry(
+                client.delete_api,
+                ignore_err_codes=('NotFoundException',),
+                ApiId=r['ApiId']
+            )
+
+
 class StageDescribe(query.ChildDescribeSource):
 
     def augment(self, resources):
@@ -1234,3 +1308,77 @@ class ApiGatewayV2Stage(query.ChildResourceManager):
                 partition, self.config.region, r['c7n:parent-id'], r['StageName']
             )
             for r in resources]
+
+
+@ApiGatewayV2Stage.action_registry.register('update')
+class UpdateApiV2Stage(BaseAction):
+    """Update configuration of a WebSocket or HTTP API stage.
+
+    https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/apigatewayv2/client/update_stage.html
+
+    :example:
+
+    .. code-block:: yaml
+
+       policies:
+         - name: apigw-stage-update
+           resource: apigwv2-stage
+           filters:
+             - description: empty
+           actions:
+             - type: update
+               AutoDeploy: True
+               Description: My APIv2
+               DefaultRouteSettings:
+                 DetailedMetricsEnabled: True
+    """
+
+    permissions = ('apigateway:PATCH',)
+    schema = utils.type_schema(
+        'update',
+        **shape_schema('apigatewayv2', 'UpdateStageRequest', drop_fields=('ApiId', 'StageName'))
+    )
+
+    def process(self, resources):
+        client = utils.local_session(
+            self.manager.session_factory).client('apigatewayv2')
+        params = dict(self.data)
+        params.pop('type')
+        for r in resources:
+            self.manager.retry(client.update_stage,
+                ApiId=r['c7n:parent-id'],
+                StageName=r['StageName'],
+                **params
+            )
+
+
+@ApiGatewayV2Stage.action_registry.register('delete')
+class DeleteApiV2Stage(BaseAction):
+    """Delete an HTTP or WebSocket API stage.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+        - name: apigwv2-stage-delete
+          resource: apigwv2-stage
+          filters:
+            - ApiGatewayManaged: False
+          actions:
+            - type: delete
+    """
+
+    permissions = ('apigateway:DELETE',)
+    schema = type_schema('delete')
+
+    def process(self, resources):
+        client = utils.local_session(
+            self.manager.session_factory).client('apigatewayv2')
+        for r in resources:
+            self.manager.retry(
+                client.delete_stage,
+                ignore_err_codes=('NotFoundException',),
+                ApiId=r['c7n:parent-id'],
+                StageName=r['StageName']
+            )
