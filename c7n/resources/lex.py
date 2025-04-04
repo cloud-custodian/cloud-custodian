@@ -42,10 +42,20 @@ class LexV2Bot(QueryResourceManager):
 
 class LexV2BotAliasDescribe(query.ChildDescribeSource):
     def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('lexv2-models')
+        sts_client = local_session(self.manager.session_factory).client('sts')
+        account_id = sts_client.get_caller_identity().get('Account')
+        region = self.manager.session_factory.region
         for r in resources:
-            client = local_session(self.manager.session_factory).client('lexv2-models')
-            r.update(client.describe_bot_alias
-                     (botId=r['c7n:parent-id'], botAliasId=r['botAliasId']))
+            botalias = client.describe_bot_alias(
+                botId=r['c7n:parent-id'], botAliasId=r['botAliasId'])
+            r.update(botalias)
+            r['botArn'] = f'arn:aws:lex:{region}:{account_id}:bot/{r["c7n:parent-id"]}'
+            r['botAliasArn'] = (
+                f'arn:aws:lex:{region}:{account_id}:bot-alias/{r["c7n:parent-id"]}/{r["botAliasId"]}')
+            tags_response = client.list_tags_for_resource(
+                resourceArn=r['botAliasArn'])
+            r['tags'] = tags_response.get('tags', {})
         return resources
 
 
@@ -57,9 +67,10 @@ class LexV2BotAlias(query.ChildResourceManager):
         enum_spec = ('list_bot_aliases', 'botAliasSummaries', None)
         name = 'botAliasId'
         id = 'botAliasId'
-        filter_name = 'botAliasId'
-        date = 'creationDateTime'
-        cfn_type = config_type = "AWS::Lex::Bot"
+        universal_taggable = object()
+        arn = 'botAliasArn'
+        arn_service = 'lex'
+        cfn_type = config_type = "AWS::Lex::BotAlias"
         permissions_enum = ('lex:DescribeBotAlias',)
 
     source_mapping = {'describe-child': LexV2BotAliasDescribe, 'config': query.ConfigSource}
@@ -98,26 +109,3 @@ class LexV2BotCrossAccountAccessFilter(CrossAccountAccessFilter):
             pol = result.get('policy', None)
             r[self.policy_attribute] = pol
         return pol
-
-
-def process(self, resources, event=None):
-    client = local_session(self.manager.session_factory).client('lexv2-models')
-    results = []
-    for r in resources:
-        if self.bot_annotation not in r:
-            aliases = self.manager.retry(client.list_bot_aliases, botId=r['botId'])
-            if 'botAliasSummaries' in aliases:
-                for alias in aliases['botAliasSummaries']:
-                    bot_alias_id = alias['botAliasId']
-                    doc = self.manager.retry(client.describe_bot_alias, botId=r['botId'],
-                                             botAliasId=bot_alias_id)
-                    if doc:
-                        doc.pop('ResponseMetadata', None)
-                        r[self.bot_annotation] = doc
-                        r['conversationLogSettings'] = doc.get('conversationLogSettings', {})
-            else:
-                continue
-        if self.match(r[self.bot_annotation]):
-            r[self.policy_annotation] = self.data.get('value')
-            results.append(r)
-    return results
