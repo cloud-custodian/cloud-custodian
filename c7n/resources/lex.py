@@ -40,6 +40,43 @@ class LexV2Bot(QueryResourceManager):
     source_mapping = {"describe": query.DescribeWithResourceTags, "config": query.ConfigSource}
 
 
+class LexV2BotAliasDescribe(query.ChildDescribeSource):
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('lexv2-models')
+        sts_client = local_session(self.manager.session_factory).client('sts')
+        account_id = sts_client.get_caller_identity().get('Account')
+        session = local_session(self.manager.session_factory)
+        region = session.region_name
+        for r in resources:
+            botalias = client.describe_bot_alias(
+                botId=r['c7n:parent-id'], botAliasId=r['botAliasId'])
+            r.update(botalias)
+            r['botArn'] = f'arn:aws:lex:{region}:{account_id}:bot/{r["c7n:parent-id"]}'
+            r['botAliasArn'] = (
+                f'arn:aws:lex:{region}:{account_id}:bot-alias/{r["c7n:parent-id"]}/{r["botAliasId"]}')
+            tags_response = client.list_tags_for_resource(
+                resourceARN=r['botAliasArn'])
+            r['tags'] = tags_response.get('tags', {})
+        return resources
+
+
+@resources.register('lexv2-bot-alias')
+class LexV2BotAlias(query.ChildResourceManager):
+    class resource_type(query.TypeInfo):
+        service = 'lexv2-models'
+        parent_spec = ('lexv2-bot', 'botId', True)
+        enum_spec = ('list_bot_aliases', 'botAliasSummaries', None)
+        name = 'botAliasId'
+        id = 'botAliasId'
+        universal_taggable = object()
+        arn = 'botAliasArn'
+        arn_service = 'lex'
+        cfn_type = config_type = "AWS::Lex::Bot"
+        permissions_enum = ('lex:DescribeBotAlias',)
+
+    source_mapping = {'describe-child': LexV2BotAliasDescribe, 'config': query.ConfigSource}
+
+
 @LexV2Bot.filter_registry.register('cross-account')
 class LexV2BotCrossAccountAccessFilter(CrossAccountAccessFilter):
     """Filters all LexV2 bots with cross-account access

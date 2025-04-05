@@ -1,0 +1,9 @@
+{
+    "status_code": 200,
+    "data": {
+        "UserId": "ABCDZL6XWCR2HNIH7E6AA",
+        "Account": "111111111111",
+        "Arn": "arn:aws:iam::111111111111:user/lexuser",
+        "ResponseMetadata": {}
+    }
+}
