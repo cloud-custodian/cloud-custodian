@@ -43,6 +43,7 @@ class TestLexConversationLogs(BaseTest):
         resource = resources[0]
         self.assertIn("conversationLogSettings", resource)
 
+
 class Lexv2BotAlias(BaseTest):
     def test_tag_action(self):
         session_factory = self.replay_flight_data('test_lex_botalias_tag_action')
