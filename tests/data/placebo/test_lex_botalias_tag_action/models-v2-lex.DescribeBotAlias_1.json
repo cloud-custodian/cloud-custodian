@@ -58,6 +58,8 @@
         ],
         "botAliasStatus": "Available",
         "botId": "OTM2WO3PEY",
+        "botArn": "arn:aws:lex:us-east-1:111111111111:bot/OTM2WO3PEY",
+        "botAliasArn": "arn:aws:lex:us-east-1:111111111111:bot-alias/OTM2WO3PEY/TSTALIASID",
         "creationDateTime": {
             "__class__": "datetime",
             "year": 2025,
