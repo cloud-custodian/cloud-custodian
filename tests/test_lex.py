@@ -42,3 +42,19 @@ class TestLexConversationLogs(BaseTest):
 
         resource = resources[0]
         self.assertIn("conversationLogSettings", resource)
+
+class Lexv2BotAlias(BaseTest):
+    def test_tag_action(self):
+        session_factory = self.replay_flight_data('test_lex_botalias_tag_action')
+        p = self.load_policy(
+            {
+                "name": "tag-lexv2-bot-alias",
+                "resource": "lexv2-bot-alias",
+                "actions": [
+                    {"type": "tag", "key": "Department", "value": "International"},
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)

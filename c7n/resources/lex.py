@@ -45,7 +45,8 @@ class LexV2BotAliasDescribe(query.ChildDescribeSource):
         client = local_session(self.manager.session_factory).client('lexv2-models')
         sts_client = local_session(self.manager.session_factory).client('sts')
         account_id = sts_client.get_caller_identity().get('Account')
-        region = self.manager.session_factory.region
+        session = local_session(self.manager.session_factory)
+        region = session.region_name
         for r in resources:
             botalias = client.describe_bot_alias(
                 botId=r['c7n:parent-id'], botAliasId=r['botAliasId'])
@@ -54,7 +55,7 @@ class LexV2BotAliasDescribe(query.ChildDescribeSource):
             r['botAliasArn'] = (
                 f'arn:aws:lex:{region}:{account_id}:bot-alias/{r["c7n:parent-id"]}/{r["botAliasId"]}')
             tags_response = client.list_tags_for_resource(
-                resourceArn=r['botAliasArn'])
+                resourceARN=r['botAliasArn'])
             r['tags'] = tags_response.get('tags', {})
         return resources
 

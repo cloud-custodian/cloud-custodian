@@ -30,7 +30,7 @@
                     "destination": {
                         "s3Bucket": {
                             "kmsKeyArn": "arn:aws:kms:us-east-1:111111111111:key/3bd15351-ad10-4cf4-b230-280746ad3dbb",
-                            "s3BucketArn": "arn:aws:s3:::example-abc-123",
+                            "s3BucketArn": "arn:aws:s3:::example-abc-111111111111",
                             "logPrefix": "aws/lex/OTM2WO3PEY/TSTALIASID/DRAFT/"
                         }
                     },
@@ -57,7 +57,7 @@
             }
         ],
         "botAliasStatus": "Available",
-        "botId": "OTM2WO3PMY",
+        "botId": "OTM2WO3PEY",
         "creationDateTime": {
             "__class__": "datetime",
             "year": 2025,
