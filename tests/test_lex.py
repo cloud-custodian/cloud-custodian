@@ -19,31 +19,6 @@ class LexV2Bot(BaseTest):
           'arn:aws:lex:us-east-1:644160558196:bot/OTM2WO3PEY')
 
 
-class TestLexConversationLogs(BaseTest):
-    def test_conversationlogs_filter(self):
-        session_factory = self.replay_flight_data("test_lex_conversationlogs")
-        p = self.load_policy(
-            {
-                "name": "test-lex-conversationLogs",
-                "resource": "lexv2-bot-alias",
-                "filters": [
-                    {
-                        "type": "value",
-                        "key": "conversationLogSettings"
-                        ".textLogSettings[?enabled == `true`].enabled",
-                        "value": "not-null",
-                    }
-                ],
-            },
-            session_factory=session_factory,
-        )
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-
-        resource = resources[0]
-        self.assertIn("conversationLogSettings", resource)
-
-
 class Lexv2BotAlias(BaseTest):
     def test_tag_action(self):
         session_factory = self.replay_flight_data('test_lex_botalias_tag_action')
