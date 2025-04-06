@@ -71,7 +71,7 @@ class LexV2BotAlias(query.ChildResourceManager):
         universal_taggable = object()
         arn = 'botAliasArn'
         arn_service = 'lex'
-        cfn_type = config_type = "AWS::Lex::Bot"
+        cfn_type = config_type = "AWS::Lex::BotAlias"
         permissions_enum = ('lex:DescribeBotAlias',)
 
     source_mapping = {'describe-child': LexV2BotAliasDescribe, 'config': query.ConfigSource}
