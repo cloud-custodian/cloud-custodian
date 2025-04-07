@@ -1,0 +1,64 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "resourceShares": [
+            {
+                "resourceShareArn": "arn:aws:ram:us-east-1:123456789012:resource-share/398276a8-0855-4473-b26e-ea910e91ba00",
+                "name": "c7n-test",
+                "owningAccountId": "123456789012",
+                "allowExternalPrincipals": true,
+                "status": "ACTIVE",
+                "creationTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 3,
+                    "day": 20,
+                    "hour": 14,
+                    "minute": 7,
+                    "second": 59,
+                    "microsecond": 470000
+                },
+                "lastUpdatedTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 3,
+                    "day": 20,
+                    "hour": 14,
+                    "minute": 7,
+                    "second": 59,
+                    "microsecond": 470000
+                },
+                "featureSet": "STANDARD"
+            },
+            {
+                "resourceShareArn": "arn:aws:ram:us-east-1:123456789012:resource-share/61cd847c-0eb8-45cd-9b2c-1307a57b255d",
+                "name": "c7n-test-self",
+                "owningAccountId": "123456789012",
+                "allowExternalPrincipals": true,
+                "status": "ACTIVE",
+                "creationTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 3,
+                    "day": 20,
+                    "hour": 14,
+                    "minute": 8,
+                    "second": 13,
+                    "microsecond": 52000
+                },
+                "lastUpdatedTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 3,
+                    "day": 20,
+                    "hour": 14,
+                    "minute": 8,
+                    "second": 13,
+                    "microsecond": 52000
+                },
+                "featureSet": "STANDARD"
+            }
+        ]
+    }
+}
