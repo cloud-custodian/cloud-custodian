@@ -1,0 +1,70 @@
+{
+    "status_code": 200,
+    "data": {
+        "EntityRecognizerPropertiesList": [
+            {
+                "EntityRecognizerArn": "arn:aws:comprehend:us-east-1:644160558196:entity-recognizer/TestVpcEntityRecognizer/version/1",
+                "LanguageCode": "en",
+                "Status": "ACTIVE",
+                "SubmitTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 4,
+                    "day": 2,
+                    "hour": 16,
+                    "minute": 39,
+                    "second": 15,
+                    "microsecond": 435000
+                },
+                "EndTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 4,
+                    "day": 2,
+                    "hour": 16,
+                    "minute": 39,
+                    "second": 50,
+                    "microsecond": 114000
+                },
+                "InputDataConfig": {
+                    "DataFormat": "COMPREHEND_CSV",
+                    "EntityTypes": [
+                        {
+                            "Type": "PERSON"
+                        },
+                        {
+                            "Type": "ORGANIZATION"
+                        },
+                        {
+                            "Type": "LOCATION"
+                        },
+                        {
+                            "Type": "EMAIL"
+                        },
+                        {
+                            "Type": "PHONE_NUMBER"
+                        }
+                    ],
+                    "Documents": {
+                        "S3Uri": "s3://c7n-test-s3-bucket/sample.txt",
+                        "InputFormat": "ONE_DOC_PER_LINE"
+                    },
+                    "Annotations": {
+                        "S3Uri": "s3://c7n-test-s3-bucket/entities.csv"
+                    }
+                },
+                "DataAccessRoleArn": "arn:aws:iam::644160558196:role/ComprehendVpcAccessRole",
+                "VpcConfig": {
+                    "SecurityGroupIds": [
+                        "sg-0d74b07ab0b3288c0"
+                    ],
+                    "Subnets": [
+                        "subnet-0ebe9abf587c5070c"
+                    ]
+                },
+                "VersionName": "1"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
