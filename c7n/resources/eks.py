@@ -4,6 +4,7 @@ import c7n.filters.vpc as net_filters
 from c7n.actions import Action
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter
 from c7n.manager import resources
+from c7n.resources.aws import shape_schema
 from c7n import tags, query
 from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, \
     ChildResourceManager, ChildDescribeSource
@@ -171,19 +172,10 @@ class EKSRemoveTag(tags.RemoveTag):
 @EKS.action_registry.register('update-config')
 class UpdateConfig(Action):
 
-    schema = {
-        'type': 'object',
-        'additionalProperties': False,
-        'oneOf': [
-            {'required': ['type', 'logging']},
-            {'required': ['type', 'resourcesVpcConfig']},
-            {'required': ['type', 'logging', 'resourcesVpcConfig']}],
-        'properties': {
-            'type': {'enum': ['update-config']},
-            'logging': {'type': 'object'},
-            'resourcesVpcConfig': {'type': 'object'}
-        }
-    }
+    schema = type_schema('update-config',
+                **shape_schema(
+                    'eks', 'UpdateClusterConfigRequest', drop_fields=('name'))
+            )
 
     permissions = ('eks:UpdateClusterConfig',)
     shape = 'UpdateClusterConfigRequest'
