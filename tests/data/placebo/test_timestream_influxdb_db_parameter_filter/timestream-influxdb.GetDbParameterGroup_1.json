@@ -1,0 +1,72 @@
+{
+    "status_code": 200,
+    "data": {
+        "id": "f09gvw8ibb",
+        "name": "test-param",
+        "arn": "arn:aws:timestream-influxdb:us-east-1:644160558196:db-parameter-group/f09gvw8ibb",
+        "description": "",
+        "parameters": {
+            "InfluxDBv2": {
+                "fluxLogEnabled": false,
+                "logLevel": "info",
+                "noTasks": false,
+                "queryConcurrency": 256,
+                "queryQueueSize": 256,
+                "tracingType": "log",
+                "metricsDisabled": false,
+                "httpIdleTimeout": {
+                    "durationType": "minutes",
+                    "value": 3
+                },
+                "httpReadHeaderTimeout": {
+                    "durationType": "seconds",
+                    "value": 10
+                },
+                "httpReadTimeout": {
+                    "durationType": "milliseconds",
+                    "value": 0
+                },
+                "httpWriteTimeout": {
+                    "durationType": "milliseconds",
+                    "value": 0
+                },
+                "influxqlMaxSelectBuckets": 0,
+                "influxqlMaxSelectPoint": 0,
+                "influxqlMaxSelectSeries": 0,
+                "pprofDisabled": true,
+                "queryInitialMemoryBytes": 0,
+                "queryMaxMemoryBytes": 0,
+                "queryMemoryBytes": 0,
+                "sessionLength": 60,
+                "sessionRenewDisabled": false,
+                "storageCacheMaxMemorySize": 1073741824,
+                "storageCacheSnapshotMemorySize": 26214400,
+                "storageCacheSnapshotWriteColdDuration": {
+                    "durationType": "minutes",
+                    "value": 10
+                },
+                "storageCompactFullWriteColdDuration": {
+                    "durationType": "hours",
+                    "value": 4
+                },
+                "storageCompactThroughputBurst": 50331648,
+                "storageMaxConcurrentCompactions": 0,
+                "storageMaxIndexLogFileSize": 1048576,
+                "storageNoValidateFieldSize": false,
+                "storageRetentionCheckInterval": {
+                    "durationType": "minutes",
+                    "value": 30
+                },
+                "storageSeriesFileMaxConcurrentSnapshotCompactions": 0,
+                "storageSeriesIdSetCacheSize": 100,
+                "storageWalMaxConcurrentWrites": 0,
+                "storageWalMaxWriteDelay": {
+                    "durationType": "minutes",
+                    "value": 10
+                },
+                "uiDisabled": false
+            }
+        },
+        "ResponseMetadata": {}
+    }
+}
