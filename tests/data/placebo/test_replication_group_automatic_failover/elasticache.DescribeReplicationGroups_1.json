@@ -9,11 +9,11 @@
                 "Status": "available",
                 "PendingModifiedValues": {},
                 "MemberClusters": [
-                    "testclusterdisabled-001",
-                    "testclusterdisabled-002",
-                    "testclusterdisabled-003"
+                    "tf-group-failover-disabled-001",
+                    "tf-group-failover-disabled-002",
+                    "tf-group-failover-disabled-003"
                 ],
-                "SnapshottingClusterId": "testclusterdisabled-002",
+                "SnapshottingClusterId": "tf-group-failover-disabled-002",
                 "AutomaticFailover": "disabled",
                 "MultiAZ": "disabled",
                 "SnapshotRetentionLimit": 1,
@@ -23,7 +23,7 @@
                 "AuthTokenEnabled": false,
                 "TransitEncryptionEnabled": true,
                 "AtRestEncryptionEnabled": true,
-                "ARN": "arn:aws:elasticache:us-east-1:644160558196:replicationgroup:testclusterdisabled",
+                "ARN": "arn:aws:elasticache:us-east-1:644160558196:replicationgroup:tf-group-failover-disabled",
                 "LogDeliveryConfigurations": [],
                 "ReplicationGroupCreateTime": {
                     "__class__": "datetime",
