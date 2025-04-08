@@ -540,6 +540,22 @@ class TestElastiCacheReplicationGroup(BaseTest):
         tags = client.list_tags_for_resource(ResourceName=arn)["TagList"]
         self.assertEqual(tags[0]["Value"], "added")
 
+    def test_replication_group_automatic_failover_enabled(self):
+        session_factory = self.replay_flight_data("test_replication_group_automatic_failover")
+        p = self.load_policy(
+            {
+                "name": "elasticache-automatic-failover-enabled",
+                "resource": "aws.elasticache-group",
+                "filters": [{
+                    "type": "automatic-failover",
+                    "enabled": True}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['ReplicationGroupId'], 'tf-group-failover-enabled')
+
     def test_replication_group_global_ds_cluster_delete(self):
         session_factory = self.replay_flight_data("test_replication_group_global_ds_cluster_delete")
         log_output = self.capture_logging('custodian.actions')

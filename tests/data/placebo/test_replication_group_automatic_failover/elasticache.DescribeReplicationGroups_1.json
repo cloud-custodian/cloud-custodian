@@ -1,0 +1,123 @@
+{
+    "status_code": 200,
+    "data": {
+        "ReplicationGroups": [
+            {
+                "ReplicationGroupId": "tf-group-failover-disabled",
+                "Description": " ",
+                "GlobalReplicationGroupInfo": {},
+                "Status": "available",
+                "PendingModifiedValues": {},
+                "MemberClusters": [
+                    "testclusterdisabled-001",
+                    "testclusterdisabled-002",
+                    "testclusterdisabled-003"
+                ],
+                "SnapshottingClusterId": "testclusterdisabled-002",
+                "AutomaticFailover": "disabled",
+                "MultiAZ": "disabled",
+                "SnapshotRetentionLimit": 1,
+                "SnapshotWindow": "06:00-07:00",
+                "ClusterEnabled": false,
+                "CacheNodeType": "cache.t2.small",
+                "AuthTokenEnabled": false,
+                "TransitEncryptionEnabled": true,
+                "AtRestEncryptionEnabled": true,
+                "ARN": "arn:aws:elasticache:us-east-1:644160558196:replicationgroup:testclusterdisabled",
+                "LogDeliveryConfigurations": [],
+                "ReplicationGroupCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 4,
+                    "day": 8,
+                    "hour": 22,
+                    "minute": 14,
+                    "second": 36,
+                    "microsecond": 523000
+                },
+                "DataTiering": "disabled",
+                "AutoMinorVersionUpgrade": true,
+                "NetworkType": "ipv4",
+                "IpDiscovery": "ipv4",
+                "TransitEncryptionMode": "required",
+                "ClusterMode": "disabled",
+                "Engine": "redis"
+            },
+            {
+                "ReplicationGroupId": "tf-group-failover-enabled",
+                "Description": "example description",
+                "GlobalReplicationGroupInfo": {},
+                "Status": "available",
+                "PendingModifiedValues": {},
+                "MemberClusters": [
+                    "tf-group-failover-enabled-001",
+                    "tf-group-failover-enabled-002"
+                ],
+                "NodeGroups": [
+                    {
+                        "NodeGroupId": "0001",
+                        "Status": "available",
+                        "PrimaryEndpoint": {
+                            "Address": "tf-group-failover-enabled.aoneci.ng.0001.use1.cache.amazonaws.com",
+                            "Port": 6379
+                        },
+                        "ReaderEndpoint": {
+                            "Address": "tf-group-failover-enabled-ro.aoneci.ng.0001.use1.cache.amazonaws.com",
+                            "Port": 6379
+                        },
+                        "NodeGroupMembers": [
+                            {
+                                "CacheClusterId": "tf-group-failover-enabled-001",
+                                "CacheNodeId": "0001",
+                                "ReadEndpoint": {
+                                    "Address": "tf-group-failover-enabled-001.aoneci.0001.use1.cache.amazonaws.com",
+                                    "Port": 6379
+                                },
+                                "PreferredAvailabilityZone": "us-east-1d",
+                                "CurrentRole": "primary"
+                            },
+                            {
+                                "CacheClusterId": "tf-group-failover-enabled-002",
+                                "CacheNodeId": "0001",
+                                "ReadEndpoint": {
+                                    "Address": "tf-group-failover-enabled-002.aoneci.0001.use1.cache.amazonaws.com",
+                                    "Port": 6379
+                                },
+                                "PreferredAvailabilityZone": "us-east-1a",
+                                "CurrentRole": "replica"
+                            }
+                        ]
+                    }
+                ],
+                "AutomaticFailover": "enabled",
+                "MultiAZ": "disabled",
+                "SnapshotRetentionLimit": 0,
+                "SnapshotWindow": "07:00-08:00",
+                "ClusterEnabled": false,
+                "CacheNodeType": "cache.t2.small",
+                "AuthTokenEnabled": false,
+                "TransitEncryptionEnabled": false,
+                "AtRestEncryptionEnabled": false,
+                "ARN": "arn:aws:elasticache:us-east-1:644160558196:replicationgroup:tf-group-failover-enabled",
+                "LogDeliveryConfigurations": [],
+                "ReplicationGroupCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 4,
+                    "day": 8,
+                    "hour": 21,
+                    "minute": 9,
+                    "second": 7,
+                    "microsecond": 191000
+                },
+                "DataTiering": "disabled",
+                "AutoMinorVersionUpgrade": true,
+                "NetworkType": "ipv4",
+                "IpDiscovery": "ipv4",
+                "ClusterMode": "disabled",
+                "Engine": "redis"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
