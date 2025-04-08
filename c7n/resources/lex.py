@@ -7,6 +7,7 @@ from c7n.filters import CrossAccountAccessFilter
 from c7n.utils import local_session, type_schema
 from c7n.tags import TagActionFilter
 from c7n.actions import BaseAction
+from c7n.tags import universal_augment
 
 
 @resources.register("lex-bot")
@@ -44,22 +45,7 @@ class LexV2Bot(QueryResourceManager):
 
 class LexV2BotAliasDescribe(query.ChildDescribeSource):
     def augment(self, resources):
-        client = local_session(self.manager.session_factory).client('lexv2-models')
-        sts_client = local_session(self.manager.session_factory).client('sts')
-        account_id = sts_client.get_caller_identity().get('Account')
-        session = local_session(self.manager.session_factory)
-        region = session.region_name
-        for r in resources:
-            botalias = client.describe_bot_alias(
-                botId=r['c7n:parent-id'], botAliasId=r['botAliasId'])
-            r.update(botalias)
-            r['botArn'] = f'arn:aws:lex:{region}:{account_id}:bot/{r["c7n:parent-id"]}'
-            r['botAliasArn'] = (
-                f'arn:aws:lex:{region}:{account_id}:bot-alias/{r["c7n:parent-id"]}/{r["botAliasId"]}')
-            tags_response = client.list_tags_for_resource(
-                resourceARN=r['botAliasArn'])
-            r['tags'] = tags_response.get('tags', {})
-        return resources
+        return universal_augment(self.manager, resources)
 
 
 @resources.register('lexv2-bot-alias')
@@ -76,6 +62,12 @@ class LexV2BotAlias(query.ChildResourceManager):
         cfn_type = 'AWS::Lex::BotAlias'
         permission_prefix = "lex"
     source_mapping = {'describe-child': LexV2BotAliasDescribe, 'config': query.ConfigSource}
+
+    def get_arns(self, resources):
+        arns = []
+        for r in resources:
+            arns.append(self.generate_arn('bot-alias/' + r['c7n:parent'] + '/' + r['botAliasId']))
+        return arns
 
 
 LexV2BotAlias.action_registry.register('mark-for-op')
