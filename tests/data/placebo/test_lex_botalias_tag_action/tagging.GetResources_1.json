@@ -1,0 +1,35 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:lex:us-east-1:111111111111:bot-alias/OTM2WO3PEY/8KRJ6TLIVD",
+                "Tags": [
+                    {
+                        "Key": "Department",
+                        "Value": "International"
+                    },
+                    {
+                        "Key": "Owner",
+                        "Value": "Corporate"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:lex:us-east-1:111111111111:bot-alias/OTM2WO3PEY/TSTALIASID",
+                "Tags": [
+                    {
+                        "Key": "Department",
+                        "Value": "National"
+                    },
+                    {
+                        "Key": "Owner",
+                        "Value": "Local"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
