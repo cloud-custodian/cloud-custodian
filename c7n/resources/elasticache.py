@@ -9,7 +9,7 @@ from dateutil.parser import parse
 
 from c7n.actions import (
     ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction)
-from c7n.filters import FilterRegistry, AgeFilter
+from c7n.filters import Filter, FilterRegistry, AgeFilter
 import c7n.filters.vpc as net_filters
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.manager import resources
@@ -495,6 +495,30 @@ class ElastiCacheReplicationGroup(QueryResourceManager):
 class KmsFilter(KmsRelatedFilter):
 
     RelatedIdsExpression = 'KmsKeyId'
+
+
+@ElastiCacheReplicationGroup.filter_registry.register('automatic-failover')
+class AutomaticFailoverFilter(Filter):
+    """Filter ElastiCache replication groups based on automatic failover status.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: elasticache-automatic-failover-enabled
+            resource: aws.elasticache-group
+            filters:
+              - type: automatic-failover
+                enabled: True
+    """
+
+    schema = type_schema('automatic-failover', enabled={'type': 'boolean'})
+
+    def process(self, resources, event=None):
+        enabled = self.data.get('enabled', True)
+        is_enabled = 'enabled' if enabled else 'disabled'
+        return [r for r in resources if r.get('AutomaticFailover') == is_enabled]
 
 
 def get_global_datastore_association(resources):
