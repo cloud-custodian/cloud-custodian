@@ -66,7 +66,7 @@ class LexV2BotAlias(query.ChildResourceManager):
     def get_arns(self, resources):
         arns = []
         for r in resources:
-            arns.append(self.generate_arn('bot-alias/' + r['c7n:parent'] + '/' + r['botAliasId']))
+            arns.append(self.generate_arn('bot-alias/' + r['c7n:parent-id'] + '/' + r['botAliasId']))
         return arns
 
 
