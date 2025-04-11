@@ -122,6 +122,7 @@ ResourceMap = {
   "aws.flow-log": "c7n.resources.vpc.FlowLog",
   "aws.fsx": "c7n.resources.fsx.FSx",
   "aws.fsx-backup": "c7n.resources.fsx.FSxBackup",
+  "aws.fsx-volume": "c7n.resources.fsx.FSxVolume",
   "aws.gamelift-build": "c7n.resources.gamelift.GameLiftBuild",
   "aws.gamelift-fleet": "c7n.resources.gamelift.GameLiftFleet",
   "aws.glacier": "c7n.resources.glacier.Glacier",

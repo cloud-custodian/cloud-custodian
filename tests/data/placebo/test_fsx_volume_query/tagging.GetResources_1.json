@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:fsx:eu-west-1:644160558196:volume/fs-05b4c44707bc2596e/fsvol-03790c16a7f73c76e",
+                "Tags": [
+                    {
+                        "Key": "OwnerName",
+                        "Value": "SomeName"
+                    },
+                    {
+                        "Key": "some-tag",
+                        "Value": "some-value"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -465,6 +465,55 @@ class TestFSx(BaseTest):
             resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_fsx_volumes_filter(self):
+        session_factory = self.replay_flight_data("test_fsx_volumes_filter")
+        p = self.load_policy({
+            "name": "fsx_volumes_filter",
+            "resource": "aws.fsx",
+            "filters": [{
+                "type": "volume",
+                "attrs": []
+            }]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources[0]['c7n:Volumes']), 2)
+
+    def test_fsx_vpc_filter(self):
+        session_factory = self.replay_flight_data("test_fsx_vpc_filter")
+        p = self.load_policy({
+            "name": "fsx_vpc_filter",
+            "resource": "aws.fsx",
+            "filters": [{
+                "type": "vpc",
+                "key": "IsDefault",
+                "value": True
+            }]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources[0]['c7n:matched-vpcs']), 1)
+
+
+class TestFSxVolume(BaseTest):
+    def test_fsx_volume_query(self):
+        session_factory = self.replay_flight_data('test_fsx_volume_query')
+        p = self.load_policy(
+            {
+                "name": "fsx_volume_query",
+                "resource": "aws.fsx-volume",
+                "filters": [{
+                    "type": "value",
+                    "key": "Lifecycle",
+                    "value": "AVAILABLE"
+                }]
+            },
+            session_factory=session_factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
 
 class TestFSxBackup(BaseTest):
     def test_fsx_backup_delete(self):

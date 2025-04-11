@@ -1,0 +1,56 @@
+{
+  "status_code": 200,
+  "data": {
+    "FileSystems": [
+      {
+        "OwnerId": "644160558196",
+        "CreationTime": 1744030913.939,
+        "FileSystemId": "fs-05b4c44707bc2596e",
+        "FileSystemType": "OPENZFS",
+        "Lifecycle": "AVAILABLE",
+        "StorageCapacity": 64,
+        "StorageType": "SSD",
+        "VpcId": "vpc-4a9ff72e",
+        "SubnetIds": [
+          "subnet-097c7d5a59478cb"
+        ],
+        "NetworkInterfaceIds": [
+          "eni-0b62154203e6d"
+        ],
+        "DNSName": "fs-05b4c44707bc2596e.fsx.eu-west-1.amazonaws.com",
+        "KmsKeyId": "arn:aws:kms:eu-west-1:644160558196:key/d5cfc927-2667-4db5-a561-a65331d25eb4",
+        "ResourceARN": "arn:aws:fsx:eu-west-1:644160558196:file-system/fs-05b4c44707bc2596e",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "my-example-fsx"
+          }
+        ],
+        "OpenZFSConfiguration": {
+          "CopyTagsToBackups": false,
+          "CopyTagsToVolumes": false,
+          "DeploymentType": "SINGLE_AZ_2",
+          "ThroughputCapacity": 160,
+          "WeeklyMaintenanceStartTime": "4:00:00",
+          "DiskIopsConfiguration": {
+            "Mode": "AUTOMATIC",
+            "Iops": 192
+          },
+          "RootVolumeId": "fsvol-03790c16a7f73c76e"
+        }
+      }
+    ],
+    "ResponseMetadata": {
+      "RequestId": "4e290ea6-c4c1-4c65-880d-27aecde1da01",
+      "HTTPStatusCode": 200,
+      "HTTPHeaders": {
+        "content-type": "application/x-amz-json-1.1",
+        "date": "Tue, 11 Dec 2018 20:08:43 GMT",
+        "x-amzn-requestid": "4e290ea6-c4c1-4c65-880d-27aecde1da01",
+        "content-length": "765",
+        "connection": "keep-alive"
+      },
+      "RetryAttempts": 0
+    }
+  }
+}
