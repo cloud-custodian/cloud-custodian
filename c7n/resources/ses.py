@@ -160,6 +160,7 @@ class SESEmailIdentity(QueryResourceManager):
         enum_spec = ('list_email_identities', 'EmailIdentities', None)
         detail_spec = ('get_email_identity', 'EmailIdentity', 'IdentityName', None)
         name = id = 'IdentityName'
+        arn_service = 'ses'
         arn_type = 'identity'
         universal_taggable = object()
         permission_prefix = 'ses'
