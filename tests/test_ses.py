@@ -242,6 +242,8 @@ class SESV2Test(BaseTest):
             self.assertTrue("ScalingMode" in r)
             self.assertTrue(r["ScalingMode"] == "MANAGED")
             self.assertTrue("Tags" in r)
+            self.assertEqual(len(r["Tags"]), 1)
+            self.assertEqual(r["Tags"][0]["Key"], "Owner")
 
     def test_ses_email_identity_cross_account(self):
         session_factory = self.replay_flight_data("test_ses_email_identity_cross_account")
