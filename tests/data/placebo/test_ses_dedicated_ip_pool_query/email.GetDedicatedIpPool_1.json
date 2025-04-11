@@ -3,7 +3,7 @@
     "data": {
         "ResponseMetadata": {},
         "DedicatedIpPool": {
-            "PoolName": "c7n-test",
+            "PoolName": "test-pool",
             "ScalingMode": "STANDARD"
         }
     }

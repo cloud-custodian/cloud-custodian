@@ -74,6 +74,7 @@ class SESConfigurationSetV2(QueryResourceManager):
         service = 'sesv2'
         enum_spec = ('list_configuration_sets', 'ConfigurationSets', None)
         name = id = 'ConfigurationSetName'
+        arn_service = 'ses'
         arn_type = 'configuration-set'
         universal_taggable = object()
         config_type = "AWS::SES::ConfigurationSet"
@@ -160,6 +161,7 @@ class SESEmailIdentity(QueryResourceManager):
         enum_spec = ('list_email_identities', 'EmailIdentities', None)
         detail_spec = ('get_email_identity', 'EmailIdentity', 'IdentityName', None)
         name = id = 'IdentityName'
+        arn_service = 'ses'
         arn_type = 'identity'
         universal_taggable = object()
         permission_prefix = 'ses'
@@ -359,6 +361,7 @@ class SESDedicatedIpPool(QueryResourceManager):
         service = 'sesv2'
         enum_spec = ('list_dedicated_ip_pools', 'DedicatedIpPools', None)
         name = id = 'PoolName'
+        arn_service = 'ses'
         arn_type = 'dedicated-ip-pool'
         universal_taggable = object()
         config_type = None
