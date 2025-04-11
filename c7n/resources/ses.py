@@ -74,6 +74,7 @@ class SESConfigurationSetV2(QueryResourceManager):
         service = 'sesv2'
         enum_spec = ('list_configuration_sets', 'ConfigurationSets', None)
         name = id = 'ConfigurationSetName'
+        arn_service = 'ses'
         arn_type = 'configuration-set'
         universal_taggable = object()
         config_type = "AWS::SES::ConfigurationSet"
