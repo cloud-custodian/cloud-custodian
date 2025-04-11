@@ -75,6 +75,28 @@ class TimestreamInfluxDB(QueryResourceManager):
         return resources
 
 
+@resources.register('timestream-influxdb-cluster')
+class TimestreamInfluxDBCluster(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = 'timestream-influxdb'
+        name = 'name'
+        arn = 'arn'
+        id = 'id'
+        enum_spec = ('list_db_clusters', 'items', {})
+        detail_spec = ('get_db_cluster', 'dbClusterId', 'id', None)
+        permissions_enum = ('timestream-influxdb:ListDbClusters',
+                            'timestream-influxdb:GetDbCluster')
+
+    def augment(self, resources):
+        resources = super().augment(resources)
+        for r in resources:
+            client = local_session(self.session_factory).client('timestream-influxdb')
+            tags = client.list_tags_for_resource(resourceArn=r['arn'])['tags']
+            if tags:
+                r['Tags'] = [{'Key': k, 'Value': v} for k, v in tags.items()]
+        return resources
+
+
 @TimestreamDatabase.action_registry.register('tag')
 @TimestreamTable.action_registry.register('tag')
 class TimestreamTag(TagAction):
@@ -105,6 +127,7 @@ TimestreamTable.filter_registry.register('marked-for-op', TagActionFilter)
 
 
 @TimestreamInfluxDB.action_registry.register('tag')
+@TimestreamInfluxDBCluster.action_registry.register('tag')
 class TimestreamInfluxDBTag(TagAction):
 
     permissions = ('timestream-influxdb:TagResource', )
@@ -116,6 +139,7 @@ class TimestreamInfluxDBTag(TagAction):
 
 
 @TimestreamInfluxDB.action_registry.register('remove-tag')
+@TimestreamInfluxDBCluster.action_registry.register('remove-tag')
 class TimestreamInfluxDBRemoveTag(RemoveTagAction):
 
     permissions = ('timestream-influxdb:UntagResource', )
@@ -133,12 +157,14 @@ TimestreamInfluxDB.filter_registry.register('network-location', net_filters.Netw
 
 
 @TimestreamInfluxDB.filter_registry.register('security-group')
+@TimestreamInfluxDBCluster.filter_registry.register('security-group')
 class TimestreamInfluxDBSGFilter(SecurityGroupFilter):
 
     RelatedIdsExpression = "vpcSecurityGroupIds[]"
 
 
 @TimestreamInfluxDB.filter_registry.register('subnet')
+@TimestreamInfluxDBCluster.filter_registry.register('subnet')
 class TimestreamInfluxDBSubnetFilter(SubnetFilter):
 
     RelatedIdsExpression = "vpcSubnetIds[]"
@@ -237,3 +263,38 @@ class TimestreamInfluxDBDelete(Action):
                 )
             except client.exceptions.ResourceNotFoundException:
                 continue
+
+
+TimestreamInfluxDBCluster.action_registry.register('mark-for-op', TagDelayedAction)
+
+TimestreamInfluxDBCluster.filter_registry.register('marked-for-op', TagActionFilter)
+
+TimestreamInfluxDBCluster.filter_registry.register('network-location', net_filters.NetworkLocation)
+
+
+@TimestreamInfluxDBCluster.action_registry.register('delete')
+class TimestreamInfluxDBClusterDelete(Action):
+    """Delete timestream influx-db cluster.
+
+    :example:
+
+    .. code-block:: yaml
+
+       policies:
+         - name: timestream-influxdb-cluster-delete
+           resource: timestream-influxdb-cluster
+           actions:
+             - type: delete
+    """
+
+    schema = type_schema('delete')
+    permissions = ('timestream-influxdb:DeleteDbCluster', )
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('timestream-influxdb')
+        for r in resources:
+            self.manager.retry(
+                client.delete_db_cluster,
+                ignore_err_codes=('ResourceNotFoundException',),
+                dbClusterId=r['id'],
+            )

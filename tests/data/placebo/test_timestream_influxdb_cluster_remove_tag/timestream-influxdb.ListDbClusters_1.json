@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "items": [
+            {
+                "id": "eoxw2pq1al",
+                "name": "test-cluster",
+                "arn": "arn:aws:timestream-influxdb:us-east-1:644160558196:db-cluster/eoxw2pq1al",
+                "status": "AVAILABLE",
+                "endpoint": "eoxw2pq1al-kx3to6fbi4fumn.timestream-influxdb.us-east-1.on.aws",
+                "readerEndpoint": "eoxw2pq1al-kx3to6fbi4fumn-ro.timestream-influxdb.us-east-1.on.aws",
+                "port": 8086,
+                "deploymentType": "MULTI_NODE_READ_REPLICAS",
+                "dbInstanceType": "db.influx.medium",
+                "networkType": "IPV4",
+                "dbStorageType": "InfluxIOIncludedT1",
+                "allocatedStorage": 20
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
