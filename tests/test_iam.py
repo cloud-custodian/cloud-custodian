@@ -1623,8 +1623,8 @@ def test_iam_delete_provider_saml_action(test, iam_delete_provider_saml):
         'filters': [
             {
                 'type': 'value',
-                'key': 'Url',
-                'value': 'accounts.google.com',
+                'key': 'tag:Name',
+                'value': 'testprovider',
             },
         ],
         'actions': [
