@@ -1,4 +1,4 @@
-name: "Docker Build"
+name: "Docker Multi-Arch Build"
 on:
   workflow_dispatch: {}
   # build a daily dev image
@@ -8,34 +8,96 @@ on:
     tags:
       # todo: update for 1.0
       - 0.*
+
 jobs:
-  Publish:
+  build-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - id: set-matrix
+        run: |
+          echo "matrix={\"image\":[\"c7n\",\"c7n-org\",\"mailer\",\"policystream\",\"c7n-left\"]}" >> $GITHUB_OUTPUT
+
+  build-arm64:
+    needs: build-matrix
+    runs-on: [self-hosted, linux, arm64]
     permissions:
       id-token: write
     strategy:
-      matrix:
-        image:
-          - c7n
-          - c7n-org
-          - mailer
-          - policystream
-          - c7n-left
-    runs-on: ubuntu-latest-8-cores
+      matrix: ${{fromJson(needs.build-matrix.outputs.matrix)}}
     steps:
       - uses: actions/checkout@v4
-      - name: ${{ matrix.image }} build and push
-        uses: ./.github/composites/docker-build-push
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Build and push ${{ matrix.image }} for ARM64
+        uses: docker/build-push-action@v5
         env:
           HUB_USER: c7nbuild
           HUB_TOKEN: ${{ secrets.DOCKER_CI_HUB_TOKEN }}
         with:
-          name: ${{ matrix.image }}
+          context: .
+          file: ./docker/${{ matrix.image }}/Dockerfile
+          platforms: linux/arm64
           push: true
-          platforms: linux/arm64,linux/amd64
+          tags: cloudcustodian/${{ matrix.image }}:${{ github.ref_name || 'latest' }}-arm64
 
+  build-amd64:
+    needs: build-matrix
+    runs-on: [ubuntu-latest-8-cores]
+    permissions:
+      id-token: write
+    strategy:
+      matrix: ${{fromJson(needs.build-matrix.outputs.matrix)}}
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Build and push ${{ matrix.image }} for AMD64
+        uses: docker/build-push-action@v5
+        env:
+          HUB_USER: c7nbuild
+          HUB_TOKEN: ${{ secrets.DOCKER_CI_HUB_TOKEN }}
+        with:
+          context: .
+          file: ./docker/${{ matrix.image }}/Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: cloudcustodian/${{ matrix.image }}:${{ github.ref_name || 'latest' }}-amd64
+
+  create-manifest:
+    needs: [build-arm64, build-amd64, build-matrix]
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    strategy:
+      matrix: ${{fromJson(needs.build-matrix.outputs.matrix)}}
+    steps:
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ env.HUB_USER || 'c7nbuild' }}
+          password: ${{ secrets.DOCKER_CI_HUB_TOKEN }}
+      
+      - name: Create and push manifest for ${{ matrix.image }}
+        run: |
+          TAG="${{ github.ref_name || 'latest' }}"
+          docker manifest create cloudcustodian/${{ matrix.image }}:${TAG} \
+            cloudcustodian/${{ matrix.image }}:${TAG}-amd64 \
+            cloudcustodian/${{ matrix.image }}:${TAG}-arm64
+          docker manifest push cloudcustodian/${{ matrix.image }}:${TAG}
+
+  notify:
+    needs: create-manifest
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
       - name: Notify Slack
         uses: ravsamhq/notify-slack-action@v2
-        if: always()
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_CI_HOOK }}
         with:
