@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "c7n_azure"
-version = "0.7.42"
+version = "0.7.43"
 description = "Cloud Custodian - Azure Support"
 readme = "readme.md"
 homepage="https://cloudcustodian.io"
@@ -15,7 +15,7 @@ classifiers=[
 ]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = ">=3.9.2,<4.0.0"
 c7n = {path = "../..", develop = true}
 
 azure-mgmt-authorization = "^1.0.0"
@@ -29,7 +29,7 @@ azure-mgmt-cognitiveservices = "^11.0.0"
 azure-mgmt-cosmosdb = "^6.1.0"
 azure-mgmt-costmanagement = "^1.0.0"
 azure-mgmt-containerinstance = "^7.0.0"
-azure-mgmt-compute = "^19.0.0"
+azure-mgmt-compute = "^29.1.0"
 azure-mgmt-cdn = "^12.0.0"
 azure-mgmt-containerregistry = "^10.3.0"
 azure-mgmt-containerservice = "^15.0.0"
@@ -54,7 +54,7 @@ azure-mgmt-resource = "^16.0.0"
 azure-mgmt-rdbms = "10.2.0b17"
 azure-mgmt-search = "^8.0.0"
 azure-mgmt-sql = "^1.0.0"
-azure-mgmt-storage = "^17.0.0"
+azure-mgmt-storage = "^22.1.1"
 azure-mgmt-streamanalytics = "^1.0.0rc1"
 azure-mgmt-subscription = "^1.0.0"
 azure-mgmt-web = "^3.0.0"

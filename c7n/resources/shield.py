@@ -161,7 +161,7 @@ class SetShieldProtection(BaseAction, ProtectedResource):
         # Get all resources unfiltered
         resources = self.manager.get_resource_manager(
             self.manager.type).resources()
-        resource_arns = set(self.manager.get_arns(resources))
+        resource_arns = set(self.get_arns(resources))
 
         pmap = {}
         # Only process stale resources in region for non global resources.

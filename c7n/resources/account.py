@@ -172,7 +172,7 @@ class MacieEnabled(ValueFilter):
     """Check status of macie v2 in the account.
 
     Gets the macie session info for the account, and
-    the macie master account for the current account if
+    the macie adminstrator account for the current account if
     configured.
     """
 
@@ -180,7 +180,7 @@ class MacieEnabled(ValueFilter):
     schema_alias = False
     annotation_key = 'c7n:macie'
     annotate = False
-    permissions = ('macie2:GetMacieSession', 'macie2:GetMasterAccount',)
+    permissions = ('macie2:GetMacieSession', 'macie2:GetAdministratorAccount',)
 
     def process(self, resources, event=None):
 
@@ -203,12 +203,13 @@ class MacieEnabled(ValueFilter):
             info = {}
 
         try:
-            minfo = client.get_master_account().get('master')
+            minfo = client.get_administrator_account().get('administrator')
         except (client.exceptions.AccessDeniedException,
                 client.exceptions.ResourceNotFoundException):
             info['master'] = {}
         else:
             info['master'] = minfo
+        info['administrator'] = info['master']
         account[self.annotation_key] = info
 
 

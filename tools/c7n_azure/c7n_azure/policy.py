@@ -20,6 +20,7 @@ from c7n_azure.function_package import FunctionPackage
 from c7n_azure.functionapp_utils import FunctionAppUtilities
 from c7n_azure.resources.arm import ArmResourceManager
 from c7n_azure.storage_utils import StorageUtilities
+from c7n_azure.query import ChildResourceManager
 from c7n_azure.utils import ResourceIdParser, StringUtils
 
 from c7n import utils
@@ -312,6 +313,15 @@ class AzureModeCommon:
         return re.search(extract_regex, event['subject'], re.IGNORECASE).group()
 
     @staticmethod
+    def annotate_parent(policy, resources):
+        if not issubclass(policy.resource_manager.__class__, ChildResourceManager):
+            return
+
+        for r in resources:
+            r[policy.resource_manager.resource_type.parent_key] = \
+                policy.resource_manager.__class__.extract_parent(r)
+
+    @staticmethod
     def run_for_event(policy, event=None):
         s = time.time()
 
@@ -319,6 +329,7 @@ class AzureModeCommon:
             [AzureModeCommon.extract_resource_id(policy, event)]
         )
 
+        AzureModeCommon.annotate_parent(policy, resources)
         resources = policy.resource_manager.filter_resources(resources, event)
 
         if not resources:

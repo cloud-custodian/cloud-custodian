@@ -384,6 +384,24 @@ class WorkspacesTest(BaseTest):
         self.assertEqual({'ReconnectEnabled': 'DISABLED'}, cp.get(
             'ClientPropertiesList')[0].get('ClientProperties'))
 
+    def test_workspaces_directory_related_directory(self):
+        session_factory = self.replay_flight_data('test_workspaces_directory_related_directory')
+        p = self.load_policy({
+            'name': 'workspace-directory-related-directory',
+            'resource': 'aws.workspaces-directory',
+            'filters': [{
+                'type': 'directory',
+                'key': 'RadiusSettings.AuthenticationProtocol',
+                'value': 'CHAP'
+            }]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['c7n:Directory']['RadiusSettings']['AuthenticationProtocol'],
+            'CHAP'
+        )
+
 
 class TestWorkspacesWeb(BaseTest):
 
