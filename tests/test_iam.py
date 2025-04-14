@@ -1646,6 +1646,7 @@ def test_iam_delete_provider_saml_action(test, iam_delete_provider_saml):
     with pytest.raises(client.exceptions.NoSuchEntityException):
         client.get_saml_provider(SAMLProviderArn=arn)
 
+
 # The terraform fixture sets up resources, which happens before we
 # actually enter the test:
 @terraform('iam_delete_certificate', teardown=terraform.TEARDOWN_IGNORE)

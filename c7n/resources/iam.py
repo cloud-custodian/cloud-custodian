@@ -3075,6 +3075,7 @@ class OpenIdProviderDelete(BaseAction):
                 ),
             )
 
+
 @SamlProvider.action_registry.register('delete')
 class SamlProviderDelete(BaseAction):
     """Delete a SAML IAM Identity Provider
@@ -3108,6 +3109,7 @@ class SamlProviderDelete(BaseAction):
                     'NoSuchEntityException',
                 ),
             )
+
 
 @InstanceProfile.filter_registry.register('has-specific-managed-policy')
 class SpecificIamProfileManagedPolicy(ValueFilter):

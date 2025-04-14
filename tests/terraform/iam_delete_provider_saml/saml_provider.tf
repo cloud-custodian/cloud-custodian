@@ -6,7 +6,7 @@ provider "aws" {
 }
 
 resource "aws_iam_saml_provider" "test_saml_provider" {
-  name                   = "testprovider"
+  name = "testprovider"
   # Use example metadata from:
   # https://mocksaml.com/
   saml_metadata_document = file("${path.module}/saml-metadata.xml")
