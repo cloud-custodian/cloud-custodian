@@ -1,0 +1,31 @@
+{
+    "status_code": 200,
+    "data": {
+        "repositories": [
+            {
+                "repositoryArn": "arn:aws:ecr:us-east-1:111111111111:repository/c7n-test",
+                "registryId": "111111111111",
+                "repositoryName": "c7n-test",
+                "repositoryUri": "111111111111.dkr.ecr.us-east-1.amazonaws.com/c7n-test",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2018,
+                    "month": 10,
+                    "day": 18,
+                    "hour": 12,
+                    "minute": 30,
+                    "second": 52,
+                    "microsecond": 0
+                },
+                "imageTagMutability": "MUTABLE",
+                "imageScanningConfiguration": {
+                    "scanOnPush": true
+                },
+                "encryptionConfiguration": {
+                    "encryptionType": "AES256"
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

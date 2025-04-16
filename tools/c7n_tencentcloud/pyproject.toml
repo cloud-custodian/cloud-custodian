@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "c7n_tencentcloud"
-version = "0.1.25"
+version = "0.1.26"
 description = "Cloud Custodian - Tencent Cloud Provider"
 authors = ["Tencent Cloud"]
 license = "Apache-2.0"
@@ -12,7 +12,7 @@ readme = "readme.md"
 "Bug Tracker" = "https://github.com/cloud-custodian/cloud-custodian/issues"
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = ">=3.9.2,<4.0.0"
 c7n = {path = "../..", develop = true}
 
 pytz = ">=2022.1"

@@ -172,7 +172,7 @@ class MacieEnabled(ValueFilter):
     """Check status of macie v2 in the account.
 
     Gets the macie session info for the account, and
-    the macie master account for the current account if
+    the macie adminstrator account for the current account if
     configured.
     """
 
@@ -180,7 +180,7 @@ class MacieEnabled(ValueFilter):
     schema_alias = False
     annotation_key = 'c7n:macie'
     annotate = False
-    permissions = ('macie2:GetMacieSession', 'macie2:GetMasterAccount',)
+    permissions = ('macie2:GetMacieSession', 'macie2:GetAdministratorAccount',)
 
     def process(self, resources, event=None):
 
@@ -203,12 +203,13 @@ class MacieEnabled(ValueFilter):
             info = {}
 
         try:
-            minfo = client.get_master_account().get('master')
+            minfo = client.get_administrator_account().get('administrator')
         except (client.exceptions.AccessDeniedException,
                 client.exceptions.ResourceNotFoundException):
             info['master'] = {}
         else:
             info['master'] = minfo
+        info['administrator'] = info['master']
         account[self.annotation_key] = info
 
 
@@ -1913,11 +1914,9 @@ class EMRBlockPublicAccessConfiguration(ValueFilter):
             'emr', region_name=self.manager.config.region)
 
         for r in resources:
-            try:
-                r[self.annotation_key] = client.get_block_public_access_configuration()
-                r[self.annotation_key].pop('ResponseMetadata')
-            except client.exceptions.NoSuchPublicAccessBlockConfiguration:
-                r[self.annotation_key] = {}
+            r[self.annotation_key] = self.manager.retry(
+                client.get_block_public_access_configuration)
+            r[self.annotation_key].pop('ResponseMetadata')
 
     def __call__(self, r):
         return super(EMRBlockPublicAccessConfiguration, self).__call__(r[self.annotation_key])

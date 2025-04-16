@@ -364,6 +364,44 @@ class WorkspacesDirectoryClientProperties(ValueFilter):
         return results
 
 
+@WorkspaceDirectory.filter_registry.register('directory')
+class WorkspaceDirectoryDirectoryFilter(ValueFilter):
+    schema = type_schema('directory', rinherit=ValueFilter.schema)
+    annotation_key = 'c7n:Directory'
+    FetchThreshold = 10
+    permissions = ('ds:DescribeDirectories', )
+
+    def process(self, resources, event=None):
+        ds = self.manager.get_resource_manager('aws.directory')
+        if len(resources) < self.FetchThreshold:
+            directories = ds.get_resources([
+                res['DirectoryId'] for res in resources if self.annotation_key not in res
+            ])
+        else:
+            directories = ds.resources()
+        model = ds.get_model()
+        by_id = {d[model.id]: d for d in directories}
+        for res in resources:
+            if self.annotation_key in res:
+                continue  # pragma: no cover
+            directory = by_id.get(res['DirectoryId'])
+            if directory:
+                res[self.annotation_key] = directory
+            else:
+                self.log.warning(
+                    "Resource %s:%s references non existent %s: %s",
+                    self.manager.type,
+                    res[model.id],
+                    ds.__class__.__name__,
+                    res['DirectoryId']
+                )
+
+        return super().process(resources, event)
+
+    def __call__(self, r):
+        return super().__call__(r.setdefault(self.annotation_key, None))
+
+
 @WorkspaceDirectory.action_registry.register('modify-client-properties')
 class ModifyClientProperties(BaseAction):
     """Action to enable/disable credential caching for Workspaces client.

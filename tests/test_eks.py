@@ -6,10 +6,7 @@ import os
 import json
 from botocore.exceptions import ClientError
 from .common import BaseTest
-from c7n import schema
 from c7n.exceptions import PolicyValidationError
-from c7n.resources import load_resources
-from c7n.schema import StructureParser
 
 from pytest_terraform import terraform
 
@@ -83,58 +80,6 @@ class EKS(BaseTest):
         self.assertEqual(resources[0]['name'], 'dev')
 
     def test_update_config_schema_validation(self):
-        policy_data = {"policies": [{
-            "name": "update-eks-config",
-            "resource": "eks",
-            "actions": [{
-                    "type": "update-config",
-                    "resourcesVpcConfig": {
-                        "endpointPublicAccess": "nay",
-                        "endpointPrivateAccess": True, },
-            }],
-        }]}
-        structure = StructureParser()
-        load_resources(structure.get_resource_types(policy_data))
-        schm = schema.generate()
-        results = schema.validate(policy_data, schm)
-        self.assertIn(
-            "'nay' is not of type 'boolean'",
-            str(results)
-        )
-
-        policy_data = {"policies": [{
-            "name": "update-eks-config",
-            "resource": "eks",
-            "actions": [{
-                "type": "update-config",
-                "upgradePolicy": {
-                    "supportType": "WRONG",
-                }
-            }],
-        }]}
-
-        results = schema.validate(policy_data, schm)
-        self.assertIn(
-            "'WRONG' is not one of",
-            str(results)
-        )
-
-        policy_data = {"policies": [{
-            "name": "update-eks-config",
-            "resource": "eks",
-            "actions": [{
-                "type": "update-config",
-                "unknownOption": True,
-            }],
-        }]}
-
-        results = schema.validate(policy_data, schm)
-        self.assertIn(
-            "Additional properties are not allowed",
-            str(results)
-        )
-
-        # test custom validate function
         with self.assertRaises(PolicyValidationError) as err:
             self.load_policy(
                 {

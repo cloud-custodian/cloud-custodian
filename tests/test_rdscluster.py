@@ -807,3 +807,25 @@ class TestRDSClusterParameterGroupFilter(BaseTest):
         )
         resources = policy.resource_manager.resources()
         self.assertEqual(len(resources), 2)
+
+
+class TestRDSDBShardGroup(BaseTest):
+    def test_rds_db_shard_group(self):
+        session_factory = self.replay_flight_data('test_rds_db_shard_group')
+        p = self.load_policy(
+            {
+                "name": "rds-db-shard-group",
+                "resource": "rds-db-shard-group",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "PubliclyAccessible",
+                        "value": False
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['DBShardGroupIdentifier'], 'db-shard-1')

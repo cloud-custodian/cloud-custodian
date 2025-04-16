@@ -1596,6 +1596,59 @@ def test_iam_delete_provider_oidc_action(test, iam_delete_provider_oidc):
 
 # The terraform fixture sets up resources, which happens before we
 # actually enter the test:
+@terraform('iam_delete_provider_saml', teardown=terraform.TEARDOWN_IGNORE)
+def test_iam_delete_provider_saml_action(test, iam_delete_provider_saml):
+    # The 'iam_delete_provider_saml' argument allows us to access the
+    # data in the 'tf_resources.json' file inside the
+    # 'tests/terraform/iam_delete_provider_saml' directory.  Here's how
+    # we access the IAM provider's arn using a 'dotted' notation:
+    arn = iam_delete_provider_saml['aws_iam_saml_provider.test_saml_provider.arn']
+
+    # Uncomment to following line when you're recording the first time:
+    # session_factory = test.record_flight_data('iam_delete_provider_saml')
+
+    # If you already recorded the interaction with AWS for this test,
+    # you can just replay it.  In which case, the files containing the
+    # responses from AWS are gonna be found inside the
+    # 'tests/data/placebo/iam_delete_provider_saml' directory:
+    session_factory = test.replay_flight_data('iam_delete_provider_saml')
+
+    # Set up an 'iam' boto client for the test:
+    client = session_factory().client('iam')
+
+    # Execute the 'delete' action that we want to test:
+    pdata = {
+        'name': 'delete',
+        'resource': 'iam-saml-provider',
+        'filters': [
+            {
+                'type': 'value',
+                'key': 'tag:Name',
+                'value': 'testprovider',
+            },
+        ],
+        'actions': [
+            {
+                'type': 'delete',
+            },
+        ],
+    }
+    policy = test.load_policy(pdata, session_factory=session_factory)
+    resources = policy.run()
+
+    # Here's the number of resources that the policy resolved,
+    # i.e. the resources that passed the filters:
+    assert len(resources) == 1
+    assert resources[0]['Arn'] == arn
+
+    # We're testing that our delete action worked because the iam
+    # provider now no longer exists:
+    with pytest.raises(client.exceptions.NoSuchEntityException):
+        client.get_saml_provider(SAMLProviderArn=arn)
+
+
+# The terraform fixture sets up resources, which happens before we
+# actually enter the test:
 @terraform('iam_delete_certificate', teardown=terraform.TEARDOWN_IGNORE)
 def test_iam_delete_certificate_action(test, iam_delete_certificate):
     # The 'iam_delete_certificate' argument allows us to access the

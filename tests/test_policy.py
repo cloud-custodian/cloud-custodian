@@ -597,7 +597,7 @@ class PolicyMetaLint(BaseTest):
             'AWS::AutoScaling::ScheduledAction',
             'AWS::Backup::BackupSelection',
             'AWS::Backup::RecoveryPoint',
-            'AWS::CodeDeploy::DeploymentConfig',
+            # 'AWS::CodeDeploy::DeploymentConfig',
             'AWS::Config::ConformancePackCompliance',
             'AWS::Config::ResourceCompliance',
             'AWS::Detective::Graph',
@@ -870,7 +870,7 @@ class PolicyMetaLint(BaseTest):
             'snowball-cluster', 'snowball', 'ssm-activation',
             'healthcheck', 'event-rule-target', 'log-metric',
             'support-case', 'transit-attachment', 'config-recorder',
-            'apigw-domain-name', 'backup-job', 'quicksight-account'}
+            'apigw-domain-name', 'backup-job', 'quicksight-account', 'codedeploy-config'}
 
         missing_method = []
         for k, v in manager.resources.items():
