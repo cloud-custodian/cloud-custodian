@@ -68,10 +68,22 @@ def resolve_dateref(since, repo):
 
 def schema_outline_from_docker(tag):
     client = docker.from_env()
-    result = client.containers.run(
-        f"cloudcustodian/c7n:{tag}",
-        "schema --outline --json"
-    )
+    result = None
+    while True:
+        try:
+            result = client.containers.run(
+                f"cloudcustodian/c7n:{tag}",
+                "schema --outline --json"
+            )
+        except docker.errors.NotFound:
+            print("missing docker hub image tagged %s" % tag)
+            vtag = version.LooseVersion(tag).version
+
+            tag = f"{vtag[0]}.{vtag[1]}.{vtag[2]-1}.0"
+            print("trying docker hub image tagged %s" % tag)
+        if result:
+            break
+
     return json.loads(result)
 
 
