@@ -903,6 +903,7 @@ def shape_schema(service, shape_name, drop_fields=()):
             drop_fields (Tuple[str]): List of fields to drop from the schema
                 (e.g. resource_id param).
      """
+    
     def _expand_shape_schema(shape):
         schema = {}
         for member, member_shape in shape.members.items():
