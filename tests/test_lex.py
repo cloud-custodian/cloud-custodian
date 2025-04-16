@@ -34,3 +34,20 @@ class Lexv2BotAlias(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 2)
+
+    def test_delete_action(self):
+        session_factory = self.replay_flight_data('test_lex_botalias_delete_action')
+        p = self.load_policy(
+            {
+                "name": "delete-lexv2-bot-alias",
+                "resource": "lexv2-bot-alias",
+                "filters": [{"botAliasName": "1234"}],
+                "actions": ["delete"],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client('lexv2-models')
+        aliases = client.list_bot_aliases(botId=resources[0]['c7n:parent-id']).get('botAliases', [])
+        self.assertNotIn(resources[0]['botAliasId'], [a['botAliasId'] for a in aliases])

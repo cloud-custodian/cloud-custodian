@@ -117,7 +117,7 @@ class DeleteLexV2BotAlias(BaseAction):
         for r in resources:
             client.delete_bot_alias(
                 botAliasId=r['botAliasId'],
-                botId=r['botId']
+                botId=r['c7n:parent-id']
             )
 
 
