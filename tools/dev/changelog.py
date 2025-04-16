@@ -79,7 +79,7 @@ def schema_outline_from_docker(tag):
             print("missing docker hub image tagged %s" % tag)
             vtag = version.LooseVersion(tag).version
 
-            tag = f"{vtag[0]}.{vtag[1]}.{vtag[2]-1}.0"
+            tag = f"{vtag[0]}.{vtag[1]}.{vtag[2] - 1}.0"
             print("trying docker hub image tagged %s" % tag)
         if result:
             break
