@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:comprehend:us-east-1:644160558196:document-classifier-endpoint/TestEndpoint",
+                "Tags": [
+                    {
+                        "Key": "ASV",
+                        "Value": "PolicyTestASV"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
