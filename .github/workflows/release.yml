@@ -24,7 +24,7 @@ jobs:
       - name: Build Wheels
         shell: bash
         run: |
-          poetry self add poetry-plugin-freeze==1.0.5
+          poetry self add poetry-plugin-freeze==1.2.0
           pip install twine
           make pkg-build-wheel
 
