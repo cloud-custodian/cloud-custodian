@@ -1,0 +1,27 @@
+{
+    "status_code": 200,
+    "data": {
+        "id": "m05xvo3vz8",
+        "name": "test-db-2",
+        "arn": "arn:aws:timestream-influxdb:us-east-1:644160558196:db-instance/m05xvo3vz8",
+        "status": "AVAILABLE",
+        "endpoint": "m05xvo3vz8-kx3to6fbi4fumn.timestream-influxdb.us-east-1.on.aws",
+        "port": 8086,
+        "networkType": "IPV4",
+        "dbInstanceType": "db.influx.medium",
+        "dbStorageType": "InfluxIOIncludedT1",
+        "allocatedStorage": 20,
+        "deploymentType": "SINGLE_AZ",
+        "vpcSubnetIds": [
+            "subnet-efbcccb7",
+            "subnet-914763e7"
+        ],
+        "publiclyAccessible": false,
+        "vpcSecurityGroupIds": [
+            "sg-6c7fa917"
+        ],
+        "availabilityZone": "us-east-1b",
+        "influxAuthParametersSecretArn": "arn:aws:secretsmanager:us-east-1:644160558196:secret:READONLY-InfluxDB-auth-parameters-m05xvo3vz8-7g1EPU",
+        "ResponseMetadata": {}
+    }
+}
