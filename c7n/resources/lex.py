@@ -45,6 +45,11 @@ class LexV2Bot(QueryResourceManager):
 
 class LexV2BotAliasDescribe(query.ChildDescribeSource):
     def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('lexv2-models')
+        for r in resources:
+            botalias = client.describe_bot_alias(
+                botId=r['c7n:parent-id'], botAliasId=r['botAliasId'])
+            r.update(botalias)
         return universal_augment(self.manager, resources)
 
 
