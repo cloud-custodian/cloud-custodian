@@ -96,6 +96,8 @@ azure-mgmt-recoveryservices = "^2.4.0"
 azure-mgmt-signalr = "0.4.0"
 azure-mgmt-synapse = "^2.0.0"
 azure-mgmt-recoveryservicesbackup = "^7.0.0"
+# workaround for: https://github.com/python-poetry/poetry-plugin-export/issues/183
+urllib3 = ">=1.25.4,<1.27"
 
 [tool.poetry.group.dev.dependencies]
 vcrpy-unittest = ">=0.1.7"

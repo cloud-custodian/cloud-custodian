@@ -28,6 +28,8 @@ recommonmark = ">=0.7.0"
 sphinx_markdown_tables = ">=0.0.12"
 myst-parser = ">=0.18"
 click = ">=8.0"
+# workaround for: https://github.com/python-poetry/poetry-plugin-export/issues/183
+urllib3 = ">=1.25.4,<1.27"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
