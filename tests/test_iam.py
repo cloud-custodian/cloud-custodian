@@ -2404,6 +2404,20 @@ class CrossAccountChecker(TestCase):
             violations = checker.check(p)
             self.assertEqual(bool(violations), expected)
 
+    def test_data_access_point_account(self):
+        policies = load_data("iam/s3-data-accesspoint-account.json")
+        checker = PolicyChecker({'allowed_accounts': ['123456789012']})
+        for p, expected in zip(policies, [True, False]):
+            violations = checker.check(p)
+            self.assertEqual(bool(violations), expected)
+
+    def test_data_access_point_arn(self):
+        policies = load_data("iam/s3-data-accesspoint-arn.json")
+        checker = PolicyChecker({'allowed_accounts': ['123456789012']})
+        for p, expected in zip(policies, [False, True]):
+            violations = checker.check(p)
+            self.assertEqual(bool(violations), expected)
+
     def test_s3_policies_vpc(self):
         policies = load_data("iam/s3-policies.json")
         checker = PolicyChecker({"allowed_accounts": {"123456789012"}})
