@@ -1,0 +1,17 @@
+{
+    "status_code": 200,
+    "data": {
+        "Attributes": {
+            "Policy": "{\"Version\":\"2008-10-17\",\"Id\":\"allSystems\",\"Statement\":[{\"Sid\":\"allSid1\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Action\":\"SNS:Subscribe\",\"Resource\":\"*\",\"Condition\":{\"StringEquals\":{\"AWS:SourceOwner\":\"644160558196\"}}},{\"Sid\":\"__console_pub_0\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Action\":\"SNS:Publish\",\"Resource\":\"arn:aws:sns:us-east-2:644160558196:foo\"}]}",
+            "Owner": "644160558196",
+            "SubscriptionsPending": "0",
+            "TopicArn": "arn:aws:sns:us-east-2:644160558196:foo",
+            "TracingConfig": "PassThrough",
+            "EffectiveDeliveryPolicy": "{\"http\":{\"defaultHealthyRetryPolicy\":{\"minDelayTarget\":20,\"maxDelayTarget\":20,\"numRetries\":3,\"numMaxDelayRetries\":0,\"numNoDelayRetries\":0,\"numMinDelayRetries\":0,\"backoffFunction\":\"linear\"},\"disableSubscriptionOverrides\":false,\"defaultRequestPolicy\":{\"headerContentType\":\"text/plain; charset=UTF-8\"}}}",
+            "SubscriptionsConfirmed": "0",
+            "DisplayName": "",
+            "SubscriptionsDeleted": "0"
+        },
+        "ResponseMetadata": {}
+    }
+}
