@@ -4,7 +4,10 @@ from c7n.manager import resources
 from c7n import query
 from c7n.query import QueryResourceManager
 from c7n.filters import CrossAccountAccessFilter
-from c7n.utils import local_session
+from c7n.utils import local_session, type_schema
+from c7n.tags import TagActionFilter
+from c7n.actions import BaseAction
+from c7n.tags import universal_augment
 
 
 @resources.register("lex-bot")
@@ -38,6 +41,89 @@ class LexV2Bot(QueryResourceManager):
         permission_prefix = "lex"
 
     source_mapping = {"describe": query.DescribeWithResourceTags, "config": query.ConfigSource}
+
+
+class LexV2BotAliasDescribe(query.ChildDescribeSource):
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('lexv2-models')
+        for r in resources:
+            botalias = client.describe_bot_alias(
+                botId=r['c7n:parent-id'], botAliasId=r['botAliasId'])
+            r.update(botalias)
+        return universal_augment(self.manager, resources)
+
+
+@resources.register('lexv2-bot-alias')
+class LexV2BotAlias(query.ChildResourceManager):
+    class resource_type(query.TypeInfo):
+        service = 'lexv2-models'
+        parent_spec = ('lexv2-bot', 'botId', True)
+        enum_spec = ('list_bot_aliases', 'botAliasSummaries', None)
+        name = 'botAliasId'
+        id = 'botAliasId'
+        universal_taggable = object()
+        arn = 'botAliasArn'
+        arn_service = 'lex'
+        cfn_type = 'AWS::Lex::BotAlias'
+        permission_prefix = "lex"
+    source_mapping = {'describe-child': LexV2BotAliasDescribe, 'config': query.ConfigSource}
+
+    def get_arns(self, resources):
+        arns = []
+        for r in resources:
+            arns.append(self.generate_arn(f"bot-alias/{r['c7n:parent-id']}/{r['botAliasId']}"))
+        return arns
+
+
+LexV2BotAlias.action_registry.register('mark-for-op')
+
+
+@LexV2BotAlias.filter_registry.register('marked-for-op')
+class MarkedForOpFilter(TagActionFilter):
+    """
+    Filter LexV2 bot aliases marked for a specific operation.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: delete-marked-lex-bot-alias
+                resource: lexv2-bot-alias
+                filters:
+                  - type: marked-for-op
+                    tag: custodian_cleanup
+                    op: delete
+    """
+    schema = type_schema('marked-for-op', rinherit=TagActionFilter.schema)
+    permissions = ('lex:ListTagsForResource',)
+
+
+@LexV2BotAlias.action_registry.register('delete')
+class DeleteLexV2BotAlias(BaseAction):
+    """
+    Deletes LexV2 bot aliases.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: delete-lex-bot-alias
+                resource: lexv2-bot-alias
+                actions:
+                  - type: delete
+    """
+    schema = type_schema('delete')
+    permissions = ('lex:DeleteBotAlias',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('lexv2-models')
+        for r in resources:
+            client.delete_bot_alias(
+                botAliasId=r['botAliasId'],
+                botId=r['c7n:parent-id']
+            )
 
 
 @LexV2Bot.filter_registry.register('cross-account')
