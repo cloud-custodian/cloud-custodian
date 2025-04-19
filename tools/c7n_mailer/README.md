@@ -192,6 +192,73 @@ Slack delivery can also be set via a resource's tag name. For example, using `sl
 
 Delivery via tag has been tested with webhooks, but it should support all delivery methods.
 
+### Jira:
+
+The Custodian mailer supports Jira as a separate notification mechanism for the SQS transport method. To enable Jira integration, you must specify below fields in the mailer config file.
+
+```yaml
+jira_url: https://your-org.atlassian.net/
+jira_username: YOUR_JIRA_USERNAME
+jira_token: YOUR_JIRA_TOKEN
+# optional, the dict to set custom fields for each Jira project when needed
+jira_custom_fields:
+  # Set fields for all projects by using 'DEFAULT' section
+  DEFAULT:
+    priority:
+      name: Medium
+  # Add special fields for a Jira project
+  MY_PROJECT:
+    customfield_10059: value_for_the_field
+  # Remove special fields for a Jira project with keyword 'cannot-be-set'
+  MY_ANOTHER_PROJECT:
+    priority: cannot-be-set
+```
+
+To enable Jira integration, several unique fields are evaluated in the policy, as shown in the below example:
+
+```yaml
+actions:
+  - type: notify
+    jira_template: my-jira-template
+    to:
+      # Use keyword "jira" to enable Jira delivery
+      - jira
+      # alternatively, specify a tag attached to cloud resources to indicate what Jira project to log ticket to
+      # set tag value to empty to ignore logging the resource to any Jira project
+      - jira://tag/jira_project_tag
+    # The subject will be used as issue summary
+    subject: This is the email subject, and jira issue summary as well
+    # Below is the dict data to send to create_issue api
+    jira:
+      # The mailer will use the tag value (if tag specified and found) on the resources first.
+      # If tag is not found, it will fall back to the below value.
+      project: MY_JIRA_PROJECT
+      priority:
+        name: High
+      # More fields here if needed. Ref https://jira.readthedocs.io/examples.html#issues
+    transport:
+      type: sqs
+      queue: https://sqs.us-east-1.amazonaws.com/1234567890/c7n-mailer-test
+```
+
+Jira delivery support use of a unique template field specified by `jira_template`. If not specified, the mailer will use the default value `default`.
+
+Please be aware that running a policy with the Jira notify action multiple times could lead to duplicated Jira tickets. To prevent such duplication, we highly recommend tagging the reported resources and implementing a filter in the policy to filter them out until the next alert cycle. Additionally, it is advisable to reduce the execution frequency of the policy to allow ample time for the ticket to be processed. For instance, consider increasing the interval to 2 or more days between successive policy runs.
+
+```yaml
+    filters:
+      - or:
+          - "tag:c7n_status": absent
+          - type: marked-for-op
+            tag: c7n_status
+            op: notify
+    actions:
+      - type: mark-for-op
+        tag: c7n_status
+        op: notify
+        days: 14
+```
+
 ### Splunk HTTP Event Collector (HEC)
 
 The Custodian mailer supports delivery to the HTTP Event Collector (HEC) endpoint of a Splunk instance as a separate notification mechanism for the SES transport method. To enable Splunk HEC integration, you must specify the URL to the HEC endpoint as well as a valid username and token:
@@ -378,6 +445,16 @@ These fields are not necessary if c7n_mailer is run in a instance/lambda/etc wit
 |           | `graph_sendmail_endpoint` | string         | Graph sendmail endpoint  |
 |           | `graph_client_id`         | string         | Client ID                |
 |           | `graph_client_secret`     | secured string | Client secret            |
+
+
+### Atlassian Jira Config
+
+| Required? | Key                  | Type           | Notes                                                                              |
+| :-------: | :------------------- | :------------- | :--------------------------------------------------------------------------------- |
+|           | `jira_url`           | string         | Jira endpoint                                                                      |
+|           | `jira_username`      | string         | Jira username                                                                      |
+|           | `jira_token`         | secured string | Jira token                                                                         |
+|           | `jira_custom_fields` | object         | The dict to set custom fields for each Jira project when needed                    |
 
 
 ### Splunk HEC Config
