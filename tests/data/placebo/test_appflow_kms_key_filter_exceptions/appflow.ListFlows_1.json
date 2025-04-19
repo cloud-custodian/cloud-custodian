@@ -1,0 +1,73 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "flows": [
+            {
+                "flowArn": "arn:aws:appflow:us-east-1:644160558196:flow/399-appflow-green",
+                "description": "399-appflow-green",
+                "flowName": "399-appflow-green",
+                "flowStatus": "Active",
+                "sourceConnectorType": "S3",
+                "destinationConnectorType": "S3",
+                "triggerType": "OnDemand",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 1,
+                    "day": 11,
+                    "hour": 11,
+                    "minute": 35,
+                    "second": 3,
+                    "microsecond": 676000
+                },
+                "lastUpdatedAt": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 1,
+                    "day": 11,
+                    "hour": 11,
+                    "minute": 35,
+                    "second": 3,
+                    "microsecond": 676000
+                },
+                "createdBy": "arn:aws:iam::644160558196:user/Anna_Shcherbak",
+                "lastUpdatedBy": "arn:aws:iam::644160558196:user/Anna_Shcherbak",
+                "tags": {
+                    "CustodiaRule": "epam-aws-399-appflow_encryption_enabled"
+                }
+            },
+            {
+                "flowArn": "arn:aws:appflow:us-east-1:644160558196:flow/399-appflow-red",
+                "flowName": "399-appflow-red",
+                "flowStatus": "Active",
+                "sourceConnectorType": "S3",
+                "destinationConnectorType": "S3",
+                "triggerType": "OnDemand",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 1,
+                    "day": 11,
+                    "hour": 11,
+                    "minute": 36,
+                    "second": 21,
+                    "microsecond": 792000
+                },
+                "lastUpdatedAt": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 1,
+                    "day": 11,
+                    "hour": 11,
+                    "minute": 36,
+                    "second": 21,
+                    "microsecond": 792000
+                },
+                "createdBy": "arn:aws:iam::644160558196:user/Anna_Shcherbak",
+                "lastUpdatedBy": "arn:aws:iam::644160558196:user/Anna_Shcherbak",
+                "tags": {}
+            }
+        ]
+    }
+}
