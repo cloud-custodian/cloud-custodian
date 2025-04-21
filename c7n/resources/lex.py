@@ -49,6 +49,13 @@ class LexV2BotAliasDescribe(query.ChildDescribeSource):
             botalias = client.describe_bot_alias(
                 botId=r['c7n:parent-id'], botAliasId=r['botAliasId'])
             r.update(botalias)
+            policy_response = self.manager.retry(
+                client.describe_resource_policy,
+                resourceArn=self.manager.generate_arn
+                (f"bot-alias/{r['c7n:parent-id']}/{r['botAliasId']}"),
+                ignore_err_codes=('ResourceNotFoundException')
+            )
+            r['c7n:Policy'] = policy_response.get('policy', None) if policy_response else None
         return universal_augment(self.manager, resources)
 
 
@@ -158,3 +165,24 @@ class LexV2BotCrossAccountAccessFilter(CrossAccountAccessFilter):
             pol = result.get('policy', None)
             r[self.policy_attribute] = pol
         return pol
+
+
+@LexV2BotAlias.filter_registry.register('cross-account')
+class LexV2BotAliasCrossAccountAccessFilter(CrossAccountAccessFilter):
+    """Filters all LexV2 bot aliases with cross-account access
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: lex-bot-alias-cross-account
+                resource: lexv2-bot-alias
+                filters:
+                  - type: cross-account
+                    whitelist_from:
+                      expr: "accounts.*.accountNumber"
+                      url: accounts_url
+    """
+    permissions = ('lex:DescribeResourcePolicy',)
+    policy_attribute = 'c7n:Policy'
