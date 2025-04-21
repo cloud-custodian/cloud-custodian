@@ -5,9 +5,8 @@ from c7n import query
 from c7n.query import QueryResourceManager
 from c7n.filters import CrossAccountAccessFilter
 from c7n.utils import local_session, type_schema
-from c7n.tags import TagActionFilter
+from c7n.tags import TagActionFilter, universal_augment
 from c7n.actions import BaseAction
-from c7n.tags import universal_augment
 
 
 @resources.register("lex-bot")

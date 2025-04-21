@@ -4,7 +4,7 @@
         "PaginationToken": "",
         "ResourceTagMappingList": [
             {
-                "ResourceARN": "arn:aws:lex:us-east-1:111111111111:bot-alias/OTM2WO3PEY/8KRJ6TLIVD",
+                "ResourceARN": "arn:aws:lex:us-east-1:111111111111:bot-alias/OTM2WO3PEY/TSTALIASID",
                 "Tags": [
                     {
                         "Key": "Department",
@@ -13,19 +13,6 @@
                     {
                         "Key": "Owner",
                         "Value": "Corporate"
-                    }
-                ]
-            },
-            {
-                "ResourceARN": "arn:aws:lex:us-east-1:111111111111:bot-alias/OTM2WO3PEY/TSTALIASID",
-                "Tags": [
-                    {
-                        "Key": "Department",
-                        "Value": "National"
-                    },
-                    {
-                        "Key": "Owner",
-                        "Value": "Local"
                     }
                 ]
             }

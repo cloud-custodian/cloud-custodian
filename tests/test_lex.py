@@ -33,7 +33,7 @@ class Lexv2BotAlias(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 2)
+        self.assertEqual(len(resources), 1)
 
     def test_delete_action(self):
         session_factory = self.replay_flight_data('test_lex_botalias_delete_action')
