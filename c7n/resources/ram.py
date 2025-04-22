@@ -184,21 +184,8 @@ class DisassociateResourceShare(Action):
         ).client(self.manager.resource_type.service)
 
         if _all and ExternalShareFilter.associations_attribute not in resources[0]:
-            share_arns = [r['resourceShareArn'] for r in resources]
-            assocs = self.manager.retry(
-                client.get_resource_share_associations,
-                associationType='PRINCIPAL',
-                resourceShareArns=share_arns
-            )['resourceShareAssociations']
-            associations_map = {}
-            for assoc in [a for a in assocs if a['status'] == 'ASSOCIATED']:
-                associations_map.setdefault(assoc['resourceShareArn'], []).append(assoc)
-            for r in resources:
-                r.setdefault(
-                    ExternalShareFilter.associations_attribute, []
-                ).extend(
-                    associations_map.get(r['resourceShareArn'], [])
-                )
+            external_share_filter = ExternalShareFilter(self.data, self.manager)
+            resources = external_share_filter.get_share_associations(resources)
 
         for r in resources:
             if _all:
