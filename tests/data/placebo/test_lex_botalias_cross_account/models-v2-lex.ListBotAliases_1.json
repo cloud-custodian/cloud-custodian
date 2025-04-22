@@ -4,31 +4,6 @@
         "ResponseMetadata": {},
         "botAliasSummaries": [
             {
-                "botAliasId": "45AVYHTPH8",
-                "botAliasName": "1234",
-                "botAliasStatus": "Available",
-                "creationDateTime": {
-                    "__class__": "datetime",
-                    "year": 2025,
-                    "month": 4,
-                    "day": 21,
-                    "hour": 18,
-                    "minute": 59,
-                    "second": 32,
-                    "microsecond": 367000
-                },
-                "lastUpdatedDateTime": {
-                    "__class__": "datetime",
-                    "year": 2025,
-                    "month": 4,
-                    "day": 21,
-                    "hour": 18,
-                    "minute": 59,
-                    "second": 32,
-                    "microsecond": 399000
-                }
-            },
-            {
                 "botAliasId": "TSTALIASID",
                 "botAliasName": "TestBotAlias",
                 "description": "test bot alias",

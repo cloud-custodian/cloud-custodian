@@ -2,7 +2,7 @@
     "status_code": 200,
     "data": {
         "ResponseMetadata": {},
-        "botAliasId": "4IZ3BLDY3Z",
+        "botAliasId": "45AVYHTPH8",
         "botAliasName": "1234",
         "botAliasStatus": "Available",
         "botId": "OTM2WO3PEY",
@@ -10,21 +10,21 @@
             "__class__": "datetime",
             "year": 2025,
             "month": 4,
-            "day": 18,
-            "hour": 8,
-            "minute": 13,
-            "second": 28,
-            "microsecond": 207000
+            "day": 21,
+            "hour": 18,
+            "minute": 59,
+            "second": 32,
+            "microsecond": 367000
         },
         "lastUpdatedDateTime": {
             "__class__": "datetime",
             "year": 2025,
             "month": 4,
-            "day": 18,
-            "hour": 8,
-            "minute": 13,
-            "second": 28,
-            "microsecond": 256000
+            "day": 21,
+            "hour": 18,
+            "minute": 59,
+            "second": 32,
+            "microsecond": 399000
         }
     }
 }

@@ -1,0 +1,11 @@
+{
+    "status_code": 404,
+    "data": {
+        "Error": {
+            "Message": "There is no policy for resourceArn arn:aws:lex:us-east-1:111111111111:bot-alias/OTM2WO3PEY/45AVYHTPH8. Create a resource-based policy and try your request again.",
+            "Code": "ResourceNotFoundException"
+        },
+        "ResponseMetadata": {},
+        "message": "There is no policy for resourceArn arn:aws:lex:us-east-1:111111111111:bot-alias/OTM2WO3PEY/45AVYHTPH8. Create a resource-based policy and try your request again."
+    }
+}

@@ -49,5 +49,21 @@ class Lexv2BotAlias(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         client = session_factory().client('lexv2-models')
-        aliases = client.list_bot_aliases(botId=resources[0]['c7n:parent-id']).get('botAliases', [])
+        aliases = client.list_bot_aliases(botId=resources[0]
+            ['c7n:parent-id']).get('botAliases', [])
         self.assertNotIn(resources[0]['botAliasId'], [a['botAliasId'] for a in aliases])
+
+    def test_lexv2_cross_account(self):
+        factory = self.replay_flight_data("test_lex_botalias_cross_account")
+        p = self.load_policy(
+            {
+                "name": "lexv2-bot-cross-account",
+                "resource": "lexv2-bot-alias",
+                "filters": [{"type": "cross-account"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['CrossAccountViolations'][0]['Resource'],
+            'arn:aws:lex:us-east-1:111111111111:bot-alias/OTM2WO3PEY/TSTALIASID')

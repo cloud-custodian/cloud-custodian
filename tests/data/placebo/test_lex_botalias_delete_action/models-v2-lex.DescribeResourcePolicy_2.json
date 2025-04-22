@@ -1,0 +1,9 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "resourceArn": "arn:aws:lex:us-east-1:111111111111:bot-alias/OTM2WO3PEY/TSTALIASID",
+        "policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"AllowSpecificAccountAccess\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::222222222222:root\"},\"Action\":\"lex:DescribeBotAlias\",\"Resource\":\"arn:aws:lex:us-east-1:111111111111:bot-alias/OTM2WO3PEY/TSTALIASID\"},{\"Sid\":\"DenyAllOtherAccounts\",\"Effect\":\"Deny\",\"Principal\":\"*\",\"Action\":\"lex:*\",\"Resource\":\"arn:aws:lex:us-east-1:111111111111:bot-alias/OTM2WO3PEY/TSTALIASID\",\"Condition\":{\"StringNotEquals\":{\"aws:PrincipalAccount\":\"111111111111\"}}}]}",
+        "revisionId": "1"
+    }
+}

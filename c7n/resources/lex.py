@@ -49,6 +49,12 @@ class LexV2BotAliasDescribe(query.ChildDescribeSource):
             botalias = client.describe_bot_alias(
                 botId=r['c7n:parent-id'], botAliasId=r['botAliasId'])
             r.update(botalias)
+            policy_response = self.manager.retry(
+                client.describe_resource_policy,
+                resourceArn=self.manager.generate_arn
+                (f"bot-alias/{r['c7n:parent-id']}/{r['botAliasId']}"),
+                ignore_err_codes=('ResourceNotFoundException'))
+        r['c7n:Policy'] = policy_response.get('policy', None)
         return universal_augment(self.manager, resources)
 
 
