@@ -4,28 +4,28 @@
         "ResponseMetadata": {},
         "botAliasSummaries": [
             {
-                "botAliasId": "45AVYHTPH8",
+                "botAliasId": "Q70NVXHAKT",
                 "botAliasName": "1234",
                 "botAliasStatus": "Available",
                 "creationDateTime": {
                     "__class__": "datetime",
                     "year": 2025,
                     "month": 4,
-                    "day": 21,
-                    "hour": 18,
-                    "minute": 59,
-                    "second": 32,
-                    "microsecond": 367000
+                    "day": 22,
+                    "hour": 16,
+                    "minute": 42,
+                    "second": 4,
+                    "microsecond": 703000
                 },
                 "lastUpdatedDateTime": {
                     "__class__": "datetime",
                     "year": 2025,
                     "month": 4,
-                    "day": 21,
-                    "hour": 18,
-                    "minute": 59,
-                    "second": 32,
-                    "microsecond": 399000
+                    "day": 22,
+                    "hour": 16,
+                    "minute": 42,
+                    "second": 4,
+                    "microsecond": 729000
                 }
             },
             {

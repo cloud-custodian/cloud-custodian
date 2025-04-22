@@ -49,12 +49,6 @@ class LexV2BotAliasDescribe(query.ChildDescribeSource):
             botalias = client.describe_bot_alias(
                 botId=r['c7n:parent-id'], botAliasId=r['botAliasId'])
             r.update(botalias)
-            policy_response = self.manager.retry(
-                client.describe_resource_policy,
-                resourceArn=self.manager.generate_arn
-                (f"bot-alias/{r['c7n:parent-id']}/{r['botAliasId']}"),
-                ignore_err_codes=('ResourceNotFoundException'))
-        r['c7n:Policy'] = policy_response.get('policy', None)
         return universal_augment(self.manager, resources)
 
 
@@ -71,6 +65,7 @@ class LexV2BotAlias(query.ChildResourceManager):
         arn_service = 'lex'
         cfn_type = 'AWS::Lex::BotAlias'
         permission_prefix = "lex"
+        permissions_augment = "lex:DescribeBotAlias"
     source_mapping = {'describe-child': LexV2BotAliasDescribe, 'config': query.ConfigSource}
 
     def get_arns(self, resources):
@@ -123,7 +118,7 @@ class DeleteLexV2BotAlias(BaseAction):
     permissions = ('lex:DeleteBotAlias',)
 
     def process(self, resources):
-        client = local_session(self.manager.session_factory).client('lexv2-models')
+        client = local_session(self.manager.retry).client('lexv2-models')
         for r in resources:
             client.delete_bot_alias(
                 botAliasId=r['botAliasId'],
@@ -185,3 +180,16 @@ class LexV2BotAliasCrossAccountAccessFilter(CrossAccountAccessFilter):
     """
     permissions = ('lex:DescribeResourcePolicy',)
     policy_attribute = 'c7n:Policy'
+
+    def get_resource_policy(self, r):
+        client = local_session(self.manager.session_factory).client('lexv2-models')
+        pol = None
+        result = self.manager.retry(
+                client.describe_resource_policy,
+                resourceArn=self.manager.generate_arn
+                (f"bot-alias/{r['c7n:parent-id']}/{r['botAliasId']}"),
+                ignore_err_codes=('ResourceNotFoundException'))
+        if result:
+            pol = result.get('policy', None)
+            r[self.policy_attribute] = pol
+        return pol
