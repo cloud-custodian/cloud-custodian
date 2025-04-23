@@ -55,6 +55,7 @@ whitelist_packages = set(
         'typed-ast',  # apache 2.0
         'starkbank-ecdsa',  # MIT
         'portalocker',  # PSF
+        'setuptools',  # Removed classifiers following PEP 639
     )
 )
 
