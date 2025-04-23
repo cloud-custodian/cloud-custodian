@@ -33,7 +33,8 @@ tabulate = "^0.9.0"
 docutils = ">=0.18, <0.19"
 # workaround for: https://github.com/python-poetry/poetry-plugin-export/issues/183
 urllib3 = ">=1.25.4,<1.27"
-
+# workaround for: https://github.com/pypa/setuptools/issues/4956
+setuptools = "<79"
 
 [tool.poetry.group.dev.dependencies]
 
