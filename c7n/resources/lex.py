@@ -65,7 +65,7 @@ class LexV2BotAlias(query.ChildResourceManager):
         arn_service = 'lex'
         cfn_type = 'AWS::Lex::BotAlias'
         permission_prefix = "lex"
-        permissions_augment = "lex:DescribeBotAlias"
+        permissions_augment = ("lex:DescribeBotAlias",)
     source_mapping = {'describe-child': LexV2BotAliasDescribe, 'config': query.ConfigSource}
 
     def get_arns(self, resources):
