@@ -119,7 +119,7 @@ class UpdateKeyspace(BaseAction):
         **shape_schema('keyspaces', 'UpdateKeyspaceRequest', drop_fields=('keyspaceName')),
         required=['replicationSpecification'],
     )
-    permissions = ('cassandra:Alter', 'cassandra:AleterMultiRegionResource')
+    permissions = ('cassandra:Alter', 'cassandra:AlterMultiRegionResource')
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client(
