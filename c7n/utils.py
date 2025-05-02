@@ -818,20 +818,31 @@ def merge_dict_list(dict_iter):
 
 
 def merge_dict(a, b):
-    """Perform a merge of dictionaries a and b
+    """Perform a merge of dictionaries A and B
 
     Any subdictionaries will be recursively merged.
-    Any leaf elements in the form of a list or scalar will use the value from a
+    Any leaf elements in the form of scalar will use the value from A
+    If there is a scalar and list for the same key, the scalar will be appended to the list
+    If there are two lists for the same key, the list from B will be treated like a set
+    and be appended to the list from A
     """
-    d = {}
-    for k, v in a.items():
-        if k not in b:
-            d[k] = v
-        elif isinstance(v, dict) and isinstance(b[k], dict):
-            d[k] = merge_dict(v, b[k])
+    d = a.copy()
     for k, v in b.items():
         if k not in d:
             d[k] = v
+        elif isinstance(d[k], dict) and isinstance(b[k], dict):
+            d[k] = merge_dict(d[k], b[k])
+        elif isinstance(d[k], list) and isinstance(b[k], list):
+            for val in v:
+                if val not in d[k]:
+                    d[k].append(val)
+        elif k in d and not isinstance(v, type(d[k])):
+            if isinstance(v, str) and isinstance(d[k], list) and v not in d[k]:
+                d[k].append(v)
+        elif k in d and isinstance(v, (int, str, float, bool)):
+            d[k] = v
+        else:
+            raise Exception(f"k={k}, {type(v)} and {type(d[k])} not conformable.")
     return d
 
 

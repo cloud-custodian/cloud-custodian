@@ -5,32 +5,32 @@
         "FileSystems": [
             {
                 "OwnerId": "644160558196",
-                "CreationToken": "quickCreated-ed8cc0b4-1133-4213-adbe-e5544a771a55",
-                "FileSystemId": "fs-0c4eafac33c417f78",
-                "FileSystemArn": "arn:aws:elasticfilesystem:us-west-1:644160558196:file-system/fs-0c4eafac33c417f78",
+                "CreationToken": "quickCreated-75c12365-c76f-4927-96f8-12d4bf27e20f",
+                "FileSystemId": "fs-050482c305683afb2",
+                "FileSystemArn": "arn:aws:elasticfilesystem:us-west-2:644160558196:file-system/fs-050482c305683afb2",
                 "CreationTime": {
                     "__class__": "datetime",
-                    "year": 2024,
-                    "month": 12,
-                    "day": 9,
-                    "hour": 15,
-                    "minute": 23,
-                    "second": 41,
+                    "year": 2025,
+                    "month": 4,
+                    "day": 29,
+                    "hour": 13,
+                    "minute": 10,
+                    "second": 22,
                     "microsecond": 0
                 },
                 "LifeCycleState": "available",
                 "Name": "efs-test",
-                "NumberOfMountTargets": 2,
+                "NumberOfMountTargets": 4,
                 "SizeInBytes": {
                     "Value": 6144,
                     "Timestamp": {
                         "__class__": "datetime",
-                        "year": 2024,
-                        "month": 12,
-                        "day": 16,
-                        "hour": 15,
-                        "minute": 45,
-                        "second": 32,
+                        "year": 2025,
+                        "month": 4,
+                        "day": 30,
+                        "hour": 14,
+                        "minute": 24,
+                        "second": 40,
                         "microsecond": 0
                     },
                     "ValueInIA": 0,
@@ -39,7 +39,7 @@
                 },
                 "PerformanceMode": "generalPurpose",
                 "Encrypted": true,
-                "KmsKeyId": "arn:aws:kms:us-west-1:644160558196:key/2efff357-0be1-4cf2-bbc2-ba2165717d84",
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/64ed10cf-cc32-4512-b473-304be63c9fe4",
                 "ThroughputMode": "elastic",
                 "Tags": [
                     {
