@@ -1,0 +1,37 @@
+{
+  "status_code": 200,
+  "data": {
+    "CacheSubnetGroups": [
+      {
+        "VpcId": "vpc-f1516b97",
+        "CacheSubnetGroupDescription": " ",
+        "Subnets": [
+          {
+            "SubnetIdentifier": "subnet-ecfb30a4",
+            "SubnetAvailabilityZone": {
+              "Name": "us-east-1a"
+            }
+          },
+          {
+            "SubnetIdentifier": "subnet-71bda45c",
+            "SubnetAvailabilityZone": {
+              "Name": "us-east-1d"
+            }
+          }
+        ],
+        "CacheSubnetGroupName": "msg"
+      }
+    ],
+    "ResponseMetadata": {
+      "RetryAttempts": 0,
+      "HTTPStatusCode": 200,
+      "RequestId": "3056b751-588a-11e7-a2c8-af369a23b0d0",
+      "HTTPHeaders": {
+        "x-amzn-requestid": "3056b751-588a-11e7-a2c8-af369a23b0d0",
+        "date": "Sat, 24 Jun 2017 03:06:58 GMT",
+        "content-length": "1043",
+        "content-type": "text/xml"
+      }
+    }
+  }
+}

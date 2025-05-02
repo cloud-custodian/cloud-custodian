@@ -21,7 +21,7 @@ interactions:
       X-TC-Region:
       - ap-singapore
       X-TC-TraceId:
-      - 32952a96-cdcc-489e-869d-8d8ab364b99d
+      - c0ef1d16-0b3e-4670-b739-b30215ed6f48
       X-TC-Version:
       - '2019-01-16'
     method: POST
@@ -258,7 +258,7 @@ interactions:
         09:33:28\",\"UpdateTime\":\"2021-04-23 09:33:28\",\"Deactived\":0,\"DeactivedDetail\":[]},{\"PolicyId\":57685507,\"PolicyName\":\"policygen-20201103170920\",\"Type\":1,\"Description\":\"\",\"CreateMode\":2,\"Attachments\":0,\"ServiceType\":\"\",\"IsAttached\":null,\"IsServiceLinkedPolicy\":0,\"AttachEntityCount\":0,\"AttachEntityBoundaryCount\":0,\"AddTime\":\"2020-11-03
         17:12:30\",\"UpdateTime\":\"2020-11-03 17:12:30\",\"Deactived\":0,\"DeactivedDetail\":[]},{\"PolicyId\":47932389,\"PolicyName\":\"QcloudSSASubAccountAccess_100009291175\",\"Type\":1,\"Description\":\"SSA
         policy for sub-account access\",\"CreateMode\":2,\"Attachments\":0,\"ServiceType\":\"\",\"IsAttached\":null,\"IsServiceLinkedPolicy\":0,\"AttachEntityCount\":0,\"AttachEntityBoundaryCount\":0,\"AddTime\":\"2020-08-05
-        15:44:18\",\"UpdateTime\":\"2020-08-05 15:44:18\",\"Deactived\":0,\"DeactivedDetail\":[]}],\"TotalNum\":187,\"RequestId\":\"567fe607-352a-4545-95bd-1ed4ca069257\"}}"
+        15:44:18\",\"UpdateTime\":\"2020-08-05 15:44:18\",\"Deactived\":0,\"DeactivedDetail\":[]}],\"TotalNum\":187,\"RequestId\":\"36fa1230-3f6d-48fa-bbb2-f2fc2d2b4e33\"}}"
     headers:
       Connection:
       - keep-alive
@@ -267,9 +267,9 @@ interactions:
       Content-Type:
       - application/json
       Date:
-      - Fri, 18 Apr 2025 09:29:58 GMT
+      - Fri, 18 Apr 2025 09:30:15 GMT
       X-TC-TraceId:
-      - 32952a96-cdcc-489e-869d-8d8ab364b99d
+      - c0ef1d16-0b3e-4670-b739-b30215ed6f48
     status:
       code: 200
       message: OK
