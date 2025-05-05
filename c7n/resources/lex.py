@@ -52,6 +52,10 @@ class LexV2BotAliasDescribe(query.ChildDescribeSource):
             r.update(botalias)
         return universal_augment(self.manager, resources)
 
+    def resources(self, query):
+        resources = self.query.filter(self.manager, **query)
+        return [r for r in resources if r['botAliasStatus'] == 'Available']
+
 
 @resources.register('lexv2-bot-alias')
 class LexV2BotAlias(query.ChildResourceManager):
