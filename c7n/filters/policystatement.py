@@ -124,7 +124,7 @@ class HasStatementFilter(Filter):
             actionsFormatted = [action.lower() for action in actions]
         return set(actionsFormatted)
 
-    # case-sensitive
+    # case-sensitive, removes ordering in lists
     def format_principal(self, principal):
         if isinstance(principal, dict):
             format_principal = {}
@@ -137,7 +137,7 @@ class HasStatementFilter(Filter):
         else:
             return principal
 
-    # case-sensitive
+    # case-sensitive, removes ordering in lists
     def format_resource(self, resource):
         if isinstance(resource, str):
             return set([resource])
