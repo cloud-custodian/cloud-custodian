@@ -48,6 +48,7 @@ class LexV2BotAliasDescribe(query.ChildDescribeSource):
         for r in resources:
             botalias = client.describe_bot_alias(
                 botId=r['c7n:parent-id'], botAliasId=r['botAliasId'])
+            botalias.pop('ResponseMetadata')
             r.update(botalias)
         return universal_augment(self.manager, resources)
 
@@ -73,30 +74,6 @@ class LexV2BotAlias(query.ChildResourceManager):
         for r in resources:
             arns.append(self.generate_arn(f"bot-alias/{r['c7n:parent-id']}/{r['botAliasId']}"))
         return arns
-
-
-LexV2BotAlias.action_registry.register('mark-for-op')
-
-
-@LexV2BotAlias.filter_registry.register('marked-for-op')
-class MarkedForOpFilter(TagActionFilter):
-    """
-    Filter LexV2 bot aliases marked for a specific operation.
-
-    :example:
-
-    .. code-block:: yaml
-
-            policies:
-              - name: delete-marked-lex-bot-alias
-                resource: lexv2-bot-alias
-                filters:
-                  - type: marked-for-op
-                    tag: custodian_cleanup
-                    op: delete
-    """
-    schema = type_schema('marked-for-op', rinherit=TagActionFilter.schema)
-    permissions = ('lex:ListTagsForResource',)
 
 
 @LexV2BotAlias.action_registry.register('delete')
