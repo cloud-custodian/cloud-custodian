@@ -205,9 +205,10 @@ class HasStatementFilter(Filter):
         if partial_match_key in resource_stmt:
             resource_stmt_value = resource_stmt.get(partial_match_key)
 
-            # set as a list in case resource_stmt_value is a list with len of 1
+            # set as a list in case partial_match_value is a list with len of 1
             if isinstance(resource_stmt_value, str):
                 resource_stmt_value = [resource_stmt_value]
+
             if isinstance(partial_match_value, list):
                 return set(partial_match_value).issubset(resource_stmt_value)
             elif isinstance(partial_match_value, set):
