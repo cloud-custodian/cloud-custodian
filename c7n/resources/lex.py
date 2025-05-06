@@ -99,7 +99,7 @@ class DeleteLexV2BotAlias(BaseAction):
     permissions = ('lex:DeleteBotAlias',)
 
     def process(self, resources):
-        client = local_session(self.manager.retry).client('lexv2-models')
+        client = local_session(self.manager.session_factory).client('lexv2-models')
         for r in resources:
             client.delete_bot_alias(
                 botAliasId=r['botAliasId'],
