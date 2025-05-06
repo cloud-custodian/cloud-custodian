@@ -14,6 +14,6 @@ class GCPSecretTest(BaseTest):
             session_factory=factory)
         resources = p.run()
 
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['name'], 'projects/cloud-custodian/'
                                                'secrets/defectdojo_token')
