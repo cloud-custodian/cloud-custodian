@@ -1,0 +1,5 @@
+paths:
+  .github/workflows/docker.yml:
+    ignore:
+      # Ignore the specific error from shellcheck, we're defining a static variable
+      - 'shellcheck reported issue in this script: SC2086:.+'
