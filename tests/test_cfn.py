@@ -258,3 +258,22 @@ class TestCFN(BaseTest):
 
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["StackName"], stack_name)
+
+    def test_cfn_topic_filter(self):
+        session_factory = self.replay_flight_data("test_cfn_topic_filter")
+        p = self.load_policy({
+            'name': 'test-cfn-topic-filter',
+            'resource': 'aws.cfn',
+            'filters': [{
+                'type': 'topic',
+                'attrs': [{
+                    'type': 'value',
+                    'key': 'SubscriptionsConfirmed',
+                    'value': 0,
+                    'value_type': 'integer'
+                }]
+            }]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['c7n:SnsTopics'][0]['SubscriptionsConfirmed'], '0')

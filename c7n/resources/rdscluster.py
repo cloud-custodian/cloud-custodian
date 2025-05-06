@@ -763,3 +763,27 @@ class PendingMaintenance(Filter):
                 results.append(r)
 
         return results
+
+
+class DescribeDbShardGroup(DescribeSource):
+    def augment(self, resources):
+        for r in resources:
+            r['Tags'] = r.pop('TagList', ())
+        return resources
+
+
+@resources.register('rds-db-shard-group')
+class RDSDbShardGroup(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = 'rds'
+        arn = 'DBShardGroupArn'
+        name = 'DBShardGroupIdentifier'
+        id = 'DBShardGroupResourceId'
+        enum_spec = ('describe_db_shard_groups', 'DBShardGroups', None)
+        cfn_type = 'AWS::RDS::DBShardGroup'
+        permissions_enum = ("rds:DescribeDBShardGroups",)
+        universal_taggable = object()
+
+    source_mapping = {
+            'describe': DescribeDbShardGroup
+        }

@@ -4,11 +4,11 @@
         "PaginationToken": "",
         "ResourceTagMappingList": [
             {
-                "ResourceARN": "arn:aws:ses:us-east-1:644160558196:dedicated-ip-pool/c7n-test-2",
+                "ResourceARN": "arn:aws:comprehend:us-east-1:644160558196:flywheel/TestFlywheelVPC",
                 "Tags": [
                     {
-                        "Key": "Owner",
-                        "Value": "Bob"
+                        "Key": "ASV",
+                        "Value": "PolicyTestASV"
                     }
                 ]
             }
