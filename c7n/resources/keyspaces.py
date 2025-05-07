@@ -95,7 +95,7 @@ class KeyspaceMark(TagDelayedAction):
 
 @Keyspace.action_registry.register('remove-tag')
 class RemoveTagKeyspace(RemoveTag):
-    permissions = ('cassandra:UntagResource', 'cassandra:UntagMultiRegionResource')
+    permissions = ('cassandra:UntagResource', 'cassandra:UnTagMultiRegionResource')
 
     def process(self, resources):
         client = self.get_client()
@@ -234,7 +234,7 @@ class TableMark(TagDelayedAction):
 
 @Table.action_registry.register('remove-tag')
 class RemoveTagTable(RemoveTag):
-    permissions = ('cassandra:UntagResource', 'casssandra:UntagMultiRegionResource')
+    permissions = ('cassandra:UntagResource', 'casssandra:UnTagMultiRegionResource')
 
     def process(self, resources):
         client = self.get_client()
