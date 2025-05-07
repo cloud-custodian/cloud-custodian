@@ -301,7 +301,7 @@ class CloudDirectory(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = "clouddirectory"
-        enum_spec = ("list_directories", "Directories", {'state': 'ENABLED'})
+        enum_spec = ("list_directories", "Directories", None)
         arn = id = "DirectoryArn"
         name = "Name"
         arn_type = "directory"
@@ -311,10 +311,12 @@ class CloudDirectory(QueryResourceManager):
     augment = universal_augment
 
     def resources(self, query=None):
-        query_filters = CloudDirectoryQueryParser.parse(self.data.get('query', []))
+        queries = CloudDirectoryQueryParser.parse(self.data.get('query', []))
         query = query or {}
-        if query_filters:
-            query['Filters'] = query_filters
+        for q in queries:
+            query.update(q)
+        if 'state' not in query:
+            query['state'] = 'ENABLED'
         return super(CloudDirectory, self).resources(query=query)
 
 
@@ -378,9 +380,9 @@ class CloudDirectoryDisable(BaseAction):
 
 class CloudDirectoryQueryParser(QueryParser):
     QuerySchema = {
-        'name': str,
-        'directoryArn': str,
-        'state': str,
+        'state': ('ENABLED', 'DISABLED', 'DELETED'),
+        'MaxResults': int,
     }
 
     type_name = 'CloudDirectory'
+    multi_value = False
