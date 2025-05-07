@@ -1038,19 +1038,19 @@ msrest = ">=0.5.0"
 
 [[package]]
 name = "azure-mgmt-security"
-version = "1.0.0"
+version = "7.0.0"
 description = "Microsoft Azure Security Center Management Client Library for Python"
 optional = false
-python-versions = "*"
+python-versions = ">=3.8"
 files = [
-    {file = "azure-mgmt-security-1.0.0.zip", hash = "sha256:ae1cff598dfe80e93406e524c55c3f2cbffced9f9b7a5577e3375008a4c3bcad"},
-    {file = "azure_mgmt_security-1.0.0-py2.py3-none-any.whl", hash = "sha256:1f7d98e6c3c6623619bb57ff71105e6e8f2f2a82dc820028246a5bea5a915d38"},
+    {file = "azure-mgmt-security-7.0.0.tar.gz", hash = "sha256:5912eed7e9d3758fdca8d26e1dc26b41943dc4703208a1184266e2c252e1ad66"},
+    {file = "azure_mgmt_security-7.0.0-py3-none-any.whl", hash = "sha256:85a6d8b7a5cd74884a548ed53fed034449f54a9989edd64e9020c5837db96933"},
 ]
 
 [package.dependencies]
-azure-common = ">=1.1,<2.0"
-azure-mgmt-core = ">=1.2.0,<2.0.0"
-msrest = ">=0.5.0"
+azure-common = ">=1.1"
+azure-mgmt-core = ">=1.3.2"
+isodate = ">=0.6.1"
 
 [[package]]
 name = "azure-mgmt-servicebus"
@@ -2822,4 +2822,4 @@ propcache = ">=0.2.1"
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9.2,<4.0.0"
-content-hash = "c6a3ce6da9d2af751b0067c61d1bcf88882adae6a7be77839e3add7228426a3e"
+content-hash = "2f9a471c5c1b280d23512af5e457a3e6a22e161fad63df209bd6b0d227d9fb49"

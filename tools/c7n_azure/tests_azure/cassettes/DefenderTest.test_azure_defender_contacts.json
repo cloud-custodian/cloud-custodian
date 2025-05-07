@@ -4,7 +4,7 @@
         {
             "request": {
                 "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/securityContacts?api-version=2017-08-01-preview",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/securityContacts?api-version=2020-01-01-preview",
                 "body": null,
                 "headers": {}
             },
@@ -18,7 +18,7 @@
                         "749"
                     ],
                     "api-supported-versions": [
-                        "2017-08-01-preview"
+                        "2020-01-01-preview"
                     ],
                     "content-type": [
                         "application/json; charset=utf-8"
@@ -38,9 +38,13 @@
                         "value": [
                             {
                                 "properties": {
-                                    "alertNotifications": "On",
-                                    "alertsToAdmins": "On",
-                                    "email": "azurebilling@epmcseclab.com",
+                                    "notificationsByRole": {
+                                        "state": "On",
+                                        "roles": [
+                                          "Admin"
+                                        ]
+                                    },
+                                    "emails": "azurebilling@epmcseclab.com",
                                     "phone": "+375291234567"
                                 },
                                 "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/securityContacts/default1",
