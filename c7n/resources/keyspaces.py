@@ -1,6 +1,6 @@
 from c7n.actions import BaseAction
 from c7n.manager import resources
-from c7n.query import ChildResourceManager, QueryResourceManager, TypeInfo
+from c7n.query import ChildResourceManager, DescribeSource, QueryResourceManager, TypeInfo
 from c7n.resources.aws import shape_schema
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 from c7n.utils import get_retry, local_session, type_schema
@@ -13,6 +13,13 @@ SYSTEM_KEYSPACES = [
     "system_multiregion_info",
 ]
 
+
+class DescribeKeyspaces(DescribeSource):
+
+    def get_permissions(self):
+        perms = super().get_permissions()
+        perms.remove('cassandra:GetKeyspace')
+        return perms
 
 @resources.register('keyspace')
 class Keyspace(QueryResourceManager):
@@ -33,6 +40,9 @@ class Keyspace(QueryResourceManager):
     retry = staticmethod(get_retry(
         ("ConflictException", "InternalServerException",)
     ))
+    source_mapping = {
+        'describe': DescribeKeyspaces,
+    }
 
     def augment(self, resources):
         resources = [
@@ -234,7 +244,7 @@ class TableMark(TagDelayedAction):
 
 @Table.action_registry.register('remove-tag')
 class RemoveTagTable(RemoveTag):
-    permissions = ('cassandra:UntagResource', 'casssandra:UnTagMultiRegionResource')
+    permissions = ('cassandra:UntagResource', 'cassandra:UnTagMultiRegionResource')
 
     def process(self, resources):
         client = self.get_client()
