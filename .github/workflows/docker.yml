@@ -21,7 +21,7 @@ jobs:
 
   build-arm64:
     needs: build-matrix
-    runs-on: [self-hosted, linux, arm64]
+    runs-on: [ubuntu-24.04-arm]
     permissions:
       id-token: write
     strategy:
@@ -46,7 +46,7 @@ jobs:
 
   build-amd64:
     needs: build-matrix
-    runs-on: [ubuntu-latest-8-cores]
+    runs-on: [ubuntu-latest]
     permissions:
       id-token: write
     strategy:
