@@ -2265,11 +2265,7 @@ def test_attribute_value_presence(tmp_path):
         {
             "name": "aws-role-permission-boundary-specified",
             "resource": ["terraform.aws_iam_role"],
-            "filters": [
-                {
-                    "permissions_boundary": "present"
-                }
-            ]
+            "filters": [{"permissions_boundary": "present"}],
         },
         terraform_dir / "attribute_value_presence",
         tmp_path,
