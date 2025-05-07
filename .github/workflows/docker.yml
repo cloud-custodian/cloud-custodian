@@ -39,7 +39,7 @@ jobs:
           HUB_TOKEN: ${{ secrets.DOCKER_CI_HUB_TOKEN }}
         with:
           context: .
-          file: ./docker/${{ matrix.image }}/Dockerfile
+          file: ./docker/${{ matrix.image }}
           platforms: linux/arm64
           push: true
           tags: cloudcustodian/${{ matrix.image }}:${{ github.ref_name || 'latest' }}-arm64
@@ -64,7 +64,7 @@ jobs:
           HUB_TOKEN: ${{ secrets.DOCKER_CI_HUB_TOKEN }}
         with:
           context: .
-          file: ./docker/${{ matrix.image }}/Dockerfile
+          file: ./docker/${{ matrix.image }}
           platforms: linux/amd64
           push: true
           tags: cloudcustodian/${{ matrix.image }}:${{ github.ref_name || 'latest' }}-amd64
