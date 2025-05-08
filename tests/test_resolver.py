@@ -90,19 +90,19 @@ def test_dynamodb_resolver_multi(test, dynamodb_resolver_multi):
 
 def test_dynamodb_resolver_complex_records():
     """Test DynamoDB resolver with complex records requiring resource value processing.
-    
-    This test specifically ensures coverage for line 165 in resolver.py that calls 
+
+    This test specifically ensures coverage for line 165 in resolver.py that calls
     _get_resource_values when record_singleton is False or there is an expr.
     """
     from unittest.mock import patch, MagicMock
-    
+
     # Create a mock manager
     manager = Bag(
-        session_factory=lambda: None, 
+        session_factory=lambda: None,
         _cache=None,
         config=Bag(account_id="123", region="us-east-1")
     )
-    
+
     # Create a ValuesFrom object with complex records (not singleton)
     # and an expression to process them
     resolver = ValuesFrom({
@@ -110,7 +110,7 @@ def test_dynamodb_resolver_complex_records():
         "query": 'select id, name, status from "test_table"',
         "expr": "[?status=='active'].id"
     }, manager)
-    
+
     # Create mock data that will ensure record_singleton is False
     # and that _get_resource_values is called
     mock_items = [
@@ -118,45 +118,45 @@ def test_dynamodb_resolver_complex_records():
         {"id": {"S": "id2"}, "name": {"S": "name2"}, "status": {"S": "inactive"}},
         {"id": {"S": "id3"}, "name": {"S": "name3"}, "status": {"S": "active"}}
     ]
-    
+
     # Create a mock paginator response
     mock_paginator = MagicMock()
     mock_paginator.paginate.return_value = [{"Items": mock_items}]
-    
+
     # Create a mock client that returns our mock paginator
     mock_client = MagicMock()
     mock_client.meta.service_model.operation_model.return_value = MagicMock()
-    
+
     # Create a mock Paginator constructor
     mock_paginator_cls = MagicMock(return_value=mock_paginator)
-    
+
     # Create a dummy deserializer that converts DynamoDB format to Python objects
     class MockDeserializer:
         def deserialize(self, value):
             # Simple deserializer that extracts value from DynamoDB format
             return next(iter(value.values()))
-    
+
     # Patch the necessary functions
     with patch('c7n.resolver.local_session', return_value=mock_client), \
          patch('botocore.paginate.Paginator', mock_paginator_cls), \
          patch('boto3.dynamodb.types.TypeDeserializer', return_value=MockDeserializer()):
-        
+
         # Add a spy on _get_resource_values to verify it gets called
         original_get_resource_values = resolver._get_resource_values
         called = [False]
-        
+
         def spy_get_resource_values(data):
             called[0] = True
             return original_get_resource_values(data)
-        
+
         resolver._get_resource_values = spy_get_resource_values
-        
+
         # Call get_values which should trigger our mocked path
-        values = resolver.get_values()
-        
+        _ = resolver.get_values()
+
         # Verify _get_resource_values was called (line 165 coverage)
         assert called[0], "Line 165 (_get_resource_values call) was not executed"
-        
+
         # Reset the method
         resolver._get_resource_values = original_get_resource_values
 
