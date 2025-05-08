@@ -21,6 +21,7 @@ class DescribeKeyspaces(DescribeSource):
         perms.remove('cassandra:GetKeyspace')
         return perms
 
+
 @resources.register('keyspace')
 class Keyspace(QueryResourceManager):
 
