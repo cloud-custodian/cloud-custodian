@@ -298,13 +298,13 @@ class UrlValueTest(BaseTest):
 
 def test_dynamodb_url_type():
     """Test that the dynamodb URL type is properly handled.
-    
+
     This test verifies that using 'url: dynamodb' in a value_from filter
     doesn't cause an error about unknown URL type.
     """
     config = Config.empty(account_id=ACCOUNT_ID)
     mgr = Bag({"session_factory": None, "_cache": None, "config": config})
-    
+
     # Verify that creating a ValuesFrom with 'url: dynamodb' doesn't raise an error
     values = ValuesFrom({
         "url": "dynamodb",
@@ -312,10 +312,10 @@ def test_dynamodb_url_type():
         "format": "json",
         "expr": "[*].id"
     }, mgr)
-    
+
     # Mock the _get_ddb_values method to avoid actually calling DynamoDB
     values._get_ddb_values = lambda: ["id1", "id2"]
-    
+
     # Verify that get_values() doesn't raise an error
     result = values.get_values()
     assert result == ["id1", "id2"]
@@ -323,15 +323,15 @@ def test_dynamodb_url_type():
 
 def test_uri_resolver_dynamodb():
     """Test that the URIResolver can handle 'dynamodb' URLs.
-    
+
     This test verifies that URIResolver.resolve doesn't raise an error
     when given a 'dynamodb' URL.
     """
     resolver = URIResolver(None, FakeCache())
-    
+
     # Verify that resolve() doesn't raise an error for 'dynamodb' URL
     result = resolver.resolve("dynamodb", {})
-    
+
     # The result should be an empty string since the actual handling
     # is done in ValuesFrom._get_ddb_values
     assert result == ""

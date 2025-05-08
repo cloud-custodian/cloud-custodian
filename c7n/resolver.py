@@ -119,10 +119,10 @@ class ValuesFrom:
       value_from:
          url: dynamodb
          query: |
-           select id from "MyTable" 
+           select id from "MyTable"
            where partition_key = 'some_value'
          expr: '[*].id'
-         
+
        # inferred from extension
        format: [json, csv, csv2dict, txt]
     """
