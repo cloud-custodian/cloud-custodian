@@ -285,6 +285,8 @@ class MetricsFilter(Filter):
             else:
                 all_meet_condition = True
                 for data_point in collected_metrics[key]:
+                    if 'ExtendedStatistics' in data_point:
+                        data_point = data_point['ExtendedStatistics']
                     if not self.op(data_point[self.statistics], self.value):
                         all_meet_condition = False
                         break

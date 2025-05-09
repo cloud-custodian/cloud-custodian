@@ -301,6 +301,32 @@ class TestMetricFilter(BaseTest):
         resources = policy.run()
         self.assertEqual(len(resources), 1)
 
+    def test_metric_filter_extended_stats(self):
+        session_factory = self.replay_flight_data(
+            "test_ec2_metric_extended_stats",
+            region="us-east-2"
+        )
+        policy = self.load_policy(
+            {
+                "name": "ec2-utilization-p95",
+                "resource": "aws.ec2",
+                "filters": [
+                    {
+                        "type": "metrics",
+                        "name": "CPUUtilization",
+                        "days": 7,
+                        "value": 10,
+                        "op": "less-than",
+                        "statistics": "p95",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+            config={"region": "us-east-2"},
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
     def test_metric_filter_multiple_datapoints(self):
         session_factory = self.replay_flight_data("test_metric_filter_multiple_datapoints")
         policy = self.load_policy(

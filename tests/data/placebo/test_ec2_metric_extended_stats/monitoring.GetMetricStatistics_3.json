@@ -1,0 +1,25 @@
+{
+    "status_code": 200,
+    "data": {
+        "Label": "CPUUtilization",
+        "Datapoints": [
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 5,
+                    "day": 2,
+                    "hour": 17,
+                    "minute": 18,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "Unit": "Percent",
+                "ExtendedStatistics": {
+                    "p95": 3.103524378446479
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
