@@ -196,6 +196,66 @@ class UtilTest(BaseTest):
                      'userName': [
                          {'anything-but': 'deputy'}]}}})
 
+    def test_iam_dict_merge(self):
+        a = {
+            "Sid": "Stmt1",
+            "Action": [
+                "s3:PutObject"
+            ],
+            "Effect": "Allow",
+            "Principal": "*",
+            "Resource": "arn:aws:s3:::cross-account-valid/*",
+            "Condition": {
+                "ArnLike": {
+                    "aws:SourceArn": "arn:aws:sns:us-east-1:123456789012"
+                },
+                "StringEquals": {
+                    "aws:sourceVpc": "vpc-12345678",
+                    "sns:Protocol": [
+                        "email"
+                    ]
+                }
+            }}
+        b = {
+            "Sid": "Stmt2",
+            "Effect": "Deny",
+            "Action": "s3:DeleteObject",
+            "Principal": {
+                "AWS": "*"
+            },
+            "Resource": "arn:aws:sns:us-east-2:644160558196:MyTopic",
+            "Condition": {
+                "StringEquals": {
+                    "sns:Protocol": [
+                        "https"
+                    ]
+                }
+            }}
+        self.assertEqual(
+            utils.merge_dict(a, b),
+            {
+                "Sid": "Stmt2",
+                "Effect": "Deny",
+                "Action": [
+                    "s3:PutObject",
+                    "s3:DeleteObject"
+                ],
+                "Principal": "*",
+                "Resource": "arn:aws:sns:us-east-2:644160558196:MyTopic",
+                "Condition": {
+                    "ArnLike": {
+                        "aws:SourceArn": "arn:aws:sns:us-east-1:123456789012"
+                    },
+                    "StringEquals": {
+                        "aws:sourceVpc": "vpc-12345678",
+                        "sns:Protocol": [
+                            "email",
+                            "https"
+                        ]
+                    }
+                }
+            })
+
     def test_local_session_region(self):
         policies = [
             self.load_policy(
