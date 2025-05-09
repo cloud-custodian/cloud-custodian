@@ -119,6 +119,22 @@
                         },
                         "Tags": [
                             {
+                                "Key": "maid_offhours",
+                                "Value": "off=(M-F,19);on=(M-F,7)"
+                            },
+                            {
+                                "Key": "Application",
+                                "Value": "myapp"
+                            },
+                            {
+                                "Key": "cost-center",
+                                "Value": "bleh "
+                            },
+                            {
+                                "Key": "maid_status",
+                                "Value": "Resource does not meet policy: stop@2024/02/10"
+                            },
+                            {
                                 "Key": "Name",
                                 "Value": "samltesting"
                             }
@@ -308,6 +324,10 @@
                             "Message": "Client.UserInitiatedShutdown: User initiated shutdown"
                         },
                         "Tags": [
+                            {
+                                "Key": "Name",
+                                "Value": "appdiscovery-agent-test"
+                            },
                             {
                                 "Key": "maid_status",
                                 "Value": "Resource does not meet policy: stop@2024/04/05"

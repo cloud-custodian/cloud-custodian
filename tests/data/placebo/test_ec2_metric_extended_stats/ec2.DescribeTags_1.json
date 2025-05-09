@@ -1,0 +1,50 @@
+{
+    "status_code": 200,
+    "data": {
+        "Tags": [
+            {
+                "Key": "Application",
+                "ResourceId": "i-00d3f85ef9622b0e2",
+                "ResourceType": "instance",
+                "Value": "myapp"
+            },
+            {
+                "Key": "Name",
+                "ResourceId": "i-00d3f85ef9622b0e2",
+                "ResourceType": "instance",
+                "Value": "samltesting"
+            },
+            {
+                "Key": "cost-center",
+                "ResourceId": "i-00d3f85ef9622b0e2",
+                "ResourceType": "instance",
+                "Value": "bleh "
+            },
+            {
+                "Key": "maid_offhours",
+                "ResourceId": "i-00d3f85ef9622b0e2",
+                "ResourceType": "instance",
+                "Value": "off=(M-F,19);on=(M-F,7)"
+            },
+            {
+                "Key": "maid_status",
+                "ResourceId": "i-00d3f85ef9622b0e2",
+                "ResourceType": "instance",
+                "Value": "Resource does not meet policy: stop@2024/02/10"
+            },
+            {
+                "Key": "Name",
+                "ResourceId": "i-0f10da6b1d974db98",
+                "ResourceType": "instance",
+                "Value": "appdiscovery-agent-test"
+            },
+            {
+                "Key": "maid_status",
+                "ResourceId": "i-0f10da6b1d974db98",
+                "ResourceType": "instance",
+                "Value": "Resource does not meet policy: stop@2024/04/05"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
