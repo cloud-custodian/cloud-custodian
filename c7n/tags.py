@@ -1222,10 +1222,17 @@ class CopyRelatedResourceTag(Tag):
         manager = self.manager.get_resource_manager(r_type)
         r_id = manager.resource_type.id
 
-        return {
-            r[r_id]: {t['Key']: t['Value'] for t in r.get('Tags', [])}
-            for r in manager.get_resources(list(ids))
-        }
+        tag_map = {}
+        # Process in batches of 100 to avoid hitting API limits
+        for batch in utils.chunks(list(ids), size=100):
+            resources_batch = manager.get_resources(batch)
+            batch_tag_map = {
+                r[r_id]: {t['Key']: t['Value'] for t in r.get('Tags', [])}
+                for r in resources_batch
+            }
+            tag_map.update(batch_tag_map)
+
+        return tag_map
 
     def get_resource_tag_map_universal(self, ids):
         related_region = None
