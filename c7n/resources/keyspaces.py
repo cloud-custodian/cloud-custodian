@@ -30,7 +30,6 @@ class Keyspace(QueryResourceManager):
         arn_type = 'keyspace'
         permission_prefix = 'cassandra'
         permissions_enum = ('cassandra:Select',)
-        permissions_augment = ('cassandra:Select',)
         enum_spec = ('list_keyspaces', 'keyspaces', None)
         detail_spec = ('get_keyspace', 'keyspaceName', 'keyspaceName', None)
         id = 'keyspaceName'
@@ -167,7 +166,6 @@ class Table(ChildResourceManager):
         service = 'keyspaces'
         permission_prefix = 'cassandra'
         permissions_enum = ('cassandra:Select',)
-        permissions_augment = ('cassandra:Select',)
         parent_spec = ('keyspace', 'keyspaceName', None)
         enum_spec = ('list_tables', 'tables', None)
         id = 'tableName'
