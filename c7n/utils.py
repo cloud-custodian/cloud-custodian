@@ -826,7 +826,7 @@ def merge_dict(a, b):
     If there are two lists for the same key, the list from B will be treated like a set
     and be appended to the list from A
     """
-    d = a.copy()
+    d = copy.deepcopy(a)
     for k, v in b.items():
         if k not in d:
             d[k] = v
