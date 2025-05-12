@@ -3,54 +3,9 @@
     "data": {
         "tables": [
             {
-                "keyspaceName": "system_schema",
-                "tableName": "keyspaces",
-                "resourceArn": "arn:aws:cassandra:us-east-1:123456789012:/keyspace/system_schema/table/keyspaces"
-            },
-            {
-                "keyspaceName": "system_schema",
-                "tableName": "types",
-                "resourceArn": "arn:aws:cassandra:us-east-1:123456789012:/keyspace/system_schema/table/types"
-            },
-            {
-                "keyspaceName": "system_schema",
-                "tableName": "tables",
-                "resourceArn": "arn:aws:cassandra:us-east-1:123456789012:/keyspace/system_schema/table/tables"
-            },
-            {
-                "keyspaceName": "system_schema",
-                "tableName": "columns",
-                "resourceArn": "arn:aws:cassandra:us-east-1:123456789012:/keyspace/system_schema/table/columns"
-            },
-            {
-                "keyspaceName": "system_schema",
-                "tableName": "triggers",
-                "resourceArn": "arn:aws:cassandra:us-east-1:123456789012:/keyspace/system_schema/table/triggers"
-            },
-            {
-                "keyspaceName": "system_schema",
-                "tableName": "dropped_columns",
-                "resourceArn": "arn:aws:cassandra:us-east-1:123456789012:/keyspace/system_schema/table/dropped_columns"
-            },
-            {
-                "keyspaceName": "system_schema",
-                "tableName": "views",
-                "resourceArn": "arn:aws:cassandra:us-east-1:123456789012:/keyspace/system_schema/table/views"
-            },
-            {
-                "keyspaceName": "system_schema",
-                "tableName": "functions",
-                "resourceArn": "arn:aws:cassandra:us-east-1:123456789012:/keyspace/system_schema/table/functions"
-            },
-            {
-                "keyspaceName": "system_schema",
-                "tableName": "aggregates",
-                "resourceArn": "arn:aws:cassandra:us-east-1:123456789012:/keyspace/system_schema/table/aggregates"
-            },
-            {
-                "keyspaceName": "system_schema",
-                "tableName": "indexes",
-                "resourceArn": "arn:aws:cassandra:us-east-1:123456789012:/keyspace/system_schema/table/indexes"
+                "keyspaceName": "c7n_test",
+                "tableName": "c7n_test_table",
+                "resourceArn": "arn:aws:cassandra:us-east-1:644160558196:/keyspace/c7n_test/table/c7n_test_table"
             }
         ],
         "ResponseMetadata": {}

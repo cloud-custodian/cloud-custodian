@@ -21,6 +21,16 @@ class DescribeKeyspaces(DescribeSource):
         perms.remove('cassandra:GetKeyspace')
         return perms
 
+    def get_resources(self, resource_ids, cache=True):
+        return [
+            r for r in super(DescribeKeyspaces, self).get_resources(resource_ids, cache)
+            if r['keyspaceName'] not in SYSTEM_KEYSPACES
+        ]
+
+    def resources(self, query):
+        return [r for r in super(DescribeKeyspaces, self).resources(query)
+                if r['keyspaceName'] not in SYSTEM_KEYSPACES]
+
 
 @resources.register('keyspace')
 class Keyspace(QueryResourceManager):
@@ -45,10 +55,6 @@ class Keyspace(QueryResourceManager):
     }
 
     def augment(self, resources):
-        resources = [
-            r for r in resources
-            if r['keyspaceName'] not in SYSTEM_KEYSPACES
-        ]
         client = local_session(self.session_factory).client(
             self.resource_type.service)
 
@@ -178,11 +184,6 @@ class Table(ChildResourceManager):
     ))
 
     def augment(self, resources):
-        resources = [
-            r for r in resources
-            if r['keyspaceName'] not in SYSTEM_KEYSPACES
-        ]
-
         client = local_session(self.session_factory).client(
             self.resource_type.service)
 

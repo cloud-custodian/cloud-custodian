@@ -7,12 +7,12 @@
         "creationTimestamp": {
             "__class__": "datetime",
             "year": 2025,
-            "month": 2,
-            "day": 24,
-            "hour": 14,
-            "minute": 54,
-            "second": 9,
-            "microsecond": 282000
+            "month": 5,
+            "day": 12,
+            "hour": 11,
+            "minute": 49,
+            "second": 47,
+            "microsecond": 570000
         },
         "status": "ACTIVE",
         "schemaDefinition": {
@@ -35,12 +35,12 @@
             "lastUpdateToPayPerRequestTimestamp": {
                 "__class__": "datetime",
                 "year": 2025,
-                "month": 2,
-                "day": 24,
-                "hour": 14,
-                "minute": 54,
-                "second": 9,
-                "microsecond": 282000
+                "month": 5,
+                "day": 12,
+                "hour": 11,
+                "minute": 49,
+                "second": 47,
+                "microsecond": 570000
             }
         },
         "encryptionSpecification": {
@@ -51,19 +51,57 @@
             "earliestRestorableTimestamp": {
                 "__class__": "datetime",
                 "year": 2025,
-                "month": 2,
-                "day": 26,
-                "hour": 15,
-                "minute": 52,
-                "second": 2,
-                "microsecond": 977000
+                "month": 5,
+                "day": 12,
+                "hour": 11,
+                "minute": 50,
+                "second": 11,
+                "microsecond": 39000
             }
         },
         "defaultTimeToLive": 0,
         "comment": {
             "message": ""
         },
-        "replicaSpecifications": [],
+        "clientSideTimestamps": {
+            "status": "ENABLED"
+        },
+        "replicaSpecifications": [
+            {
+                "region": "us-east-1",
+                "status": "ACTIVE",
+                "capacitySpecification": {
+                    "throughputMode": "PAY_PER_REQUEST",
+                    "lastUpdateToPayPerRequestTimestamp": {
+                        "__class__": "datetime",
+                        "year": 2025,
+                        "month": 5,
+                        "day": 12,
+                        "hour": 11,
+                        "minute": 49,
+                        "second": 47,
+                        "microsecond": 570000
+                    }
+                }
+            },
+            {
+                "region": "us-west-2",
+                "status": "CREATING",
+                "capacitySpecification": {
+                    "throughputMode": "PAY_PER_REQUEST",
+                    "lastUpdateToPayPerRequestTimestamp": {
+                        "__class__": "datetime",
+                        "year": 2025,
+                        "month": 5,
+                        "day": 12,
+                        "hour": 11,
+                        "minute": 49,
+                        "second": 47,
+                        "microsecond": 570000
+                    }
+                }
+            }
+        ],
         "ResponseMetadata": {}
     }
 }

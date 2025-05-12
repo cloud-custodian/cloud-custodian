@@ -11,12 +11,11 @@
         "replicationGroupStatuses": [
             {
                 "region": "us-east-1",
-                "keyspaceStatus": "ACTIVE"
+                "keyspaceStatus": "UPDATING"
             },
             {
                 "region": "us-west-2",
-                "keyspaceStatus": "ACTIVE",
-                "tablesReplicationProgress": "100.00%"
+                "keyspaceStatus": "CREATING"
             }
         ],
         "ResponseMetadata": {}

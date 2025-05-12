@@ -3,7 +3,22 @@
     "data": {
         "keyspaceName": "c7n_test",
         "resourceArn": "arn:aws:cassandra:us-east-1:644160558196:/keyspace/c7n_test/",
-        "replicationStrategy": "SINGLE_REGION",
+        "replicationStrategy": "MULTI_REGION",
+        "replicationRegions": [
+            "us-east-1",
+            "us-west-2"
+        ],
+        "replicationGroupStatuses": [
+            {
+                "region": "us-east-1",
+                "keyspaceStatus": "ACTIVE"
+            },
+            {
+                "region": "us-west-2",
+                "keyspaceStatus": "ACTIVE",
+                "tablesReplicationProgress": "100.00%"
+            }
+        ],
         "ResponseMetadata": {}
     }
 }
