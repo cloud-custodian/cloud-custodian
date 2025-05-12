@@ -1,8 +1,14 @@
 from c7n.actions import BaseAction
 from c7n.manager import resources
-from c7n.query import ChildResourceManager, DescribeSource, QueryResourceManager, TypeInfo
+from c7n.query import (
+    ChildDescribeSource,
+    ChildResourceManager,
+    DescribeWithResourceTags,
+    QueryResourceManager,
+    TypeInfo,
+)
 from c7n.resources.aws import shape_schema
-from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
+from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction, universal_augment
 from c7n.utils import get_retry, local_session, type_schema
 
 
@@ -14,7 +20,7 @@ SYSTEM_KEYSPACES = [
 ]
 
 
-class DescribeKeyspaces(DescribeSource):
+class DescribeKeyspaces(DescribeWithResourceTags):
 
     def get_permissions(self):
         perms = super().get_permissions()
@@ -23,12 +29,12 @@ class DescribeKeyspaces(DescribeSource):
 
     def get_resources(self, resource_ids, cache=True):
         return [
-            r for r in super(DescribeKeyspaces, self).get_resources(resource_ids, cache)
+            r for r in super().get_resources(resource_ids, cache)
             if r['keyspaceName'] not in SYSTEM_KEYSPACES
         ]
 
     def resources(self, query):
-        return [r for r in super(DescribeKeyspaces, self).resources(query)
+        return [r for r in super().resources(query)
                 if r['keyspaceName'] not in SYSTEM_KEYSPACES]
 
 
@@ -53,21 +59,6 @@ class Keyspace(QueryResourceManager):
     source_mapping = {
         'describe': DescribeKeyspaces,
     }
-
-    def augment(self, resources):
-        client = local_session(self.session_factory).client(
-            self.resource_type.service)
-
-        def _augment(r):
-            tags = self.retry(client.list_tags_for_resource,
-                resourceArn=r['resourceArn'])['tags']
-            r['Tags'] = [
-                {'Key': t['key'], 'Value': t['value']}
-                for t in tags
-            ]
-            return r
-        resources = super().augment(resources)
-        return list(map(_augment, resources))
 
 
 Keyspace.filter_registry.register('marked-for-op', TagActionFilter)
@@ -165,6 +156,25 @@ class DeleteKeyspace(BaseAction):
             )
 
 
+class DescribeTables(ChildDescribeSource):
+
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client(
+            self.manager.resource_type.service)
+
+        def _augment(r):
+            details = self.manager.retry(
+                client.get_table,
+                keyspaceName=r['keyspaceName'],
+                tableName=r['tableName']
+            )
+            r.update(details)
+            return r
+
+        resources = universal_augment(self.manager, super().augment(resources))
+        return list(map(_augment, resources))
+
+
 @resources.register('keyspace-table')
 class Table(ChildResourceManager):
 
@@ -182,28 +192,9 @@ class Table(ChildResourceManager):
     retry = staticmethod(get_retry(
         ("ConflictException", "InternalServerException",)
     ))
-
-    def augment(self, resources):
-        client = local_session(self.session_factory).client(
-            self.resource_type.service)
-
-        def _augment(r):
-            details = self.retry(
-                client.get_table,
-                keyspaceName=r['keyspaceName'],
-                tableName=r['tableName']
-            )
-            r.update(details)
-
-            tags = self.retry(client.list_tags_for_resource,
-                resourceArn=r['resourceArn'])['tags']
-            r['Tags'] = [
-                {'Key': t['key'], 'Value': t['value']}
-                for t in tags
-            ]
-            return r
-        resources = super().augment(resources)
-        return list(map(_augment, resources))
+    source_mapping = {
+        'describe-child': DescribeTables,
+    }
 
 
 @Table.action_registry.register('tag')

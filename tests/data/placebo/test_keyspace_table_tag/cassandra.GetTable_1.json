@@ -9,10 +9,10 @@
             "year": 2025,
             "month": 5,
             "day": 12,
-            "hour": 11,
-            "minute": 49,
-            "second": 47,
-            "microsecond": 570000
+            "hour": 14,
+            "minute": 54,
+            "second": 42,
+            "microsecond": 398000
         },
         "status": "ACTIVE",
         "schemaDefinition": {
@@ -37,10 +37,10 @@
                 "year": 2025,
                 "month": 5,
                 "day": 12,
-                "hour": 11,
-                "minute": 49,
-                "second": 47,
-                "microsecond": 570000
+                "hour": 14,
+                "minute": 54,
+                "second": 42,
+                "microsecond": 398000
             }
         },
         "encryptionSpecification": {
@@ -53,10 +53,10 @@
                 "year": 2025,
                 "month": 5,
                 "day": 12,
-                "hour": 11,
-                "minute": 50,
-                "second": 11,
-                "microsecond": 39000
+                "hour": 15,
+                "minute": 30,
+                "second": 1,
+                "microsecond": 728000
             }
         },
         "defaultTimeToLive": 0,
@@ -77,10 +77,27 @@
                         "year": 2025,
                         "month": 5,
                         "day": 12,
-                        "hour": 11,
-                        "minute": 49,
-                        "second": 47,
-                        "microsecond": 570000
+                        "hour": 14,
+                        "minute": 54,
+                        "second": 42,
+                        "microsecond": 398000
+                    }
+                }
+            },
+            {
+                "region": "us-west-2",
+                "status": "ACTIVE",
+                "capacitySpecification": {
+                    "throughputMode": "PAY_PER_REQUEST",
+                    "lastUpdateToPayPerRequestTimestamp": {
+                        "__class__": "datetime",
+                        "year": 2025,
+                        "month": 5,
+                        "day": 12,
+                        "hour": 14,
+                        "minute": 54,
+                        "second": 42,
+                        "microsecond": 398000
                     }
                 }
             }

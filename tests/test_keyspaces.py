@@ -87,7 +87,7 @@ class TestKeyspaceTable(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         client = local_session(factory).client('keyspaces')
-        tags = client.list_tags_for_resource(resourceArn=resources[0]['resourceArn'])["tags"]
+        tags = client.list_tags_for_resource(resourceArn=resources[0]['resourceArn'])['tags']
         self.assertEqual(tags[0]["key"], "TestTag")
 
         p = self.load_policy({
@@ -96,11 +96,11 @@ class TestKeyspaceTable(BaseTest):
             'filters': [{"tag:TestTag": "c7n"}],
             'actions': [
                 {'type': 'remove-tag',
-                 'tags': ["TestTag"]},]},
+                 'tags': ['TestTag']},]},
             session_factory=factory,)
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        tags = client.list_tags_for_resource(resourceArn=resources[0]['resourceArn'])["tags"]
+        tags = client.list_tags_for_resource(resourceArn=resources[0]['resourceArn'])['tags']
         self.assertEqual(len(tags), 0)
 
     def test_keyspace_table_update(self):

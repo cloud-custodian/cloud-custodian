@@ -15,7 +15,8 @@
             },
             {
                 "region": "us-west-2",
-                "keyspaceStatus": "CREATING"
+                "keyspaceStatus": "CREATING",
+                "tablesReplicationProgress": "0.00%"
             }
         ],
         "ResponseMetadata": {}
