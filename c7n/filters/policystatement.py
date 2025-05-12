@@ -3,7 +3,14 @@
 import json
 
 from .core import Filter
-from c7n.utils import type_schema, format_string_values, merge_dict
+from c7n.utils import (
+    type_schema,
+    format_string_values,
+    merge_dict,
+    compare_dicts_using_sets,
+    format_to_set,
+    format_dict_with_sets
+)
 
 
 class HasStatementFilter(Filter):
@@ -124,28 +131,6 @@ class HasStatementFilter(Filter):
             actionsFormatted = [action.lower() for action in actions]
         return set(actionsFormatted)
 
-    # case-sensitive, removes ordering in lists
-    def format_principal(self, principal):
-        if isinstance(principal, dict):
-            format_principal = {}
-            for key, value in principal.items():
-                if isinstance(value, str):
-                    format_principal[key] = set([value])
-                else:
-                    format_principal[key] = set(value)
-            return format_principal
-        else:
-            return principal
-
-    # case-sensitive, removes ordering in lists
-    def format_resource(self, resource):
-        if isinstance(resource, str):
-            return set([resource])
-        elif isinstance(resource, list):
-            return set(resource)
-        else:
-            return resource
-
     def __get_matched_statements(self, required_stmts, resource_stmts):
         matched_statements = []
         for required_statement in required_stmts:
@@ -174,18 +159,20 @@ class HasStatementFilter(Filter):
                             found += 1
 
                     else:
-                        if req_key in ['Principal', 'NotPrincipal'] and \
-                            req_key in resource_statement:
-                            req_value = self.format_principal(req_value)
-                            resource_statement[req_key] = self.format_principal(
-                                resource_statement[req_key]
-                            )
-                        elif req_key in ['Resource', 'NotResource'] and \
-                            req_key in resource_statement:
-                            req_value = self.format_resource(req_value)
-                            resource_statement[req_key] = self.format_resource(
-                                resource_statement[req_key]
-                            )
+                        if req_key in resource_statement:
+                            if isinstance(req_value, dict):
+                                req_value = format_dict_with_sets(req_value)
+                            else:
+                                req_value = format_to_set(req_value)
+
+                            if isinstance(resource_statement[req_key], dict):
+                                resource_statement[req_key] = format_dict_with_sets(
+                                    resource_statement[req_key]
+                                    )
+                            else:
+                                resource_statement[req_key] = format_to_set(
+                                    resource_statement[req_key]
+                                )
 
                         # If req_key is not a partial_match element,
                         # do a regular full value match for a given req_value
@@ -214,9 +201,12 @@ class HasStatementFilter(Filter):
             elif isinstance(partial_match_value, set):
                 return partial_match_value.issubset(resource_stmt_value)
             elif isinstance(partial_match_value, dict):
-                return merge_dict(
-                    resource_stmt_value, partial_match_value
-                ) == resource_stmt_value
+                merged_stmts = merge_dict(
+                    partial_match_value, resource_stmt_value
+                    )
+                return compare_dicts_using_sets(
+                    merged_stmts, resource_stmt_value
+                )
             else:
                 return partial_match_value in resource_stmt_value
         else:

@@ -196,65 +196,156 @@ class UtilTest(BaseTest):
                      'userName': [
                          {'anything-but': 'deputy'}]}}})
 
-    def test_iam_dict_merge(self):
+    def test_merge_dict_iam_condition(self):
         a = {
-            "Sid": "Stmt1",
-            "Action": [
-                "s3:PutObject"
-            ],
-            "Effect": "Allow",
-            "Principal": "*",
-            "Resource": "arn:aws:s3:::cross-account-valid/*",
-            "Condition": {
-                "ArnLike": {
-                    "aws:SourceArn": "arn:aws:sns:us-east-1:123456789012"
-                },
-                "StringEquals": {
-                    "aws:sourceVpc": "vpc-12345678",
-                    "sns:Protocol": [
-                        "email"
-                    ]
-                }
-            }}
-        b = {
-            "Sid": "Stmt2",
-            "Effect": "Deny",
-            "Action": "s3:DeleteObject",
-            "Principal": {
-                "AWS": "*"
+            "Bool": {
+                "aws:SecureTransport": "true",
             },
-            "Resource": "arn:aws:sns:us-east-2:644160558196:MyTopic",
-            "Condition": {
-                "StringEquals": {
-                    "sns:Protocol": [
-                        "https"
-                    ]
-                }
-            }}
+            "StringNotLike": {
+                "aws": "abc"
+            },
+            "StringEquals": {
+                "aws:PrincipalType": "AssumedRole"
+            }
+            }
+        b = {
+            "StringNotLike": {
+                "aws": "def"
+            },
+            "Bool": {
+                "elasticfilesystem:AccessedViaMountTarget": "true",
+                "aws:SecureTransport": "false"
+            },
+            "StringEquals": {
+                "aws:PrincipalType": [
+                    "AssumedRole",
+                    "User",
+                    "Account"
+                ]
+            }
+            }
+
         self.assertEqual(
             utils.merge_dict(a, b),
             {
-                "Sid": "Stmt2",
-                "Effect": "Deny",
-                "Action": [
-                    "s3:PutObject",
-                    "s3:DeleteObject"
-                ],
-                "Principal": "*",
-                "Resource": "arn:aws:sns:us-east-2:644160558196:MyTopic",
-                "Condition": {
-                    "ArnLike": {
-                        "aws:SourceArn": "arn:aws:sns:us-east-1:123456789012"
-                    },
-                    "StringEquals": {
-                        "aws:sourceVpc": "vpc-12345678",
-                        "sns:Protocol": [
-                            "email",
-                            "https"
-                        ]
-                    }
+                "Bool": {
+                    "aws:SecureTransport": "true",
+                    "elasticfilesystem:AccessedViaMountTarget": "true",
+                },
+                "StringNotLike": {
+                    "aws": "abc"
+                },
+                "StringEquals": {
+                    "aws:PrincipalType": [
+                        "AssumedRole",
+                        "User",
+                        "Account"
+                    ]
                 }
             })
+
+    def test_compare_dicts_using_sets(self):
+        a = {
+                "Bool": {
+                    "aws:SecureTransport": "true",
+                    "elasticfilesystem:AccessedViaMountTarget": "true",
+                },
+                "StringNotLike": {
+                    "aws": "abc"
+                },
+                "StringEquals": {
+                    "aws:PrincipalType": [
+                        "AssumedRole",
+                        "User",
+                        "Account"
+                    ]
+                },
+                "StringNotEquals": {
+                    "aws:PrincipalType": [
+                        "Anonymous",
+                        "User"
+                    ]
+                }
+            }
+        b = {
+            "StringNotLike": {
+                "aws": ["abc"]
+            },
+            "Bool": {
+                "elasticfilesystem:AccessedViaMountTarget": "true",
+                "aws:SecureTransport": "true"
+            },
+            "StringEquals": {
+                "aws:PrincipalType": [
+                    "User",
+                    "AssumedRole",
+                    "Account"
+                ]
+            },
+            "StringNotEquals": {
+                "aws:PrincipalType": [
+                    "Anonymous",
+                    "User"
+                ]
+            }
+            }
+        self.assertTrue(utils.compare_dicts_using_sets(a, b))
+
+    def test_format_to_set(self):
+        self.assertEqual(utils.format_to_set("abcd"), {"abcd"})
+        self.assertEqual(utils.format_to_set(["abc", "def"]), {"abc", "def"})
+        self.assertEqual(utils.format_to_set(123), 123)
+        self.assertEqual(utils.format_to_set(True), True)
+        self.assertEqual(utils.format_to_set(False), False)
+
+    def test_format_dict_with_sets(self):
+        a = {
+                "Bool": {
+                    "aws:SecureTransport": "true",
+                    "elasticfilesystem:AccessedViaMountTarget": "true",
+                },
+                "StringNotLike": {
+                    "aws": "abc"
+                },
+                "StringEquals": {
+                    "aws:PrincipalType": [
+                        "AssumedRole",
+                        "User",
+                        "Account"
+                    ]
+                },
+                "StringNotEquals": {
+                    "aws:PrincipalType": [
+                        "Anonymous",
+                        "User"
+                    ]
+                }
+            }
+        self.assertEqual(utils.format_dict_with_sets(a),
+            {
+                "Bool": {
+                    "aws:SecureTransport": {"true"},
+                    "elasticfilesystem:AccessedViaMountTarget": {"true"},
+                },
+                "StringNotLike": {
+                    "aws": {"abc"}
+                },
+                "StringEquals": {
+                    "aws:PrincipalType": {
+                        "AssumedRole",
+                        "User",
+                        "Account"
+                    }
+                },
+                "StringNotEquals": {
+                    "aws:PrincipalType": {
+                        "Anonymous",
+                        "User"
+                    }
+                }
+            }
+            )
+        self.assertEqual(utils.format_dict_with_sets("abc"), "abc")
 
     def test_local_session_region(self):
         policies = [
