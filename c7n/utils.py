@@ -830,8 +830,8 @@ def merge_dict(a, b):
     for k, v in b.items():
         if k not in d:
             d[k] = v
-        elif isinstance(d[k], dict) and isinstance(b[k], dict):
-            d[k] = merge_dict(d[k], b[k])
+        elif isinstance(d[k], dict) and isinstance(v, dict):
+            d[k] = merge_dict(d[k], v)
         elif isinstance(d[k], list) and isinstance(b[k], list):
             for val in v:
                 if val not in d[k]:
