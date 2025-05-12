@@ -394,6 +394,7 @@ class MetricsOutput(Metrics):
         super(MetricsOutput, self).__init__(ctx, config)
         self.namespace = self.config.get('namespace', DEFAULT_NAMESPACE)
         self.region = self.config.get('region')
+        self.profile = self.config.get('profile')
         self.ignore_zero = self.config.get('ignore_zero')
         am = self.config.get('active_metrics')
         self.active_metrics = am and am.split(',')
@@ -426,7 +427,7 @@ class MetricsOutput(Metrics):
     def _put_metrics(self, ns, metrics):
         if self.destination == 'master':
             watch = self.ctx.session_factory(
-                assume=False).client('cloudwatch', region_name=self.region)
+                assume=False, profile=self.profile).client('cloudwatch', region_name=self.region)
         else:
             watch = utils.local_session(
                 self.ctx.session_factory).client('cloudwatch', region_name=self.region)
