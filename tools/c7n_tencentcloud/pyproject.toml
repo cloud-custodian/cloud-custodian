@@ -1,31 +1,29 @@
-[tool.poetry]
+[project]
+authors = [
+    {name = "Tencent Cloud"},
+]
+license = {text = "Apache-2.0"}
+requires-python = "<4.0.0,>=3.9.2"
+dependencies = [
+    "c7n",
+    "pytz>=2022.1",
+    "retrying<2.0.0,>=1.3.3",
+    "tencentcloud-sdk-python<4.0.0,>=3.0.783",
+    "cos-python-sdk-v5<2.0.0,>=1.9.21",
+    "freezegun<2.0.0,>=1.5.1",
+    "urllib3<1.27,>=1.25.4",
+]
 name = "c7n_tencentcloud"
 version = "0.1.26"
 description = "Cloud Custodian - Tencent Cloud Provider"
-authors = ["Tencent Cloud"]
-license = "Apache-2.0"
-homepage = "https://cloudcustodian.io"
-documentation = "https://cloudcustodian.io/docs"
 readme = "readme.md"
 
-[tool.poetry.urls]
+[project.urls]
 "Bug Tracker" = "https://github.com/cloud-custodian/cloud-custodian/issues"
+homepage = "https://cloudcustodian.io"
+documentation = "https://cloudcustodian.io/docs"
 
-[tool.poetry.dependencies]
-python = ">=3.9.2,<4.0.0"
-c7n = {path = "../..", develop = true}
-
-pytz = ">=2022.1"
-retrying = "^1.3.3"
-tencentcloud-sdk-python = "^3.0.783"
-cos-python-sdk-v5 = "^1.9.21"
-freezegun = "^1.5.1"
-# workaround for: https://github.com/python-poetry/poetry-plugin-export/issues/183
-urllib3 = ">=1.25.4,<1.27"
-
-[tool.poetry.group.dev.dependencies]
-pytest = "<8.0"
-
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+[dependency-groups]
+dev = [
+    "pytest<8.0",
+]

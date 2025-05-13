@@ -61,6 +61,17 @@ addons = [
     "psutil>=5.7",
 ]
 
+[tool.uv.sources]
+c7n = { workspace = true }
+
+[tool.uv.workspace]
+members = [
+  "tools/c7n_azure",
+  "tools/c7n_gcp",
+  "tools/c7n_org",
+  "tools/c7n_tencentcloud"
+]
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"

@@ -25,9 +25,6 @@ classifiers = [
     "Topic :: System :: Distributed Computing",
 ]
 
-[tool.uv.sources]
-c7n = { path = "../.." }
-
 [project.urls]
 homepage = "https://cloudcustodian.io"
 repository = "https://github.com/cloud-custodian/cloud-custodian"
