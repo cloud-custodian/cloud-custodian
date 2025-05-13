@@ -867,10 +867,10 @@ def get_service_region_map(regions, resource_types, provider='aws'):
     resource_service_map = {
         r: clouds[provider].resources.get(r).resource_type.service
         for r in normalized_types if r != 'account'}
-    # support for govcloud, china, and iso. We only utilize these regions if they
-    # are explicitly passed in on the cli.
+    # support for non standard aws partitions (China, GovCloud and ADCs).
+    # We only utilize these regions if they are explicitly passed in on the cli.
     partition_regions = {}
-    for p in ('aws-cn', 'aws-us-gov', 'aws-iso'):
+    for p in session.get_available_partitions():
         for r in session.get_available_regions('s3', partition_name=p):
             partition_regions[r] = p
 
