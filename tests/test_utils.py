@@ -210,7 +210,7 @@ class UtilTest(BaseTest):
             "StringLike": {
                 "aws": ["def", "ghi"]
             },
-            "StringNotLike": {
+            "StringNotLikeIfExists": {
                 "aws": "tsr"
             }
             }
@@ -232,7 +232,7 @@ class UtilTest(BaseTest):
             "StringLike": {
                 "aws": "abc"
             },
-            "StringNotLike": {
+            "StringNotLikeIfExists": {
                 "aws": ["zyx", "wvu"]
             }
             }
@@ -257,11 +257,12 @@ class UtilTest(BaseTest):
                 "StringLike": {
                     "aws": ["def", "ghi", "abc"]
                 },
-                "StringNotLike": {
-                    "aws": ["tsr","zyx", "wvu"]
+                "StringNotLikeIfExists": {
+                    "aws": ["tsr", "zyx", "wvu"]
                 }
             }
         )
+
     def test_merge_dict_exception(self):
 
         a = {
@@ -271,8 +272,7 @@ class UtilTest(BaseTest):
             "a": {"abc": 123}
         }
         with self.assertRaises(Exception):
-            utils.merge_dict(a,b)
-
+            utils.merge_dict(a, b)
 
     def test_compare_dicts_using_sets(self):
         a = {
