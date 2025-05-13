@@ -295,6 +295,9 @@ class UtilTest(BaseTest):
                         "Anonymous",
                         "User"
                     ]
+                },
+                "StringNotLikeIfExists": {
+                    "aws": ["zyx"]
                 }
             }
         b = {
@@ -317,9 +320,20 @@ class UtilTest(BaseTest):
                     "Anonymous",
                     "User"
                 ]
+            },
+            "StringNotLikeIfExists": {
+                "aws": "zyx"
             }
             }
         self.assertTrue(utils.compare_dicts_using_sets(a, b))
+
+    def test_compare_dicts_using_sets_false(self):
+        a = {"a": "abc"}
+        b = {"b": "cde"}
+        self.assertFalse(utils.compare_dicts_using_sets(a, b))
+
+        c = {"a": "bcd"}
+        self.assertFalse(utils.compare_dicts_using_sets(a, c))
 
     def test_format_to_set(self):
         self.assertEqual(utils.format_to_set("abcd"), {"abcd"})
