@@ -1,38 +1,41 @@
-[tool.poetry]
+[project]
+authors = [
+    {name = "Cloud Custodian Project"},
+]
+license = {text = "Apache-2.0"}
+requires-python = "<4.0.0,>=3.9.2"
+dependencies = [
+    "c7n",
+    "retrying<2.0.0,>=1.3.3",
+    "google-api-python-client<3.0,>=2.0",
+    "google-cloud-logging<4.0,>=3.2",
+    "google-auth<3.0.0,>=2.1.0",
+    "google-cloud-monitoring<3.0.0,>=2.5.0",
+    "google-cloud-storage<3.0,>=2.7",
+    "pyrate-limiter<3.0.0,>=2.8.4",
+    "urllib3<1.27,>=1.25.4",
+]
 name = "c7n_gcp"
 version = "0.4.43"
 description = "Cloud Custodian - Google Cloud Provider"
 readme = "readme.md"
+classifiers = [
+    "License :: OSI Approved :: Apache Software License",
+    "Topic :: System :: Systems Administration",
+    "Topic :: System :: Distributed Computing",
+]
+
+[tool.uv.sources]
+c7n = { path = "../.." }
+
+[project.urls]
 homepage = "https://cloudcustodian.io"
 repository = "https://github.com/cloud-custodian/cloud-custodian"
 documentation = "https://cloudcustodian.io/docs/"
-authors = ["Cloud Custodian Project"]
-license = "Apache-2.0"
-classifiers = [
-   "License :: OSI Approved :: Apache Software License",
-   "Topic :: System :: Systems Administration",
-   "Topic :: System :: Distributed Computing"
+
+[dependency-groups]
+dev = [
+    "freezegun<2.0.0,>=1.2.2",
+    "pytest<8.0",
+    "pytest-terraform<1.0.0,>=0.7.0",
 ]
-
-[tool.poetry.dependencies]
-python = ">=3.9.2,<4.0.0"
-c7n = {path = "../..", develop = true}
-
-retrying = "^1.3.3"
-google-api-python-client = "^2.0"
-google-cloud-logging = "^3.2"
-google-auth = "^2.1.0"
-google-cloud-monitoring = "^2.5.0"
-google-cloud-storage = "^2.7"
-pyrate-limiter = "^2.8.4"
-# workaround for: https://github.com/python-poetry/poetry-plugin-export/issues/183
-urllib3 = ">=1.25.4,<1.27"
-
-[tool.poetry.group.dev.dependencies]
-freezegun = "^1.2.2"
-pytest = "<8.0"
-pytest-terraform = "^0.7.0"
-
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
