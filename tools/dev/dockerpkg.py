@@ -98,11 +98,10 @@ RUN mkdir /output
 BUILD_STAGE = BOOTSTRAP_STAGE + """\
 # Add core & aws packages
 ADD pyproject.toml poetry.lock README.md /src/
-RUN . /usr/local/bin/activate && pip install -qU pip wheel aws-xray-sdk psutil jsonpatch
 
 # Ignore root first pass so if source changes we don't have to invalidate
 # dependency install
-RUN . /usr/local/bin/activate && poetry install --without dev --no-root
+RUN . /usr/local/bin/activate && poetry install --with addons --without dev --no-root
 
 # Now install the root package, we used to do this after dependencies of other providers
 # but since moving c7n to a main dependency in pyproject toml we have to do this one first.
