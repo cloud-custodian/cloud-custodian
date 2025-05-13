@@ -1,26 +1,29 @@
-[tool.poetry]
+[project]
+authors = [
+    {name = "Cloud Custodian Project"},
+]
+license = {text = "Apache-2.0"}
+requires-python = "<4.0.0,>=3.9.2"
+dependencies = [
+    "c7n",
+    "oci<3.0,>=2.106",
+]
 name = "c7n_oci"
 version = "0.1.18"
 description = "Cloud Custodian - OCI Support"
 readme = "readme.md"
-homepage="https://cloudcustodian.io"
-repository="https://github.com/cloud-custodian/cloud-custodian"
-documentation="https://cloudcustodian.io/docs/"
-authors = ["Cloud Custodian Project"]
-license = "Apache-2.0"
-classifiers=[
-   "License :: OSI Approved :: Apache Software License",
-   "Topic :: System :: Systems Administration",
-   "Topic :: System :: Distributed Computing"
+classifiers = [
+    "License :: OSI Approved :: Apache Software License",
+    "Topic :: System :: Systems Administration",
+    "Topic :: System :: Distributed Computing",
 ]
 
-[tool.poetry.dependencies]
-python = ">=3.9.2,<4.0.0"
-oci = "^2.106"
+[project.urls]
+homepage = "https://cloudcustodian.io"
+repository = "https://github.com/cloud-custodian/cloud-custodian"
+documentation = "https://cloudcustodian.io/docs/"
 
-[tool.poetry.group.dev.dependencies]
-pytest = "<8.0"
-
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+[dependency-groups]
+dev = [
+    "pytest<8.0",
+]
