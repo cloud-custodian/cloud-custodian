@@ -206,6 +206,9 @@ class UtilTest(BaseTest):
             },
             "StringEquals": {
                 "aws:PrincipalType": "AssumedRole"
+            },
+            "StringLike": {
+                "aws": ["def", "ghi"]
             }
             }
         b = {
@@ -222,6 +225,9 @@ class UtilTest(BaseTest):
                     "User",
                     "Account"
                 ]
+            },
+            "StringLike": {
+                "aws": "abc"
             }
             }
 
@@ -241,6 +247,9 @@ class UtilTest(BaseTest):
                         "User",
                         "Account"
                     ]
+                },
+                "StringLike": {
+                    "aws": ["def", "ghi", "abc"]
                 }
             })
 
