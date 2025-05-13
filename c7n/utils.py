@@ -836,14 +836,13 @@ def merge_dict(a, b):
             for val in v:
                 if val not in d[k]:
                     d[k].append(val)
-        elif k in d and not isinstance(v, type(d[k])):
-            if isinstance(v, str) and isinstance(d[k], list) and v not in d[k]:
-                d[k].append(v)
-            elif isinstance(v, list) and isinstance(d[k], str) and d[k] in v:
-                d[k] = v
-            elif isinstance(v, list) and isinstance(d[k], str) and d[k] not in v:
-                v.insert(0, d[k])
-                d[k] = v
+        elif isinstance(v, str) and isinstance(d[k], list) and v not in d[k]:
+            d[k].append(v)
+        elif isinstance(v, list) and isinstance(d[k], str) and d[k] in v:
+            d[k] = v
+        elif isinstance(v, list) and isinstance(d[k], str) and d[k] not in v:
+            v.insert(0, d[k])
+            d[k] = v
         elif k in d and isinstance(v, (int, str, float, bool)):
             continue
         else:
