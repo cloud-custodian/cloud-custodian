@@ -47,7 +47,10 @@ RUN rm -Rf /home/nonroot/.local/lib/python${PY_VERSION}/site-packages/pip*
 COPY --from=builder /app/c7n/c7n /app/c7n
 COPY --from=builder /app/c7n/tools/c7n_left /app/c7n/tools/c7n_left
 
+USER nonroot
+
 ENV LC_ALL="C.UTF-8" LANG="C.UTF-8"
 ENV PYTHONPATH=/app:/app/c7n/tools/c7n_left:/home/nonroot/.local/lib/python${PY_VERSION}/site-packages
+
 
 ENTRYPOINT [ "python", "-m", "c7n_left.cli"]
