@@ -56,6 +56,9 @@ pytest-recording = ">=0.12.1,<0.14.0"
 moto = "^5.0"
 openapi-spec-validator = "^0.7.1"
 
+[tool.poetry.group.addons]
+optional = true
+
 [tool.poetry.group.addons.dependencies]
 
 aws-xray-sdk = "^2.14"
