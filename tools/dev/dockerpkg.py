@@ -65,7 +65,7 @@ BOOTSTRAP_STAGE = """\
 # Dockerfiles are generated from tools/dev/dockerpkg.py
 FROM {base_build_image} AS build-env
 
-ARG POETRY_VERSION="1.8.3"
+ARG POETRY_VERSION="2.1.3"
 SHELL ["/bin/bash", "-c"]
 
 # pre-requisite distro deps, and build env setup
