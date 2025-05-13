@@ -209,6 +209,9 @@ class UtilTest(BaseTest):
             },
             "StringLike": {
                 "aws": ["def", "ghi"]
+            },
+            "StringNotLike": {
+                "aws": "tsr"
             }
             }
         b = {
@@ -228,6 +231,9 @@ class UtilTest(BaseTest):
             },
             "StringLike": {
                 "aws": "abc"
+            },
+            "StringNotLike": {
+                "aws": ["zyx", "wvu"]
             }
             }
 
@@ -250,8 +256,12 @@ class UtilTest(BaseTest):
                 },
                 "StringLike": {
                     "aws": ["def", "ghi", "abc"]
+                },
+                "StringNotLike": {
+                    "aws": ["tsr","zyx", "wvu"]
                 }
-            })
+            }
+        )
 
     def test_compare_dicts_using_sets(self):
         a = {
