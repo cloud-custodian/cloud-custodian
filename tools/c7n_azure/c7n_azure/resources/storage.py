@@ -12,7 +12,7 @@ from azure.storage.common.models import Logging, RetentionPolicy
 from azure.storage.file import FileService
 from azure.storage.queue import QueueServiceClient
 from c7n.exceptions import PolicyValidationError
-from c7n.filters.core import type_schema
+from c7n.filters.core import type_schema, ListItemFilter
 from c7n.utils import get_annotation_prefix, local_session
 from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.actions.firewall import SetFirewallAction
@@ -179,6 +179,52 @@ class StorageSetFirewallAction(SetFirewallAction):
             resource['resourceGroup'],
             resource['name'],
             StorageAccountUpdateParameters(network_rule_set=rule_set))
+
+
+@Storage.filter_registry.register("management-policy-rules")
+class StorageAccountManagementPolicyRulesFilter(ListItemFilter):
+    """
+    Filter Storage Accounts based on their management policy rules
+
+    :example:
+
+    Find storage accounts where lifecycle policy configured to remove base Blob
+    after less or equal than 3 days
+
+    .. code-block:: yaml
+
+        policies:
+          - name: storage-delete-blob-le-3-days
+            resource: azure.storage
+            filters:
+              - type: management-policy-rules
+                attrs:
+                  - type: value
+                    key: definition.actions.baseBlob.delete.daysAfterModificationGreaterThan
+                    value: 3
+                    op: le
+
+    """
+    schema = type_schema(
+        "management-policy-rules",
+        attrs={"$ref": "#/definitions/filters_common/list_item_attrs"},
+        count={"type": "number"},
+        count_op={"$ref": "#/definitions/filters_common/comparison_operators"}
+    )
+    item_annotation_key = "c7n:management-policy-rules"
+    annotate_items = True
+
+    def get_item_values(self, resource):
+        try:
+            item = self.manager.get_client().management_policies.get(
+                resource_group_name=resource["resourceGroup"],
+                account_name=resource["name"],
+                management_policy_name="default"
+            )
+            return item.serialize(True)["properties"]["policy"].get("rules", [])
+        except Exception as e:  # azure.core.exceptions.ResourceNotFoundError
+            self.log.error(e)
+            return []  # no rules
 
 
 @Storage.filter_registry.register('firewall-rules')
@@ -528,11 +574,25 @@ class RequireSecureTransferAction(AzureBaseAction):
               actions:
               - type: require-secure-transfer
                 value: True
+
+    You can also set the minimum tls version on a bucket,
+    valid values: TLS1_0, TLS1_1, TLS1_2:
+
+    .. code-block:: yaml
+
+        policies:
+            - name: require-secure-transfer-with-tls-v1-2
+              resource: azure.storage
+              actions:
+              - type: require-secure-transfer
+                value: True
+                minimum_tls_version: TLS1_2
     """
 
     # Default to true assuming user wants secure connection
     schema = type_schema(
         'require-secure-transfer',
+        minimum_tls_version={"type": "string"},
         **{
             'value': {'type': 'boolean', "default": True},
         })
@@ -544,10 +604,18 @@ class RequireSecureTransferAction(AzureBaseAction):
         self.client = self.manager.get_client()
 
     def _process_resource(self, resource):
+        kwargs = {
+            "enable_https_traffic_only": self.data.get("value")
+        }
+
+        if self.data.get("minimum_tls_version"):
+            kwargs["minimum_tls_version"] = self.data.get("minimum_tls_version")
+
+        update_params = StorageAccountUpdateParameters(**kwargs)
         self.client.storage_accounts.update(
             resource['resourceGroup'],
             resource['name'],
-            StorageAccountUpdateParameters(enable_https_traffic_only=self.data.get('value'))
+            update_params,
         )
 
 

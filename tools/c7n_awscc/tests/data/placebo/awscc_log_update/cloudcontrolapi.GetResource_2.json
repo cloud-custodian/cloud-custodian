@@ -1,0 +1,11 @@
+{
+    "status_code": 200,
+    "data": {
+        "TypeName": "AWS::Logs::LogGroup",
+        "ResourceDescription": {
+            "Identifier": "/aws/codebuild/custodian-build-python",
+            "Properties": "{\"FieldIndexPolicies\":[],\"RetentionInDays\":7,\"LogGroupClass\":\"STANDARD\",\"LogGroupName\":\"/aws/codebuild/custodian-build-python\",\"Arn\":\"arn:aws:logs:us-east-1:644160558196:log-group:/aws/codebuild/custodian-build-python:*\",\"Tags\":[{\"Value\":\"Kapil\",\"Key\":\"Owner\"}],\"DataProtectionPolicy\":{}}"
+        },
+        "ResponseMetadata": {}
+    }
+}

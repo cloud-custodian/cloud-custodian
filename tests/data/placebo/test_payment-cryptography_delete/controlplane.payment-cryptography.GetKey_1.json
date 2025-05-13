@@ -1,0 +1,61 @@
+{
+    "status_code": 200,
+    "data": {
+        "Key": {
+            "KeyArn": "arn:aws:payment-cryptography:us-east-1:111111111111:key/abcderkydbkw7ypi",
+            "KeyAttributes": {
+                "KeyUsage": "TR31_C0_CARD_VERIFICATION_KEY",
+                "KeyClass": "SYMMETRIC_KEY",
+                "KeyAlgorithm": "TDES_2KEY",
+                "KeyModesOfUse": {
+                    "Encrypt": false,
+                    "Decrypt": false,
+                    "Wrap": false,
+                    "Unwrap": false,
+                    "Generate": true,
+                    "Sign": false,
+                    "Verify": true,
+                    "DeriveKey": false,
+                    "NoRestrictions": false
+                }
+            },
+            "KeyCheckValue": "593703",
+            "KeyCheckValueAlgorithm": "ANSI_X9_24",
+            "Enabled": true,
+            "Exportable": true,
+            "KeyState": "DELETE_PENDING",
+            "KeyOrigin": "AWS_PAYMENT_CRYPTOGRAPHY",
+            "CreateTimestamp": {
+                "__class__": "datetime",
+                "year": 2024,
+                "month": 11,
+                "day": 7,
+                "hour": 15,
+                "minute": 28,
+                "second": 59,
+                "microsecond": 850000
+            },
+            "UsageStartTimestamp": {
+                "__class__": "datetime",
+                "year": 2024,
+                "month": 11,
+                "day": 7,
+                "hour": 15,
+                "minute": 28,
+                "second": 59,
+                "microsecond": 829000
+            },
+            "DeletePendingTimestamp": {
+                "__class__": "datetime",
+                "year": 2024,
+                "month": 11,
+                "day": 20,
+                "hour": 13,
+                "minute": 20,
+                "second": 30,
+                "microsecond": 695000
+            }
+        },
+        "ResponseMetadata": {}
+    }
+}

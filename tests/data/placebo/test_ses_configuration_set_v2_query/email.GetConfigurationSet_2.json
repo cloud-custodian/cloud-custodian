@@ -1,0 +1,24 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "ConfigurationSetName": "test-c7n-shared-pool",
+        "DeliveryOptions": {
+            "TlsPolicy": "REQUIRE",
+            "SendingPoolName": "ses-shared-pool"
+        },
+        "ReputationOptions": {
+            "ReputationMetricsEnabled": true
+        },
+        "SendingOptions": {
+            "SendingEnabled": true
+        },
+        "Tags": [],
+        "SuppressionOptions": {
+            "SuppressedReasons": [
+                "BOUNCE",
+                "COMPLAINT"
+            ]
+        }
+    }
+}

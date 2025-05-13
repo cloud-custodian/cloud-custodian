@@ -589,7 +589,9 @@ class RDSClusterSnapshotTest(BaseTest):
             {1, 0})
 
     def test_rdscluster_snapshot_cross_account(self):
-        session_factory = self.replay_flight_data('test_rds_cluster_snapshot_cross_account')
+        session_factory = self.replay_flight_data(
+            'test_rds_cluster_snapshot_cross_account_everyone_only'
+        )
         p = self.load_policy(
             {
                 'name': 'rdscluster-snapshot-xaccount',
@@ -599,9 +601,31 @@ class RDSClusterSnapshotTest(BaseTest):
             },
             session_factory=session_factory)
         resources = p.run()
+        violations = {
+            r["DBClusterSnapshotIdentifier"]: r["c7n:CrossAccountViolations"]
+            for r in resources
+        }
+        self.assertEqual(len(violations), 2)
+        self.assertEqual(violations["c7n-testing-public"], ["all"])
+        self.assertEqual(violations["c7n-testing-shared"], ['111111111111'])
+
+    def test_rdscluster_snapshot_cross_account_everyone_only(self):
+        session_factory = self.replay_flight_data(
+            'test_rds_cluster_snapshot_cross_account_everyone_only'
+        )
+        p = self.load_policy(
+            {
+                'name': 'rdscluster-snapshot-xaccount-everyone',
+                'resource': 'aws.rds-cluster-snapshot',
+                'filters': [
+                    {'type': 'cross-account',
+                     'everyone_only': True}]
+            },
+            session_factory=session_factory)
+        resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['DBClusterSnapshotIdentifier'], 'test-cluster-final-snapshot')
-        self.assertEqual(resources[0]['c7n:CrossAccountViolations'], ['12345678910'])
+        self.assertEqual(resources[0]['DBClusterSnapshotIdentifier'], 'c7n-testing-public')
+        self.assertEqual(resources[0]['c7n:CrossAccountViolations'], ['all'])
 
     def test_rdscluster_snapshot_simple_filter(self):
         session_factory = self.replay_flight_data("test_rdscluster_snapshot_simple")
@@ -783,3 +807,25 @@ class TestRDSClusterParameterGroupFilter(BaseTest):
         )
         resources = policy.resource_manager.resources()
         self.assertEqual(len(resources), 2)
+
+
+class TestRDSDBShardGroup(BaseTest):
+    def test_rds_db_shard_group(self):
+        session_factory = self.replay_flight_data('test_rds_db_shard_group')
+        p = self.load_policy(
+            {
+                "name": "rds-db-shard-group",
+                "resource": "rds-db-shard-group",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "PubliclyAccessible",
+                        "value": False
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['DBShardGroupIdentifier'], 'db-shard-1')

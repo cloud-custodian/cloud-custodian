@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "c7n_policystream"
-version = "0.4.40"
+version = "0.4.43"
 description = "Cloud Custodian - Git Commits as Logical Policy Changes"
 readme = "README.md"
 homepage = "https://cloudcustodian.io"
@@ -19,7 +19,7 @@ packages = [{"include" = "policystream.py"}]
 c7n-policystream = 'policystream:cli'
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = ">=3.9.2,<4.0.0"
 c7n = {path = "../..", develop = true}
 
 click = "^8.0"
@@ -27,6 +27,8 @@ pyyaml = ">=5.4.0"
 pygit2 = ">=1.11"
 boto3 = "^1.12.0"
 requests = "^2.22.0"
+# workaround for: https://github.com/python-poetry/poetry-plugin-export/issues/183
+urllib3 = ">=1.25.4,<1.27"
 
 [tool.poetry.dev-dependencies]
 pytest = "<8.0"

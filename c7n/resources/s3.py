@@ -55,7 +55,7 @@ from c7n.filters import (
     FilterRegistry, Filter, CrossAccountAccessFilter, MetricsFilter,
     ValueFilter, ListItemFilter)
 from .aws import shape_validate
-import c7n.filters.policystatement as polstmt_filter
+from c7n.filters.policystatement import HasStatementFilter
 from c7n.manager import resources
 from c7n.output import NullBlobOutput
 from c7n import query
@@ -829,7 +829,7 @@ class BucketFinding(PostFinding):
 
 
 @S3.filter_registry.register('has-statement')
-class HasStatementFilter(polstmt_filter.HasStatementFilter):
+class S3HasStatementFilter(HasStatementFilter):
     def get_std_format_args(self, bucket):
         return {
             'account_id': self.manager.config.account_id,
@@ -2748,7 +2748,8 @@ class SetInventory(BucketActionBase):
             'Size', 'LastModifiedDate', 'StorageClass', 'ETag',
             'IsMultipartUploaded', 'ReplicationStatus', 'EncryptionStatus',
             'ObjectLockRetainUntilDate', 'ObjectLockMode', 'ObjectLockLegalHoldStatus',
-            'IntelligentTieringAccessTier', 'BucketKeyStatus', 'ChecksumAlgorithm']}})
+            'IntelligentTieringAccessTier', 'BucketKeyStatus', 'ChecksumAlgorithm',
+            'ObjectAccessControlList', 'ObjectOwner']}})
 
     permissions = ('s3:PutInventoryConfiguration', 's3:GetInventoryConfiguration')
 

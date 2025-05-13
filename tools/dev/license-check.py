@@ -16,6 +16,7 @@ accept = (
     'BSD-3-Clause',
     'Apache-2.0',
     'Apache-2',
+    'PSF-2.0'
 )
 
 accept_classifiers = set(
@@ -54,6 +55,7 @@ whitelist_packages = set(
         'typed-ast',  # apache 2.0
         'starkbank-ecdsa',  # MIT
         'portalocker',  # PSF
+        'setuptools',  # Removed classifiers following PEP 639
     )
 )
 
@@ -65,9 +67,9 @@ def main():
         dname = d.metadata['Name']
         if dname in seen:
             continue
-        if d.metadata['License'] in accept:
+        if d.metadata.get('License') in accept or d.metadata.get("License-Expression") in accept:
             continue
-        if d.metadata['License'] is not None and ' or ' in d.metadata['License']:
+        if d.metadata.get('License') is not None and ' or ' in d.metadata.get('License'):
             licenses = str(d.metadata['License']).split(' or ')
             if any(i in licenses for i in accept):
                 continue
@@ -77,7 +79,8 @@ def main():
         delta = set(classifiers).difference(accept_classifiers)
         if (delta or not classifiers) and dname not in whitelist_packages:
             found = True
-            print(f"{dname}: {d.metadata['License']} {classifiers}")
+            license = d.metadata.get('License', None) or d.metadata.get('License-Expression', None)
+            print(f"{dname}: license:{license} classifiers:{classifiers}")
 
         seen.add(dname)
 

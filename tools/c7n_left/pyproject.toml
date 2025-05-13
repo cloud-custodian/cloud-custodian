@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "c7n_left"
-version = "0.3.27"
+version = "0.3.30"
 description = "Custodian policies for IAAC definitions"
 authors = ["Cloud Custodian Project"]
 license = "Apache-2"
@@ -18,11 +18,11 @@ classifiers = [
 c7n-left = 'c7n_left.cli:cli'
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = ">=3.9.2,<4.0.0"
 c7n = {path = "../..", develop = true}
 
 click = ">=8.0"
-rich = "^13.1"
+rich = "^14.0"
 tfparse = "^0.6"
 python-hcl2 = "^4.3.2"
 

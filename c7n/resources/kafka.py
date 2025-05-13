@@ -154,3 +154,43 @@ class Delete(Action):
                 client.delete_cluster(ClusterArn=r['ClusterArn'])
             except client.exceptions.NotFoundException:
                 continue
+
+
+@resources.register('kafka-config')
+class KafkaClusterConfiguration(QueryResourceManager):
+    """ Resource Manager for MSK Kafka Configuration.
+    """
+
+    class resource_type(TypeInfo):
+        service = 'kafka'
+        enum_spec = ('list_configurations', 'Configurations', None)
+        name = 'Name'
+        id = arn = 'Arn'
+        date = 'CreationTime'
+        permissions_augment = ("kafka:ListConfigurations",)
+
+
+@KafkaClusterConfiguration.action_registry.register('delete')
+class DeleteClusterConfiguration(Action):
+    """Delete MSK Cluster Configuration.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: msk-delete-cluster-configuration
+                resource: aws.kafka-config
+                actions:
+                  - type: delete
+    """
+    schema = type_schema('delete')
+    permissions = ('kafka:DeleteConfiguration',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('kafka')
+        for r in resources:
+            try:
+                client.delete_configuration(Arn=r['Arn'])
+            except client.exceptions.NotFoundException:
+                continue

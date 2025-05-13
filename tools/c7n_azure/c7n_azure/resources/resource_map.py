@@ -2,8 +2,11 @@
 # SPDX-License-Identifier: Apache-2.0
 ResourceMap = {
     "azure.advisor-recommendation": "c7n_azure.resources.advisor.AdvisorRecommendation",
+    "azure.afd-endpoint": "c7n_azure.resources.afd_endpoint.AfdEndpoint",
+    "azure.afd-custom-domain": "c7n_azure.resources.afd_custom_domain.AfdCustomDomain",
     "azure.aks": "c7n_azure.resources.k8s_service.KubernetesService",
     "azure.app-insights": "c7n_azure.resources.appinsights.AzureAppInsights",
+    "azure.app-service-environment": "c7n_azure.resources.app_service_environment.AppServiceEnvironment",  # noqa
     "azure.automation-account": "c7n_azure.resources.automation_account.AutomationAccount",
     "azure.open-shift": "c7n_azure.resources.open_shift.OpenShiftService",
     "azure.api-management": "c7n_azure.resources.apimanagement.ApiManagement",
@@ -62,6 +65,7 @@ ResourceMap = {
     "azure.mariadb-server": "c7n_azure.resources.mariadb_server.MariaDBServer",
     "azure.mysql": "c7n_azure.resources.mysql.MySQL",
     "azure.mysql-flexibleserver": "c7n_azure.resources.mysql_flexibleserver.MySQLFlexibleServer",
+    "azure.postgresql-flexibleserver": "c7n_azure.resources.postgresql_flexibleserver.PostgreSQLFlexibleServer",  # noqa
     "azure.networkinterface": "c7n_azure.resources.network_interface.NetworkInterface",
     "azure.networksecuritygroup": "c7n_azure.resources.network_security_group.NetworkSecurityGroup",
     "azure.networkwatcher": "c7n_azure.resources.network_watcher.NetworkWatcher",

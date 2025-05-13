@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "c7n"
-version = "0.9.41"
+version = "0.9.44"
 description = "Cloud Custodian - Policy Rules Engine"
 authors = ["Cloud Custodian Project"]
 readme = "README.md"
@@ -22,8 +22,8 @@ classifiers=[
 custodian = 'c7n.cli:main'
 
 [tool.poetry.dependencies]
-cryptography = "<43"
-python = "^3.8"
+python = ">=3.9.2,<4.0.0"
+cryptography = ">=44"
 boto3 = "^1.12.31"
 jsonschema = ">=4.18"
 argcomplete = ">=1.12.3"
@@ -31,23 +31,13 @@ python-dateutil = "^2.8.2"
 pyyaml = ">=5.4.0"
 tabulate = "^0.9.0"
 docutils = ">=0.18, <0.19"
-
-# some issue in c7n_gcp libraries, possibly a bug in poetry, even with this specification
-# importlib-metadata = ">=6,<9"
-# we're picking up a release behind on 8.4 vs 8.5 and to avoid incompatible package installs,
-# we're pinning for now. time to explore uv workspaces perhaps.
-importlib-metadata = "==8.4"
-
-# temporary work around for 
-# https://github.com/cloud-custodian/poetry-plugin-freeze/issues/18
-urllib3 = "<2"
-
-# temporary work around for
-# https://github.com/p1c2u/jsonschema-path/issues/98
-# which gets pulled in via moto
-referencing = "==0.35.1"
+# workaround for: https://github.com/python-poetry/poetry-plugin-export/issues/183
+urllib3 = ">=1.25.4,<1.27"
+# workaround for: https://github.com/pypa/setuptools/issues/4956
+setuptools = "<79"
 
 [tool.poetry.group.dev.dependencies]
+
 ruff = ">=0.3,<0.6"
 docker = {extras = ["websockets"], version = "^7.1.0"}
 black = ">=23.1,<25.0"

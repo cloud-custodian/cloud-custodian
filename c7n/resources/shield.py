@@ -6,20 +6,40 @@ from botocore.paginate import Paginator
 from c7n.actions import BaseAction
 from c7n.filters import Filter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, RetryPageIterator, TypeInfo
+from c7n.query import (QueryResourceManager, RetryPageIterator, TypeInfo,
+    DescribeSource, ConfigSource)
+from c7n.tags import RemoveTag, Tag, TagDelayedAction, TagActionFilter
 from c7n.utils import local_session, type_schema, get_retry
+
+
+class DescribeShieldProtection(DescribeSource):
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('shield')
+
+        def _augment(r):
+            tags = self.manager.retry(client.list_tags_for_resource,
+                ResourceARN=r['ProtectionArn'])['Tags']
+            r['Tags'] = tags
+            return r
+        resources = super().augment(resources)
+        return list(map(_augment, resources))
 
 
 @resources.register('shield-protection')
 class ShieldProtection(QueryResourceManager):
-
     class resource_type(TypeInfo):
         service = 'shield'
         enum_spec = ('list_protections', 'Protections', None)
         id = 'Id'
         name = 'Name'
-        arn = False
+        arn = 'ProtectionArn'
         config_type = 'AWS::Shield::Protection'
+        global_resource = True
+
+    source_mapping = {
+            'describe': DescribeShieldProtection,
+            'config': ConfigSource
+        }
 
 
 @resources.register('shield-attack')
@@ -35,6 +55,7 @@ class ShieldAttack(QueryResourceManager):
         filter_name = 'ResourceArns'
         filter_type = 'list'
         arn = False
+        global_resource = True
 
 
 def get_protections_paginator(client):
@@ -140,7 +161,7 @@ class SetShieldProtection(BaseAction, ProtectedResource):
         # Get all resources unfiltered
         resources = self.manager.get_resource_manager(
             self.manager.type).resources()
-        resource_arns = set(self.manager.get_arns(resources))
+        resource_arns = set(self.get_arns(resources))
 
         pmap = {}
         # Only process stale resources in region for non global resources.
@@ -187,3 +208,54 @@ class IsEIPShieldProtected(ProtectedEIP, IsShieldProtected):
 
 class SetEIPShieldProtection(ProtectedEIP, SetShieldProtection):
     pass
+
+
+@ShieldProtection.action_registry.register('tag')
+class TagResource(Tag):
+    """Action to tag a Shield resources
+    """
+    permissions = ('shield:TagResource',)
+
+    def process_resource_set(self, client, resource_set, tags):
+        mid = self.manager.resource_type.arn
+        for r in resource_set:
+            try:
+                client.tag_resource(ResourceARN=r[mid], Tags=tags)
+            except client.exceptions.ResourceNotFoundException:
+                continue
+
+
+@ShieldProtection.action_registry.register('remove-tag')
+class RemoveTag(RemoveTag):
+    """Action to remove tags from a Shield resource
+    """
+    permissions = ('shield:UntagResource',)
+
+    def process_resource_set(self, client, resource_set, tag_keys):
+        mid = self.manager.resource_type.arn
+        for r in resource_set:
+            try:
+                client.untag_resource(ResourceARN=r[mid], TagKeys=tag_keys)
+            except client.exceptions.ResourceNotFoundException:
+                continue
+
+
+@ShieldProtection.filter_registry.register('marked-for-op', TagActionFilter)
+@ShieldProtection.action_registry.register('mark-for-op')
+class MarkShieldProtectionForOp(TagDelayedAction):
+    """Mark Shield Protection for deferred action
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: shield-protection-invalid-tag-mark
+            resource: shield-protection
+            filters:
+              - "tag:InvalidTag": present
+            actions:
+              - type: mark-for-op
+                op: delete
+                days: 1
+    """

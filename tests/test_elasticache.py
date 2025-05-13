@@ -60,6 +60,24 @@ class TestElastiCacheCluster(BaseTest):
             ["myec-001", "myec-002", "myec-003"],
         )
 
+    def test_elasticache_vpc_filter(self):
+        session_factory = self.replay_flight_data(
+            "test_elasticache_vpc_filter"
+        )
+        p = self.load_policy(
+            {
+                "name": "elasticache-cluster-vpc",
+                "resource": "aws.cache-cluster",
+                "filters": [
+                    {"type": "vpc", "key": "IsDefault", "value": True}
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['c7n:matched-vpcs'], ['vpc-f1516b97'])
+
     def test_elasticache_cluster_simple(self):
         session_factory = self.replay_flight_data("test_elasticache_cluster_simple")
         p = self.load_policy(
@@ -560,3 +578,108 @@ class TestElastiCacheReplicationGroup(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['ReplicationGroupId'], 'c7n-test-global')
         assert "Skipping c7n-test-global" in log_output.getvalue()
+
+
+class TestElastiCacheUser(BaseTest):
+
+    def test_elasticache_user(self):
+        session_factory = self.replay_flight_data("test_elasticache_user")
+        client = session_factory().client("elasticache")
+        p = self.load_policy(
+            {
+                "name": "elasticache-user-tag",
+                "resource": "elasticache-user",
+                "filters": [{"type": "value", "key": "UserId", "value": "c7n-user"}],
+                "actions": [{"type": "tag", "key": "test-tag", "value": "test-value"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['UserId'], 'c7n-user')
+
+        p = self.load_policy(
+            {
+                "name": "elasticache-user-untag",
+                "resource": "elasticache-user",
+                "filters": [{"type": "value", "key": "tag:test-tag", "value": "test-value"}],
+                "actions": [{"type": "remove-tag", "tags": ["test-tag"]}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['UserId'], 'c7n-user')
+        tags = client.list_tags_for_resource(
+            ResourceName='arn:aws:elasticache:us-east-1:123456789012:user:c7n-user')["TagList"]
+        assert len(tags) == 0
+
+    def test_elasticache_user_modify(self):
+        session_factory = self.replay_flight_data("test_elasticache_user_modify")
+        client = session_factory().client("elasticache")
+        p = self.load_policy(
+            {
+                "name": "elasticache-user-modify",
+                "resource": "elasticache-user",
+                "filters": [{"type": "value", "key": "UserId", "value": "c7n-user"}],
+                "actions": [{
+                    "type": "modify",
+                    "attributes": {
+                        "AccessString": "on +@all",
+                        "AuthenticationMode": {
+                            "Type": "password",
+                            "Passwords": ["c7n-user-password"]
+                        }
+                    }
+                }],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        users = client.describe_users(UserId='c7n-user')["Users"]
+        assert users[0]["AccessString"] == "on +@all"
+        assert users[0]["Authentication"]["Type"] == "password"
+        assert users[0]["Authentication"]["PasswordCount"] == 1
+
+    def test_elasticache_user_delete(self):
+        session_factory = self.replay_flight_data("test_elasticache_user_delete")
+        client = session_factory().client("elasticache")
+        p = self.load_policy(
+            {
+                "name": "elasticache-user-delete",
+                "resource": "elasticache-user",
+                "filters": [{"type": "value", "key": "UserId", "value": "c7n-user"}],
+                "actions": [{"type": "delete"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        users = client.describe_users(UserId='c7n-user')["Users"]
+        assert users[0]["Status"] == "deleting"
+
+    def test_elasticace_query_node_info(self):
+        session_factory = self.replay_flight_data("test_elasticache_query_node_info")
+        p = self.load_policy(
+            {
+                "name": "elasticache-node-default-port",
+                "resource": "aws.cache-cluster",
+                "query": [{
+                    "Name": "ShowCacheNodeInfo",
+                    "Value": True
+                }],
+                "filters": [{
+                    "type": "list-item",
+                    "key": "CacheNodes",
+                    "attrs": [{
+                        "type": "value",
+                        "key": "Endpoint.Port",
+                        "value": 11211
+                    }]
+                }],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)

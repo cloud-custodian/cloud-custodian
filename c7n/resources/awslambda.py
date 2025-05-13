@@ -120,6 +120,35 @@ class LambdaPermissions(CheckPermissions):
         return [r['Role'] for r in resources]
 
 
+@AWSLambda.filter_registry.register('url-config')
+class URLConfig(ValueFilter):
+
+    annotation_key = "c7n:UrlConfig"
+    schema = type_schema('url-config', rinherit=ValueFilter.schema)
+    schema_alias = False
+    permissions = ('lambda:GetFunctionUrlConfig',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('lambda')
+
+        def _augment(r):
+            try:
+                r[self.annotation_key] = self.manager.retry(
+                    client.get_function_url_config, FunctionName=r['FunctionArn'])
+                r[self.annotation_key].pop('ResponseMetadata')
+            except client.exceptions.ResourceNotFoundException:
+                r[self.annotation_key] = {}
+            return r
+
+        with self.executor_factory(max_workers=2) as w:
+            resources = list(filter(None, w.map(_augment, resources)))
+
+        return super().process(resources, event)
+
+    def __call__(self, i):
+        return super().__call__(i[self.annotation_key])
+
+
 @AWSLambda.filter_registry.register('reserved-concurrency')
 class ReservedConcurrency(ValueFilter):
 
@@ -152,7 +181,7 @@ class ReservedConcurrency(ValueFilter):
 
         with self.executor_factory(max_workers=3) as w:
             resources = list(filter(None, w.map(_augment, resources)))
-            return super(ReservedConcurrency, self).process(resources, event)
+        return super(ReservedConcurrency, self).process(resources, event)
 
 
 def get_lambda_policies(client, executor_factory, resources, log):
@@ -345,6 +374,7 @@ class UpdateLambda(Action):
 
         for r in resources:
             params = self.get_parameters(r)
+            params.pop('FunctionName', None)
             try:
                 retry(
                     client.update_function_configuration,

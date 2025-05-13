@@ -108,6 +108,18 @@ class LambdaPermissionTest(BaseTest):
         self.assertRaises(ClientError, client.get_policy, FunctionName=name)
 
 
+def test_function_url_absent(test):
+    aws_region = 'us-west-2'
+    factory = test.replay_flight_data('test_aws_lambda_function_url', region=aws_region)
+    p = test.load_policy({
+        'name': 'lambda-function-url',
+        'resource': 'aws.lambda',
+        'filters': [{'type': 'url-config', 'key': 'FunctionUrl', 'value': 'present'}],
+        }, session_factory=factory, config={'region': aws_region})
+    resources = p.run()
+    assert len(resources) == 1
+
+
 class LambdaLayerTest(BaseTest):
 
     def test_lambda_layer_cross_account(self):
@@ -594,6 +606,30 @@ class LambdaTagTest(BaseTest):
             after_tags,
             {'custodian_next': 'Resource does not meet policy: delete@2019/02/09',
              'xyz': 'abcdef'})
+
+    def test_lambda_update_memory_config(self):
+        factory = self.replay_flight_data("test_lambda_update_memory_config")
+        p = self.load_policy(
+            {
+                "name": "lambda-update-memory",
+                "resource": "lambda",
+                "filters": [
+                    {"FunctionName": "cloud-custodian-memory-resize-test"}
+                ],
+                "actions": [
+                    {
+                        "type": "update",
+                        "properties": {"MemorySize": 128}
+                    }],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = factory().client("lambda")
+        response = client.get_function(FunctionName=resources[0]['FunctionName'])
+        self.assertEqual(response['Configuration']['MemorySize'], 128)
+        self.assertEqual(resources[0]['MemorySize'], 256)
 
 
 class TestModifyVpcSecurityGroupsAction(BaseTest):

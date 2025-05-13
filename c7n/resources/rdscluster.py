@@ -453,6 +453,7 @@ class CrossAccountSnapshot(CrossAccountAccessFilter):
 
     def process(self, resources, event=None):
         self.accounts = self.get_accounts()
+        self.everyone_only = self.data.get("everyone_only", False)
         results = []
         with self.executor_factory(max_workers=2) as w:
             futures = []
@@ -474,6 +475,8 @@ class CrossAccountSnapshot(CrossAccountAccessFilter):
                          'DBClusterSnapshotAttributesResult']['DBClusterSnapshotAttributes']}
             r[self.attributes_key] = attrs
             shared_accounts = set(attrs.get('restore', []))
+            if self.everyone_only:
+                shared_accounts = {a for a in shared_accounts if a == 'all'}
             delta_accounts = shared_accounts.difference(self.accounts)
             if delta_accounts:
                 r[self.annotation_key] = list(delta_accounts)
@@ -760,3 +763,27 @@ class PendingMaintenance(Filter):
                 results.append(r)
 
         return results
+
+
+class DescribeDbShardGroup(DescribeSource):
+    def augment(self, resources):
+        for r in resources:
+            r['Tags'] = r.pop('TagList', ())
+        return resources
+
+
+@resources.register('rds-db-shard-group')
+class RDSDbShardGroup(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = 'rds'
+        arn = 'DBShardGroupArn'
+        name = 'DBShardGroupIdentifier'
+        id = 'DBShardGroupResourceId'
+        enum_spec = ('describe_db_shard_groups', 'DBShardGroups', None)
+        cfn_type = 'AWS::RDS::DBShardGroup'
+        permissions_enum = ("rds:DescribeDBShardGroups",)
+        universal_taggable = object()
+
+    source_mapping = {
+            'describe': DescribeDbShardGroup
+        }

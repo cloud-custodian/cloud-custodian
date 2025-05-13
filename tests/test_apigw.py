@@ -1,6 +1,8 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import time
 from botocore.exceptions import ClientError
+from mock import patch
 
 from .common import BaseTest, event_data
 from c7n.exceptions import PolicyValidationError
@@ -74,6 +76,29 @@ class TestRestAccount(BaseTest):
 
         after_account, = p.resource_manager._get_account()
         self.assertEqual(after_account["cloudwatchRoleArn"], log_role)
+
+    def test_rest_account_exception(self):
+        session_factory = self.replay_flight_data('test_rest_account_exception')
+        p = self.load_policy(
+            {'name': 'rest-account-exception',
+             'resource': 'aws.rest-account'},
+            session_factory=session_factory
+        )
+        with self.assertRaises(ClientError) as e:
+            p.run()
+        self.assertEqual(e.exception.response['Error']['Code'], 'AccessDeniedException')
+
+    def test_rest_account_rate_limit(self):
+        session_factory = self.replay_flight_data('test_rest_account_rate_limit')
+        p = self.load_policy(
+            {'name': 'rest-account-rate-limit',
+             'resource': 'aws.rest-account'},
+            session_factory=session_factory
+        )
+        with patch('c7n.utils.time.sleep', new_callable=time.sleep(0)) as func:
+            resources = p.run()
+        self.assertTrue(func.called)
+        self.assertEqual(len(resources), 1)
 
 
 class TestRestApi(BaseTest):
@@ -193,6 +218,75 @@ class TestRestApi(BaseTest):
                 {"Name": "ApiName", "Value": "c7n-test-2"}
             ],
         )
+
+    def test_rest_api_has_statement(self):
+        session_factory = self.replay_flight_data('test_rest_api_has_statement')
+        p = self.load_policy(
+            {'name': 'api-has-statement',
+             'resource': 'rest-api',
+             'filters': [
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Allow",
+                                "Action": "execute-api:Invoke",
+                                "Principal": {
+                                    "AWS": "arn:aws:iam::123456789012:root",
+                                },
+                            },
+                            {
+                                "Effect": "Allow",
+                                "Action": "execute-api:Invoke",
+                                "Condition": {
+                                    "StringEquals": {
+                                        "aws:SourceVpc": ["vpc-1a2b3c4d", "vpc-abc123"]
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                ],
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], 'c7n-test')
+
+        p = self.load_policy(
+            {'name': 'api-has-statement',
+             'resource': 'rest-api',
+             'filters': [
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Allow",
+                                "Action": "execute-api:Invoke",
+                                "Principal": {
+                                    "AWS": "arn:aws:iam::123456789012:root",
+                                },
+                                "PartialMatch": ["Action"],
+                            },
+                            {
+                                "Effect": "Allow",
+                                "Action": "execute-api:Invoke",
+                                "Condition": {
+                                    "StringEquals": {
+                                        "aws:SourceVpc": ["vpc-1a2b3c4d", "vpc-abc123"]
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                ],
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], 'c7n-test')
 
 
 class TestRestResource(BaseTest):

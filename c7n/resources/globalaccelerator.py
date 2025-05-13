@@ -7,6 +7,8 @@ from c7n.query import (
 from c7n.utils import local_session
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 from c7n.resources.shield import IsShieldProtected
+from c7n.filters import ValueFilter
+from c7n.utils import type_schema
 
 
 # Global accelerator is a AWS global service.US West (N. California) Region
@@ -126,3 +128,46 @@ class MarkedForOpReadinessCheck(TagActionFilter):
 
 
 GlobalAccelerator.filter_registry.register('shield-enabled', IsShieldProtected)
+
+
+@GlobalAccelerator.filter_registry.register('attribute')
+class GlobalAcceleratorLoggingFilter(ValueFilter):
+    """
+    Filter by global accelerator
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: flow-log-enabled
+            resource: aws.globalaccelerator
+            filters:
+              - type: attribute
+                key: FlowLogsEnabled
+                value: False
+    """
+    schema = type_schema('attribute', rinherit=ValueFilter.schema)
+    schema_alias = False
+    permissions = ('globalaccelerator:DescribeAcceleratorAttributes', )
+    annotation_key = 'c7n:GlobalAcceleratorAttributes'
+
+    def get_client(self):
+        return self.manager.get_client()
+
+    def process(self, resources, event=None):
+        client = self.get_client()
+        results = []
+        for r in resources:
+            if self.annotation_key not in r:
+                try:
+                    attributes = client.describe_accelerator_attributes(
+                    AcceleratorArn=r['AcceleratorArn'])['AcceleratorAttributes']
+                except client.exceptions.NotFoundException:
+                    continue
+
+                r[self.annotation_key] = attributes
+
+            if self.match(r[self.annotation_key]):
+                results.append(r)
+
+        return results

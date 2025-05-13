@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:athena:us-east-1:644160558196:datacatalog/c7n-test",
+                "Tags": [
+                    {
+                        "Key": "c7n",
+                        "Value": "test"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

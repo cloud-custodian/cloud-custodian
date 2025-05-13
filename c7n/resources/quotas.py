@@ -150,10 +150,19 @@ class UsageFilter(MetricsFilter):
 
     schema = type_schema('usage-metric', limit={'type': 'integer'}, min_period={'type': 'integer'})
 
+    cloudwatch_max_datapoints = 1440
+    # https://boto3.amazonaws.com/v1/documentation/api/1.35.9/reference/services/cloudwatch/client/get_metric_statistics.html
+    # If the StartTime parameter specifies a time stamp that is greater than 3 hours ago,
+    # you must specify the period as follows or no data points in that time range is returned:
+    # - Start time between 3 hours and 15 days ago - Use a multiple of 60 seconds (1 minute).
+    # We systematically use a start time of 24h ago. This means the min period is always 60 seconds.
+    cloudwatch_min_period = 60
+
     permisisons = ('cloudwatch:GetMetricStatistics',)
 
     annotation_key = 'c7n:UsageMetric'
 
+    # see: https://boto3.amazonaws.com/v1/documentation/api/1.35.9/reference/services/service-quotas/client/list_service_quotas.html
     time_delta_map = {
         'MICROSECOND': 'microseconds',
         'MILLISECOND': 'milliseconds',
@@ -174,11 +183,25 @@ class UsageFilter(MetricsFilter):
 
     percentile_regex = re.compile('p\\d{0,2}\\.{0,1}\\d{0,2}')
 
+    def round_up(self, n, d):
+        if n % d == 0:
+            return n
+        return d * (1 + (n // d))
+
     def get_dimensions(self, usage_metric):
         dimensions = []
         for k, v in usage_metric['MetricDimensions'].items():
             dimensions.append({'Name': k, 'Value': v})
         return dimensions
+
+    def scale_period(self, total_seconds, period, min_period):
+        initial_period = period
+        if period < min_period:
+            period = min_period
+        while total_seconds / period > self.cloudwatch_max_datapoints:
+            period += self.cloudwatch_min_period
+        period = self.round_up(period, self.cloudwatch_min_period)
+        return period, period / initial_period
 
     def process(self, resources, event):
         client = local_session(self.manager.session_factory).client('cloudwatch')
@@ -187,7 +210,7 @@ class UsageFilter(MetricsFilter):
         start_time = end_time - timedelta(1)
 
         limit = self.data.get('limit', 80)
-        min_period = max(self.data.get('min_period', 300), 60)
+        min_period = max(self.data.get('min_period', 300), self.cloudwatch_min_period)
 
         result = []
 
@@ -206,21 +229,25 @@ class UsageFilter(MetricsFilter):
             else:
                 period = int(timedelta(1).total_seconds())
 
-            # Use scaling to avoid CW limit of 1440 data points
-            metric_scale = 1
-            if period < min_period and stat == "Sum":
-                metric_scale = min_period / period
-                period = min_period
+            total_seconds = (end_time - start_time).total_seconds()
+            period, metric_scale = self.scale_period(total_seconds, period, min_period)
 
-            res = client.get_metric_statistics(
-                Namespace=metric['MetricNamespace'],
-                MetricName=metric['MetricName'],
-                Dimensions=self.get_dimensions(metric),
-                Statistics=[stat],
-                StartTime=start_time,
-                EndTime=end_time,
-                Period=period,
-            )
+            try:
+                res = client.get_metric_statistics(
+                    Namespace=metric['MetricNamespace'],
+                    MetricName=metric['MetricName'],
+                    Dimensions=self.get_dimensions(metric),
+                    Statistics=[stat],
+                    StartTime=start_time,
+                    EndTime=end_time,
+                    Period=period,
+                )
+            except Exception as e:
+                raise Exception(
+                    f'failed to collect metric {metric["MetricName"]}'
+                    f' namespace {metric["MetricNamespace"]}'
+                    f' for service {r.get("ServiceCode")}') from e
+
             if res['Datapoints']:
                 if self.percentile_regex.match(stat):
                     # AWS CloudWatch supports percentile statistic as a statistic but
@@ -324,7 +351,7 @@ class Increase(Action):
         multiplier = self.data.get('multiplier', 1.2)
         error = None
         for r in resources:
-            count = math.ceil(multiplier * r['Value'])
+            count = math.ceil(float(multiplier) * r['Value'])
             if not r['Adjustable']:
                 continue
             try:
