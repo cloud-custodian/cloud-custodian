@@ -6,7 +6,7 @@ SHELL ["/bin/bash", "-c"]
 
 # pre-requisite distro deps, and build env setup
 RUN apt-get --yes update
-RUN apt-get --yes install --no-install-recommends build-essential     curl python3-venv python3-dev adduser
+RUN apt-get --yes install --no-install-recommends build-essential curl python3-venv python3-dev adduser
 # todo: 24.04 is trying to standardize on ubuntu as builtin non root.
 RUN adduser --disabled-login --gecos "" custodian
 RUN python3 -m venv /usr/local
