@@ -5,7 +5,7 @@ authors = [
 license = {text = "Apache-2.0"}
 requires-python = "<4.0.0,>=3.9.2"
 dependencies = [
-    "c7n @ file:///${PROJECT_ROOT}/../..",
+    "c7n",
     "click>=8.0",
 ]
 name = "c7n_org"
