@@ -68,6 +68,7 @@ c7n = { workspace = true }
 members = [
   "tools/c7n_azure",
   "tools/c7n_gcp",
+  "tools/c7n_kube",
   "tools/c7n_org",
   "tools/c7n_policystream",
   "tools/c7n_tencentcloud"
