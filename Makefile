@@ -35,10 +35,10 @@ install:
 .PHONY: test
 
 test:
-	. $(PWD)/test.env && poetry run pytest -n auto $(ARGS) tests tools
+	. $(PWD)/test.env && uv run pytest -n auto $(ARGS) tests tools
 
 test-coverage:
-	. $(PWD)/test.env && poetry run pytest -n auto \
+	. $(PWD)/test.env && uv run pytest -n auto \
             --cov-config .coveragerc \
             --cov-report $(COVERAGE_TYPE) \
             --cov c7n \
