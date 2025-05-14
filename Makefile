@@ -29,16 +29,16 @@ endif
 
 install:
 	@if [[ -z "$(VIRTUAL_ENV)" ]]; then echo "Create and Activate VirtualEnv First, ie. python3 -m venv .venv && source .venv/bin/activate"; exit 1; fi
-	poetry install --with addons
-	for pkg in $(PKG_SET); do echo "Install $$pkg" && cd $$pkg && poetry install --all-extras && cd ../..; done
+	cd workspace
+	uv sync --active
 
 .PHONY: test
 
 test:
-	. $(PWD)/test.env && poetry run pytest -n auto $(ARGS) tests tools
+	. $(PWD)/test.env && uv run pytest -n auto $(ARGS) tests tools
 
 test-coverage:
-	. $(PWD)/test.env && poetry run pytest -n auto \
+	. $(PWD)/test.env && uv run pytest -n auto \
             --cov-config .coveragerc \
             --cov-report $(COVERAGE_TYPE) \
             --cov c7n \
