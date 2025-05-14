@@ -76,7 +76,8 @@ members = [
   "tools/c7n_org",
   "tools/c7n_policystream",
   "tools/c7n_sphinxext",
-  "tools/c7n_tencentcloud"
+  "tools/c7n_tencentcloud",
+  "workspace"
 ]
 
 [build-system]

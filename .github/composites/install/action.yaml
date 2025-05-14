@@ -13,9 +13,8 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - name: Install poetry
-      shell: bash
-      run: pipx install poetry==${{ inputs.poetry-version }}
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
 
     - name: Set up Python ${{ inputs.python-version }}
       uses: actions/setup-python@8d9ed9ac5c53483de85588cdf95a591a75ab9f55 # ratchet:actions/setup-python@v5

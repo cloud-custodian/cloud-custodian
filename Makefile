@@ -29,8 +29,8 @@ endif
 
 install:
 	@if [[ -z "$(VIRTUAL_ENV)" ]]; then echo "Create and Activate VirtualEnv First, ie. python3 -m venv .venv && source .venv/bin/activate"; exit 1; fi
-	poetry install --with addons
-	for pkg in $(PKG_SET); do echo "Install $$pkg" && cd $$pkg && poetry install --all-extras && cd ../..; done
+	cd workspace
+	uv sync --active
 
 .PHONY: test
 
