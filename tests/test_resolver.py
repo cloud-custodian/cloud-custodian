@@ -88,6 +88,79 @@ def test_dynamodb_resolver_multi(test, dynamodb_resolver_multi):
     assert set(values) == {"shared", "prod"}
 
 
+def test_dynamodb_resolver_complex_records():
+    """Test DynamoDB resolver with complex records requiring resource value processing.
+
+    This test specifically ensures coverage for line 165 in resolver.py that calls
+    _get_resource_values when record_singleton is False or there is an expr.
+    """
+    from unittest.mock import patch, MagicMock
+
+    # Create a mock manager
+    manager = Bag(
+        session_factory=lambda: None,
+        _cache=None,
+        config=Bag(account_id="123", region="us-east-1")
+    )
+
+    # Create a ValuesFrom object with complex records (not singleton)
+    # and an expression to process them
+    resolver = ValuesFrom({
+        "url": "dynamodb",
+        "query": 'select id, name, status from "test_table"',
+        "expr": "[?status=='active'].id"
+    }, manager)
+
+    # Create mock data that will ensure record_singleton is False
+    # and that _get_resource_values is called
+    mock_items = [
+        {"id": {"S": "id1"}, "name": {"S": "name1"}, "status": {"S": "active"}},
+        {"id": {"S": "id2"}, "name": {"S": "name2"}, "status": {"S": "inactive"}},
+        {"id": {"S": "id3"}, "name": {"S": "name3"}, "status": {"S": "active"}}
+    ]
+
+    # Create a mock paginator response
+    mock_paginator = MagicMock()
+    mock_paginator.paginate.return_value = [{"Items": mock_items}]
+
+    # Create a mock client that returns our mock paginator
+    mock_client = MagicMock()
+    mock_client.meta.service_model.operation_model.return_value = MagicMock()
+
+    # Create a mock Paginator constructor
+    mock_paginator_cls = MagicMock(return_value=mock_paginator)
+
+    # Create a dummy deserializer that converts DynamoDB format to Python objects
+    class MockDeserializer:
+        def deserialize(self, value):
+            # Simple deserializer that extracts value from DynamoDB format
+            return next(iter(value.values()))
+
+    # Patch the necessary functions
+    with patch('c7n.resolver.local_session', return_value=mock_client), \
+         patch('botocore.paginate.Paginator', mock_paginator_cls), \
+         patch('boto3.dynamodb.types.TypeDeserializer', return_value=MockDeserializer()):
+
+        # Add a spy on _get_resource_values to verify it gets called
+        original_get_resource_values = resolver._get_resource_values
+        called = [False]
+
+        def spy_get_resource_values(data):
+            called[0] = True
+            return original_get_resource_values(data)
+
+        resolver._get_resource_values = spy_get_resource_values
+
+        # Call get_values which should trigger our mocked path
+        _ = resolver.get_values()
+
+        # Verify _get_resource_values was called (line 165 coverage)
+        assert called[0], "Line 165 (_get_resource_values call) was not executed"
+
+        # Reset the method
+        resolver._get_resource_values = original_get_resource_values
+
+
 class ResolverTest(BaseTest):
 
     def test_resolve_s3(self):
@@ -294,3 +367,44 @@ class UrlValueTest(BaseTest):
         self.assertEqual(values.get_values(), {"east-resource"})
         self.assertEqual(cache.saves, 1)
         self.assertEqual(cache.gets, 3)
+
+
+def test_dynamodb_url_type():
+    """Test that the dynamodb URL type is properly handled.
+
+    This test verifies that using 'url: dynamodb' in a value_from filter
+    doesn't cause an error about unknown URL type.
+    """
+    config = Config.empty(account_id=ACCOUNT_ID)
+    mgr = Bag({"session_factory": None, "_cache": None, "config": config})
+
+    # Verify that creating a ValuesFrom with 'url: dynamodb' doesn't raise an error
+    values = ValuesFrom({
+        "url": "dynamodb",
+        "query": "select id from mytable",
+        "format": "json",
+        "expr": "[*].id"
+    }, mgr)
+
+    # Mock the _get_ddb_values method to avoid actually calling DynamoDB
+    values._get_ddb_values = lambda: ["id1", "id2"]
+
+    # Verify that get_values() doesn't raise an error
+    result = values.get_values()
+    assert result == ["id1", "id2"]
+
+
+def test_uri_resolver_dynamodb():
+    """Test that the URIResolver can handle 'dynamodb' URLs.
+
+    This test verifies that URIResolver.resolve doesn't raise an error
+    when given a 'dynamodb' URL.
+    """
+    resolver = URIResolver(None, FakeCache())
+
+    # Verify that resolve() doesn't raise an error for 'dynamodb' URL
+    result = resolver.resolve("dynamodb", {})
+
+    # The result should be an empty string since the actual handling
+    # is done in ValuesFrom._get_ddb_values
+    assert result == ""
