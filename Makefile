@@ -29,13 +29,12 @@ endif
 
 install:
 	@if [[ -z "$(VIRTUAL_ENV)" ]]; then echo "Create and Activate VirtualEnv First, ie. python3 -m venv .venv && source .venv/bin/activate"; exit 1; fi
-	cd workspace
-	uv sync --active
+	uv sync --active --all-packages --group dev
 
 .PHONY: test
 
 test:
-	. $(PWD)/test.env && uv run pytest -n auto $(ARGS) tests tools
+	. $(PWD)/test.env && uv run --active pytest -n auto $(ARGS) tests
 
 test-coverage:
 	. $(PWD)/test.env && uv run pytest -n auto \

@@ -2260,6 +2260,7 @@ name = "custodian-workspace"
 version = "1.0"
 source = { virtual = "workspace" }
 dependencies = [
+    { name = "c7n" },
     { name = "c7n-azure" },
     { name = "c7n-gcp" },
     { name = "c7n-kube" },
@@ -2275,6 +2276,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
+    { name = "c7n", extras = ["dev", "addons"], editable = "." },
     { name = "c7n-azure", virtual = "tools/c7n_azure" },
     { name = "c7n-gcp", virtual = "tools/c7n_gcp" },
     { name = "c7n-kube", editable = "tools/c7n_kube" },

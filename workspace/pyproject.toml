@@ -6,6 +6,7 @@ name = "custodian-workspace"
 version = "1.0"
 requires-python = ">=3.9.2"
 dependencies = [
+  "c7n[dev,addons]",
   "c7n_azure",
   "c7n_gcp",
   "c7n_kube",
