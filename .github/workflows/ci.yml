@@ -27,6 +27,8 @@ jobs:
         with:
           # Install a specific version of uv.
           version: "0.7.5"
+	  enable-cache: true
+          cache-suffix: "linter"	  
       - name: Install Linters
         run: |
 	  uv sync --only-group lint --no-workspace-packages
