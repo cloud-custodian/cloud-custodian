@@ -28,9 +28,12 @@ endif
 # Common developer targets
 
 install:
-#	@if [[ -z "$(VIRTUAL_ENV)" ]]; then echo "Create and Activate VirtualEnv First, ie. python3 -m venv .venv && source .venv/bin/activate"; exit 1; fi
-# extras are for c7n_mailer
-	uv sync --all-packages --group dev --group addons --extra gcp --extra azure
+# extras are for c7n_mailer, separate lint from dev for ci
+	uv sync --all-packages \
+	    --group dev \
+	    --group addons \
+	    --group lint \
+            --extra gcp --extra azure
 
 .PHONY: test
 

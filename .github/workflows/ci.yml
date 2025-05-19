@@ -22,11 +22,14 @@ jobs:
       - uses: actions/setup-python@8d9ed9ac5c53483de85588cdf95a591a75ab9f55 # ratchet:actions/setup-python@v5
         with:
           python-version: ${{ env.DEFAULT_PY_VERSION }}
-      - name: Install Linter
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          # Install a specific version of uv.
+          version: "0.7.5"
+      - name: Install Linters
         run: |
-          RUFF_VERSION="$(python tools/dev/lint_version.py ruff poetry.lock)"
-          BLACK_VERSION="$(python tools/dev/lint_version.py black poetry.lock)"
-          pip install ruff=="$RUFF_VERSION" black=="$BLACK_VERSION"
+	  uv sync --only-group lint --no-workspace-packages
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # ratchet:hashicorp/setup-terraform@v3
         with:
