@@ -59,13 +59,13 @@ sphinx:
 	make -f docs/Makefile.sphinx html
 
 lint:
-	ruff check c7n tests tools
-	black --check $(FMT_SET)
+	uv run ruff check c7n tests tools
+	uv run black --check $(FMT_SET)
 	type -P terraform && terraform fmt -check -recursive .
 
 format:
-	black $(FMT_SET)
-	ruff check --fix c7n tests tools
+	uv run black $(FMT_SET)
+	uv ruff check --fix c7n tests tools
 	type -P terraform && terraform fmt -recursive .
 
 clean:

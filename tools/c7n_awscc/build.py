@@ -20,7 +20,6 @@ try:
     from hatchling.plugin import hookimpl
     from hatchling.builders.hooks.plugin.interface import BuildHookInterface
 
-
     class CloudDataBuild(BuildHookInterface):
 
         PLUGIN_NAME = "CloudServiceData"
@@ -28,7 +27,6 @@ try:
         def initialize(self, version, build_data):
             build({})
             build_data["artifacts"].append("data/*.json")
-
 
     @hookimpl
     def hatch_register_build_hook():
