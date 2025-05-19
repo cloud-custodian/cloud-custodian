@@ -4,6 +4,8 @@ import datetime
 
 from .azure_common import BaseTest, arm_template, requires_arm_polling
 from c7n_azure.session import Session
+from c7n_azure.tags import TagHelper
+from c7n_azure.actions.tagging import Tag
 from c7n_azure import utils
 
 from . import tools_tags as tools
@@ -75,6 +77,18 @@ class FunctionalActionsTagsTest(BaseTest):
         self.sleep_in_live_mode(5)
         self.assertIsNotNone(self._get_tags().get('cctest_email'))
         self.assertIsNotNone(self._get_tags().get('cctest_date'))
+
+    @arm_template('dns.json')
+    def test_record_set_tagging_not_implemented(self):
+        p = self.load_policy({
+            'name': 'test-tag',
+            'resource': 'azure.recordset',
+        })
+        resources = p.run()
+        tag_action = Tag(p.data, p.resource_manager)
+        tag_action.session = p.resource_manager.get_session()
+        with self.assertRaises(NotImplementedError):
+            TagHelper.add_tags(tag_action, resources[0], {'cctest_tag': 'ccvalue'})
 
     def _get_tags(self):
         return tools.get_tags(self.client, self.rg_name, self.vm_name)
