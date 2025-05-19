@@ -63,8 +63,8 @@ sphinx:
 	make -f docs/Makefile.sphinx html
 
 lint:
-	uv run ruff check c7n tests tools
-	uv run black --check $(FMT_SET)
+	uv run --no-project ruff check c7n tests tools
+	uv run --no-project black --check $(FMT_SET)
 	type -P terraform && terraform fmt -check -recursive .
 
 format:
