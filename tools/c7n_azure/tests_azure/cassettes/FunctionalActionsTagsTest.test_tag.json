@@ -14,8 +14,8 @@
                     "message": ""
                 },
                 "headers": {
-                    "x-cache": [
-                        "CONFIG_NOCACHE"
+                    "x-msedge-ref": [
+                        "Ref A: DED2FACF5A904548B96BBFFB604FC047 Ref B: MNZ221060609011 Ref C: 2025-05-19T03:50:16Z"
                     ],
                     "x-ms-need-to-refresh-epl-cache": [
                         "False"
@@ -23,11 +23,14 @@
                     "cache-control": [
                         "no-cache"
                     ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/HighCostGetSubscriptionMaximum;898"
+                    ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
                     "date": [
-                        "Mon, 19 May 2025 02:51:57 GMT"
+                        "Mon, 19 May 2025 03:50:16 GMT"
                     ],
                     "x-ms-ratelimit-remaining-subscription-global-reads": [
                         "3749"
@@ -35,11 +38,8 @@
                     "content-length": [
                         "3234"
                     ],
-                    "x-ms-ratelimit-remaining-resource": [
-                        "Microsoft.Compute/HighCostGetSubscriptionMaximum;897"
-                    ],
-                    "x-msedge-ref": [
-                        "Ref A: 3F470067337E4191A63D34EB39F59F05 Ref B: MNZ221060619037 Ref C: 2025-05-19T02:51:57Z"
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
                     ]
                 },
                 "body": {
@@ -148,11 +148,8 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "x-cache": [
-                        "CONFIG_NOCACHE"
-                    ],
-                    "x-ms-ratelimit-remaining-subscription-global-writes": [
-                        "2999"
+                    "x-msedge-ref": [
+                        "Ref A: E0CA9A4CF8AF4C8DA035AA75DDAA9720 Ref B: MNZ221060610025 Ref C: 2025-05-19T03:50:17Z"
                     ],
                     "cache-control": [
                         "no-cache"
@@ -160,17 +157,20 @@
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
-                    "date": [
-                        "Mon, 19 May 2025 02:51:57 GMT"
-                    ],
                     "x-ms-ratelimit-remaining-subscription-writes": [
                         "199"
+                    ],
+                    "date": [
+                        "Mon, 19 May 2025 03:50:17 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-writes": [
+                        "2999"
                     ],
                     "content-length": [
                         "388"
                     ],
-                    "x-msedge-ref": [
-                        "Ref A: DAF317C85F4E41DBB16EAA60CD33EE18 Ref B: MNZ221060618053 Ref C: 2025-05-19T02:51:57Z"
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
                     ]
                 },
                 "body": {
@@ -203,8 +203,8 @@
                     "message": ""
                 },
                 "headers": {
-                    "x-cache": [
-                        "CONFIG_NOCACHE"
+                    "x-msedge-ref": [
+                        "Ref A: 869CEA5638BA4A6796F44AE0E63F9E2E Ref B: MNZ221060608053 Ref C: 2025-05-19T03:50:18Z"
                     ],
                     "x-ms-need-to-refresh-epl-cache": [
                         "False"
@@ -212,11 +212,14 @@
                     "cache-control": [
                         "no-cache"
                     ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/LowCostGetSubscriptionMaximum;23994,Microsoft.Compute/LowCostGetResource;30"
+                    ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
                     "date": [
-                        "Mon, 19 May 2025 02:51:58 GMT"
+                        "Mon, 19 May 2025 03:50:17 GMT"
                     ],
                     "x-ms-ratelimit-remaining-subscription-global-reads": [
                         "3749"
@@ -224,11 +227,8 @@
                     "content-length": [
                         "3420"
                     ],
-                    "x-ms-ratelimit-remaining-resource": [
-                        "Microsoft.Compute/LowCostGetSubscriptionMaximum;23996,Microsoft.Compute/LowCostGetResource;32"
-                    ],
-                    "x-msedge-ref": [
-                        "Ref A: D07BF4AF247D4BDABDF8D6576B8C5B6A Ref B: MNZ221060619033 Ref C: 2025-05-19T02:51:59Z"
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
                     ]
                 },
                 "body": {

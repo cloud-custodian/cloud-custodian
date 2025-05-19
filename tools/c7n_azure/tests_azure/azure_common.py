@@ -391,29 +391,29 @@ class BaseTest(TestUtils, AzureVCRBaseTest):
             self._now_patch.start()
             self.addCleanup(self._now_patch.stop)
 
-        if self._requires_polling:
-            # If using polling we need to monkey patch the timeout during playback
-            # or we'll have long sleeps introduced into our test runs
-            Session._old_client = Session.client
-            Session.client = BaseTest.session_client_wrapper
-            self.addCleanup(BaseTest.session_client_cleanup)
-        else:
-            # Patch Poller with constructor that always disables polling
-            # This breaks blocking on long running operations (resource creation).
-            self._lro_patch = patch.object(azure.core.polling.LROPoller,
-                                            '__init__',
-                                            BaseTest.lro_init)
-            self._lro_patch.start()
-            self.addCleanup(self._lro_patch.stop)
-
-            # We still have a few legacy clients, so keep this code.
-            self._lro_patch_legacy = patch.object(msrest.polling.LROPoller,
-                                                    '__init__',
-                                                    BaseTest.lro_init_legacy)
-            self._lro_patch_legacy.start()
-            self.addCleanup(self._lro_patch_legacy.stop)
-
         if self.is_playback():
+            if self._requires_polling:
+                # If using polling we need to monkey patch the timeout during playback
+                # or we'll have long sleeps introduced into our test runs
+                Session._old_client = Session.client
+                Session.client = BaseTest.session_client_wrapper
+                self.addCleanup(BaseTest.session_client_cleanup)
+            else:
+                # Patch Poller with constructor that always disables polling
+                # This breaks blocking on long running operations (resource creation).
+                self._lro_patch = patch.object(azure.core.polling.LROPoller,
+                                               '__init__',
+                                               BaseTest.lro_init)
+                self._lro_patch.start()
+                self.addCleanup(self._lro_patch.stop)
+
+                # We still have a few legacy clients, so keep this code.
+                self._lro_patch_legacy = patch.object(msrest.polling.LROPoller,
+                                                      '__init__',
+                                                      BaseTest.lro_init_legacy)
+                self._lro_patch_legacy.start()
+                self.addCleanup(self._lro_patch_legacy.stop)
+
             if constants.ENV_ACCESS_TOKEN in os.environ:
                 self._tenant_patch = patch('c7n_azure.session.Session.get_tenant_id',
                                            return_value=DEFAULT_TENANT_ID)

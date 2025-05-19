@@ -14,38 +14,38 @@
                     "message": ""
                 },
                 "headers": {
-                    "x-cache": [
-                        "CONFIG_NOCACHE"
+                    "x-msedge-ref": [
+                        "Ref A: 08ACEF5BA4144DE8B8031A105F1D8D8B Ref B: BL2AA2011006052 Ref C: 2025-05-19T03:50:19Z"
                     ],
                     "x-ms-need-to-refresh-epl-cache": [
                         "False"
                     ],
-                    "x-ms-ratelimit-remaining-subscription-global-writes": [
-                        "2999"
+                    "x-ms-operation-identifier": [
+                        "tenantId=e8a8a38e-cc42-4dac-b5d6-d01ca1e23173,objectId=792077c9-1885-45f2-ad89-a2f5b7768832/eastus2/caedde83-30cc-44b4-9c87-2741fb6b8163"
                     ],
                     "cache-control": [
                         "no-cache"
                     ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/UpdateVMSubscriptionMaximum;1494,Microsoft.Compute/UpdateVMResource;4"
+                    ],
                     "content-type": [
                         "application/json; charset=utf-8"
-                    ],
-                    "date": [
-                        "Mon, 19 May 2025 02:51:59 GMT"
-                    ],
-                    "x-ms-operation-identifier": [
-                        "tenantId=e8a8a38e-cc42-4dac-b5d6-d01ca1e23173,objectId=792077c9-1885-45f2-ad89-a2f5b7768832/eastus/1bae0db0-f3c4-4796-8e22-1a7c2afbce32"
                     ],
                     "x-ms-ratelimit-remaining-subscription-writes": [
                         "199"
                     ],
+                    "date": [
+                        "Mon, 19 May 2025 03:50:20 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-writes": [
+                        "2999"
+                    ],
                     "content-length": [
                         "3288"
                     ],
-                    "x-ms-ratelimit-remaining-resource": [
-                        "Microsoft.Compute/UpdateVMSubscriptionMaximum;1497,Microsoft.Compute/UpdateVMResource;9"
-                    ],
-                    "x-msedge-ref": [
-                        "Ref A: 6C8E69B11E1C4DCE92761D7C7B19394C Ref B: MNZ221060608009 Ref C: 2025-05-19T02:51:59Z"
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
                     ]
                 },
                 "body": {
@@ -155,6 +155,151 @@
         {
             "request": {
                 "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/virtualMachines/cctestvm?api-version=2022-11-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": ""
+                },
+                "headers": {
+                    "x-msedge-ref": [
+                        "Ref A: 67957079C3FA41AA8B40CD748D534C7D Ref B: BL2AA2011006052 Ref C: 2025-05-19T03:50:20Z"
+                    ],
+                    "x-ms-need-to-refresh-epl-cache": [
+                        "False"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/LowCostGetSubscriptionMaximum;23993,Microsoft.Compute/LowCostGetResource;29"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Mon, 19 May 2025 03:50:20 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-length": [
+                        "3289"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "name": "cctestvm",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/virtualMachines/cctestvm",
+                        "type": "Microsoft.Compute/virtualMachines",
+                        "location": "southcentralus",
+                        "tags": {
+                            "cctest_trim": "ccvalue"
+                        },
+                        "properties": {
+                            "hardwareProfile": {
+                                "vmSize": "Standard_A1_v2"
+                            },
+                            "provisioningState": "Succeeded",
+                            "vmId": "d874328d-9284-4084-a07e-95c1dcdc2a42",
+                            "storageProfile": {
+                                "imageReference": {
+                                    "publisher": "Canonical",
+                                    "offer": "UbuntuServer",
+                                    "sku": "16.04.0-LTS",
+                                    "version": "latest",
+                                    "exactVersion": "16.04.202109280"
+                                },
+                                "osDisk": {
+                                    "osType": "Linux",
+                                    "name": "cctestvm_OsDisk_1_0aa569485c1243fbb95398d030141205",
+                                    "createOption": "FromImage",
+                                    "caching": "ReadWrite",
+                                    "managedDisk": {
+                                        "storageAccountType": "Standard_LRS",
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_0aa569485c1243fbb95398d030141205"
+                                    },
+                                    "deleteOption": "Detach",
+                                    "diskSizeGB": 30
+                                },
+                                "dataDisks": [
+                                    {
+                                        "lun": 0,
+                                        "name": "cctestvm_disk2_e1f0c6cc6c61481f9a70fba7ee59381f",
+                                        "createOption": "Empty",
+                                        "caching": "None",
+                                        "managedDisk": {
+                                            "storageAccountType": "Standard_LRS",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_disk2_e1f0c6cc6c61481f9a70fba7ee59381f"
+                                        },
+                                        "deleteOption": "Detach",
+                                        "diskSizeGB": 1023,
+                                        "toBeDetached": false
+                                    }
+                                ]
+                            },
+                            "osProfile": {
+                                "computerName": "vmpzk3zilc6fgye",
+                                "adminUsername": "testuser",
+                                "linuxConfiguration": {
+                                    "disablePasswordAuthentication": false,
+                                    "patchSettings": {
+                                        "patchMode": "ImageDefault",
+                                        "assessmentMode": "ImageDefault"
+                                    }
+                                },
+                                "secrets": []
+                            },
+                            "networkProfile": {
+                                "networkInterfaces": [
+                                    {
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic"
+                                    }
+                                ]
+                            },
+                            "diagnosticsProfile": {
+                                "bootDiagnostics": {
+                                    "enabled": true,
+                                    "storageUri": "https://pzk3zilc6fgyesalinuxvm.blob.core.windows.net/"
+                                }
+                            },
+                            "timeCreated": "2025-05-13T04:53:42.769173+00:00"
+                        },
+                        "resources": [
+                            {
+                                "name": "script1",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/virtualMachines/cctestvm/extensions/script1",
+                                "type": "Microsoft.Compute/virtualMachines/extensions",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "displayName": "config-app"
+                                },
+                                "properties": {
+                                    "autoUpgradeMinorVersion": true,
+                                    "provisioningState": "Succeeded",
+                                    "publisher": "Microsoft.Azure.Extensions",
+                                    "type": "CustomScript",
+                                    "typeHandlerVersion": "2.1",
+                                    "settings": {
+                                        "skipDos2Unix": false,
+                                        "timestamp": 123456789
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
                 "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/virtualMachines?api-version=2022-11-01",
                 "body": null,
                 "headers": {}
@@ -165,8 +310,8 @@
                     "message": ""
                 },
                 "headers": {
-                    "x-cache": [
-                        "CONFIG_NOCACHE"
+                    "x-msedge-ref": [
+                        "Ref A: EA6AE338AB5347DA97AB64886BC6FCFB Ref B: MNZ221060608009 Ref C: 2025-05-19T03:50:20Z"
                     ],
                     "x-ms-need-to-refresh-epl-cache": [
                         "False"
@@ -174,11 +319,14 @@
                     "cache-control": [
                         "no-cache"
                     ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/HighCostGetSubscriptionMaximum;897"
+                    ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
                     "date": [
-                        "Mon, 19 May 2025 02:52:00 GMT"
+                        "Mon, 19 May 2025 03:50:20 GMT"
                     ],
                     "x-ms-ratelimit-remaining-subscription-global-reads": [
                         "3749"
@@ -186,11 +334,8 @@
                     "content-length": [
                         "3125"
                     ],
-                    "x-ms-ratelimit-remaining-resource": [
-                        "Microsoft.Compute/HighCostGetSubscriptionMaximum;896"
-                    ],
-                    "x-msedge-ref": [
-                        "Ref A: 8FA52863E6854331AA055F0456F0176F Ref B: MNZ221060610007 Ref C: 2025-05-19T02:52:00Z"
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
                     ]
                 },
                 "body": {
@@ -297,11 +442,8 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "x-cache": [
-                        "CONFIG_NOCACHE"
-                    ],
-                    "x-ms-ratelimit-remaining-subscription-global-writes": [
-                        "2999"
+                    "x-msedge-ref": [
+                        "Ref A: E2E13A43772F476BAE1E6AC214F9D730 Ref B: BL2AA2011003023 Ref C: 2025-05-19T03:50:21Z"
                     ],
                     "cache-control": [
                         "no-cache"
@@ -309,17 +451,20 @@
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
-                    "date": [
-                        "Mon, 19 May 2025 02:52:01 GMT"
-                    ],
                     "x-ms-ratelimit-remaining-subscription-writes": [
                         "199"
+                    ],
+                    "date": [
+                        "Mon, 19 May 2025 03:50:21 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-writes": [
+                        "2999"
                     ],
                     "content-length": [
                         "255"
                     ],
-                    "x-msedge-ref": [
-                        "Ref A: 5E08BCC37D6B4EE1944E8CDE239399B3 Ref B: BL2AA2011006029 Ref C: 2025-05-19T02:52:01Z"
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
                     ]
                 },
                 "body": {
@@ -347,8 +492,8 @@
                     "message": ""
                 },
                 "headers": {
-                    "x-cache": [
-                        "CONFIG_NOCACHE"
+                    "x-msedge-ref": [
+                        "Ref A: 62EF566A1F64404FB5815CCCBA099261 Ref B: BL2AA2011006052 Ref C: 2025-05-19T03:50:22Z"
                     ],
                     "x-ms-need-to-refresh-epl-cache": [
                         "False"
@@ -356,11 +501,14 @@
                     "cache-control": [
                         "no-cache"
                     ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/LowCostGetSubscriptionMaximum;23992,Microsoft.Compute/LowCostGetResource;28"
+                    ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
                     "date": [
-                        "Mon, 19 May 2025 02:52:02 GMT"
+                        "Mon, 19 May 2025 03:50:22 GMT"
                     ],
                     "x-ms-ratelimit-remaining-subscription-global-reads": [
                         "3749"
@@ -368,11 +516,8 @@
                     "content-length": [
                         "3255"
                     ],
-                    "x-ms-ratelimit-remaining-resource": [
-                        "Microsoft.Compute/LowCostGetSubscriptionMaximum;23995,Microsoft.Compute/LowCostGetResource;31"
-                    ],
-                    "x-msedge-ref": [
-                        "Ref A: B384A272C631449D80B79DE58B3E43F6 Ref B: MNZ221060608009 Ref C: 2025-05-19T02:52:02Z"
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
                     ]
                 },
                 "body": {

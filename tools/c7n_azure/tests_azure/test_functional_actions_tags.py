@@ -2,13 +2,14 @@
 # SPDX-License-Identifier: Apache-2.0
 import datetime
 
-from .azure_common import BaseTest, arm_template
+from .azure_common import BaseTest, arm_template, requires_arm_polling
 from c7n_azure.session import Session
 from c7n_azure import utils
 
 from . import tools_tags as tools
 
 
+@requires_arm_polling
 class FunctionalActionsTagsTest(BaseTest):
 
     rg_name = 'test_vm'
