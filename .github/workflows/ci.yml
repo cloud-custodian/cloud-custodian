@@ -32,7 +32,7 @@ jobs:
           cache-suffix: "linter"
       - name: Install Linters
         run: |
-          uv sync --only-group lint --no-workspace-packages
+          uv sync --only-group lint --no-install-workspace
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # ratchet:hashicorp/setup-terraform@v3
         with:
