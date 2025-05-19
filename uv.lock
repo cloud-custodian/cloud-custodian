@@ -1306,10 +1306,13 @@ dev = [
     { name = "pytest-sugar" },
     { name = "pytest-terraform" },
     { name = "pytest-xdist" },
-    { name = "ruff" },
     { name = "tomli" },
     { name = "twine" },
     { name = "vcrpy" },
+]
+lint = [
+    { name = "black" },
+    { name = "ruff" },
 ]
 
 [package.metadata]
@@ -1347,10 +1350,13 @@ dev = [
     { name = "pytest-sugar", specifier = ">=0.9.2,<1.1.0" },
     { name = "pytest-terraform", specifier = ">=0.6,<0.8" },
     { name = "pytest-xdist", specifier = ">=3.0,<4.0" },
-    { name = "ruff", specifier = "~=0.11" },
     { name = "tomli", specifier = ">=2.2.1" },
     { name = "twine", specifier = ">=3.1.1,<6.0.0" },
     { name = "vcrpy", specifier = ">=4.0.2" },
+]
+lint = [
+    { name = "black", specifier = ">=23.1,<25.0" },
+    { name = "ruff", specifier = "~=0.11" },
 ]
 
 [[package]]
