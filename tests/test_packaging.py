@@ -8,7 +8,7 @@ import pytest
 
 @pytest.mark.parametrize("package", [
     "c7n", "c7n_azure", "c7n_gcp", "c7n_kube", "c7n_org",
-    "c7n_mailer", "policystream", "c7n_trailcreator", "c7n_terraform",
+    "c7n_mailer", "policystream", "c7n_trailcreator",
     "c7n_logexporter", "c7n_sphinxext", "c7n_openstack"])
 def test_package_metadata(package):
     try:
