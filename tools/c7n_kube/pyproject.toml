@@ -8,7 +8,6 @@ dependencies = [
     "c7n",
     "kubernetes>=10.0.1",
     "jsonpatch<2.0,>=1.32",
-    "urllib3<1.27,>=1.25.4",
 ]
 name = "c7n_kube"
 version = "0.2.43"

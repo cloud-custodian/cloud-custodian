@@ -13,7 +13,6 @@ dependencies = [
     "google-cloud-monitoring<3.0.0,>=2.5.0",
     "google-cloud-storage<3.0,>=2.7",
     "pyrate-limiter<3.0.0,>=2.8.4",
-    "urllib3<1.27,>=1.25.4",
 ]
 name = "c7n_gcp"
 version = "0.4.43"

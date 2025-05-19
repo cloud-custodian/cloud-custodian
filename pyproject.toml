@@ -12,9 +12,6 @@ dependencies = [
     "python-dateutil<3.0.0,>=2.8.2",
     "pyyaml>=5.4.0",
     "tabulate<1.0.0,>=0.9.0",
-    "docutils<0.19,>=0.18",
-    "urllib3<1.27,>=1.25.4",
-    "setuptools<79",
 ]
 name = "c7n"
 version = "0.9.44"

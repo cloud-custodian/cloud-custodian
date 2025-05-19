@@ -2,7 +2,7 @@
 authors = [
     {name = "Cloud Custodian Project"},
 ]
-license = {text = "Apache-2.0"}
+license = "Apache-2.0"
 requires-python = "<4.0.0,>=3.9.2"
 dependencies = [
     "c7n",
@@ -13,7 +13,6 @@ dependencies = [
     "sphinx-markdown-tables>=0.0.12",
     "myst-parser>=0.18",
     "click>=8.0",
-    "urllib3<1.27,>=1.25.4",
 ]
 name = "c7n_sphinxext"
 version = "1.1.43"

@@ -87,11 +87,9 @@ gen-docker:
 # - primarily used to help drive frozen releases and dependency upgrades
 
 pkg-rebase:
-	rm -f poetry.lock
-	for pkg in $(PKG_SET); do cd $$pkg && echo $$pkg && rm -f poetry.lock && cd ../..; done
+	rm -f uv.lock
 	@$(MAKE) -f $(SELF_MAKE) pkg-update
-	git add poetry.lock
-	for pkg in $(PKG_SET); do cd $$pkg && echo $$pkg && git add poetry.lock && cd ../..; done
+	git add uv.lock
 
 pkg-clean:
 	rm -f release.md
@@ -103,30 +101,30 @@ pkg-clean:
 	for pkg in $(PKG_SET); do cd $$pkg && rm -Rf build/* && cd ../..; done
 
 pkg-update:
-	poetry update
-	for pkg in $(PKG_SET); do cd $$pkg && echo $$pkg && poetry update && cd ../..; done
+	uv sync --all-packages \
+	    --group dev \
+	    --group addons \
+	    --group lint \
+            --extra gcp --extra azure \
+            --upgrade
 
 pkg-show-update:
-	poetry show -o
-	for pkg in $(PKG_SET); do cd $$pkg && echo $$pkg && poetry show -o && cd ../..; done
+	uv tree --outdated --no-default-groups
 
-pkg-increment:
+# TODO: script to increment version in pyproject.toml files
+#pkg-increment:
 # increment versions
-	poetry version $(PKG_INCREMENT)
-	for pkg in $(PKG_SET); do cd $$pkg && poetry version $(PKG_INCREMENT) && cd ../..; done
-	poetry run python tools/dev/poetrypkg.py gen-version-file -p . -f c7n/version.py
+#	poetry version $(PKG_INCREMENT)
+#	for pkg in $(PKG_SET); do cd $$pkg && poetry version $(PKG_INCREMENT) && cd ../..; done
+#	poetry run python tools/dev/poetrypkg.py gen-version-file -p . -f c7n/version.py
 
 pkg-build-wheel:
 # requires plugin installation -> poetry self add poetry-plugin-freeze
 	@$(MAKE) -f $(SELF_MAKE) pkg-clean
+	uv build --all-packages --wheel
+# TODO: poetry freeze-wheel
+	twine check --strict dist/*.whl
 
-	poetry build --format wheel
-	for pkg in $(PKG_SET); do cd $$pkg && poetry build --format wheel && cd ../..; done
-
-	poetry freeze-wheel
-
-	twine check --strict dist/*
-	for pkg in $(PKG_SET); do cd $$pkg && twine check --strict dist/* && cd ../..; done
 
 pkg-publish-wheel:
 # upload to test pypi
