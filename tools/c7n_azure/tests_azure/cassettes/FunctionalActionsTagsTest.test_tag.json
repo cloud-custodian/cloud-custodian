@@ -14,32 +14,32 @@
                     "message": ""
                 },
                 "headers": {
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
                     "x-ms-need-to-refresh-epl-cache": [
                         "False"
-                    ],
-                    "content-length": [
-                        "3234"
-                    ],
-                    "date": [
-                        "Tue, 13 May 2025 05:40:24 GMT"
-                    ],
-                    "x-ms-ratelimit-remaining-subscription-global-reads": [
-                        "3749"
-                    ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
-                    ],
-                    "x-msedge-ref": [
-                        "Ref A: 8436EB921AC849F780850F7E79CEA8AA Ref B: MNZ221060609035 Ref C: 2025-05-13T05:40:24Z"
                     ],
                     "cache-control": [
                         "no-cache"
                     ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Mon, 19 May 2025 02:51:57 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-length": [
+                        "3234"
+                    ],
                     "x-ms-ratelimit-remaining-resource": [
                         "Microsoft.Compute/HighCostGetSubscriptionMaximum;897"
                     ],
-                    "x-cache": [
-                        "CONFIG_NOCACHE"
+                    "x-msedge-ref": [
+                        "Ref A: 3F470067337E4191A63D34EB39F59F05 Ref B: MNZ221060619037 Ref C: 2025-05-19T02:51:57Z"
                     ]
                 },
                 "body": {
@@ -51,9 +51,9 @@
                                 "type": "Microsoft.Compute/virtualMachines",
                                 "location": "southcentralus",
                                 "tags": {
-                                    "cctest_email": "live.com#ajkerrigan@outlook.com",
-                                    "cctest_date": "05.13.2025",
-                                    "cctest_mark": "delete, 2025/05/23"
+                                    "cctest_email": "live.com#aj@speckledmonkey.com",
+                                    "cctest_date": "05.19.2025",
+                                    "cctest_mark": "delete, 2025/05/29"
                                 },
                                 "properties": {
                                     "hardwareProfile": {
@@ -148,29 +148,29 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "content-length": [
-                        "388"
-                    ],
-                    "date": [
-                        "Tue, 13 May 2025 05:40:25 GMT"
-                    ],
-                    "x-msedge-ref": [
-                        "Ref A: B332E1D496A946B68598B9D33F837BEA Ref B: MNZ221060619035 Ref C: 2025-05-13T05:40:25Z"
-                    ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
-                    ],
-                    "cache-control": [
-                        "no-cache"
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
                     ],
                     "x-ms-ratelimit-remaining-subscription-global-writes": [
                         "2999"
                     ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Mon, 19 May 2025 02:51:57 GMT"
+                    ],
                     "x-ms-ratelimit-remaining-subscription-writes": [
                         "199"
                     ],
-                    "x-cache": [
-                        "CONFIG_NOCACHE"
+                    "content-length": [
+                        "388"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: DAF317C85F4E41DBB16EAA60CD33EE18 Ref B: MNZ221060618053 Ref C: 2025-05-19T02:51:57Z"
                     ]
                 },
                 "body": {
@@ -180,9 +180,9 @@
                         "type": "Microsoft.Resources/tags",
                         "properties": {
                             "tags": {
-                                "cctest_email": "live.com#ajkerrigan@outlook.com",
-                                "cctest_date": "05.13.2025",
-                                "cctest_mark": "delete, 2025/05/23",
+                                "cctest_email": "live.com#aj@speckledmonkey.com",
+                                "cctest_date": "05.19.2025",
+                                "cctest_mark": "delete, 2025/05/29",
                                 "cctest_tag": "ccvalue"
                             }
                         }
@@ -203,32 +203,32 @@
                     "message": ""
                 },
                 "headers": {
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
                     "x-ms-need-to-refresh-epl-cache": [
                         "False"
-                    ],
-                    "content-length": [
-                        "3420"
-                    ],
-                    "date": [
-                        "Tue, 13 May 2025 05:40:25 GMT"
-                    ],
-                    "x-ms-ratelimit-remaining-subscription-global-reads": [
-                        "3749"
-                    ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
-                    ],
-                    "x-msedge-ref": [
-                        "Ref A: 9474950F65524D5FA2E023FF182ED970 Ref B: BL2AA2011001054 Ref C: 2025-05-13T05:40:26Z"
                     ],
                     "cache-control": [
                         "no-cache"
                     ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Mon, 19 May 2025 02:51:58 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-length": [
+                        "3420"
+                    ],
                     "x-ms-ratelimit-remaining-resource": [
                         "Microsoft.Compute/LowCostGetSubscriptionMaximum;23996,Microsoft.Compute/LowCostGetResource;32"
                     ],
-                    "x-cache": [
-                        "CONFIG_NOCACHE"
+                    "x-msedge-ref": [
+                        "Ref A: D07BF4AF247D4BDABDF8D6576B8C5B6A Ref B: MNZ221060619033 Ref C: 2025-05-19T02:51:59Z"
                     ]
                 },
                 "body": {
@@ -238,9 +238,9 @@
                         "type": "Microsoft.Compute/virtualMachines",
                         "location": "southcentralus",
                         "tags": {
-                            "cctest_email": "live.com#ajkerrigan@outlook.com",
-                            "cctest_date": "05.13.2025",
-                            "cctest_mark": "delete, 2025/05/23",
+                            "cctest_email": "live.com#aj@speckledmonkey.com",
+                            "cctest_date": "05.19.2025",
+                            "cctest_mark": "delete, 2025/05/29",
                             "cctest_tag": "ccvalue"
                         },
                         "properties": {
