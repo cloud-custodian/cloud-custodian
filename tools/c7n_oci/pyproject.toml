@@ -27,3 +27,10 @@ documentation = "https://cloudcustodian.io/docs/"
 dev = [
     "pytest<8.0",
 ]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["c7n_oci"]

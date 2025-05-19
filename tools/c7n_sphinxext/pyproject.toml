@@ -32,3 +32,7 @@ documentation = "https://cloudcustodian.io/docs"
 
 [project.scripts]
 c7n-sphinxext = "c7n_sphinxext.docgen:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

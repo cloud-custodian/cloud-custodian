@@ -106,3 +106,7 @@ dev = [
     "vcrpy-unittest>=0.1.7",
     "parameterized>=0.7.1",
 ]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

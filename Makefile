@@ -29,12 +29,13 @@ endif
 
 install:
 #	@if [[ -z "$(VIRTUAL_ENV)" ]]; then echo "Create and Activate VirtualEnv First, ie. python3 -m venv .venv && source .venv/bin/activate"; exit 1; fi
-	uv sync --all-packages --group dev --group addons
+# extras are for c7n_mailer
+	uv sync --all-packages --group dev --group addons --extra gcp --extra azure
 
 .PHONY: test
 
 test:
-	. $(PWD)/test.env && uv run pytest -n auto $(ARGS) tests
+	. $(PWD)/test.env && uv run pytest -n auto $(ARGS) tests tools
 
 test-coverage:
 	. $(PWD)/test.env && uv run pytest -n auto \
@@ -65,7 +66,7 @@ lint:
 
 format:
 	uv run black $(FMT_SET)
-	uv ruff check --fix c7n tests tools
+	uv run ruff check --fix c7n tests tools
 	type -P terraform && terraform fmt -recursive .
 
 clean:

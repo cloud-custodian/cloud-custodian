@@ -1381,7 +1381,7 @@ dev = [{ name = "pytest", specifier = "<8.0" }]
 [[package]]
 name = "c7n-azure"
 version = "0.7.43"
-source = { virtual = "tools/c7n_azure" }
+source = { editable = "tools/c7n_azure" }
 dependencies = [
     { name = "adal" },
     { name = "applicationinsights" },
@@ -1565,7 +1565,7 @@ dev = [
 [[package]]
 name = "c7n-gcp"
 version = "0.4.43"
-source = { virtual = "tools/c7n_gcp" }
+source = { editable = "tools/c7n_gcp" }
 dependencies = [
     { name = "c7n" },
     { name = "google-api-python-client" },
@@ -1712,8 +1712,8 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "boto3", specifier = ">=1.11.12" },
-    { name = "c7n-azure", marker = "extra == 'azure'", virtual = "tools/c7n_azure" },
-    { name = "c7n-gcp", marker = "extra == 'gcp'", virtual = "tools/c7n_gcp" },
+    { name = "c7n-azure", marker = "extra == 'azure'", editable = "tools/c7n_azure" },
+    { name = "c7n-gcp", marker = "extra == 'gcp'", editable = "tools/c7n_gcp" },
     { name = "datadog", specifier = ">=0.34.0,<1.0.0" },
     { name = "google-cloud-secret-manager", marker = "extra == 'gcp'", specifier = ">=2.8.0,<3.0.0" },
     { name = "importlib-metadata", specifier = ">=8.0,<9.0" },
@@ -1742,7 +1742,7 @@ dev = [
 [[package]]
 name = "c7n-oci"
 version = "0.1.18"
-source = { virtual = "tools/c7n_oci" }
+source = { editable = "tools/c7n_oci" }
 dependencies = [
     { name = "c7n" },
     { name = "oci" },
@@ -1765,7 +1765,7 @@ dev = [{ name = "pytest", specifier = "<8.0" }]
 [[package]]
 name = "c7n-openstack"
 version = "0.1.34"
-source = { virtual = "tools/c7n_openstack" }
+source = { editable = "tools/c7n_openstack" }
 dependencies = [
     { name = "c7n" },
     { name = "openstacksdk" },
@@ -1857,7 +1857,7 @@ dev = [
 [[package]]
 name = "c7n-sphinxext"
 version = "1.1.43"
-source = { virtual = "tools/c7n_sphinxext" }
+source = { editable = "tools/c7n_sphinxext" }
 dependencies = [
     { name = "c7n" },
     { name = "click", version = "8.1.8", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
@@ -1887,7 +1887,7 @@ requires-dist = [
 [[package]]
 name = "c7n-tencentcloud"
 version = "0.1.26"
-source = { virtual = "tools/c7n_tencentcloud" }
+source = { editable = "tools/c7n_tencentcloud" }
 dependencies = [
     { name = "c7n" },
     { name = "cos-python-sdk-v5" },
