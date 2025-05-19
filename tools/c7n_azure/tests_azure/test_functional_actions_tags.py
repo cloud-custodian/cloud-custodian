@@ -71,6 +71,7 @@ class FunctionalActionsTagsTest(BaseTest):
     def test_autotag_user_and_date(self):
         self._run_policy([{'type': 'auto-tag-user', 'tag': 'cctest_email', 'days': 1},
                           {'type': 'auto-tag-date', 'tag': 'cctest_date', 'days': 1}])
+        self.sleep_in_live_mode(5)
         self.assertIsNotNone(self._get_tags().get('cctest_email'))
         self.assertIsNotNone(self._get_tags().get('cctest_date'))
 
