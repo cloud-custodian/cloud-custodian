@@ -2,7 +2,7 @@
 authors = [
     {name = "Cloud Custodian Project"},
 ]
-license = {text = "Apache-2.0"}
+license = "Apache-2.0"
 requires-python = "<4.0.0,>=3.9.2"
 dependencies = [
     "c7n",

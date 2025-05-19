@@ -2,7 +2,7 @@
 authors = [
     {name = "Cloud Custodian Project"},
 ]
-license = {text = "Apache-2.0"}
+license = "Apache-2.0"
 requires-python = "<4.0.0,>=3.9.2"
 dependencies = [
     "cryptography>=44",
@@ -54,6 +54,7 @@ dev = [
     "pytest-recording<0.14.0,>=0.12.1",
     "moto<6.0,>=5.0",
     "openapi-spec-validator<1.0.0,>=0.7.1",
+    "tomli>=2.2.1",
 ]
 addons = [
     "aws-xray-sdk<3.0,>=2.14",
@@ -77,7 +78,6 @@ members = [
   "tools/c7n_policystream",
   "tools/c7n_sphinxext",
   "tools/c7n_tencentcloud",
-  "workspace"
 ]
 
 [build-system]

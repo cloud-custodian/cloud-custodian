@@ -26,7 +26,6 @@ members = [
     "c7n-policystream",
     "c7n-sphinxext",
     "c7n-tencentcloud",
-    "custodian-workspace",
 ]
 
 [[package]]
@@ -1307,6 +1306,7 @@ dev = [
     { name = "pytest-terraform" },
     { name = "pytest-xdist" },
     { name = "ruff" },
+    { name = "tomli" },
     { name = "twine" },
     { name = "vcrpy" },
 ]
@@ -1347,6 +1347,7 @@ dev = [
     { name = "pytest-terraform", specifier = ">=0.6,<0.8" },
     { name = "pytest-xdist", specifier = ">=3.0,<4.0" },
     { name = "ruff", specifier = "~=0.11" },
+    { name = "tomli", specifier = ">=2.2.1" },
     { name = "twine", specifier = ">=3.1.1,<6.0.0" },
     { name = "vcrpy", specifier = ">=4.0.2" },
 ]
@@ -2253,41 +2254,6 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/35/b0/ec4082d3793f03cb248881fecefc26015813199b88f33e3e990a43f79835/cryptography-44.0.3-pp311-pypy311_pp73-manylinux_2_34_aarch64.whl", hash = "sha256:dd3db61b8fe5be220eee484a17233287d0be6932d056cf5738225b9c05ef4fff", size = 3898034, upload-time = "2025-05-02T19:35:54.72Z" },
     { url = "https://files.pythonhosted.org/packages/0b/7f/adf62e0b8e8d04d50c9a91282a57628c00c54d4ae75e2b02a223bd1f2613/cryptography-44.0.3-pp311-pypy311_pp73-manylinux_2_34_x86_64.whl", hash = "sha256:978631ec51a6bbc0b7e58f23b68a8ce9e5f09721940933e9c217068388789fe5", size = 4114449, upload-time = "2025-05-02T19:35:57.139Z" },
     { url = "https://files.pythonhosted.org/packages/87/62/d69eb4a8ee231f4bf733a92caf9da13f1c81a44e874b1d4080c25ecbb723/cryptography-44.0.3-pp311-pypy311_pp73-win_amd64.whl", hash = "sha256:5d20cc348cca3a8aa7312f42ab953a56e15323800ca3ab0706b8cd452a3a056c", size = 3134369, upload-time = "2025-05-02T19:35:58.907Z" },
-]
-
-[[package]]
-name = "custodian-workspace"
-version = "1.0"
-source = { virtual = "workspace" }
-dependencies = [
-    { name = "c7n" },
-    { name = "c7n-azure" },
-    { name = "c7n-gcp" },
-    { name = "c7n-kube" },
-    { name = "c7n-left" },
-    { name = "c7n-mailer" },
-    { name = "c7n-oci" },
-    { name = "c7n-openstack" },
-    { name = "c7n-org" },
-    { name = "c7n-policystream" },
-    { name = "c7n-sphinxext" },
-    { name = "c7n-tencentcloud" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "c7n", extras = ["dev", "addons"], editable = "." },
-    { name = "c7n-azure", virtual = "tools/c7n_azure" },
-    { name = "c7n-gcp", virtual = "tools/c7n_gcp" },
-    { name = "c7n-kube", editable = "tools/c7n_kube" },
-    { name = "c7n-left", editable = "tools/c7n_left" },
-    { name = "c7n-mailer", editable = "tools/c7n_mailer" },
-    { name = "c7n-oci", virtual = "tools/c7n_oci" },
-    { name = "c7n-openstack", virtual = "tools/c7n_openstack" },
-    { name = "c7n-org", editable = "tools/c7n_org" },
-    { name = "c7n-policystream", editable = "tools/c7n_policystream" },
-    { name = "c7n-sphinxext", virtual = "tools/c7n_sphinxext" },
-    { name = "c7n-tencentcloud", virtual = "tools/c7n_tencentcloud" },
 ]
 
 [[package]]

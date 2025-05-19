@@ -25,12 +25,13 @@ def test_package_metadata(package):
             p = c
     assert found, "could not find %s pyproject.toml" % package
     data = tomli.loads(p.read_text())
-    md = data['tool']['poetry']
-    assert md.get('homepage') == 'https://cloudcustodian.io'
-    assert md.get('documentation').startswith('https://cloudcustodian.io/docs')
-    assert md.get('repository') == 'https://github.com/cloud-custodian/cloud-custodian'
+    md = data['project']
+    urls = data['project']['urls']
+    assert urls.get('homepage') == 'https://cloudcustodian.io'
+    assert urls.get('documentation').startswith('https://cloudcustodian.io/docs')
+    assert urls.get('repository') == 'https://github.com/cloud-custodian/cloud-custodian'
     assert md.get('license') == 'Apache-2.0'
-    assert md.get('authors') == ['Cloud Custodian Project']
+    assert md.get('authors') == [{'name': 'Cloud Custodian Project'}]
     assert md.get('classifiers', []) == [
         'License :: OSI Approved :: Apache Software License',
         'Topic :: System :: Systems Administration',
@@ -49,5 +50,5 @@ def test_version_match():
     pyproject = Path(m.__file__).parent.parent / 'pyproject.toml'
     with open(pyproject, 'r') as f:
         loaded = tomli.loads(f.read())
-        pyproject_version = loaded['tool']['poetry']['version']
+        pyproject_version = loaded['project']['version']
         assert pyproject_version == version

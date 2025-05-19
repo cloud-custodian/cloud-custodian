@@ -28,13 +28,13 @@ endif
 # Common developer targets
 
 install:
-	@if [[ -z "$(VIRTUAL_ENV)" ]]; then echo "Create and Activate VirtualEnv First, ie. python3 -m venv .venv && source .venv/bin/activate"; exit 1; fi
-	uv sync --active --all-packages --group dev
+#	@if [[ -z "$(VIRTUAL_ENV)" ]]; then echo "Create and Activate VirtualEnv First, ie. python3 -m venv .venv && source .venv/bin/activate"; exit 1; fi
+	uv sync --all-packages --group dev --group addons
 
 .PHONY: test
 
 test:
-	. $(PWD)/test.env && uv run --active pytest -n auto $(ARGS) tests
+	. $(PWD)/test.env && uv run pytest -n auto $(ARGS) tests
 
 test-coverage:
 	. $(PWD)/test.env && uv run pytest -n auto \

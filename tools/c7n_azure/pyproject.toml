@@ -2,10 +2,10 @@
 authors = [
     {name = "Cloud Custodian Project"},
 ]
-license = {text = "Apache-2.0"}
+license = "Apache-2.0"
 requires-python = "<4.0.0,>=3.9.2"
 dependencies = [
-    "c7n @ file:///${PROJECT_ROOT}/../..",
+    "c7n",	     
     "azure-mgmt-authorization<2.0.0,>=1.0.0",
     "azure-mgmt-advisor<10.0.0,>=9.0.0",
     "azure-mgmt-apimanagement<2.0.0,>=1.0.0",
