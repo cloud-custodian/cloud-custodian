@@ -20,10 +20,10 @@ class TagHelper:
             raise NotImplementedError('Cannot tag resource with type {0}'
                                         .format(az_resource.type))
 
-        # create a PATCH object with only updates to tags
+        # create a PATCH object with a new complete tag set following any adds/updates/deletes
         tags_patch = TagsPatchResource(operation='Replace', properties={'tags': tags})
 
-        client.tags.begin_update_at_scope(resource['id'], tags_patch)
+        return client.tags.begin_update_at_scope(resource['id'], tags_patch).result()
 
     @staticmethod
     def remove_tags(tag_action, resource, tags_to_delete):
