@@ -12,28 +12,33 @@ from pathlib import Path
 import zipfile
 import requests
 
-from hatchling.plugin import hookimpl
-from hatchling.builders.hooks.plugin.interface import BuildHookInterface
-
 # we use this to fetch the available python sdk service names.
 # boto is listed as a build dependency.
 import boto3
 
+try:
+    from hatchling.plugin import hookimpl
+    from hatchling.builders.hooks.plugin.interface import BuildHookInterface
+
+
+    class CloudDataBuild(BuildHookInterface):
+
+        PLUGIN_NAME = "CloudServiceData"
+
+        def initialize(self, version, build_data):
+            build({})
+            build_data["artifacts"].append("data/*.json")
+
+
+    @hookimpl
+    def hatch_register_build_hook():
+        return CloudDataBuild
+
+except ImportError:
+    pass
+
+
 SCHEMA_URL = "https://schema.cloudformation.us-east-1.amazonaws.com/CloudformationSchema.zip"
-
-
-class CloudDataBuild(BuildHookInterface):
-
-    PLUGIN_NAME = "CloudServiceData"
-
-    def initialize(self, version, build_data):
-        build({})
-        build_data["artifacts"].append("data/*.json")
-
-
-@hookimpl
-def hatch_register_build_hook():
-    return CloudDataBuild
 
 
 def fake_session():
