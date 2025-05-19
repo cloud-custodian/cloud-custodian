@@ -9,8 +9,8 @@ https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/resource-type-sch
 import json
 from io import BytesIO
 from pathlib import Path
-from urllib.request import urlopen
 import zipfile
+import requests
 
 from hatchling.plugin import hookimpl
 from hatchling.builders.hooks.plugin.interface import BuildHookInterface
@@ -135,11 +135,12 @@ def build(setup_kwargs):
     data_dir = Path("c7n_awscc") / "data"
     data_dir.mkdir(exist_ok=True)
 
-    with urlopen(SCHEMA_URL) as response:
-        zipf = zipfile.ZipFile(BytesIO(response.read()))
-        for f in zipf.namelist():
-            name = f.replace("-", "_")
-            (data_dir / name).write_text(zipf.read(f).decode("utf8"), encoding="utf8")
+    response = requests.get(SCHEMA_URL)
+
+    zipf = zipfile.ZipFile(BytesIO(response.content))
+    for f in zipf.namelist():
+        name = f.replace("-", "_")
+        (data_dir / name).write_text(zipf.read(f).decode("utf8"), encoding="utf8")
 
     print("awscc - downloaded %d resource types" % (len(zipf.namelist())))
     build_index(data_dir)

@@ -35,4 +35,4 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.hooks.custom]
 path = "build.py"
-dependencies = ["boto3"]
+dependencies = ["boto3", "requests"]
