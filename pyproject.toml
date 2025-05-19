@@ -67,6 +67,7 @@ c7n = { workspace = true }
 
 [tool.uv.workspace]
 members = [
+  "tools/c7n_awscc",
   "tools/c7n_azure",
   "tools/c7n_gcp",
   "tools/c7n_kube",
