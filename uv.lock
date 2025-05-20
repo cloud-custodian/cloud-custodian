@@ -1772,7 +1772,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "c7n", editable = "." },
-    { name = "openstacksdk", specifier = ">=0.52.0,<1.0.0" },
+    { name = "openstacksdk", specifier = "==0.52.0" },
 ]
 
 [package.metadata.requires-dev]
@@ -3542,7 +3542,7 @@ wheels = [
 
 [[package]]
 name = "openstacksdk"
-version = "0.103.0"
+version = "0.52.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "appdirs" },
@@ -3560,9 +3560,9 @@ dependencies = [
     { name = "pyyaml" },
     { name = "requestsexceptions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/be/bb/91f8f5f8882a8909ffec033003a8f2bb08d7354c7d214929ed4c6e296e00/openstacksdk-0.103.0.tar.gz", hash = "sha256:4f9f118986603967435f3976b3e059950a71bd8e41a8316cc8afb2d9668a0741", size = 1094619, upload-time = "2022-11-24T13:41:58.199Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/84/19/f1bc34691a0db5d5072d389f114d0b99080c8a418912ee8690f825760dbf/openstacksdk-0.52.0.tar.gz", hash = "sha256:c9a2dd8c9d2cf44d7ba2075c7963f8fc79adf98f44af6aac2f4b612c12b798b3", size = 981077, upload-time = "2020-11-18T17:41:53.53Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/15/cd/2b0d6abc31cab37e07dff0d2d28489412e2fc32867fa9f6fd5276eab2909/openstacksdk-0.103.0-py3-none-any.whl", hash = "sha256:838486f47cf5a2b52c8bdfdc0b42b7203319deb2420ae208b8add3c02f9d62f4", size = 1532321, upload-time = "2022-11-24T13:41:56.319Z" },
+    { url = "https://files.pythonhosted.org/packages/b4/da/d42fda9f5d058bc442a5b9cc4e1555ee69be86e81d55d7e3e62daadfb8bb/openstacksdk-0.52.0-py3-none-any.whl", hash = "sha256:cd8a23539961e2958a4e2e2240ec3d1d801a85d1bd23d7d8f22bbd554db42d2e", size = 1338961, upload-time = "2020-11-18T17:41:26.832Z" },
 ]
 
 [[package]]

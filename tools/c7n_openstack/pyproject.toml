@@ -6,7 +6,7 @@ license = "Apache-2.0"
 requires-python = "<4.0.0,>=3.9.2"
 dependencies = [
     "c7n",
-    "openstacksdk<1.0.0,>=0.52.0",
+    "openstacksdk==0.52.0",
 ]
 name = "c7n_openstack"
 version = "0.1.34"
