@@ -50,7 +50,7 @@ CORE_DEPS = [
     # sendgrid dependencies
     "sendgrid",
     "python_http_client",
-    "ecdsa"
+    "ecdsa",
 ]
 
 
