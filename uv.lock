@@ -904,16 +904,17 @@ wheels = [
 
 [[package]]
 name = "azure-mgmt-resource"
-version = "16.1.0"
+version = "23.3.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "azure-common" },
     { name = "azure-mgmt-core" },
-    { name = "msrest" },
+    { name = "isodate" },
+    { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/a2/bc/afc5f0aac38026b339224b2321bcab43fd5cd810fe8f0de8100996d15af5/azure-mgmt-resource-16.1.0.zip", hash = "sha256:b814ee27b37f030fe69461ef6f514661340dc8b1f28736362541e1c0d31d90ae", size = 2632239, upload-time = "2021-04-19T06:58:36.713Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/a7/28/e950da2d89e55e2315ff0f4de075da4ac0fed4c27a489f7c774dedde9854/azure_mgmt_resource-23.3.0.tar.gz", hash = "sha256:fc4f1fd8b6aad23f8af4ed1f913df5f5c92df117449dc354fea6802a2829fea4", size = 2126229, upload-time = "2025-02-26T03:13:14.633Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a4/0b/8fea0e1e8ad814fbb75c4c27f68206719bf9021807948a73d95031324393/azure_mgmt_resource-16.1.0-py2.py3-none-any.whl", hash = "sha256:433cddfb737bbc894698a7c9b07e15b4e0872cf89a54eaf1301d5605b2c4118d", size = 1882865, upload-time = "2021-04-19T06:58:33.966Z" },
+    { url = "https://files.pythonhosted.org/packages/86/09/722855d8b6b0ac6351a5552ea25b67c149a906891928bc1772c57423dac9/azure_mgmt_resource-23.3.0-py3-none-any.whl", hash = "sha256:ab216ee28e29db6654b989746e0c85a1181f66653929d2cb6e48fba66d9af323", size = 2866899, upload-time = "2025-02-26T03:13:18.067Z" },
 ]
 
 [[package]]
@@ -1526,7 +1527,7 @@ requires-dist = [
     { name = "azure-mgmt-recoveryservicesbackup", specifier = ">=7.0.0,<8.0.0" },
     { name = "azure-mgmt-redhatopenshift", specifier = ">=1.2.0,<2.0.0" },
     { name = "azure-mgmt-redis", specifier = ">=14.5.0,<15.0.0" },
-    { name = "azure-mgmt-resource", specifier = ">=16.0.0,<17.0.0" },
+    { name = "azure-mgmt-resource", specifier = ">=23.0.0,<24.0.0" },
     { name = "azure-mgmt-resourcegraph", specifier = ">=7.0.0,<8.0.0" },
     { name = "azure-mgmt-search", specifier = ">=8.0.0,<9.0.0" },
     { name = "azure-mgmt-security", specifier = ">=7.0.0,<8.0.0" },
