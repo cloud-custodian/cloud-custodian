@@ -1289,7 +1289,6 @@ addons = [
     { name = "psutil" },
 ]
 dev = [
-    { name = "black" },
     { name = "click", version = "8.1.8", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
     { name = "click", version = "8.2.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
     { name = "coverage" },
@@ -1332,7 +1331,6 @@ addons = [
     { name = "psutil", specifier = ">=5.7" },
 ]
 dev = [
-    { name = "black", specifier = ">=23.1,<25.0" },
     { name = "click", specifier = ">=8.0,<9.0" },
     { name = "coverage", specifier = ">=7,<8" },
     { name = "docker", extras = ["websockets"], specifier = ">=7.1.0,<8.0.0" },

@@ -74,6 +74,7 @@ RUN apt-get --yes install --no-install-recommends build-essential \
     curl python3-venv python3-dev adduser
 # todo: 24.04 is trying to standardize on ubuntu as builtin non root.
 RUN adduser --disabled-login --gecos "" custodian
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 RUN python3 -m venv /usr/local
 RUN /usr/local/bin/pip install -U pip setuptools && \
     /usr/local/bin/pip install "poetry=={poetry_version}"
