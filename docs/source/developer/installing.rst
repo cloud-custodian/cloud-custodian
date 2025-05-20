@@ -68,25 +68,25 @@ above don't apply to your environment, you can still install a current release o
 manually. `This guide <https://realpython.com/installing-python/>`_ may be a useful reference.
 
 
-Install Poetry
+Install UV
 ~~~~~~~~~~~~~~
 
-Cloud Custodian uses `Poetry <https://python-poetry.org>`_ to manage its dependencies. Once your
-Python environment is set up, you will need to install `install Poetry <https://python-poetry.org/docs/#installation>`_.
+Cloud Custodian uses `UV <https://docs.astral.sh/uv/>`_ to manage Python and its dependencies. 
+You will need to install `install UV <https://docs.astral.sh/uv/getting-started/installation/>`_.
 
 On Mac/Linux
 ************
 
 .. code-block:: bash
 
-    curl -sSL https://install.python-poetry.org | python3 -
+    curl -LsSf https://astral.sh/uv/install.sh | sh
 
 On Windows with Powershell
 **************************
 
 .. code-block:: powershell
 
-    (Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | python -
+    powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
 
 Installing Custodian
 --------------------
@@ -123,7 +123,7 @@ First, clone the repository:
         git merge upstream/main
 
 
-Now that the repository is set up, perform a developer installation using Poetry:
+Now that the repository is set up, perform a developer installation using UV:
 
 .. code-block:: bash
 
@@ -132,33 +132,33 @@ Now that the repository is set up, perform a developer installation using Poetry
 This creates a sandboxed "virtual environment" ("venv") inside the ``cloud-custodian``
 directory, and installs the full suite of Cloud Custodian packages.
 
-You can run tests via Poetry as well:
+You can run tests via UV as well:
 
 .. code-block:: bash
 
     make test
 
-To run executables from your Poetry environment, precede them with ``poetry run``:
+To run executables from your UV environment, precede them with ``uv run``:
 
 .. code-block:: bash
 
-    poetry run custodian version
+   uv run custodian version
 
-Alternatively, activate a Poetry shell so that commands will run from your
+Alternatively, activate a UV virtualenvment shell so that commands will run from your
 development environment by default:
 
 .. code-block:: bash
 
-    poetry shell
+    source .venv/bin/activate
     custodian version
     custodian schema
 
 You'll also be able to invoke `pytest <https://docs.pytest.org/en/latest/>`_ directly
-with the arguments of your choosing, though that requires mimicking ``make test-poetry``'s
+with the arguments of your choosing, though that requires mimicking ``make test``'s
 environment preparation:
 
 .. code-block:: bash
 
-    poetry shell
+    source .venv/bin/activate
     source test.env
     pytest tests/test_s3.py -x -k replication
