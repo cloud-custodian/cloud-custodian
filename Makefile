@@ -29,7 +29,7 @@ endif
 
 install:
 # extras are for c7n_mailer, separate lint from dev for ci
-	uv sync --all-packages \
+	uv sync --locked --all-packages \
 	    --group dev \
 	    --group addons \
 	    --group lint \
@@ -81,7 +81,7 @@ image:
 	docker build -f docker/$(IMAGE) -t $(IMAGE):$(IMAGE_TAG) .
 
 gen-docker:
-	python tools/dev/dockerpkg.py generate
+	uv run tools/dev/dockerpkg.py generate
 ###
 # Package Management Targets
 # - primarily used to help drive frozen releases and dependency upgrades
@@ -119,10 +119,9 @@ pkg-show-update:
 #	poetry run python tools/dev/poetrypkg.py gen-version-file -p . -f c7n/version.py
 
 pkg-build-wheel:
-# requires plugin installation -> poetry self add poetry-plugin-freeze
 	@$(MAKE) -f $(SELF_MAKE) pkg-clean
 	uv build --all-packages --wheel
-# TODO: poetry freeze-wheel
+	uv run tools/dev/freezeuvwheel dist uv.lock
 	twine check --strict dist/*.whl
 
 
