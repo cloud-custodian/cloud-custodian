@@ -49,7 +49,14 @@ On macOS with Homebrew
 
     brew install python3
 
-Installing ``python3`` will get you the latest version of Python 3 supported by Homebrew, currently Python 3.9.
+Installing ``python3`` will get you the latest version of Python 3 supported by Homebrew, currently Python 3.13.
+
+.. code-block:: bash
+
+    brew install libgit2@1.8
+
+Installing ``libgit2@1.8`` will get you specific version of libgit2 to use `pygit2` in our current environment
+
 
 
 On Windows
