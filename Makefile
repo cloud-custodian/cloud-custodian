@@ -134,17 +134,17 @@ release-get-artifacts:
 
 data-update:
 # terraform data sets
-	cd tools/c7n_left/scripts && python get_taggable.py \
+	cd tools/c7n_left/scripts && python uv run get_taggable.py \
 		--module-path taggable_providers/latest \
 		--module-path taggable_providers/azurerm-previous \
 		--output ../c7n_left/data/taggable.json
 # aws data sets
-	python tools/dev/cfntypedb.py -f tests/data/cfn-types.json
-	python tools/dev/updatearnref.py > tests/data/arn-types.json
-	python tools/dev/iamdb.py -f tests/data/iam-actions.json
+	uv run tools/dev/data_cfntypedb.py -f tests/data/cfn-types.json
+	uv run tools/dev/data_updatearnref.py > tests/data/arn-types.json
+	uv run tools/dev/data_iamdb.py -f tests/data/iam-actions.json
 # gcp data sets
-	python tools/dev/gcpiamdb.py -f tools/c7n_gcp/tests/data/iam-permissions.json
-	python tools/dev/gcpregion.py -f tools/c7n_gcp/c7n_gcp/regions.json
+	uv run tools/dev/data_gcpiamdb.py -f tools/c7n_gcp/tests/data/iam-permissions.json
+	uv run tools/dev/data_gcpregion.py -f tools/c7n_gcp/c7n_gcp/regions.json
 
 ###
 # Static analyzers

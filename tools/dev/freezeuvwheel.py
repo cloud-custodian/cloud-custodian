@@ -1,9 +1,13 @@
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 # /// script
 # dependencies = [
 #   "tomli"
 # ]
 # ///
-
+"""
+Update wheels to use pinned dependencies from a lockfile
+"""
 import zipfile
 import tempfile
 import shutil
