@@ -1,6 +1,6 @@
 # /// script
 # dependencies = [
-#   "toml"
+#   "tomli"
 # ]
 # ///
 
@@ -8,7 +8,7 @@ import zipfile
 import tempfile
 import shutil
 import os
-import toml
+import tomli
 import re
 from pathlib import Path
 
@@ -22,7 +22,7 @@ def extract_metadata_path(zipf):
 
 def parse_lock_file(lock_file_path):
     with open(lock_file_path, 'r') as f:
-        lock_data = toml.load(f)
+        lock_data = tomli.loads(f.read())
 
     dependencies = {}
     for package in lock_data.get('package', []):

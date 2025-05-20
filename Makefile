@@ -29,7 +29,7 @@ endif
 
 install:
 # extras are for c7n_mailer, separate lint from dev for ci
-	uv sync --locked --all-packages \
+	uv sync --all-packages \
 	    --group dev \
 	    --group addons \
 	    --group lint \
@@ -111,12 +111,11 @@ pkg-update:
 pkg-show-update:
 	uv tree --outdated --no-default-groups
 
-# TODO: script to increment version in pyproject.toml files
-#pkg-increment:
+pkg-increment:
 # increment versions
-#	poetry version $(PKG_INCREMENT)
-#	for pkg in $(PKG_SET); do cd $$pkg && poetry version $(PKG_INCREMENT) && cd ../..; done
-#	poetry run python tools/dev/poetrypkg.py gen-version-file -p . -f c7n/version.py
+	uv version $(PKG_INCREMENT)
+	for pkg in $(PKG_SET); do cd $$pkg && uv version $(PKG_INCREMENT) && cd ../..; done
+	uv run tools/dev/devpkg.py gen-version-file -p . -f c7n/version.py
 
 pkg-build-wheel:
 	@$(MAKE) -f $(SELF_MAKE) pkg-clean
@@ -153,7 +152,7 @@ data-update:
 # Static analyzers
 
 analyzer-bandit:
-	bandit -i -s B101,B311 \
+	uvx bandit -i -s B101,B311 \
 	-r tools/c7n_azure/c7n_azure \
 	 tools/c7n_gcp/c7n_gcp \
 	 tools/c7n_oci/c7n_oci \
@@ -167,7 +166,7 @@ analyzer-bandit:
 
 
 analyzer-semgrep:
-	semgrep --error --verbose --config p/security-audit \
+	uvx semgrep --error --verbose --config p/security-audit \
 	 tools/c7n_azure/c7n_azure \
 	 tools/c7n_gcp/c7n_gcp \
 	 tools/c7n_oci/c7n_oci \

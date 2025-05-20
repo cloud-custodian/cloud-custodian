@@ -9,7 +9,7 @@ from pathlib import Path
 def cli():
     """Custodian Python Packaging Utility
 
-    some simple tooling to sync poetry files to setup/pip
+    some simple tooling to sync pyproject.toml files to setup/pip
     """
 
 
@@ -25,7 +25,7 @@ def gen_qa_requires(root, output):
     packages = []
     for root in project_roots(root):
         data = toml.loads((root / "pyproject.toml").read_text())
-        poetry_data = data['tool']['poetry']
+        poetry_data = data['package']
         packages.append((poetry_data['name'], poetry_data['version']))
 
     with open(output, 'w') as fh:
@@ -40,9 +40,9 @@ def gen_version_file(package_dir, version_file):
     """Generate a version file from poetry"""
     with open(Path(str(package_dir)) / 'pyproject.toml', 'rb') as f:
         data = toml.load(f)
-    version = data['tool']['poetry']['version']
+    version = data['package']['version']
     with open(version_file, 'w') as fh:
-        fh.write('# Generated via tools/dev/poetrypkg.py\n')
+        fh.write('# Generated via tools/dev/devpkg.py\n')
         fh.write('version = "{}"\n'.format(version))
 
 

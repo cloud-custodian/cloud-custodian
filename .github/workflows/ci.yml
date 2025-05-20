@@ -11,6 +11,7 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
   cancel-in-progress: true
 env:
+  UV_VERSION: "0.7.6"
   POETRY_VERSION: "1.5.1"
   DEFAULT_PY_VERSION: "3.11"
 
@@ -26,8 +27,7 @@ jobs:
         id: setup-uv-lint
         uses: astral-sh/setup-uv@v5
         with:
-          # Install a specific version of uv.
-          version: "0.7.5"
+          version: ${{ env.UV_VERSION }}
           enable-cache: true
           cache-suffix: "linter"
       - name: Install Linters
@@ -57,13 +57,17 @@ jobs:
       - uses: actions/setup-python@8d9ed9ac5c53483de85588cdf95a591a75ab9f55 # ratchet:actions/setup-python@v5
         with:
           python-version: ${{ env.DEFAULT_PY_VERSION }}
+        id: setup-uv-analyzer
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: ${{ env.UV_VERSION }}
+          enable-cache: true
+          cache-suffix: "analyzer"
       - name: Run Bandit
         run: |
-          python -m pip install bandit
           make analyzer-bandit
       - name: Run Semgrep
         run: |
-          python -m pip install semgrep
           make analyzer-semgrep
 
   Docs:
