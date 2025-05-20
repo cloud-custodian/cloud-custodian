@@ -121,18 +121,16 @@ pkg-build-wheel:
 	@$(MAKE) -f $(SELF_MAKE) pkg-clean
 	uv build --all-packages --wheel
 	uv run tools/dev/freezeuvwheel dist uv.lock
-	twine check --strict dist/*.whl
-
+	uv run twine check --strict dist/*.whl
 
 pkg-publish-wheel:
-# upload to test pypi
-	set -e
-	twine upload -r $(PKG_REPO) dist/*
-	for pkg in $(PKG_SET); do cd $$pkg && twine upload -r $(PKG_REPO) dist/* && cd ../..; done
+# upload to named package index / pypi
+	uv run twine upload -r $(PKG_REPO) dist/*
 
 release-get-artifacts:
+# download release artifacts from github release action
 	@$(MAKE) -f $(SELF_MAKE) pkg-clean
-	python tools/dev/get_release_artifacts.py
+	uv run tools/dev/get_release_artifacts.py
 
 data-update:
 # terraform data sets
