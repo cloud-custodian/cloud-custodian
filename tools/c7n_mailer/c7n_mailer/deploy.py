@@ -61,7 +61,7 @@ def get_archive(config):
 
     # sendgrid on python 3.10
     if sys.version_info.minor < 11:
-        deps.append('ellipticurve')
+        deps.append('ellipticcurve')
     # sendgrid on python 3.11+
     else:
         deps.append('ecdsa')
