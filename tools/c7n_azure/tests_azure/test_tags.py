@@ -45,17 +45,28 @@ class TagsTest(BaseTest):
         self.assertEqual(tools.get_tags_parameter(update_resource_tags), expected_tags)
 
     def test_update_tags(self):
-        for resource_type, resource in {
-            "vm": tools.get_resource({}),
-            "resourcegroup": tools.get_resource_group_resource({})
-        }.items():
-            client_mock = Mock()
-            action = Mock()
-            action.manager.type = resource_type
-            action.session.client.return_value = client_mock
+        resource = tools.get_resource({})
+        resource_group = tools.get_resource_group_resource({})
 
-            TagHelper.update_resource_tags(action, resource, self.existing_tags)
-            client_mock.tags.begin_update_at_scope.assert_called_once()
-            args = client_mock.tags.begin_update_at_scope.call_args[0]
-            self.assertEqual(args[0], resource['id'])
-            self.assertEqual(args[1].properties['tags'], self.existing_tags)
+        client_mock = Mock()
+
+        action = Mock()
+        action.manager.type = 'resourcegroup'
+        action.session.client.return_value = client_mock
+
+        TagHelper.update_resource_tags(action, resource_group, self.existing_tags)
+        client_mock.resource_groups.update.assert_called_once()
+        args = client_mock.resource_groups.update.call_args[0]
+        self.assertEqual(args[0], resource_group['name'])
+        self.assertEqual(args[1].tags, self.existing_tags)
+        # Only PATCH tags
+        self.assertListEqual(['tags'], [x for x in args[1].as_dict() if x is not None])
+
+        action.manager.type = 'vm'
+        TagHelper.update_resource_tags(action, resource, self.existing_tags)
+        client_mock.resources.begin_update_by_id.assert_called_once()
+        args = client_mock.resources.begin_update_by_id.call_args[0]
+        self.assertEqual(args[0], resource['id'])
+        self.assertEqual(args[2].tags, self.existing_tags)
+        # Only PATCH tags
+        self.assertListEqual(['tags'], [x for x in args[2].as_dict() if x is not None])

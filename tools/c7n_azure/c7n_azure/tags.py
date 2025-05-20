@@ -2,7 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 import logging
 
-from azure.mgmt.resource.resources.models import GenericResource, TagsPatchResource
+from azure.mgmt.resource.resources.models import GenericResource, ResourceGroupPatchable
+from c7n_azure.utils import is_resource_group
 
 
 class TagHelper:
@@ -13,17 +14,29 @@ class TagHelper:
     def update_resource_tags(tag_action, resource, tags):
         client = tag_action.session.client('azure.mgmt.resource.ResourceManagementClient')
 
-        # deserialize the original object
-        az_resource = GenericResource.deserialize(resource)
+        # resource group type
+        if is_resource_group(resource):
+            params_patch = ResourceGroupPatchable(
+                tags=tags
+            )
+            client.resource_groups.update(
+                resource['name'],
+                params_patch,
+            )
+        # other Azure resources
+        else:
+            # deserialize the original object
+            az_resource = GenericResource.deserialize(resource)
 
-        if not tag_action.manager.tag_operation_enabled(az_resource.type):
-            raise NotImplementedError('Cannot tag resource with type {0}'
-                                        .format(az_resource.type))
+            if not tag_action.manager.tag_operation_enabled(az_resource.type):
+                raise NotImplementedError('Cannot tag resource with type {0}'
+                                          .format(az_resource.type))
+            api_version = tag_action.session.resource_api_version(resource['id'])
 
-        # create a PATCH object with a new complete tag set following any adds/updates/deletes
-        tags_patch = TagsPatchResource(operation='Replace', properties={'tags': tags})
+            # create a PATCH object with only updates to tags
+            tags_patch = GenericResource(tags=tags)
 
-        return client.tags.begin_update_at_scope(resource['id'], tags_patch).result()
+            client.resources.begin_update_by_id(resource['id'], api_version, tags_patch)
 
     @staticmethod
     def remove_tags(tag_action, resource, tags_to_delete):

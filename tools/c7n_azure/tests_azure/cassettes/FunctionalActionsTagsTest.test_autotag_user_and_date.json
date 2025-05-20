@@ -4,42 +4,31 @@
         {
             "request": {
                 "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/virtualMachines?api-version=2022-11-01",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/virtualMachines?api-version=2019-03-01",
                 "body": null,
                 "headers": {}
             },
             "response": {
                 "status": {
                     "code": 200,
-                    "message": ""
+                    "message": "OK"
                 },
                 "headers": {
-                    "x-msedge-ref": [
-                        "Ref A: 6D0225B4A59B4D298EEC96771F965CF0 Ref B: MNZ221060608039 Ref C: 2025-05-19T03:49:59Z"
-                    ],
-                    "x-ms-need-to-refresh-epl-cache": [
-                        "False"
+                    "content-type": [
+                        "application/json; charset=utf-8"
                     ],
                     "cache-control": [
                         "no-cache"
                     ],
-                    "x-ms-ratelimit-remaining-resource": [
-                        "Microsoft.Compute/HighCostGetSubscriptionMaximum;899"
-                    ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
-                    ],
-                    "date": [
-                        "Mon, 19 May 2025 03:49:58 GMT"
-                    ],
-                    "x-ms-ratelimit-remaining-subscription-global-reads": [
-                        "3749"
+                    "x-ms-original-request-ids": [
+                        "dd05ec56-71da-49a6-a4f1-f2792bb23c18",
+                        "b3413ffe-7b9f-4468-9639-2a59a3be1526"
                     ],
                     "content-length": [
-                        "3083"
+                        "14155"
                     ],
-                    "x-cache": [
-                        "CONFIG_NOCACHE"
+                    "date": [
+                        "Wed, 29 Jan 2020 21:42:05 GMT"
                     ]
                 },
                 "body": {
@@ -52,56 +41,48 @@
                                 "location": "southcentralus",
                                 "tags": {},
                                 "properties": {
+                                    "vmId": "5ed2188d-4e51-4f76-9c34-8846450348d0",
                                     "hardwareProfile": {
-                                        "vmSize": "Standard_A1_v2"
+                                        "vmSize": "Basic_A0"
                                     },
-                                    "provisioningState": "Succeeded",
-                                    "vmId": "d874328d-9284-4084-a07e-95c1dcdc2a42",
                                     "storageProfile": {
                                         "imageReference": {
                                             "publisher": "Canonical",
                                             "offer": "UbuntuServer",
                                             "sku": "16.04.0-LTS",
-                                            "version": "latest",
-                                            "exactVersion": "16.04.202109280"
+                                            "version": "latest"
                                         },
                                         "osDisk": {
                                             "osType": "Linux",
-                                            "name": "cctestvm_OsDisk_1_0aa569485c1243fbb95398d030141205",
+                                            "name": "cctestvm_OsDisk_1_410a0dff83a34dea9123286081fb4b31",
                                             "createOption": "FromImage",
                                             "caching": "ReadWrite",
                                             "managedDisk": {
                                                 "storageAccountType": "Standard_LRS",
-                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_0aa569485c1243fbb95398d030141205"
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_410a0dff83a34dea9123286081fb4b31"
                                             },
-                                            "deleteOption": "Detach",
                                             "diskSizeGB": 30
                                         },
                                         "dataDisks": [
                                             {
                                                 "lun": 0,
-                                                "name": "cctestvm_disk2_e1f0c6cc6c61481f9a70fba7ee59381f",
+                                                "name": "cctestvm_disk2_4101844f489b42f4808812eb3b1f415a",
                                                 "createOption": "Empty",
                                                 "caching": "None",
                                                 "managedDisk": {
                                                     "storageAccountType": "Standard_LRS",
-                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_disk2_e1f0c6cc6c61481f9a70fba7ee59381f"
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_disk2_4101844f489b42f4808812eb3b1f415a"
                                                 },
-                                                "deleteOption": "Detach",
                                                 "diskSizeGB": 1023,
                                                 "toBeDetached": false
                                             }
                                         ]
                                     },
                                     "osProfile": {
-                                        "computerName": "vmpzk3zilc6fgye",
+                                        "computerName": "vm45mqcga7pkswi",
                                         "adminUsername": "testuser",
                                         "linuxConfiguration": {
-                                            "disablePasswordAuthentication": false,
-                                            "patchSettings": {
-                                                "patchMode": "ImageDefault",
-                                                "assessmentMode": "ImageDefault"
-                                            }
+                                            "disablePasswordAuthentication": false
                                         },
                                         "secrets": []
                                     },
@@ -115,16 +96,11 @@
                                     "diagnosticsProfile": {
                                         "bootDiagnostics": {
                                             "enabled": true,
-                                            "storageUri": "https://pzk3zilc6fgyesalinuxvm.blob.core.windows.net/"
+                                            "storageUri": "https://45mqcga7pkswisalinuxvm.blob.core.windows.net/"
                                         }
                                     },
-                                    "timeCreated": "2025-05-13T04:53:42.769173+00:00"
-                                },
-                                "resources": [
-                                    {
-                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm/extensions/script1"
-                                    }
-                                ]
+                                    "provisioningState": "Succeeded"
+                                }
                             }
                         ]
                     }
@@ -134,7 +110,7 @@
         {
             "request": {
                 "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.insights/eventtypes/management/values?api-version=2015-04-01&$filter=eventTimestamp%20ge%20%272025-05-18%2023%3A59%3A59%27%20and%20resourceUri%20eq%20%27%2Fsubscriptions%2Fea42f556-5106-4743-99b0-c129bfa71a47%2FresourceGroups%2FTEST_VM%2Fproviders%2FMicrosoft.Compute%2FvirtualMachines%2Fcctestvm%27%20and%20eventChannels%20eq%20%27Operation%27%20and%20resourceType%20eq%20%27Microsoft.Compute%2FvirtualMachines%27&$select=eventTimestamp%2C%20operationName%2C%20caller%2C%20claims",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.insights/eventtypes/management/values?api-version=2015-04-01&$filter=eventTimestamp%20ge%20%272020-01-28%2023%3A59%3A59%27%20and%20resourceUri%20eq%20%27%2Fsubscriptions%2Fea42f556-5106-4743-99b0-c129bfa71a47%2FresourceGroups%2FTEST_VM%2Fproviders%2FMicrosoft.Compute%2FvirtualMachines%2Fcctestvm%27%20and%20eventChannels%20eq%20%27Operation%27%20and%20resourceType%20eq%20%27Microsoft.Compute%2FvirtualMachines%27&$select=eventTimestamp%2C%20operationName%2C%20caller%2C%20claims",
                 "body": null,
                 "headers": {}
             },
@@ -144,41 +120,17 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "x-ms-ratelimit-remaining-subscription-global-reads": [
-                        "3749"
-                    ],
-                    "mise-correlation-id": [
-                        "0c7027fc-7298-4715-ad47-34a5c5ebbe76"
-                    ],
-                    "x-msedge-ref": [
-                        "Ref A: F3EAD04E8D404A7C8B983C205892023A Ref B: MNZ221060610017 Ref C: 2025-05-19T03:49:59Z"
-                    ],
-                    "content-length": [
-                        "379540"
-                    ],
-                    "x-ms-operation-identifier": [
-                        "tenantId=e8a8a38e-cc42-4dac-b5d6-d01ca1e23173,objectId=792077c9-1885-45f2-ad89-a2f5b7768832/eastus/e46a4943-0772-495d-b634-1c129062c76a"
-                    ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
                     "date": [
-                        "Mon, 19 May 2025 03:50:04 GMT"
-                    ],
-                    "api-supported-versions": [
-                        "2014-04-01, 2014-11-01, 2015-04-01, 2016-09-01-preview, 2017-03-01-preview"
+                        "Wed, 29 Jan 2020 21:42:05 GMT"
                     ],
                     "cache-control": [
                         "no-cache"
                     ],
-                    "access-control-allow-origin": [
-                        "*"
-                    ],
-                    "request-context": [
-                        "appId=cid-v1:e9ce6014-b708-4056-a18d-21dc38a7abb0"
-                    ],
-                    "x-cache": [
-                        "CONFIG_NOCACHE"
+                    "content-length": [
+                        "186810"
                     ]
                 },
                 "body": {
@@ -200,211 +152,356 @@
         },
         {
             "request": {
-                "method": "PATCH",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm/providers/Microsoft.Resources/tags/default?api-version=2024-11-01",
-                "body": "mock_body",
-                "headers": {}
-            },
-            "response": {
-                "status": {
-                    "code": 200,
-                    "message": "OK"
-                },
-                "headers": {
-                    "x-msedge-ref": [
-                        "Ref A: FCFD69538A8B47FA8815932EBD53120E Ref B: MNZ221060619047 Ref C: 2025-05-19T03:50:06Z"
-                    ],
-                    "cache-control": [
-                        "no-cache"
-                    ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
-                    ],
-                    "x-ms-ratelimit-remaining-subscription-writes": [
-                        "199"
-                    ],
-                    "date": [
-                        "Mon, 19 May 2025 03:50:07 GMT"
-                    ],
-                    "x-ms-ratelimit-remaining-subscription-global-writes": [
-                        "2999"
-                    ],
-                    "content-length": [
-                        "303"
-                    ],
-                    "x-cache": [
-                        "CONFIG_NOCACHE"
-                    ]
-                },
-                "body": {
-                    "data": {
-                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm/providers/Microsoft.Resources/tags/default",
-                        "name": "default",
-                        "type": "Microsoft.Resources/tags",
-                        "properties": {
-                            "tags": {
-                                "cctest_email": "live.com#aj@speckledmonkey.com"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        {
-            "request": {
-                "method": "PATCH",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm/providers/Microsoft.Resources/tags/default?api-version=2024-11-01",
-                "body": "mock_body",
-                "headers": {}
-            },
-            "response": {
-                "status": {
-                    "code": 200,
-                    "message": "OK"
-                },
-                "headers": {
-                    "x-msedge-ref": [
-                        "Ref A: 748007D015EA488AB5F1994B50748437 Ref B: MNZ221060619047 Ref C: 2025-05-19T03:50:07Z"
-                    ],
-                    "cache-control": [
-                        "no-cache"
-                    ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
-                    ],
-                    "x-ms-ratelimit-remaining-subscription-writes": [
-                        "199"
-                    ],
-                    "date": [
-                        "Mon, 19 May 2025 03:50:08 GMT"
-                    ],
-                    "x-ms-ratelimit-remaining-subscription-global-writes": [
-                        "2999"
-                    ],
-                    "content-length": [
-                        "330"
-                    ],
-                    "x-cache": [
-                        "CONFIG_NOCACHE"
-                    ]
-                },
-                "body": {
-                    "data": {
-                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm/providers/Microsoft.Resources/tags/default",
-                        "name": "default",
-                        "type": "Microsoft.Resources/tags",
-                        "properties": {
-                            "tags": {
-                                "cctest_email": "live.com#aj@speckledmonkey.com",
-                                "cctest_date": "05.19.2025"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        {
-            "request": {
                 "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/virtualMachines/cctestvm?api-version=2022-11-01",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute?api-version=2019-08-01",
                 "body": null,
                 "headers": {}
             },
             "response": {
                 "status": {
                     "code": 200,
-                    "message": ""
+                    "message": "OK"
                 },
                 "headers": {
-                    "x-msedge-ref": [
-                        "Ref A: 8BA14691B9024DB79D9EB481C7810BF4 Ref B: MNZ221060619011 Ref C: 2025-05-19T03:50:13Z"
-                    ],
-                    "x-ms-need-to-refresh-epl-cache": [
-                        "False"
+                    "content-type": [
+                        "application/json; charset=utf-8"
                     ],
                     "cache-control": [
                         "no-cache"
                     ],
-                    "x-ms-ratelimit-remaining-resource": [
-                        "Microsoft.Compute/LowCostGetSubscriptionMaximum;23997,Microsoft.Compute/LowCostGetResource;33"
+                    "content-length": [
+                        "33645"
+                    ],
+                    "date": [
+                        "Wed, 29 Jan 2020 21:42:06 GMT"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute",
+                        "namespace": "Microsoft.Compute",
+                        "authorizations": [],
+                        "resourceTypes": [
+                            {
+                                "resourceType": "availabilitySets",
+                                "apiVersions": [
+                                    "2019-12-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualMachines",
+                                "apiVersions": [
+                                    "2019-12-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualMachines/extensions",
+                                "apiVersions": [
+                                    "2019-12-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualMachineScaleSets",
+                                "apiVersions": [
+                                    "2019-12-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualMachineScaleSets/extensions",
+                                "apiVersions": [
+                                    "2019-12-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualMachineScaleSets/virtualMachines",
+                                "apiVersions": [
+                                    "2019-12-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualMachineScaleSets/networkInterfaces",
+                                "apiVersions": [
+                                    "2019-12-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualMachineScaleSets/virtualMachines/networkInterfaces",
+                                "apiVersions": [
+                                    "2019-12-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualMachineScaleSets/publicIPAddresses",
+                                "apiVersions": [
+                                    "2019-12-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations",
+                                "apiVersions": [
+                                    "2019-12-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/operations",
+                                "apiVersions": [
+                                    "2019-12-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/vmSizes",
+                                "apiVersions": [
+                                    "2019-12-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/runCommands",
+                                "apiVersions": [
+                                    "2019-12-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/usages",
+                                "apiVersions": [
+                                    "2019-12-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/virtualMachines",
+                                "apiVersions": [
+                                    "2019-12-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/publishers",
+                                "apiVersions": [
+                                    "2019-07-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "operations",
+                                "apiVersions": [
+                                    "2019-12-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "restorePointCollections",
+                                "apiVersions": [
+                                    "2019-12-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "restorePointCollections/restorePoints",
+                                "apiVersions": [
+                                    "2019-12-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "proximityPlacementGroups",
+                                "apiVersions": [
+                                    "2019-12-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualMachines/metricDefinitions",
+                                "apiVersions": [
+                                    "2014-04-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "sharedVMImages",
+                                "apiVersions": [
+                                    "2017-10-15-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "sharedVMImages/versions",
+                                "apiVersions": [
+                                    "2017-10-15-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/artifactPublishers",
+                                "apiVersions": [
+                                    "2017-10-15-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/capsoperations",
+                                "apiVersions": [
+                                    "2019-07-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "galleries",
+                                "apiVersions": [
+                                    "2019-07-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "galleries/images",
+                                "apiVersions": [
+                                    "2019-07-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "galleries/images/versions",
+                                "apiVersions": [
+                                    "2019-07-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "disks",
+                                "apiVersions": [
+                                    "2019-07-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "snapshots",
+                                "apiVersions": [
+                                    "2019-07-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/diskoperations",
+                                "apiVersions": [
+                                    "2019-07-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "diskEncryptionSets",
+                                "apiVersions": [
+                                    "2019-07-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/vsmoperations",
+                                "apiVersions": [
+                                    "2019-07-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "images",
+                                "apiVersions": [
+                                    "2019-12-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/logAnalytics",
+                                "apiVersions": [
+                                    "2019-12-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "hostGroups",
+                                "apiVersions": [
+                                    "2019-12-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "hostGroups/hosts",
+                                "apiVersions": [
+                                    "2019-12-01"
+                                ]
+                            }
+                        ],
+                        "registrationState": "Registered",
+                        "registrationPolicy": "RegistrationRequired"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "PATCH",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm?api-version=2019-12-01",
+                "body": "mock_body",
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-ratelimit-remaining-subscription-writes": [
+                        "1199"
                     ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
-                    "date": [
-                        "Mon, 19 May 2025 03:50:12 GMT"
+                    "azure-asyncnotification": [
+                        "Enabled"
                     ],
-                    "x-ms-ratelimit-remaining-subscription-global-reads": [
-                        "3749"
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/PutVM3Min;235,Microsoft.Compute/PutVM30Min;1184"
+                    ],
+                    "date": [
+                        "Wed, 29 Jan 2020 21:42:08 GMT"
+                    ],
+                    "azure-asyncoperation": [
+                        "https://management.azure.com/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.Compute/locations/southcentralus/operations/0140ff81-062f-41cf-8ef9-bed3ecc8fa59?api-version=2019-12-01"
+                    ],
+                    "cache-control": [
+                        "no-cache"
                     ],
                     "content-length": [
-                        "3348"
-                    ],
-                    "x-cache": [
-                        "CONFIG_NOCACHE"
+                        "2349"
                     ]
                 },
                 "body": {
                     "data": {
                         "name": "cctestvm",
-                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/virtualMachines/cctestvm",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm",
                         "type": "Microsoft.Compute/virtualMachines",
                         "location": "southcentralus",
                         "tags": {
-                            "cctest_email": "live.com#aj@speckledmonkey.com",
-                            "cctest_date": "05.19.2025"
+                            "cctest_email": "foo@foo.com"
                         },
                         "properties": {
+                            "vmId": "5ed2188d-4e51-4f76-9c34-8846450348d0",
                             "hardwareProfile": {
-                                "vmSize": "Standard_A1_v2"
+                                "vmSize": "Basic_A0"
                             },
-                            "provisioningState": "Succeeded",
-                            "vmId": "d874328d-9284-4084-a07e-95c1dcdc2a42",
                             "storageProfile": {
                                 "imageReference": {
                                     "publisher": "Canonical",
                                     "offer": "UbuntuServer",
                                     "sku": "16.04.0-LTS",
                                     "version": "latest",
-                                    "exactVersion": "16.04.202109280"
+                                    "exactVersion": "16.04.202001070"
                                 },
                                 "osDisk": {
                                     "osType": "Linux",
-                                    "name": "cctestvm_OsDisk_1_0aa569485c1243fbb95398d030141205",
+                                    "name": "cctestvm_OsDisk_1_410a0dff83a34dea9123286081fb4b31",
                                     "createOption": "FromImage",
                                     "caching": "ReadWrite",
                                     "managedDisk": {
                                         "storageAccountType": "Standard_LRS",
-                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_0aa569485c1243fbb95398d030141205"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_410a0dff83a34dea9123286081fb4b31"
                                     },
-                                    "deleteOption": "Detach",
                                     "diskSizeGB": 30
                                 },
                                 "dataDisks": [
                                     {
                                         "lun": 0,
-                                        "name": "cctestvm_disk2_e1f0c6cc6c61481f9a70fba7ee59381f",
+                                        "name": "cctestvm_disk2_4101844f489b42f4808812eb3b1f415a",
                                         "createOption": "Empty",
                                         "caching": "None",
                                         "managedDisk": {
                                             "storageAccountType": "Standard_LRS",
-                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_disk2_e1f0c6cc6c61481f9a70fba7ee59381f"
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_disk2_4101844f489b42f4808812eb3b1f415a"
                                         },
-                                        "deleteOption": "Detach",
                                         "diskSizeGB": 1023,
                                         "toBeDetached": false
                                     }
                                 ]
                             },
                             "osProfile": {
-                                "computerName": "vmpzk3zilc6fgye",
+                                "computerName": "vm45mqcga7pkswi",
                                 "adminUsername": "testuser",
                                 "linuxConfiguration": {
-                                    "disablePasswordAuthentication": false,
-                                    "patchSettings": {
-                                        "patchMode": "ImageDefault",
-                                        "assessmentMode": "ImageDefault"
-                                    }
+                                    "disablePasswordAuthentication": false
                                 },
                                 "secrets": []
                             },
@@ -418,139 +515,107 @@
                             "diagnosticsProfile": {
                                 "bootDiagnostics": {
                                     "enabled": true,
-                                    "storageUri": "https://pzk3zilc6fgyesalinuxvm.blob.core.windows.net/"
+                                    "storageUri": "https://45mqcga7pkswisalinuxvm.blob.core.windows.net/"
                                 }
                             },
-                            "timeCreated": "2025-05-13T04:53:42.769173+00:00"
-                        },
-                        "resources": [
-                            {
-                                "name": "script1",
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/virtualMachines/cctestvm/extensions/script1",
-                                "type": "Microsoft.Compute/virtualMachines/extensions",
-                                "location": "southcentralus",
-                                "tags": {
-                                    "displayName": "config-app"
-                                },
-                                "properties": {
-                                    "autoUpgradeMinorVersion": true,
-                                    "provisioningState": "Succeeded",
-                                    "publisher": "Microsoft.Azure.Extensions",
-                                    "type": "CustomScript",
-                                    "typeHandlerVersion": "2.1",
-                                    "settings": {
-                                        "skipDos2Unix": false,
-                                        "timestamp": 123456789
-                                    }
-                                }
-                            }
-                        ]
+                            "provisioningState": "Updating"
+                        }
                     }
                 }
             }
         },
         {
             "request": {
-                "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/virtualMachines/cctestvm?api-version=2022-11-01",
-                "body": null,
+                "method": "PATCH",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm?api-version=2019-12-01",
+                "body": "mock_body",
                 "headers": {}
             },
             "response": {
                 "status": {
                     "code": 200,
-                    "message": ""
+                    "message": "OK"
                 },
                 "headers": {
-                    "x-msedge-ref": [
-                        "Ref A: 5275C42242CD420BB7E9CA412F5B0644 Ref B: MNZ221060619011 Ref C: 2025-05-19T03:50:13Z"
-                    ],
-                    "x-ms-need-to-refresh-epl-cache": [
-                        "False"
-                    ],
-                    "cache-control": [
-                        "no-cache"
-                    ],
-                    "x-ms-ratelimit-remaining-resource": [
-                        "Microsoft.Compute/LowCostGetSubscriptionMaximum;23996,Microsoft.Compute/LowCostGetResource;32"
+                    "x-ms-ratelimit-remaining-subscription-writes": [
+                        "1198"
                     ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
-                    "date": [
-                        "Mon, 19 May 2025 03:50:13 GMT"
+                    "azure-asyncnotification": [
+                        "Enabled"
                     ],
-                    "x-ms-ratelimit-remaining-subscription-global-reads": [
-                        "3749"
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/PutVM3Min;234,Microsoft.Compute/PutVM30Min;1183"
+                    ],
+                    "date": [
+                        "Wed, 29 Jan 2020 21:42:09 GMT"
+                    ],
+                    "azure-asyncoperation": [
+                        "https://management.azure.com/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.Compute/locations/southcentralus/operations/76ed8c0b-c643-4769-bfb8-23a9b5c16469?api-version=2019-12-01"
+                    ],
+                    "cache-control": [
+                        "no-cache"
                     ],
                     "content-length": [
-                        "3348"
-                    ],
-                    "x-cache": [
-                        "CONFIG_NOCACHE"
+                        "2383"
                     ]
                 },
                 "body": {
                     "data": {
                         "name": "cctestvm",
-                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/virtualMachines/cctestvm",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm",
                         "type": "Microsoft.Compute/virtualMachines",
                         "location": "southcentralus",
                         "tags": {
-                            "cctest_email": "live.com#aj@speckledmonkey.com",
-                            "cctest_date": "05.19.2025"
+                            "cctest_email": "foo@foo.com",
+                            "cctest_date": "01.29.2020"
                         },
                         "properties": {
+                            "vmId": "5ed2188d-4e51-4f76-9c34-8846450348d0",
                             "hardwareProfile": {
-                                "vmSize": "Standard_A1_v2"
+                                "vmSize": "Basic_A0"
                             },
-                            "provisioningState": "Succeeded",
-                            "vmId": "d874328d-9284-4084-a07e-95c1dcdc2a42",
                             "storageProfile": {
                                 "imageReference": {
                                     "publisher": "Canonical",
                                     "offer": "UbuntuServer",
                                     "sku": "16.04.0-LTS",
                                     "version": "latest",
-                                    "exactVersion": "16.04.202109280"
+                                    "exactVersion": "16.04.202001070"
                                 },
                                 "osDisk": {
                                     "osType": "Linux",
-                                    "name": "cctestvm_OsDisk_1_0aa569485c1243fbb95398d030141205",
+                                    "name": "cctestvm_OsDisk_1_410a0dff83a34dea9123286081fb4b31",
                                     "createOption": "FromImage",
                                     "caching": "ReadWrite",
                                     "managedDisk": {
                                         "storageAccountType": "Standard_LRS",
-                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_0aa569485c1243fbb95398d030141205"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_410a0dff83a34dea9123286081fb4b31"
                                     },
-                                    "deleteOption": "Detach",
                                     "diskSizeGB": 30
                                 },
                                 "dataDisks": [
                                     {
                                         "lun": 0,
-                                        "name": "cctestvm_disk2_e1f0c6cc6c61481f9a70fba7ee59381f",
+                                        "name": "cctestvm_disk2_4101844f489b42f4808812eb3b1f415a",
                                         "createOption": "Empty",
                                         "caching": "None",
                                         "managedDisk": {
                                             "storageAccountType": "Standard_LRS",
-                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_disk2_e1f0c6cc6c61481f9a70fba7ee59381f"
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_disk2_4101844f489b42f4808812eb3b1f415a"
                                         },
-                                        "deleteOption": "Detach",
                                         "diskSizeGB": 1023,
                                         "toBeDetached": false
                                     }
                                 ]
                             },
                             "osProfile": {
-                                "computerName": "vmpzk3zilc6fgye",
+                                "computerName": "vm45mqcga7pkswi",
                                 "adminUsername": "testuser",
                                 "linuxConfiguration": {
-                                    "disablePasswordAuthentication": false,
-                                    "patchSettings": {
-                                        "patchMode": "ImageDefault",
-                                        "assessmentMode": "ImageDefault"
-                                    }
+                                    "disablePasswordAuthentication": false
                                 },
                                 "secrets": []
                             },
@@ -564,33 +629,219 @@
                             "diagnosticsProfile": {
                                 "bootDiagnostics": {
                                     "enabled": true,
-                                    "storageUri": "https://pzk3zilc6fgyesalinuxvm.blob.core.windows.net/"
+                                    "storageUri": "https://45mqcga7pkswisalinuxvm.blob.core.windows.net/"
                                 }
                             },
-                            "timeCreated": "2025-05-13T04:53:42.769173+00:00"
+                            "provisioningState": "Updating"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/virtualMachines/cctestvm?api-version=2019-03-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/LowCostGet3Min;3990,Microsoft.Compute/LowCostGet30Min;31966"
+                    ],
+                    "date": [
+                        "Wed, 29 Jan 2020 21:42:10 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "2340"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "name": "cctestvm",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/virtualMachines/cctestvm",
+                        "type": "Microsoft.Compute/virtualMachines",
+                        "location": "southcentralus",
+                        "tags": {
+                            "cctest_email": "foo@foo.com",
+                            "cctest_date": "01.29.2020"
                         },
-                        "resources": [
-                            {
-                                "name": "script1",
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/virtualMachines/cctestvm/extensions/script1",
-                                "type": "Microsoft.Compute/virtualMachines/extensions",
-                                "location": "southcentralus",
-                                "tags": {
-                                    "displayName": "config-app"
+                        "properties": {
+                            "vmId": "5ed2188d-4e51-4f76-9c34-8846450348d0",
+                            "hardwareProfile": {
+                                "vmSize": "Basic_A0"
+                            },
+                            "storageProfile": {
+                                "imageReference": {
+                                    "publisher": "Canonical",
+                                    "offer": "UbuntuServer",
+                                    "sku": "16.04.0-LTS",
+                                    "version": "latest"
                                 },
-                                "properties": {
-                                    "autoUpgradeMinorVersion": true,
-                                    "provisioningState": "Succeeded",
-                                    "publisher": "Microsoft.Azure.Extensions",
-                                    "type": "CustomScript",
-                                    "typeHandlerVersion": "2.1",
-                                    "settings": {
-                                        "skipDos2Unix": false,
-                                        "timestamp": 123456789
+                                "osDisk": {
+                                    "osType": "Linux",
+                                    "name": "cctestvm_OsDisk_1_410a0dff83a34dea9123286081fb4b31",
+                                    "createOption": "FromImage",
+                                    "caching": "ReadWrite",
+                                    "managedDisk": {
+                                        "storageAccountType": "Standard_LRS",
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_410a0dff83a34dea9123286081fb4b31"
+                                    },
+                                    "diskSizeGB": 30
+                                },
+                                "dataDisks": [
+                                    {
+                                        "lun": 0,
+                                        "name": "cctestvm_disk2_4101844f489b42f4808812eb3b1f415a",
+                                        "createOption": "Empty",
+                                        "caching": "None",
+                                        "managedDisk": {
+                                            "storageAccountType": "Standard_LRS",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_disk2_4101844f489b42f4808812eb3b1f415a"
+                                        },
+                                        "diskSizeGB": 1023,
+                                        "toBeDetached": false
                                     }
+                                ]
+                            },
+                            "osProfile": {
+                                "computerName": "vm45mqcga7pkswi",
+                                "adminUsername": "testuser",
+                                "linuxConfiguration": {
+                                    "disablePasswordAuthentication": false
+                                },
+                                "secrets": []
+                            },
+                            "networkProfile": {
+                                "networkInterfaces": [
+                                    {
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic"
+                                    }
+                                ]
+                            },
+                            "diagnosticsProfile": {
+                                "bootDiagnostics": {
+                                    "enabled": true,
+                                    "storageUri": "https://45mqcga7pkswisalinuxvm.blob.core.windows.net/"
                                 }
-                            }
-                        ]
+                            },
+                            "provisioningState": "Succeeded"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/virtualMachines/cctestvm?api-version=2019-03-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/LowCostGet3Min;3989,Microsoft.Compute/LowCostGet30Min;31965"
+                    ],
+                    "date": [
+                        "Wed, 29 Jan 2020 21:42:10 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "2340"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "name": "cctestvm",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/virtualMachines/cctestvm",
+                        "type": "Microsoft.Compute/virtualMachines",
+                        "location": "southcentralus",
+                        "tags": {
+                            "cctest_email": "foo@foo.com",
+                            "cctest_date": "01.29.2020"
+                        },
+                        "properties": {
+                            "vmId": "5ed2188d-4e51-4f76-9c34-8846450348d0",
+                            "hardwareProfile": {
+                                "vmSize": "Basic_A0"
+                            },
+                            "storageProfile": {
+                                "imageReference": {
+                                    "publisher": "Canonical",
+                                    "offer": "UbuntuServer",
+                                    "sku": "16.04.0-LTS",
+                                    "version": "latest"
+                                },
+                                "osDisk": {
+                                    "osType": "Linux",
+                                    "name": "cctestvm_OsDisk_1_410a0dff83a34dea9123286081fb4b31",
+                                    "createOption": "FromImage",
+                                    "caching": "ReadWrite",
+                                    "managedDisk": {
+                                        "storageAccountType": "Standard_LRS",
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_410a0dff83a34dea9123286081fb4b31"
+                                    },
+                                    "diskSizeGB": 30
+                                },
+                                "dataDisks": [
+                                    {
+                                        "lun": 0,
+                                        "name": "cctestvm_disk2_4101844f489b42f4808812eb3b1f415a",
+                                        "createOption": "Empty",
+                                        "caching": "None",
+                                        "managedDisk": {
+                                            "storageAccountType": "Standard_LRS",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_disk2_4101844f489b42f4808812eb3b1f415a"
+                                        },
+                                        "diskSizeGB": 1023,
+                                        "toBeDetached": false
+                                    }
+                                ]
+                            },
+                            "osProfile": {
+                                "computerName": "vm45mqcga7pkswi",
+                                "adminUsername": "testuser",
+                                "linuxConfiguration": {
+                                    "disablePasswordAuthentication": false
+                                },
+                                "secrets": []
+                            },
+                            "networkProfile": {
+                                "networkInterfaces": [
+                                    {
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic"
+                                    }
+                                ]
+                            },
+                            "diagnosticsProfile": {
+                                "bootDiagnostics": {
+                                    "enabled": true,
+                                    "storageUri": "https://45mqcga7pkswisalinuxvm.blob.core.windows.net/"
+                                }
+                            },
+                            "provisioningState": "Succeeded"
+                        }
                     }
                 }
             }
