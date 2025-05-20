@@ -1,0 +1,11 @@
+{
+    "status_code": 200,
+    "data": {
+        "TableNames": [
+            "328_dynamodb_table_green",
+            "328_dynamodb_table_red",
+            "swarm_table"
+        ],
+        "ResponseMetadata": {}
+    }
+}
