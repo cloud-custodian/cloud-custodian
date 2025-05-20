@@ -715,6 +715,8 @@ class TestGlueDataCatalog(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(p.resource_manager.get_arns(resources),
+                         ['arn:aws:glue:us-east-1:644160558196:catalog'])
 
     def test_catalog_remove_matched(self):
         session_factory = self.replay_flight_data("test_catalog_remove_matched")
