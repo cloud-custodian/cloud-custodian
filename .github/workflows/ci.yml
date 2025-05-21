@@ -165,7 +165,7 @@ jobs:
         uses: ./.github/composites/install
         with:
           python-version: ${{ matrix.python-version }}
-          uv-version: ${{ uv.UV_VERSION }}
+          uv-version: ${{ env.UV_VERSION }}
 
       - name: Test
         shell: bash

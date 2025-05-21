@@ -17,7 +17,7 @@ runs:
       uses: astral-sh/setup-uv@v5
       with:
         version: ${{ inputs.uv-version }}
-	enable-cache: true
+        enable-cache: true
 
     - name: Set up Python ${{ inputs.python-version }}
       uses: actions/setup-python@8d9ed9ac5c53483de85588cdf95a591a75ab9f55 # ratchet:actions/setup-python@v5
