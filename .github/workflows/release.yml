@@ -2,7 +2,9 @@ name: "Release"
 
 on:
   workflow_dispatch: {}
-
+env:
+  UV_VERSION: "0.7.6"
+  DEFAULT_PY_VERSION: "3.11"
 
 jobs:
   BuildWheels:
@@ -19,19 +21,18 @@ jobs:
       - name: Install Custodian
         uses: ./.github/composites/install
         with:
-          python-version: "3.11"
+          python-version: ${{ env.DEFAULT_PY_VERSION }}
+	  uv-version: ${{ env.UV_VERSION }}
 
       - name: Build Wheels
         shell: bash
         run: |
-          poetry self add poetry-plugin-freeze==1.2.0
-          pip install twine
           make pkg-build-wheel
 
       - name: Build ChangeLog
         shell: bash
         run: |
-          python tools/dev/changelog.py --output release.md \
+          uv run python tools/dev/changelog.py --output release.md \
              --path . --since last --skip-provider awscc
           cat release.md
 
@@ -58,7 +59,7 @@ jobs:
         run: |
           set -euxo pipefail
           python tools/dev/staging-clean.py
-          python tools/dev/poetrypkg.py gen-qa-requires -r . --output wheels-manifest.txt
+          python tools/dev/devpkg.py gen-qa-requires -r . --output wheels-manifest.txt
           make pkg-publish-wheel PKG_REPO=${{ env.PKG_REPO }}
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # ratchet:actions/upload-artifact@v4
@@ -81,7 +82,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@8d9ed9ac5c53483de85588cdf95a591a75ab9f55 # ratchet:actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: ${{ env.DEFAULT_PY_VERSION }}
 
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # ratchet:actions/download-artifact@v4
         with:
@@ -122,7 +123,8 @@ jobs:
       - name: Install Custodian
         uses: ./.github/composites/install
         with:
-          python-version: "3.11"
+          python-version: ${{ env.DEFAULT_PY_VERSION }}
+	  uv-version: ${{ env.UV_VERSION }}
 
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # ratchet:actions/download-artifact@v4
         with:
@@ -131,7 +133,7 @@ jobs:
       - name: Get Tag
         shell: bash
         run: |
-          echo "release=$(poetry version -s).0" >> "$GITHUB_ENV"
+          echo "release=$(uv version --short).0" >> "$GITHUB_ENV"
 
 #      - name: Create Release
 #        uses: ncipollo/release-action@v1

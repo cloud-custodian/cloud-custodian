@@ -8,7 +8,7 @@ RUN apt-get --yes update
 RUN apt-get --yes install --no-install-recommends build-essential     curl python3-venv python3-dev adduser
 RUN adduser --disabled-login --gecos "" custodian
 # wheel installation cache
-RUN --mount=type=cache,target=/root/.cache/uv 
+RUN --mount=type=cache,target=/root/.cache/uv
 COPY --from=ghcr.io/astral-sh/uv:0.7.6 /uv /uvx /bin/
 ARG PATH="/root/.local/bin:$PATH"
 
