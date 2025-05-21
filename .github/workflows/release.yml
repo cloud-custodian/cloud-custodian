@@ -21,7 +21,6 @@ jobs:
       - name: Install Custodian
         uses: ./.github/composites/install
         with:
-          python-version: ${{ env.DEFAULT_PY_VERSION }}
           uv-version: ${{ env.UV_VERSION }}
 
       - name: Build Wheels

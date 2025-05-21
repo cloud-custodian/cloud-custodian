@@ -19,7 +19,7 @@ IMAGE_TAG := latest
 
 install:
 # extras are for c7n_mailer, separate lint from dev for ci
-	uv sync --all-packages \
+	uv sync --all-packages --locked \
 	    --group dev \
 	    --group addons \
 	    --group lint \
@@ -96,7 +96,7 @@ pkg-update:
 	    --group addons \
 	    --group lint \
             --extra gcp --extra azure \
-	    --resolution=highest \
+	    --verbose \
             --upgrade
 
 pkg-show-update:
