@@ -22,6 +22,7 @@ jobs:
         uses: ./.github/composites/install
         with:
           uv-version: ${{ env.UV_VERSION }}
+          python-version: ${{ env.DEFAULT_PY_VERSION }}
 
       - name: Build Wheels
         shell: bash
