@@ -96,7 +96,7 @@ jobs:
             docs/source/azure/resources
             docs/source/awscc/resources
             docs/source/tencentcloud/resources
-          key: sphinx-docs-${{ runner.os }}-3.11-v3-${{ hashFiles('**/poetry.lock') }}
+          key: sphinx-docs-${{ runner.os }}-3.11-v3-${{ hashFiles('uv.lock') }}
 
       - name: Build Docs
         shell: bash
@@ -117,7 +117,7 @@ jobs:
             docs/source/azure/resources
             docs/source/awscc/resources
             docs/source/tencentcloud/resources
-          key: sphinx-docs-${{ runner.os }}-3.11-v3-${{ hashFiles('**/poetry.lock') }}
+          key: sphinx-docs-${{ runner.os }}-3.11-v3-${{ hashFiles('uv.lock') }}
 
       - name: Deploy Docs
         if: ${{ github.event_name == 'push' }}
@@ -191,4 +191,4 @@ jobs:
       - name: License Check
         if: contains(matrix.python-version, '3.11') && contains(matrix.os, 'ubuntu')
         run: |
-          poetry run python tools/dev/license-check.py
+          uv run tools/dev/license-check.py
