@@ -60,7 +60,7 @@ def get_archive(config):
     deps = ["c7n_mailer"] + list(CORE_DEPS)
 
     # sendgrid on python 3.10
-    if sys.version_info.minor < 11:
+    if sys.version_info.minor < 11:  # pragma: no cover
         deps.append('ellipticcurve')
     # sendgrid on python 3.11+
     else:
