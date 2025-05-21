@@ -96,6 +96,7 @@ pkg-update:
 	    --group addons \
 	    --group lint \
             --extra gcp --extra azure \
+	    --resolution=highest \
             --upgrade
 
 pkg-show-update:
