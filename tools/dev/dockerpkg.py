@@ -13,12 +13,6 @@ We also support running functional tests and image cve scanning before pushing.
 """
 
 import logging
-import os
-import time
-import subprocess
-import sys
-import traceback
-from datetime import datetime
 from pathlib import Path
 
 import click
@@ -27,10 +21,16 @@ log = logging.getLogger("dockerpkg")
 
 PHASE_1_INSTALL_TMPL = """
 ADD tools/c7n_{pkg}/pyproject.toml /src/tools/c7n_{pkg}/
+RUN if [[ " ${{providers[*]}} " =~ "{pkg}" ]]; then \
+   uv sync --package c7n_{pkg} --frozen --inexact --no-install-workspace; \
+fi
 """
 
 PHASE_2_INSTALL_TMPL = """
 ADD tools/c7n_{pkg} /src/tools/c7n_{pkg}
+RUN if [[ " ${{providers[*]}} " =~ "{pkg}" ]]; then \
+   uv sync --package c7n_{pkg} --frozen --inexact; \
+fi
 """
 
 default_providers = ["gcp", "azure", "kube", "openstack", "tencentcloud", "oci", "awscc"]
@@ -55,16 +55,16 @@ BOOTSTRAP_STAGE = """\
 # Dockerfiles are generated from tools/dev/dockerpkg.py
 FROM {base_build_image} AS build-env
 
-ARG UV_VERSION="0.7.6"
 SHELL ["/bin/bash", "-c"]
 
 # pre-requisite distro deps, and build env setup
 RUN apt-get --yes update
 RUN apt-get --yes install --no-install-recommends build-essential \
     curl python3-venv python3-dev adduser
-# todo: 24.04 is trying to standardize on ubuntu as builtin non root.
 RUN adduser --disabled-login --gecos "" custodian
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+# wheel installation cache
+RUN --mount=type=cache,target=/root/.cache/uv
+COPY --from=ghcr.io/astral-sh/uv:{uv_version} /uv /uvx /bin/
 ARG PATH="/root/.local/bin:$PATH"
 
 WORKDIR /src
@@ -77,21 +77,15 @@ ARG providers="{providers}"
 
 # copy pyproject.tomls for all packages
 ADD pyproject.toml uv.lock README.md /src/
+RUN uv sync --frozen --inexact --no-install-workspace
 
 {PHASE_1_PKG_INSTALL_DEP}
 
-# install dependencies
-RUN PKG_ARGS=`python3 -c 'print(" ".join(["--package=%s" % p for p in "${{providers}}".split()]), end="")'` && \
-    uv sync --no-install-workspace --locked --package c7n $PKG_ARGS
-
 # copy packages
 ADD c7n /src/c7n/
+RUN uv sync --frozen --inexact
 
 {PHASE_2_PKG_INSTALL_ROOT}
-
-# install packages
-RUN PKG_ARGS=`python3 -c 'print(" ".join(["--package=c7n_%s" % p for p in "${{providers}}".split()]), end="")'` && \
-    uv sync --locked --package c7n $PKG_ARGS
 
 RUN mkdir /output
 """
@@ -181,7 +175,7 @@ LABEL "org.opencontainers.image.documentation"="https://cloudcustodian.io/docs"
 BUILD_MAILER = """\
 # Install c7n-mailer
 ADD tools/c7n_mailer /src/tools/c7n_mailer
-RUN uv sync --locked --all-extras --package c7n_mailer 
+RUN uv sync --locked --all-extras --package c7n_mailer
 """
 
 TARGET_MAILER = """\
@@ -208,7 +202,7 @@ class Image:
     defaults = dict(
         base_build_image="ubuntu:24.04",
         base_target_image="ubuntu:24.04",
-        poetry_version="${POETRY_VERSION}",
+        uv_version="0.7.6",
         packages="",
         providers=" ".join(default_providers),
         PHASE_1_PKG_INSTALL_DEP=PHASE_1_PKG_INSTALL_DEP,
@@ -248,7 +242,7 @@ ImageMap = {
             name="cli",
             repo="c7n",
             description="Cloud Management Rules Engine",
-            entrypoint="/usr/local/bin/custodian",
+            entrypoint="/src/.venv/bin/custodian",
         ),
         build=[BUILD_STAGE],
         target=[TARGET_UBUNTU_STAGE, TARGET_CLI],
