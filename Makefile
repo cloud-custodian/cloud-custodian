@@ -5,24 +5,14 @@ SELF_MAKE := $(lastword $(MAKEFILE_LIST))
 
 PKG_REPO = testpypi
 PKG_INCREMENT := patch
-PKG_SET := tools/c7n_gcp tools/c7n_kube tools/c7n_openstack tools/c7n_mailer tools/c7n_logexporter tools/c7n_policystream tools/c7n_trailcreator tools/c7n_org tools/c7n_sphinxext tools/c7n_awscc tools/c7n_tencentcloud tools/c7n_azure tools/c7n_oci tools/c7n_terraform
+PKG_SET := tools/c7n_gcp tools/c7n_kube tools/c7n_openstack tools/c7n_mailer tools/c7n_logexporter tools/c7n_policystream tools/c7n_trailcreator tools/c7n_org tools/c7n_sphinxext tools/c7n_awscc tools/c7n_tencentcloud tools/c7n_azure tools/c7n_oci tools/c7n_terraform tools/c7n_left
 
 FMT_SET := tools/c7n_left tools/c7n_mailer tools/c7n_oci tools/c7n_kube tools/c7n_awscc
-
-PLATFORM_ARCH := $(shell python3 -c "import platform; print(platform.machine())")
-PLATFORM_OS := $(shell python3 -c "import platform; print(platform.system())")
-PY_VERSION := $(shell python3 -c "import sys; print('%s.%s' % (sys.version_info.major, sys.version_info.minor))")
 
 COVERAGE_TYPE := html
 ARGS :=
 IMAGE := c7n
 IMAGE_TAG := latest
-
-# we distribute tfparse binary wheels for 3.10+
-ifneq "$(findstring 3.1, $(PY_VERSION))" ""
-    PKG_SET := tools/c7n_left $(PKG_SET)
-endif
-
 
 ###
 # Common developer targets
