@@ -101,10 +101,10 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser(
-        description="Pin dependencies in wheels using a uv (Poetry-style) lock file."
+        description="Pin dependencies in wheels using a uv (pep-751 style) lock file."
     )
     parser.add_argument("dist_dir", help="Directory containing .whl files")
-    parser.add_argument("lockfile", help="Path to the uv/poetry lock file (TOML format)")
+    parser.add_argument("lockfile", help="Path to the python lock file (TOML format)")
 
     args = parser.parse_args()
     process_wheel_directory(args.dist_dir, args.lockfile)

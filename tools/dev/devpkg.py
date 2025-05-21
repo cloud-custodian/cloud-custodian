@@ -25,8 +25,8 @@ def gen_qa_requires(root, output):
     packages = []
     for root in project_roots(root):
         data = toml.loads((root / "pyproject.toml").read_text())
-        poetry_data = data['package']
-        packages.append((poetry_data['name'], poetry_data['version']))
+        pkg_data = data['package']
+        packages.append((pkg_data['name'], pkg_data['version']))
 
     with open(output, 'w') as fh:
         fh.write("\n".join(
@@ -37,7 +37,7 @@ def gen_qa_requires(root, output):
 @click.option('-p', '--package-dir', type=click.Path())
 @click.option('-f', '--version-file', type=click.Path())
 def gen_version_file(package_dir, version_file):
-    """Generate a version file from poetry"""
+    """Generate a version file from pyproject.yml"""
     with open(Path(str(package_dir)) / 'pyproject.toml', 'rb') as f:
         data = toml.load(f)
     version = data['package']['version']
