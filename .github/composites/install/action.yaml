@@ -76,7 +76,6 @@ runs:
       id: echo-uv-version
       run: echo "uv-version=${{ inputs.uv-version }}" >> $GITHUB_OUTPUT
 
-#    - name: Build awscc data files
-#      shell: bash
-#      run: cd tools/c7n_awscc && python build.py
-
+    - name: Build awscc data files
+      shell: bash
+      run: cd tools/c7n_awscc && python build.py
