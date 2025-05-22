@@ -9,7 +9,7 @@ dependencies = [
     "oci<3.0,>=2.106",
     # uv will for some reason downgrade pyopenssl for reasons not
     # apparent, without an dependency spec precluding older versions.
-    # "pyopenssl>=23"
+    "pyopenssl>=23"
 ]
 name = "c7n_oci"
 version = "0.1.18"
