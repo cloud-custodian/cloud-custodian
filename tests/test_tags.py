@@ -5,7 +5,7 @@ module to test some universal tagging infrastructure not directly exposed.
 """
 import time
 from freezegun import freeze_time
-from mock import MagicMock, call
+from unittest.mock import MagicMock, call
 
 from c7n.tags import universal_retry, coalesce_copy_user_tags
 from c7n.exceptions import PolicyExecutionError, PolicyValidationError

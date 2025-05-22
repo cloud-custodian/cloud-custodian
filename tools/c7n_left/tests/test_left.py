@@ -1077,7 +1077,7 @@ def test_cli_execution_error(policy_env, test, debug_cli_runner):
         }
     )
 
-    runner = debug_cli_runner
+    runner = CliRunner()
     with patch.object(core.CollectionRunner, "run_policy", side_effect=KeyError("abc")):
         result = runner.invoke(
             cli.cli, ["run", "-p", policy_env.policy_dir, "-d", policy_env.policy_dir]
@@ -1110,7 +1110,7 @@ def test_cli_dump(policy_env, test, debug_cli_runner):
         }
         """
     )
-    runner = debug_cli_runner
+    runner = CliRunner()
     result = runner.invoke(
         cli.cli,
         [
@@ -1151,7 +1151,8 @@ def test_cli_var_file(tmp_path, var_tf_setup, debug_cli_runner):
             }
         )
     )
-    result = debug_cli_runner.invoke(
+    runner = CliRunner()
+    result = runner.invoke(
         cli.cli,
         [
             "run",
@@ -1207,7 +1208,8 @@ resource "google_storage_bucket" "static-site" {
 }        """
     )
 
-    result = debug_cli_runner.invoke(
+    runner = CliRunner()
+    result = runner.invoke(
         cli.cli,
         [
             "run",
@@ -1493,7 +1495,7 @@ resource "aws_cloudwatch_log_group" "yada" {
             "filters": [{"tags": "absent"}],
         }
     )
-    runner = debug_cli_runner  # CliRunner()
+    runner = CliRunner()
     result = runner.invoke(
         cli.cli,
         [

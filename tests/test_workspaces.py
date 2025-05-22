@@ -3,7 +3,7 @@
 import datetime
 import time
 from dateutil import parser
-from mock import patch
+from unittest.mock import patch
 
 from .common import BaseTest
 from c7n import filters

@@ -22,7 +22,7 @@ class DebugCliRunner(CliRunner):
     @contextlib.contextmanager
     def isolation(self, input=None, env=None, color=False):
         s = io.BytesIO(b"{stdout not captured because --pdb-trace}")
-        yield (s, not self.mix_stderr and s)
+        yield (s, s)
 
 
 @pytest.fixture
