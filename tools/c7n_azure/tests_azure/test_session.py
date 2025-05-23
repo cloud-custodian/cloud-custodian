@@ -369,7 +369,7 @@ class SessionTest(BaseTest):
         self.assertEqual(AZURE_CHINA_CLOUD.endpoints.resource_manager,
                          client._client._base_url)
         self.assertEqual(AZURE_CHINA_CLOUD.endpoints.management + ".default",
-                         client._client._config.credential_scopes[0])
+                         client._config.credential_scopes[0])
 
     # This test won't run with real credentials unless the
     # tenant is actually in Azure US Government
@@ -381,7 +381,7 @@ class SessionTest(BaseTest):
         self.assertEqual(AZURE_US_GOV_CLOUD.endpoints.resource_manager,
                          client._client._base_url)
         self.assertEqual(AZURE_US_GOV_CLOUD.endpoints.management + ".default",
-                         client._client._config.credential_scopes[0])
+                         client._config.credential_scopes[0])
 
     @patch('c7n_azure.session.get_keyvault_secret', return_value='{}')
     def test_compare_auth_params(self, _1):

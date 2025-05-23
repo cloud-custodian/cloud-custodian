@@ -1,0 +1,64 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "resourceShareAssociations": [
+            {
+                "resourceShareArn": "arn:aws:ram:us-east-1:123456789012:resource-share/a4c9e71b-bb81-4974-8d89-8b0c293ad0d7",
+                "resourceShareName": "c7n-test-self",
+                "associatedEntity": "210987654321",
+                "associationType": "PRINCIPAL",
+                "status": "DISASSOCIATED",
+                "creationTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 3,
+                    "day": 20,
+                    "hour": 13,
+                    "minute": 54,
+                    "second": 2,
+                    "microsecond": 874000
+                },
+                "lastUpdatedTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 3,
+                    "day": 20,
+                    "hour": 13,
+                    "minute": 55,
+                    "second": 11,
+                    "microsecond": 608000
+                },
+                "external": false
+            },
+            {
+                "resourceShareArn": "arn:aws:ram:us-east-1:123456789012:resource-share/a4c9e71b-bb81-4974-8d89-8b0c293ad0d7",
+                "resourceShareName": "c7n-test-self",
+                "associatedEntity": "111111111111",
+                "associationType": "PRINCIPAL",
+                "status": "DISASSOCIATED",
+                "creationTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 3,
+                    "day": 20,
+                    "hour": 13,
+                    "minute": 54,
+                    "second": 2,
+                    "microsecond": 874000
+                },
+                "lastUpdatedTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 3,
+                    "day": 20,
+                    "hour": 13,
+                    "minute": 55,
+                    "second": 10,
+                    "microsecond": 663000
+                },
+                "external": false
+            }
+        ]
+    }
+}

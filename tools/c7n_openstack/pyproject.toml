@@ -19,6 +19,8 @@ python = ">=3.9.2,<4.0.0"
 c7n = {path = "../..", develop = true}
 
 openstacksdk = "^0.52.0"
+# workaround for: https://github.com/python-poetry/poetry-plugin-export/issues/183
+urllib3 = ">=1.25.4,<1.27"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "<8.0"

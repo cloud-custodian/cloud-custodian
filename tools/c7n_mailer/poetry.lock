@@ -501,19 +501,20 @@ msrest = ">=0.5.0"
 
 [[package]]
 name = "azure-mgmt-containerregistry"
-version = "10.3.0"
+version = "14.0.0"
 description = "Microsoft Azure Container Registry Client Library for Python"
 optional = true
-python-versions = ">=3.7"
+python-versions = ">=3.9"
 files = [
-    {file = "azure-mgmt-containerregistry-10.3.0.tar.gz", hash = "sha256:ae21651855dfb19c42d91d6b3a965c6c611e23f8bc4bf7138835e652d2f918e3"},
-    {file = "azure_mgmt_containerregistry-10.3.0-py3-none-any.whl", hash = "sha256:851e1c57f9bc4a3589c6b21fb627c11fd6cbb57a0388b7dfccd530ba3160805f"},
+    {file = "azure_mgmt_containerregistry-14.0.0-py3-none-any.whl", hash = "sha256:224e823beffe317c59ca4b482df5ee0b2977c3f44cdae59b165513fb47b32b8e"},
+    {file = "azure_mgmt_containerregistry-14.0.0.tar.gz", hash = "sha256:7383f1c5547bcffe76e411edd8250d55c34cddf5ef6804d5875c163cca66c4b5"},
 ]
 
 [package.dependencies]
-azure-common = ">=1.1,<2.0"
-azure-mgmt-core = ">=1.3.2,<2.0.0"
-isodate = ">=0.6.1,<1.0.0"
+azure-common = ">=1.1"
+azure-mgmt-core = ">=1.5.0"
+isodate = ">=0.6.1"
+typing-extensions = ">=4.6.0"
 
 [[package]]
 name = "azure-mgmt-containerservice"
@@ -1014,19 +1015,20 @@ typing-extensions = ">=4.6.0"
 
 [[package]]
 name = "azure-mgmt-resource"
-version = "16.1.0"
+version = "23.4.0"
 description = "Microsoft Azure Resource Management Client Library for Python"
 optional = true
-python-versions = "*"
+python-versions = ">=3.9"
 files = [
-    {file = "azure-mgmt-resource-16.1.0.zip", hash = "sha256:b814ee27b37f030fe69461ef6f514661340dc8b1f28736362541e1c0d31d90ae"},
-    {file = "azure_mgmt_resource-16.1.0-py2.py3-none-any.whl", hash = "sha256:433cddfb737bbc894698a7c9b07e15b4e0872cf89a54eaf1301d5605b2c4118d"},
+    {file = "azure_mgmt_resource-23.4.0-py3-none-any.whl", hash = "sha256:17282d20dc643fb68a286c2c350a191dc3bf386827f65a7daeeb714367a19316"},
+    {file = "azure_mgmt_resource-23.4.0.tar.gz", hash = "sha256:7cc0909184bd01439e245f5f2e20945a3668d45a6774e1f008227bb33a733d16"},
 ]
 
 [package.dependencies]
-azure-common = ">=1.1,<2.0"
-azure-mgmt-core = ">=1.2.0,<2.0.0"
-msrest = ">=0.6.21"
+azure-common = ">=1.1"
+azure-mgmt-core = ">=1.5.0"
+isodate = ">=0.6.1"
+typing-extensions = ">=4.6.0"
 
 [[package]]
 name = "azure-mgmt-resourcegraph"
@@ -1062,19 +1064,19 @@ msrest = ">=0.5.0"
 
 [[package]]
 name = "azure-mgmt-security"
-version = "1.0.0"
+version = "7.0.0"
 description = "Microsoft Azure Security Center Management Client Library for Python"
 optional = true
-python-versions = "*"
+python-versions = ">=3.8"
 files = [
-    {file = "azure-mgmt-security-1.0.0.zip", hash = "sha256:ae1cff598dfe80e93406e524c55c3f2cbffced9f9b7a5577e3375008a4c3bcad"},
-    {file = "azure_mgmt_security-1.0.0-py2.py3-none-any.whl", hash = "sha256:1f7d98e6c3c6623619bb57ff71105e6e8f2f2a82dc820028246a5bea5a915d38"},
+    {file = "azure-mgmt-security-7.0.0.tar.gz", hash = "sha256:5912eed7e9d3758fdca8d26e1dc26b41943dc4703208a1184266e2c252e1ad66"},
+    {file = "azure_mgmt_security-7.0.0-py3-none-any.whl", hash = "sha256:85a6d8b7a5cd74884a548ed53fed034449f54a9989edd64e9020c5837db96933"},
 ]
 
 [package.dependencies]
-azure-common = ">=1.1,<2.0"
-azure-mgmt-core = ">=1.2.0,<2.0.0"
-msrest = ">=0.5.0"
+azure-common = ">=1.1"
+azure-mgmt-core = ">=1.3.2"
+isodate = ">=0.6.1"
 
 [[package]]
 name = "azure-mgmt-servicebus"
@@ -1390,32 +1392,32 @@ uvloop = ["uvloop (>=0.15.2)"]
 
 [[package]]
 name = "boto3"
-version = "1.38.21"
+version = "1.38.22"
 description = "The AWS SDK for Python"
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "boto3-1.38.21-py3-none-any.whl", hash = "sha256:37e4b6b7f77f4cc476ea82eb76a502a289bb750eee96f7d07ec9bcec6592191a"},
-    {file = "boto3-1.38.21.tar.gz", hash = "sha256:417d0328fd3394ffb1c1f400d4277d45b0b86f48d2f088a02306474969344a47"},
+    {file = "boto3-1.38.22-py3-none-any.whl", hash = "sha256:760c85ab6dd78f12aa669269ca917d313fe02378722dc3b8ab41a8dc13b2a999"},
+    {file = "boto3-1.38.22.tar.gz", hash = "sha256:008f6a7c2f9f306984f9bd00c331d70341124aaa7dfebcb0466ecbda6619884a"},
 ]
 
 [package.dependencies]
-botocore = ">=1.38.21,<1.39.0"
+botocore = ">=1.38.22,<1.39.0"
 jmespath = ">=0.7.1,<2.0.0"
-s3transfer = ">=0.12.0,<0.13.0"
+s3transfer = ">=0.13.0,<0.14.0"
 
 [package.extras]
 crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "botocore"
-version = "1.38.21"
+version = "1.38.22"
 description = "Low-level, data-driven core of boto 3."
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "botocore-1.38.21-py3-none-any.whl", hash = "sha256:567b4d338114174d0b41857002a4b1e8efb68f1654ed9f3ec6c34ebdef5e9eaf"},
-    {file = "botocore-1.38.21.tar.gz", hash = "sha256:08d5e9c00e5cc9e0ae0e60570846011789dc7f1d4ea094b3f3e3f3ae1ff2063a"},
+    {file = "botocore-1.38.22-py3-none-any.whl", hash = "sha256:0e524cc763eced7c87ab256338ebd247ce10d1eb11d5cc4f71a3bd82611739e8"},
+    {file = "botocore-1.38.22.tar.gz", hash = "sha256:3b464984674f97367ca1dfa29bdbce499327571208aaec2f9743f66e54d9ba05"},
 ]
 
 [package.dependencies]
@@ -1443,14 +1445,12 @@ argcomplete = ">=1.12.3"
 boto3 = "^1.12.31"
 cryptography = ">=44"
 docutils = ">=0.18, <0.19"
-importlib-metadata = "==8.4"
+importlib-metadata = ">=6.0,<8.7.0"
 jsonschema = ">=4.18"
-portalocker = ">1,<3"
 python-dateutil = "^2.8.2"
 pyyaml = ">=5.4.0"
-referencing = "==0.35.1"
 tabulate = "^0.9.0"
-urllib3 = "<2"
+urllib3 = ">=1.25.4,<1.27"
 
 [package.source]
 type = "directory"
@@ -1490,7 +1490,7 @@ azure-mgmt-cdn = "^12.0.0"
 azure-mgmt-cognitiveservices = "^11.0.0"
 azure-mgmt-compute = "^29.1.0"
 azure-mgmt-containerinstance = "^7.0.0"
-azure-mgmt-containerregistry = "^10.3.0"
+azure-mgmt-containerregistry = "^14.0.0"
 azure-mgmt-containerservice = "^15.0.0"
 azure-mgmt-cosmosdb = "^6.1.0"
 azure-mgmt-costmanagement = "^1.0.0"
@@ -1519,10 +1519,10 @@ azure-mgmt-recoveryservices = "^2.4.0"
 azure-mgmt-recoveryservicesbackup = "^7.0.0"
 azure-mgmt-redhatopenshift = "^1.2.0"
 azure-mgmt-redis = "^14.5.0"
-azure-mgmt-resource = "^16.0.0"
+azure-mgmt-resource = "^23.0.0"
 azure-mgmt-resourcegraph = "^7.0.0"
 azure-mgmt-search = "^8.0.0"
-azure-mgmt-security = "^1.0.0"
+azure-mgmt-security = "^7.0.0"
 azure-mgmt-servicebus = "^8.2.0"
 azure-mgmt-servicefabric = "^1.0.0"
 azure-mgmt-signalr = "0.4.0"
@@ -1545,6 +1545,7 @@ jmespath = "^1.0.0"
 netaddr = "^0.7.19"
 PyJWT = ">=1.7.1,<3.0.0"
 requests = "^2.22.0"
+urllib3 = ">=1.25.4,<1.27"
 
 [package.source]
 type = "directory"
@@ -1568,6 +1569,7 @@ google-cloud-monitoring = "^2.5.0"
 google-cloud-storage = "^2.7"
 pyrate-limiter = "^2.8.4"
 retrying = "^1.3.3"
+urllib3 = ">=1.25.4,<1.27"
 
 [package.source]
 type = "directory"
@@ -2019,13 +2021,13 @@ grpcio-gcp = ["grpcio-gcp (>=0.2.2,<1.0.dev0)"]
 
 [[package]]
 name = "google-api-python-client"
-version = "2.169.0"
+version = "2.170.0"
 description = "Google API Client Library for Python"
 optional = true
 python-versions = ">=3.7"
 files = [
-    {file = "google_api_python_client-2.169.0-py3-none-any.whl", hash = "sha256:dae3e882dc0e6f28e60cf09c1f13fedfd881db84f824dd418aa9e44def2fe00d"},
-    {file = "google_api_python_client-2.169.0.tar.gz", hash = "sha256:0585bb97bd5f5bf3ed8d4bf624593e4c5a14d06c811d1952b07a1f94b4d12c51"},
+    {file = "google_api_python_client-2.170.0-py3-none-any.whl", hash = "sha256:7bf518a0527ad23322f070fa69f4f24053170d5c766821dc970ff0571ec22748"},
+    {file = "google_api_python_client-2.170.0.tar.gz", hash = "sha256:75f3a1856f11418ea3723214e0abc59d9b217fd7ed43dcf743aab7f06ab9e2b1"},
 ]
 
 [package.dependencies]
@@ -2429,22 +2431,26 @@ all = ["flake8 (>=7.1.1)", "mypy (>=1.11.2)", "pytest (>=8.3.2)", "ruff (>=0.6.2
 
 [[package]]
 name = "importlib-metadata"
-version = "8.4.0"
+version = "8.6.1"
 description = "Read metadata from Python packages"
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.9"
 files = [
-    {file = "importlib_metadata-8.4.0-py3-none-any.whl", hash = "sha256:66f342cc6ac9818fc6ff340576acd24d65ba0b3efabb2b4ac08b598965a4a2f1"},
-    {file = "importlib_metadata-8.4.0.tar.gz", hash = "sha256:9a547d3bc3608b025f93d403fdd1aae741c24fbb8314df4b155675742ce303c5"},
+    {file = "importlib_metadata-8.6.1-py3-none-any.whl", hash = "sha256:02a89390c1e15fdfdc0d7c6b25cb3e62650d0494005c97d6f148bf5b9787525e"},
+    {file = "importlib_metadata-8.6.1.tar.gz", hash = "sha256:310b41d755445d74569f993ccfc22838295d9fe005425094fad953d7f15c8580"},
 ]
 
 [package.dependencies]
-zipp = ">=0.5"
+zipp = ">=3.20"
 
 [package.extras]
+check = ["pytest-checkdocs (>=2.4)", "pytest-ruff (>=0.2.1)"]
+cover = ["pytest-cov"]
 doc = ["furo", "jaraco.packaging (>=9.3)", "jaraco.tidelift (>=1.4)", "rst.linker (>=1.9)", "sphinx (>=3.5)", "sphinx-lint"]
+enabler = ["pytest-enabler (>=2.2)"]
 perf = ["ipython"]
-test = ["flufl.flake8", "importlib-resources (>=1.3)", "jaraco.test (>=5.4)", "packaging", "pyfakefs", "pytest (>=6,!=8.1.*)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=2.2)", "pytest-mypy", "pytest-perf (>=0.9.2)", "pytest-ruff (>=0.2.1)"]
+test = ["flufl.flake8", "importlib_resources (>=1.3)", "jaraco.test (>=5.4)", "packaging", "pyfakefs", "pytest (>=6,!=8.1.*)", "pytest-perf (>=0.9.2)"]
+type = ["pytest-mypy"]
 
 [[package]]
 name = "iniconfig"
@@ -2858,25 +2864,6 @@ dev = ["pre-commit", "tox"]
 testing = ["coverage", "pytest", "pytest-benchmark"]
 
 [[package]]
-name = "portalocker"
-version = "2.10.1"
-description = "Wraps the portalocker recipe for easy usage"
-optional = true
-python-versions = ">=3.8"
-files = [
-    {file = "portalocker-2.10.1-py3-none-any.whl", hash = "sha256:53a5984ebc86a025552264b459b46a2086e269b21823cb572f8f28ee759e45bf"},
-    {file = "portalocker-2.10.1.tar.gz", hash = "sha256:ef1bf844e878ab08aee7e40184156e1151f228f103aa5c6bd0724cc330960f8f"},
-]
-
-[package.dependencies]
-pywin32 = {version = ">=226", markers = "platform_system == \"Windows\""}
-
-[package.extras]
-docs = ["sphinx (>=1.7.1)"]
-redis = ["redis"]
-tests = ["pytest (>=5.4.1)", "pytest-cov (>=2.8.1)", "pytest-mypy (>=0.8.0)", "pytest-timeout (>=2.1.0)", "redis", "sphinx (>=6.0.0)", "types-redis"]
-
-[[package]]
 name = "proto-plus"
 version = "1.26.1"
 description = "Beautiful, Pythonic protocol buffers"
@@ -2949,13 +2936,13 @@ files = [
 
 [[package]]
 name = "pyjwt"
-version = "2.9.0"
+version = "2.10.1"
 description = "JSON Web Token implementation in Python"
-optional = false
-python-versions = ">=3.8"
+optional = true
+python-versions = ">=3.9"
 files = [
-    {file = "PyJWT-2.9.0-py3-none-any.whl", hash = "sha256:3b02fb0f44517787776cf48f2ae25d8e14f300e6d7545a4315cee571a415e850"},
-    {file = "pyjwt-2.9.0.tar.gz", hash = "sha256:7e1e5b56cc735432a7369cbfa0efe50fa113ebecdc04ae6922deba8b84582d0c"},
+    {file = "PyJWT-2.10.1-py3-none-any.whl", hash = "sha256:dcdd193e30abefd5debf142f9adfcdd2b58004e644f25406ffaebd50bd98dacb"},
+    {file = "pyjwt-2.10.1.tar.gz", hash = "sha256:3cc5772eb20009233caf06e9d8a0577824723b44e6648ee0a2aedb6cf9381953"},
 ]
 
 [package.dependencies]
@@ -3044,31 +3031,6 @@ files = [
 ]
 
 [[package]]
-name = "pywin32"
-version = "310"
-description = "Python for Window Extensions"
-optional = true
-python-versions = "*"
-files = [
-    {file = "pywin32-310-cp310-cp310-win32.whl", hash = "sha256:6dd97011efc8bf51d6793a82292419eba2c71cf8e7250cfac03bba284454abc1"},
-    {file = "pywin32-310-cp310-cp310-win_amd64.whl", hash = "sha256:c3e78706e4229b915a0821941a84e7ef420bf2b77e08c9dae3c76fd03fd2ae3d"},
-    {file = "pywin32-310-cp310-cp310-win_arm64.whl", hash = "sha256:33babed0cf0c92a6f94cc6cc13546ab24ee13e3e800e61ed87609ab91e4c8213"},
-    {file = "pywin32-310-cp311-cp311-win32.whl", hash = "sha256:1e765f9564e83011a63321bb9d27ec456a0ed90d3732c4b2e312b855365ed8bd"},
-    {file = "pywin32-310-cp311-cp311-win_amd64.whl", hash = "sha256:126298077a9d7c95c53823934f000599f66ec9296b09167810eb24875f32689c"},
-    {file = "pywin32-310-cp311-cp311-win_arm64.whl", hash = "sha256:19ec5fc9b1d51c4350be7bb00760ffce46e6c95eaf2f0b2f1150657b1a43c582"},
-    {file = "pywin32-310-cp312-cp312-win32.whl", hash = "sha256:8a75a5cc3893e83a108c05d82198880704c44bbaee4d06e442e471d3c9ea4f3d"},
-    {file = "pywin32-310-cp312-cp312-win_amd64.whl", hash = "sha256:bf5c397c9a9a19a6f62f3fb821fbf36cac08f03770056711f765ec1503972060"},
-    {file = "pywin32-310-cp312-cp312-win_arm64.whl", hash = "sha256:2349cc906eae872d0663d4d6290d13b90621eaf78964bb1578632ff20e152966"},
-    {file = "pywin32-310-cp313-cp313-win32.whl", hash = "sha256:5d241a659c496ada3253cd01cfaa779b048e90ce4b2b38cd44168ad555ce74ab"},
-    {file = "pywin32-310-cp313-cp313-win_amd64.whl", hash = "sha256:667827eb3a90208ddbdcc9e860c81bde63a135710e21e4cb3348968e4bd5249e"},
-    {file = "pywin32-310-cp313-cp313-win_arm64.whl", hash = "sha256:e308f831de771482b7cf692a1f308f8fca701b2d8f9dde6cc440c7da17e47b33"},
-    {file = "pywin32-310-cp38-cp38-win32.whl", hash = "sha256:0867beb8addefa2e3979d4084352e4ac6e991ca45373390775f7084cc0209b9c"},
-    {file = "pywin32-310-cp38-cp38-win_amd64.whl", hash = "sha256:30f0a9b3138fb5e07eb4973b7077e1883f558e40c578c6925acc7a94c34eaa36"},
-    {file = "pywin32-310-cp39-cp39-win32.whl", hash = "sha256:851c8d927af0d879221e616ae1f66145253537bbdd321a77e8ef701b443a9a1a"},
-    {file = "pywin32-310-cp39-cp39-win_amd64.whl", hash = "sha256:96867217335559ac619f00ad70e513c0fcf84b8a3af9fc2bba3b59b97da70475"},
-]
-
-[[package]]
 name = "pyyaml"
 version = "6.0.2"
 description = "YAML parser and emitter for Python"
@@ -3132,37 +3094,38 @@ files = [
 
 [[package]]
 name = "redis"
-version = "5.3.0"
+version = "6.1.0"
 description = "Python client for Redis database and key-value store"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "redis-5.3.0-py3-none-any.whl", hash = "sha256:f1deeca1ea2ef25c1e4e46b07f4ea1275140526b1feea4c6459c0ec27a10ef83"},
-    {file = "redis-5.3.0.tar.gz", hash = "sha256:8d69d2dde11a12dc85d0dbf5c45577a5af048e2456f7077d87ad35c1c81c310e"},
+    {file = "redis-6.1.0-py3-none-any.whl", hash = "sha256:3b72622f3d3a89df2a6041e82acd896b0e67d9f54e9bcd906d091d23ba5219f6"},
+    {file = "redis-6.1.0.tar.gz", hash = "sha256:c928e267ad69d3069af28a9823a07726edf72c7e37764f43dc0123f37928c075"},
 ]
 
 [package.dependencies]
 async-timeout = {version = ">=4.0.3", markers = "python_full_version < \"3.11.3\""}
-PyJWT = ">=2.9.0,<2.10.0"
 
 [package.extras]
 hiredis = ["hiredis (>=3.0.0)"]
-ocsp = ["cryptography (>=36.0.1)", "pyopenssl (==23.2.1)", "requests (>=2.31.0)"]
+jwt = ["pyjwt (>=2.9.0)"]
+ocsp = ["cryptography (>=36.0.1)", "pyopenssl (>=20.0.1)", "requests (>=2.31.0)"]
 
 [[package]]
 name = "referencing"
-version = "0.35.1"
+version = "0.36.2"
 description = "JSON Referencing + Python"
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.9"
 files = [
-    {file = "referencing-0.35.1-py3-none-any.whl", hash = "sha256:eda6d3234d62814d1c64e305c1331c9a3a6132da475ab6382eaa997b21ee75de"},
-    {file = "referencing-0.35.1.tar.gz", hash = "sha256:25b42124a6c8b632a425174f24087783efb348a6f1e0008e63cd4466fedf703c"},
+    {file = "referencing-0.36.2-py3-none-any.whl", hash = "sha256:e8699adbbf8b5c7de96d8ffa0eb5c158b3beafce084968e2ea8bb08c6794dcd0"},
+    {file = "referencing-0.36.2.tar.gz", hash = "sha256:df2e89862cd09deabbdba16944cc3f10feb6b3e6f18e902f7cc25609a34775aa"},
 ]
 
 [package.dependencies]
 attrs = ">=22.2.0"
 rpds-py = ">=0.7.0"
+typing-extensions = {version = ">=4.4.0", markers = "python_version < \"3.13\""}
 
 [[package]]
 name = "requests"
@@ -3359,13 +3322,13 @@ pyasn1 = ">=0.1.3"
 
 [[package]]
 name = "s3transfer"
-version = "0.12.0"
+version = "0.13.0"
 description = "An Amazon S3 Transfer Manager"
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "s3transfer-0.12.0-py3-none-any.whl", hash = "sha256:35b314d7d82865756edab59f7baebc6b477189e6ab4c53050e28c1de4d9cce18"},
-    {file = "s3transfer-0.12.0.tar.gz", hash = "sha256:8ac58bc1989a3fdb7c7f3ee0918a66b160d038a147c7b5db1500930a607e9a1c"},
+    {file = "s3transfer-0.13.0-py3-none-any.whl", hash = "sha256:0148ef34d6dd964d0d8cf4311b2b21c474693e57c2e069ec708ce043d2b527be"},
+    {file = "s3transfer-0.13.0.tar.gz", hash = "sha256:f5e6db74eb7776a37208001113ea7aa97695368242b364d73e91c981ac522177"},
 ]
 
 [package.dependencies]
@@ -3695,4 +3658,4 @@ gcp = ["c7n-gcp", "google-cloud-secret-manager"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9.2,<4.0.0"
-content-hash = "e28871c13bf3b799627ff834cb01c9a45e5a70c32a1d0abd32ee5a8a6ed66608"
+content-hash = "8462dc1c51e766af42a38ca5a1f349f34e4990cbe48099858e504d93aebefc8f"

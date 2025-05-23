@@ -1,0 +1,64 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "resourceShareAssociations": [
+            {
+                "resourceShareArn": "arn:aws:ram:us-east-1:123456789012:resource-share/21438521-d745-45e9-8c0d-3b990f4f0550",
+                "resourceShareName": "c7n-test",
+                "associatedEntity": "111111111111",
+                "associationType": "PRINCIPAL",
+                "status": "DISASSOCIATING",
+                "creationTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 3,
+                    "day": 20,
+                    "hour": 13,
+                    "minute": 53,
+                    "second": 15,
+                    "microsecond": 794000
+                },
+                "lastUpdatedTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 3,
+                    "day": 20,
+                    "hour": 13,
+                    "minute": 55,
+                    "second": 10,
+                    "microsecond": 888000
+                },
+                "external": false
+            },
+            {
+                "resourceShareArn": "arn:aws:ram:us-east-1:123456789012:resource-share/21438521-d745-45e9-8c0d-3b990f4f0550",
+                "resourceShareName": "c7n-test",
+                "associatedEntity": "arn:aws:iam::222222222222:role/GR_GG_COF_AWS_NP_CoreEngineering",
+                "associationType": "PRINCIPAL",
+                "status": "DISASSOCIATING",
+                "creationTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 3,
+                    "day": 20,
+                    "hour": 13,
+                    "minute": 53,
+                    "second": 15,
+                    "microsecond": 794000
+                },
+                "lastUpdatedTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 3,
+                    "day": 20,
+                    "hour": 13,
+                    "minute": 55,
+                    "second": 10,
+                    "microsecond": 889000
+                },
+                "external": false
+            }
+        ]
+    }
+}

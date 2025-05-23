@@ -1,0 +1,38 @@
+{
+    "status_code": 200,
+    "data": {
+        "EndpointPropertiesList": [
+            {
+                "EndpointArn": "arn:aws:comprehend:us-east-1:644160558196:document-classifier-endpoint/TestEndpoint",
+                "Status": "IN_SERVICE",
+                "ModelArn": "arn:aws:comprehend:us-east-1:644160558196:document-classifier/TestModelVPC/version/7",
+                "DesiredModelArn": "arn:aws:comprehend:us-east-1:644160558196:document-classifier/TestModelVPC/version/7",
+                "DesiredInferenceUnits": 1,
+                "CurrentInferenceUnits": 1,
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 4,
+                    "day": 15,
+                    "hour": 13,
+                    "minute": 12,
+                    "second": 12,
+                    "microsecond": 919000
+                },
+                "LastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 4,
+                    "day": 15,
+                    "hour": 13,
+                    "minute": 12,
+                    "second": 12,
+                    "microsecond": 919000
+                },
+                "DataAccessRoleArn": "arn:aws:iam::644160558196:role/ComprehendVpcAccessRole",
+                "DesiredDataAccessRoleArn": "arn:aws:iam::644160558196:role/ComprehendVpcAccessRole"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

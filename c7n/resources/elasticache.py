@@ -13,10 +13,11 @@ from c7n.filters import FilterRegistry, AgeFilter
 import c7n.filters.vpc as net_filters
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, TypeInfo
+from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, ConfigSource
 from c7n.tags import universal_augment
 from c7n.utils import (
-    local_session, chunks, snapshot_identifier, type_schema, jmespath_search, get_retry)
+    local_session, chunks, snapshot_identifier, type_schema, jmespath_search,
+    get_retry, QueryParser)
 
 from .aws import shape_validate
 
@@ -24,6 +25,46 @@ filters = FilterRegistry('elasticache.filters')
 actions = ActionRegistry('elasticache.actions')
 
 TTYPE = re.compile('cache.t1')
+
+
+class ElastiCacheQueryParser(QueryParser):
+
+    QuerySchema = {
+        'ShowCacheNodeInfo': bool,
+        'ShowCacheClustersNotInReplicationGroups': bool,
+    }
+    multi_value = False
+    value_key = 'Value'
+
+
+class DescribeElastiCache(DescribeSource):
+    """
+    Allows to use query to retrieve more information
+
+    :example
+
+    .. code-block:: yaml
+
+        policies:
+          - name: cache-node-with-default-port
+            resource: aws.cache-cluster
+            query:
+              - Name: ShowCacheNodeInfo
+                Value: true
+            filters:
+              - type: list-item
+                key: CacheNodes
+                attrs:
+                  - type: value
+                    key: Endpoint.Port
+                    value: 11211
+    """
+
+    def get_query_params(self, query_params):
+        query_params = query_params or {}
+        for q in ElastiCacheQueryParser.parse(self.manager.data.get('query', [])):
+            query_params[q['Name']] = q['Value']
+        return query_params
 
 
 @resources.register('cache-cluster')
@@ -48,6 +89,11 @@ class ElastiCacheCluster(QueryResourceManager):
     action_registry = actions
     permissions = ('elasticache:ListTagsForResource',)
     augment = universal_augment
+
+    source_mapping = {
+        'describe': DescribeElastiCache,
+        'config': ConfigSource
+    }
 
 
 @filters.register('security-group')
@@ -89,6 +135,38 @@ class SubnetFilter(net_filters.SubnetFilter):
             self.manager.get_resource_manager(
                 'cache-subnet-group').resources()}
         return super(SubnetFilter, self).process(resources, event)
+
+
+@filters.register('vpc')
+class VpcFilter(net_filters.VpcFilter):
+    """Filters elasticache clusters based on their associated VPCs
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: cache-node-with-default-vpc
+            resource: aws.cache-cluster
+            filters:
+              - type: vpc
+                key: IsDefault
+                value: false
+    """
+
+    RelatedIdsExpression = ""
+
+    def get_related_ids(self, resources):
+        return {
+            self.groups[res['CacheSubnetGroupName']]['VpcId'] for res in resources
+        }
+
+    def process(self, resources, event=None):
+        self.groups = {
+            r['CacheSubnetGroupName']: r
+            for r in self.manager.get_resource_manager('cache-subnet-group').resources()
+        }
+        return super().process(resources, event)
 
 
 filters.register('network-location', net_filters.NetworkLocation)

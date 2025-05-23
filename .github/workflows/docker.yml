@@ -22,7 +22,7 @@ jobs:
           - c7n-left
     runs-on: ubuntu-latest-8-cores
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # ratchet:actions/checkout@v4
       - name: ${{ matrix.image }} build and push
         uses: ./.github/composites/docker-build-push
         env:
@@ -34,7 +34,7 @@ jobs:
           platforms: linux/arm64,linux/amd64
 
       - name: Notify Slack
-        uses: ravsamhq/notify-slack-action@v2
+        uses: ravsamhq/notify-slack-action@be814b201e233b2dc673608aa46e5447c8ab13f2 # ratchet:ravsamhq/notify-slack-action@v2
         if: always()
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_CI_HOOK }}

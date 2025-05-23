@@ -318,7 +318,7 @@ class TestFSx(BaseTest):
         client = session_factory().client('fsx')
         fs = client.describe_file_systems(
             FileSystemIds=[resources[0]['FileSystemId']])['FileSystems']
-        self.assertTrue(len(fs), 1)
+        self.assertEqual(len(fs), 1)
         self.assertEqual(fs[0]['Lifecycle'], 'DELETING')
         backups = client.describe_backups(
             Filters=[
@@ -364,7 +364,7 @@ class TestFSx(BaseTest):
         client = session_factory().client('fsx')
         fs = client.describe_file_systems(
             FileSystemIds=[resources[0]['FileSystemId']])['FileSystems']
-        self.assertTrue(len(fs), 1)
+        self.assertEqual(len(fs), 1)
         self.assertEqual(fs[0]['Lifecycle'], 'DELETING')
         backups = client.describe_backups(
             Filters=[
@@ -404,7 +404,7 @@ class TestFSx(BaseTest):
         client = session_factory().client('fsx')
         fs = client.describe_file_systems(
             FileSystemIds=[resources[0]['FileSystemId']])['FileSystems']
-        self.assertTrue(len(fs), 1)
+        self.assertEqual(len(fs), 1)
         self.assertNotEqual(fs[0]['Lifecycle'], 'DELETING')
 
     def test_fsx_arn_in_event(self):
@@ -577,7 +577,7 @@ class TestFSxBackup(BaseTest):
         tags = None
         for b in backups:
             if b['BackupId'] == backup_id:
-                self.assertTrue(len(b['Tags']), 1)
+                self.assertEqual(len(b['Tags']), 1)
                 tags = b['Tags']
         self.assertTrue(tags)
         self.assertEqual(tags[0]['Key'], 'tag-test')
@@ -615,7 +615,7 @@ class TestFSxBackup(BaseTest):
         tags = None
         for b in backups:
             if b['BackupId'] == backup_id:
-                self.assertTrue(len(b['Tags']), 1)
+                self.assertEqual(len(b['Tags']), 1)
                 tags = [t for t in b['Tags'] if t['Key'] == 'maid_status']
         self.assertTrue(tags)
 

@@ -20,6 +20,8 @@ retrying = "^1.3.3"
 tencentcloud-sdk-python = "^3.0.783"
 cos-python-sdk-v5 = "^1.9.21"
 freezegun = "^1.5.1"
+# workaround for: https://github.com/python-poetry/poetry-plugin-export/issues/183
+urllib3 = ">=1.25.4,<1.27"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "<8.0"

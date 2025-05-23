@@ -22,7 +22,7 @@ python = ">=3.9.2,<4.0.0"
 c7n = {path = "../..", develop = true}
 
 click = ">=8.0"
-rich = "^13.1"
+rich = "^14.0"
 tfparse = "^0.6"
 python-hcl2 = "^4.3.2"
 

@@ -10,13 +10,13 @@ jobs:
     permissions:
       id-token: write
       contents: read
-      checks: write    
+      checks: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # ratchet:actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Install Custodian        
+      - name: Install Custodian
         uses: ./.github/composites/install
         with:
           python-version: "3.11"
@@ -24,7 +24,7 @@ jobs:
       - name: Build Wheels
         shell: bash
         run: |
-          poetry self add poetry-plugin-freeze==1.0.5
+          poetry self add poetry-plugin-freeze==1.2.0
           pip install twine
           make pkg-build-wheel
 
@@ -35,7 +35,7 @@ jobs:
              --path . --since last --skip-provider awscc
           cat release.md
 
-      - uses: aws-actions/configure-aws-credentials@v4
+      - uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # ratchet:aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_FTEST_ROLE }}
           aws-region: us-east-1
@@ -48,7 +48,7 @@ jobs:
           PKG_REPO: stagec7n
         run: |
           ./tools/dev/staging-auth.sh >> /dev/null
-  
+
       - name: Stage Wheels
         shell: bash
         env:
@@ -61,7 +61,7 @@ jobs:
           python tools/dev/poetrypkg.py gen-qa-requires -r . --output wheels-manifest.txt
           make pkg-publish-wheel PKG_REPO=${{ env.PKG_REPO }}
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # ratchet:actions/upload-artifact@v4
         with:
           name: built-wheels
           path: |
@@ -75,19 +75,19 @@ jobs:
     permissions:
       id-token: write
       contents: read
-      checks: write    
+      checks: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # ratchet:actions/checkout@v4
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@8d9ed9ac5c53483de85588cdf95a591a75ab9f55 # ratchet:actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # ratchet:actions/download-artifact@v4
         with:
           name: built-wheels
 
-      - uses: aws-actions/configure-aws-credentials@v4
+      - uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # ratchet:aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_FTEST_ROLE }}
           aws-region: us-east-1
@@ -118,13 +118,13 @@ jobs:
     runs-on: ubuntu-latest
     needs: TestWheels
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # ratchet:actions/checkout@v4
       - name: Install Custodian
         uses: ./.github/composites/install
         with:
-          python-version: "3.11"          
+          python-version: "3.11"
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # ratchet:actions/download-artifact@v4
         with:
           name: built-wheels
 

@@ -1,0 +1,37 @@
+{
+  "status_code": 200,
+  "data": {
+    "Vpcs": [
+      {
+        "VpcId": "vpc-f1516b97",
+        "InstanceTenancy": "default",
+        "Tags": [
+          {
+            "Value": "FancyTestVPC",
+            "Key": "Name"
+          },
+          {
+            "Value": "tagfanncyvalue",
+            "Key": "tagfancykey"
+          }
+        ],
+        "State": "available",
+        "DhcpOptionsId": "dopt-24ff1940",
+        "CidrBlock": "10.0.42.0/24",
+        "IsDefault": true
+      }
+    ],
+    "ResponseMetadata": {
+      "RetryAttempts": 0,
+      "HTTPStatusCode": 200,
+      "RequestId": "688ea6ff-7a28-41fb-9729-eea68fab91d8",
+      "HTTPHeaders": {
+        "transfer-encoding": "chunked",
+        "vary": "Accept-Encoding",
+        "server": "AmazonEC2",
+        "content-type": "text/xml;charset=UTF-8",
+        "date": "Tue, 27 Jun 2017 17:50:58 GMT"
+      }
+    }
+  }
+}

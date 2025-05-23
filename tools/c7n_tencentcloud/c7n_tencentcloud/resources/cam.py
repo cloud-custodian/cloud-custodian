@@ -556,15 +556,20 @@ class UsedIamPolicies(Filter):
           resource: tencentcloud.cam-policy
           filters:
           - type: used
+            state: true
     """
-    schema = type_schema('used')
+    schema = type_schema('used', state={'type': 'boolean'})
     permissions = ()
 
     def process(self, resources, event=None):
         """process"""
         results = []
-        for resource in resources:
-            self.manager.get_policy_binded_entities(resource)
-            if len(resource["binded_entities"]) > 0:
-                results.append(resource)
+        if self.data.get("state", True):
+            for resource in resources:
+                if resource["AttachEntityCount"] > 0:
+                    results.append(resource)
+        else:
+            for resource in resources:
+                if resource["AttachEntityCount"] == 0:
+                    results.append(resource)
         return results
