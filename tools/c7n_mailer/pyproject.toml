@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "c7n_mailer"
-version = "0.6.43"
+version = "0.6.44"
 description = "Cloud Custodian - Reference Mailer"
 authors = ["Cloud Custodian Project"]
 license = "Apache-2.0"
@@ -28,7 +28,7 @@ pyyaml = ">=5.4.0"
 sendgrid = "^6.1.1"
 datadog = "^0.34.0"
 ldap3 = "^2.6.1"
-redis = "^5.0"
+redis = "^6.0"
 jsonpointer = ">=2.0"
 jsonpatch = "^1.25"
 types-six = "^1.16.10"

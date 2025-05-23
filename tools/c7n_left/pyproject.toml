@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "c7n_left"
-version = "0.3.30"
+version = "0.3.31"
 description = "Custodian policies for IAAC definitions"
 authors = ["Cloud Custodian Project"]
 license = "Apache-2"
