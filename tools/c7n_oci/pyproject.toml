@@ -17,6 +17,7 @@ classifiers=[
 [tool.poetry.dependencies]
 python = ">=3.9.2,<4.0.0"
 oci = "^2.106"
+pyopenssl = ">=23"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "<8.0"
