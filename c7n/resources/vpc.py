@@ -3333,3 +3333,113 @@ class UsedByNetworkAddress(Filter):
                     if rtype == self.data.get('resource-type'):
                         results.append(r)
         return results
+
+
+@Vpc.filter_registry.register('resolver-query-logging')
+class ResolverQueryLoggingFilter(Filter):
+    """Filter VPCs based on Route 53 Resolver query logging configuration.
+
+    This filter checks if VPCs have Route 53 Resolver query logging enabled
+    and optionally verifies if logs are being sent to a specific S3 destination.
+
+    :Example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: vpc-missing-resolver-query-logs
+                resource: vpc
+                filters:
+                  - type: resolver-query-logging
+                    state: false
+
+              - name: vpc-resolver-logs-to-specific-bucket
+                resource: vpc
+                filters:
+                  - type: resolver-query-logging
+                    state: true
+                    bucket: my-logging-bucket
+
+    """
+    schema = type_schema(
+        'resolver-query-logging',
+        state={'type': 'boolean', 'default': True},
+        bucket={'type': 'string'},
+        **{'s3-destination': {'type': 'boolean'}}
+    )
+
+    permissions = (
+        'route53resolver:ListResolverQueryLogConfigs',
+        'route53resolver:ListResolverQueryLogConfigAssociations'
+    )
+
+    annotation_key = 'c7n:resolver-logging'
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('route53resolver')
+
+        target_state = self.data.get('state', True)
+        check_bucket = self.data.get('bucket')
+        check_s3_destination = self.data.get('s3-destination')
+
+        try:
+            vpc_to_config = {}
+            paginator = client.get_paginator('list_resolver_query_log_config_associations')
+            for page in paginator.paginate():
+                for assoc in page.get('ResolverQueryLogConfigAssociations', []):
+                    if (assoc['ResourceId'].startswith('vpc-') and
+                        assoc['Status'] in ['ACTIVE', 'CREATING']):
+                        vpc_to_config[assoc['ResourceId']] = assoc['ResolverQueryLogConfigId']
+
+            log_configs = {}
+            if target_state:
+                paginator = client.get_paginator('list_resolver_query_log_configs')
+                for page in paginator.paginate():
+                    for config in page.get('ResolverQueryLogConfigs', []):
+                        if config['Status'] in ['COMPLETE', 'CREATING', 'ACTIVE', 'CREATED']:
+                            log_configs[config['Id']] = config
+
+        except Exception as e:
+            self.log.warning(f"Error fetching resolver query log configurations: {e}")
+            return resources
+
+        results = []
+        for vpc in resources:
+            vpc_id = vpc['VpcId']
+            has_logging = vpc_id in vpc_to_config
+            config_id = vpc_to_config.get(vpc_id)
+            config = log_configs.get(config_id, {}) if config_id else {}
+
+            vpc[self.annotation_key] = {
+                'enabled': has_logging,
+                'config_id': config_id,
+                'destination_arn': config.get('DestinationArn', ''),
+                'config_status': config.get('Status', ''),
+                'config_name': config.get('Name', ''),
+                'bucket_name': ''
+            }
+
+            destination_arn = config.get('DestinationArn', '')
+            if destination_arn.startswith('arn:aws:s3:::'):
+                bucket_name = destination_arn[13:]
+                if '/' in bucket_name:
+                    bucket_name = bucket_name.split('/')[0]
+                vpc[self.annotation_key]['bucket_name'] = bucket_name
+
+            if has_logging != target_state:
+                continue
+
+            if (check_bucket or check_s3_destination) and has_logging:
+                destination_arn = config.get('DestinationArn', '')
+                if not destination_arn.startswith('arn:aws:s3:::'):
+                    continue
+
+                # Only check specific bucket if specified
+                if check_bucket:
+                    current_bucket = vpc[self.annotation_key]['bucket_name']
+                    if current_bucket != check_bucket:
+                        continue
+
+            results.append(vpc)
+
+        return results
