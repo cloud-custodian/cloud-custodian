@@ -91,6 +91,10 @@ class PolicyChecker:
     def allowed_orgid(self):
         return self.checker_config.get('allowed_orgid', ())
 
+    @property
+    def allowed_arn(self):
+        return self.checker_config.get('allowed_arn', ())
+
     # Policy statement handling
     def check(self, policy_text):
         if isinstance(policy_text, str):
@@ -167,9 +171,15 @@ class PolicyChecker:
 
         results = []
         for c in conditions:
-            results.append(self.handle_condition(s, c))
+            val = self.handle_condition(s, c)
+            if val is None:
+                continue
+            results.append(val)
 
-        return all(results)
+        if results:
+            return all(results)
+
+        return False
 
     def handle_condition(self, s, c):
         if not c['op']:
@@ -182,7 +192,10 @@ class PolicyChecker:
             log.warning("no handler:%s op:%s key:%s values:%s" % (
                 handler_name, c['op'], c['key'], c['values']))
             return
-        return not handler(s, c)
+        val = handler(s, c)
+        if val is None:
+            return
+        return not val
 
     def normalize_conditions(self, s):
         s_cond = []
@@ -200,19 +213,18 @@ class PolicyChecker:
         set_conditions = ('ForAllValues', 'ForAnyValues')
 
         for s_cond_op in list(s['Condition'].keys()):
-            cond = {'op': s_cond_op}
-
             if s_cond_op not in conditions:
                 if not any(s_cond_op.startswith(c) for c in set_conditions):
                     continue
 
-            cond['key'] = list(s['Condition'][s_cond_op].keys())[0]
-            cond['values'] = s['Condition'][s_cond_op][cond['key']]
-            cond['values'] = (
-                isinstance(cond['values'],
-                           str) and (cond['values'],) or cond['values'])
-            cond['key'] = cond['key'].lower()
-            s_cond.append(cond)
+            for key in s['Condition'][s_cond_op].keys():
+                cond = {'op': s_cond_op}
+                cond['key'] = key.lower()
+                cond['values'] = s['Condition'][s_cond_op][key]
+                cond['values'] = (
+                        isinstance(cond['values'],
+                                   str) and (cond['values'],) or cond['values'])
+                s_cond.append(cond)
 
         return s_cond
 
@@ -245,8 +257,13 @@ class PolicyChecker:
 
     def handle_aws_principalorgid(self, s, c):
         if not self.allowed_orgid:
-            return True
+            return None
         return bool(set(map(_account, c['values'])).difference(self.allowed_orgid))
+
+    def handle_aws_principalarn(self, s, c):
+        if not self.allowed_arn:
+            return None
+        return bool(set(c['values']).difference(self.allowed_arn))
 
 
 class CrossAccountAccessFilter(Filter):
@@ -271,7 +288,9 @@ class CrossAccountAccessFilter(Filter):
         whitelist_vpce_from={'$ref': '#/definitions/filters_common/value_from'},
         whitelist_vpce={'type': 'array', 'items': {'type': 'string'}},
         whitelist_vpc_from={'$ref': '#/definitions/filters_common/value_from'},
-        whitelist_vpc={'type': 'array', 'items': {'type': 'string'}})
+        whitelist_vpc={'type': 'array', 'items': {'type': 'string'}},
+        whitelist_arns={'type': 'array', 'items': {'type': 'string'}},
+        whitelist_arns_from={'$ref': '#/definitions/filters_common/value_from'})
 
     policy_attribute = 'Policy'
     annotation_key = 'CrossAccountViolations'
@@ -290,12 +309,14 @@ class CrossAccountAccessFilter(Filter):
         self.vpcs = self.get_vpcs()
         self.vpces = self.get_vpces()
         self.orgid = self.get_orgids()
+        self.arn = self.get_arns()
         self.checker_config = getattr(self, 'checker_config', None) or {}
         self.checker_config.update(
             {'allowed_accounts': self.accounts,
              'allowed_vpc': self.vpcs,
              'allowed_vpce': self.vpces,
              'allowed_orgid': self.orgid,
+             'allowed_arn': self.arn,
              'check_actions': self.actions,
              'everyone_only': self.everyone_only,
              'whitelist_conditions': self.conditions,
@@ -332,6 +353,13 @@ class CrossAccountAccessFilter(Filter):
             values = ValuesFrom(self.data['whitelist_orgids_from'], self.manager)
             org_ids = org_ids.union(values.get_values())
         return org_ids
+
+    def get_arns(self):
+        arns = set(self.data.get('whitelist_arns', ()))
+        if 'whitelist_arns_from' in self.data:
+            values = ValuesFrom(self.data['whitelist_arns_from'], self.manager)
+            arns = arns.union(values.get_values())
+        return arns
 
     def get_resource_policy(self, r):
         return r.get(self.policy_attribute, None)
