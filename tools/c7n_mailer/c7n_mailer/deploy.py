@@ -4,6 +4,7 @@ import copy
 import logging
 import json
 import os
+import sys
 
 from c7n.mu import CloudWatchEventSource, LambdaFunction, LambdaManager, PythonPackageArchive
 
@@ -50,12 +51,22 @@ CORE_DEPS = [
     # sendgrid dependencies
     "sendgrid",
     "python_http_client",
-    "ellipticcurve",
+    # This changes dynamically based on python version :/
+    # "ellipticcurve",
 ]
 
 
 def get_archive(config):
     deps = ["c7n_mailer"] + list(CORE_DEPS)
+
+
+     # sendgrid on python 3.10
+     if sys.version_info.minor < 11:  # pragma: no cover
+         deps.append('ellipticcurve')
+     # sendgrid on python 3.11+
+     else:
+         deps.append('ecdsa')
+
     archive = PythonPackageArchive(modules=deps)
 
     for d in set(config["templates_folders"]):
