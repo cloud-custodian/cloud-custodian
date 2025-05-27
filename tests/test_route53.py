@@ -443,6 +443,28 @@ class TestResolverQueryLogConfig(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['Id'], "rqlc-01234567891234")
 
+    def test_resolver_query_log_config_associate_skip_shared(self):
+        session_factory = self.replay_flight_data(
+            'test_resolver_query_log_config_associate_skip_shared',
+            region='us-east-2'
+        )
+        p = self.load_policy({
+            'name': 'r53-resolver-query-log-config-associate-skip-shared',
+            'filters': [{
+                'type': 'value', 'key': 'Name', 'op': 'contains', 'value': 'c7n'}],
+            'resource': 'resolver-logs',
+            'actions': [{
+                'type': 'associate-vpc', 'vpcid': 'vpc-06fbfb0683669c546'}]},
+            config={'region': 'us-east-2'},
+            session_factory=session_factory
+        )
+        with self.capture_logging(level=logging.WARNING) as log_output:
+            p.run()
+            self.assertIn(
+                'implicitly filtered 1 of 2 resources key:OwnerId',
+                log_output.getvalue()
+            )
+
     def test_resolver_query_log_config_not_associated(self):
         session_factory = self.replay_flight_data(
             'test_resolver_query_log_config_associate_2')
