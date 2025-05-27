@@ -638,7 +638,7 @@ class ResolverQueryLogConfigAssociate(BaseAction):
 
     def is_associated(self, resource, vpc_id):
         associated = False
-        for association in resource['c7n:Associations']:
+        for association in resource.get('c7n:Associations', ()):
             if association['ResourceId'] == vpc_id:
                 associated = True
                 break

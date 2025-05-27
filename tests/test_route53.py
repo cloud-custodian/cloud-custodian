@@ -404,7 +404,8 @@ class TestResolverQueryLogConfig(BaseTest):
             'resource': 'resolver-logs',
             'filters': [
                 {'type': 'is-associated', 'vpcid': 'vpc-011516c4325953'}]},
-            session_factory=session_factory)
+            session_factory=session_factory,
+            config={'account_id': '123456789012'})
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
