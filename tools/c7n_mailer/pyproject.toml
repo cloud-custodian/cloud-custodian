@@ -33,6 +33,7 @@ jsonpointer = ">=2.0"
 jsonpatch = "^1.25"
 types-six = "^1.16.10"
 importlib-metadata = "^8.0"
+werkzeug = "^3.1"
 
 # Optional packages for additional provider support
 c7n-gcp = { path = "../c7n_gcp/", develop = true, optional = true }
