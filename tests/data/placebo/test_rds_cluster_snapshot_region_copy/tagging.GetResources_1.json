@@ -1,0 +1,36 @@
+{
+    "status_code": 200, 
+    "data": {
+        "PaginationToken": "", 
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:rds:us-east-1:644160558196:snapshot:rds:originb-2016-12-28-09-15",
+                "Tags": [
+                    {
+                        "Value": "mgmt-portal",
+                        "Key": "app"
+                    },
+                    {
+                        "Value": "other",
+                        "Key": "workload-type"
+                    },
+                    {
+                        "Value": "staging",
+                        "Key": "env"
+                    }
+                ]
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "bed27a38-9742-11e7-8210-dd0e2d1c96ab", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "bed27a38-9742-11e7-8210-dd0e2d1c96ab", 
+                "date": "Mon, 11 Sep 2017 22:44:18 GMT", 
+                "content-length": "205", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}
