@@ -1,0 +1,19 @@
+{
+    "status_code": 200,
+    "data": {
+        "TotalCount": 1,
+        "TotalFilteredCount": 1,
+        "ResolverQueryLogConfigAssociations": [
+            {
+                "Id": "rqlca-a3591a308c9344f3",
+                "ResolverQueryLogConfigId": "rqlc-ff0edcdf72814d4d",
+                "ResourceId": "vpc-06fbfb0683669c546",
+                "Status": "FAILED",
+                "Error": "ACCESS_DENIED",
+                "ErrorMessage": "Account is not authorized to perform this operation.",
+                "CreationTime": "2025-05-27T17:48:54.515912049Z"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

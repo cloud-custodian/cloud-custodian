@@ -1,0 +1,34 @@
+{
+    "status_code": 200,
+    "data": {
+        "TotalCount": 2,
+        "TotalFilteredCount": 2,
+        "ResolverQueryLogConfigs": [
+            {
+                "Id": "rqlc-9a0ca4b672e41b1",
+                "OwnerId": "111111111111",
+                "Status": "CREATED",
+                "ShareStatus": "SHARED_WITH_ME",
+                "AssociationCount": 0,
+                "Arn": "arn:aws:route53resolver:us-east-2:111111111111:resolver-query-log-config/rqlc-9a0ca4b672e41b1",
+                "Name": "c7ntest-shared",
+                "DestinationArn": "arn:aws:s3:::ima-good-bucket",
+                "CreatorRequestId": "a9928bd4-e173-47ea-8a43-92f90cbf1610",
+                "CreationTime": "2025-05-27T17:12:54.559388056Z"
+            },
+            {
+                "Id": "rqlc-ff0edcdf72814d4d",
+                "OwnerId": "644160558196",
+                "Status": "CREATED",
+                "ShareStatus": "NOT_SHARED",
+                "AssociationCount": 1,
+                "Arn": "arn:aws:route53resolver:us-east-2:644160558196:resolver-query-log-config/rqlc-ff0edcdf72814d4d",
+                "Name": "c7ntest",
+                "DestinationArn": "arn:aws:s3:::ajsbx-c7n",
+                "CreatorRequestId": "cff4024d-e28e-4389-9866-0b70044ddc04",
+                "CreationTime": "2025-05-27T17:12:12.208142337Z"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
