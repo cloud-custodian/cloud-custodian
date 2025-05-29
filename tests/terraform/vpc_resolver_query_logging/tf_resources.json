@@ -1,0 +1,22 @@
+{
+  "resolver_log_bucket": {
+    "sensitive": false,
+    "type": "string",
+    "value": "resolver-query-logs-20250513181124788700000003"
+  },
+  "resolver_log_config_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "rqlc-ceb57b1765044c85"
+  },
+  "vpc_with_resolver_logging_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "vpc-0503a8b9ddbb3a5c5"
+  },
+  "vpc_without_resolver_logging_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "vpc-029d7b65096a4717d"
+  }
+}
