@@ -22,7 +22,7 @@ Individual package tests can be targeted with pytest:
 
 .. code-block:: bash
 
-   $ poetry run pytest -n auto -s tools/c7n_left
+   $ uv run pytest -n auto -s tools/c7n_left
 
 Note we maintain a set of common environment variables used when running tests in `test.env`.
 Beyond dummy values for cloud providers, Of particular note is C7N_VALIDATE.
