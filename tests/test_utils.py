@@ -761,3 +761,19 @@ def test_jmespath_parse_to_json():
         {'foo': '{"]}'}
     )
     assert result is None
+
+def test_lambda_cwe_policy_delta():
+    json_array = [
+        {
+            "Sid": "func_name",
+            "Condition": {
+                "ArnLike": {
+                    "AWS:SourceArn": "source_arn"
+                }
+            }
+        }
+    ]
+    assert utils.lambda_cwe_policy_delta(json_array, 'func_name', 'source_arn') is False
+    assert utils.lambda_cwe_policy_delta(json_array, 'func_name', 'source_arn2') is True
+    assert utils.lambda_cwe_policy_delta(json_array, 'func_name2', 'source_arn') is True
+    assert utils.lambda_cwe_policy_delta([], 'func_name', 'source_arn') is True
