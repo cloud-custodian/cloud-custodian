@@ -1,0 +1,11 @@
+{
+    "status_code": 201,
+    "data": {
+        "ResponseMetadata": {},
+        "AliasArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-sg-modified:Dev",
+        "Name": "Dev",
+        "FunctionVersion": "1",
+        "Description": "",
+        "RevisionId": "983d4455-f8ff-40aa-93fb-ad7b491e19dc"
+    }
+}
