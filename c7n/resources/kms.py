@@ -169,6 +169,13 @@ class KeyRotationStatus(ValueFilter):
                     self.log.warning(
                         "Access denied when getting rotation status on key:%s",
                         resource.get('KeyArn'))
+                elif e.response['Error']['Code'] == 'UnsupportedOperationException':
+                    # This is expected for keys that do not support rotation
+                    # (e.g., imported keys) and keys that are PendingImport
+                    self.log.warning(
+                        "UnsupportedOperationException when getting rotation status on key:%s",
+                        resource.get('KeyArn'))
+                    return None
                 else:
                     raise
 
