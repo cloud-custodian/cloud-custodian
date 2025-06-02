@@ -171,11 +171,11 @@ class KeyRotationStatus(ValueFilter):
                         resource.get('KeyArn'))
                 elif e.response['Error']['Code'] == 'UnsupportedOperationException':
                     # This is expected for keys that do not support rotation
-                    # (e.g., imported keys) and keys that are PendingImport
+                    # e.g. keys in custom keystores or when keys are in certain
+                    # states such as PendingImport.
                     self.log.warning(
                         "UnsupportedOperationException when getting rotation status on key:%s",
                         resource.get('KeyArn'))
-                    return None
                 else:
                     raise
 

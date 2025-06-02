@@ -95,6 +95,45 @@ class KMSTest(BaseTest):
         key = client.get_key_rotation_status(KeyId=resources[0]["KeyId"])
         self.assertEqual(key["KeyRotationEnabled"], True)
 
+    def test_key_rotation_exception_unsupportedopp(self):
+        region = "us-west-2"
+        session_factory = self.replay_flight_data(
+            "test_key_rotation_unsupportedopp", region=region
+        )
+
+        p = self.load_policy(
+            {
+                "name": "kms-key-rotation-unsupportedopp",
+                "resource": "kms-key",
+                "filters": [
+                    {
+                        "and": [
+                            {
+                                "type": "key-rotation-status",
+                                "key": "KeyRotationEnabled",
+                                "op": "ne",
+                                "value": True
+                            },
+                            {
+                                "type": "value",
+                                "key": "KeyState",
+                                "op": "eq",
+                                "value": "PendingImport"
+                            }
+                        ]
+                    }
+                ],
+            },
+            session_factory=session_factory,
+            config={"region": region}
+        )
+
+        # Trying to get the key rotation status of a key in PendingImport state
+        # will raise an UnsupportedOperationException, but it should be handled
+        # as a warning and not cause the policy to fail.
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_kms_config_source(self):
         session_factory = self.replay_flight_data("test_kms_config_source")
         p = self.load_policy(
