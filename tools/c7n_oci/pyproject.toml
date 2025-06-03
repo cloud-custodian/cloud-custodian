@@ -12,7 +12,7 @@ dependencies = [
     "pyopenssl>=23"
 ]
 name = "c7n_oci"
-version = "0.1.18"
+version = "0.1.19"
 description = "Cloud Custodian - OCI Support"
 readme = "readme.md"
 classifiers = [
@@ -20,6 +20,7 @@ classifiers = [
     "Topic :: System :: Systems Administration",
     "Topic :: System :: Distributed Computing",
 ]
+
 
 [project.urls]
 homepage = "https://cloudcustodian.io"

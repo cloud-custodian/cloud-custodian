@@ -2258,3 +2258,22 @@ def test_merge_locals_with_apply_time_values(tmp_path):
     assert {r.resource.name for r in resources} == {
         "aws_db_parameter_group.untagged",
     }
+
+
+@pytest.mark.xfail(reason="https://github.com/cloud-custodian/cloud-custodian/issues/10119")
+def test_attribute_value_presence(tmp_path):
+
+    resources = run_policy(
+        {
+            "name": "aws-role-permission-boundary-specified",
+            "resource": ["terraform.aws_iam_role"],
+            "filters": [{"permissions_boundary": "present"}],
+        },
+        terraform_dir / "attribute_value_presence",
+        tmp_path,
+    )
+    assert len(resources) == 2
+    assert {r.resource.name for r in resources} == {
+        "aws_iam_role.attribute_with_direct_reference",
+        "aws_iam_role.attribute_with_interpolated_reference",
+    }

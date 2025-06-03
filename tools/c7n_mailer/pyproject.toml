@@ -20,7 +20,7 @@ dependencies = [
     "importlib-metadata<9.0,>=8.0",
 ]
 name = "c7n_mailer"
-version = "0.6.43"
+version = "0.6.44"
 description = "Cloud Custodian - Reference Mailer"
 readme = "README.md"
 classifiers = [

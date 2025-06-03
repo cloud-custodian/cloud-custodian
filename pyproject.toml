@@ -14,7 +14,7 @@ dependencies = [
     "tabulate<1.0.0,>=0.9.0",
 ]
 name = "c7n"
-version = "0.9.44"
+version = "0.9.45"
 description = "Cloud Custodian - Policy Rules Engine"
 readme = "README.md"
 classifiers = [
@@ -60,7 +60,6 @@ addons = [
     "jsonpatch<2.0,>=1.25",
     "psutil>=5.7",
 ]
-
 
 [tool.uv.sources]
 c7n = { workspace = true }

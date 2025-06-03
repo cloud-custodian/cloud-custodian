@@ -1270,7 +1270,7 @@ wheels = [
 
 [[package]]
 name = "c7n"
-version = "0.9.44"
+version = "0.9.45"
 source = { editable = "." }
 dependencies = [
     { name = "argcomplete" },
@@ -1354,7 +1354,7 @@ lint = [
 
 [[package]]
 name = "c7n-awscc"
-version = "0.1.29"
+version = "0.1.30"
 source = { editable = "tools/c7n_awscc" }
 dependencies = [
     { name = "boto3" },
@@ -1379,7 +1379,7 @@ dev = [{ name = "pytest", specifier = "<8.0" }]
 
 [[package]]
 name = "c7n-azure"
-version = "0.7.43"
+version = "0.7.44"
 source = { editable = "tools/c7n_azure" }
 dependencies = [
     { name = "adal" },
@@ -1561,7 +1561,7 @@ dev = [
 
 [[package]]
 name = "c7n-gcp"
-version = "0.4.43"
+version = "0.4.44"
 source = { editable = "tools/c7n_gcp" }
 dependencies = [
     { name = "c7n" },
@@ -1602,7 +1602,7 @@ dev = [
 
 [[package]]
 name = "c7n-kube"
-version = "0.2.43"
+version = "0.2.44"
 source = { editable = "tools/c7n_kube" }
 dependencies = [
     { name = "c7n" },
@@ -1631,7 +1631,7 @@ dev = [
 
 [[package]]
 name = "c7n-left"
-version = "0.3.30"
+version = "0.3.31"
 source = { editable = "tools/c7n_left" }
 dependencies = [
     { name = "c7n" },
@@ -1665,7 +1665,7 @@ dev = [
 
 [[package]]
 name = "c7n-mailer"
-version = "0.6.43"
+version = "0.6.44"
 source = { editable = "tools/c7n_mailer" }
 dependencies = [
     { name = "boto3" },
@@ -1732,7 +1732,7 @@ dev = [
 
 [[package]]
 name = "c7n-oci"
-version = "0.1.18"
+version = "0.1.19"
 source = { editable = "tools/c7n_oci" }
 dependencies = [
     { name = "c7n" },
@@ -1757,7 +1757,7 @@ dev = [{ name = "pytest", specifier = "<8.0" }]
 
 [[package]]
 name = "c7n-openstack"
-version = "0.1.34"
+version = "0.1.35"
 source = { editable = "tools/c7n_openstack" }
 dependencies = [
     { name = "c7n" },
@@ -1784,7 +1784,7 @@ dev = [
 
 [[package]]
 name = "c7n-org"
-version = "0.6.43"
+version = "0.6.44"
 source = { editable = "tools/c7n_org" }
 dependencies = [
     { name = "c7n" },
@@ -1808,7 +1808,7 @@ dev = [{ name = "pytest", specifier = "<8.0" }]
 
 [[package]]
 name = "c7n-policystream"
-version = "0.4.43"
+version = "0.4.44"
 source = { editable = "tools/c7n_policystream" }
 dependencies = [
     { name = "boto3" },
@@ -1845,7 +1845,7 @@ dev = [
 
 [[package]]
 name = "c7n-sphinxext"
-version = "1.1.43"
+version = "1.1.44"
 source = { editable = "tools/c7n_sphinxext" }
 dependencies = [
     { name = "c7n" },
@@ -1874,7 +1874,7 @@ requires-dist = [
 
 [[package]]
 name = "c7n-tencentcloud"
-version = "0.1.26"
+version = "0.1.27"
 source = { editable = "tools/c7n_tencentcloud" }
 dependencies = [
     { name = "c7n" },
@@ -2378,7 +2378,7 @@ name = "exceptiongroup"
 version = "1.3.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
+    { name = "typing-extensions", marker = "python_full_version < '3.11'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/0b/9f/a65090624ecf468cdca03533906e7c69ed7588582240cfe7cc9e770b50eb/exceptiongroup-1.3.0.tar.gz", hash = "sha256:b241f5885f560bc56a59ee63ca4c6a8bfa46ae4ad651af316d4e81817bb9fd88", size = 29749, upload-time = "2025-05-10T17:42:51.123Z" }
 wheels = [

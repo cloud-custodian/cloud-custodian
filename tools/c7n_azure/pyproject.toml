@@ -86,7 +86,7 @@ dependencies = [
     "azure-mgmt-recoveryservicesbackup<8.0.0,>=7.0.0",
 ]
 name = "c7n_azure"
-version = "0.7.43"
+version = "0.7.44"
 description = "Cloud Custodian - Azure Support"
 readme = "readme.md"
 classifiers = [

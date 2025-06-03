@@ -15,7 +15,7 @@ dependencies = [
     "pyrate-limiter<3.0.0,>=2.8.4",
 ]
 name = "c7n_gcp"
-version = "0.4.43"
+version = "0.4.44"
 description = "Cloud Custodian - Google Cloud Provider"
 readme = "readme.md"
 classifiers = [

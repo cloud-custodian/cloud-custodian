@@ -13,7 +13,7 @@ dependencies = [
     "freezegun<2.0.0,>=1.5.1",
 ]
 name = "c7n_tencentcloud"
-version = "0.1.26"
+version = "0.1.27"
 description = "Cloud Custodian - Tencent Cloud Provider"
 readme = "readme.md"
 

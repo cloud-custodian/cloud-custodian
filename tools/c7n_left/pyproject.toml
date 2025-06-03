@@ -12,7 +12,7 @@ dependencies = [
     "python-hcl2<5.0.0,>=4.3.2",
 ]
 name = "c7n_left"
-version = "0.3.30"
+version = "0.3.31"
 description = "Custodian policies for IAAC definitions"
 readme = "README.md"
 classifiers = [

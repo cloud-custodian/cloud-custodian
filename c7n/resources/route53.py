@@ -589,6 +589,8 @@ class ResolverQueryLogConfig(QueryResourceManager):
     def augment(self, rqlcs):
         client = local_session(self.session_factory).client('route53resolver')
         for rqlc in rqlcs:
+            if rqlc['OwnerId'] != self.account_id:
+                continue  # don't try to fetch tags for shared resources
             rqlc['Tags'] = self.retry(
                 client.list_tags_for_resource,
                 ResourceArn=rqlc['Arn'])['Tags']
@@ -636,7 +638,7 @@ class ResolverQueryLogConfigAssociate(BaseAction):
 
     def is_associated(self, resource, vpc_id):
         associated = False
-        for association in resource['c7n:Associations']:
+        for association in resource.get('c7n:Associations', ()):
             if association['ResourceId'] == vpc_id:
                 associated = True
                 break
@@ -645,6 +647,9 @@ class ResolverQueryLogConfigAssociate(BaseAction):
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('route53resolver')
         vpc_ids = self.get_vpc_id()
+
+        # Don't try to take action on resources the active account doesn't own
+        resources = self.filter_resources(resources, 'OwnerId', (self.manager.account_id,))
 
         for resource in resources:
             for vpc_id in vpc_ids:
