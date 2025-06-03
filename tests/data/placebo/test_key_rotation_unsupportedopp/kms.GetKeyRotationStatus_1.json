@@ -1,0 +1,11 @@
+{
+    "status_code": 400,
+    "data": {
+        "Error": {
+            "Message": "arn:aws:kms:us-west-2:644160558196:key/0e70fa46-b702-4fe7-807e-8dea0d333f7d origin is EXTERNAL which is not valid for this operation.",
+            "Code": "UnsupportedOperationException"
+        },
+        "ResponseMetadata": {},
+        "message": "arn:aws:kms:us-west-2:644160558196:key/0e70fa46-b702-4fe7-807e-8dea0d333f7d origin is EXTERNAL which is not valid for this operation."
+    }
+}

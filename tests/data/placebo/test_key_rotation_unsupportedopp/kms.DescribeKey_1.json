@@ -1,0 +1,33 @@
+{
+    "status_code": 200,
+    "data": {
+        "KeyMetadata": {
+            "AWSAccountId": "644160558196",
+            "KeyId": "0e70fa46-b702-4fe7-807e-8dea0d333f7d",
+            "Arn": "arn:aws:kms:us-west-2:644160558196:key/0e70fa46-b702-4fe7-807e-8dea0d333f7d",
+            "CreationDate": {
+                "__class__": "datetime",
+                "year": 2025,
+                "month": 6,
+                "day": 2,
+                "hour": 10,
+                "minute": 43,
+                "second": 58,
+                "microsecond": 931000
+            },
+            "Enabled": false,
+            "Description": "",
+            "KeyUsage": "ENCRYPT_DECRYPT",
+            "KeyState": "PendingImport",
+            "Origin": "EXTERNAL",
+            "KeyManager": "CUSTOMER",
+            "CustomerMasterKeySpec": "SYMMETRIC_DEFAULT",
+            "KeySpec": "SYMMETRIC_DEFAULT",
+            "EncryptionAlgorithms": [
+                "SYMMETRIC_DEFAULT"
+            ],
+            "MultiRegion": false
+        },
+        "ResponseMetadata": {}
+    }
+}
