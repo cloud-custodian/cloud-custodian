@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 import time
 from botocore.exceptions import ClientError
-from mock import patch
+from unittest.mock import patch
 
 from .common import BaseTest, event_data
 from c7n.exceptions import PolicyValidationError
