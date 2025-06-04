@@ -20,6 +20,7 @@ from c7n_azure.function_package import FunctionPackage
 from c7n_azure.functionapp_utils import FunctionAppUtilities
 from c7n_azure.resources.arm import ArmResourceManager
 from c7n_azure.storage_utils import StorageUtilities
+from c7n_azure.query import ChildResourceManager
 from c7n_azure.utils import ResourceIdParser, StringUtils
 
 from c7n import utils
@@ -312,52 +313,58 @@ class AzureModeCommon:
         return re.search(extract_regex, event['subject'], re.IGNORECASE).group()
 
     @staticmethod
+    def annotate_parent(policy, resources):
+        if not issubclass(policy.resource_manager.__class__, ChildResourceManager):
+            return
+
+        for r in resources:
+            r[policy.resource_manager.resource_type.parent_key] = \
+                policy.resource_manager.__class__.extract_parent(r)
+
+    @staticmethod
     def run_for_event(policy, event=None):
         s = time.time()
 
-        with policy.ctx:
-            resources = policy.resource_manager.get_resources(
-                [AzureModeCommon.extract_resource_id(policy, event)])
+        resources = policy.resource_manager.get_resources(
+            [AzureModeCommon.extract_resource_id(policy, event)]
+        )
 
-            resources = policy.resource_manager.filter_resources(
-                resources, event)
+        AzureModeCommon.annotate_parent(policy, resources)
+        resources = policy.resource_manager.filter_resources(resources, event)
+
+        if not resources:
+            policy.log.info(
+                "policy: %s resources: %s no resources found" % (policy.name, policy.resource_type)
+            )
+            return
 
         with policy.ctx as ctx:
             rt = time.time() - s
 
-            ctx.metrics.put_metric(
-                'ResourceCount', len(resources), 'Count', Scope="Policy",
-                buffer=False)
-            ctx.metrics.put_metric(
-                "ResourceTime", rt, "Seconds", Scope="Policy")
-            ctx.output.write_file(
-                'resources.json', utils.dumps(resources, indent=2))
-
-            if not resources:
-                policy.log.info(
-                    "policy: %s resources: %s no resources found" % (
-                        policy.name, policy.resource_type))
-                return
+            ctx.metrics.put_metric("ResourceCount", len(resources), "Count", Scope="Policy")
+            ctx.metrics.put_metric("ResourceTime", rt, "Seconds", Scope="Policy")
+            ctx.output.write_file("resources.json", utils.dumps(resources, indent=2))
 
             at = time.time()
             for action in policy.resource_manager.actions:
                 policy.log.info(
                     "policy: %s invoking action: %s resources: %d",
-                    policy.name, action.name, len(resources))
+                    policy.name,
+                    action.name,
+                    len(resources),
+                )
                 with ctx.tracer.subsegment('action:%s' % action.type):
                     if isinstance(action, EventAction):
                         results = action.process(resources, event)
                     else:
                         results = action.process(resources)
                 try:
-                    ctx.output.write_file(
-                        "action-%s" % action.name, utils.dumps(results))
+                    ctx.output.write_file("action-%s" % action.name, utils.dumps(results))
                 except (TypeError, OverflowError):
                     pass
 
-        policy.ctx.metrics.put_metric(
-            "ActionTime", time.time() - at, "Seconds", Scope="Policy")
-        return resources
+            ctx.metrics.put_metric("ActionTime", time.time() - at, "Seconds", Scope="Policy")
+            return resources
 
 
 @execution.register(FUNCTION_TIME_TRIGGER_MODE)

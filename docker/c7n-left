@@ -4,7 +4,7 @@ ARG POETRY_VERSION="1.8.4"
 ARG PY_VERSION=3.12
 WORKDIR /app
 
-RUN apk add python-${PY_VERSION} py${PY_VERSION}-pip && chown -R nonroot:nonroot /app/
+RUN apk add --no-cache python-${PY_VERSION} py${PY_VERSION}-pip && chown -R nonroot:nonroot /app/
 
 USER nonroot
 
@@ -40,14 +40,17 @@ LABEL "org.opencontainers.image.documentation"="https://cloudcustodian.io/docs"
 ARG PY_VERSION=3.12
 
 WORKDIR /app
-RUN apk add git python-${PY_VERSION} && chown -R nonroot:nonroot /app/
+RUN apk add --no-cache git python-${PY_VERSION} && chown -R nonroot:nonroot /app/
 
 COPY --from=builder /home/nonroot/venv/lib/python${PY_VERSION}/site-packages /home/nonroot/.local/lib/python${PY_VERSION}/site-packages
 RUN rm -Rf /home/nonroot/.local/lib/python${PY_VERSION}/site-packages/pip*
 COPY --from=builder /app/c7n/c7n /app/c7n
 COPY --from=builder /app/c7n/tools/c7n_left /app/c7n/tools/c7n_left
 
+USER nonroot
+
 ENV LC_ALL="C.UTF-8" LANG="C.UTF-8"
 ENV PYTHONPATH=/app:/app/c7n/tools/c7n_left:/home/nonroot/.local/lib/python${PY_VERSION}/site-packages
+
 
 ENTRYPOINT [ "python", "-m", "c7n_left.cli"]

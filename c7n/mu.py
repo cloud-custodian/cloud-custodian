@@ -1861,8 +1861,9 @@ class ConfigRule(AWSEventBase):
                                 "The most recent AWS config types are here: http://docs.aws"
                                 ".amazon.com/config/latest/developerguide/resource"
                                 "-config-reference.html.")
-            params['Scope'] = {
-                'ComplianceResourceTypes': [config_type]}
+            if self.data.get('type') != 'config-poll-rule':
+                params['Scope'] = {
+                    'ComplianceResourceTypes': [config_type]}
         else:
             params['Scope']['ComplianceResourceTypes'] = self.data.get(
                 'resource-types', ())
@@ -1888,7 +1889,7 @@ class ConfigRule(AWSEventBase):
         # doesn't seem like we have anything mutable at the moment,
         # since we restrict params, maybe reusing the same policy name
         # with a different resource type.
-        if rule['Scope'] != params['Scope']:
+        if rule.get('Scope') != params.get('Scope'):
             return True
         if rule['Source'] != params['Source']:
             return True

@@ -29,7 +29,7 @@ endif
 
 install:
 	@if [[ -z "$(VIRTUAL_ENV)" ]]; then echo "Create and Activate VirtualEnv First, ie. python3 -m venv .venv && source .venv/bin/activate"; exit 1; fi
-	poetry install
+	poetry install --with addons
 	for pkg in $(PKG_SET); do echo "Install $$pkg" && cd $$pkg && poetry install --all-extras && cd ../..; done
 
 .PHONY: test
@@ -137,7 +137,10 @@ release-get-artifacts:
 
 data-update:
 # terraform data sets
-	cd tools/c7n_left/scripts && terraform init && python get_taggable.py --output ../c7n_left/data/taggable.json
+	cd tools/c7n_left/scripts && python get_taggable.py \
+		--module-path taggable_providers/latest \
+		--module-path taggable_providers/azurerm-previous \
+		--output ../c7n_left/data/taggable.json
 # aws data sets
 	python tools/dev/cfntypedb.py -f tests/data/cfn-types.json
 	python tools/dev/updatearnref.py > tests/data/arn-types.json

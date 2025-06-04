@@ -12,7 +12,8 @@ import types
 from azure.common.credentials import BasicTokenAuthentication
 from azure.core.credentials import AccessToken
 from azure.identity import (AzureCliCredential, ClientSecretCredential,
-                            ManagedIdentityCredential, CertificateCredential)
+                            ManagedIdentityCredential, CertificateCredential,
+                            __version__ as az_identity_version)
 from azure.identity._credentials.azure_cli import _run_command
 from msrestazure.azure_cloud import AZURE_PUBLIC_CLOUD
 from requests import HTTPError
@@ -104,7 +105,14 @@ class AzureCredential:
         elif self._auth_params.get('enable_cli_auth'):
             auth_name = 'Azure CLI'
             self._credential = AzureCliCredential()
-            account_info = _run_command('az account show --output json', timeout=10)
+
+            command = ['account', 'show', '--output', 'json']
+            if az_identity_version <= '1.19.0':
+                # 1.19 has no patch releases so can check version like that
+                command.insert(0, 'az')
+                command = ' '.join(command)
+
+            account_info = _run_command(command, timeout=10)
             account_json = json.loads(account_info)
             self._auth_params['subscription_id'] = account_json['id']
             self._auth_params['tenant_id'] = account_json['tenantId']

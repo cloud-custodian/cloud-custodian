@@ -1,0 +1,13 @@
+{
+    "status_code": 200,
+    "data": {
+        "FailedResourcesMap": {
+            "arn:aws:ram:us-east-1:644160558196:resource-share/ca59e91e-d123-4037-b581-5779840bef4a": {
+                "StatusCode": 400,
+                "ErrorCode": "InvalidParameterException",
+                "ErrorMessage": "arn:aws:ram:us-east-1:644160558196:resource-share/ca59e91e-d123-4037-b581-5779840bef4a"
+            }
+        },
+        "ResponseMetadata": {}
+    }
+}

@@ -60,6 +60,24 @@ class TestElastiCacheCluster(BaseTest):
             ["myec-001", "myec-002", "myec-003"],
         )
 
+    def test_elasticache_vpc_filter(self):
+        session_factory = self.replay_flight_data(
+            "test_elasticache_vpc_filter"
+        )
+        p = self.load_policy(
+            {
+                "name": "elasticache-cluster-vpc",
+                "resource": "aws.cache-cluster",
+                "filters": [
+                    {"type": "vpc", "key": "IsDefault", "value": True}
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['c7n:matched-vpcs'], ['vpc-f1516b97'])
+
     def test_elasticache_cluster_simple(self):
         session_factory = self.replay_flight_data("test_elasticache_cluster_simple")
         p = self.load_policy(
@@ -640,3 +658,28 @@ class TestElastiCacheUser(BaseTest):
         self.assertEqual(len(resources), 1)
         users = client.describe_users(UserId='c7n-user')["Users"]
         assert users[0]["Status"] == "deleting"
+
+    def test_elasticace_query_node_info(self):
+        session_factory = self.replay_flight_data("test_elasticache_query_node_info")
+        p = self.load_policy(
+            {
+                "name": "elasticache-node-default-port",
+                "resource": "aws.cache-cluster",
+                "query": [{
+                    "Name": "ShowCacheNodeInfo",
+                    "Value": True
+                }],
+                "filters": [{
+                    "type": "list-item",
+                    "key": "CacheNodes",
+                    "attrs": [{
+                        "type": "value",
+                        "key": "Endpoint.Port",
+                        "value": 11211
+                    }]
+                }],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)

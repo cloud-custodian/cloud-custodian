@@ -962,6 +962,13 @@ def test_provider_parse():
         "line_start": 5,
         "line_end": 8,
         "src_dir": Path("tests") / "terraform" / "ec2_stop_protection_disabled",
+        "references": [
+            {
+                "id": ANY,
+                "label": "aws_vpc",
+                "name": "example",
+            }
+        ],
     }
 
 
@@ -2165,3 +2172,106 @@ resource "aws_ecs_task_definition" "test_task_def" {
     results = policy_env.run()
     assert results[0].resource["c7n:MatchedFilters"] == ["container_definitions"]
     assert results[1].resource["c7n:MatchedFilters"] == ["container_definitions"]
+
+
+@pytest.mark.xfail(reason="https://github.com/cloud-custodian/cloud-custodian/issues/9709")
+def test_traverse_list_members(tmp_path):
+    resources = run_policy(
+        {
+            "name": "launch-template-ami-owner",
+            "resource": "terraform.aws_launch_template",
+            "filters": [
+                {
+                    "type": "traverse",
+                    "resources": "data.aws_ami_ids",
+                    "attrs": [
+                        {
+                            "type": "value",
+                            "key": "owners",
+                            "value": "amazon",
+                            "op": "contains",
+                        }
+                    ],
+                }
+            ],
+        },
+        terraform_dir / "traverse_list_members",
+        tmp_path,
+    )
+    assert len(resources) == 2
+    assert {r.resource.name for r in resources} == {
+        "aws_launch_template.bare_list_reference",
+        "aws_launch_template.parenthesized_list_reference",
+    }
+
+
+def test_traverse_multiple_references(tmp_path):
+
+    resources = run_policy(
+        {
+            "name": "azurerm-storage-account-private-endpoint",
+            "resource": ["terraform.azurerm_storage_account"],
+            "filters": [
+                {
+                    "type": "traverse",
+                    "resources": ["azurerm_private_endpoint"],
+                }
+            ],
+        },
+        terraform_dir / "traverse_multiple_references",
+        tmp_path,
+    )
+    assert len(resources) == 2
+
+
+def test_merge_null_elements(tmp_path):
+
+    resources = run_policy(
+        {
+            "name": "aws-tags",
+            "resource": ["terraform.aws_*"],
+            "filters": ["taggable", {"tag:Environment": "absent"}],
+        },
+        terraform_dir / "merge_null_elements",
+        tmp_path,
+    )
+    assert len(resources) == 1
+    assert {r.resource.name for r in resources} == {
+        "aws_instance.untagged",
+    }
+
+
+def test_merge_locals_with_apply_time_values(tmp_path):
+
+    resources = run_policy(
+        {
+            "name": "aws-tags-using-locals",
+            "resource": ["terraform.aws_*"],
+            "filters": ["taggable", {"tag:Environment": "absent"}],
+        },
+        terraform_dir / "merge_locals_with_apply_time_values",
+        tmp_path,
+    )
+    assert len(resources) == 1
+    assert {r.resource.name for r in resources} == {
+        "aws_db_parameter_group.untagged",
+    }
+
+
+@pytest.mark.xfail(reason="https://github.com/cloud-custodian/cloud-custodian/issues/10119")
+def test_attribute_value_presence(tmp_path):
+
+    resources = run_policy(
+        {
+            "name": "aws-role-permission-boundary-specified",
+            "resource": ["terraform.aws_iam_role"],
+            "filters": [{"permissions_boundary": "present"}],
+        },
+        terraform_dir / "attribute_value_presence",
+        tmp_path,
+    )
+    assert len(resources) == 2
+    assert {r.resource.name for r in resources} == {
+        "aws_iam_role.attribute_with_direct_reference",
+        "aws_iam_role.attribute_with_interpolated_reference",
+    }

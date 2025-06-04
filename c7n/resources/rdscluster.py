@@ -4,6 +4,7 @@ import logging
 import itertools
 from concurrent.futures import as_completed
 from datetime import datetime, timedelta
+from itertools import chain
 
 from c7n.actions import BaseAction
 from c7n.filters import AgeFilter, CrossAccountAccessFilter, Filter, ValueFilter
@@ -28,11 +29,16 @@ log = logging.getLogger('custodian.rds-cluster')
 class DescribeCluster(DescribeSource):
 
     def get_resources(self, ids):
-        return self.query.filter(
-            self.manager,
-            **{
-                'Filters': [
-                    {'Name': 'db-cluster-id', 'Values': ids}]})
+        resources = chain.from_iterable(
+            self.query.filter(
+                self.manager,
+                Filters=[
+                    {'Name': 'db-cluster-id', 'Values': ids_chunk}
+                ]
+            )
+            for ids_chunk in chunks(ids, 100)  # DescribeCluster filter length limit
+        )
+        return list(resources)
 
     def augment(self, resources):
         for r in resources:
@@ -763,3 +769,27 @@ class PendingMaintenance(Filter):
                 results.append(r)
 
         return results
+
+
+class DescribeDbShardGroup(DescribeSource):
+    def augment(self, resources):
+        for r in resources:
+            r['Tags'] = r.pop('TagList', ())
+        return resources
+
+
+@resources.register('rds-db-shard-group')
+class RDSDbShardGroup(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = 'rds'
+        arn = 'DBShardGroupArn'
+        name = 'DBShardGroupIdentifier'
+        id = 'DBShardGroupResourceId'
+        enum_spec = ('describe_db_shard_groups', 'DBShardGroups', None)
+        cfn_type = 'AWS::RDS::DBShardGroup'
+        permissions_enum = ("rds:DescribeDBShardGroups",)
+        universal_taggable = object()
+
+    source_mapping = {
+            'describe': DescribeDbShardGroup
+        }

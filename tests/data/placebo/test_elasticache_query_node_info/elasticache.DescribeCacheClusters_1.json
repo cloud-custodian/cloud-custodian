@@ -1,0 +1,76 @@
+{
+  "status_code": 200,
+  "data": {
+    "CacheClusters": [
+      {
+        "CacheClusterId": "my-test-cache",
+        "ConfigurationEndpoint": {
+          "Address": "my-test-cache.pnnl.cfg.euw1.cache.amazonaws.com",
+          "Port": 11211
+        },
+        "ClientDownloadLandingPage": "https://console.aws.amazon.com/elasticache/home#client-download:",
+        "CacheNodeType": "cache.t2.small",
+        "Engine": "memcached",
+        "EngineVersion": "1.6.22",
+        "CacheClusterStatus": "available",
+        "NumCacheNodes": 2,
+        "PreferredAvailabilityZone": "eu-west-1b",
+        "CacheClusterCreateTime": "2025-04-29T11:40:05.278000+00:00",
+        "PreferredMaintenanceWindow": "wed:23:30-thu:00:30",
+        "PendingModifiedValues": {},
+        "CacheSecurityGroups": [],
+        "CacheParameterGroup": {
+          "CacheParameterGroupName": "default.memcached1.6",
+          "ParameterApplyStatus": "in-sync",
+          "CacheNodeIdsToReboot": []
+        },
+        "CacheSubnetGroupName": "my-test-subnet-group",
+        "CacheNodes": [
+          {
+            "CacheNodeId": "0001",
+            "CacheNodeStatus": "available",
+            "CacheNodeCreateTime": "2025-04-29T11:40:05.278000+00:00",
+            "Endpoint": {
+              "Address": "my-test-cache.pnnl.0001.euw1.cache.amazonaws.com",
+              "Port": 11211
+            },
+            "ParameterGroupStatus": "in-sync",
+            "CustomerAvailabilityZone": "eu-west-1b"
+          },
+          {
+            "CacheNodeId": "0002",
+            "CacheNodeStatus": "available",
+            "CacheNodeCreateTime": "2025-04-29T11:40:05.278000+00:00",
+            "Endpoint": {
+              "Address": "my-test-cache.pnnl.0002.euw1.cache.amazonaws.com",
+              "Port": 11211
+            },
+            "ParameterGroupStatus": "in-sync",
+            "CustomerAvailabilityZone": "eu-west-1b"
+          }
+        ],
+        "AutoMinorVersionUpgrade": true,
+        "AuthTokenEnabled": false,
+        "TransitEncryptionEnabled": false,
+        "AtRestEncryptionEnabled": false,
+        "ARN": "arn:aws:elasticache:eu-west-1:644160558196:cluster:my-test-cache",
+        "ReplicationGroupLogDeliveryEnabled": false,
+        "LogDeliveryConfigurations": [],
+        "NetworkType": "ipv4",
+        "IpDiscovery": "ipv4",
+        "Tags": []
+      }
+    ],
+    "ResponseMetadata": {
+      "RetryAttempts": 0,
+      "HTTPStatusCode": 200,
+      "RequestId": "0b48b0bb-5884-11e7-a74e-ad90ee5f1247",
+      "HTTPHeaders": {
+        "x-amzn-requestid": "0b48b0bb-5884-11e7-a74e-ad90ee5f1247",
+        "date": "Sat, 24 Jun 2017 02:23:00 GMT",
+        "content-length": "4727",
+        "content-type": "text/xml"
+      }
+    }
+  }
+}

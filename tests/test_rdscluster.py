@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import sys
+from unittest.mock import patch
 
 import c7n.resources.rdscluster
 import pytest
@@ -62,6 +63,22 @@ class RDSClusterTest(BaseTest):
             describe_resource.pop(kk, None)
 
         assert describe_resource == config_resource
+
+    def test_rdscluster_api_filter_limit(self):
+        self.remove_augments()
+        factory = self.replay_flight_data("test_rdscluster_api_filter_limit")
+        p = self.load_policy(
+            {"name": "foo", "resource": "aws.rds-cluster"},
+            session_factory=factory)
+        resource_ids = [f"db-instance{i}" for i in range(200)]
+        with patch.object(
+            p.resource_manager.source.query,
+            "filter",
+            wraps=p.resource_manager.source.query.filter
+        ) as wrapped_filter:
+            p.resource_manager.get_resources(resource_ids)
+            # 200 unique IDs, batched into chunks of 100
+            assert wrapped_filter.call_count == 2
 
     def test_rdscluster_security_group(self):
         self.remove_augments()
@@ -807,3 +824,25 @@ class TestRDSClusterParameterGroupFilter(BaseTest):
         )
         resources = policy.resource_manager.resources()
         self.assertEqual(len(resources), 2)
+
+
+class TestRDSDBShardGroup(BaseTest):
+    def test_rds_db_shard_group(self):
+        session_factory = self.replay_flight_data('test_rds_db_shard_group')
+        p = self.load_policy(
+            {
+                "name": "rds-db-shard-group",
+                "resource": "rds-db-shard-group",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "PubliclyAccessible",
+                        "value": False
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['DBShardGroupIdentifier'], 'db-shard-1')

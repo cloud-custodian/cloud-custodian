@@ -607,6 +607,30 @@ class LambdaTagTest(BaseTest):
             {'custodian_next': 'Resource does not meet policy: delete@2019/02/09',
              'xyz': 'abcdef'})
 
+    def test_lambda_update_memory_config(self):
+        factory = self.replay_flight_data("test_lambda_update_memory_config")
+        p = self.load_policy(
+            {
+                "name": "lambda-update-memory",
+                "resource": "lambda",
+                "filters": [
+                    {"FunctionName": "cloud-custodian-memory-resize-test"}
+                ],
+                "actions": [
+                    {
+                        "type": "update",
+                        "properties": {"MemorySize": 128}
+                    }],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = factory().client("lambda")
+        response = client.get_function(FunctionName=resources[0]['FunctionName'])
+        self.assertEqual(response['Configuration']['MemorySize'], 128)
+        self.assertEqual(resources[0]['MemorySize'], 256)
+
 
 class TestModifyVpcSecurityGroupsAction(BaseTest):
 

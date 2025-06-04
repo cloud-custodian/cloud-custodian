@@ -18,8 +18,8 @@ jobs:
   Lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # ratchet:actions/checkout@v4
+      - uses: actions/setup-python@8d9ed9ac5c53483de85588cdf95a591a75ab9f55 # ratchet:actions/setup-python@v5
         with:
           python-version: ${{ env.DEFAULT_PY_VERSION }}
       - name: Install Linter
@@ -28,7 +28,7 @@ jobs:
           BLACK_VERSION="$(python tools/dev/lint_version.py black poetry.lock)"
           pip install ruff=="$RUFF_VERSION" black=="$BLACK_VERSION"
       - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v3
+        uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # ratchet:hashicorp/setup-terraform@v3
         with:
           terraform_wrapper: false
           # last OSS version
@@ -47,8 +47,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: Lint
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # ratchet:actions/checkout@v4
+      - uses: actions/setup-python@8d9ed9ac5c53483de85588cdf95a591a75ab9f55 # ratchet:actions/setup-python@v5
         with:
           python-version: ${{ env.DEFAULT_PY_VERSION }}
       - name: Run Bandit
@@ -67,7 +67,7 @@ jobs:
       id-token: write
       contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # ratchet:actions/checkout@v4
 
       - name: Install Custodian
         uses: ./.github/composites/install
@@ -76,7 +76,7 @@ jobs:
           poetry-version: ${{ env.POETRY_VERSION }}
 
       - name: Set up doc cache
-        uses: actions/cache@v4
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # ratchet:actions/cache@v4
         id: sphinx
         with:
           path: |
@@ -98,7 +98,7 @@ jobs:
         # on its contents, on merges to main we update the cache to prevent
         # staleness.
         if: ${{ github.event_name == 'push' }}
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@5a3ec84eff668545956fd18022155c47e93e2684 # ratchet:actions/cache/save@v4
         with:
           path: |
             docs/build
@@ -120,7 +120,7 @@ jobs:
   Docker:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # ratchet:actions/checkout@v4
       - name: c7n build and test
         uses: ./.github/composites/docker-build-push
         with:
@@ -143,10 +143,10 @@ jobs:
           - os: ubuntu-latest
             python-version: "3.9"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # ratchet:actions/checkout@v4
 
       - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v3
+        uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # ratchet:hashicorp/setup-terraform@v3
         with:
           terraform_wrapper: false
           # last OSS version
@@ -172,7 +172,7 @@ jobs:
           fi
 
       - name: Upload Code Coverage
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@18283e04ce6e62d37312384ff67231eb8fd56d24 # ratchet:codecov/codecov-action@v5
         if: contains(matrix.python-version, '3.11') && contains(matrix.os, 'ubuntu')
         with:
           files: ./coverage.xml

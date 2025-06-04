@@ -205,8 +205,8 @@ class PolicyMetaLint(BaseTest):
         overrides = overrides.difference(
             {'account', 's3', 'hostedzone', 'log-group', 'rest-api', 'redshift-snapshot',
              'rest-stage', 'codedeploy-app', 'codedeploy-group', 'fis-template', 'dlm-policy',
-             'apigwv2', 'apigwv2-stage', 'apigw-domain-name', 'fis-experiment',
-             'launch-template-version', 'glue-table'})
+             'apigwv2', 'apigwv2-stage', 'lexv2-bot-alias', 'apigw-domain-name', 'fis-experiment',
+             'launch-template-version', 'glue-table', 'glue-catalog'})
         if overrides:
             raise ValueError("unknown arn overrides in %s" % (", ".join(overrides)))
 
@@ -597,7 +597,7 @@ class PolicyMetaLint(BaseTest):
             'AWS::AutoScaling::ScheduledAction',
             'AWS::Backup::BackupSelection',
             'AWS::Backup::RecoveryPoint',
-            'AWS::CodeDeploy::DeploymentConfig',
+            # 'AWS::CodeDeploy::DeploymentConfig',
             'AWS::Config::ConformancePackCompliance',
             'AWS::Config::ResourceCompliance',
             'AWS::Detective::Graph',
@@ -870,7 +870,7 @@ class PolicyMetaLint(BaseTest):
             'snowball-cluster', 'snowball', 'ssm-activation',
             'healthcheck', 'event-rule-target', 'log-metric',
             'support-case', 'transit-attachment', 'config-recorder',
-            'apigw-domain-name', 'backup-job', 'quicksight-account'}
+            'apigw-domain-name', 'backup-job', 'quicksight-account', 'codedeploy-config'}
 
         missing_method = []
         for k, v in manager.resources.items():

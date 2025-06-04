@@ -2621,8 +2621,8 @@ class UserDelete(BaseAction):
 class UserRemoveAccessKey(BaseAction):
     """Delete or disable user's access keys.
 
-    For example if we wanted to disable keys after 90 days of non-use and
-    delete them after 180 days of nonuse:
+    For example if we wanted to disable keys 90 days after creation and
+    delete them 180 days after creation:
 
     :example:
 
@@ -3072,6 +3072,41 @@ class OpenIdProviderDelete(BaseAction):
                 ignore_err_codes=(
                     'NoSuchEntityException',
                     'DeleteConflictException',
+                ),
+            )
+
+
+@SamlProvider.action_registry.register('delete')
+class SamlProviderDelete(BaseAction):
+    """Delete a SAML IAM Identity Provider
+
+    For example, if you want to automatically delete an SAML IdP for unknown-idp
+
+    :example:
+
+      .. code-block:: yaml
+
+        - name: aws-iam-saml-provider-delete
+          resource: iam-saml-provider
+          filters:
+            - type: value
+              key: Name
+              value: unknown-idp
+          actions:
+            - type: delete
+
+    """
+    schema = type_schema('delete')
+    permissions = ('iam:DeleteSAMLProvider',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('iam')
+        for provider in resources:
+            self.manager.retry(
+                client.delete_saml_provider,
+                SAMLProviderArn=provider['Arn'],
+                ignore_err_codes=(
+                    'NoSuchEntityException',
                 ),
             )
 

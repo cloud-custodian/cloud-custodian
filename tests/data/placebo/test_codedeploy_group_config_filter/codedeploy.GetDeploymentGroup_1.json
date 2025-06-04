@@ -1,0 +1,28 @@
+{
+    "status_code": 200,
+    "data": {
+        "deploymentGroupInfo": {
+            "applicationName": "test",
+            "deploymentGroupId": "653b64f1-6194-4dfa-96b7-58634abeff3c",
+            "deploymentGroupName": "test",
+            "deploymentConfigName": "my-test-configuration",
+            "ec2TagFilters": [],
+            "onPremisesInstanceTagFilters": [],
+            "autoScalingGroups": [],
+            "serviceRoleArn": "arn:aws:iam::644160558196:role/custodian-codebuild",
+            "triggerConfigurations": [],
+            "alarmConfiguration": {
+                "enabled": false,
+                "ignorePollAlarmFailure": false,
+                "alarms": []
+            },
+            "deploymentStyle": {
+                "deploymentType": "BLUE_GREEN",
+                "deploymentOption": "WITH_TRAFFIC_CONTROL"
+            },
+            "outdatedInstancesStrategy": "UPDATE",
+            "computePlatform": "Lambda"
+        },
+        "ResponseMetadata": {}
+    }
+}

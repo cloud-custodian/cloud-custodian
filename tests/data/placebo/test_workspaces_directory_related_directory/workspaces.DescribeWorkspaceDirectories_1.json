@@ -1,0 +1,94 @@
+{
+    "status_code": 200,
+    "data": {
+        "Directories": [
+            {
+                "DirectoryId": "d-9067b0eabf",
+                "Alias": "d-9067b0eabf",
+                "DirectoryName": "workspaces.546RadiusServerRed.com",
+                "RegistrationCode": "SLiad+8WTY3X",
+                "SubnetIds": [
+                    "subnet-0e36ec5c99ae2906a",
+                    "subnet-082f1e4a5f91c2222"
+                ],
+                "DnsIpAddresses": [
+                    "10.0.1.103",
+                    "10.0.2.51"
+                ],
+                "CustomerUserName": "Administrator",
+                "IamRoleId": "arn:aws:iam::644160558196:role/workspaces_DefaultRole",
+                "DirectoryType": "MicrosoftAD",
+                "WorkspaceSecurityGroupId": "sg-07d7470a3312e5112",
+                "State": "REGISTERED",
+                "WorkspaceCreationProperties": {
+                    "EnableWorkDocs": false,
+                    "EnableInternetAccess": true,
+                    "UserEnabledAsLocalAdministrator": true,
+                    "EnableMaintenanceMode": true
+                },
+                "WorkspaceAccessProperties": {
+                    "DeviceTypeWindows": "ALLOW",
+                    "DeviceTypeOsx": "ALLOW",
+                    "DeviceTypeWeb": "DENY",
+                    "DeviceTypeIos": "ALLOW",
+                    "DeviceTypeAndroid": "ALLOW",
+                    "DeviceTypeChromeOs": "ALLOW",
+                    "DeviceTypeZeroClient": "ALLOW",
+                    "DeviceTypeLinux": "DENY"
+                },
+                "Tenancy": "SHARED",
+                "SelfservicePermissions": {
+                    "RestartWorkspace": "ENABLED",
+                    "IncreaseVolumeSize": "DISABLED",
+                    "ChangeComputeType": "DISABLED",
+                    "SwitchRunningMode": "DISABLED",
+                    "RebuildWorkspace": "DISABLED"
+                }
+            },
+            {
+                "DirectoryId": "d-9067b09f7f",
+                "Alias": "d-9067b09f7f",
+                "DirectoryName": "workspaces.546RadiusServerGreen.com",
+                "RegistrationCode": "SLiad+SC6HGR",
+                "SubnetIds": [
+                    "subnet-0f7f521b83380c6b6",
+                    "subnet-08498320e54fc2cce"
+                ],
+                "DnsIpAddresses": [
+                    "10.0.1.137",
+                    "10.0.2.88"
+                ],
+                "CustomerUserName": "Administrator",
+                "IamRoleId": "arn:aws:iam::644160558196:role/workspaces_DefaultRole",
+                "DirectoryType": "MicrosoftAD",
+                "WorkspaceSecurityGroupId": "sg-017b836ca2043deee",
+                "State": "REGISTERED",
+                "WorkspaceCreationProperties": {
+                    "EnableWorkDocs": false,
+                    "EnableInternetAccess": true,
+                    "UserEnabledAsLocalAdministrator": true,
+                    "EnableMaintenanceMode": true
+                },
+                "WorkspaceAccessProperties": {
+                    "DeviceTypeWindows": "ALLOW",
+                    "DeviceTypeOsx": "ALLOW",
+                    "DeviceTypeWeb": "DENY",
+                    "DeviceTypeIos": "ALLOW",
+                    "DeviceTypeAndroid": "ALLOW",
+                    "DeviceTypeChromeOs": "ALLOW",
+                    "DeviceTypeZeroClient": "ALLOW",
+                    "DeviceTypeLinux": "DENY"
+                },
+                "Tenancy": "SHARED",
+                "SelfservicePermissions": {
+                    "RestartWorkspace": "ENABLED",
+                    "IncreaseVolumeSize": "DISABLED",
+                    "ChangeComputeType": "DISABLED",
+                    "SwitchRunningMode": "DISABLED",
+                    "RebuildWorkspace": "DISABLED"
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

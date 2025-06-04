@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "c7n_oci"
-version = "0.1.17"
+version = "0.1.19"
 description = "Cloud Custodian - OCI Support"
 readme = "readme.md"
 homepage="https://cloudcustodian.io"
@@ -15,8 +15,9 @@ classifiers=[
 ]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = ">=3.9.2,<4.0.0"
 oci = "^2.106"
+pyopenssl = ">=23"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "<8.0"

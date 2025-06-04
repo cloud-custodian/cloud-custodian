@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "c7n_openstack"
-version = "0.1.33"
+version = "0.1.35"
 description = "Cloud Custodian - OpenStack Provider"
 readme = "readme.md"
 authors = ["Cloud Custodian Project"]
@@ -15,10 +15,12 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = ">=3.9.2,<4.0.0"
 c7n = {path = "../..", develop = true}
 
 openstacksdk = "^0.52.0"
+# workaround for: https://github.com/python-poetry/poetry-plugin-export/issues/183
+urllib3 = ">=1.25.4,<1.27"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "<8.0"

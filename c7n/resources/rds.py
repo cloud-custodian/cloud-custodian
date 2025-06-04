@@ -993,6 +993,43 @@ class RDSSubscription(QueryResourceManager):
     augment = universal_augment
 
 
+@RDSSubscription.filter_registry.register('topic')
+class RDSSubscriptionSNSTopic(related.RelatedResourceFilter):
+    """
+    Retrieves topics related to RDS event subscriptions
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: rds-subscriptions-no-confirmed-topics
+                resource: aws.rds-subscription
+                filters:
+                  - type: topic
+                    key: SubscriptionsConfirmed
+                    value: 0
+                    value_type: integer
+    """
+    schema = type_schema('topic', rinherit=ValueFilter.schema)
+    RelatedResource = 'c7n.resources.sns.SNS'
+    RelatedIdsExpression = 'SnsTopicArn'
+    annotation_key = 'c7n:SnsTopic'
+
+    def process(self, resources, event=None):
+        rel = self.get_related(resources)
+        matched = []
+        for resource in resources:
+            if self.process_resource(resource, rel):
+                # adding full topic details
+                resource[self.annotation_key] = rel.get(
+                    resource[self.RelatedIdsExpression],
+                    None  # can be if value is "absent"
+                )
+                matched.append(resource)
+        return matched
+
+
 @RDSSubscription.action_registry.register('delete')
 class RDSSubscriptionDelete(BaseAction):
     """Deletes a RDS snapshot resource

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "c7n_awscc"
-version = "0.1.28"
+version = "0.1.30"
 readme = "readme.md"
 homepage = "https://cloudcustodian.io"
 repository = "https://github.com/cloud-custodian/cloud-custodian"
@@ -18,7 +18,7 @@ classifiers=[
 include = ["c7n_awscc/data/*json"]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = ">=3.9.2,<4.0.0"
 click = "^8.0"
 jsonpatch = "^1.32"
 c7n = {path = "../..", develop = true}

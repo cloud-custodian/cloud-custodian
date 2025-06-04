@@ -298,6 +298,24 @@ class TestECR(BaseTest):
     def test_ecr_set_lifecycle(self):
         pass
 
+    def test_ecr_image_query(self):
+        session_factory = self.replay_flight_data("test_ecr_image_query")
+        p = self.load_policy(
+            {
+                "name": "query-ecr-image",
+                "resource": "aws.ecr-image",
+                "query": [
+                    {
+                        "filter": {
+                            "tagStatus": "TAGGED"
+                        }
+                    }
+                ]
+            },
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_ecr_image_filter_security_finding(self):
         session_factory = self.replay_flight_data("test_ecr_image_filter_security_finding")
         p = self.load_policy(
