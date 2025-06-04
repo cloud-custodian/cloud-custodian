@@ -10,7 +10,6 @@ SPHINXBINS    ?= .tox/$(VIRTUALENV)/bin
 SRCDIR        ?= docs/source
 SPHINXOPTS    ?=
 #SPHINXBUILD   ?= $(SPHINXBINS)/sphinx-build
-# use for poetry environments
 SPHINXBUILD   ?= sphinx-build
 PAPER         ?=
 BUILDDIR      ?= docs/build
