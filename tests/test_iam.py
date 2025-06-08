@@ -2373,6 +2373,75 @@ class CrossAccountChecker(TestCase):
             self.assertEqual(
                 bool(checker.handle_statement(statement)), expected)
 
+    def test_principal_arn(self):
+        statements = [
+            {'Actions': "kms:*",
+             'Principal': ['*'],
+             'StatementId': 'goodArn_multiple_conditions',
+             'Effect': 'Allow',
+             'Resource': '*',
+             'Condition': {
+                 'StringEquals': {
+                     "aws:PrincipalArn": "arn:aws:iam::*:role/goodArn",
+                     'aws:PrincipalOrgID': ['o-goodOrgId']}}},
+            {'Actions': "kms:*",
+             'Principal': ['*'],
+             'StatementId': 'badArn_multiple_conditions',
+             'Effect': 'Allow',
+             'Resource': '*',
+             'Condition': {
+                 'StringEquals': {
+                     "aws:PrincipalArn": "arn:aws:iam::*:role/badArn",
+                     'aws:PrincipalOrgID': ['o-goodOrgId']}}},
+            {'Actions': "kms:*",
+             'Principal': ['*'],
+             'StatementId': 'badArn_badOrgId_multiple_conditions',
+             'Effect': 'Allow',
+             'Resource': '*',
+             'Condition': {
+                 'StringEquals': {
+                     "aws:PrincipalArn": "arn:aws:iam::*:role/badArn",
+                     'aws:PrincipalOrgID': ['o-badOrgId']}}},
+            {'Actions': "kms:*",
+             'Principal': ['*'],
+             'StatementId': 'goodArn_single_condition',
+             'Effect': 'Allow',
+             'Resource': '*',
+             'Condition': {
+                 'StringEquals': {
+                     "aws:PrincipalArn": "arn:aws:iam::*:role/goodArn"}}},
+            {'Actions': "kms:*",
+             'Principal': ['*'],
+             'StatementId': 'badArn_single_condition',
+             'Effect': 'Allow',
+             'Resource': '*',
+             'Condition': {
+                 'StringEquals': {
+                     "aws:PrincipalArn": "arn:aws:iam::*:role/badArn"}}},
+            {'Actions': "kms:*",
+             'Principal': ['12345678910'],
+             'StatementId': 'no_conditions',
+             'Effect': 'Allow',
+             'Resource': '*'}
+        ]
+
+        checker = PolicyChecker({
+            'allowed_arn': ['arn:aws:iam::*:role/goodArn']})
+        for statement, expected in zip(statements, [False, True, True, False, True, True]):
+            self.assertEqual(
+                bool(checker.handle_statement(statement)), expected)
+
+        checker = PolicyChecker({})
+        for statement, expected in zip(statements, [True, True, True, True, True, True]):
+            self.assertEqual(
+                bool(checker.handle_statement(statement)), expected)
+
+        checker = PolicyChecker({
+            'allowed_orgid': ['o-goodOrgId']})
+        for statement, expected in zip(statements, [False, False, True, True, True, True]):
+            self.assertEqual(
+                bool(checker.handle_statement(statement)), expected)
+
     def test_s3_policies(self):
         policies = load_data("iam/s3-policies.json")
         checker = PolicyChecker(
