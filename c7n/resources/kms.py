@@ -444,6 +444,9 @@ class KmsPostFinding(PostFinding):
 class KmsKeyScheduleDeletion(BaseAction):
     """Schedule KMS key deletion
 
+    If the number of days is not specified, the default value of 30 days is used.
+    The number of days must be between 7 and 30.
+
     :example:
 
     .. code-block:: yaml
