@@ -2,11 +2,12 @@
 # SPDX-License-Identifier: Apache-2.0
 import json
 import time
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta
 from unittest.mock import patch
 
 import boto3
 import moto
+from dateutil.tz import tzutc
 
 from c7n.resources.aws import shape_validate
 from .common import BaseTest, functional
@@ -759,7 +760,7 @@ class KMSMotoTests(BaseTest):
 
         # Why macOS is your timing off? Subtracting a minute to account for
         # whatever is messing that up.
-        seven_days_away = datetime.now(UTC) + timedelta(days=7) - timedelta(minutes=1)
+        seven_days_away = datetime.now(tzutc()) + timedelta(days=7) - timedelta(minutes=1)
         deletion_date = key_meta["DeletionDate"]
         # It looks like moto's logic for scheduling key deletion causes the UTC
         # offset to be applied twice, since it goes through a series of steps that:
@@ -771,7 +772,7 @@ class KMSMotoTests(BaseTest):
         #
         # Part of the story:
         # https://github.com/getmoto/moto/blob/880ddc5cd9664e48ab352753678d63a7e58c34cc/moto/kms/models.py#L504-L507
-        deletion_date = (deletion_date - deletion_date.utcoffset()).astimezone(UTC)
+        deletion_date = (deletion_date - deletion_date.utcoffset()).astimezone(tzutc())
         assert deletion_date > seven_days_away
         assert deletion_date < (seven_days_away + timedelta(days=1))
 
@@ -796,7 +797,7 @@ class KMSMotoTests(BaseTest):
 
         # Why macOS is your timing off? Subtracting a minute to account for
         # whatever is messing that up.
-        thirty_days_away = datetime.now(UTC) + timedelta(days=30) - timedelta(minutes=1)
+        thirty_days_away = datetime.now(tzutc()) + timedelta(days=30) - timedelta(minutes=1)
         deletion_date = key_meta["DeletionDate"]
         # It looks like moto's logic for scheduling key deletion causes the UTC
         # offset to be applied twice, since it goes through a series of steps that:
@@ -808,6 +809,6 @@ class KMSMotoTests(BaseTest):
         #
         # Part of the story:
         # https://github.com/getmoto/moto/blob/880ddc5cd9664e48ab352753678d63a7e58c34cc/moto/kms/models.py#L504-L507
-        deletion_date = (deletion_date - deletion_date.utcoffset()).astimezone(UTC)
+        deletion_date = (deletion_date - deletion_date.utcoffset()).astimezone(tzutc())
         assert deletion_date > thirty_days_away
         assert deletion_date < (thirty_days_away + timedelta(days=1))
