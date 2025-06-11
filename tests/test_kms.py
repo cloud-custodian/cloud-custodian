@@ -758,8 +758,9 @@ class KMSMotoTests(BaseTest):
         assert key_meta["KeyState"] == "PendingDeletion"
 
         seven_days_away = datetime.now(UTC) + timedelta(days=7)
-        assert key_meta["DeletionDate"] > seven_days_away
-        assert key_meta["DeletionDate"] < (seven_days_away + timedelta(days=1))
+        deletion_date = key_meta["DeletionDate"].astimezone(UTC)
+        assert deletion_date > seven_days_away
+        assert deletion_date < (seven_days_away + timedelta(days=1))
 
     @moto.mock_aws
     def test_schedule_deletion_default_days(self):
@@ -781,5 +782,6 @@ class KMSMotoTests(BaseTest):
         assert key_meta["KeyState"] == "PendingDeletion"
 
         thirty_days_away = datetime.now(UTC) + timedelta(days=30)
-        assert key_meta["DeletionDate"] > thirty_days_away
-        assert key_meta["DeletionDate"] < (thirty_days_away + timedelta(days=1))
+        deletion_date = key_meta["DeletionDate"].astimezone(UTC)
+        assert deletion_date > thirty_days_away
+        assert deletion_date < (thirty_days_away + timedelta(days=1))
