@@ -757,7 +757,9 @@ class KMSMotoTests(BaseTest):
         key_meta = kms.describe_key(KeyId=key_id)["KeyMetadata"]
         assert key_meta["KeyState"] == "PendingDeletion"
 
-        seven_days_away = datetime.now(UTC) + timedelta(days=7)
+        # Why macOS is your timing off? Subtracting a minute to account for
+        # whatever is messing that up.
+        seven_days_away = datetime.now(UTC) + timedelta(days=7) - timedelta(minutes=1)
         deletion_date = key_meta["DeletionDate"].astimezone(UTC)
         assert deletion_date > seven_days_away
         assert deletion_date < (seven_days_away + timedelta(days=1))
@@ -781,7 +783,9 @@ class KMSMotoTests(BaseTest):
         key_meta = kms.describe_key(KeyId=key_id)["KeyMetadata"]
         assert key_meta["KeyState"] == "PendingDeletion"
 
-        thirty_days_away = datetime.now(UTC) + timedelta(days=30)
+        # Why macOS is your timing off? Subtracting a minute to account for
+        # whatever is messing that up.
+        thirty_days_away = datetime.now(UTC) + timedelta(days=30) - timedelta(minutes=1)
         deletion_date = key_meta["DeletionDate"].astimezone(UTC)
         assert deletion_date > thirty_days_away
         assert deletion_date < (thirty_days_away + timedelta(days=1))
