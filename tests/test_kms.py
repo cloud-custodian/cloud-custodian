@@ -2,8 +2,11 @@
 # SPDX-License-Identifier: Apache-2.0
 import json
 import time
+from datetime import UTC, datetime, timedelta
 from unittest.mock import patch
 
+import boto3
+import moto
 
 from c7n.resources.aws import shape_validate
 from .common import BaseTest, functional
@@ -732,3 +735,51 @@ class KMSCrossAccount(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["KeyId"], key_info["KeyId"])
+
+
+class KMSMotoTests(BaseTest):
+    @moto.mock_aws
+    def test_schedule_deletion(self):
+        kms = boto3.client("kms", region_name="us-east-1")
+        kms.create_key(Description="test-key")
+
+        p = self.load_policy(
+            {
+                "name": "delete-keys",
+                "resource": "kms-key",
+                "actions": [{"type": "schedule-deletion", "days": 7}],
+            }
+        )
+        resources = p.run()
+        assert len(resources) == 1
+        key_id = resources[0]["KeyId"]
+
+        key_meta = kms.describe_key(KeyId=key_id)["KeyMetadata"]
+        assert key_meta["KeyState"] == "PendingDeletion"
+
+        seven_days_away = datetime.now(UTC) + timedelta(days=7)
+        assert key_meta["DeletionDate"] > seven_days_away
+        assert key_meta["DeletionDate"] < (seven_days_away + timedelta(days=1))
+
+    @moto.mock_aws
+    def test_schedule_deletion_default_days(self):
+        kms = boto3.client("kms", region_name="us-east-1")
+        kms.create_key(Description="test-key")
+
+        p = self.load_policy(
+            {
+                "name": "delete-keys",
+                "resource": "kms-key",
+                "actions": [{"type": "schedule-deletion"}],
+            }
+        )
+        resources = p.run()
+        assert len(resources) == 1
+        key_id = resources[0]["KeyId"]
+
+        key_meta = kms.describe_key(KeyId=key_id)["KeyMetadata"]
+        assert key_meta["KeyState"] == "PendingDeletion"
+
+        thirty_days_away = datetime.now(UTC) + timedelta(days=30)
+        assert key_meta["DeletionDate"] > thirty_days_away
+        assert key_meta["DeletionDate"] < (thirty_days_away + timedelta(days=1))

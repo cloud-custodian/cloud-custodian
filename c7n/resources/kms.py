@@ -438,3 +438,36 @@ class KmsPostFinding(PostFinding):
             )
 
         return envelope
+
+
+@Key.action_registry.register("schedule-deletion")
+class KmsKeyScheduleDeletion(BaseAction):
+    """Schedule KMS key deletion
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: delete-tagged-keys
+            resource: kms-key
+            filters:
+              - type: value
+                key: tag:DeleteAfter
+                op: ge
+                value_type: age # age is a special value type that will be converted to a timestamp
+                value: 0
+            actions:
+              - type: schedule-deletion
+                days: 7
+    """
+
+    permissions = ("kms:ScheduleKeyDeletion",)
+    schema = type_schema("schedule-deletion", days={"type": "integer", "minimum": 7, "maximum": 30})
+
+    def process(self, keys):
+        client = local_session(self.manager.session_factory).client("kms")
+        for k in keys:
+            client.schedule_key_deletion(
+                KeyId=k["KeyId"], PendingWindowInDays=self.data.get("days", 30)
+            )
