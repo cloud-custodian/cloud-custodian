@@ -7,6 +7,7 @@ from unittest.mock import patch
 
 import boto3
 import moto
+import pytest
 
 from c7n.resources.aws import shape_validate
 from .common import BaseTest, functional
@@ -738,10 +739,17 @@ class KMSCrossAccount(BaseTest):
 
 
 class KMSMotoTests(BaseTest):
+    @pytest.fixture(autouse=True)
+    def use_utc_timezone(self, monkeypatch):
+        monkeypatch.setenv("TZ", "UTC")
+        time.tzset()
+
     @moto.mock_aws
     def test_schedule_deletion(self):
         kms = boto3.client("kms", region_name="us-east-1")
         kms.create_key(Description="test-key")
+
+        seven_days_away = datetime.now(UTC) + timedelta(days=7)
 
         p = self.load_policy(
             {
@@ -757,9 +765,6 @@ class KMSMotoTests(BaseTest):
         key_meta = kms.describe_key(KeyId=key_id)["KeyMetadata"]
         assert key_meta["KeyState"] == "PendingDeletion"
 
-        # Why macOS is your timing off? Subtracting a minute to account for
-        # whatever is messing that up.
-        seven_days_away = datetime.now(UTC) + timedelta(days=7) - timedelta(minutes=1)
         deletion_date = key_meta["DeletionDate"].astimezone(UTC)
         assert deletion_date > seven_days_away
         assert deletion_date < (seven_days_away + timedelta(days=1))
@@ -768,6 +773,8 @@ class KMSMotoTests(BaseTest):
     def test_schedule_deletion_default_days(self):
         kms = boto3.client("kms", region_name="us-east-1")
         kms.create_key(Description="test-key")
+
+        thirty_days_away = datetime.now(UTC) + timedelta(days=30)
 
         p = self.load_policy(
             {
@@ -783,9 +790,6 @@ class KMSMotoTests(BaseTest):
         key_meta = kms.describe_key(KeyId=key_id)["KeyMetadata"]
         assert key_meta["KeyState"] == "PendingDeletion"
 
-        # Why macOS is your timing off? Subtracting a minute to account for
-        # whatever is messing that up.
-        thirty_days_away = datetime.now(UTC) + timedelta(days=30) - timedelta(minutes=1)
         deletion_date = key_meta["DeletionDate"].astimezone(UTC)
         assert deletion_date > thirty_days_away
         assert deletion_date < (thirty_days_away + timedelta(days=1))
