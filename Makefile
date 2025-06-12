@@ -1,6 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-SHELL := /bin/bash
+oSHELL := /bin/bash
 SELF_MAKE := $(lastword $(MAKEFILE_LIST))
 
 PKG_REPO = testpypi
@@ -76,11 +76,6 @@ gen-docker:
 # Package Management Targets
 # - primarily used to help drive frozen releases and dependency upgrades
 
-pkg-rebase:
-	rm -f uv.lock
-	@$(MAKE) -f $(SELF_MAKE) pkg-update
-	git add uv.lock
-
 pkg-clean:
 	rm -f release.md
 	rm -f wheels-manifest.txt
@@ -96,7 +91,6 @@ pkg-update:
 	    --group addons \
 	    --group lint \
             --extra gcp --extra azure \
-	    --verbose \
             --upgrade
 
 pkg-show-update:
