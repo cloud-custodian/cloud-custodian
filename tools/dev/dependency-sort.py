@@ -6,7 +6,6 @@
 
 import argparse
 from pathlib import Path
-import itertools
 import sys
 import tomlkit
 
