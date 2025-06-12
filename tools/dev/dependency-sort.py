@@ -26,6 +26,7 @@ def sort_pep508_deps(deps):
     tdeps.multiline(True)
     return tdeps
 
+
 def sort_dependencies_in_pyproject(filepath):
     path = Path(filepath)
     if not path.exists():
