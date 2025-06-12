@@ -55,12 +55,12 @@ sphinx:
 lint:
 	uv run --no-project ruff check c7n tests tools
 	uv run --no-project black --check $(FMT_SET)
-	type -P terraform && terraform fmt -check -recursive .
+	terraform fmt -check -recursive .
 
 format:
 	uv run black $(FMT_SET)
 	uv run ruff check --fix c7n tests tools
-	type -P terraform && terraform fmt -recursive .
+	terraform fmt -recursive .
 
 clean:
 	make -f docs/Makefile.sphinx clean
