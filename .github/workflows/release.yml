@@ -3,7 +3,7 @@ name: "Release"
 on:
   workflow_dispatch: {}
 env:
-  UV_VERSION: "0.7.13"
+  UV_VERSION: "0.7.12"
   DEFAULT_PY_VERSION: "3.12"
 
 jobs:
