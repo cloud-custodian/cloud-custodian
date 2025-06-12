@@ -743,7 +743,12 @@ class KMSMotoTests(BaseTest):
     @pytest.fixture(autouse=True)
     def use_utc_timezone(self, monkeypatch):
         monkeypatch.setenv("TZ", "UTC")
-        time.tzset()
+        try:
+            time.tzset()
+        except AttributeError:
+            # A windows system should honor the TZ environment variable
+            # when it next calls datetime.now() (so says AI)
+            pass
 
     @moto.mock_aws
     def test_schedule_deletion(self):
