@@ -5,14 +5,14 @@ authors = [
 license = "Apache-2.0"
 requires-python = "<4.0.0,>=3.9.2"
 dependencies = [
-    "c7n",
-    "Sphinx<8.0,>=7.0",
     "Pygments>=2.10.0",
-    "sphinx-rtd-theme>=1.0.0",
+    "Sphinx<8.0,>=7.0",
+    "c7n",
+    "click>=8.0",
+    "myst-parser>=0.18",
     "recommonmark>=0.7.0",
     "sphinx-markdown-tables>=0.0.12",
-    "myst-parser>=0.18",
-    "click>=8.0",
+    "sphinx-rtd-theme>=1.0.0",
 ]
 name = "c7n_sphinxext"
 version = "1.1.44"

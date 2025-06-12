@@ -7,9 +7,9 @@ requires-python = "<4.0.0,>=3.9.2"
 dependencies = [
     "c7n",
     "click>=8.0",
+    "python-hcl2<5.0.0,>=4.3.2",
     "rich<15.0,>=14.0",
     "tfparse<1.0,>=0.6",
-    "python-hcl2<5.0.0,>=4.3.2",
 ]
 name = "c7n_left"
 version = "0.3.31"

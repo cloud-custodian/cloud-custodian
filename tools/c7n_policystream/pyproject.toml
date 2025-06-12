@@ -5,11 +5,11 @@ authors = [
 license = "Apache-2.0"
 requires-python = "<4.0.0,>=3.9.2"
 dependencies = [
+    "boto3<2.0.0,>=1.12.0",
     "c7n",
     "click<9.0,>=8.0",
-    "pyyaml>=5.4.0",
     "pygit2>=1.11",
-    "boto3<2.0.0,>=1.12.0",
+    "pyyaml>=5.4.0",
     "requests<3.0.0,>=2.22.0",
 ]
 name = "c7n_policystream"
@@ -32,8 +32,8 @@ c7n-policystream = "policystream:cli"
 
 [dependency-groups]
 dev = [
-    "pytest<8.0",
     "mock<5.0.0,>=4.0.2",
+    "pytest<8.0",
 ]
 
 [tool.hatch.build.targets.wheel]

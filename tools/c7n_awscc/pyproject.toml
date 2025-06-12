@@ -5,8 +5,8 @@ authors = [
 license = "Apache-2.0"
 requires-python = "<4.0.0,>=3.9.2"
 dependencies = [
-    "c7n",
     "boto3",
+    "c7n",
     "jsonpatch<2.0,>=1.32",
 ]
 name = "c7n_awscc"
