@@ -2,12 +2,13 @@
 # SPDX-License-Identifier: Apache-2.0
 import json
 import time
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta
 from unittest.mock import patch
 
 import boto3
 import moto
 import pytest
+from dateutil.tz import tzutc
 
 from c7n.resources.aws import shape_validate
 from .common import BaseTest, functional
@@ -749,7 +750,7 @@ class KMSMotoTests(BaseTest):
         kms = boto3.client("kms", region_name="us-east-1")
         kms.create_key(Description="test-key")
 
-        seven_days_away = datetime.now(UTC) + timedelta(days=7)
+        seven_days_away = datetime.now(tzutc()) + timedelta(days=7)
 
         p = self.load_policy(
             {
@@ -765,7 +766,7 @@ class KMSMotoTests(BaseTest):
         key_meta = kms.describe_key(KeyId=key_id)["KeyMetadata"]
         assert key_meta["KeyState"] == "PendingDeletion"
 
-        deletion_date = key_meta["DeletionDate"].astimezone(UTC)
+        deletion_date = key_meta["DeletionDate"].astimezone(tzutc())
         assert deletion_date > seven_days_away
         assert deletion_date < (seven_days_away + timedelta(days=1))
 
@@ -774,7 +775,7 @@ class KMSMotoTests(BaseTest):
         kms = boto3.client("kms", region_name="us-east-1")
         kms.create_key(Description="test-key")
 
-        thirty_days_away = datetime.now(UTC) + timedelta(days=30)
+        thirty_days_away = datetime.now(tzutc()) + timedelta(days=30)
 
         p = self.load_policy(
             {
@@ -790,6 +791,6 @@ class KMSMotoTests(BaseTest):
         key_meta = kms.describe_key(KeyId=key_id)["KeyMetadata"]
         assert key_meta["KeyState"] == "PendingDeletion"
 
-        deletion_date = key_meta["DeletionDate"].astimezone(UTC)
+        deletion_date = key_meta["DeletionDate"].astimezone(tzutc())
         assert deletion_date > thirty_days_away
         assert deletion_date < (thirty_days_away + timedelta(days=1))
