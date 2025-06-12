@@ -5,32 +5,32 @@
         "FileSystems": [
             {
                 "OwnerId": "644160558196",
-                "CreationToken": "quickCreated-ed8cc0b4-1133-4213-adbe-e5544a771a55",
-                "FileSystemId": "fs-0c4eafac33c417f78",
-                "FileSystemArn": "arn:aws:elasticfilesystem:us-west-1:644160558196:file-system/fs-0c4eafac33c417f78",
+                "CreationToken": "quickCreated-f2606782-2162-48de-a22b-487f827898b5",
+                "FileSystemId": "fs-0371f35245f586545",
+                "FileSystemArn": "arn:aws:elasticfilesystem:us-west-1:644160558196:file-system/fs-0371f35245f586545",
                 "CreationTime": {
                     "__class__": "datetime",
-                    "year": 2024,
-                    "month": 12,
-                    "day": 9,
-                    "hour": 15,
+                    "year": 2025,
+                    "month": 3,
+                    "day": 14,
+                    "hour": 10,
                     "minute": 23,
-                    "second": 41,
+                    "second": 35,
                     "microsecond": 0
                 },
                 "LifeCycleState": "available",
-                "Name": "efs-test",
-                "NumberOfMountTargets": 2,
+                "Name": "efs-has-statement",
+                "NumberOfMountTargets": 0,
                 "SizeInBytes": {
                     "Value": 6144,
                     "Timestamp": {
                         "__class__": "datetime",
-                        "year": 2024,
-                        "month": 12,
-                        "day": 16,
-                        "hour": 15,
-                        "minute": 45,
-                        "second": 32,
+                        "year": 2025,
+                        "month": 5,
+                        "day": 2,
+                        "hour": 13,
+                        "minute": 54,
+                        "second": 27,
                         "microsecond": 0
                     },
                     "ValueInIA": 0,
@@ -44,7 +44,7 @@
                 "Tags": [
                     {
                         "Key": "Name",
-                        "Value": "efs-test"
+                        "Value": "efs-has-statement"
                     },
                     {
                         "Key": "aws:elasticfilesystem:default-backup",
