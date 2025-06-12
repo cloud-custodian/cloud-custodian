@@ -43,7 +43,7 @@ whitelist_packages = set(
         #
         # packages with bad metadata
         'protobuf',  # BSD-3-Clause
-        'uritemplate' # Dual license BSD 3-Clause OR Apache-2.0
+        'uritemplate'  # Dual license BSD 3-Clause OR Apache-2.0
     )
 )
 
