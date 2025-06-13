@@ -1,0 +1,10 @@
+{
+  "status_code": 404,
+  "data": {
+    "ResponseMetadata": {},
+    "Error": {
+      "Message": "Not found",
+      "Code": "ResourceNotFoundException"
+    }
+  }
+}

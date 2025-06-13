@@ -836,6 +836,48 @@ class AWSLambdaSingingConfigTest(BaseTest):
         assert len(resources) == 1
         assert resources[0]['CodeSigningConfigId'] == 'csc-0ae823415010ccc4x'
 
+    def test_get_resources_by_id(self):
+        factory = self.replay_flight_data('test_awslambda_signing_config_get_each')
+        p = self.load_policy({
+            'name': 'get-code-signing-config',
+            'resource': 'code-signing-config'
+        }, session_factory=factory)
+        rm = p.resource_manager
+        resources = rm.get_resources(['csc-0ae823415010ccc4x'])
+        assert len(resources) == 1
+        assert resources[0]['CodeSigningConfigId'] == 'csc-0ae823415010ccc4x'
+
+    def test_get_resources_by_arn(self):
+        factory = self.replay_flight_data('test_awslambda_signing_config_get_each')
+        p = self.load_policy({
+            'name': 'get-code-signing-config',
+            'resource': 'code-signing-config'
+        }, session_factory=factory)
+        rm = p.resource_manager
+        resources = rm.get_resources(['arn:aws:lambda:eu-west-1:644160558196:code-signing-config:csc-0ae823415010ccc4x'])
+        assert len(resources) == 1
+        assert resources[0]['CodeSigningConfigId'] == 'csc-0ae823415010ccc4x'
+
+    def test_get_resources_not_found(self):
+        factory = self.replay_flight_data('test_awslambda_signing_config_get_not_found')
+        p = self.load_policy({
+            'name': 'get-code-signing-config',
+            'resource': 'code-signing-config'
+        }, session_factory=factory)
+        rm = p.resource_manager
+        resources = rm.get_resources(['one'])
+        assert len(resources) == 0
+
+    def test_get_resources_not_invalid_name(self):
+        factory = self.replay_flight_data('test_awslambda_signing_config_get_not_found')
+        p = self.load_policy({
+            'name': 'get-code-signing-config',
+            'resource': 'code-signing-config'
+        }, session_factory=factory)
+        rm = p.resource_manager
+        resources = rm.get_resources(['one'])
+        assert len(resources) == 0
+
 
 class AWSLambdaSingingConfigFilterTest(BaseTest):
 

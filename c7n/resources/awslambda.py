@@ -119,13 +119,7 @@ class DescribeCodeSigningConfig(query.DescribeSource):
                     self.manager.log.warning(
                         'Code signing config %s not found', arn)
                     continue
-                elif code == 'ValidationException':
-                    # happens if you provide incorrectly formatted id/arn
-                    self.manager.log.warning(
-                        'Invalid code signing config id/arn %s', rid)
-                    continue
                 raise
-
             result.append(config['CodeSigningConfig'])
         return result
 
@@ -140,7 +134,7 @@ class AWSLambdaCodeSigningConfig(query.QueryResourceManager):
         enum_spec = ('list_code_signing_configs', 'CodeSigningConfigs', None)
         name = id = 'CodeSigningConfigId'
         date = 'LastModified'
-        config_type = 'AWS::Lambda::CodeSigningConfig'
+        # config_type = 'AWS::Lambda::CodeSigningConfig'
         cfn_type = 'AWS::Lambda::CodeSigningConfig'
         id_prefix = 'csc-'
         universal_taggable = object()
