@@ -77,7 +77,7 @@ RUN mkdir /output
 
 # Install c7n-mailer
 ADD tools/c7n_mailer /src/tools/c7n_mailer
-RUN uv sync --locked --all-extras --package c7n_mailer
+RUN uv sync --frozen --all-extras --package c7n_mailer
 
 FROM ubuntu:24.04
 

@@ -151,7 +151,7 @@ LABEL "org.opencontainers.image.documentation"="https://cloudcustodian.io/docs"
 BUILD_KUBE = """\
 # Install c7n-kube
 ADD tools/c7n_kube /src/tools/c7n_kube
-RUN uv sync --locked --package c7n_kube
+RUN uv sync --frozen --package c7n_kube
 """
 
 TARGET_KUBE = """\
@@ -163,7 +163,7 @@ LABEL "org.opencontainers.image.documentation"="https://cloudcustodian.io/docs"
 BUILD_ORG = """\
 # Install c7n-org
 ADD tools/c7n_org /src/tools/c7n_org
-RUN uv sync --locked --inexact --package c7n_org
+RUN uv sync --frozen --inexact --package c7n_org
 """
 
 TARGET_ORG = """\
@@ -175,7 +175,7 @@ LABEL "org.opencontainers.image.documentation"="https://cloudcustodian.io/docs"
 BUILD_MAILER = """\
 # Install c7n-mailer
 ADD tools/c7n_mailer /src/tools/c7n_mailer
-RUN uv sync --locked --all-extras --package c7n_mailer
+RUN uv sync --frozen --all-extras --package c7n_mailer
 """
 
 TARGET_MAILER = """\
@@ -187,7 +187,7 @@ LABEL "org.opencontainers.image.documentation"="https://cloudcustodian.io/docs"
 BUILD_POLICYSTREAM = """\
 # Install c7n-policystream
 ADD tools/c7n_policystream /src/tools/c7n_policystream
-RUN uv sync --locked --package c7n_policystream
+RUN uv sync --frozen --package c7n_policystream
 """
 
 TARGET_POLICYSTREAM = """\

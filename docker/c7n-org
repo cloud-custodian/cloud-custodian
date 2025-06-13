@@ -77,7 +77,7 @@ RUN mkdir /output
 
 # Install c7n-org
 ADD tools/c7n_org /src/tools/c7n_org
-RUN uv sync --locked --inexact --package c7n_org
+RUN uv sync --frozen --inexact --package c7n_org
 
 FROM ubuntu:24.04
 

@@ -77,7 +77,7 @@ RUN mkdir /output
 
 # Install c7n-policystream
 ADD tools/c7n_policystream /src/tools/c7n_policystream
-RUN uv sync --locked --package c7n_policystream
+RUN uv sync --frozen --package c7n_policystream
 
 FROM ubuntu:24.04
 

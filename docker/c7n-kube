@@ -77,7 +77,7 @@ RUN mkdir /output
 
 # Install c7n-kube
 ADD tools/c7n_kube /src/tools/c7n_kube
-RUN uv sync --locked --package c7n_kube
+RUN uv sync --frozen --package c7n_kube
 
 FROM ubuntu:24.04
 
