@@ -92,39 +92,138 @@ class AWSLambda(query.QueryResourceManager):
         return super(AWSLambda, self).get_resources(ids, cache, augment)
 
 
-@AWSLambda.filter_registry.register('signing-config')
-class AWSLambdaSigninConfigFilter(Filter):
-    schema = type_schema('signing-config')
-    annotation_key = "CodeSigningConfigArn"
-    permissions = ('lambda:GetFunctionCodeSigningConfig',)
+class DescribeCodeSigningConfig(query.DescribeSource):
+    def augment(self, resources):
+        return universal_augment(self.manager, super().augment(resources))
 
-    def _process_resource(self, client, resource):
-        arn = client.get_function_code_signing_config(
-            FunctionName=resource['FunctionName']
-        ).get('CodeSigningConfigArn')
-        if arn:
-            resource[self.annotation_key] = arn
+    def get_resources(self, ids, cache=True):
+        if not ids:
+            return []
+
+        client = local_session(self.manager.session_factory).client('lambda')
+        _processed = set()
+        result = []
+        for rid in ids:
+            arn = rid if rid.startswith('arn:') else self.manager.generate_arn(rid)
+            if arn in _processed:
+                continue
+            _processed.add(arn)
+
+            try:
+                config = self.manager.retry(
+                    client.get_code_signing_config, CodeSigningConfigArn=arn
+                )
+            except ClientError as e:
+                code = e.response['Error']['Code']
+                if code == 'ResourceNotFoundException':
+                    self.manager.log.warning(
+                        'Code signing config %s not found', arn)
+                    continue
+                elif code == 'ValidationException':
+                    # happens if you provide incorrectly formatted id/arn
+                    self.manager.log.warning(
+                        'Invalid code signing config id/arn %s', rid)
+                    continue
+                raise
+
+            result.append(config['CodeSigningConfig'])
+        return result
+
+
+@resources.register('code-signing-config')
+class AWSLambdaCodeSigningConfig(query.QueryResourceManager):
+    class resource_type(query.TypeInfo):
+        service = 'lambda'
+        arn = 'CodeSigningConfigArn'
+        arn_type = 'code-signing-config'
+        arn_separator = ':'
+        enum_spec = ('list_code_signing_configs', 'CodeSigningConfigs', None)
+        name = id = 'CodeSigningConfigId'
+        date = 'LastModified'
+        config_type = 'AWS::Lambda::CodeSigningConfig'
+        cfn_type = 'AWS::Lambda::CodeSigningConfig'
+        id_prefix = 'csc-'
+        universal_taggable = object()
+        default_report_fields = (
+            'CodeSigningConfigArn',
+            'CodeSigningPolicies.UntrustedArtifactOnDeployment'
+            'Description',
+            'LastModified'
+        )
+
+    source_mapping = {
+        'describe': DescribeCodeSigningConfig,
+        'config': query.ConfigSource
+    }
+
+
+@AWSLambda.filter_registry.register('code-signing-config')
+class AWSLambdaSigningConfigFilter(ValueFilter):
+    """Filter lambda functions by code signing config.
+
+    This filter will annotate the lambda function with the
+    CodeSigningConfigArn if it has one.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: lambda-code-signing-config
+            resource: aws.lambda
+            filters:
+              - type: code-signing-config
+    """
+    schema = type_schema(
+        'code-signing-config',
+        rinherit=ValueFilter.schema
+    )
+    permissions = ('lambda:GetFunctionCodeSigningConfig',)
+    annotation_key = "CodeSigningConfig"
+
+    @staticmethod
+    def _get_lambdas_by_config(client, arn):
+        p = client.get_paginator('list_functions_by_code_signing_config')
+        p.PAGE_ITERATOR_CLS = query.RetryPageIterator
+        data = p.paginate(CodeSigningConfigArn=arn).build_full_result()
+        return data.get('FunctionArns') or []
 
     def process(self, resources, event=None):
+        # assuming that number of signing configs is much smaller that number
+        # of functions
+        sc = self.manager.get_resource_manager('code-signing-config')
+        model = sc.get_model()
+        configs = sc.resources()
+        if not configs:
+            return resources
+
         client = local_session(self.manager.session_factory).client('lambda')
-        with self.executor_factory(max_workers=3) as w:
-            futures = []
-            for res in resources:
-                if self.annotation_key in res:
-                    continue
-                futures.append(w.submit(self._process_resource, client, res))
+
+        function_to_config = {}
+        with self.executor_factory() as w:
+            futures = {
+                w.submit(self._get_lambdas_by_config, client, c[model.arn]): c
+                for c in configs
+            }
             for f in as_completed(futures):
                 if f.exception():
                     self.log.error(
-                        "Exception getting function signin config \n %s" % (
-                            f.exception()
-                        )
+                        "Exception getting lambda functions by code signing config: %s",
+                        f.exception()
                     )
                     continue
+                for arn in f.result():
+                    function_to_config[arn] = futures[f]
+        for function in resources:
+            function[self.annotation_key] = function_to_config.get(function['FunctionArn'])
         return super().process(resources, event)
 
     def __call__(self, i):
-        return self.annotation_key in i
+        if self.annotate:
+            item = i[self.annotation_key]
+        else:
+            item = i.pop(self.annotation_key)
+        return super().__call__(item)
 
 
 @AWSLambda.filter_registry.register('security-group')

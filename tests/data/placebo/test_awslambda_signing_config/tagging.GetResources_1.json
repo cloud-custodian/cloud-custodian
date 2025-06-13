@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:lambda:eu-west-1:644160558196:code-signing-config:csc-0ae823415010ccc4x",
+                "Tags": [
+                    {
+                        "Key": "Env",
+                        "Value": "Dev"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

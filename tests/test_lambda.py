@@ -8,8 +8,7 @@ from botocore.exceptions import ClientError
 from .common import BaseTest, functional
 from c7n.executor import MainThreadExecutor
 from c7n.resources.aws import shape_validate
-from c7n.resources.awslambda import AWSLambdaSigninConfigFilter
-from c7n.resources.awslambda import AWSLambda, ReservedConcurrency
+from c7n.resources.awslambda import AWSLambda, ReservedConcurrency, AWSLambdaSigningConfigFilter
 from c7n.mu import PythonPackageArchive
 from pytest_terraform import terraform
 
@@ -826,37 +825,55 @@ def test_lambda_check_permission_deleted_role(test, aws_lambda_check_permissions
     test.assertEqual(len(resources), 0)
 
 
+class AWSLambdaSingingConfigTest(BaseTest):
+    def test_query(self):
+        factory = self.replay_flight_data('test_awslambda_signing_config')
+        p = self.load_policy({
+            'name': 'get-code-signing-config',
+            'resource': 'code-signing-config'
+        }, session_factory=factory)
+        resources = p.run()
+        assert len(resources) == 1
+        assert resources[0]['CodeSigningConfigId'] == 'csc-0ae823415010ccc4x'
+
+
 class AWSLambdaSingingConfigFilterTest(BaseTest):
 
     def test_query(self):
-        self.patch(AWSLambdaSigninConfigFilter, "executor_factory", MainThreadExecutor)
+        self.patch(AWSLambdaSigningConfigFilter, "executor_factory", MainThreadExecutor)
         factory = self.replay_flight_data("test_awslambda_signing_config_filter")
 
         p = self.load_policy(
             {
                 "name": "awslambda-signing-config-filter",
-                "resource": "lambda",
-                "filters": [
-                    {"type": "signing-config"}
-                ],
+                "resource": "aws.lambda",
+                "filters": [{
+                    "type": "code-signing-config",
+                    "key": "CodeSigningPolicies.UntrustedArtifactOnDeployment",
+                    "value": "Enforce"
+                }],
             },
             session_factory=factory,
         )
         resources = p.run()
 
         self.assertEqual(resources[0]["FunctionName"], "678_lambda_green")
+        self.assertEqual(resources[0]["CodeSigningConfig"]["CodeSigningConfigId"],
+                         'csc-0ae823415010ccc4x')
         self.assertEqual(len(resources), 1)
 
     def test_exception(self):
-        self.patch(AWSLambdaSigninConfigFilter, "executor_factory", MainThreadExecutor)
+        self.patch(AWSLambdaSigningConfigFilter, "executor_factory", MainThreadExecutor)
         factory = self.replay_flight_data("test_awslambda_signing_config_filter_exception")
         p = self.load_policy(
             {
                 "name": "awslambda-signing-config-filter",
-                "resource": "lambda",
-                "filters": [
-                    {"type": "signing-config"}
-                ],
+                "resource": "aws.lambda",
+                "filters": [{
+                    "type": "code-signing-config",
+                    "key": "CodeSigningPolicies.UntrustedArtifactOnDeployment",
+                    "value": "Enforce"
+                }],
             },
             session_factory=factory,
         )
