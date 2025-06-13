@@ -854,7 +854,9 @@ class AWSLambdaSingingConfigTest(BaseTest):
             'resource': 'code-signing-config'
         }, session_factory=factory)
         rm = p.resource_manager
-        resources = rm.get_resources(['arn:aws:lambda:eu-west-1:644160558196:code-signing-config:csc-0ae823415010ccc4x'])
+        resources = rm.get_resources([
+            'arn:aws:lambda:eu-west-1:644160558196:code-signing-config:csc-0ae823415010ccc4x'
+        ])
         assert len(resources) == 1
         assert resources[0]['CodeSigningConfigId'] == 'csc-0ae823415010ccc4x'
 
