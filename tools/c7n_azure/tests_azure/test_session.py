@@ -125,6 +125,19 @@ class SessionTest(BaseTest):
             s = Session()
             self.assertEqual(s.get_subscription_id(), DEFAULT_SUBSCRIPTION_ID)
             self.assertEqual(s.get_tenant_id(), DEFAULT_TENANT_ID)
+        mock_run.assert_called_with(['account', 'show', '--output', 'json'], timeout=10)
+
+    @patch('c7n_azure.session._run_command')
+    @patch('c7n_azure.session.az_identity_version', '1.19.0')
+    def test_initialize_session_old_version(self, mock_run):
+        mock_run.return_value = \
+            f'{{"id":"{DEFAULT_SUBSCRIPTION_ID}", "tenantId":"{DEFAULT_TENANT_ID}"}}'
+
+        with patch.dict(os.environ, {}, clear=True):
+            s = Session()
+            self.assertEqual(s.get_subscription_id(), DEFAULT_SUBSCRIPTION_ID)
+            self.assertEqual(s.get_tenant_id(), DEFAULT_TENANT_ID)
+        mock_run.assert_called_with('az account show --output json', timeout=10)
 
     def test_run_command_signature(self):
         """Catch signature changes in the internal method we use for CLI authentication
@@ -145,7 +158,7 @@ class SessionTest(BaseTest):
         So continuing to rely on _run_command() may be more reliable, as long as we
         catch signature changes to avoid accidental breakage.
         """
-        expected_parameters = {"command", "timeout"}
+        expected_parameters = {"command_args", "timeout"}
         actual_parameters = set(signature(azure_cli._run_command).parameters.keys())
         self.assertSetEqual(expected_parameters, actual_parameters)
 
@@ -356,7 +369,7 @@ class SessionTest(BaseTest):
         self.assertEqual(AZURE_CHINA_CLOUD.endpoints.resource_manager,
                          client._client._base_url)
         self.assertEqual(AZURE_CHINA_CLOUD.endpoints.management + ".default",
-                         client._client._config.credential_scopes[0])
+                         client._config.credential_scopes[0])
 
     # This test won't run with real credentials unless the
     # tenant is actually in Azure US Government
@@ -368,7 +381,7 @@ class SessionTest(BaseTest):
         self.assertEqual(AZURE_US_GOV_CLOUD.endpoints.resource_manager,
                          client._client._base_url)
         self.assertEqual(AZURE_US_GOV_CLOUD.endpoints.management + ".default",
-                         client._client._config.credential_scopes[0])
+                         client._config.credential_scopes[0])
 
     @patch('c7n_azure.session.get_keyvault_secret', return_value='{}')
     def test_compare_auth_params(self, _1):

@@ -439,19 +439,20 @@ class SnapshotDelete(BaseAction):
                  post, pre - post)
 
         client = local_session(self.manager.session_factory).client('ec2')
+        deleted_snapshots = []
         with self.executor_factory(max_workers=2) as w:
             futures = []
             for snapshot_set in chunks(reversed(snapshots), size=50):
                 futures.append(
-                    w.submit(self.process_snapshot_set, client, snapshot_set))
+                    w.submit(self.process_snapshot_set, client, snapshot_set, deleted_snapshots))
             for f in as_completed(futures):
                 if f.exception():
                     self.log.error(
                         "Exception deleting snapshot set \n %s" % (
                             f.exception()))
-        return snapshots
+        return deleted_snapshots
 
-    def process_snapshot_set(self, client, snapshots_set):
+    def process_snapshot_set(self, client, snapshots_set, deleted_snapshots):
         retry = get_retry((
             'RequestLimitExceeded', 'Client.RequestLimitExceeded'))
 
@@ -462,6 +463,7 @@ class SnapshotDelete(BaseAction):
                 retry(client.delete_snapshot,
                       SnapshotId=s['SnapshotId'],
                       DryRun=self.manager.config.dryrun)
+                deleted_snapshots.append(s)
             except ClientError as e:
                 if e.response['Error']['Code'] == "InvalidSnapshot.NotFound":
                     continue

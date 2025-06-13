@@ -318,7 +318,7 @@ class TestFSx(BaseTest):
         client = session_factory().client('fsx')
         fs = client.describe_file_systems(
             FileSystemIds=[resources[0]['FileSystemId']])['FileSystems']
-        self.assertTrue(len(fs), 1)
+        self.assertEqual(len(fs), 1)
         self.assertEqual(fs[0]['Lifecycle'], 'DELETING')
         backups = client.describe_backups(
             Filters=[
@@ -364,7 +364,7 @@ class TestFSx(BaseTest):
         client = session_factory().client('fsx')
         fs = client.describe_file_systems(
             FileSystemIds=[resources[0]['FileSystemId']])['FileSystems']
-        self.assertTrue(len(fs), 1)
+        self.assertEqual(len(fs), 1)
         self.assertEqual(fs[0]['Lifecycle'], 'DELETING')
         backups = client.describe_backups(
             Filters=[
@@ -404,7 +404,7 @@ class TestFSx(BaseTest):
         client = session_factory().client('fsx')
         fs = client.describe_file_systems(
             FileSystemIds=[resources[0]['FileSystemId']])['FileSystems']
-        self.assertTrue(len(fs), 1)
+        self.assertEqual(len(fs), 1)
         self.assertNotEqual(fs[0]['Lifecycle'], 'DELETING')
 
     def test_fsx_arn_in_event(self):
@@ -463,6 +463,55 @@ class TestFSx(BaseTest):
         )
         with mock_datetime_now(date_parse("2022-09-09T00:00:00+00:00"), c7n.filters.backup):
             resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_fsx_volumes_filter(self):
+        session_factory = self.replay_flight_data("test_fsx_volumes_filter")
+        p = self.load_policy({
+            "name": "fsx_volumes_filter",
+            "resource": "aws.fsx",
+            "filters": [{
+                "type": "volume",
+                "attrs": []
+            }]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources[0]['c7n:Volumes']), 2)
+
+    def test_fsx_vpc_filter(self):
+        session_factory = self.replay_flight_data("test_fsx_vpc_filter")
+        p = self.load_policy({
+            "name": "fsx_vpc_filter",
+            "resource": "aws.fsx",
+            "filters": [{
+                "type": "vpc",
+                "key": "IsDefault",
+                "value": True
+            }]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources[0]['c7n:matched-vpcs']), 1)
+
+
+class TestFSxVolume(BaseTest):
+    def test_fsx_volume_query(self):
+        session_factory = self.replay_flight_data('test_fsx_volume_query')
+        p = self.load_policy(
+            {
+                "name": "fsx_volume_query",
+                "resource": "aws.fsx-volume",
+                "filters": [{
+                    "type": "value",
+                    "key": "Lifecycle",
+                    "value": "AVAILABLE"
+                }]
+            },
+            session_factory=session_factory,
+        )
+
+        resources = p.run()
         self.assertEqual(len(resources), 1)
 
 
@@ -528,7 +577,7 @@ class TestFSxBackup(BaseTest):
         tags = None
         for b in backups:
             if b['BackupId'] == backup_id:
-                self.assertTrue(len(b['Tags']), 1)
+                self.assertEqual(len(b['Tags']), 1)
                 tags = b['Tags']
         self.assertTrue(tags)
         self.assertEqual(tags[0]['Key'], 'tag-test')
@@ -566,7 +615,7 @@ class TestFSxBackup(BaseTest):
         tags = None
         for b in backups:
             if b['BackupId'] == backup_id:
-                self.assertTrue(len(b['Tags']), 1)
+                self.assertEqual(len(b['Tags']), 1)
                 tags = [t for t in b['Tags'] if t['Key'] == 'maid_status']
         self.assertTrue(tags)
 

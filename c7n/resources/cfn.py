@@ -3,12 +3,13 @@
 import json
 import logging
 import re
+from itertools import chain
 
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 
 from c7n.actions import BaseAction
-from c7n.filters import Filter
+from c7n.filters import Filter, ListItemFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema
@@ -284,3 +285,36 @@ class CloudFormationTemplateFilter(Filter):
                 matched.append(r)
 
         return matched
+
+
+@CloudFormation.filter_registry.register('topic')
+class CloudFormationNotificationTopic(ListItemFilter):
+    schema = type_schema(
+        'topic',
+        attrs={"$ref": "#/definitions/filters_common/list_item_attrs"},
+        count={"type": "number"},
+        count_op={"$ref": "#/definitions/filters_common/comparison_operators"}
+    )
+    annotation_key = "c7n:SnsTopics"
+    FetchThreshold = 10
+    permissions = ('sns:GetTopicAttributes', 'sns:ListTopics')
+
+    def __init__(self, data, manager=None):
+        data['key'] = f'"{self.annotation_key}"'
+        super().__init__(data, manager)
+
+    def process(self, resources, event=None):
+        sns = self.manager.get_resource_manager('aws.sns')
+        topic_arns = set(chain.from_iterable(res.get('NotificationARNs', ()) for res in resources))
+
+        if len(topic_arns) < self.FetchThreshold:
+            topics = sns.get_resources(list(topic_arns))
+        else:
+            topics = sns.resources()
+        model = sns.get_model()
+        by_id = {t[model.id]: t for t in topics}
+        for res in resources:
+            res[self.annotation_key] = [
+                by_id[arn] for arn in res.get('NotificationARNs', ()) if arn in by_id
+            ]
+        return super().process(resources, event)

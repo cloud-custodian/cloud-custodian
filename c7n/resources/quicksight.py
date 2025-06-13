@@ -88,7 +88,20 @@ class QuicksightAccount(ResourceManager):
                 AwsAccountId=self.config.account_id
             )["AccountSettings"]
         except ClientError as e:
-            if e.response['Error']['Code'] in ('ResourceNotFoundException',):
+            # Return no resources if no quicksight account has been created, the standard edition is
+            # being used, or if the policy is being run from a non-identity region. Otherwise, raise
+            # the exception. It's a bit brittle to depend on error messages, but unfortunately
+            # these all are lumped under AccessDenied, and we would like normal AccessDenied
+            # Exceptions caused by lack of IAM permissions to still be raised.
+            error_code = e.response['Error']['Code']
+            error_message = e.response['Error'].get('Message', '')
+
+            if error_code == 'ResourceNotFoundException' or (
+                error_code == 'AccessDeniedException' and (
+                    "disabled for STANDARD Edition" in error_message or
+                    "Operation is being called from endpoint" in error_message
+                )
+            ):
                 return []
             raise
 

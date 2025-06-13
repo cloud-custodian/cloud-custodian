@@ -409,6 +409,7 @@ class UpdateLambda(Action):
 
         for r in resources:
             params = self.get_parameters(r)
+            params.pop('FunctionName', None)
             try:
                 retry(
                     client.update_function_configuration,

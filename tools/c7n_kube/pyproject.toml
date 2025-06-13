@@ -1,35 +1,38 @@
-[tool.poetry]
+[project]
+authors = [
+    {name = "Cloud Custodian Project"},
+]
+license = "Apache-2.0"
+requires-python = "<4.0.0,>=3.9.2"
+dependencies = [
+    "c7n",
+    "jsonpatch<2.0,>=1.32",
+    "kubernetes>=10.0.1",
+]
 name = "c7n_kube"
-version = "0.2.42"
+version = "0.2.44"
 description = "Cloud Custodian - Kubernetes Provider"
 readme = "readme.md"
+classifiers = [
+    "License :: OSI Approved :: Apache Software License",
+    "Topic :: System :: Systems Administration",
+    "Topic :: System :: Distributed Computing",
+]
+
+[project.urls]
 homepage = "https://cloudcustodian.io"
 repository = "https://github.com/cloud-custodian/cloud-custodian"
 documentation = "https://cloudcustodian.io/docs/"
-authors = ["Cloud Custodian Project"]
-license = "Apache-2.0"
-classifiers = [
-   "License :: OSI Approved :: Apache Software License",
-   "Topic :: System :: Systems Administration",
-   "Topic :: System :: Distributed Computing"
+
+[project.scripts]
+c7n-kube = "c7n_kube.cli:cli"
+
+[dependency-groups]
+dev = [
+    "pytest<8.0",
+    "vcrpy>=4.0.2",
 ]
 
-[tool.poetry.dependencies]
-python = "^3.8"
-c7n = {path = "../..", develop = true}
-
-kubernetes = ">=10.0.1"
-jsonpatch = "^1.32"
-
-[tool.poetry.dev-dependencies]
-pytest = "<8.0"
-vcrpy = ">=4.0.2"
-
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
-
-[tool.poetry.scripts]
-"c7n-kube" = "c7n_kube.cli:cli"
-# backward compatability, keep c7n-kates entrypoint for now
-"c7n-kates" = "c7n_kube.cli:cli"
+requires = ["hatchling"]
+build-backend = "hatchling.build"

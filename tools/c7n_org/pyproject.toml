@@ -1,31 +1,36 @@
-[tool.poetry]
+[project]
+authors = [
+    {name = "Cloud Custodian Project"},
+]
+license = "Apache-2.0"
+requires-python = "<4.0.0,>=3.9.2"
+dependencies = [
+    "c7n",
+    "click>=8.0",
+]
 name = "c7n_org"
-version = "0.6.42"
+version = "0.6.44"
 description = "Cloud Custodian - Parallel Execution"
 readme = "README.md"
-homepage = "https://cloudcustodian.io"
-documentation = "https://cloudcustodian.io/docs/tools/c7n-org.html"
-repository = "https://github.com/cloud-custodian/cloud-custodian"
-authors = ["Cloud Custodian Project"]
-license = "Apache-2.0"
-classifiers=[
-   "License :: OSI Approved :: Apache Software License",
-   "Topic :: System :: Systems Administration",
-   "Topic :: System :: Distributed Computing"
+classifiers = [
+    "License :: OSI Approved :: Apache Software License",
+    "Topic :: System :: Systems Administration",
+    "Topic :: System :: Distributed Computing",
 ]
 
-[tool.poetry.scripts]
-c7n-org = 'c7n_org.cli:cli'
+[project.urls]
+homepage = "https://cloudcustodian.io"
+repository = "https://github.com/cloud-custodian/cloud-custodian"
+documentation = "https://cloudcustodian.io/docs/tools/c7n-org.html"
 
-[tool.poetry.dependencies]
-python = "^3.8"
-c7n = {path = "../..", develop = true}
+[project.scripts]
+c7n-org = "c7n_org.cli:cli"
 
-click = ">=8.0"
-
-[tool.poetry.dev-dependencies]
-pytest = "<8.0"
+[dependency-groups]
+dev = [
+    "pytest<8.0",
+]
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"

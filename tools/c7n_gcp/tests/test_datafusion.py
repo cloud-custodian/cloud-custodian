@@ -13,7 +13,7 @@ class DatafusionInstanceTest(BaseTest):
             session_factory=factory)
         resources = p.run()
 
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['name'], 'projects/cloud-custodian/'
                                                'locations/us-central1/'
                                                'instances/instance-311-green')
