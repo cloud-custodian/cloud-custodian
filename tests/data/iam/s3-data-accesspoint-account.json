@@ -1,0 +1,38 @@
+[
+    {
+        "Id": "DataAccessPointAccountInvalid",
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Actions": ["s3:PutObject"],
+                "Principal": ["*"],
+                "StatementId": "cab89702-05f0-4751-818e-ced6e98ef5f9",
+                "Effect": "Allow",
+                "Resource": ["arn:aws:s3:::data-accesspoint-invalid/*", "arn:aws:s3:::data-accesspoint-invalid"],
+                    "Condition": {
+                        "StringEquals": {
+                            "s3:DataAccessPointAccount": ["444456789012"]
+                    }
+                }
+            }
+        ]
+    },
+    {
+        "Id": "DataAccessPointAccountValid",
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Actions": ["s3:PutObject"],
+                "Principal": ["*"],
+                "StatementId": "cab89702-05f0-4751-818e-ced6e98ef5f9",
+                "Effect": "Allow",
+                "Resource": ["arn:aws:s3:::data-accesspoint-valid/*", "arn:aws:s3:::data-accesspoint-valid"],
+                    "Condition": {
+                        "StringEquals": {
+                            "s3:DataAccessPointAccount": ["123456789012"]
+                    }
+                }
+            }
+        ]
+    } 
+]
