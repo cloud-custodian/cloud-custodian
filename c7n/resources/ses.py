@@ -349,7 +349,13 @@ class DescribeDedicatedIpPool(DescribeSource):
     def augment(self, resources):
         client = local_session(self.manager.session_factory).client('sesv2')
         resource_list = []
+        # Default & Shared Dedicated IP pool names
+        # https://docs.aws.amazon.com/ses/latest/dg/managing-ip-pools.html
+        default_shared_pools = ["ses-default-dedicated-pool", "ses-shared-pool"]
         for r in resources:
+            if r in default_shared_pools:
+                # For default & shared pools, we cannot call get_dedicated_ip_pool
+                continue
             details = client.get_dedicated_ip_pool(PoolName=r)
             resource_list.append(details["DedicatedIpPool"])
         return universal_augment(self.manager, resource_list)
