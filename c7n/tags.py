@@ -28,24 +28,6 @@ from c7n import deprecated, utils
 DEFAULT_TAG = "maid_status"
 
 
-def register_ec2_tags(filters, actions):
-    filters.register('marked-for-op', TagActionFilter)
-    filters.register('tag-count', TagCountFilter)
-
-    actions.register('auto-tag-user', AutoTagUser)
-    actions.register('mark-for-op', TagDelayedAction)
-    actions.register('tag-trim', TagTrim)
-
-    actions.register('mark', Tag)
-    actions.register('tag', Tag)
-
-    actions.register('unmark', RemoveTag)
-    actions.register('untag', RemoveTag)
-    actions.register('remove-tag', RemoveTag)
-    actions.register('rename-tag', RenameTag)
-    actions.register('normalize-tag', NormalizeTag)
-
-
 def register_universal_tags(filters, actions, compatibility=True):
     filters.register('marked-for-op', TagActionFilter)
 
