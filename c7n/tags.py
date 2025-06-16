@@ -63,6 +63,7 @@ def register_universal_tags(filters, actions, compatibility=True):
 
     actions.register('remove-tag', UniversalUntag)
     actions.register('rename-tag', UniversalTagRename)
+    actions.register('normalize-tag', NormalizeTag)
 
 
 def universal_augment(self, resources):
@@ -762,13 +763,8 @@ class NormalizeTag(Action):
             len(resource_set)))
         key = self.data.get('key')
 
-        c = utils.local_session(self.manager.session_factory).client('ec2')
-
-        self.create_tag(
-            c,
-            [r[self.id_key] for r in resource_set if len(
-                r.get('Tags', [])) < 50],
-            key, tag_value)
+        tag_class = self.manager.action_registry['tag']
+        tag_class({'type': 'tag', 'key': key, 'value': tag_value}, self.manager).process(resource_set)
 
     def create_set(self, instances):
         key = self.data.get('key', None)
@@ -961,7 +957,7 @@ class UniversalTagRename(Action):
 
         # sort tags using ordering of old_keys
         def key_func(a):
-            if a['Key'] in old_keys:
+            if a['Key'] in old_keys and 'old_keys' in self.data:
                 return self.data['old_keys'].index(a['Key'])
             return 50
 
