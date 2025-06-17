@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import json
+import logging
 
 from c7n.actions import BaseAction, Action
 from c7n.filters.iamaccess import CrossAccountAccessFilter
@@ -14,6 +15,8 @@ from c7n.tags import RemoveTag, Tag
 from c7n.filters import (FilterRegistry, ListItemFilter)
 
 filters = FilterRegistry('SESIngressEndpoint.filters')
+
+log = logging.getLogger("custodian.ses")
 
 
 class DescribeConfigurationSet(DescribeSource):
@@ -355,6 +358,7 @@ class DescribeDedicatedIpPool(DescribeSource):
         for r in resources:
             if r in default_shared_pools:
                 # For default & shared pools, we cannot call get_dedicated_ip_pool
+                log.info("Skipping default/shared pool: %s", r)
                 continue
             details = client.get_dedicated_ip_pool(PoolName=r)
             resource_list.append(details["DedicatedIpPool"])
