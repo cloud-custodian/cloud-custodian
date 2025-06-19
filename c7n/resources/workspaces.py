@@ -262,7 +262,6 @@ class WorkspaceDirectory(QueryResourceManager):
         filter_name = 'DirectoryIds'
         filter_type = 'list'
 
-
     augment = universal_augment
 
 
