@@ -81,6 +81,34 @@ class GcpTest(unittest.TestCase):
             },
         )
 
+    def test_ack_individual_message(self):
+        patched_client = MagicMock()
+        patched_client.execute_command.return_value = {}
+        processor = MailerGcpQueueProcessor(MAILER_CONFIG_GCP, logger)
+        processor.client = patched_client
+        processor.ack_message("test-ack-id")
+        patched_client.execute_command.assert_called_with(
+            "acknowledge",
+            {
+                "subscription": "projects/c7n-dev/subscriptions/getnotify",
+                "body": {"ackIds": ["test-ack-id"]},
+            },
+        )
+
+    def test_nack_individual_message(self):
+        patched_client = MagicMock()
+        patched_client.execute_command.return_value = {}
+        processor = MailerGcpQueueProcessor(MAILER_CONFIG_GCP, logger)
+        processor.client = patched_client
+        processor.nack_message("test-ack-id")
+        patched_client.execute_command.assert_called_with(
+            "modifyAckDeadline",
+            {
+                "subscription": "projects/c7n-dev/subscriptions/getnotify",
+                "body": {"ackIds": ["test-ack-id"], "ackDeadlineSeconds": 0},
+            },
+        )
+
     @patch.object(MailerGcpQueueProcessor, "receive_messages")
     def test_run_empty_receive(self, mock_receive):
         mock_receive.return_value = self._pull_messages(0)
@@ -127,10 +155,10 @@ class GcpTest(unittest.TestCase):
             [call().deliver_datadog_messages("mock_datadog_message_map", datadog_loaded_message)]
         )
 
-    @patch.object(MailerGcpQueueProcessor, "ack_messages")
+    @patch.object(MailerGcpQueueProcessor, "ack_message")
     @patch.object(MailerGcpQueueProcessor, "process_message")
     @patch.object(MailerGcpQueueProcessor, "receive_messages")
-    def test_gcp_queue_processor_run(self, mock_receive, mock_process_message, mock_ack_messages):
+    def test_gcp_queue_processor_run(self, mock_receive, mock_process_message, mock_ack_message):
         mock_receive.side_effect = [
             self._pull_messages(1),
             self._pull_messages(0),
@@ -138,4 +166,4 @@ class GcpTest(unittest.TestCase):
         processor = MailerGcpQueueProcessor(MAILER_CONFIG_GCP, logger)
         processor.run()
         mock_process_message.assert_called()
-        mock_ack_messages.assert_called()
+        mock_ack_message.assert_called()
