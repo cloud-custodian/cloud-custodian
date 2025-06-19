@@ -2784,6 +2784,39 @@ class SubnetEndpointFilter(RelatedResourceByIdFilter):
         rinherit=ValueFilter.schema)
 
 
+@resources.register('vpc-endpoint-service-configuration')
+class VPCEndpointServiceConfiguration(query.QueryResourceManager):
+    """
+    Resource manager for VPC Endpoint Service Configurations.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: acceptance-not-enabled
+            resource: aws.vpc-endpoint-service-configuration
+            filters:
+              - AcceptanceRequired: false
+
+    """
+    class resource_type(query.TypeInfo):
+        service = 'ec2'
+        enum_spec = ('describe_vpc_endpoint_service_configurations',
+                     'ServiceConfigurations', None)
+        name = id = 'ServiceId'  # ServiceName contains DNS
+        id_prefix = 'vpce-svc-'
+        filter_name = 'ServiceIds'
+        filter_type = 'list'
+        cfn_type = config_type = 'AWS::EC2::VPCEndpointService'
+        arn_type = 'vpc-endpoint-service'
+        arn_separator = '/'
+        default_report_fields = (
+            'ServiceId',
+            'ServiceState'
+        )
+
+
 @resources.register('key-pair')
 class KeyPair(query.QueryResourceManager):
 

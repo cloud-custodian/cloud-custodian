@@ -4358,3 +4358,18 @@ def test_eip_shield_sync_deleted(test, eip_shield_sync):
         InclusionFilters={"ResourceTypes": ["ELASTIC_IP_ALLOCATION"]}
     )
     test.assertEqual(len(protections["Protections"]), 1)
+
+
+class TestVPCEndpointServiceConfiguration(BaseTest):
+    def test_query(self):
+        session_factory = self.replay_flight_data("test_vpc_endpoint_service_configuration_query")
+        p = self.load_policy({
+            "name": "vpc-endpoint-service-configuration-query",
+            "resource": "aws.vpc-endpoint-service-configuration",
+            "filters": [{
+                'RemoteAccessEnabled': False
+            }],
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['ServiceId'], 'vpce-svc-042193297e333714e')

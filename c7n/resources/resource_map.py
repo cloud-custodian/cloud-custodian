@@ -326,6 +326,7 @@ ResourceMap = {
   "aws.user-pool": "c7n.resources.cognito.CognitoUserPool",
   "aws.vpc": "c7n.resources.vpc.Vpc",
   "aws.vpc-endpoint": "c7n.resources.vpc.VpcEndpoint",
+  "aws.vpc-endpoint-service-configuration": "c7n.resources.vpc.VPCEndpointServiceConfiguration",
   "aws.vpn-connection": "c7n.resources.vpc.VPNConnection",
   "aws.vpn-gateway": "c7n.resources.vpc.VPNGateway",
   "aws.waf": "c7n.resources.waf.WAF",
