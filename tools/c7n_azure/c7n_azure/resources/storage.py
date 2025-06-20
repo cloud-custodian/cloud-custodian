@@ -58,6 +58,69 @@ class Storage(ArmResourceManager):
         )
 
 
+@Storage.filter_registry.register("file-services")
+class StorageFileServicesFilter(ListItemFilter):
+    """
+    Filters Storage Accounts by their file services configuration.
+
+    :example:
+
+    Find storage accounts with file services soft delete disabled
+
+    .. code-block:: yaml
+
+        policies:
+          - name: storage-no-file-services-delete-policy
+            resource: azure.storage
+            filters:
+              - type: file-services
+                attrs:
+                  - type: value
+                    key: properties.shareDeleteRetentionPolicy.enabled
+                    value: false
+
+    """
+    schema = type_schema(
+        "file-services",
+        attrs={"$ref": "#/definitions/filters_common/list_item_attrs"},
+        count={"type": "number"},
+        count_op={"$ref": "#/definitions/filters_common/comparison_operators"}
+    )
+    item_annotation_key = "c7n:FileServices"
+    annotate_items = True
+
+    def _process_resources(self, resources, event=None, client=None):
+        if client is None:
+            client = self.manager.get_client()
+
+        for res in resources:
+            if self.item_annotation_key in res:
+                continue
+            file_services = client.file_services.list(
+                resource_group_name=res["resourceGroup"],
+                account_name=res["name"],
+            )
+            # at least one default is present
+            res[self.item_annotation_key] = file_services.serialize(True).get('value', [])
+
+    def process(self, resources, event=None):
+
+        _, exceptions = ThreadHelper.execute_in_parallel(
+            resources=resources,
+            event=event,
+            execution_method=self._process_resources,
+            executor_factory=self.executor_factory,
+            log=self.log,
+            client=self.manager.get_client()  # seems like Azure mgmt clients are thread-safe
+        )
+        if exceptions:
+            raise exceptions[0]  # pragma: no cover
+        return super().process(resources, event)
+
+    def get_item_values(self, resource):
+        return resource.pop(self.item_annotation_key, [])
+
+
 @Storage.action_registry.register('set-firewall-rules')
 class StorageSetFirewallAction(SetFirewallAction):
     """ Set Firewall Rules Action
