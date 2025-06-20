@@ -3,7 +3,7 @@
     "data": {
         "ResponseMetadata": {},
         "DedicatedIpPools": [
-            "test-pool", "c7n-test-2"
+            "ses-default-dedicated-pool", "test-pool", "c7n-test-2"
         ]
     }
 }
