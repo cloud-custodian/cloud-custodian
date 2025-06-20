@@ -607,7 +607,6 @@ class PolicyMetaLint(BaseTest):
             'AWS::EC2::RegisteredHAInstance',
             'AWS::EC2::TransitGatewayAttachment',
             'AWS::EC2::TransitGatewayRouteTable',
-            'AWS::EC2::VPCEndpointService',
             'AWS::ECR::PublicRepository',
             'AWS::EFS::AccessPoint',
             'AWS::EMR::SecurityConfiguration',
