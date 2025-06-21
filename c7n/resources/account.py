@@ -2590,3 +2590,51 @@ class SetEC2MetadataDefaults(BaseAction):
         client = local_session(self.manager.session_factory).client(self.service)
         self.data.pop('type')
         client.modify_instance_metadata_defaults(**self.data)
+
+
+@actions.register('set-security-token-service-preferences')
+class SetSecurityTokenServicePreferences(BaseAction):
+    """Action to set STS preferences."""
+
+    """Action to set STS preferences.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: set-sts-preferences
+                resource: account
+                filters:
+                  - or:
+                    - type: iam-summary
+                      key: GlobalEndpointTokenVersion
+                      value: absent
+                      value: optional
+                    - type: iam-summary
+                      key: GlobalEndpointTokenVersion
+                      op: ne
+                      value: 2
+                actions:
+                  - type: set-security-token-service-preferences
+                    token_version: v2Token
+
+    """
+
+    schema = type_schema(
+        'set-security-token-service-preferences',
+        token_version={'type': 'string', 'enum': ['v1Token', 'v2Token']}
+    )
+
+    permissions = ('iam:SetSecurityTokenServicePreferences',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('iam')
+        token_version = self.data.get('token_version', 'v2Token')
+        for resource in resources:
+            self.set_sts_preferences(client, token_version)
+
+    def set_sts_preferences(self, client, token_version):
+        client.set_security_token_service_preferences(
+            GlobalEndpointTokenVersion=token_version
+        )

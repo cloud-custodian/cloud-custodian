@@ -1,0 +1,8 @@
+{
+  "status_code": 200,
+  "data": {
+    "AccountAliases": ["Test-account-1"],
+    "IsTruncated": false,
+    "ResponseMetadata": {}
+  }
+}
