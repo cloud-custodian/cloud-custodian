@@ -32,6 +32,11 @@ class URIResolver:
 
         if uri.startswith('s3://'):
             contents = self.get_s3_uri(uri)
+        elif uri == 'dynamodb':
+            # Special handling for dynamodb URLs
+            # This is just a placeholder since actual handling is done in ValuesFrom._get_ddb_values
+            # We just need to avoid trying to fetch from this URL directly
+            contents = ""
         else:
             headers.update({"Accept-Encoding": "gzip"})
             req = Request(uri, headers=headers)
@@ -101,13 +106,23 @@ class ValuesFrom:
          format: csv2dict
          expr: key[1]
 
-      # using cql against dynamodb
+      # using PartiQL queries against DynamoDB
       value_from:
          url: dynamodb
          query: |
            select resource_id from exceptions
-           where account_id = '{account_id} and policy = '{policy.name}'
+           where account_id = '{account_id}' and policy = '{policy.name}'
          expr: [].resource_id
+         format: json  # Optional, defaults to json
+
+      # using PartiQL to query a specific DynamoDB table
+      value_from:
+         url: dynamodb
+         query: |
+           select id from "MyTable"
+           where partition_key = 'some_value'
+         expr: '[*].id'
+
        # inferred from extension
        format: [json, csv, csv2dict, txt]
     """
@@ -145,6 +160,10 @@ class ValuesFrom:
         self.resolver = URIResolver(manager.session_factory, self.cache)
 
     def get_contents(self):
+        # Special handling for dynamodb URL
+        if self.data['url'] == 'dynamodb':
+            return "", self.data.get('format', 'json')
+
         _, format = os.path.splitext(self.data['url'])
 
         if not format or self.data.get('format'):
