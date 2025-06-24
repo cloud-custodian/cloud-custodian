@@ -15,7 +15,7 @@ dependencies = [
     "retrying<2.0.0,>=1.3.3",
 ]
 name = "c7n_gcp"
-version = "0.4.44"
+version = "0.4.45"
 description = "Cloud Custodian - Google Cloud Provider"
 readme = "readme.md"
 classifiers = [
