@@ -40,7 +40,7 @@ def gen_version_file(package_dir, version_file):
     """Generate a version file from pyproject.yml"""
     with open(Path(str(package_dir)) / 'pyproject.toml', 'rb') as f:
         data = toml.load(f)
-    version = data['package']['version']
+    version = data['project']['version']
     with open(version_file, 'w') as fh:
         fh.write('# Generated via tools/dev/devpkg.py\n')
         fh.write('version = "{}"\n'.format(version))

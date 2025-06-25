@@ -5,7 +5,9 @@ SELF_MAKE := $(lastword $(MAKEFILE_LIST))
 
 PKG_REPO = testpypi
 PKG_INCREMENT := patch
-PKG_SET := tools/c7n_gcp tools/c7n_kube tools/c7n_openstack tools/c7n_mailer tools/c7n_logexporter tools/c7n_policystream tools/c7n_trailcreator tools/c7n_org tools/c7n_sphinxext tools/c7n_awscc tools/c7n_tencentcloud tools/c7n_azure tools/c7n_oci tools/c7n_terraform tools/c7n_left
+PKG_SET := tools/c7n_gcp tools/c7n_kube tools/c7n_openstack tools/c7n_mailer tools/c7n_policystream tools/c7n_org tools/c7n_sphinxext tools/c7n_awscc tools/c7n_tencentcloud tools/c7n_azure tools/c7n_oci tools/c7n_left
+
+PKG_SET_OLD := tools/c7n_logexporter tools/c7n_trailcreator tools/c7n_terraform
 
 FMT_SET := tools/c7n_left tools/c7n_mailer tools/c7n_oci tools/c7n_kube tools/c7n_awscc
 
@@ -99,8 +101,8 @@ pkg-show-update:
 
 pkg-increment:
 # increment versions
-	uv version $(PKG_INCREMENT)
-	for pkg in $(PKG_SET); do cd $$pkg && uv version $(PKG_INCREMENT) && cd ../..; done
+	uv version --bump $(PKG_INCREMENT)
+	for pkg in $(PKG_SET); do cd $$pkg && uv version --bump $(PKG_INCREMENT) && cd ../..; done
 	uv run tools/dev/devpkg.py gen-version-file -p . -f c7n/version.py
 
 pkg-build-wheel:

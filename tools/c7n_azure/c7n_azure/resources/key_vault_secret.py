@@ -49,3 +49,16 @@ class KeyVaultSecret(ChildResourceManager):
         )
 
         keyvault_child = True
+
+    def enumerate_resources(self, *args, **kw):
+        # azure keyvaults secrets from version 4.9 to 4.10 made incompatible output
+        # changes to move attributes to a subdictionary ('data'), this would break
+        # extant policies, so preserve compatiblity.
+        resources = super().enumerate_resources(*args, **kw)
+        for r in resources:
+            data = r['attributes'].pop('data', {})
+            # also incompatible change of expires to exp :/
+            if 'exp' in data:
+                data['expires'] = data['exp']
+            r['attributes'].update(data)
+        return resources
