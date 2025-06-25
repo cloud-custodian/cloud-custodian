@@ -50,6 +50,8 @@ class LexV2BotAliasDescribe(query.ChildDescribeSource):
                 botId=r['c7n:parent-id'], botAliasId=r['botAliasId'])
             botalias.pop('ResponseMetadata')
             r.update(botalias)
+            r['botAliasArn'] = self.manager.generate_arn(
+                f"bot-alias/{r['c7n:parent-id']}/{r['botAliasId']}")
         return universal_augment(self.manager, resources)
 
     def resources(self, query):
@@ -72,12 +74,6 @@ class LexV2BotAlias(query.ChildResourceManager):
         permission_prefix = "lex"
         permissions_augment = ("lex:DescribeBotAlias",)
     source_mapping = {'describe-child': LexV2BotAliasDescribe, 'config': query.ConfigSource}
-
-    def get_arns(self, resources):
-        arns = []
-        for r in resources:
-            arns.append(self.generate_arn(f"bot-alias/{r['c7n:parent-id']}/{r['botAliasId']}"))
-        return arns
 
 
 @LexV2BotAlias.action_registry.register('delete')
