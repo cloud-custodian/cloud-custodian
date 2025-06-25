@@ -46,7 +46,7 @@ class MailerGcpQueueProcessor(MessageTargetMixin):
                 except Exception as e:
                     self.logger.error(
                         f"Failed to process message {message.get('ackId', 'unknown')}: {e}"
-                        )
+                    )
                     # NACK the message so it can be retried
                     self.nack_message(message["ackId"])
 
@@ -75,11 +75,7 @@ class MailerGcpQueueProcessor(MessageTargetMixin):
     def ack_message(self, ack_id):
         """Acknowledge a specific message by its ack_id"""
         return self.client.execute_command(
-            "acknowledge",
-            {
-                "subscription": self.subscription,
-                "body": {"ackIds": [ack_id]}
-            }
+            "acknowledge", {"subscription": self.subscription, "body": {"ackIds": [ack_id]}}
         )
 
     def nack_message(self, ack_id):
@@ -88,8 +84,8 @@ class MailerGcpQueueProcessor(MessageTargetMixin):
             "modifyAckDeadline",
             {
                 "subscription": self.subscription,
-                "body": {"ackIds": [ack_id], "ackDeadlineSeconds": 0}
-            }
+                "body": {"ackIds": [ack_id], "ackDeadlineSeconds": 0},
+            },
         )
 
     def ack_messages(self, discard_datetime):
