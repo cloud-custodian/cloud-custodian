@@ -79,9 +79,6 @@ RUN mkdir /output
 ADD tools/c7n_mailer /src/tools/c7n_mailer
 RUN uv sync --frozen --all-extras --package c7n_mailer
 
-# Find where uv installed the c7n-mailer executable
-RUN find /src -name "c7n-mailer" -type f -executable
-
 FROM ubuntu:24.04
 
 LABEL name="mailer" \
@@ -101,14 +98,6 @@ COPY --from=build-env /src /src
 COPY --from=build-env /usr/local /usr/local
 COPY --from=build-env /output /output
 
-# Find and copy the c7n-mailer executable to /usr/local/bin
-RUN find /src -name "c7n-mailer" -type f -executable -exec cp {} /usr/local/bin/ \; || \
-    find /src -path "*/bin/c7n-mailer" -type f -executable -exec cp {} /usr/local/bin/ \; || \
-    find /src -path "*/Scripts/c7n-mailer" -type f -executable -exec cp {} /usr/local/bin/ \; || \
-    echo "c7n-mailer executable not found in expected locations"
-
-# Make sure the executable is in PATH and has correct permissions
-RUN chmod +x /usr/local/bin/c7n-mailer || echo "c7n-mailer not found in /usr/local/bin"
 
 RUN adduser --disabled-login --gecos "" custodian
 USER custodian

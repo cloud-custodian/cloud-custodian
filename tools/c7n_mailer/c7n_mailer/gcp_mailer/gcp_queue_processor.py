@@ -44,7 +44,9 @@ class MailerGcpQueueProcessor(MessageTargetMixin):
                     # ACK this specific message after successful processing
                     self.ack_message(message["ackId"])
                 except Exception as e:
-                    self.logger.error(f"Failed to process message {message.get('ackId', 'unknown')}: {e}")
+                    self.logger.error(
+                        f"Failed to process message {message.get('ackId', 'unknown')}: {e}"
+                        )
                     # NACK the message so it can be retried
                     self.nack_message(message["ackId"])
 
@@ -73,9 +75,9 @@ class MailerGcpQueueProcessor(MessageTargetMixin):
     def ack_message(self, ack_id):
         """Acknowledge a specific message by its ack_id"""
         return self.client.execute_command(
-            "acknowledge", 
+            "acknowledge",
             {
-                "subscription": self.subscription, 
+                "subscription": self.subscription,
                 "body": {"ackIds": [ack_id]}
             }
         )
