@@ -1,0 +1,192 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Storage/storageAccounts?api-version=2024-01-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-original-request-ids": [
+                        "54eaf5b9-6c4d-44f9-8b26-3c868fb00687"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-length": [
+                        "1908"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Wed, 18 Jun 2025 12:10:49 GMT"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 68FEB6805B464941A5F295263CC60D64 Ref B: CPH011050218034 Ref C: 2025-06-18T12:10:50Z"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "identity": {
+                                    "type": "None"
+                                },
+                                "sku": {
+                                    "name": "Standard_GRS",
+                                    "tier": "Standard"
+                                },
+                                "kind": "StorageV2",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/example-resources/providers/Microsoft.Storage/storageAccounts/storagefasdfhad2323",
+                                "name": "storagefasdfhad2323",
+                                "type": "Microsoft.Storage/storageAccounts",
+                                "location": "westeurope",
+                                "tags": {
+                                    "environment": "staging"
+                                },
+                                "properties": {
+                                    "dnsEndpointType": "Standard",
+                                    "defaultToOAuthAuthentication": false,
+                                    "publicNetworkAccess": "Enabled",
+                                    "keyCreationTime": {
+                                        "key1": "2025-06-18T09:25:59.4408336Z",
+                                        "key2": "2025-06-18T09:25:59.4408336Z"
+                                    },
+                                    "allowCrossTenantReplication": false,
+                                    "privateEndpointConnections": [],
+                                    "isNfsV3Enabled": false,
+                                    "isLocalUserEnabled": true,
+                                    "isSftpEnabled": false,
+                                    "minimumTlsVersion": "TLS1_2",
+                                    "allowBlobPublicAccess": true,
+                                    "allowSharedKeyAccess": true,
+                                    "isHnsEnabled": false,
+                                    "networkAcls": {
+                                        "ipv6Rules": [],
+                                        "resourceAccessRules": [],
+                                        "bypass": "AzureServices",
+                                        "virtualNetworkRules": [],
+                                        "ipRules": [],
+                                        "defaultAction": "Allow"
+                                    },
+                                    "supportsHttpsTrafficOnly": true,
+                                    "encryption": {
+                                        "services": {
+                                            "file": {
+                                                "keyType": "Account",
+                                                "enabled": true,
+                                                "lastEnabledTime": "2025-06-18T09:25:59.4564604Z"
+                                            },
+                                            "blob": {
+                                                "keyType": "Account",
+                                                "enabled": true,
+                                                "lastEnabledTime": "2025-06-18T09:25:59.4564604Z"
+                                            }
+                                        },
+                                        "keySource": "Microsoft.Storage"
+                                    },
+                                    "accessTier": "Hot",
+                                    "provisioningState": "Succeeded",
+                                    "creationTime": "2025-06-18T09:25:59.2845851Z",
+                                    "primaryEndpoints": {
+                                        "dfs": "https://storagefasdfhad2323.dfs.core.windows.net/",
+                                        "web": "https://storagefasdfhad2323.z6.web.core.windows.net/",
+                                        "blob": "https://storagefasdfhad2323.blob.core.windows.net/",
+                                        "queue": "https://storagefasdfhad2323.queue.core.windows.net/",
+                                        "table": "https://storagefasdfhad2323.table.core.windows.net/",
+                                        "file": "https://storagefasdfhad2323.file.core.windows.net/"
+                                    },
+                                    "primaryLocation": "westeurope",
+                                    "statusOfPrimary": "available",
+                                    "secondaryLocation": "northeurope",
+                                    "statusOfSecondary": "available"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/example-resources/providers/Microsoft.Storage/storageAccounts/storagefasdfhad2323/fileServices?api-version=2024-01-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-length": [
+                        "439"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-operation-identifier": [
+                        "tenantId=7a2f64e5-cac1-4ea1-abab-c7fdb6a799b8,objectId=b95cc733-b44c-43e8-a2b8-ad5bf922f668/northeurope/99e0ed7e-4993-4fa6-8e6e-a69024f82b14"
+                    ],
+                    "content-type": [
+                        "application/json"
+                    ],
+                    "date": [
+                        "Wed, 18 Jun 2025 12:10:50 GMT"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 73F24A570411422191B01B7B4BECD13F Ref B: CPH011050218034 Ref C: 2025-06-18T12:10:50Z"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "sku": {
+                                    "name": "Standard_GRS",
+                                    "tier": "Standard"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/example-resources/providers/Microsoft.Storage/storageAccounts/storagefasdfhad2323/fileServices/default",
+                                "name": "default",
+                                "type": "Microsoft.Storage/storageAccounts/fileServices",
+                                "properties": {
+                                    "protocolSettings": {
+                                        "smb": {}
+                                    },
+                                    "cors": {
+                                        "corsRules": []
+                                    },
+                                    "shareDeleteRetentionPolicy": {
+                                        "enabled": true,
+                                        "days": 7
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}
