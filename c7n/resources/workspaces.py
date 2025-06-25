@@ -259,6 +259,8 @@ class WorkspaceDirectory(QueryResourceManager):
         id = 'DirectoryId'
         name = 'DirectoryName'
         universal_taggable = True
+        filter_name = 'DirectoryIds'
+        filter_type = 'list'
 
     augment = universal_augment
 

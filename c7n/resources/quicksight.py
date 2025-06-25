@@ -3,10 +3,10 @@
 from botocore.exceptions import ClientError
 
 from c7n import query
-from c7n.actions import ActionRegistry
+from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import FilterRegistry
 from c7n.manager import resources, ResourceManager
-from c7n.utils import local_session, get_retry
+from c7n.utils import local_session, get_retry, type_schema
 
 
 class DescribeQuicksight(query.DescribeSource):
@@ -32,6 +32,25 @@ class QuicksightUser(query.QueryResourceManager):
     source_mapping = {
         "describe": DescribeQuicksight,
     }
+
+
+@QuicksightUser.action_registry.register('delete')
+class DeleteUserAction(BaseAction):
+    schema = type_schema('delete',)
+    permissions = ('quicksight:DeleteUser',)
+
+    def process(self, resources):
+        session = local_session(self.manager.session_factory)
+        client = session.client(self.manager.resource_type.service)
+        account_id = self.manager.config.account_id
+        for r in resources:
+            self.manager.retry(
+                client.delete_user,
+                AwsAccountId=account_id,
+                Namespace='default',
+                UserName=r['UserName'],
+                ignore_err_codes=('ResourceNotFoundException',)
+            )
 
 
 @resources.register("quicksight-group")
