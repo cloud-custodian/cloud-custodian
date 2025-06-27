@@ -171,7 +171,9 @@ class GcpTest(unittest.TestCase):
     @patch.object(MailerGcpQueueProcessor, "receive_messages")
     @patch.object(MailerGcpQueueProcessor, "nack_message")
     @patch("common.logger.error")
-    def test_run_handles_process_message_failure(self, mock_logger_error, mock_nack_message, mock_receive):
+    def test_run_handles_process_message_failure(
+        self, mock_logger_error, mock_nack_message, mock_receive
+    ):
         # Simulate one message to process
         mock_receive.side_effect = [
             self._pull_messages(1),
