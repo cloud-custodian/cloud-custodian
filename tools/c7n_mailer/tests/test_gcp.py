@@ -167,3 +167,19 @@ class GcpTest(unittest.TestCase):
         processor.run()
         mock_process_message.assert_called()
         mock_ack_message.assert_called()
+
+    @patch.object(MailerGcpQueueProcessor, "receive_messages")
+    @patch.object(MailerGcpQueueProcessor, "nack_message")
+    @patch("common.logger.error")
+    def test_run_handles_process_message_failure(self, mock_logger_error, mock_nack_message, mock_receive):
+        # Simulate one message to process
+        mock_receive.side_effect = [
+            self._pull_messages(1),
+            self._pull_messages(0),
+        ]
+        processor = MailerGcpQueueProcessor(MAILER_CONFIG_GCP, logger)
+        # Patch process_message to raise an exception
+        with patch.object(processor, "process_message", side_effect=Exception("fail")):
+            processor.run()
+        mock_logger_error.assert_called()
+        mock_nack_message.assert_called_with("")
