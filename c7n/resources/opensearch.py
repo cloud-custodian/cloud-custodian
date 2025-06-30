@@ -1,12 +1,13 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+from c7n.actions import BaseAction
+from c7n.filters import ValueFilter
+from c7n.filters.kms import KmsRelatedFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
-from c7n.utils import local_session, type_schema
-from c7n.actions import BaseAction
-from c7n.filters.kms import KmsRelatedFilter
+from c7n.utils import local_session, type_schema, yaml_load
 
 
 @resources.register('opensearch-serverless')
@@ -155,6 +156,46 @@ class OpensearchIngestion(QueryResourceManager):
 @OpensearchIngestion.filter_registry.register('kms-key')
 class OpensearchIngestionKmsFilter(KmsRelatedFilter):
     RelatedIdsExpression = 'EncryptionAtRestOptions.KmsKeyArn'
+
+
+@OpensearchIngestion.filter_registry.register('pipeline-config')
+class OpensearchIngestionPipelineConfigFilter(ValueFilter):
+    """Filter OpenSearch Ingestion Pipelines by their PipelineConfiguration
+    :example:
+    .. code-block:: yaml
+        policies:
+          - name: osis-persistent-buffer-disabled
+            resource: opensearch-ingestion
+            filters:
+              - type: pipeline-config
+                key: '{pipeline_name}'.source
+                op: in
+                value: ['http', 'otel']
+              - type: value
+                key: BufferOptions.PersistentBufferEnabled
+                op: ne
+                value: True
+    """
+    annotation_key = 'c7n:PipelineConfiguration'
+    schema = type_schema(
+        'pipeline-config',
+        rinherit=ValueFilter.schema,
+    )
+    permissions = ('osis:ListPipelines',)
+
+    def process(self, resources, event=None):
+        # var_fmt = VarFormat()
+        # updated = format_string_values(
+        #     self.data.filter.key, formatter=var_fmt.format, **{'pipeline_name': '{PipelineName}'})
+
+        # # Update ourselves in place
+        # self.data = updated
+        matched = []
+        for r in resources:
+            r[self.annotation_key] = yaml_load(r.get('PipelineConfiguration', '{}'))
+            if self.match(r[self.annotation_key]):
+                matched.append(r)
+        return matched
 
 
 @OpensearchIngestion.action_registry.register('tag')
