@@ -1307,8 +1307,6 @@ class Policy:
             'target_bucket_name': '{target_bucket_name}',
             'target_prefix': '{target_prefix}',
             'LoadBalancerName': '{LoadBalancerName}',
-            # osis pipeline config parsing
-            'pipeline_name': '{PipelineName}'
         })
         return variables
 

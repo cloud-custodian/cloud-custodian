@@ -160,21 +160,27 @@ class OpensearchIngestionKmsFilter(KmsRelatedFilter):
 
 @OpensearchIngestion.filter_registry.register('pipeline-config')
 class OpensearchIngestionPipelineConfigFilter(ValueFilter):
-    """Filter OpenSearch Ingestion Pipelines by their PipelineConfiguration
+    """Filter OpenSearch Ingestion Pipelines by their PipelineConfiguration.  The '{pipeline_name}'
+    variable substition can be used in the filter key.
+
     :example:
     .. code-block:: yaml
         policies:
           - name: osis-persistent-buffer-disabled
             resource: opensearch-ingestion
             filters:
+            - or:
               - type: pipeline-config
-                key: '{pipeline_name}'.source
-                op: in
-                value: ['http', 'otel']
+                key: '{pipeline_name}'.source.http
+                value: not-null
               - type: value
-                key: BufferOptions.PersistentBufferEnabled
-                op: ne
-                value: True
+              - type: pipeline-config
+                key: '{pipeline_name}'.source.otel
+                value: not-null
+            - type: value
+              key: BufferOptions.PersistentBufferEnabled
+              op: ne
+              value: True
     """
     annotation_key = 'c7n:PipelineConfiguration'
     schema = type_schema(
@@ -183,18 +189,23 @@ class OpensearchIngestionPipelineConfigFilter(ValueFilter):
     )
     permissions = ('osis:ListPipelines',)
 
-    def process(self, resources, event=None):
-        # var_fmt = VarFormat()
-        # updated = format_string_values(
-        #     self.data.filter.key, formatter=var_fmt.format, **{'pipeline_name': '{PipelineName}'})
+    def get_pipeline_name_key(self, pipeline_config):
+        """Extract the pipeline name key from the PipelineConfigurationBody because it may not be
+        the same as the PipelineName"""
+        for key in pipeline_config:
+            if isinstance(pipeline_config[key], dict) and "source" in pipeline_config[key].keys():
+                return key
 
-        # # Update ourselves in place
-        # self.data = updated
+    def process(self, resources, event=None):
         matched = []
+        filter_key = self.data['key'][:]
         for r in resources:
-            r[self.annotation_key] = yaml_load(r.get('PipelineConfiguration', '{}'))
+            r[self.annotation_key] = yaml_load(r.get('PipelineConfigurationBody', '{}'))
+            pipeline_name = self.get_pipeline_name_key(r[self.annotation_key])
+            self.data['key'] = filter_key.format(pipeline_name=pipeline_name)
             if self.match(r[self.annotation_key]):
                 matched.append(r)
+            self.data['key'] = filter_key
         return matched
 
 
