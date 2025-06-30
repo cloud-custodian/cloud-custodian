@@ -169,17 +169,17 @@ class OpensearchIngestionPipelineConfigFilter(ValueFilter):
           - name: osis-persistent-buffer-disabled
             resource: opensearch-ingestion
             filters:
-            - or:
-              - type: pipeline-config
-                key: '{pipeline_name}'.source.http
-                value: not-null
-              - type: pipeline-config
-                key: '{pipeline_name}'.source.otel
-                value: not-null
-            - type: value
-              key: BufferOptions.PersistentBufferEnabled
-              op: ne
-              value: True
+              - or:
+                - type: pipeline-config
+                  key: '{pipeline_name}'.source.http
+                  value: not-null
+                - type: pipeline-config
+                  key: '{pipeline_name}'.source.otel
+                  value: not-null
+              - type: value
+                key: BufferOptions.PersistentBufferEnabled
+                op: ne
+                value: True
     """
     annotation_key = 'c7n:PipelineConfiguration'
     schema = type_schema(
