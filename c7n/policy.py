@@ -1306,7 +1306,7 @@ class Policy:
             'source_bucket_region': '{source_bucket_region}',
             'target_bucket_name': '{target_bucket_name}',
             'target_prefix': '{target_prefix}',
-            'LoadBalancerName': '{LoadBalancerName}',
+            'LoadBalancerName': '{LoadBalancerName}'
         })
         return variables
 
