@@ -200,7 +200,8 @@ class OpensearchIngestionPipelineConfigFilter(ValueFilter):
         matched = []
         filter_key = self.data['key'][:]
         for r in resources:
-            r[self.annotation_key] = yaml_load(r.get('PipelineConfigurationBody', '{}'))
+            if self.annotation_key not in r:
+                r[self.annotation_key] = yaml_load(r.get('PipelineConfigurationBody', '{}'))
             pipeline_name = self.get_pipeline_name_key(r[self.annotation_key])
             self.data['key'] = filter_key.format(pipeline_name=pipeline_name)
             if self.match(r[self.annotation_key]):
