@@ -173,7 +173,6 @@ class OpensearchIngestionPipelineConfigFilter(ValueFilter):
               - type: pipeline-config
                 key: '{pipeline_name}'.source.http
                 value: not-null
-              - type: value
               - type: pipeline-config
                 key: '{pipeline_name}'.source.otel
                 value: not-null
