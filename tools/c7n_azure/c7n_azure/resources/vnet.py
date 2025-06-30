@@ -68,7 +68,7 @@ class Subnet(ChildArmResourceManager):
             'location',
             'resourceGroup',
             'properties.addressPrefix',
-            'properties.networkSecurityGroup.id'
+            'properties.networkSecurityGroup.id',
         )
         parent_manager_name = 'vnet'
 
@@ -78,8 +78,10 @@ class Subnet(ChildArmResourceManager):
             # Currently, we can retrieve subnets from parent's JSON. They
             # can also be retrieved from API, but its response has no
             # additional attributes
-            return {'resource_group_name': parent_resource['resourceGroup'],
-                    'virtual_network_name': parent_resource['name']}
+            return {
+                'resource_group_name': parent_resource['resourceGroup'],
+                'virtual_network_name': parent_resource['name'],
+            }
 
     def enumerate_resources(self, parent_resource, type_info, vault_url=None, **params):
         return parent_resource['properties'].get('subnets') or []

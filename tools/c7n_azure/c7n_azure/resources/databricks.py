@@ -34,12 +34,7 @@ class Databricks(ArmResourceManager):
         service = 'azure.mgmt.databricks'
         client = 'DatabricksClient'
         enum_spec = ('workspaces', 'list_by_subscription', None)
-        default_report_fields = (
-            'name',
-            'location',
-            'resourceGroup',
-            'sku.name'
-        )
+        default_report_fields = ('name', 'location', 'resourceGroup', 'sku.name')
         resource_type = 'Microsoft.Databricks/workspaces'
 
 
@@ -49,6 +44,7 @@ class DatabricksNSGFilter(ValueFilter):
     Databricks Vnet filter. Allows to filter Databricks resources based on their associated
     Virtual Network.
     """
+
     schema = type_schema('vnet', rinherit=ValueFilter.schema)
     annotation_key = 'c7n:Vnet'
     FetchThreshold = 5
@@ -61,7 +57,9 @@ class DatabricksNSGFilter(ValueFilter):
         for r in resources:
             if self.annotation_key in r:
                 continue
-            vid = r['properties'].get('parameters',{}).get('customVirtualNetworkId', {}).get('value')
+            vid = (
+                r['properties'].get('parameters', {}).get('customVirtualNetworkId', {}).get('value')
+            )
             if vid:
                 ids.add(vid)
         if not ids:
@@ -76,7 +74,9 @@ class DatabricksNSGFilter(ValueFilter):
         for r in resources:
             if self.annotation_key in r:
                 continue
-            vid = r['properties'].get('parameters',{}).get('customVirtualNetworkId', {}).get('value')
+            vid = (
+                r['properties'].get('parameters', {}).get('customVirtualNetworkId', {}).get('value')
+            )
             if vid and vid in mapping:
                 r[self.annotation_key] = mapping[vid]
             else:
@@ -94,7 +94,7 @@ class DatabricksSubnetsFilter(ListItemFilter):
         "subnets",
         attrs={"$ref": "#/definitions/filters_common/list_item_attrs"},
         count={"type": "number"},
-        count_op={"$ref": "#/definitions/filters_common/comparison_operators"}
+        count_op={"$ref": "#/definitions/filters_common/comparison_operators"},
     )
     annotation_key = "c7n:Subnets"
     FetchThreshold = 5
@@ -110,10 +110,17 @@ class DatabricksSubnetsFilter(ListItemFilter):
         for r in resources:
             if self.annotation_key in r:
                 continue
-            pub = r['properties'].get('parameters', {}).get('customPublicSubnetName', {}).get('value')
+            pub = (
+                r['properties'].get('parameters', {}).get('customPublicSubnetName', {}).get('value')
+            )
             if pub:
                 names.add(pub)
-            pr = r['properties'].get('parameters', {}).get('customPrivateSubnetName', {}).get('value')
+            pr = (
+                r['properties']
+                .get('parameters', {})
+                .get('customPrivateSubnetName', {})
+                .get('value')
+            )
             if pr:
                 names.add(pr)
         if not names:
@@ -123,12 +130,21 @@ class DatabricksSubnetsFilter(ListItemFilter):
         # TODO: use get_resources when number of names is small. For that we need to
         #  build ID from name; maybe add some generic function that tries its best
         #  to build valid resource id from name given resource type
-        mapping = {subnet['name']: subnet for subnet in subnets.resources() if subnet['name'] in names}
+        mapping = {
+            subnet['name']: subnet for subnet in subnets.resources() if subnet['name'] in names
+        }
         for r in resources:
             if self.annotation_key in r:
                 continue
-            pub = r['properties'].get('parameters', {}).get('customPublicSubnetName', {}).get('value')
-            pr = r['properties'].get('parameters', {}).get('customPrivateSubnetName', {}).get('value')
+            pub = (
+                r['properties'].get('parameters', {}).get('customPublicSubnetName', {}).get('value')
+            )
+            pr = (
+                r['properties']
+                .get('parameters', {})
+                .get('customPrivateSubnetName', {})
+                .get('value')
+            )
             s = []
             if pub and pub in mapping:
                 s.append(mapping[pub])
