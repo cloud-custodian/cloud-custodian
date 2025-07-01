@@ -207,7 +207,6 @@ class OpensearchIngestionPipelineConfigFilter(ValueFilter):
         matched = []
         for r in resources:
             self.augment(r)
-            # import pdb; pdb.set_trace()
             if self.match(r[self.annotation_key]):
                 matched.append(r)
         return matched
