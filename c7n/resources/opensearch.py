@@ -164,7 +164,9 @@ class OpensearchIngestionPipelineConfigFilter(ValueFilter):
     variable substition can be used in the filter key.
 
     :example:
+
     .. code-block:: yaml
+
         policies:
           - name: osis-persistent-buffer-disabled
             resource: opensearch-ingestion
