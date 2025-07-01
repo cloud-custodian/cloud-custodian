@@ -173,10 +173,10 @@ class OpensearchIngestionPipelineConfigFilter(ValueFilter):
             filters:
               - or:
                 - type: pipeline-config
-                  key: '{pipeline_name}'.source.http
+                  key: "'{pipeline_name}'.source.http"
                   value: not-null
                 - type: pipeline-config
-                  key: '{pipeline_name}'.source.otel
+                  key: "'{pipeline_name}'.source.otel"
                   value: not-null
               - type: value
                 key: BufferOptions.PersistentBufferEnabled
