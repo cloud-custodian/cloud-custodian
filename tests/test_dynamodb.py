@@ -443,6 +443,20 @@ class DynamodbTest(BaseTest):
         self.assertTrue(stream_field)
         self.assertEqual("NEW_IMAGE", stream_type)
 
+    def test_dynamodb_autoscaling(self):
+        factory = self.replay_flight_data("test_dynamodb_autoscaling")
+        p = self.load_policy(
+            {
+                "name": "dynamodb-autoscaling",
+                "resource": "dynamodb-table",
+                "filters": [{"type": "autoscaling", "attrs": []}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+        self.assertEqual('328_dynamodb_table_green', resources[0]['TableName'])
+
 
 class DynamoDbAccelerator(BaseTest):
 
