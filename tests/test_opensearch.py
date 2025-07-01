@@ -172,12 +172,12 @@ class OpensearchIngestion(BaseTest):
                 'filters': [
                     {
                         'type': 'pipeline-config',
-                        'key': '"{pipeline_name}".source.opensearch',
+                        'key': 'pipeline.source.opensearch',
                         'value': 'not-null',
                     },
                     {
                         'type': 'pipeline-config',
-                        'key': '"{pipeline_name}".sink[].opensearch',
+                        'key': 'pipeline.sink[].opensearch',
                         'value': 'not-null',
                     }
                 ]

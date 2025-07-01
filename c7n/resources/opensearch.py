@@ -160,8 +160,9 @@ class OpensearchIngestionKmsFilter(KmsRelatedFilter):
 
 @OpensearchIngestion.filter_registry.register('pipeline-config')
 class OpensearchIngestionPipelineConfigFilter(ValueFilter):
-    """Filter OpenSearch Ingestion Pipelines by their PipelineConfiguration.  The '{pipeline_name}'
-    variable substition can be used in the filter key.
+    """Filter OpenSearch Ingestion Pipelines by their PipelineConfiguration.
+    Custodian substitutes the pipeline name key in the PipelineConfigurationBody with
+    'pipeline' so that its sub-fields can be referenced in the filter.
 
     :example:
 
@@ -173,10 +174,10 @@ class OpensearchIngestionPipelineConfigFilter(ValueFilter):
             filters:
               - or:
                 - type: pipeline-config
-                  key: "'{pipeline_name}'.source.http"
+                  key: pipeline.source.http
                   value: not-null
                 - type: pipeline-config
-                  key: "'{pipeline_name}'.source.otel"
+                  key: pipeline.source.otel
                   value: not-null
               - type: value
                 key: BufferOptions.PersistentBufferEnabled
@@ -189,25 +190,26 @@ class OpensearchIngestionPipelineConfigFilter(ValueFilter):
         rinherit=ValueFilter.schema,
     )
     permissions = ('osis:ListPipelines',)
+    pipeline_name_key_substitute = "pipeline"
 
-    def get_pipeline_name_key(self, pipeline_config):
-        """Extract the pipeline name key from the PipelineConfigurationBody because it may not be
-        the same as the PipelineName"""
-        for key in pipeline_config:
+    def substitute_pipeline_name_key(self, pipeline_config):
+        for key in list(pipeline_config.keys()):
             if isinstance(pipeline_config[key], dict) and "source" in pipeline_config[key].keys():
-                return key
+                pipeline_config[self.pipeline_name_key_substitute] = pipeline_config.pop(key)
+                continue
+
+    def augment(self, r):
+        if self.annotation_key not in r:
+            r[self.annotation_key] = yaml_load(r.get('PipelineConfigurationBody', '{}'))
+            self.substitute_pipeline_name_key(r[self.annotation_key])
 
     def process(self, resources, event=None):
         matched = []
-        filter_key = self.data['key'][:]
         for r in resources:
-            if self.annotation_key not in r:
-                r[self.annotation_key] = yaml_load(r.get('PipelineConfigurationBody', '{}'))
-            pipeline_name = self.get_pipeline_name_key(r[self.annotation_key])
-            self.data['key'] = filter_key.format(pipeline_name=pipeline_name)
+            self.augment(r)
+            # import pdb; pdb.set_trace()
             if self.match(r[self.annotation_key]):
                 matched.append(r)
-            self.data['key'] = filter_key
         return matched
 
 
