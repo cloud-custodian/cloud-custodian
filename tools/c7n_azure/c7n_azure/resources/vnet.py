@@ -42,7 +42,8 @@ class Subnet(ChildArmResourceManager):
 
     :example:
 
-    This policy will find all Subnets that do not have a Network Security Group associated with them.
+    This policy will find all Subnets that do not have a Network Security
+    Group associated with them.
 
     .. code-block:: yaml
 
