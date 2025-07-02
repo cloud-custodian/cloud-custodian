@@ -1,0 +1,71 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Pipeline": {
+            "PipelineName": "c7n-test",
+            "PipelineArn": "arn:aws:osis:us-east-1:123456789012:pipeline/c7n-test",
+            "MinUnits": 2,
+            "MaxUnits": 4,
+            "Status": "ACTIVE",
+            "StatusReason": {
+                "Description": "WARN: There is no \"available\" VPC endpoint associated with this pipeline. You must configure an interface vpc endpoint to ingest data."
+            },
+            "PipelineConfigurationBody": "{\n  \"version\": 2,\n  \"extension\": {\n    \"osis_configuration_metadata\": {\n      \"builder_type\": \"visual\"\n    }\n  },\n  \"aos-c8d1f5\": {\n    \"source\": {\n      \"opensearch\": {\n        \"acknowledgments\": true,\n        \"hosts\": [\n          \"https://vpc-c7n-test-ug4l2nqtnwwrktaeagxsqso27u.us-east-1.es.amazonaws.com\"\n        ],\n        \"aws\": {\n          \"serverless\": false,\n          \"region\": \"us-east-1\"\n        },\n        \"search_options\": {\n          \"batch_size\": 1000\n        }\n      }\n    },\n    \"processor\": [],\n    \"sink\": [\n      {\n        \"opensearch\": {\n          \"hosts\": [\n            \"https://vpc-c7n-test-ug4l2nqtnwwrktaeagxsqso27u.us-east-1.es.amazonaws.com\"\n          ],\n          \"aws\": {\n            \"serverless\": false,\n            \"region\": \"us-east-1\"\n          },\n          \"index_type\": \"custom\",\n          \"index\": \"${getMetadata(\\\"opensearch-index\\\")}\",\n          \"document_id\": \"${getMetadata(\\\"opensearch-document_id\\\")}\"\n        }\n      }\n    ]\n  }\n}",
+            "CreatedAt": {
+                "__class__": "datetime",
+                "year": 2025,
+                "month": 6,
+                "day": 30,
+                "hour": 15,
+                "minute": 3,
+                "second": 40,
+                "microsecond": 0
+            },
+            "LastUpdatedAt": {
+                "__class__": "datetime",
+                "year": 2025,
+                "month": 6,
+                "day": 30,
+                "hour": 15,
+                "minute": 3,
+                "second": 40,
+                "microsecond": 0
+            },
+            "IngestEndpointUrls": [
+                "c7n-test-oxilhb42xb6l5avsb22t2tx2b4.us-east-1.osis.amazonaws.com"
+            ],
+            "LogPublishingOptions": {
+                "IsLoggingEnabled": true,
+                "CloudWatchLogDestination": {
+                    "LogGroup": "/aws/vendedlogs/OpenSearchIngestion/c7n-test/audit-logs"
+                }
+            },
+            "VpcEndpoints": [
+                {
+                    "VpcId": "vpc-d2d616b5",
+                    "VpcOptions": {
+                        "SubnetIds": [
+                            "subnet-914763e7"
+                        ],
+                        "SecurityGroupIds": [
+                            "sg-03e74ddc0c08167cb"
+                        ],
+                        "VpcAttachmentOptions": {
+                            "AttachToVpc": false
+                        },
+                        "VpcEndpointManagement": "CUSTOMER"
+                    }
+                }
+            ],
+            "VpcEndpointService": "com.amazonaws.osis.us-east-1.c7n-test-oxilhb42xb6l5avsb22t2tx2b4",
+            "Destinations": [
+                {
+                    "ServiceName": "OpenSearch",
+                    "Endpoint": "https://vpc-c7n-test-ug4l2nqtnwwrktaeagxsqso27u.us-east-1.es.amazonaws.com"
+                }
+            ],
+            "Tags": []
+        }
+    }
+}
