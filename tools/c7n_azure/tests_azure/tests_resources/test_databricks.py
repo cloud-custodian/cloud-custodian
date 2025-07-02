@@ -62,7 +62,7 @@ class DatabricksVnetFilterTest(BaseTest):
 
 
 class DatabricksSubnetsFilterTest(BaseTest):
-    def test_databricks_vnet_filter_schema_prefix(self):
+    def test_databricks_subnet_filter_schema_prefix(self):
         p = self.load_policy(
             {
                 'name': 'test-azure-databricks-vnet-filter',
