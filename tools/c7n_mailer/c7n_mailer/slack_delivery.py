@@ -128,9 +128,6 @@ class SlackDelivery:
                     if is_email(resolved_addr):
                         ims = self.retrieve_user_im([resolved_addr])
                         slack_target = ims.get(resolved_addr)
-                        if not slack_target:
-                            self.logger.debug(f"Could not resolve IM for email {resolved_addr}")
-                            continue
                     elif not resolved_addr.startswith("#"):
                         resolved_addr = "#" + resolved_addr
                         slack_target = resolved_addr
