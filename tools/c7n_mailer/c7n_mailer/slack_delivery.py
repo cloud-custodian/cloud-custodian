@@ -144,7 +144,10 @@ class SlackDelivery:
                         "slack_default",
                         self.config["templates_folders"],
                     )
-                    self.logger.debug(f"Generating message for tag value '{tag_value}' with {len(resources)} resources.")
+                    self.logger.debug(
+                        f"Generating message for tag value '{tag_value}' "
+                        f"with {len(resources)} resources."
+                    )
         return slack_messages
 
     def slack_handler(self, sqs_message, slack_messages):
