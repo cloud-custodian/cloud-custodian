@@ -119,7 +119,7 @@ class SlackDelivery:
                         tagged_resources[tag_value].append(r)
 
                 if not tagged_resources:
-                    self.logger.debug(f"No resources with tag '{tag_name}' found.")
+                    self.logger.debug("No %s tag found in resource." % tag_name)
                     continue
 
                 for tag_value, resources in tagged_resources.items():
@@ -144,10 +144,7 @@ class SlackDelivery:
                         "slack_default",
                         self.config["templates_folders"],
                     )
-                    self.logger.debug(
-                        f"Generating message for tag value '{tag_value}' "
-                        f"with {len(resources)} resources."
-                    )
+                    self.logger.debug("Generating message for specified Slack channel.")
         return slack_messages
 
     def slack_handler(self, sqs_message, slack_messages):
