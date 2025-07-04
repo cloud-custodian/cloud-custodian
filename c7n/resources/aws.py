@@ -730,7 +730,8 @@ class S3Output(BlobOutput):
             path, self.bucket, key,
             extra_args={
                 'ACL': 'bucket-owner-full-control',
-                'ServerSideEncryption': 'AES256'})
+                'ServerSideEncryption': 'AES256',
+                'ContentEncoding': 'gzip'})
 
 
 @clouds.register('aws')
