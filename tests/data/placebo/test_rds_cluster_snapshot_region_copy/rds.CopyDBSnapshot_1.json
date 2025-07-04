@@ -1,0 +1,45 @@
+{
+    "status_code": 200, 
+    "data": {
+        "DBSnapshot": {
+            "Engine": "postgres", 
+            "Status": "pending", 
+            "SourceRegion": "us-east-1", 
+            "MasterUsername": "muttuser", 
+            "Encrypted": true, 
+            "LicenseModel": "postgresql-license", 
+            "StorageType": "gp2", 
+            "KmsKeyId": "arn:aws:kms:us-east-2:644160558196:key/cb291f53-f3ab-4e64-843e-47b0a7c9cf61", 
+            "PercentProgress": 0, 
+            "SourceDBSnapshotIdentifier": "arn:aws:rds:us-east-1:644160558196:snapshot:rds:originb-2016-12-28-09-15", 
+            "DBSnapshotIdentifier": "rds-originb-2016-12-28-09-15", 
+            "InstanceCreateTime": {
+                "hour": 8, 
+                "__class__": "datetime", 
+                "month": 12, 
+                "second": 22, 
+                "microsecond": 858000, 
+                "year": 2016, 
+                "day": 22, 
+                "minute": 45
+            }, 
+            "AllocatedStorage": 5, 
+            "EngineVersion": "9.5.4", 
+            "SnapshotType": "manual", 
+            "DBSnapshotArn": "arn:aws:rds:us-east-2:644160558196:snapshot:rds-originb-2016-12-28-09-15", 
+            "Port": 5432, 
+            "DBInstanceIdentifier": "originb"
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "b97e96f6-ccef-11e6-b9b9-311fc0c8e676", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "b97e96f6-ccef-11e6-b9b9-311fc0c8e676", 
+                "date": "Wed, 28 Dec 2016 11:21:07 GMT", 
+                "content-length": "1412", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}
