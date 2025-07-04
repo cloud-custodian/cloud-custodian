@@ -157,7 +157,7 @@ class S3OutputTest(TestUtils):
             fh.name,
             "cloud-custodian",
             "%s/foo.txt" % output.key_prefix.lstrip('/'),
-            extra_args={"ACL": "bucket-owner-full-control", "ServerSideEncryption": "AES256"},
+            extra_args={"ACL": "bucket-owner-full-control", "ServerSideEncryption": "AES256", "ContentEncoding": "gzip"},
         )
 
     def test_sans_prefix(self):
