@@ -18,7 +18,7 @@ from c7n.exceptions import ClientError, ResourceLimitExceeded, PolicyExecutionEr
 from c7n.filters import FilterRegistry, MetricsFilter
 from c7n.manager import ResourceManager
 from c7n.registry import PluginRegistry
-from c7n.tags import register_ec2_tags, register_universal_tags, universal_augment
+from c7n.tags import register_universal_tags, universal_augment
 from c7n.utils import (
     local_session, generate_arn, get_retry, chunks, camelResource, jmespath_compile, get_path)
 
@@ -196,8 +196,8 @@ class QueryMeta(type):
             if m.service == 'ec2':
                 # Generic ec2 resource tag support
                 if getattr(m, 'taggable', True):
-                    register_ec2_tags(
-                        attrs['filter_registry'], attrs['action_registry'])
+                    register_universal_tags(
+                        attrs['filter_registry'], attrs['action_registry'], True)
             if getattr(m, 'universal_taggable', False):
                 compatibility = isinstance(m.universal_taggable, bool) and True or False
                 register_universal_tags(
