@@ -21,6 +21,14 @@ class TestEC2Report(BaseTest):
             formatter.to_csv([self.records['full']]),
             [['InstanceId-1', '', 'LaunchTime-1']])
 
+    def test_default_csv_azure(self):
+        resource_type = 'azure.machine-learning-workspace'
+        self.patch(resource_type,
+                   'default_report_fields', ())
+        formatter = Formatter(resource_type)
+        csv = formatter.to_csv([self.records['full']])
+        assert csv
+
     def test_csv(self):
         p = self.load_policy({"name": "report-test-ec2", "resource": "ec2"})
         formatter = Formatter(p.resource_manager.resource_type)
