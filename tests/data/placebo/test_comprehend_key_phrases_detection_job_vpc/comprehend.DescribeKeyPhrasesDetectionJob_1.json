@@ -1,0 +1,52 @@
+{
+    "status_code": 200,
+    "data": {
+        "KeyPhrasesDetectionJobProperties": {
+            "JobId": "bbd214d4bf077f77551999636e811e52",
+            "JobArn": "arn:aws:comprehend:us-east-1:644160558196:key-phrases-detection-job/bbd214d4bf077f77551999636e811e52",
+            "JobName": "KeyPhrasesJob",
+            "JobStatus": "FAILED",
+            "Message": "Internal Server Error",
+            "SubmitTime": {
+                "__class__": "datetime",
+                "year": 2025,
+                "month": 7,
+                "day": 8,
+                "hour": 14,
+                "minute": 32,
+                "second": 45,
+                "microsecond": 634000
+            },
+            "EndTime": {
+                "__class__": "datetime",
+                "year": 2025,
+                "month": 7,
+                "day": 8,
+                "hour": 14,
+                "minute": 43,
+                "second": 8,
+                "microsecond": 232000
+            },
+            "InputDataConfig": {
+                "S3Uri": "s3://c7n-test-s3-bucket/product.txt",
+                "InputFormat": "ONE_DOC_PER_LINE"
+            },
+            "OutputDataConfig": {
+                "S3Uri": "s3://c7n-test-s3-bucket/644160558196-KP-bbd214d4bf077f77551999636e811e52/output/output.tar.gz",
+                "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/20a0c3ed-99ff-4b38-92e6-e489628e0bfb"
+            },
+            "LanguageCode": "en",
+            "DataAccessRoleArn": "arn:aws:iam::644160558196:role/ComprehendVpcAccessRole",
+            "VolumeKmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/20a0c3ed-99ff-4b38-92e6-e489628e0bfb",
+            "VpcConfig": {
+                "SecurityGroupIds": [
+                    "sg-0d74b07ab0b3288c0"
+                ],
+                "Subnets": [
+                    "subnet-0ebe9abf587c5070c"
+                ]
+            }
+        },
+        "ResponseMetadata": {}
+    }
+}

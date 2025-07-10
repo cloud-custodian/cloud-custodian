@@ -1,0 +1,8 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResourceArn": "arn:aws:comprehend:us-east-1:644160558196:dominant-language-detection-job/564b8c385b4bd834abaf428b4a79ed8f",
+        "Tags": [],
+        "ResponseMetadata": {}
+    }
+}

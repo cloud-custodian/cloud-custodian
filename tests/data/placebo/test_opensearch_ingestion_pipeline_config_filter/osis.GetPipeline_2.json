@@ -1,0 +1,53 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Pipeline": {
+            "PipelineName": "c7n-test-1",
+            "PipelineArn": "arn:aws:osis:us-east-1:123456789012:pipeline/c7n-test-1",
+            "MinUnits": 2,
+            "MaxUnits": 4,
+            "Status": "ACTIVE",
+            "StatusReason": {
+                "Description": "The pipeline is ready to ingest data."
+            },
+            "PipelineConfigurationBody": "{\n  \"version\": 2,\n  \"extension\": {\n    \"osis_configuration_metadata\": {\n      \"builder_type\": \"visual\"\n    }\n  },\n  \"s3-434ce8\": {\n    \"source\": {\n      \"s3\": {\n        \"acknowledgments\": true,\n        \"delete_s3_objects_on_read\": false,\n        \"scan\": {\n          \"buckets\": [\n            {\n              \"bucket\": {\n                \"name\": \"aws-cloudtrail-logs-123456789012-9be0d6ba-delete-me\"\n              }\n            }\n          ]\n        },\n        \"aws\": {\n          \"region\": \"us-east-1\"\n        },\n        \"codec\": {\n          \"newline\": {}\n        },\n        \"compression\": \"none\",\n        \"workers\": \"1\"\n      }\n    },\n    \"processor\": [\n      {\n        \"grok\": {\n          \"match\": {\n            \"message\": [\n              \"%{ELB_ACCESS_LOG}\"\n            ]\n          }\n        }\n      },\n      {\n        \"delete_entries\": {\n          \"with_keys\": [\n            \"s3\",\n            \"message\"\n          ]\n        }\n      }\n    ],\n    \"sink\": [\n      {\n        \"opensearch\": {\n          \"hosts\": [\n            \"https://vpc-c7n-test-ug4l2nqtnwwrktaeagxsqso27u.us-east-1.es.amazonaws.com\"\n          ],\n          \"aws\": {\n            \"serverless\": false,\n            \"region\": \"us-east-1\"\n          },\n          \"index_type\": \"custom\",\n          \"index\": \"uncompressed_logs\"\n        }\n      }\n    ]\n  }\n}",
+            "CreatedAt": {
+                "__class__": "datetime",
+                "year": 2025,
+                "month": 6,
+                "day": 30,
+                "hour": 16,
+                "minute": 12,
+                "second": 25,
+                "microsecond": 0
+            },
+            "LastUpdatedAt": {
+                "__class__": "datetime",
+                "year": 2025,
+                "month": 6,
+                "day": 30,
+                "hour": 16,
+                "minute": 12,
+                "second": 25,
+                "microsecond": 0
+            },
+            "IngestEndpointUrls": [
+                "c7n-test-1-cmghifkzgsjdtngpnnic5dkevu.us-east-1.osis.amazonaws.com"
+            ],
+            "LogPublishingOptions": {
+                "IsLoggingEnabled": true,
+                "CloudWatchLogDestination": {
+                    "LogGroup": "/aws/vendedlogs/OpenSearchIngestion/c7n-test-1/audit-logs"
+                }
+            },
+            "Destinations": [
+                {
+                    "ServiceName": "OpenSearch",
+                    "Endpoint": "https://vpc-c7n-test-ug4l2nqtnwwrktaeagxsqso27u.us-east-1.es.amazonaws.com"
+                }
+            ],
+            "Tags": []
+        }
+    }
+}
