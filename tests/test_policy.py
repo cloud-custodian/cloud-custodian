@@ -439,7 +439,6 @@ class PolicyMetaLint(BaseTest):
             "AWS::Athena::PreparedStatement",
             "AWS::CustomerProfiles::ObjectType",
             "AWS::EC2::CapacityReservation",
-            "AWS::EC2::ClientVpnEndpoint",
             "AWS::EC2::IPAMScope",
             "AWS::Evidently::Launch",
             "AWS::Forecast::DatasetGroup",

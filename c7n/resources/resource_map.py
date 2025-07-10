@@ -327,6 +327,7 @@ ResourceMap = {
   "aws.vpc": "c7n.resources.vpc.Vpc",
   "aws.vpc-endpoint": "c7n.resources.vpc.VpcEndpoint",
   "aws.vpc-endpoint-service-configuration": "c7n.resources.vpc.VPCEndpointServiceConfiguration",
+  "aws.client-vpn-endpoint": "c7n.resources.vpc.ClientVpnEndpoint",
   "aws.vpn-connection": "c7n.resources.vpc.VPNConnection",
   "aws.vpn-gateway": "c7n.resources.vpc.VPNGateway",
   "aws.waf": "c7n.resources.waf.WAF",

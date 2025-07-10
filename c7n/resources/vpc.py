@@ -2649,6 +2649,22 @@ class VPNGateway(query.QueryResourceManager):
         id_prefix = "vgw-"
 
 
+@resources.register('client-vpn-endpoint')
+class ClientVpnEndpoint(query.QueryResourceManager):
+
+    class resource_type(query.TypeInfo):
+        service = 'ec2'
+        arn_type = 'client-vpn-endpoint'
+        enum_spec = ('describe_client_vpn_endpoints', 'ClientVpnEndpoints', None)
+        name = id = 'ClientVpnEndpointId'
+        filter_name = 'ClientVpnEndpointIds'
+        filter_type = 'list'
+        cfn_type = config_type = 'AWS::EC2::ClientVpnEndpoint'
+        id_prefix = 'cvpn-endpoint-'
+        metrics_namespace = 'AWS/ClientVPN'
+        dimension = 'ClientVpnEndpointId'
+
+
 @resources.register('vpc-endpoint')
 class VpcEndpoint(query.QueryResourceManager):
 
