@@ -13,7 +13,7 @@ echo STAGE_INDEX_URL="https://${CODEARTIFACT_USER}:${CODEARTIFACT_AUTH_TOKEN}@${
 # Note: `aws codeartifact login --tool pip` updates user-level pip settings. As a finer-grained alternative, we can
 # build a PyPI index URL and use it only inside our virtual environment.
 
-python3 -m pip config --site set global.index-url "$CODEARTIFACT_REPOSITORY_URL"
+uv run python -m pip config --site set global.index-url "$CODEARTIFACT_REPOSITORY_URL"
 
 
 cat <<EOF >> $HOME/.pypirc
