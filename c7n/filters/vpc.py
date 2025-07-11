@@ -59,7 +59,7 @@ class SubnetFilter(MatchResourceValidator, RelatedResourceFilter):
          - name: public-ec2
            resource: aws.ec2
            filters:
-             -or:
+             - or:
                - type: subnet
                  igw: True
                  key: SubnetId
