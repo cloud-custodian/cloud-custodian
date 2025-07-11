@@ -58,8 +58,8 @@ jobs:
           PKG_REPO: stagec7n
         run: |
           set -euxo pipefail
-          python tools/dev/staging-clean.py
-          python tools/dev/devpkg.py gen-qa-requires -r . --output wheels-manifest.txt
+          uv run python tools/dev/staging-clean.py
+          uv run python tools/dev/devpkg.py gen-qa-requires -r . --output wheels-manifest.txt
           make pkg-publish-wheel PKG_REPO=${{ env.PKG_REPO }}
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # ratchet:actions/upload-artifact@v4
@@ -106,7 +106,7 @@ jobs:
         shell: bash
         run: |
           set -euxo pipefail
-          pip install -r wheels-manifest.txt  --index-url ${{ env.STAGE_INDEX_URL }} --extra-index-url https://pypi.org/simple/
+          uv pip install -r wheels-manifest.txt  --index-url ${{ env.STAGE_INDEX_URL }} --extra-index-url https://pypi.org/simple/
 
       - name: Smoke Test
         shell: bash

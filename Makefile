@@ -108,7 +108,7 @@ pkg-increment:
 pkg-build-wheel:
 	@$(MAKE) -f $(SELF_MAKE) pkg-clean
 	uv build --all-packages --wheel
-	uv run tools/dev/freezeuvwheel dist uv.lock
+	uv run tools/dev/freezeuvwheel.py dist uv.lock
 	uv run twine check --strict dist/*.whl
 
 pkg-publish-wheel:
