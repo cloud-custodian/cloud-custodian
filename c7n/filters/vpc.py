@@ -156,7 +156,8 @@ class SubnetFilter(MatchResourceValidator, RelatedResourceFilter):
         elif not self.check_nat and not found_nat:
             return True
         return False
-    
+
+
 class VpcFilter(MatchResourceValidator, RelatedResourceFilter):
     """Filter a resource by its associated vpc."""
     schema = type_schema(
