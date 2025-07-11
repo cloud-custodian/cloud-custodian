@@ -1425,3 +1425,40 @@ class AppELBTargetGroupModifyAttributes(BaseAction):
                 ignore_err_codes=('TargetGroupNotFoundException',),
             )
         return resources
+
+
+@AppELB.action_registry.register('delete-listener')
+class AppELBDeleteListenerAction(BaseAction):
+    """Action to delete listeners from an Application Load Balancer.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: delete-alb-listeners
+            resource: app-elb
+            filters:
+              - type: listener
+                key: Protocol
+                value: HTTP
+            actions:
+              - type: delete-listener
+    """
+
+    schema = type_schema('delete-listener')
+    permissions = ("elasticloadbalancing:DeleteListener",)
+
+    def process(self, albs):
+        client = local_session(self.manager.session_factory).client('elbv2')
+        for alb in albs:
+            # You may want to filter listeners to delete only specific ones
+
+            listeners = alb.get('c7n:MatchedListeners', [])
+
+            for listener in listeners:
+                try:
+                    client.delete_listener(
+                        ListenerArn=listener['ListenerArn'])
+                except client.exceptions.ListenerNotFoundException:
+                    continue
