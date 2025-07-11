@@ -72,7 +72,8 @@ class LambdaInvoke(EventAction):
 
         if assumed_role:
             self.log.debug('Assuming role: {}'.format(assumed_role))
-            target_session = assumed_session(assumed_role, 'LambdaAssumedRoleSession', session)
+            target_session = assumed_session(
+                role_arn=assumed_role, session_name='LambdaAssumedRoleSession', session=session)
             client = target_session.client('lambda', config=config)
         else:
             client = utils.local_session(
