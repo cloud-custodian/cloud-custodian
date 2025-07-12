@@ -247,7 +247,7 @@ class PolicyChecker:
         if not self.allowed_orgid:
             return True
         return bool(set(map(_account, c['values'])).difference(self.allowed_orgid))
-    
+
     def handle_aws_arn(self, s, c):
         """Handle the aws:arn condition key.
 
@@ -257,7 +257,7 @@ class PolicyChecker:
         if not self.allowed_accounts:
             return True
         return bool(set(map(_account, c['values'])).difference(self.allowed_accounts))
-    
+
     def handle_aws_resourceorgid(self, s, c):
         """Handle the aws:resourceOrgID condition key.
 
