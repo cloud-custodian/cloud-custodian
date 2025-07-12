@@ -2444,14 +2444,14 @@ class CrossAccountChecker(TestCase):
     def test_s3_everyone_only(self):
         policies = load_data("iam/s3-principal.json")
         checker = PolicyChecker({"everyone_only": True})
-        for p, expected in zip(policies, [True, True, False, False, False, False]):
+        for p, expected in zip(policies, [True, True, False, False, False, False, False]):
             violations = checker.check(p)
             self.assertEqual(bool(violations), expected)
 
     def test_s3_return_allowed_only(self):
         policies = load_data("iam/s3-principal.json")
         checker = PolicyChecker({"return_allowed": True})
-        for p, expected in zip(policies, [False, False, False, True, True, True]):
+        for p, expected in zip(policies, [False, False, False, True, True, True, False]):
             allowances = checker.check(p)
             self.assertEqual(bool(allowances), expected)
 
@@ -2462,7 +2462,7 @@ class CrossAccountChecker(TestCase):
                 "allowed_orgid": {"o-goodorg"}
             }
         )
-        for p, expected in zip(policies, [False, True]):
+        for p, expected in zip(policies, [False, True, False, True]):
             violations = checker.check(p)
             self.assertEqual(bool(violations), expected)
 
