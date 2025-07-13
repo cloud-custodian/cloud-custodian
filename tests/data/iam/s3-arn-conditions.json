@@ -1,6 +1,6 @@
 [
   {
-    "Id": "OrgID-Valid",
+    "Id": "AWSArnLikeValid",
     "Version": "2012-10-17",
     "Statement": [
       {
@@ -11,8 +11,8 @@
         "Effect": "Allow",
         "Resource": "arn:aws:s3:::cross-account-valid/*",
         "Condition": {
-          "StringEquals": {
-            "aws:PrincipalOrgID": "o-goodorg"
+          "StringLike": {
+            "aws:arn": "arn:aws:iam::123456789012:role/MySpecialRole"
           }
         },
         "Principal": "*"
@@ -20,7 +20,7 @@
     ]
   },
   {
-    "Id": "OrgID-InValid",
+    "Id": "AWSArnLikeValid",
     "Version": "2012-10-17",
     "Statement": [
       {
@@ -31,8 +31,8 @@
         "Effect": "Allow",
         "Resource": "arn:aws:s3:::cross-account-valid/*",
         "Condition": {
-          "StringEquals": {
-            "aws:PrincipalOrgID": "o-badorg"
+          "StringLike": {
+            "aws:arn": "arn:aws:iam::123456789056:role/MySpecialRole"
           }
         },
         "Principal": "*"

@@ -12,7 +12,7 @@
         "Resource": "arn:aws:s3:::cross-account-valid/*",
         "Condition": {
           "StringEquals": {
-            "aws:PrincipalOrgID": "o-goodorg"
+            "aws:ResourceOrgID": "o-goodorg"
           }
         },
         "Principal": "*"
@@ -20,7 +20,7 @@
     ]
   },
   {
-    "Id": "OrgID-InValid",
+    "Id": "OrgID-Valid",
     "Version": "2012-10-17",
     "Statement": [
       {
@@ -32,7 +32,7 @@
         "Resource": "arn:aws:s3:::cross-account-valid/*",
         "Condition": {
           "StringEquals": {
-            "aws:PrincipalOrgID": "o-badorg"
+            "aws:ResourceOrgID": "o-badorg"
           }
         },
         "Principal": "*"
