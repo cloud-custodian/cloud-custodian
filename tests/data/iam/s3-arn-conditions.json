@@ -12,7 +12,7 @@
         "Resource": "arn:aws:s3:::cross-account-valid/*",
         "Condition": {
           "StringLike": {
-            "aws:arn": "arn:aws:iam::123456789012:role/MySpecialRole"
+            "aws:PrincipalArn": "arn:aws:iam::123456789012:role/MySpecialRole"
           }
         },
         "Principal": "*"
@@ -32,7 +32,7 @@
         "Resource": "arn:aws:s3:::cross-account-valid/*",
         "Condition": {
           "StringLike": {
-            "aws:arn": "arn:aws:iam::123456789056:role/MySpecialRole"
+            "aws:PrincipalArn": "arn:aws:iam::123456789056:role/MySpecialRole"
           }
         },
         "Principal": "*"

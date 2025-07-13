@@ -248,34 +248,19 @@ class PolicyChecker:
             return True
         return bool(set(map(_account, c['values'])).difference(self.allowed_orgid))
 
-    def handle_aws_arn(self, s, c):
-        """Handle the aws:arn condition key.
+    def handle_aws_principalarn(self, s, c):
+        """Handle the aws:PrincipalArn condition key."""
 
-        Returns True if any value in the condition is not in allowed_accounts,
-        otherwise False.
-        """
-        if not self.allowed_accounts:
-            return True
         return bool(set(map(_account, c['values'])).difference(self.allowed_accounts))
 
     def handle_aws_resourceorgid(self, s, c):
-        """Handle the aws:resourceOrgID condition key.
+        """Handle the aws:resourceOrgID condition key."""
 
-        Returns True if any value in the condition is not in allowed_orgid,
-        otherwise False.
-        """
-        if not self.allowed_orgid:
-            return True
         return bool(set(map(_account, c['values'])).difference(self.allowed_orgid))
 
     def handle_aws_principalaccount(self, s, c):
-        """Handle the aws:PrincipalAccount condition key.
-
-        Returns True if any value in the condition is not in allowed_accounts,
-        otherwise False.
-        """
-        if not self.allowed_accounts:
-            return True
+        """Handle the aws:PrincipalAccount condition key."""
+        
         return bool(set(map(_account, c['values'])).difference(self.allowed_accounts))
 
 
