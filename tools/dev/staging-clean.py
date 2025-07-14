@@ -33,7 +33,7 @@ def main():
 
     for p in package_manifests:
         content = tomllib.loads(p.read_text())
-        pkg_info = content['tool']['poetry']
+        pkg_info = content['project']
         package_versions[pkg_info['name']] = pkg_info['version']
 
     client = boto3.client('codeartifact')
