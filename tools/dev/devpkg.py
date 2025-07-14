@@ -1,7 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import click
-import tomli as toml
+import tomllib as toml
 from pathlib import Path
 
 
@@ -25,7 +25,6 @@ def gen_qa_requires(root, output):
     packages = []
     for root in project_roots(root):
         data = toml.loads((root / "pyproject.toml").read_text())
-        print(str(data))
         pkg_data = data['project']
         packages.append((pkg_data['name'], pkg_data['version']))
 
