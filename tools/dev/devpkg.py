@@ -25,6 +25,7 @@ def gen_qa_requires(root, output):
     packages = []
     for root in project_roots(root):
         data = toml.loads((root / "pyproject.toml").read_text())
+        print(str(data))
         pkg_data = data['project']
         packages.append((pkg_data['name'], pkg_data['version']))
 
