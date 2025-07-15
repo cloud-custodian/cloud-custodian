@@ -343,6 +343,114 @@ class Snapshot(BaseAction):
                 client.exceptions.InvalidDBClusterStateFault)
 
 
+@RDSClusterSnapshot.action_registry.register("region-copy")
+class RegionCopyClusterSnapshot(BaseAction):
+    """Copy an cluster snapshot across regions
+
+    :example:
+
+    .. code-block:: yaml
+
+          - name: copy-cluster-snapshots
+            description: |
+              copy cluster snapshots under 1 day old to dr region with kms
+            resource: rds-cluster-snapshot
+            region: us-east-1
+            filters:
+             - Status: available
+             - type: value
+               key: SnapshotCreateTime
+               value_type: age
+               value: 1
+               op: less-than
+            actions:
+              - type: region-copy
+                target_region: us-east-2
+                target_key: arn:aws:kms:us-east-2:0000:key/cb291f53-c9cf61
+                copy_tags: true
+                tags:
+                  OriginRegion: us-east-1
+    """
+
+    schema = type_schema(
+        "region-copy",
+        target_region={"type": "string"},
+        target_key={"type": "string"},
+        copy_tages={"type": "boolean"},
+        tags={"type": "object"},
+        required=("target_region",),
+    )
+
+    permissions = ("rds:CopyDBClusterSnapshot",)
+    min_delay = 120
+    max_attempts = 30
+
+    def validate(self):
+        if self.data.get('target_region') and self.manager.data.get('mode'):
+            raise PolicyValidationError(
+                "cross region snapshot may require waiting for "
+                "longer then lambda runtime allows %s" % (self.manager.data,))
+        return self
+
+    def process(self, resources):
+        if self.data['target_region'] == self.manager.config.region:
+            self.log.warning(
+                "Source and destination region are the same, skipping copy")
+            return
+        for resource_set in chunks(resources, 20):
+            self.process_resource_set(resource_set)
+
+    def process_resource(self, target, key, tags, snapshot):
+        p = {}
+        if key:
+            p['KmsKeyId'] = key
+        p['TargetDBClusterSnapshotIdentifier'] = snapshot[
+            'DBClusterSnapshotIdentifier'].replace(':', '-')
+        p['SourceRegion'] = self.manager.config.region
+        p['SourceDBClusterSnapshotIdentifier'] = snapshot['DBClusterSnapshotArn']
+
+        if self.data.get('copy_tags', True):
+            p['CopyTags'] = True
+        if tags:
+            p['Tags'] = tags
+
+        retry = get_retry(
+            ('SnapshotQuotaExceeded',),
+            # TODO make this configurable, class defaults to 1hr
+            min_delay=self.min_delay,
+            max_attempts=self.max_attempts,
+            log_retries=logging.DEBUG)
+        
+        try:
+            result = retry(target.copy_db_cluster_snapshot, **p)
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'DBClusterSnapshotAlreadyExists':
+                self.log.warning(
+                    "Cluster snapshot %s already exists in target region",
+                    snapshot['DBClusterSnapshotIdentifier'])
+                return
+            raise
+        snapshot['c7n:CopiedSnapshot'] = result[
+            'DBClusterSnapshot']['DBClusterSnapshotArn']
+
+    def process_resource_set(self, resource_set):
+        target_client = self.manager.session_factory(
+            region=self.data['target_region']).client('rds')
+        target_key = self.data.get('target_key')
+        tags = [{'Key': k, 'Value': v} for k, v
+                in self.data.get('tags', {}).items()]
+
+        for snapshot_set in chunks(resource_set, 5):
+            for r in snapshot_set:
+                # If tags are supplied, copy tags are ignored, and
+                # we need to augment the tag set with the original
+                # resource tags to preserve the common case.
+                rtags = tags and list(tags) or None
+                if tags and self.data.get('copy_tags', True):
+                    rtags.extend(r['Tags'])
+                self.process_resource(target_client, target_key, rtags, r)
+        
+
 @RDSCluster.action_registry.register('modify-db-cluster')
 class ModifyDbCluster(BaseAction):
     """Modifies an RDS instance based on specified parameter
