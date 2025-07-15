@@ -821,10 +821,10 @@ def merge_dict(a, b):
     """Perform a merge of dictionaries A and B
 
     Any subdictionaries will be recursively merged.
-    Any leaf elements in the form of scalar will use the value from A
-    If there is a scalar and list for the same key, the scalar will be appended to the list
+    Any leaf elements in the form of scalar will use the value from A.
+    If there is a scalar and list for the same key, the scalar will be appended to the list.
     If there are two lists for the same key, the list from B will be treated like a set
-    and be appended to the list from A
+    and be appended to the list from A.
     """
     d = copy.deepcopy(a)
     for k, v in b.items():
@@ -881,7 +881,7 @@ def format_to_set(x) -> set:
 
     Strings return as a set with one string.
     Lists return as a set.
-    booleans, Floats, and ints
+    Variables of other datatypes will return as the original datatype.
     """
     if isinstance(x, str):
         return set([x])
