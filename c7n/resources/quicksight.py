@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 from botocore.exceptions import ClientError
 
-from c7n import query
+from c7n import query, tags
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import FilterRegistry
 from c7n.manager import resources, ResourceManager
@@ -133,3 +133,57 @@ class QuicksightAccount(ResourceManager):
 
     def get_resources(self, resource_ids):
         return self._get_account()
+
+
+class DescribeQuicksightWithAccountId(query.DescribeSource):
+
+    def resources(self, query):
+        required = {
+            "AwsAccountId": self.manager.config.account_id
+        }
+        return super().resources(required)
+
+def augment_quicksight_tags(manager, resources):
+    client = local_session(manager.session_factory).client('quicksight')
+    for r in resources:
+        tags = manager.retry(client.list_tags_for_resource,
+                            ResourceArn=r['Arn'],
+                            ignore_err_codes=("ResourceNotFoundException",))
+        r['Tags'] = {t['Key']: t['Value'] for t in tags} if tags else {}
+    return resources
+
+@resources.register("quicksight-dashboard")
+class QuicksightDashboard(query.QueryResourceManager):
+    class resource_type(query.TypeInfo):
+        service = "quicksight"
+        enum_spec = ('list_dashboards', 'DashboardSummaryList', None)
+        arn_type = "dashboard"
+        arn = "Arn"
+        id = "DashboardId"
+        name = "Name"
+        permissions_augment = ("quicksight:ListTagsForResource",)
+
+    source_mapping = {
+        "describe": DescribeQuicksightWithAccountId,
+    }
+
+    def augment(self, resources):
+        return augment_quicksight_tags(self, resources)
+    
+@resources.register("quicksight-datasource")
+class QuicksightDatasource(query.QueryResourceManager):
+    class resource_type(query.TypeInfo):
+        service = "quicksight"
+        enum_spec = ('list_data_sources', 'DataSources', None)
+        arn_type = "datasource"
+        arn = "Arn"
+        id = "DataSourceId"
+        name = "Name"
+        permissions_augment = ("quicksight:ListTagsForResource",)
+
+    source_mapping = {
+        "describe": DescribeQuicksightWithAccountId,
+    }
+
+    def augment(self, resources):
+        return augment_quicksight_tags(self, resources)
