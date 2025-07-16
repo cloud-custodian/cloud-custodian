@@ -106,7 +106,7 @@ jobs:
         shell: bash
         run: |
           set -euxo pipefail
-          uv pip install -r wheels-manifest.txt  --index-url ${{ env.STAGE_INDEX_URL }} --extra-index-url https://pypi.org/simple/
+          pip install -r wheels-manifest.txt  --index-url ${{ env.STAGE_INDEX_URL }} --extra-index-url https://pypi.org/simple/
 
       - name: Smoke Test
         shell: bash
