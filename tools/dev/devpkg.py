@@ -25,6 +25,10 @@ def gen_qa_requires(root, output):
     packages = []
     for root in project_roots(root):
         data = toml.loads((root / "pyproject.toml").read_text())
+        # not all tool subdirs were converted (logexporter, trailcreator)
+        # they are candidates for moving to a sandbox repo
+        if 'project' not in data:
+            continue
         pkg_data = data['project']
         packages.append((pkg_data['name'], pkg_data['version']))
 
