@@ -164,6 +164,7 @@ def test_eni_igw_subnet(test):
 
 def test_eni_nat_subnet(test):
     factory = test.replay_flight_data('test_eni_private_subnet')
+
     p = test.load_policy({
         'name': 'private-eni',
         'resource': 'aws.eni',
@@ -176,6 +177,19 @@ def test_eni_nat_subnet(test):
     resources = p.run()
     assert len(resources) == 2
     assert resources[0]['NetworkInterfaceId'] == 'eni-054de8d628e757d05'
+
+    p = test.load_policy({
+        'name': 'egress-eni',
+        'resource': 'aws.eni',
+        'filters': [
+            {'type': 'subnet',
+             'key': 'SubnetId',
+             'value': 'present',
+             'nat': False}
+        ]}, session_factory=factory)
+    resources = p.run()
+    assert len(resources) == 1
+    assert resources[0]['NetworkInterfaceId'] == 'eni-02f9c1d34f40af967'
 
 
 @terraform('aws_code_build_vpc')
