@@ -802,6 +802,57 @@ class RDSClusterSnapshotTest(BaseTest):
         )
         self.assertEqual(len(restore_permissions_after), 0)
 
+    def test_rds_cluster_cross_region_copy(self):
+        # preconditions
+        # rds cluster snapshot, encrypted in region with kms, and tags
+        factory = self.replay_flight_data("test_rds_cluster_snapshot_region_copy")
+        client = factory().client("rds", region_name="us-east-2")
+        self.change_environment(AWS_DEFAULT_REGION="us-east-1")
+        p = self.load_policy(
+            {
+                "name": "rds-cluster-snapshot-region-copy",
+                "resource": "rds-cluster-snapshot",
+                "filters": [{"DBClusterSnapshotIdentifier": "test-cluster-final-snapshot"}],
+                "actions": [
+                    {
+                        "type": "region-copy",
+                        "target_region": "us-east-2",
+                        "tags": {"migrated_from": "us-east-1"},
+                        "target_key": "cb291f53-f3ab-4e64-843e-47b0a7c9cf61",
+                    }
+                ],
+            },
+            config=dict(region="us-east-1"),
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        snapshots = client.describe_db_cluster_snapshots(
+            DBClusterSnapshotIdentifier=resources[0]["c7n:CopiedClusterSnapshot"].rsplit(":", 1)[1]
+        )[
+            "DBClusterSnapshots"
+        ]
+        self.assertEqual(len(snapshots), 1)
+        self.assertEqual(snapshots[0]["DBClusterIdentifier"], "test-cluster")
+        tags = {
+            t["Key"]: t["Value"]
+            for t in client.list_tags_for_resource(
+                ResourceName=resources[0]["c7n:CopiedClusterSnapshot"]
+            )[
+                "TagList"
+            ]
+        }
+        self.assertEqual(
+            {
+                "migrated_from": "us-east-1",
+                "app": "mgmt-portal",
+                "env": "staging",
+                "workload-type": "other",
+            },
+            tags,
+        )
+
 
 class TestRDSClusterParameterGroupFilter(BaseTest):
 
