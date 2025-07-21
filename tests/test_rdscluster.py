@@ -818,7 +818,7 @@ class RDSClusterSnapshotTest(BaseTest):
                         "type": "region-copy",
                         "target_region": "us-east-2",
                         "tags": {"migrated_from": "us-east-1"},
-                        "target_key": "cb291f53-f3ab-4e64-843e-47b0a7c9cf61",
+                        "target_key": "b10f842a-feb7-4318-92d5-0640a75b7688",
                     }
                 ],
             },
