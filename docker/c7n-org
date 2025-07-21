@@ -104,7 +104,7 @@ USER custodian
 WORKDIR /home/custodian
 ENV LC_ALL="C.UTF-8" LANG="C.UTF-8"
 VOLUME ["/home/custodian"]
-ENTRYPOINT ["/usr/local/bin/c7n-org"]
+ENTRYPOINT ["/src/.venv/bin/c7n-org"]
 CMD ["--help"]
 
 LABEL "org.opencontainers.image.title"="org"

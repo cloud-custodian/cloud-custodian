@@ -121,27 +121,6 @@ CMD ["--help"]
 """
 
 
-TARGET_DISTROLESS_STAGE = """\
-FROM {base_target_image}
-
-LABEL name="{name}" \\
-      repository="http://github.com/cloud-custodian/cloud-custodian"
-
-COPY --from=build-env /src /src
-COPY --from=build-env /usr/local /usr/local
-COPY --from=build-env /etc/passwd /etc/passwd
-COPY --from=build-env /etc/group /etc/group
-COPY --chown=custodian:custodian --from=build-env /output /output
-COPY --chown=custodian:custodian --from=build-env /home/custodian /home/custodian
-
-USER custodian
-WORKDIR /home/custodian
-ENV LC_ALL="C.UTF-8" LANG="C.UTF-8"
-VOLUME ["/home/custodian"]
-ENTRYPOINT ["{entrypoint}"]
-CMD ["--help"]
-"""
-
 TARGET_CLI = """\
 LABEL "org.opencontainers.image.title"="cli"
 LABEL "org.opencontainers.image.description"="Cloud Management Rules Engine"
@@ -252,7 +231,7 @@ ImageMap = {
             name="kube",
             repo="c7n",
             description="Cloud Custodian Kubernetes Hooks",
-            entrypoint="/usr/local/bin/c7n-kates",
+            entrypoint="/src/.venv/bin/c7n-kates",
         ),
         build=[BUILD_STAGE, BUILD_KUBE],
         target=[TARGET_UBUNTU_STAGE, TARGET_KUBE],
@@ -262,7 +241,7 @@ ImageMap = {
             name="org",
             repo="c7n-org",
             description="Cloud Custodian Organization Runner",
-            entrypoint="/usr/local/bin/c7n-org",
+            entrypoint="/src/.venv/bin/c7n-org",
         ),
         build=[BUILD_STAGE, BUILD_ORG],
         target=[TARGET_UBUNTU_STAGE, TARGET_ORG],
@@ -271,7 +250,7 @@ ImageMap = {
         dict(
             name="mailer",
             description="Cloud Custodian Notification Delivery",
-            entrypoint="/usr/local/bin/c7n-mailer",
+            entrypoint="/src/.venv/bin/c7n-mailer",
         ),
         build=[BUILD_STAGE, BUILD_MAILER],
         target=[TARGET_UBUNTU_STAGE, TARGET_MAILER],
@@ -280,7 +259,7 @@ ImageMap = {
         dict(
             name="policystream",
             description="Custodian policy changes streamed from Git",
-            entrypoint="/usr/local/bin/c7n-policystream",
+            entrypoint="/src/.venv/bin/c7n-policystream",
         ),
         build=[BUILD_STAGE, BUILD_POLICYSTREAM],
         target=[TARGET_UBUNTU_STAGE, TARGET_POLICYSTREAM],
