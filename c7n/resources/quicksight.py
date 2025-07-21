@@ -171,7 +171,7 @@ class QuicksightDashboard(query.QueryResourceManager):
         return augment_quicksight_tags(self, resources)
     
 @resources.register("quicksight-datasource")
-class QuicksightDatasource(query.QueryResourceManager):
+class QuicksightDataSource(query.QueryResourceManager):
     class resource_type(query.TypeInfo):
         service = "quicksight"
         enum_spec = ('list_data_sources', 'DataSources', None)
