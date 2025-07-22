@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 from botocore.exceptions import ClientError
 
-from c7n import query, tags
+from c7n import query
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import FilterRegistry
 from c7n.manager import resources, ResourceManager
@@ -143,14 +143,16 @@ class DescribeQuicksightWithAccountId(query.DescribeSource):
         }
         return super().resources(required)
 
+
 def augment_quicksight_tags(manager, resources):
     client = local_session(manager.session_factory).client('quicksight')
     for r in resources:
         tags = manager.retry(client.list_tags_for_resource,
                             ResourceArn=r['Arn'],
-                            ignore_err_codes=("ResourceNotFoundException",))
-        r['Tags'] = {t['Key']: t['Value'] for t in tags} if tags else {}
+                            ignore_err_codes=("ResourceNotFoundException",))['Tags']
+        r['Tags'] = tags
     return resources
+
 
 @resources.register("quicksight-dashboard")
 class QuicksightDashboard(query.QueryResourceManager):
@@ -169,7 +171,8 @@ class QuicksightDashboard(query.QueryResourceManager):
 
     def augment(self, resources):
         return augment_quicksight_tags(self, resources)
-    
+
+
 @resources.register("quicksight-datasource")
 class QuicksightDataSource(query.QueryResourceManager):
     class resource_type(query.TypeInfo):

@@ -14,9 +14,9 @@ resource "aws_s3_object" "data" {
 }
 
 resource "aws_s3_object" "manifest" {
-  bucket       = aws_s3_bucket.example.id
-  key          = "manifest.json"
-  content      = jsonencode({
+  bucket = aws_s3_bucket.example.id
+  key    = "manifest.json"
+  content = jsonencode({
     fileLocations = [
       {
         URIs = ["s3://${aws_s3_bucket.example.bucket}/data.csv"]
@@ -35,8 +35,8 @@ resource "aws_s3_bucket_policy" "quicksight_access" {
     Version = "2012-10-17",
     Statement = [
       {
-        Sid       = "AllowQuickSightService",
-        Effect    = "Allow",
+        Sid    = "AllowQuickSightService",
+        Effect = "Allow",
         Principal = {
           Service = "quicksight.amazonaws.com"
         },
@@ -100,8 +100,8 @@ resource "aws_quicksight_data_source" "example" {
         bucket = aws_s3_bucket.example.bucket
         key    = aws_s3_object.manifest.key
       }
-      
-      role_arn       = aws_iam_role.quicksight_s3_role.arn
+
+      role_arn = aws_iam_role.quicksight_s3_role.arn
     }
   }
 }
@@ -132,7 +132,37 @@ resource "aws_quicksight_dashboard" "tagged_dashboard" {
   dashboard_id        = "tagged-dashboard-id"
   name                = "tagged-dashboard-name"
   version_description = "basic version"
+  tags                = { "Owner" : "c7n" }
 
+  definition {
+    data_set_identifiers_declarations {
+      data_set_arn = aws_quicksight_data_set.example.arn
+      identifier   = "main"
+    }
+
+    sheets {
+      title    = "Sheet"
+      sheet_id = "sheet1"
+
+      visuals {
+        line_chart_visual {
+          visual_id = "line1"
+          title {
+            format_text {
+              plain_text = "Line Chart"
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+resource "aws_quicksight_dashboard" "not_owner_tagged_dashboard" {
+  dashboard_id        = "not-owner-tagged-dashboard-id"
+  name                = "not-owner-tagged-dashboard-name"
+  version_description = "version"
+  tags                = { "Env" : "dev" }
   definition {
     data_set_identifiers_declarations {
       data_set_arn = aws_quicksight_data_set.example.arn
