@@ -15,6 +15,9 @@ from azure.mgmt.compute import ComputeManagementClient
 class DiskTest(BaseTest):
     def setUp(self):
         super(DiskTest, self).setUp()
+        patcher = patch('c7n_azure.resources.disk.Disk.augment', lambda self, x: x)
+        self.addCleanup(patcher.stop)
+        patcher.start()
 
     def test_azure_disk_schema_validate(self):
         with self.sign_out_patch():
@@ -59,6 +62,10 @@ class ModifyDiskTypeTests(BaseTest):
         self.action.VM_CHECK_INTERVAL = 1  # Reduce sleep time for testing
 
         self.client = local_session(Session).client('azure.mgmt.compute.ComputeManagementClient')
+
+        patcher = patch('c7n_azure.resources.disk.Disk.augment', lambda self, x: x)
+        self.addCleanup(patcher.stop)
+        patcher.start()
 
     def tearDown(self, *args, **kwargs):
         super(ModifyDiskTypeTests, self).tearDown(*args, **kwargs)

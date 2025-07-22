@@ -4,7 +4,7 @@
         {
             "request": {
                 "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/disks?api-version=2018-09-30",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/disks?api-version=2022-07-02",
                 "body": null,
                 "headers": {}
             },
@@ -17,217 +17,355 @@
                     "cache-control": [
                         "no-cache"
                     ],
+                    "x-ms-original-request-ids": [
+                        "d51bb022-50a0-493e-9502-7a5416ea7d09"
+                    ],
+                    "content-length": [
+                        "9676"
+                    ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/HighCostGet3Min;239,Microsoft.Compute/HighCostGet30Min;1916"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: BB06BAD3D59A4D5892481F6E576D0C53 Ref B: YTO221090814051 Ref C: 2025-07-22T20:58:17Z"
+                    ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
                     "date": [
-                        "Fri, 13 Sep 2019 22:10:40 GMT"
+                        "Tue, 22 Jul 2025 20:58:16 GMT"
                     ],
-                    "x-ms-ratelimit-remaining-resource": [
-                        "Microsoft.Compute/HighCostGet3Min;237,Microsoft.Compute/HighCostGet30Min;1917"
-                    ],
-                    "content-length": [
-                        "1501"
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
                     ]
                 },
                 "body": {
                     "data": {
                         "value": [
                             {
-                                "name": "cctestlockfilterdiskkj6zteiu22tsy",
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_DISK-LOCKED/providers/Microsoft.Compute/disks/cctestlockfilterdiskkj6zteiu22tsy",
+                                "name": "pkros1pzfutlm1e",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/RG-NPR-INFRA-DEVOPS/providers/Microsoft.Compute/disks/pkros1pzfutlm1e",
                                 "type": "Microsoft.Compute/disks",
-                                "location": "southcentralus",
+                                "location": "eastus",
+                                "tags": {
+                                    "app": "ubuntu_base_image",
+                                    "env": "npr_infra_devops",
+                                    "provisioner": "packer"
+                                },
                                 "sku": {
-                                    "name": "Standard_LRS",
-                                    "tier": "Standard"
+                                    "name": "Premium_LRS",
+                                    "tier": "Premium"
                                 },
                                 "properties": {
-                                    "creationData": {
-                                        "createOption": "Empty"
+                                    "osType": "Linux",
+                                    "hyperVGeneration": "V2",
+                                    "supportsHibernation": true,
+                                    "supportedCapabilities": {
+                                        "diskControllerTypes": "SCSI, NVMe",
+                                        "acceleratedNetwork": true,
+                                        "architecture": "x64"
                                     },
-                                    "diskSizeGB": 32,
-                                    "diskIOPSReadWrite": 500,
-                                    "diskMBpsReadWrite": 60,
-                                    "timeCreated": "2019-09-13T21:47:53.1644108+00:00",
+                                    "creationData": {
+                                        "createOption": "FromImage",
+                                        "imageReference": {
+                                            "id": "/Subscriptions/8903174f-f773-4dbb-8575-fb980e36aefd/Providers/Microsoft.Compute/Locations/eastus/Publishers/canonical/ArtifactTypes/VMImage/Offers/0001-com-ubuntu-server-jammy/Skus/22_04-lts-gen2/Versions/22.04.202506200"
+                                        }
+                                    },
+                                    "diskSizeGB": 30,
+                                    "diskIOPSReadWrite": 120,
+                                    "diskMBpsReadWrite": 25,
+                                    "encryption": {
+                                        "type": "EncryptionAtRestWithPlatformKey"
+                                    },
+                                    "networkAccessPolicy": "AllowAll",
+                                    "publicNetworkAccess": "Enabled",
+                                    "timeCreated": "2025-07-16T19:24:03.681681+00:00",
                                     "provisioningState": "Succeeded",
-                                    "diskState": "Unattached"
+                                    "diskState": "Unattached",
+                                    "diskSizeBytes": 32213303296,
+                                    "uniqueId": "791ad1a4-dbca-45fe-82a7-2396fca5e663",
+                                    "tier": "P4"
                                 }
                             },
                             {
-                                "name": "cctestlockfilterdiskgt4ngt4wopgzq",
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_LOCKED/providers/Microsoft.Compute/disks/cctestlockfilterdiskgt4ngt4wopgzq",
+                                "name": "pkros6gak8euqcq",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/RG-NPR-INFRA-DEVOPS/providers/Microsoft.Compute/disks/pkros6gak8euqcq",
                                 "type": "Microsoft.Compute/disks",
-                                "location": "southcentralus",
+                                "location": "eastus",
+                                "tags": {
+                                    "app": "historian_img",
+                                    "env": "npr_infra_devops",
+                                    "provisioner": "packer"
+                                },
                                 "sku": {
-                                    "name": "Standard_LRS",
-                                    "tier": "Standard"
+                                    "name": "Premium_LRS",
+                                    "tier": "Premium"
                                 },
                                 "properties": {
-                                    "creationData": {
-                                        "createOption": "Empty"
+                                    "osType": "Linux",
+                                    "hyperVGeneration": "V2",
+                                    "supportedCapabilities": {
+                                        "diskControllerTypes": "SCSI, NVMe",
+                                        "architecture": "x64"
                                     },
-                                    "diskSizeGB": 32,
-                                    "diskIOPSReadWrite": 500,
-                                    "diskMBpsReadWrite": 60,
-                                    "timeCreated": "2019-09-13T22:07:01.3460633+00:00",
-                                    "provisioningState": "Succeeded",
-                                    "diskState": "Unattached"
-                                }
-                            }
-                        ]
-                    }
-                }
-            }
-        },
-        {
-            "request": {
-                "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/TEST_DISK-LOCKED/providers/Microsoft.Compute/disks/cctestlockfilterdiskkj6zteiu22tsy/providers/Microsoft.Authorization/locks?api-version=2016-09-01",
-                "body": null,
-                "headers": {}
-            },
-            "response": {
-                "status": {
-                    "code": 200,
-                    "message": "OK"
-                },
-                "headers": {
-                    "cache-control": [
-                        "no-cache"
-                    ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
-                    ],
-                    "date": [
-                        "Fri, 13 Sep 2019 22:10:39 GMT"
-                    ],
-                    "content-length": [
-                        "12"
-                    ]
-                },
-                "body": {
-                    "data": {
-                        "value": []
-                    }
-                }
-            }
-        },
-        {
-            "request": {
-                "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/TEST_LOCKED/providers/Microsoft.Compute/disks/cctestlockfilterdiskgt4ngt4wopgzq/providers/Microsoft.Authorization/locks?api-version=2016-09-01",
-                "body": null,
-                "headers": {}
-            },
-            "response": {
-                "status": {
-                    "code": 200,
-                    "message": "OK"
-                },
-                "headers": {
-                    "cache-control": [
-                        "no-cache"
-                    ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
-                    ],
-                    "date": [
-                        "Fri, 13 Sep 2019 22:10:39 GMT"
-                    ],
-                    "content-length": [
-                        "324"
-                    ]
-                },
-                "body": {
-                    "data": {
-                        "value": [
-                            {
-                                "properties": {
-                                    "level": "CanNotDelete",
-                                    "notes": "This lock is for the cc test_filter_resource_lock test"
-                                },
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_locked/providers/Microsoft.Authorization/locks/cctestlockfilter",
-                                "type": "Microsoft.Authorization/locks",
-                                "name": "cctestlockfilter"
-                            }
-                        ]
-                    }
-                }
-            }
-        },
-        {
-            "request": {
-                "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/disks?api-version=2018-09-30",
-                "body": null,
-                "headers": {}
-            },
-            "response": {
-                "status": {
-                    "code": 200,
-                    "message": "OK"
-                },
-                "headers": {
-                    "cache-control": [
-                        "no-cache"
-                    ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
-                    ],
-                    "date": [
-                        "Fri, 13 Sep 2019 22:10:40 GMT"
-                    ],
-                    "x-ms-ratelimit-remaining-resource": [
-                        "Microsoft.Compute/HighCostGet3Min;236,Microsoft.Compute/HighCostGet30Min;1916"
-                    ],
-                    "content-length": [
-                        "1501"
-                    ]
-                },
-                "body": {
-                    "data": {
-                        "value": [
-                            {
-                                "name": "cctestlockfilterdiskkj6zteiu22tsy",
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_DISK-LOCKED/providers/Microsoft.Compute/disks/cctestlockfilterdiskkj6zteiu22tsy",
-                                "type": "Microsoft.Compute/disks",
-                                "location": "southcentralus",
-                                "sku": {
-                                    "name": "Standard_LRS",
-                                    "tier": "Standard"
-                                },
-                                "properties": {
                                     "creationData": {
-                                        "createOption": "Empty"
+                                        "createOption": "FromImage",
+                                        "imageReference": {
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/rg-npr-infra-devops/providers/Microsoft.Compute/galleries/gal_npr_infradevops_eastus_amd/images/vena-base-Ubuntu-2204/versions/250627.19.42"
+                                        },
+                                        "galleryImageReference": {
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/rg-npr-infra-devops/providers/Microsoft.Compute/galleries/gal_npr_infradevops_eastus_amd/images/vena-base-Ubuntu-2204/versions/250627.19.42"
+                                        }
                                     },
-                                    "diskSizeGB": 32,
-                                    "diskIOPSReadWrite": 500,
-                                    "diskMBpsReadWrite": 60,
-                                    "timeCreated": "2019-09-13T21:47:53.1644108+00:00",
+                                    "diskSizeGB": 30,
+                                    "diskIOPSReadWrite": 120,
+                                    "diskMBpsReadWrite": 25,
+                                    "encryption": {
+                                        "type": "EncryptionAtRestWithPlatformKey"
+                                    },
+                                    "networkAccessPolicy": "AllowAll",
+                                    "publicNetworkAccess": "Enabled",
+                                    "timeCreated": "2025-06-27T20:25:30.8539451+00:00",
                                     "provisioningState": "Succeeded",
-                                    "diskState": "Unattached"
+                                    "diskState": "Unattached",
+                                    "diskSizeBytes": 32213303296,
+                                    "uniqueId": "d9adc437-136c-4580-9ac9-09d1fef5a6b0",
+                                    "tier": "P4"
                                 }
                             },
                             {
-                                "name": "cctestlockfilterdiskgt4ngt4wopgzq",
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_LOCKED/providers/Microsoft.Compute/disks/cctestlockfilterdiskgt4ngt4wopgzq",
+                                "name": "pkros8f90ht6jpo",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/RG-NPR-INFRA-DEVOPS/providers/Microsoft.Compute/disks/pkros8f90ht6jpo",
                                 "type": "Microsoft.Compute/disks",
-                                "location": "southcentralus",
+                                "location": "eastus",
+                                "tags": {
+                                    "app": "zookeeper_img",
+                                    "env": "npr_infra_devops",
+                                    "provisioner": "packer"
+                                },
+                                "sku": {
+                                    "name": "Premium_LRS",
+                                    "tier": "Premium"
+                                },
+                                "properties": {
+                                    "osType": "Linux",
+                                    "hyperVGeneration": "V2",
+                                    "supportedCapabilities": {
+                                        "diskControllerTypes": "SCSI, NVMe",
+                                        "architecture": "x64"
+                                    },
+                                    "creationData": {
+                                        "createOption": "FromImage",
+                                        "imageReference": {
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/rg-npr-infra-devops/providers/Microsoft.Compute/galleries/gal_npr_infradevops_eastus_amd/images/vena-base-Ubuntu-2204/versions/250623.18.25"
+                                        },
+                                        "galleryImageReference": {
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/rg-npr-infra-devops/providers/Microsoft.Compute/galleries/gal_npr_infradevops_eastus_amd/images/vena-base-Ubuntu-2204/versions/250623.18.25"
+                                        }
+                                    },
+                                    "diskSizeGB": 30,
+                                    "diskIOPSReadWrite": 120,
+                                    "diskMBpsReadWrite": 25,
+                                    "encryption": {
+                                        "type": "EncryptionAtRestWithPlatformKey"
+                                    },
+                                    "networkAccessPolicy": "AllowAll",
+                                    "publicNetworkAccess": "Enabled",
+                                    "timeCreated": "2025-06-23T18:47:02.4866988+00:00",
+                                    "provisioningState": "Succeeded",
+                                    "diskState": "Unattached",
+                                    "diskSizeBytes": 32213303296,
+                                    "uniqueId": "408a698f-7d17-4143-8265-7d9b77ea26df",
+                                    "tier": "P4"
+                                }
+                            },
+                            {
+                                "name": "pkrosl61cu41ap1",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/RG-NPR-INFRA-DEVOPS/providers/Microsoft.Compute/disks/pkrosl61cu41ap1",
+                                "type": "Microsoft.Compute/disks",
+                                "location": "eastus",
+                                "tags": {
+                                    "app": "mongo_img",
+                                    "env": "npr_infra_devops",
+                                    "provisioner": "packer"
+                                },
+                                "sku": {
+                                    "name": "Premium_LRS",
+                                    "tier": "Premium"
+                                },
+                                "properties": {
+                                    "osType": "Linux",
+                                    "hyperVGeneration": "V2",
+                                    "supportedCapabilities": {
+                                        "diskControllerTypes": "SCSI, NVMe",
+                                        "architecture": "x64"
+                                    },
+                                    "creationData": {
+                                        "createOption": "FromImage",
+                                        "imageReference": {
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/rg-npr-infra-devops/providers/Microsoft.Compute/galleries/gal_npr_infradevops_eastus_amd/images/vena-base-Ubuntu-2204/versions/250623.18.25"
+                                        },
+                                        "galleryImageReference": {
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/rg-npr-infra-devops/providers/Microsoft.Compute/galleries/gal_npr_infradevops_eastus_amd/images/vena-base-Ubuntu-2204/versions/250623.18.25"
+                                        }
+                                    },
+                                    "diskSizeGB": 30,
+                                    "diskIOPSReadWrite": 120,
+                                    "diskMBpsReadWrite": 25,
+                                    "encryption": {
+                                        "type": "EncryptionAtRestWithPlatformKey"
+                                    },
+                                    "networkAccessPolicy": "AllowAll",
+                                    "publicNetworkAccess": "Enabled",
+                                    "timeCreated": "2025-06-23T18:50:24.3456245+00:00",
+                                    "provisioningState": "Succeeded",
+                                    "diskState": "Unattached",
+                                    "diskSizeBytes": 32213303296,
+                                    "uniqueId": "7fbe48a2-a28a-4941-897d-c8c16f059e9f",
+                                    "tier": "P4"
+                                }
+                            },
+                            {
+                                "name": "pkroso7altzna1l",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/RG-NPR-INFRA-DEVOPS/providers/Microsoft.Compute/disks/pkroso7altzna1l",
+                                "type": "Microsoft.Compute/disks",
+                                "location": "eastus",
+                                "tags": {
+                                    "app": "ubuntu_base_image",
+                                    "env": "npr_infra_devops",
+                                    "provisioner": "packer"
+                                },
                                 "sku": {
                                     "name": "Standard_LRS",
                                     "tier": "Standard"
                                 },
                                 "properties": {
-                                    "creationData": {
-                                        "createOption": "Empty"
+                                    "osType": "Linux",
+                                    "hyperVGeneration": "V2",
+                                    "supportsHibernation": true,
+                                    "supportedCapabilities": {
+                                        "diskControllerTypes": "SCSI, NVMe",
+                                        "acceleratedNetwork": true,
+                                        "architecture": "x64"
                                     },
-                                    "diskSizeGB": 32,
+                                    "creationData": {
+                                        "createOption": "FromImage",
+                                        "imageReference": {
+                                            "id": "/Subscriptions/0b51c89a-8fd4-414e-aa3d-3c5484314f3b/Providers/Microsoft.Compute/Locations/eastus/Publishers/canonical/ArtifactTypes/VMImage/Offers/0001-com-ubuntu-server-jammy/Skus/22_04-lts-gen2/Versions/22.04.202506200"
+                                        }
+                                    },
+                                    "diskSizeGB": 30,
                                     "diskIOPSReadWrite": 500,
                                     "diskMBpsReadWrite": 60,
-                                    "timeCreated": "2019-09-13T22:07:01.3460633+00:00",
+                                    "encryption": {
+                                        "type": "EncryptionAtRestWithPlatformKey"
+                                    },
+                                    "networkAccessPolicy": "AllowAll",
+                                    "publicNetworkAccess": "Enabled",
+                                    "timeCreated": "2025-07-16T19:24:02.5098003+00:00",
                                     "provisioningState": "Succeeded",
-                                    "diskState": "Unattached"
+                                    "diskState": "Unattached",
+                                    "diskSizeBytes": 32213303296,
+                                    "uniqueId": "46223502-15d5-4dba-8636-d5118eec72d1"
+                                }
+                            },
+                            {
+                                "name": "pkrosyhgc5sn4ht",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/RG-NPR-INFRA-DEVOPS/providers/Microsoft.Compute/disks/pkrosyhgc5sn4ht",
+                                "type": "Microsoft.Compute/disks",
+                                "location": "eastus",
+                                "tags": {
+                                    "app": "mongo_img",
+                                    "env": "npr_infra_devops",
+                                    "provisioner": "packer"
+                                },
+                                "sku": {
+                                    "name": "Premium_LRS",
+                                    "tier": "Premium"
+                                },
+                                "properties": {
+                                    "osType": "Linux",
+                                    "hyperVGeneration": "V2",
+                                    "supportedCapabilities": {
+                                        "diskControllerTypes": "SCSI, NVMe",
+                                        "architecture": "x64"
+                                    },
+                                    "creationData": {
+                                        "createOption": "FromImage",
+                                        "imageReference": {
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/rg-npr-infra-devops/providers/Microsoft.Compute/galleries/gal_npr_infradevops_eastus_amd/images/vena-base-Ubuntu-2204/versions/250623.18.25"
+                                        },
+                                        "galleryImageReference": {
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/rg-npr-infra-devops/providers/Microsoft.Compute/galleries/gal_npr_infradevops_eastus_amd/images/vena-base-Ubuntu-2204/versions/250623.18.25"
+                                        }
+                                    },
+                                    "diskSizeGB": 30,
+                                    "diskIOPSReadWrite": 120,
+                                    "diskMBpsReadWrite": 25,
+                                    "encryption": {
+                                        "type": "EncryptionAtRestWithPlatformKey"
+                                    },
+                                    "networkAccessPolicy": "AllowAll",
+                                    "publicNetworkAccess": "Enabled",
+                                    "timeCreated": "2025-06-23T18:50:14.9862714+00:00",
+                                    "provisioningState": "Succeeded",
+                                    "diskState": "Unattached",
+                                    "diskSizeBytes": 32213303296,
+                                    "uniqueId": "9e602af8-cb15-4e8a-8cdd-27ce56b12ce8",
+                                    "tier": "P4"
+                                }
+                            },
+                            {
+                                "name": "vm-playwright-windows-ui-test_OsDisk_1_3d311f3b73de4580b0cf68238a9d0c52",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/RG-NPR-INFRA-DEVOPS/providers/Microsoft.Compute/disks/vm-playwright-windows-ui-test_OsDisk_1_3d311f3b73de4580b0cf68238a9d0c52",
+                                "type": "Microsoft.Compute/disks",
+                                "location": "eastus",
+                                "zones": [
+                                    "1"
+                                ],
+                                "managedBy": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/rg-npr-infra-devops/providers/Microsoft.Compute/virtualMachines/vm-playwright-windows-ui-test",
+                                "sku": {
+                                    "name": "Premium_LRS",
+                                    "tier": "Premium"
+                                },
+                                "properties": {
+                                    "osType": "Windows",
+                                    "hyperVGeneration": "V2",
+                                    "supportsHibernation": true,
+                                    "supportedCapabilities": {
+                                        "diskControllerTypes": "SCSI, NVMe",
+                                        "acceleratedNetwork": true,
+                                        "architecture": "x64"
+                                    },
+                                    "creationData": {
+                                        "createOption": "FromImage",
+                                        "imageReference": {
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/rg-npr-infra-devops/providers/Microsoft.Compute/galleries/gal_npr_infradevops_eastus/images/vena-playwright-windows-ui-test/versions/1.0.0"
+                                        },
+                                        "galleryImageReference": {
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/rg-npr-infra-devops/providers/Microsoft.Compute/galleries/gal_npr_infradevops_eastus/images/vena-playwright-windows-ui-test/versions/1.0.0"
+                                        }
+                                    },
+                                    "diskSizeGB": 127,
+                                    "diskIOPSReadWrite": 500,
+                                    "diskMBpsReadWrite": 100,
+                                    "encryption": {
+                                        "type": "EncryptionAtRestWithPlatformKey"
+                                    },
+                                    "networkAccessPolicy": "AllowAll",
+                                    "securityProfile": {
+                                        "securityType": "TrustedLaunch"
+                                    },
+                                    "publicNetworkAccess": "Enabled",
+                                    "timeCreated": "2025-05-16T18:40:43.923975+00:00",
+                                    "provisioningState": "Succeeded",
+                                    "diskState": "Attached",
+                                    "diskSizeBytes": 136367308800,
+                                    "uniqueId": "3d311f3b-73de-4580-b0cf-68238a9d0c52",
+                                    "tier": "P10"
                                 }
                             }
                         ]
@@ -238,7 +376,7 @@
         {
             "request": {
                 "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/TEST_DISK-LOCKED/providers/Microsoft.Compute/disks/cctestlockfilterdiskkj6zteiu22tsy/providers/Microsoft.Authorization/locks?api-version=2016-09-01",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/disks?api-version=2022-07-02",
                 "body": null,
                 "headers": {}
             },
@@ -251,60 +389,356 @@
                     "cache-control": [
                         "no-cache"
                     ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
-                    ],
-                    "date": [
-                        "Fri, 13 Sep 2019 22:10:40 GMT"
+                    "x-ms-original-request-ids": [
+                        "9ec3876c-e535-404e-8c46-e9772bddfb5e"
                     ],
                     "content-length": [
-                        "12"
-                    ]
-                },
-                "body": {
-                    "data": {
-                        "value": []
-                    }
-                }
-            }
-        },
-        {
-            "request": {
-                "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/TEST_LOCKED/providers/Microsoft.Compute/disks/cctestlockfilterdiskgt4ngt4wopgzq/providers/Microsoft.Authorization/locks?api-version=2016-09-01",
-                "body": null,
-                "headers": {}
-            },
-            "response": {
-                "status": {
-                    "code": 200,
-                    "message": "OK"
-                },
-                "headers": {
-                    "cache-control": [
-                        "no-cache"
+                        "9676"
+                    ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/HighCostGet3Min;238,Microsoft.Compute/HighCostGet30Min;1915"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: D2B66A2AFA14499B831E863B6A9EFB23 Ref B: YTO221090814039 Ref C: 2025-07-22T20:58:17Z"
                     ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
-                    "date": [
-                        "Fri, 13 Sep 2019 22:10:40 GMT"
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
                     ],
-                    "content-length": [
-                        "324"
+                    "date": [
+                        "Tue, 22 Jul 2025 20:58:17 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
                     ]
                 },
                 "body": {
                     "data": {
                         "value": [
                             {
-                                "properties": {
-                                    "level": "CanNotDelete",
-                                    "notes": "This lock is for the cc test_filter_resource_lock test"
+                                "name": "pkros1pzfutlm1e",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/RG-NPR-INFRA-DEVOPS/providers/Microsoft.Compute/disks/pkros1pzfutlm1e",
+                                "type": "Microsoft.Compute/disks",
+                                "location": "eastus",
+                                "tags": {
+                                    "app": "ubuntu_base_image",
+                                    "env": "npr_infra_devops",
+                                    "provisioner": "packer"
                                 },
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_locked/providers/Microsoft.Authorization/locks/cctestlockfilter",
-                                "type": "Microsoft.Authorization/locks",
-                                "name": "cctestlockfilter"
+                                "sku": {
+                                    "name": "Premium_LRS",
+                                    "tier": "Premium"
+                                },
+                                "properties": {
+                                    "osType": "Linux",
+                                    "hyperVGeneration": "V2",
+                                    "supportsHibernation": true,
+                                    "supportedCapabilities": {
+                                        "diskControllerTypes": "SCSI, NVMe",
+                                        "acceleratedNetwork": true,
+                                        "architecture": "x64"
+                                    },
+                                    "creationData": {
+                                        "createOption": "FromImage",
+                                        "imageReference": {
+                                            "id": "/Subscriptions/8903174f-f773-4dbb-8575-fb980e36aefd/Providers/Microsoft.Compute/Locations/eastus/Publishers/canonical/ArtifactTypes/VMImage/Offers/0001-com-ubuntu-server-jammy/Skus/22_04-lts-gen2/Versions/22.04.202506200"
+                                        }
+                                    },
+                                    "diskSizeGB": 30,
+                                    "diskIOPSReadWrite": 120,
+                                    "diskMBpsReadWrite": 25,
+                                    "encryption": {
+                                        "type": "EncryptionAtRestWithPlatformKey"
+                                    },
+                                    "networkAccessPolicy": "AllowAll",
+                                    "publicNetworkAccess": "Enabled",
+                                    "timeCreated": "2025-07-16T19:24:03.681681+00:00",
+                                    "provisioningState": "Succeeded",
+                                    "diskState": "Unattached",
+                                    "diskSizeBytes": 32213303296,
+                                    "uniqueId": "791ad1a4-dbca-45fe-82a7-2396fca5e663",
+                                    "tier": "P4"
+                                }
+                            },
+                            {
+                                "name": "pkros6gak8euqcq",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/RG-NPR-INFRA-DEVOPS/providers/Microsoft.Compute/disks/pkros6gak8euqcq",
+                                "type": "Microsoft.Compute/disks",
+                                "location": "eastus",
+                                "tags": {
+                                    "app": "historian_img",
+                                    "env": "npr_infra_devops",
+                                    "provisioner": "packer"
+                                },
+                                "sku": {
+                                    "name": "Premium_LRS",
+                                    "tier": "Premium"
+                                },
+                                "properties": {
+                                    "osType": "Linux",
+                                    "hyperVGeneration": "V2",
+                                    "supportedCapabilities": {
+                                        "diskControllerTypes": "SCSI, NVMe",
+                                        "architecture": "x64"
+                                    },
+                                    "creationData": {
+                                        "createOption": "FromImage",
+                                        "imageReference": {
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/rg-npr-infra-devops/providers/Microsoft.Compute/galleries/gal_npr_infradevops_eastus_amd/images/vena-base-Ubuntu-2204/versions/250627.19.42"
+                                        },
+                                        "galleryImageReference": {
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/rg-npr-infra-devops/providers/Microsoft.Compute/galleries/gal_npr_infradevops_eastus_amd/images/vena-base-Ubuntu-2204/versions/250627.19.42"
+                                        }
+                                    },
+                                    "diskSizeGB": 30,
+                                    "diskIOPSReadWrite": 120,
+                                    "diskMBpsReadWrite": 25,
+                                    "encryption": {
+                                        "type": "EncryptionAtRestWithPlatformKey"
+                                    },
+                                    "networkAccessPolicy": "AllowAll",
+                                    "publicNetworkAccess": "Enabled",
+                                    "timeCreated": "2025-06-27T20:25:30.8539451+00:00",
+                                    "provisioningState": "Succeeded",
+                                    "diskState": "Unattached",
+                                    "diskSizeBytes": 32213303296,
+                                    "uniqueId": "d9adc437-136c-4580-9ac9-09d1fef5a6b0",
+                                    "tier": "P4"
+                                }
+                            },
+                            {
+                                "name": "pkros8f90ht6jpo",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/RG-NPR-INFRA-DEVOPS/providers/Microsoft.Compute/disks/pkros8f90ht6jpo",
+                                "type": "Microsoft.Compute/disks",
+                                "location": "eastus",
+                                "tags": {
+                                    "app": "zookeeper_img",
+                                    "env": "npr_infra_devops",
+                                    "provisioner": "packer"
+                                },
+                                "sku": {
+                                    "name": "Premium_LRS",
+                                    "tier": "Premium"
+                                },
+                                "properties": {
+                                    "osType": "Linux",
+                                    "hyperVGeneration": "V2",
+                                    "supportedCapabilities": {
+                                        "diskControllerTypes": "SCSI, NVMe",
+                                        "architecture": "x64"
+                                    },
+                                    "creationData": {
+                                        "createOption": "FromImage",
+                                        "imageReference": {
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/rg-npr-infra-devops/providers/Microsoft.Compute/galleries/gal_npr_infradevops_eastus_amd/images/vena-base-Ubuntu-2204/versions/250623.18.25"
+                                        },
+                                        "galleryImageReference": {
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/rg-npr-infra-devops/providers/Microsoft.Compute/galleries/gal_npr_infradevops_eastus_amd/images/vena-base-Ubuntu-2204/versions/250623.18.25"
+                                        }
+                                    },
+                                    "diskSizeGB": 30,
+                                    "diskIOPSReadWrite": 120,
+                                    "diskMBpsReadWrite": 25,
+                                    "encryption": {
+                                        "type": "EncryptionAtRestWithPlatformKey"
+                                    },
+                                    "networkAccessPolicy": "AllowAll",
+                                    "publicNetworkAccess": "Enabled",
+                                    "timeCreated": "2025-06-23T18:47:02.4866988+00:00",
+                                    "provisioningState": "Succeeded",
+                                    "diskState": "Unattached",
+                                    "diskSizeBytes": 32213303296,
+                                    "uniqueId": "408a698f-7d17-4143-8265-7d9b77ea26df",
+                                    "tier": "P4"
+                                }
+                            },
+                            {
+                                "name": "pkrosl61cu41ap1",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/RG-NPR-INFRA-DEVOPS/providers/Microsoft.Compute/disks/pkrosl61cu41ap1",
+                                "type": "Microsoft.Compute/disks",
+                                "location": "eastus",
+                                "tags": {
+                                    "app": "mongo_img",
+                                    "env": "npr_infra_devops",
+                                    "provisioner": "packer"
+                                },
+                                "sku": {
+                                    "name": "Premium_LRS",
+                                    "tier": "Premium"
+                                },
+                                "properties": {
+                                    "osType": "Linux",
+                                    "hyperVGeneration": "V2",
+                                    "supportedCapabilities": {
+                                        "diskControllerTypes": "SCSI, NVMe",
+                                        "architecture": "x64"
+                                    },
+                                    "creationData": {
+                                        "createOption": "FromImage",
+                                        "imageReference": {
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/rg-npr-infra-devops/providers/Microsoft.Compute/galleries/gal_npr_infradevops_eastus_amd/images/vena-base-Ubuntu-2204/versions/250623.18.25"
+                                        },
+                                        "galleryImageReference": {
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/rg-npr-infra-devops/providers/Microsoft.Compute/galleries/gal_npr_infradevops_eastus_amd/images/vena-base-Ubuntu-2204/versions/250623.18.25"
+                                        }
+                                    },
+                                    "diskSizeGB": 30,
+                                    "diskIOPSReadWrite": 120,
+                                    "diskMBpsReadWrite": 25,
+                                    "encryption": {
+                                        "type": "EncryptionAtRestWithPlatformKey"
+                                    },
+                                    "networkAccessPolicy": "AllowAll",
+                                    "publicNetworkAccess": "Enabled",
+                                    "timeCreated": "2025-06-23T18:50:24.3456245+00:00",
+                                    "provisioningState": "Succeeded",
+                                    "diskState": "Unattached",
+                                    "diskSizeBytes": 32213303296,
+                                    "uniqueId": "7fbe48a2-a28a-4941-897d-c8c16f059e9f",
+                                    "tier": "P4"
+                                }
+                            },
+                            {
+                                "name": "pkroso7altzna1l",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/RG-NPR-INFRA-DEVOPS/providers/Microsoft.Compute/disks/pkroso7altzna1l",
+                                "type": "Microsoft.Compute/disks",
+                                "location": "eastus",
+                                "tags": {
+                                    "app": "ubuntu_base_image",
+                                    "env": "npr_infra_devops",
+                                    "provisioner": "packer"
+                                },
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "properties": {
+                                    "osType": "Linux",
+                                    "hyperVGeneration": "V2",
+                                    "supportsHibernation": true,
+                                    "supportedCapabilities": {
+                                        "diskControllerTypes": "SCSI, NVMe",
+                                        "acceleratedNetwork": true,
+                                        "architecture": "x64"
+                                    },
+                                    "creationData": {
+                                        "createOption": "FromImage",
+                                        "imageReference": {
+                                            "id": "/Subscriptions/0b51c89a-8fd4-414e-aa3d-3c5484314f3b/Providers/Microsoft.Compute/Locations/eastus/Publishers/canonical/ArtifactTypes/VMImage/Offers/0001-com-ubuntu-server-jammy/Skus/22_04-lts-gen2/Versions/22.04.202506200"
+                                        }
+                                    },
+                                    "diskSizeGB": 30,
+                                    "diskIOPSReadWrite": 500,
+                                    "diskMBpsReadWrite": 60,
+                                    "encryption": {
+                                        "type": "EncryptionAtRestWithPlatformKey"
+                                    },
+                                    "networkAccessPolicy": "AllowAll",
+                                    "publicNetworkAccess": "Enabled",
+                                    "timeCreated": "2025-07-16T19:24:02.5098003+00:00",
+                                    "provisioningState": "Succeeded",
+                                    "diskState": "Unattached",
+                                    "diskSizeBytes": 32213303296,
+                                    "uniqueId": "46223502-15d5-4dba-8636-d5118eec72d1"
+                                }
+                            },
+                            {
+                                "name": "pkrosyhgc5sn4ht",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/RG-NPR-INFRA-DEVOPS/providers/Microsoft.Compute/disks/pkrosyhgc5sn4ht",
+                                "type": "Microsoft.Compute/disks",
+                                "location": "eastus",
+                                "tags": {
+                                    "app": "mongo_img",
+                                    "env": "npr_infra_devops",
+                                    "provisioner": "packer"
+                                },
+                                "sku": {
+                                    "name": "Premium_LRS",
+                                    "tier": "Premium"
+                                },
+                                "properties": {
+                                    "osType": "Linux",
+                                    "hyperVGeneration": "V2",
+                                    "supportedCapabilities": {
+                                        "diskControllerTypes": "SCSI, NVMe",
+                                        "architecture": "x64"
+                                    },
+                                    "creationData": {
+                                        "createOption": "FromImage",
+                                        "imageReference": {
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/rg-npr-infra-devops/providers/Microsoft.Compute/galleries/gal_npr_infradevops_eastus_amd/images/vena-base-Ubuntu-2204/versions/250623.18.25"
+                                        },
+                                        "galleryImageReference": {
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/rg-npr-infra-devops/providers/Microsoft.Compute/galleries/gal_npr_infradevops_eastus_amd/images/vena-base-Ubuntu-2204/versions/250623.18.25"
+                                        }
+                                    },
+                                    "diskSizeGB": 30,
+                                    "diskIOPSReadWrite": 120,
+                                    "diskMBpsReadWrite": 25,
+                                    "encryption": {
+                                        "type": "EncryptionAtRestWithPlatformKey"
+                                    },
+                                    "networkAccessPolicy": "AllowAll",
+                                    "publicNetworkAccess": "Enabled",
+                                    "timeCreated": "2025-06-23T18:50:14.9862714+00:00",
+                                    "provisioningState": "Succeeded",
+                                    "diskState": "Unattached",
+                                    "diskSizeBytes": 32213303296,
+                                    "uniqueId": "9e602af8-cb15-4e8a-8cdd-27ce56b12ce8",
+                                    "tier": "P4"
+                                }
+                            },
+                            {
+                                "name": "vm-playwright-windows-ui-test_OsDisk_1_3d311f3b73de4580b0cf68238a9d0c52",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/RG-NPR-INFRA-DEVOPS/providers/Microsoft.Compute/disks/vm-playwright-windows-ui-test_OsDisk_1_3d311f3b73de4580b0cf68238a9d0c52",
+                                "type": "Microsoft.Compute/disks",
+                                "location": "eastus",
+                                "zones": [
+                                    "1"
+                                ],
+                                "managedBy": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/rg-npr-infra-devops/providers/Microsoft.Compute/virtualMachines/vm-playwright-windows-ui-test",
+                                "sku": {
+                                    "name": "Premium_LRS",
+                                    "tier": "Premium"
+                                },
+                                "properties": {
+                                    "osType": "Windows",
+                                    "hyperVGeneration": "V2",
+                                    "supportsHibernation": true,
+                                    "supportedCapabilities": {
+                                        "diskControllerTypes": "SCSI, NVMe",
+                                        "acceleratedNetwork": true,
+                                        "architecture": "x64"
+                                    },
+                                    "creationData": {
+                                        "createOption": "FromImage",
+                                        "imageReference": {
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/rg-npr-infra-devops/providers/Microsoft.Compute/galleries/gal_npr_infradevops_eastus/images/vena-playwright-windows-ui-test/versions/1.0.0"
+                                        },
+                                        "galleryImageReference": {
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/rg-npr-infra-devops/providers/Microsoft.Compute/galleries/gal_npr_infradevops_eastus/images/vena-playwright-windows-ui-test/versions/1.0.0"
+                                        }
+                                    },
+                                    "diskSizeGB": 127,
+                                    "diskIOPSReadWrite": 500,
+                                    "diskMBpsReadWrite": 100,
+                                    "encryption": {
+                                        "type": "EncryptionAtRestWithPlatformKey"
+                                    },
+                                    "networkAccessPolicy": "AllowAll",
+                                    "securityProfile": {
+                                        "securityType": "TrustedLaunch"
+                                    },
+                                    "publicNetworkAccess": "Enabled",
+                                    "timeCreated": "2025-05-16T18:40:43.923975+00:00",
+                                    "provisioningState": "Succeeded",
+                                    "diskState": "Attached",
+                                    "diskSizeBytes": 136367308800,
+                                    "uniqueId": "3d311f3b-73de-4580-b0cf-68238a9d0c52",
+                                    "tier": "P10"
+                                }
                             }
                         ]
                     }
