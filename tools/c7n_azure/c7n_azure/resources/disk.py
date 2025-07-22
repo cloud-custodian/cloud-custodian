@@ -46,6 +46,26 @@ class Disk(ArmResourceManager):
         )
         resource_type = 'Microsoft.Compute/disks'
 
+    def augment(self, resources):
+        """
+        Augment the disk resources with additional properties from the Azure REST API.
+        """
+        resource_client = self.get_client('azure.mgmt.resource.ResourceManagementClient')
+
+        for r in resources:
+            try:
+                rest_obj = resource_client.resources.get_by_id(
+                    r['id'],
+                    api_version='2025-01-02'
+                )
+                data = rest_obj.as_dict()
+                if 'LastOwnershipUpdateTime' in data.get('properties', {}):
+                    r['properties']['LastOwnershipUpdateTime'] = \
+                        data['properties']['LastOwnershipUpdateTime']
+            except Exception as e:
+                self.log.error(f"Error fetching {r['name']}: {e}")
+        return resources
+
 
 @Disk.action_registry.register('modify-disk-type')
 class ModifyDiskTypeAction(AzureBaseAction):
