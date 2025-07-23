@@ -63,3 +63,20 @@ class MachineLearningWorkspaceComputeInstancesFilterTest(BaseTest):
         resources = p.run()
         self.assertEqual(1, len(resources))
         self.assertEqual(resources[0]['c7n:ComputeInstances'][0]['name'], 'vvmlwrkspc11')
+
+
+class MachineLearningWorkspaceResourceLockFilterTest(BaseTest):
+
+    def test_query(self):
+        p = self.load_policy({
+            'name': 'compute',
+            'resource': 'azure.machine-learning-workspace',
+            'filters': [{
+                'type': 'resource-lock',
+                'lock-type': 'ReadOnly'
+            }],
+        })
+        resources = p.run()
+
+        self.assertEqual(1, len(resources))
+        self.assertEqual('mlwsp165red', resources[0]['name'])
