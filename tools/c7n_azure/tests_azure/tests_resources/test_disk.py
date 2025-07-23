@@ -4,11 +4,12 @@ import logging
 from c7n.utils import local_session
 from c7n_azure.session import Session
 from c7n_azure.utils import ResourceIdParser, ThreadHelper
+from c7n_azure.resources.disk import Disk, ModifyDiskTypeAction
+from unittest import TestCase
 from mock import patch, MagicMock
 import pytest
 from ..azure_common import BaseTest, arm_template, cassette_name
 from azure.core.exceptions import AzureError
-from c7n_azure.resources.disk import ModifyDiskTypeAction
 from azure.mgmt.compute import ComputeManagementClient
 
 
@@ -565,3 +566,61 @@ class ModifyDiskTypeTests(BaseTest):
 
         self.assertIn("Skipping disk 'disk1'", cm.output[0])
         self.assertIn("Skipping disk 'disk2'", cm.output[1])
+
+
+class TestDiskAugment(TestCase):
+    def setUp(self):
+        self.ctx = MagicMock()
+        self.ctx.session_factory = MagicMock()
+        self.manager = MagicMock()
+        self.manager.get_model.return_value = {}
+
+    @patch('c7n_azure.resources.disk.Disk.get_source', return_value=lambda self: None)
+    @patch('c7n_azure.resources.disk.Disk.get_client')
+    def test_adds_last_ownership_update_time(self, mock_get_client, mock_get_source):
+        disk = Disk(self.ctx, self.manager)
+
+        resource = {
+            'id': '/subscriptions/0/resourceGroups/my-rg/providers/Microsoft.Compute/disks/disk1',
+            'name': 'disk1',
+            'properties': {}
+        }
+
+        mock_rest_obj = MagicMock()
+        mock_rest_obj.as_dict.return_value = {
+            'properties': {
+                'LastOwnershipUpdateTime': '2025-01-01T00:00:00Z'
+            }
+        }
+
+        mock_resource_client = MagicMock()
+        mock_resource_client.resources.get_by_id.return_value = mock_rest_obj
+        mock_get_client.return_value = mock_resource_client
+
+        result = disk.augment([resource])[0]
+        self.assertEqual(
+            result['properties']['LastOwnershipUpdateTime'],
+            '2025-01-01T00:00:00Z'
+        )
+
+    @patch('c7n_azure.resources.disk.Disk.get_source', return_value=lambda self: None)
+    @patch('c7n_azure.resources.disk.Disk.get_client')
+    def test_logs_error_when_fetch_fails(self, mock_get_client, mock_get_source):
+        disk = Disk(self.ctx, self.manager)
+        disk.log = MagicMock()
+
+        resource = {
+            'id': '/subscriptions/0/resourceGroups/my-rg/providers/Microsoft.Compute/disks/disk1',
+            'name': 'disk1',
+            'properties': {}
+        }
+
+        mock_resource_client = MagicMock()
+        mock_resource_client.resources.get_by_id.side_effect = Exception("boom!")
+        mock_get_client.return_value = mock_resource_client
+
+        disk.augment([resource])
+        disk.log.error.assert_called_once()
+        msg = disk.log.error.call_args[0][0]
+        self.assertIn("Error fetching disk1", msg)
+        self.assertIn("boom!", msg)
