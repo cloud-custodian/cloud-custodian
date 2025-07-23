@@ -98,6 +98,7 @@ ResourceMap = {
     "azure.sqlserver": "c7n_azure.resources.sqlserver.SqlServer",
     "azure.storage": "c7n_azure.resources.storage.Storage",
     "azure.storage-container": "c7n_azure.resources.storage_container.StorageContainer",
+    "azure.subnet": "c7n_azure.resources.vnet.Subnet",
     "azure.subscription": "c7n_azure.resources.subscription.Subscription",
     "azure.synapse": "c7n_azure.resources.synapse.Synapse",
     "azure.traffic-manager-profile": "c7n_azure.resources.traffic_manager.TrafficManagerProfile",
