@@ -6,6 +6,8 @@ from c7n.filters import ValueFilter
 from c7n.utils import local_session, type_schema
 from c7n.actions import Action
 from c7n.filters.kms import KmsRelatedFilter
+from c7n.filters import CrossAccountAccessFilter
+from c7n.resolver import ValuesFrom
 
 
 @resources.register('connect-instance')
@@ -137,3 +139,62 @@ class ConnectCampaign(QueryResourceManager):
 @ConnectCampaign.filter_registry.register('kms-key')
 class ConnectCampaignKmsFilter(KmsRelatedFilter):
     RelatedIdsExpression = 'connectInstanceConfig.encryptionConfig.keyArn'
+
+
+@resources.register('connect-analytics-association')
+class ConnectAnalyticsAssociation(QueryResourceManager):
+    """Resource manager for Connect Analytics Data Associations.
+
+    """
+
+    class resource_type(TypeInfo):
+        service = 'connect'
+        arn = id = 'AssociationId'
+        name = 'DataSetId'
+        enum_spec = ('list_instances', 'InstanceSummaryList', None)
+    permissions = (
+        'connect:ListInstances',
+        'connect:ListAnalyticsDataAssociations',
+    )
+
+    def resources(self, query=None):
+        """
+        Overrides the default resources() method to handle the multi-step
+        enumeration required for analytics data associations.
+        """
+        client = local_session(self.session_factory).client('connect')
+        instance_paginator = client.get_paginator('list_instances')
+        all_associations = []
+        for page in instance_paginator.paginate():
+            for instance in page.get('InstanceSummaryList', []):
+                response = client.list_analytics_data_associations(InstanceId=instance['Id'])
+                all_associations.extend(response.get('Results', []))
+        return self.filter_resources(all_associations)
+
+
+@ConnectAnalyticsAssociation.filter_registry.register('cross-account')
+class ConnectAssociationCrossAccountFilter(CrossAccountAccessFilter):
+    """
+    Flags associations that target an external, non-whitelisted account.
+    """
+    schema = type_schema(
+        'cross-account',
+        whitelist={'type': 'array', 'items': {'type': 'string'}},
+        whitelist_from=ValuesFrom.schema)
+
+    permissions = ('connect:ListAnalyticsDataAssociations',)
+
+    def process(self, resources, event=None):
+        approved_accounts = self.get_accounts()
+        results = []
+
+        for r in resources:
+            target_account = r.get('TargetAccountId')
+            if not target_account:
+                continue
+
+            if target_account not in approved_accounts:
+                r['c7n:CrossAccountViolations'] = [target_account]
+                results.append(r)
+
+        return results

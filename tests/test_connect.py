@@ -145,3 +145,20 @@ class ConnectCampaignTest(BaseTest):
             }, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 2)
+
+
+class ConnectAnalyticsAssociationTest(BaseTest):
+
+    def test_connect_analytics_association_cross_account(self):
+        session_factory = self.replay_flight_data(
+            "test_connect_analytics_association_cross_account")
+        p = self.load_policy(
+            {
+                "name": "connect-analytics-cross-account",
+                "resource": "connect-analytics-association",
+                "filters": ['cross-account'],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
