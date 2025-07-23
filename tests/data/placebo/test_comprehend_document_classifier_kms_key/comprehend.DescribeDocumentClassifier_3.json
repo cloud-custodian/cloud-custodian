@@ -1,0 +1,59 @@
+{
+    "status_code": 200,
+    "data": {
+        "DocumentClassifierProperties": {
+            "DocumentClassifierArn": "arn:aws:comprehend:us-east-1:644160558196:document-classifier/TestModelVPC/version/KMS-3",
+            "LanguageCode": "en",
+            "Status": "IN_ERROR",
+            "Message": "Amazon Comprehend can't process the request because there isn't enough capacity. Try again later.",
+            "SubmitTime": {
+                "__class__": "datetime",
+                "year": 2025,
+                "month": 7,
+                "day": 8,
+                "hour": 15,
+                "minute": 46,
+                "second": 14,
+                "microsecond": 717000
+            },
+            "EndTime": {
+                "__class__": "datetime",
+                "year": 2025,
+                "month": 7,
+                "day": 8,
+                "hour": 20,
+                "minute": 47,
+                "second": 13,
+                "microsecond": 811000
+            },
+            "TrainingEndTime": {
+                "__class__": "datetime",
+                "year": 2025,
+                "month": 7,
+                "day": 8,
+                "hour": 20,
+                "minute": 45,
+                "second": 10,
+                "microsecond": 983000
+            },
+            "InputDataConfig": {
+                "DataFormat": "COMPREHEND_CSV",
+                "S3Uri": "s3://c7n-test-s3-bucket/TrainingData - Sheet1.csv"
+            },
+            "OutputDataConfig": {},
+            "DataAccessRoleArn": "arn:aws:iam::644160558196:role/ComprehendVpcAccessRole",
+            "VolumeKmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/20a0c3ed-99ff-4b38-92e6-e489628e0bfb",
+            "VpcConfig": {
+                "SecurityGroupIds": [
+                    "sg-0d74b07ab0b3288c0"
+                ],
+                "Subnets": [
+                    "subnet-0ebe9abf587c5070c"
+                ]
+            },
+            "Mode": "MULTI_CLASS",
+            "VersionName": "KMS-3"
+        },
+        "ResponseMetadata": {}
+    }
+}

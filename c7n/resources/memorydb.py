@@ -1,16 +1,21 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
-from .aws import AWS
-from c7n.query import (
-    QueryResourceManager, TypeInfo, DescribeSource)
-from c7n.actions import BaseAction
-from c7n.utils import local_session, type_schema
-from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
-from c7n.filters.kms import KmsRelatedFilter
 import c7n.filters.vpc as net_filters
+from c7n.actions import BaseAction
+from c7n.filters.kms import KmsRelatedFilter
 from c7n.manager import resources
-from c7n.tags import universal_augment
+from c7n.query import (
+    ConfigSource,
+    DescribeSource,
+    DescribeWithResourceTags,
+    QueryResourceManager,
+    TypeInfo,
+)
+from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
+from c7n.utils import local_session, type_schema
+
+from .aws import AWS
 
 
 class DescribeMemoryDb(DescribeSource):
@@ -278,10 +283,14 @@ class MemoryDbSubnetGroup(QueryResourceManager):
         name = id = 'Name'
         filter_name = 'SubnetGroupName'
         filter_type = 'scalar'
-        cfn_type = 'AWS::MemoryDB::SubnetGroup'
+        config_type = cfn_type = 'AWS::MemoryDB::SubnetGroup'
         universal_taggable = object()
         permissions = ('memorydb:DescribeSubnetGroups',)
-    augment = universal_augment
+
+    source_mapping = {
+        'describe': DescribeWithResourceTags,
+        'config': ConfigSource
+    }
 
 
 @MemoryDbSnapshot.action_registry.register('delete')

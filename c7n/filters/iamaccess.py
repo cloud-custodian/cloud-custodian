@@ -248,6 +248,21 @@ class PolicyChecker:
             return True
         return bool(set(map(_account, c['values'])).difference(self.allowed_orgid))
 
+    def handle_aws_principalarn(self, s, c):
+        """Handle the aws:PrincipalArn condition key."""
+
+        return bool(set(map(_account, c['values'])).difference(self.allowed_accounts))
+
+    def handle_aws_resourceorgid(self, s, c):
+        """Handle the aws:resourceOrgID condition key."""
+
+        return bool(set(map(_account, c['values'])).difference(self.allowed_orgid))
+
+    def handle_aws_principalaccount(self, s, c):
+        """Handle the aws:PrincipalAccount condition key."""
+
+        return bool(set(map(_account, c['values'])).difference(self.allowed_accounts))
+
 
 class CrossAccountAccessFilter(Filter):
     """Check a resource's embedded iam policy for cross account access.

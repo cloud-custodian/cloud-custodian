@@ -1,0 +1,52 @@
+{
+    "status_code": 200,
+    "data": {
+        "TopicsDetectionJobProperties": {
+            "JobId": "6cdb67f4dde0896e98f8f740a217c0c8",
+            "JobArn": "arn:aws:comprehend:us-east-1:644160558196:topics-detection-job/6cdb67f4dde0896e98f8f740a217c0c8",
+            "JobName": "TopicModelingJob",
+            "JobStatus": "FAILED",
+            "Message": "DOCUMENT_CORPUS_SIZE_LESS_THAN_MINIMUM: Document corpus size is less than the minimum requirement: 500 bytes., exit code: 0",
+            "SubmitTime": {
+                "__class__": "datetime",
+                "year": 2025,
+                "month": 7,
+                "day": 8,
+                "hour": 15,
+                "minute": 1,
+                "second": 54,
+                "microsecond": 362000
+            },
+            "EndTime": {
+                "__class__": "datetime",
+                "year": 2025,
+                "month": 7,
+                "day": 8,
+                "hour": 15,
+                "minute": 8,
+                "second": 29,
+                "microsecond": 639000
+            },
+            "InputDataConfig": {
+                "S3Uri": "s3://c7n-test-s3-bucket/Topic_A.txt",
+                "InputFormat": "ONE_DOC_PER_LINE"
+            },
+            "OutputDataConfig": {
+                "S3Uri": "s3://c7n-test-s3-bucket/644160558196-TOPICS-6cdb67f4dde0896e98f8f740a217c0c8/output/output.tar.gz",
+                "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/20a0c3ed-99ff-4b38-92e6-e489628e0bfb"
+            },
+            "NumberOfTopics": 2,
+            "DataAccessRoleArn": "arn:aws:iam::644160558196:role/ComprehendVpcAccessRole",
+            "VolumeKmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/20a0c3ed-99ff-4b38-92e6-e489628e0bfb",
+            "VpcConfig": {
+                "SecurityGroupIds": [
+                    "sg-0d74b07ab0b3288c0"
+                ],
+                "Subnets": [
+                    "subnet-0ebe9abf587c5070c"
+                ]
+            }
+        },
+        "ResponseMetadata": {}
+    }
+}

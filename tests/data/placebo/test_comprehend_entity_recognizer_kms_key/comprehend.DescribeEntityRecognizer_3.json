@@ -1,0 +1,92 @@
+{
+    "status_code": 200,
+    "data": {
+        "EntityRecognizerProperties": {
+            "EntityRecognizerArn": "arn:aws:comprehend:us-east-1:644160558196:entity-recognizer/TestVpcEntityRecognizer/version/7",
+            "LanguageCode": "en",
+            "Status": "IN_ERROR",
+            "Message": "Validate user metadata failed.\n, exit code: 255",
+            "SubmitTime": {
+                "__class__": "datetime",
+                "year": 2025,
+                "month": 4,
+                "day": 15,
+                "hour": 9,
+                "minute": 5,
+                "second": 17,
+                "microsecond": 753000
+            },
+            "EndTime": {
+                "__class__": "datetime",
+                "year": 2025,
+                "month": 4,
+                "day": 15,
+                "hour": 9,
+                "minute": 16,
+                "second": 27,
+                "microsecond": 69000
+            },
+            "TrainingStartTime": {
+                "__class__": "datetime",
+                "year": 2025,
+                "month": 4,
+                "day": 15,
+                "hour": 9,
+                "minute": 13,
+                "second": 8,
+                "microsecond": 301000
+            },
+            "TrainingEndTime": {
+                "__class__": "datetime",
+                "year": 2025,
+                "month": 4,
+                "day": 15,
+                "hour": 9,
+                "minute": 16,
+                "second": 3,
+                "microsecond": 699000
+            },
+            "InputDataConfig": {
+                "DataFormat": "COMPREHEND_CSV",
+                "EntityTypes": [
+                    {
+                        "Type": "PERSON"
+                    },
+                    {
+                        "Type": "ORGANIZATION"
+                    },
+                    {
+                        "Type": "LOCATION"
+                    },
+                    {
+                        "Type": "EMAIL"
+                    },
+                    {
+                        "Type": "PHONE_NUMBER"
+                    },
+                    {
+                        "Type": "PRODUCT"
+                    }
+                ],
+                "Documents": {
+                    "S3Uri": "s3://c7n-test-s3-bucket/sample2.txt",
+                    "InputFormat": "ONE_DOC_PER_LINE"
+                },
+                "EntityList": {
+                    "S3Uri": "s3://c7n-test-s3-bucket/TrainingData2 - Sheet1.csv"
+                }
+            },
+            "DataAccessRoleArn": "arn:aws:iam::644160558196:role/ComprehendVpcAccessRole",
+            "VpcConfig": {
+                "SecurityGroupIds": [
+                    "sg-0d74b07ab0b3288c0"
+                ],
+                "Subnets": [
+                    "subnet-0ebe9abf587c5070c"
+                ]
+            },
+            "VersionName": "7"
+        },
+        "ResponseMetadata": {}
+    }
+}

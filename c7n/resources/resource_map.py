@@ -59,10 +59,28 @@ ResourceMap = {
   "aws.codedeploy-group": "c7n.resources.code.CodeDeployDeploymentGroup",
   "aws.codepipeline": "c7n.resources.code.CodeDeployPipeline",
   "aws.composite-alarm": "c7n.resources.cw.CompositeAlarm",
-  "aws.comprehend-document-classifier": "c7n.resources.comprehend.ComprehendDocumentClassifier",
+  "aws.comprehend-document-classification-job":
+    "c7n.resources.comprehend.ComprehendDocumentClassificationJob",
+  "aws.comprehend-document-classifier":
+    "c7n.resources.comprehend.ComprehendDocumentClassifier",
+  "aws.comprehend-dominant-language-detection-job":
+    "c7n.resources.comprehend.ComprehendDominantLanguageDetectionJob",
   "aws.comprehend-endpoint": "c7n.resources.comprehend.ComprehendEndpoint",
+  "aws.comprehend-entities-detection-job":
+   "c7n.resources.comprehend.ComprehendEntitiesDetectionJob",
   "aws.comprehend-entity-recognizer": "c7n.resources.comprehend.ComprehendEntityRecognizer",
+  "aws.comprehend-events-detection-job": "c7n.resources.comprehend.ComprehendEventsDetectionJob",
   "aws.comprehend-flywheel": "c7n.resources.comprehend.ComprehendFlywheel",
+  "aws.comprehend-key-phrases-detection-job":
+  "c7n.resources.comprehend.ComprehendKeyPhrasesDetectionJob",
+  "aws.comprehend-pii-entities-detection-job":
+    "c7n.resources.comprehend.ComprehendPiiEntitiesDetectionJob",
+  "aws.comprehend-sentiment-detection-job":
+    "c7n.resources.comprehend.ComprehendSentimentDetectionJob",
+  "aws.comprehend-targeted-sentiment-detection-job":
+    "c7n.resources.comprehend.ComprehendTargetedSentimentDetectionJob",
+  "aws.comprehend-topics-detection-job":
+    "c7n.resources.comprehend.ComprehendTopicsDetectionJob",
   "aws.config-recorder": "c7n.resources.config.ConfigRecorder",
   "aws.config-rule": "c7n.resources.config.ConfigRule",
   "aws.connect-campaign": "c7n.resources.connect.ConnectCampaign",
@@ -327,6 +345,7 @@ ResourceMap = {
   "aws.vpc": "c7n.resources.vpc.Vpc",
   "aws.vpc-endpoint": "c7n.resources.vpc.VpcEndpoint",
   "aws.vpc-endpoint-service-configuration": "c7n.resources.vpc.VPCEndpointServiceConfiguration",
+  "aws.client-vpn-endpoint": "c7n.resources.vpc.ClientVpnEndpoint",
   "aws.vpn-connection": "c7n.resources.vpc.VPNConnection",
   "aws.vpn-gateway": "c7n.resources.vpc.VPNGateway",
   "aws.waf": "c7n.resources.waf.WAF",

@@ -2466,6 +2466,63 @@ class CrossAccountChecker(TestCase):
             violations = checker.check(p)
             self.assertEqual(bool(violations), expected)
 
+    def test_s3_resource_org_id(self):
+        policies = load_data("iam/s3-resource-orgid.json")
+        checker = PolicyChecker(
+            {
+                "allowed_orgid": {"o-goodorg"}
+            }
+        )
+        for p, expected in zip(policies, [False, True]):
+            violations = checker.check(p)
+            self.assertEqual(bool(violations), expected)
+        checker = PolicyChecker(
+            {
+                "allowed_orgid": {}
+            }
+        )
+        for p, expected in zip(policies, [True, True]):
+            violations = checker.check(p)
+            self.assertEqual(bool(violations), expected)
+
+    def test_s3_arn_condition(self):
+        policies = load_data("iam/s3-arn-conditions.json")
+        checker = PolicyChecker(
+            {
+                "allowed_accounts": {"123456789012"}
+            }
+        )
+        for p, expected in zip(policies, [False, True]):
+            violations = checker.check(p)
+            self.assertEqual(bool(violations), expected)
+        checker = PolicyChecker(
+            {
+                "allowed_accounts": {}
+            }
+        )
+        for p, expected in zip(policies, [True, True]):
+            violations = checker.check(p)
+            self.assertEqual(bool(violations), expected)
+
+    def test_s3_principal_account(self):
+        policies = load_data("iam/s3-principal-accounts.json")
+        checker = PolicyChecker(
+            {
+                "allowed_accounts": {"123456789012"}
+            }
+        )
+        for p, expected in zip(policies, [False, True]):
+            violations = checker.check(p)
+            self.assertEqual(bool(violations), expected)
+        checker = PolicyChecker(
+            {
+                "allowed_accounts": {}
+            }
+        )
+        for p, expected in zip(policies, [True, True]):
+            violations = checker.check(p)
+            self.assertEqual(bool(violations), expected)
+
 
 class SetRolePolicyAction(BaseTest):
     def test_set_policy_attached(self):
