@@ -1,6 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-oSHELL := /bin/bash
+SHELL := /bin/bash
 SELF_MAKE := $(lastword $(MAKEFILE_LIST))
 
 PKG_REPO = testpypi
