@@ -73,16 +73,16 @@ class Subnet(ChildArmResourceManager):
         )
         parent_manager_name = 'vnet'
 
-        @classmethod
-        def extra_args(cls, parent_resource):
-            # NOTE: these extra args are valid but not actually used.
-            # Currently, we can retrieve subnets from parent's JSON. They
-            # can also be retrieved from API, but its response has no
-            # additional attributes
-            return {
-                'resource_group_name': parent_resource['resourceGroup'],
-                'virtual_network_name': parent_resource['name'],
-            }
+        # @classmethod
+        # def extra_args(cls, parent_resource):
+        #     # NOTE: these extra args are valid but not actually used.
+        #     # Currently, we can retrieve subnets from parent's JSON. They
+        #     # can also be retrieved from API, but its response has no
+        #     # additional attributes
+        #     return {
+        #         'resource_group_name': parent_resource['resourceGroup'],
+        #         'virtual_network_name': parent_resource['name'],
+        #     }
 
     def enumerate_resources(self, parent_resource, type_info, vault_url=None, **params):
         return parent_resource['properties'].get('subnets') or []

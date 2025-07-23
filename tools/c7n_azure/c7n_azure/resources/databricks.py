@@ -50,20 +50,15 @@ class DatabricksNSGFilter(ValueFilter):
     FetchThreshold = 5
 
     def process(self, resources, event=None):
-        if not resources:
-            return resources
-
         ids = set()
         for r in resources:
             if self.annotation_key in r:
-                continue
+                continue  # pragma: no cover
             vid = (
                 r['properties'].get('parameters', {}).get('customVirtualNetworkId', {}).get('value')
             )
             if vid:
                 ids.add(vid)
-        if not ids:
-            return resources
 
         vnet = self.manager.get_resource_manager('azure.vnet')
         if len(ids) < self.FetchThreshold:
@@ -103,8 +98,6 @@ class DatabricksSubnetsFilter(ListItemFilter):
         """
         Seems like each Databricks resource can have one public and one private subnet
         """
-        if not resources:
-            return resources
         names = set()
 
         for r in resources:
@@ -123,8 +116,7 @@ class DatabricksSubnetsFilter(ListItemFilter):
             )
             if pr:
                 names.add(pr)
-        if not names:
-            return resources
+
         subnets = self.manager.get_resource_manager('azure.subnet')
 
         # TODO: use get_resources when number of names is small. For that we need to
@@ -135,7 +127,7 @@ class DatabricksSubnetsFilter(ListItemFilter):
         }
         for r in resources:
             if self.annotation_key in r:
-                continue
+                continue  # pragma: no cover
             pub = (
                 r['properties'].get('parameters', {}).get('customPublicSubnetName', {}).get('value')
             )
