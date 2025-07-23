@@ -1,0 +1,183 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.MachineLearningServices/workspaces?api-version=2023-04-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "x-request-time": [
+                        "0.035"
+                    ],
+                    "x-ms-response-type": [
+                        "standard"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Wed, 23 Jul 2025 10:52:29 GMT"
+                    ],
+                    "x-ms-original-request-ids": [
+                        ""
+                    ],
+                    "azureml-served-by-cluster": [
+                        "vienna-eastus-01"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: A31307967D9A4D78B3F926753912E5B4 Ref B: CPH011050218034 Ref C: 2025-07-23T10:52:29Z"
+                    ],
+                    "request-context": [
+                        "appId=cid-v1:2d2e8e63-272e-4b3c-8598-4ee570a0e70d"
+                    ],
+                    "content-length": [
+                        "2425"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/165-rg-red/providers/Microsoft.MachineLearningServices/workspaces/mlwsp165red",
+                                "name": "mlwsp165red",
+                                "type": "Microsoft.MachineLearningServices/workspaces",
+                                "location": "eastus",
+                                "tags": {
+                                    "ComplianceStatus": "Red",
+                                    "CustodianRule": "ecc-azure-165-asb_ml_workspaces_private_link"
+                                },
+                                "etag": null,
+                                "properties": {
+                                    "friendlyName": "",
+                                    "description": "",
+                                    "storageAccount": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/165-rg-red/providers/Microsoft.Storage/storageAccounts/storage165red",
+                                    "keyVault": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/165-rg-red/providers/Microsoft.Keyvault/vaults/kv165red15",
+                                    "applicationInsights": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/165-rg-red/providers/Microsoft.insights/components/appins165red",
+                                    "hbiWorkspace": false,
+                                    "tenantId": "00000000-0000-0000-0000-000000000003",
+                                    "imageBuildCompute": null,
+                                    "provisioningState": "Succeeded",
+                                    "managedNetwork": {
+                                        "changeableIsolationModes": [],
+                                        "isolationMode": "Disabled",
+                                        "enableNetworkMonitor": false,
+                                        "enableFirewallLog": false
+                                    },
+                                    "allowRoleAssignmentOnRG": true,
+                                    "v1LegacyMode": false,
+                                    "softDeleteEnabled": false,
+                                    "creationTime": "2025-07-23T09:27:56.3462691Z",
+                                    "notebookInfo": {
+                                        "resourceId": "9868333efd5e453cbe64d7fe2f7c6223",
+                                        "fqdn": "ml-mlwsp165red-eastus-abf3e9ba-2bc9-49d6-9e08-4660e1b8a62a.eastus.notebooks.azure.net",
+                                        "isPrivateLinkEnabled": false,
+                                        "notebookPreparationError": null
+                                    },
+                                    "storageHnsEnabled": false,
+                                    "workspaceId": "abf3e9ba-2bc9-49d6-9e08-4660e1b8a62a",
+                                    "linkedModelInventoryArmId": null,
+                                    "privateLinkCount": 0,
+                                    "publicNetworkAccess": "Disabled",
+                                    "discoveryUrl": "https://eastus.api.azureml.ms/discovery",
+                                    "mlFlowTrackingUri": "azureml://eastus.api.azureml.ms/mlflow/v1.0/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/165-rg-red/providers/Microsoft.MachineLearningServices/workspaces/mlwsp165red",
+                                    "sdkTelemetryAppInsightsKey": "71fa86c2-fe23-49db-bb2e-8537edfb6ead",
+                                    "enableDataIsolation": false
+                                },
+                                "identity": {
+                                    "type": "SystemAssigned",
+                                    "principalId": "bf87c5e2-f3e6-45cd-b6cf-6d9004543e2e",
+                                    "tenantId": "00000000-0000-0000-0000-000000000003"
+                                },
+                                "kind": "Default",
+                                "sku": {
+                                    "name": "Basic",
+                                    "tier": "Basic"
+                                },
+                                "systemData": {
+                                    "createdAt": "2025-07-23T09:27:56.3462691Z",
+                                    "createdBy": "duma12let@gmail.com",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2025-07-23T09:27:56.3462691Z",
+                                    "lastModifiedBy": "duma12let@gmail.com",
+                                    "lastModifiedByType": "User"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/165-rg-red/providers/Microsoft.MachineLearningServices//workspaces/mlwsp165red/providers/Microsoft.Authorization/locks?api-version=2016-09-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Wed, 23 Jul 2025 10:52:31 GMT"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-operation-identifier": [
+                        "tenantId=7a2f64e5-cac1-4ea1-abab-c7fdb6a799b8,objectId=b95cc733-b44c-43e8-a2b8-ad5bf922f668/southcentralus/3073faac-d98a-455c-9f7f-8b5a14594c68"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 386FA366D723448683792955BD3C399D Ref B: CPH011050219042 Ref C: 2025-07-23T10:52:30Z"
+                    ],
+                    "content-length": [
+                        "314"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "properties": {
+                                    "level": "ReadOnly",
+                                    "notes": ""
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/165-rg-red/providers/Microsoft.MachineLearningServices/workspaces/mlwsp165red/providers/Microsoft.Authorization/locks/my-lock",
+                                "type": "Microsoft.Authorization/locks",
+                                "name": "my-lock"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

@@ -1,5 +1,5 @@
 from c7n_azure.provider import resources
-from c7n_azure.query import QueryResourceManager
+from c7n_azure.resources.arm import ArmResourceManager
 from c7n.utils import type_schema
 from c7n.filters import ListItemFilter
 from c7n_azure.utils import ResourceIdParser
@@ -8,7 +8,7 @@ from azure.mgmt.machinelearningservices.models import (ComputeInstanceProperties
 
 
 @resources.register('machine-learning-workspace')
-class MachineLearningWorkspace(QueryResourceManager):
+class MachineLearningWorkspace(ArmResourceManager):
     """Machine Learning Workspace Resource
 
     :example:
@@ -23,12 +23,13 @@ class MachineLearningWorkspace(QueryResourceManager):
 
     """
 
-    class resource_type(QueryResourceManager.resource_type):
+    class resource_type(ArmResourceManager.resource_type):
         doc_groups = ['ML']
 
         service = 'azure.mgmt.machinelearningservices'
         client = 'MachineLearningServicesMgmtClient'
         enum_spec = ('workspaces', 'list_by_subscription', None)
+        resource_type = 'Microsoft.MachineLearningServices/workspaces'
 
 
 @MachineLearningWorkspace.filter_registry.register("compute-instances")
