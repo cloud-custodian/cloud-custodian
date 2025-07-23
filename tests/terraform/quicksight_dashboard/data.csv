@@ -1,0 +1,6 @@
+id,name,signup_date,active,score
+1,Alice,2023-01-15,true,82.5
+2,Bob,2023-03-22,false,67.0
+3,Charlie,2023-05-10,true,91.2
+4,Diana,2023-07-01,true,76.8
+5,Evan,2023-09-14,false,59.4

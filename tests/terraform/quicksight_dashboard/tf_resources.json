@@ -1,0 +1,994 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_iam_policy": {
+            "quicksight_s3_policy": {
+                "arn": "arn:aws:iam::644160558196:policy/QuickSightS3AccessPolicy",
+                "attachment_count": 0,
+                "description": "",
+                "id": "arn:aws:iam::644160558196:policy/QuickSightS3AccessPolicy",
+                "name": "QuickSightS3AccessPolicy",
+                "name_prefix": "",
+                "path": "/",
+                "policy": "{\"Statement\":[{\"Action\":[\"s3:GetObject\",\"s3:ListBucket\"],\"Effect\":\"Allow\",\"Resource\":[\"arn:aws:s3:::c7ntest-quicksight-test-bucket\",\"arn:aws:s3:::c7ntest-quicksight-test-bucket/*\"]}],\"Version\":\"2012-10-17\"}",
+                "policy_id": "ANPAZL6XWCR2JSU5NK77T",
+                "tags": null,
+                "tags_all": {}
+            }
+        },
+        "aws_iam_role": {
+            "quicksight_s3_role": {
+                "arn": "arn:aws:iam::644160558196:role/QuickSightS3AccessRole",
+                "assume_role_policy": "{\"Statement\":[{\"Action\":\"sts:AssumeRole\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"quicksight.amazonaws.com\"}}],\"Version\":\"2012-10-17\"}",
+                "create_date": "2025-07-21T20:00:28Z",
+                "description": "",
+                "force_detach_policies": false,
+                "id": "QuickSightS3AccessRole",
+                "inline_policy": [],
+                "managed_policy_arns": [],
+                "max_session_duration": 3600,
+                "name": "QuickSightS3AccessRole",
+                "name_prefix": "",
+                "path": "/",
+                "permissions_boundary": "",
+                "tags": null,
+                "tags_all": {},
+                "unique_id": "AROAZL6XWCR2L6UA252PQ"
+            }
+        },
+        "aws_iam_role_policy_attachment": {
+            "quicksight_s3_role_attach": {
+                "id": "QuickSightS3AccessRole/arn:aws:iam::644160558196:policy/QuickSightS3AccessPolicy",
+                "policy_arn": "arn:aws:iam::644160558196:policy/QuickSightS3AccessPolicy",
+                "role": "QuickSightS3AccessRole"
+            }
+        },
+        "aws_quicksight_dashboard": {
+            "not_owner_tagged_dashboard": {
+                "arn": "arn:aws:quicksight:us-east-1:644160558196:dashboard/not-owner-tagged-dashboard-id",
+                "aws_account_id": "644160558196",
+                "created_time": "2025-07-21T20:00:45Z",
+                "dashboard_id": "not-owner-tagged-dashboard-id",
+                "dashboard_publish_options": [
+                    {
+                        "ad_hoc_filtering_option": [
+                            {
+                                "availability_status": "ENABLED"
+                            }
+                        ],
+                        "data_point_drill_up_down_option": [
+                            {
+                                "availability_status": "ENABLED"
+                            }
+                        ],
+                        "data_point_menu_label_option": [
+                            {
+                                "availability_status": "ENABLED"
+                            }
+                        ],
+                        "data_point_tooltip_option": [
+                            {
+                                "availability_status": "ENABLED"
+                            }
+                        ],
+                        "export_to_csv_option": [
+                            {
+                                "availability_status": "ENABLED"
+                            }
+                        ],
+                        "export_with_hidden_fields_option": [
+                            {
+                                "availability_status": "DISABLED"
+                            }
+                        ],
+                        "sheet_controls_option": [
+                            {
+                                "visibility_state": "COLLAPSED"
+                            }
+                        ],
+                        "sheet_layout_element_maximization_option": [
+                            {
+                                "availability_status": "ENABLED"
+                            }
+                        ],
+                        "visual_axis_sort_option": [
+                            {
+                                "availability_status": "ENABLED"
+                            }
+                        ],
+                        "visual_menu_option": [
+                            {
+                                "availability_status": "ENABLED"
+                            }
+                        ]
+                    }
+                ],
+                "definition": [
+                    {
+                        "analysis_defaults": [],
+                        "calculated_fields": [],
+                        "column_configurations": [],
+                        "data_set_identifiers_declarations": [
+                            {
+                                "data_set_arn": "arn:aws:quicksight:us-east-1:644160558196:dataset/example-dataset",
+                                "identifier": "main"
+                            }
+                        ],
+                        "filter_groups": [],
+                        "parameter_declarations": [],
+                        "sheets": [
+                            {
+                                "content_type": "INTERACTIVE",
+                                "description": "",
+                                "filter_controls": [],
+                                "layouts": [
+                                    {
+                                        "configuration": [
+                                            {
+                                                "free_form_layout": [],
+                                                "grid_layout": [
+                                                    {
+                                                        "canvas_size_options": [],
+                                                        "elements": [
+                                                            {
+                                                                "column_index": "",
+                                                                "column_span": 18,
+                                                                "element_id": "line1",
+                                                                "element_type": "VISUAL",
+                                                                "row_index": "",
+                                                                "row_span": 12
+                                                            }
+                                                        ]
+                                                    }
+                                                ],
+                                                "section_based_layout": []
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "name": "",
+                                "parameter_controls": [],
+                                "sheet_control_layouts": [],
+                                "sheet_id": "sheet1",
+                                "text_boxes": [],
+                                "title": "Sheet",
+                                "visuals": [
+                                    {
+                                        "bar_chart_visual": [],
+                                        "box_plot_visual": [],
+                                        "combo_chart_visual": [],
+                                        "custom_content_visual": [],
+                                        "empty_visual": [],
+                                        "filled_map_visual": [],
+                                        "funnel_chart_visual": [],
+                                        "gauge_chart_visual": [],
+                                        "geospatial_map_visual": [],
+                                        "heat_map_visual": [],
+                                        "histogram_visual": [],
+                                        "insight_visual": [],
+                                        "kpi_visual": [],
+                                        "line_chart_visual": [
+                                            {
+                                                "actions": [],
+                                                "chart_configuration": [
+                                                    {
+                                                        "contribution_analysis_defaults": [],
+                                                        "data_labels": [],
+                                                        "default_series_settings": [],
+                                                        "field_wells": [
+                                                            {
+                                                                "line_chart_aggregated_field_wells": [
+                                                                    {
+                                                                        "category": [],
+                                                                        "colors": [],
+                                                                        "small_multiples": [],
+                                                                        "values": []
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ],
+                                                        "forecast_configurations": [],
+                                                        "legend": [],
+                                                        "primary_y_axis_display_options": [],
+                                                        "primary_y_axis_label_options": [],
+                                                        "reference_lines": [],
+                                                        "secondary_y_axis_display_options": [],
+                                                        "secondary_y_axis_label_options": [],
+                                                        "series": [],
+                                                        "small_multiples_options": [],
+                                                        "sort_configuration": [
+                                                            {
+                                                                "category_items_limit_configuration": null,
+                                                                "category_sort": null,
+                                                                "color_items_limit_configuration": null,
+                                                                "small_multiples_limit_configuration": null,
+                                                                "small_multiples_sort": null
+                                                            }
+                                                        ],
+                                                        "tooltip": [],
+                                                        "type": "LINE",
+                                                        "visual_palette": [],
+                                                        "x_axis_display_options": [],
+                                                        "x_axis_label_options": []
+                                                    }
+                                                ],
+                                                "column_hierarchies": [],
+                                                "subtitle": [
+                                                    {
+                                                        "format_text": [],
+                                                        "visibility": "VISIBLE"
+                                                    }
+                                                ],
+                                                "title": [
+                                                    {
+                                                        "format_text": [
+                                                            {
+                                                                "plain_text": "Line Chart",
+                                                                "rich_text": ""
+                                                            }
+                                                        ],
+                                                        "visibility": "VISIBLE"
+                                                    }
+                                                ],
+                                                "visual_id": "line1"
+                                            }
+                                        ],
+                                        "pie_chart_visual": [],
+                                        "pivot_table_visual": [],
+                                        "radar_chart_visual": [],
+                                        "sankey_diagram_visual": [],
+                                        "scatter_plot_visual": [],
+                                        "table_visual": [],
+                                        "tree_map_visual": [],
+                                        "waterfall_visual": [],
+                                        "word_cloud_visual": []
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "id": "644160558196,not-owner-tagged-dashboard-id",
+                "last_published_time": null,
+                "last_updated_time": "2025-07-21T20:00:45Z",
+                "name": "not-owner-tagged-dashboard-name",
+                "parameters": null,
+                "permissions": [],
+                "region": "us-east-1",
+                "source_entity": [],
+                "source_entity_arn": "",
+                "status": "CREATION_SUCCESSFUL",
+                "tags": {
+                    "Env": "dev"
+                },
+                "tags_all": {
+                    "Env": "dev"
+                },
+                "theme_arn": null,
+                "timeouts": null,
+                "version_description": "version",
+                "version_number": 1
+            },
+            "tagged_dashboard": {
+                "arn": "arn:aws:quicksight:us-east-1:644160558196:dashboard/tagged-dashboard-id",
+                "aws_account_id": "644160558196",
+                "created_time": "2025-07-21T20:00:45Z",
+                "dashboard_id": "tagged-dashboard-id",
+                "dashboard_publish_options": [
+                    {
+                        "ad_hoc_filtering_option": [
+                            {
+                                "availability_status": "ENABLED"
+                            }
+                        ],
+                        "data_point_drill_up_down_option": [
+                            {
+                                "availability_status": "ENABLED"
+                            }
+                        ],
+                        "data_point_menu_label_option": [
+                            {
+                                "availability_status": "ENABLED"
+                            }
+                        ],
+                        "data_point_tooltip_option": [
+                            {
+                                "availability_status": "ENABLED"
+                            }
+                        ],
+                        "export_to_csv_option": [
+                            {
+                                "availability_status": "ENABLED"
+                            }
+                        ],
+                        "export_with_hidden_fields_option": [
+                            {
+                                "availability_status": "DISABLED"
+                            }
+                        ],
+                        "sheet_controls_option": [
+                            {
+                                "visibility_state": "COLLAPSED"
+                            }
+                        ],
+                        "sheet_layout_element_maximization_option": [
+                            {
+                                "availability_status": "ENABLED"
+                            }
+                        ],
+                        "visual_axis_sort_option": [
+                            {
+                                "availability_status": "ENABLED"
+                            }
+                        ],
+                        "visual_menu_option": [
+                            {
+                                "availability_status": "ENABLED"
+                            }
+                        ]
+                    }
+                ],
+                "definition": [
+                    {
+                        "analysis_defaults": [],
+                        "calculated_fields": [],
+                        "column_configurations": [],
+                        "data_set_identifiers_declarations": [
+                            {
+                                "data_set_arn": "arn:aws:quicksight:us-east-1:644160558196:dataset/example-dataset",
+                                "identifier": "main"
+                            }
+                        ],
+                        "filter_groups": [],
+                        "parameter_declarations": [],
+                        "sheets": [
+                            {
+                                "content_type": "INTERACTIVE",
+                                "description": "",
+                                "filter_controls": [],
+                                "layouts": [
+                                    {
+                                        "configuration": [
+                                            {
+                                                "free_form_layout": [],
+                                                "grid_layout": [
+                                                    {
+                                                        "canvas_size_options": [],
+                                                        "elements": [
+                                                            {
+                                                                "column_index": "",
+                                                                "column_span": 18,
+                                                                "element_id": "line1",
+                                                                "element_type": "VISUAL",
+                                                                "row_index": "",
+                                                                "row_span": 12
+                                                            }
+                                                        ]
+                                                    }
+                                                ],
+                                                "section_based_layout": []
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "name": "",
+                                "parameter_controls": [],
+                                "sheet_control_layouts": [],
+                                "sheet_id": "sheet1",
+                                "text_boxes": [],
+                                "title": "Sheet",
+                                "visuals": [
+                                    {
+                                        "bar_chart_visual": [],
+                                        "box_plot_visual": [],
+                                        "combo_chart_visual": [],
+                                        "custom_content_visual": [],
+                                        "empty_visual": [],
+                                        "filled_map_visual": [],
+                                        "funnel_chart_visual": [],
+                                        "gauge_chart_visual": [],
+                                        "geospatial_map_visual": [],
+                                        "heat_map_visual": [],
+                                        "histogram_visual": [],
+                                        "insight_visual": [],
+                                        "kpi_visual": [],
+                                        "line_chart_visual": [
+                                            {
+                                                "actions": [],
+                                                "chart_configuration": [
+                                                    {
+                                                        "contribution_analysis_defaults": [],
+                                                        "data_labels": [],
+                                                        "default_series_settings": [],
+                                                        "field_wells": [
+                                                            {
+                                                                "line_chart_aggregated_field_wells": [
+                                                                    {
+                                                                        "category": [],
+                                                                        "colors": [],
+                                                                        "small_multiples": [],
+                                                                        "values": []
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ],
+                                                        "forecast_configurations": [],
+                                                        "legend": [],
+                                                        "primary_y_axis_display_options": [],
+                                                        "primary_y_axis_label_options": [],
+                                                        "reference_lines": [],
+                                                        "secondary_y_axis_display_options": [],
+                                                        "secondary_y_axis_label_options": [],
+                                                        "series": [],
+                                                        "small_multiples_options": [],
+                                                        "sort_configuration": [
+                                                            {
+                                                                "category_items_limit_configuration": null,
+                                                                "category_sort": null,
+                                                                "color_items_limit_configuration": null,
+                                                                "small_multiples_limit_configuration": null,
+                                                                "small_multiples_sort": null
+                                                            }
+                                                        ],
+                                                        "tooltip": [],
+                                                        "type": "LINE",
+                                                        "visual_palette": [],
+                                                        "x_axis_display_options": [],
+                                                        "x_axis_label_options": []
+                                                    }
+                                                ],
+                                                "column_hierarchies": [],
+                                                "subtitle": [
+                                                    {
+                                                        "format_text": [],
+                                                        "visibility": "VISIBLE"
+                                                    }
+                                                ],
+                                                "title": [
+                                                    {
+                                                        "format_text": [
+                                                            {
+                                                                "plain_text": "Line Chart",
+                                                                "rich_text": ""
+                                                            }
+                                                        ],
+                                                        "visibility": "VISIBLE"
+                                                    }
+                                                ],
+                                                "visual_id": "line1"
+                                            }
+                                        ],
+                                        "pie_chart_visual": [],
+                                        "pivot_table_visual": [],
+                                        "radar_chart_visual": [],
+                                        "sankey_diagram_visual": [],
+                                        "scatter_plot_visual": [],
+                                        "table_visual": [],
+                                        "tree_map_visual": [],
+                                        "waterfall_visual": [],
+                                        "word_cloud_visual": []
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "id": "644160558196,tagged-dashboard-id",
+                "last_published_time": null,
+                "last_updated_time": "2025-07-21T20:00:45Z",
+                "name": "tagged-dashboard-name",
+                "parameters": null,
+                "permissions": [],
+                "region": "us-east-1",
+                "source_entity": [],
+                "source_entity_arn": "",
+                "status": "CREATION_SUCCESSFUL",
+                "tags": {
+                    "Owner": "c7n"
+                },
+                "tags_all": {
+                    "Owner": "c7n"
+                },
+                "theme_arn": null,
+                "timeouts": null,
+                "version_description": "basic version",
+                "version_number": 1
+            },
+            "untagged_dashboard": {
+                "arn": "arn:aws:quicksight:us-east-1:644160558196:dashboard/untagged-dashboard-id",
+                "aws_account_id": "644160558196",
+                "created_time": "2025-07-21T20:00:45Z",
+                "dashboard_id": "untagged-dashboard-id",
+                "dashboard_publish_options": [
+                    {
+                        "ad_hoc_filtering_option": [
+                            {
+                                "availability_status": "ENABLED"
+                            }
+                        ],
+                        "data_point_drill_up_down_option": [
+                            {
+                                "availability_status": "ENABLED"
+                            }
+                        ],
+                        "data_point_menu_label_option": [
+                            {
+                                "availability_status": "ENABLED"
+                            }
+                        ],
+                        "data_point_tooltip_option": [
+                            {
+                                "availability_status": "ENABLED"
+                            }
+                        ],
+                        "export_to_csv_option": [
+                            {
+                                "availability_status": "ENABLED"
+                            }
+                        ],
+                        "export_with_hidden_fields_option": [
+                            {
+                                "availability_status": "DISABLED"
+                            }
+                        ],
+                        "sheet_controls_option": [
+                            {
+                                "visibility_state": "COLLAPSED"
+                            }
+                        ],
+                        "sheet_layout_element_maximization_option": [
+                            {
+                                "availability_status": "ENABLED"
+                            }
+                        ],
+                        "visual_axis_sort_option": [
+                            {
+                                "availability_status": "ENABLED"
+                            }
+                        ],
+                        "visual_menu_option": [
+                            {
+                                "availability_status": "ENABLED"
+                            }
+                        ]
+                    }
+                ],
+                "definition": [
+                    {
+                        "analysis_defaults": [],
+                        "calculated_fields": [],
+                        "column_configurations": [],
+                        "data_set_identifiers_declarations": [
+                            {
+                                "data_set_arn": "arn:aws:quicksight:us-east-1:644160558196:dataset/example-dataset",
+                                "identifier": "main"
+                            }
+                        ],
+                        "filter_groups": [],
+                        "parameter_declarations": [],
+                        "sheets": [
+                            {
+                                "content_type": "INTERACTIVE",
+                                "description": "",
+                                "filter_controls": [],
+                                "layouts": [
+                                    {
+                                        "configuration": [
+                                            {
+                                                "free_form_layout": [],
+                                                "grid_layout": [
+                                                    {
+                                                        "canvas_size_options": [],
+                                                        "elements": [
+                                                            {
+                                                                "column_index": "",
+                                                                "column_span": 18,
+                                                                "element_id": "line1",
+                                                                "element_type": "VISUAL",
+                                                                "row_index": "",
+                                                                "row_span": 12
+                                                            }
+                                                        ]
+                                                    }
+                                                ],
+                                                "section_based_layout": []
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "name": "",
+                                "parameter_controls": [],
+                                "sheet_control_layouts": [],
+                                "sheet_id": "sheet1",
+                                "text_boxes": [],
+                                "title": "Sheet",
+                                "visuals": [
+                                    {
+                                        "bar_chart_visual": [],
+                                        "box_plot_visual": [],
+                                        "combo_chart_visual": [],
+                                        "custom_content_visual": [],
+                                        "empty_visual": [],
+                                        "filled_map_visual": [],
+                                        "funnel_chart_visual": [],
+                                        "gauge_chart_visual": [],
+                                        "geospatial_map_visual": [],
+                                        "heat_map_visual": [],
+                                        "histogram_visual": [],
+                                        "insight_visual": [],
+                                        "kpi_visual": [],
+                                        "line_chart_visual": [
+                                            {
+                                                "actions": [],
+                                                "chart_configuration": [
+                                                    {
+                                                        "contribution_analysis_defaults": [],
+                                                        "data_labels": [],
+                                                        "default_series_settings": [],
+                                                        "field_wells": [
+                                                            {
+                                                                "line_chart_aggregated_field_wells": [
+                                                                    {
+                                                                        "category": [],
+                                                                        "colors": [],
+                                                                        "small_multiples": [],
+                                                                        "values": []
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ],
+                                                        "forecast_configurations": [],
+                                                        "legend": [],
+                                                        "primary_y_axis_display_options": [],
+                                                        "primary_y_axis_label_options": [],
+                                                        "reference_lines": [],
+                                                        "secondary_y_axis_display_options": [],
+                                                        "secondary_y_axis_label_options": [],
+                                                        "series": [],
+                                                        "small_multiples_options": [],
+                                                        "sort_configuration": [
+                                                            {
+                                                                "category_items_limit_configuration": null,
+                                                                "category_sort": null,
+                                                                "color_items_limit_configuration": null,
+                                                                "small_multiples_limit_configuration": null,
+                                                                "small_multiples_sort": null
+                                                            }
+                                                        ],
+                                                        "tooltip": [],
+                                                        "type": "LINE",
+                                                        "visual_palette": [],
+                                                        "x_axis_display_options": [],
+                                                        "x_axis_label_options": []
+                                                    }
+                                                ],
+                                                "column_hierarchies": [],
+                                                "subtitle": [
+                                                    {
+                                                        "format_text": [],
+                                                        "visibility": "VISIBLE"
+                                                    }
+                                                ],
+                                                "title": [
+                                                    {
+                                                        "format_text": [
+                                                            {
+                                                                "plain_text": "Line Chart",
+                                                                "rich_text": ""
+                                                            }
+                                                        ],
+                                                        "visibility": "VISIBLE"
+                                                    }
+                                                ],
+                                                "visual_id": "line1"
+                                            }
+                                        ],
+                                        "pie_chart_visual": [],
+                                        "pivot_table_visual": [],
+                                        "radar_chart_visual": [],
+                                        "sankey_diagram_visual": [],
+                                        "scatter_plot_visual": [],
+                                        "table_visual": [],
+                                        "tree_map_visual": [],
+                                        "waterfall_visual": [],
+                                        "word_cloud_visual": []
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "id": "644160558196,untagged-dashboard-id",
+                "last_published_time": null,
+                "last_updated_time": "2025-07-21T20:00:46Z",
+                "name": "untagged-dashboard-name",
+                "parameters": null,
+                "permissions": [],
+                "region": "us-east-1",
+                "source_entity": [],
+                "source_entity_arn": "",
+                "status": "CREATION_SUCCESSFUL",
+                "tags": null,
+                "tags_all": {},
+                "theme_arn": null,
+                "timeouts": null,
+                "version_description": "version",
+                "version_number": 1
+            }
+        },
+        "aws_quicksight_data_set": {
+            "example": {
+                "arn": "arn:aws:quicksight:us-east-1:644160558196:dataset/example-dataset",
+                "aws_account_id": "644160558196",
+                "column_groups": [],
+                "column_level_permission_rules": [],
+                "data_set_id": "example-dataset",
+                "data_set_usage_configuration": [
+                    {
+                        "disable_use_as_direct_query_source": false,
+                        "disable_use_as_imported_source": false
+                    }
+                ],
+                "field_folders": [],
+                "id": "644160558196,example-dataset",
+                "import_mode": "SPICE",
+                "logical_table_map": [
+                    {
+                        "alias": "Group 1",
+                        "data_transforms": [],
+                        "logical_table_map_id": "main",
+                        "source": [
+                            {
+                                "data_set_arn": "",
+                                "join_instruction": [],
+                                "physical_table_id": "main"
+                            }
+                        ]
+                    }
+                ],
+                "name": "example-dataset",
+                "output_columns": [
+                    {
+                        "description": "",
+                        "name": "id",
+                        "type": "STRING"
+                    }
+                ],
+                "permissions": [],
+                "physical_table_map": [
+                    {
+                        "custom_sql": [],
+                        "physical_table_map_id": "main",
+                        "relational_table": [],
+                        "s3_source": [
+                            {
+                                "data_source_arn": "arn:aws:quicksight:us-east-1:644160558196:datasource/example-source",
+                                "input_columns": [
+                                    {
+                                        "name": "id",
+                                        "type": "STRING"
+                                    }
+                                ],
+                                "upload_settings": [
+                                    {
+                                        "contains_header": true,
+                                        "delimiter": ",",
+                                        "format": "CSV",
+                                        "start_from_row": 0,
+                                        "text_qualifier": "DOUBLE_QUOTE"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "refresh_properties": [],
+                "region": "us-east-1",
+                "row_level_permission_data_set": [],
+                "row_level_permission_tag_configuration": [],
+                "tags": null,
+                "tags_all": {}
+            }
+        },
+        "aws_quicksight_data_source": {
+            "example": {
+                "arn": "arn:aws:quicksight:us-east-1:644160558196:datasource/example-source",
+                "aws_account_id": "644160558196",
+                "credentials": [],
+                "data_source_id": "example-source",
+                "id": "644160558196/example-source",
+                "name": "example-source",
+                "parameters": [
+                    {
+                        "amazon_elasticsearch": [],
+                        "athena": [],
+                        "aurora": [],
+                        "aurora_postgresql": [],
+                        "aws_iot_analytics": [],
+                        "databricks": [],
+                        "jira": [],
+                        "maria_db": [],
+                        "mysql": [],
+                        "oracle": [],
+                        "postgresql": [],
+                        "presto": [],
+                        "rds": [],
+                        "redshift": [],
+                        "s3": [
+                            {
+                                "manifest_file_location": [
+                                    {
+                                        "bucket": "c7ntest-quicksight-test-bucket",
+                                        "key": "manifest.json"
+                                    }
+                                ],
+                                "role_arn": "arn:aws:iam::644160558196:role/QuickSightS3AccessRole"
+                            }
+                        ],
+                        "service_now": [],
+                        "snowflake": [],
+                        "spark": [],
+                        "sql_server": [],
+                        "teradata": [],
+                        "twitter": []
+                    }
+                ],
+                "permission": [],
+                "region": "us-east-1",
+                "ssl_properties": [],
+                "tags": null,
+                "tags_all": {},
+                "type": "S3",
+                "vpc_connection_properties": []
+            }
+        },
+        "aws_s3_bucket": {
+            "example": {
+                "acceleration_status": "",
+                "acl": null,
+                "arn": "arn:aws:s3:::c7ntest-quicksight-test-bucket",
+                "bucket": "c7ntest-quicksight-test-bucket",
+                "bucket_domain_name": "c7ntest-quicksight-test-bucket.s3.amazonaws.com",
+                "bucket_prefix": "",
+                "bucket_region": "us-east-1",
+                "bucket_regional_domain_name": "c7ntest-quicksight-test-bucket.s3.us-east-1.amazonaws.com",
+                "cors_rule": [],
+                "force_destroy": false,
+                "grant": [
+                    {
+                        "id": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15",
+                        "permissions": [
+                            "FULL_CONTROL"
+                        ],
+                        "type": "CanonicalUser",
+                        "uri": ""
+                    }
+                ],
+                "hosted_zone_id": "Z3AQBSTGFYJSTF",
+                "id": "c7ntest-quicksight-test-bucket",
+                "lifecycle_rule": [],
+                "logging": [],
+                "object_lock_configuration": [],
+                "object_lock_enabled": false,
+                "policy": "",
+                "region": "us-east-1",
+                "replication_configuration": [],
+                "request_payer": "BucketOwner",
+                "server_side_encryption_configuration": [
+                    {
+                        "rule": [
+                            {
+                                "apply_server_side_encryption_by_default": [
+                                    {
+                                        "kms_master_key_id": "",
+                                        "sse_algorithm": "AES256"
+                                    }
+                                ],
+                                "bucket_key_enabled": false
+                            }
+                        ]
+                    }
+                ],
+                "tags": null,
+                "tags_all": {},
+                "timeouts": null,
+                "versioning": [
+                    {
+                        "enabled": false,
+                        "mfa_delete": false
+                    }
+                ],
+                "website": [],
+                "website_domain": null,
+                "website_endpoint": null
+            }
+        },
+        "aws_s3_bucket_policy": {
+            "quicksight_access": {
+                "bucket": "c7ntest-quicksight-test-bucket",
+                "id": "c7ntest-quicksight-test-bucket",
+                "policy": "{\"Statement\":[{\"Action\":[\"s3:GetObject\",\"s3:ListBucket\"],\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"quicksight.amazonaws.com\"},\"Resource\":[\"arn:aws:s3:::c7ntest-quicksight-test-bucket\",\"arn:aws:s3:::c7ntest-quicksight-test-bucket/*\"],\"Sid\":\"AllowQuickSightService\"}],\"Version\":\"2012-10-17\"}",
+                "region": "us-east-1"
+            }
+        },
+        "aws_s3_object": {
+            "data": {
+                "acl": null,
+                "arn": "arn:aws:s3:::c7ntest-quicksight-test-bucket/data.csv",
+                "bucket": "c7ntest-quicksight-test-bucket",
+                "bucket_key_enabled": false,
+                "cache_control": "",
+                "checksum_algorithm": null,
+                "checksum_crc32": "",
+                "checksum_crc32c": "",
+                "checksum_crc64nvme": "",
+                "checksum_sha1": "",
+                "checksum_sha256": "",
+                "content": null,
+                "content_base64": null,
+                "content_disposition": "",
+                "content_encoding": "",
+                "content_language": "",
+                "content_type": "text/csv",
+                "etag": "b5705e9b8660b4d5ca422f1c8845efe8",
+                "force_destroy": false,
+                "id": "c7ntest-quicksight-test-bucket/data.csv",
+                "key": "data.csv",
+                "kms_key_id": null,
+                "metadata": null,
+                "object_lock_legal_hold_status": "",
+                "object_lock_mode": "",
+                "object_lock_retain_until_date": "",
+                "override_provider": [],
+                "region": "us-east-1",
+                "server_side_encryption": "AES256",
+                "source": "./data.csv",
+                "source_hash": null,
+                "storage_class": "STANDARD",
+                "tags": null,
+                "tags_all": {},
+                "version_id": "",
+                "website_redirect": ""
+            },
+            "manifest": {
+                "acl": null,
+                "arn": "arn:aws:s3:::c7ntest-quicksight-test-bucket/manifest.json",
+                "bucket": "c7ntest-quicksight-test-bucket",
+                "bucket_key_enabled": false,
+                "cache_control": "",
+                "checksum_algorithm": null,
+                "checksum_crc32": "",
+                "checksum_crc32c": "",
+                "checksum_crc64nvme": "",
+                "checksum_sha1": "",
+                "checksum_sha256": "",
+                "content": "{\"fileLocations\":[{\"URIs\":[\"s3://c7ntest-quicksight-test-bucket/data.csv\"]}],\"globalUploadSettings\":{\"format\":\"CSV\"}}",
+                "content_base64": null,
+                "content_disposition": "",
+                "content_encoding": "",
+                "content_language": "",
+                "content_type": "application/json",
+                "etag": "8ec67323320d33cc23ef602173492b51",
+                "force_destroy": false,
+                "id": "c7ntest-quicksight-test-bucket/manifest.json",
+                "key": "manifest.json",
+                "kms_key_id": null,
+                "metadata": null,
+                "object_lock_legal_hold_status": "",
+                "object_lock_mode": "",
+                "object_lock_retain_until_date": "",
+                "override_provider": [],
+                "region": "us-east-1",
+                "server_side_encryption": "AES256",
+                "source": null,
+                "source_hash": null,
+                "storage_class": "STANDARD",
+                "tags": null,
+                "tags_all": {},
+                "version_id": "",
+                "website_redirect": ""
+            }
+        }
+    }
+}
