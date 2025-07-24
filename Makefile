@@ -163,3 +163,39 @@ analyzer-semgrep:
 	 tools/c7n_policystream/policystream.py \
 	 tools/c7n_trailcreator/c7n_trailcreator \
 	 c7n
+
+###
+# Everything below here is just for ZOE's use
+###
+
+.PHONY: zoe-image-push
+zoe-image-push:
+	@echo "This will push the cloud custodian image to GCP, you will need permissions to push to artifact registry."
+	@read -p "Continue? [y/N] " confirm && [ "$$confirm" = "y" ]
+	docker build \
+		-f docker/c7n \
+		--platform linux/amd64 \
+		-t europe-west1-docker.pkg.dev/backend-producti-b8633498/zoe-custom-images/cloud_custodian:latest \
+		.
+	docker push europe-west1-docker.pkg.dev/backend-producti-b8633498/zoe-custom-images/cloud_custodian:latest
+
+
+test-gcp-policy:
+	@echo "Running GCP policy test..."
+	@if [ -z "$$GOOGLE_CLOUD_PROJECT" ]; then \
+		echo "Error: GOOGLE_CLOUD_PROJECT environment variable not set"; \
+		exit 1; \
+	fi
+	@if [ -z "$$GOOGLE_APPLICATION_CREDENTIALS" ] && [ ! -f "$$HOME/.config/gcloud/application_default_credentials.json" ]; then \
+		echo "Error: GCP credentials not found. Run 'gcloud auth application-default login' or set GOOGLE_APPLICATION_CREDENTIALS"; \
+		exit 1; \
+	fi
+	uv run custodian validate $(POLICY_FILE)
+	uv run custodian run --dryrun -s ./tmp/output $(POLICY_FILE)
+
+run-gcp-policy:
+	@echo "Running GCP policy (LIVE)..."
+	@read -p "This will execute actions on GCP resources. Continue? [y/N] " confirm && [ "$$confirm" = "y" ]
+	uv run custodian run -s ./tmp/output $(POLICY_FILE)
+
+.PHONY: test-gcp-policy run-gcp-policy
