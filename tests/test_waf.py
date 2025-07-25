@@ -246,11 +246,12 @@ class WAFTest(BaseTest):
         self.assertEqual(managed_rule['ManagedGroup'], 'AWSManagedRulesAmazonIpReputationList')
 
         rule_names = [rule['Name'] for rule in managed_rule['Rules']]
-        expected_rules = ['AWSManagedIPReputationList', 'AWSManagedReconnaissanceList', 'AWSManagedIPDDoSList']
+        expected_rules = ['AWSManagedIPReputationList',
+                          'AWSManagedReconnaissanceList',
+                          'AWSManagedIPDDoSList']
         for expected_rule in expected_rules:
             self.assertIn(expected_rule, rule_names, f"Should contain {expected_rule} rule")
 
         for rule in managed_rule['Rules']:
             self.assertIn('Name', rule)
             self.assertIn('Action', rule)
-

@@ -299,7 +299,8 @@ class WAFV2ListAllRulesFilter(ListItemFilter):
                         "Type": "ManagedRuleGroup",
                         "Name": rule.get('Name'),
                         "ManagedGroup": managed_group_ref['Name'],
-                        "Rules": [{"Name": r['Name'], "Action": r.get('Action', {})} for r in rules_meta]
+                        "Rules": [{"Name": r['Name'], "Action": r.get('Action', {})}
+                                  for r in rules_meta]
                     })
                 except client.exceptions.WAFNonexistentItemException:
                     all_rules.append({
