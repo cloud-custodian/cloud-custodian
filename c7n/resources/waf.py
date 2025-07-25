@@ -233,7 +233,10 @@ class WAFV2ListAllRulesFilter(ListItemFilter):
         'web-acl-rules',
         attrs={'$ref': '#/definitions/filters_common/list_item_attrs'}
     )
-    permissions = ('wafv2:GetRuleGroup',)
+    permissions = (
+        'wafv2:GetRuleGroup',
+        'wafv2:DescribeManagedRuleGroup',
+    )
     annotate_items = True
     item_annotation_key = 'c7n:WebACLAllRules'
 
@@ -245,30 +248,64 @@ class WAFV2ListAllRulesFilter(ListItemFilter):
         all_rules = []
 
         for rule in resource.get('Rules', []):
-            if rule.get("Statement", {}).get('RuleGroupReferenceStatement'):
-                rule_group_arn = rule['Statement']['RuleGroupReferenceStatement']['ARN']
-                scope = resource['Scope']
+            statement = rule.get("Statement", {})
+            rule_group_ref = statement.get('RuleGroupReferenceStatement')
+            managed_group_ref = statement.get('ManagedRuleGroupStatement')
 
-                rule_group_response = client.get_rule_group(
-                    Name=rule_group_arn.split('/')[-2],
-                    Id=rule_group_arn.split('/')[-1],
-                    Scope=scope
-                )
-                rule_group = rule_group_response.get('RuleGroup', {})
-
-                rule_details = {
-                    "Type": "RuleGroup",
-                    "Name": rule.get('Name'),
-                    "RuleGroupARN": rule_group_arn,
-                    "Rules": rule_group.get('Rules', [])
-                }
-                all_rules.append(rule_details)
-            else:
-                rule_details = {
+            # Standalone Rules
+            if not rule_group_ref and not managed_group_ref:
+                all_rules.append({
                     "Type": "Standalone",
                     "Name": rule.get('Name'),
-                    "Rule": rule
-                }
-                all_rules.append(rule_details)
+                    "Rules": rule
+                })
+                continue
+
+            # Customer Managed Rule Groups
+            if rule_group_ref:
+                arn = rule_group_ref['ARN']
+                scope = resource['Scope']
+                try:
+                    resp = client.get_rule_group(
+                        Name=arn.split('/')[-2],
+                        Id=arn.split('/')[-1],
+                        Scope=scope
+                    )
+                    rg = resp.get('RuleGroup', {})
+                    all_rules.append({
+                        "Type": "CustomerRuleGroup",
+                        "Name": rule.get('Name'),
+                        "RuleGroupARN": arn,
+                        "Rules": rg.get('Rules', [])
+                    })
+                except client.exceptions.WAFNonexistentItemException:
+                    all_rules.append({
+                        "Type": "UnknownRuleGroup",
+                        "Name": rule.get('Name'),
+                        "RuleGroupARN": arn,
+                        "Error": "Unable to retrieve rule group"
+                    })
+
+            # AWS Managed Rule Groups
+            elif managed_group_ref:
+                try:
+                    resp = client.describe_managed_rule_group(
+                        VendorName=managed_group_ref['VendorName'],
+                        Name=managed_group_ref['Name'],
+                        Scope=resource['Scope']
+                    )
+                    rules_meta = resp.get('Rules', [])
+                    all_rules.append({
+                        "Type": "ManagedRuleGroup",
+                        "Name": rule.get('Name'),
+                        "ManagedGroup": managed_group_ref['Name'],
+                        "Rules": [{"Name": r['Name'], "Action": r.get('Action', {})} for r in rules_meta]
+                    })
+                except client.exceptions.WAFNonexistentItemException:
+                    all_rules.append({
+                        "Type": "ManagedRuleGroup",
+                        "Name": rule.get('Name'),
+                        "Error": "Unable to describe managed rule group"
+                    })
 
         return all_rules
