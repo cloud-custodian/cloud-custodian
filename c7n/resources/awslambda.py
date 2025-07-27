@@ -1038,33 +1038,25 @@ class LambdaEventSourceMapping(query.ChildResourceManager):
 
     class resource_type(query.TypeInfo):
         service = 'lambda'
-        parent_spec = ('lambda', 'FunctionName', True)
         enum_spec = ('list_event_source_mappings', 'EventSourceMappings', None)
         detail_spec = ('get_event_source_mapping', 'UUID', 'UUID', None)
         name = id = 'UUID'
         arn = "EventSourceArn"
         cfn_type = 'AWS::Lambda::EventSourceMapping'
         permissions_augment = ("lambda:ListEventSourceMappings", "lambda:GetEventSourceMapping", "lambda:ListTags")
+        parent_spec = ('lambda', 'FunctionName', True)
 
-    # def augment(self, resources):
-    #     client = local_session(self.manager.session_factory).client('lambda')
+    def augment(self, resources):
+        # Call the original augment method from ChildResourceManager
+        resources = super().augment(resources)
 
-    #     def add_parent_tags(mapping):
-    #         try:
-    #             function_name = mapping.get('FunctionName')
-    #             if not function_name:
-    #                 return mapping
-    #             parent = client.get_function(FunctionName=function_name)
-    #             tags = parent.get('Tags', {})
-    #             mapping['Tags'] = [{'Key': k, 'Value': v} for k, v in tags.items()]
-    #         except ClientError:
-    #             mapping['Tags'] = []
-    #         return mapping
-
-    #     with self.executor_factory(max_workers=3) as w:
-    #         resources = list(w.map(add_parent_tags, resources))
-
-    #     return resources
+        # Add tag information to the resources
+        client = local_session(self.session_factory).client('lambda')
+        for resource in resources:
+            tags = client.list_tags(Resource=resource['FunctionArn']).get('Tags', {})
+            resource['Tags'] = [{'Key': k, 'Value': v} for k, v in tags.items()]
+            
+        return resources
 
 
 @LambdaEventSourceMapping.filter_registry.register('kms-key')
