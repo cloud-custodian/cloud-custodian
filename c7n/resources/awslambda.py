@@ -13,6 +13,7 @@ from c7n.filters import CrossAccountAccessFilter, ValueFilter, Filter
 from c7n.filters.costhub import CostHubRecommendation
 from c7n.filters.kms import KmsRelatedFilter
 import c7n.filters.vpc as net_filters
+from c7n.filters import ListItemFilter
 from c7n.manager import resources
 from c7n import query, utils
 from c7n.resources.aws import shape_validate
@@ -37,6 +38,7 @@ ErrAccessDenied = "AccessDeniedException"
 class DescribeLambda(query.DescribeSource):
 
     def augment(self, resources):
+        # This ensures Lambda resources have tags
         return universal_augment(
             self.manager, super(DescribeLambda, self).augment(resources))
 
@@ -988,3 +990,83 @@ class LambdaEdgeFilter(Filter):
             elif (r['FunctionArn'] not in lambda_edge_cf_map and not self.data.get('state')):
                 results.append(r)
         return results
+
+@AWSLambda.filter_registry.register('event-source-mapping')
+class EventSourceMappingFilter(ListItemFilter):
+    """
+    Return all event source mapping associated with lambda.
+    Allows filtering based on any field within the event source mapping data.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: find-event-source-mappings
+            resource: aws.lambda
+            filters:
+              - type: event-source-mapping
+                attrs:
+                  - State: Enabled
+
+    """
+
+    schema = type_schema(
+        'event-source-mapping',
+        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'}
+    )
+    permissions = ('lambda:ListEventSourceMappings',)
+    annotate_items = True
+    annotation_key = 'c7n:EventSourceMappings'
+
+    def get_item_values(self, resource):
+        client = local_session(self.manager.session_factory).client(
+            'lambda', region_name=self.manager.region
+        )
+
+        paginator = client.get_paginator('list_event_source_mappings')
+        paginator.PAGE_ITERATOR_CLS = query.RetryPageIterator
+        mappings = []
+        for page in paginator.paginate(FunctionName=resource['FunctionName']):
+            mappings.extend(page.get('EventSourceMappings', []))
+        resource[self.annotation_key] = mappings
+        return mappings
+
+
+@resources.register('lambda-event-source-mapping')
+class LambdaEventSourceMapping(query.ChildResourceManager):
+
+    class resource_type(query.TypeInfo):
+        service = 'lambda'
+        parent_spec = ('lambda', 'FunctionName', True)
+        enum_spec = ('list_event_source_mappings', 'EventSourceMappings', None)
+        detail_spec = ('get_event_source_mapping', 'UUID', 'UUID', None)
+        name = id = 'UUID'
+        arn = "EventSourceArn"
+        cfn_type = 'AWS::Lambda::EventSourceMapping'
+        permissions_augment = ("lambda:ListEventSourceMappings", "lambda:GetEventSourceMapping", "lambda:ListTags")
+
+    # def augment(self, resources):
+    #     client = local_session(self.manager.session_factory).client('lambda')
+
+    #     def add_parent_tags(mapping):
+    #         try:
+    #             function_name = mapping.get('FunctionName')
+    #             if not function_name:
+    #                 return mapping
+    #             parent = client.get_function(FunctionName=function_name)
+    #             tags = parent.get('Tags', {})
+    #             mapping['Tags'] = [{'Key': k, 'Value': v} for k, v in tags.items()]
+    #         except ClientError:
+    #             mapping['Tags'] = []
+    #         return mapping
+
+    #     with self.executor_factory(max_workers=3) as w:
+    #         resources = list(w.map(add_parent_tags, resources))
+
+    #     return resources
+
+
+@LambdaEventSourceMapping.filter_registry.register('kms-key')
+class KmsFilter(KmsRelatedFilter):
+    RelatedIdsExpression = 'KMSKeyArn'
