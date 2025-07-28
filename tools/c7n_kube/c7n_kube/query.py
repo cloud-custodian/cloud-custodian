@@ -87,7 +87,11 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
         return self.resource_type
 
     def get_cache_key(self, query):
-        return {"source_type": self.source_type, "query": query}
+        return {'source_type': self.kube_resource_type, 'query': query}
+
+    @property
+    def kube_resource_type(self):
+        return self.data.get('resource')
 
     @property
     def source_type(self):
@@ -117,6 +121,9 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
         return self.filter_resources(resources)
 
     def augment(self, resources):
+        for r in resources:
+            if 'metadata' in r and 'uid' in r['metadata']:
+                r['metadata.uid'] = r['metadata']['uid']
         return resources
 
 

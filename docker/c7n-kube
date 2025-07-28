@@ -14,7 +14,7 @@ ARG PATH="/root/.local/bin:$PATH"
 
 WORKDIR /src
 # Add core & aws packages
-ARG providers="gcp azure kube openstack tencentcloud oci awscc"
+ARG providers="gcp azure kube oci awscc"
 
 # copy pyproject.tomls for all packages
 ADD pyproject.toml uv.lock README.md /src/
@@ -60,12 +60,6 @@ RUN if [[ " ${providers[*]} " =~ "azure" ]]; then    uv sync --package c7n_azure
 ADD tools/c7n_kube /src/tools/c7n_kube
 RUN if [[ " ${providers[*]} " =~ "kube" ]]; then    uv sync --package c7n_kube --frozen --inexact; fi
 
-ADD tools/c7n_openstack /src/tools/c7n_openstack
-RUN if [[ " ${providers[*]} " =~ "openstack" ]]; then    uv sync --package c7n_openstack --frozen --inexact; fi
-
-ADD tools/c7n_tencentcloud /src/tools/c7n_tencentcloud
-RUN if [[ " ${providers[*]} " =~ "tencentcloud" ]]; then    uv sync --package c7n_tencentcloud --frozen --inexact; fi
-
 ADD tools/c7n_oci /src/tools/c7n_oci
 RUN if [[ " ${providers[*]} " =~ "oci" ]]; then    uv sync --package c7n_oci --frozen --inexact; fi
 
@@ -80,17 +74,35 @@ ADD tools/c7n_kube /src/tools/c7n_kube
 RUN uv sync --frozen --package c7n_kube
 
 FROM ubuntu:24.04
-
+# From Buildx/Buildkit
+ARG TARGETARCH
 LABEL name="kube" \
       repository="http://github.com/cloud-custodian/cloud-custodian"
 
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get --yes update \
-        && apt-get --yes install python3 python3-venv adduser  --no-install-recommends \
+        && apt-get --yes install python3 python3-venv adduser curl unzip --no-install-recommends \
         && rm -Rf /var/cache/apt \
         && rm -Rf /var/lib/apt/lists/* \
         && rm -Rf /var/log/*
+
+RUN if [ "${TARGETARCH}" = "amd64" ]; then \
+        curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"; \
+    elif [ "${TARGETARCH}" = "arm64" ]; then \
+        curl "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o "awscliv2.zip"; \
+    fi \
+    && unzip awscliv2.zip \
+    && ./aws/install \
+    && rm -rf aws awscliv2.zip
+
+RUN if [ "${TARGETARCH}" = "amd64" ]; then \
+        curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"; \
+    elif [ "${TARGETARCH}" = "arm64" ]; then \
+        curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/arm64/kubectl"; \
+    fi \
+    && install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl \
+    && rm -rf kubectl
 
 # These should remain below any other commands because they will invalidate
 # the layer cache
