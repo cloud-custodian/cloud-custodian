@@ -1050,19 +1050,16 @@ class LambdaEventSourceMapping(query.ChildResourceManager):
         # Call the original augment method from ChildResourceManager
         resources = super().augment(resources)
 
-        client = local_session(self.session_factory).client('lambda')
-
         # Part 1: Add tags from parent resources to child resources
+        parent_resources = self.get_parent_manager().resources()
+        parent_tag_map = {p['FunctionArn']: p.get('Tags', []) for p in parent_resources}
+
         for resource in resources:
-            if 'Tags' not in resource:
-                try:
-                    tags = client.list_tags(Resource=resource['FunctionArn']).get('Tags', {})
-                    resource['Tags'] = [{'Key': k, 'Value': v} for k, v in tags.items()]
-                except ClientError:
-                    resource['Tags'] = []
+            resource['Tags'] = parent_tag_map.get(resource['FunctionArn'], [])
 
         # Part 2: Get all event source mappings and add orphaned ones to resources
         existing_uuids = {r['UUID'] for r in resources}
+        client = local_session(self.session_factory).client('lambda')
         paginator = client.get_paginator('list_event_source_mappings')
         paginator.PAGE_ITERATOR_CLS = query.RetryPageIterator
         for page in paginator.paginate():

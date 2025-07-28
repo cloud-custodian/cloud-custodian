@@ -1,9 +1,0 @@
-{
-    "status_code": 200,
-    "data": {
-        "ResponseMetadata": {},
-        "Tags": {
-            "team": "policy"
-        }
-    }
-}
