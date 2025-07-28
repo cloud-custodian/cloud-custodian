@@ -425,7 +425,7 @@ class LambdaTest(BaseTest):
         )
 
     def test_event_source_mapping(self):
-        factory = self.record_flight_data("test_aws_lambda_event_source_mapping")
+        factory = self.replay_flight_data("test_aws_lambda_event_source_mapping")
         p = self.load_policy(
             {
                 "name": "lambda-event-source",
