@@ -4,6 +4,8 @@
 import logging
 
 import c7n_kube.actions.shared  # noqa
+# This is an MM upgrade: to be able to use our offhour/offhour filter
+import c7n_kube.actions.core_mm
 
 from c7n_kube.resources.batch import (
     cronjob)

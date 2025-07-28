@@ -3,6 +3,8 @@
 
 from c7n_kube.query import CustomResourceQueryManager, CustomTypeInfo
 from c7n_kube.provider import resources
+# This is an MM upgrade: to be able to use our offhour/offhour filter
+from c7n.filters.offhours import OffHour, OnHour
 
 
 @resources.register("custom-namespaced-resource")
@@ -48,3 +50,9 @@ class CustomResourceDefinition(CustomResourceQueryManager):
         namespaced = False
         delete = "delete_cluster_custom_object"
         patch = "patch_cluster_custom_object"
+
+# This is an MM upgrade: to be able to use our offhour/onhour filter
+CustomResourceDefinition.filter_registry.register('offhour', OffHour)
+CustomResourceDefinition.filter_registry.register('onhour', OnHour)
+CustomNamespacedResourceDefinition.filter_registry.register('offhour', OffHour)
+CustomNamespacedResourceDefinition.filter_registry.register('onhour', OnHour)

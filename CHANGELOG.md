@@ -9,7 +9,7 @@ This document outlines the modifications and enhancements made to the upstream C
 This fork includes the following Kubernetes resources that may not be present in the upstream master branch:
 
 - **cron-job** - Kubernetes CronJob resource management
-- **daemon-set** - Kubernetes DaemonSet resource management  
+- **daemon-set** - Kubernetes DaemonSet resource management
 - **deployment** - Enhanced Kubernetes Deployment resource management
 - **stateful-set** - Enhanced Kubernetes StatefulSet resource management
 - **replica-set** - Kubernetes ReplicaSet resource management
@@ -49,6 +49,7 @@ This fork includes the following enhanced or new actions:
 - **ECR Integration** - Custom build and push scripts for AWS ECR deployment
 - **Docker Multi-architecture** - Support for ARM64 architecture builds
 - **Time Zone Support** - Enhanced timezone handling capabilities
+- **Custom Resource Support** - Added core_mm.py with extended PatchAction and PatchResource classes for NodePools and custom resource handling and add the offhour/offhour filter
 
 ### Build and Deployment
 
@@ -61,7 +62,7 @@ This fork includes the following enhanced or new actions:
 The following components have been removed from this fork:
 
 - **TencentCloud Provider** - Removed tencentcloud support
-- **OpenStack Provider** - Removed openstack support  
+- **OpenStack Provider** - Removed openstack support
 - **Compression ZSTD** - Removed zstd compression support
 
 ## Installation
