@@ -5,6 +5,9 @@ import logging
 
 import c7n_kube.actions.shared  # noqa
 
+from c7n_kube.resources.batch import (
+    cronjob)
+
 from c7n_kube.resources.core import (
     configmap,
     namespace,
@@ -28,6 +31,7 @@ log = logging.getLogger("custodian.k8s")
 ALL = [
     crd,
     configmap,
+    cronjob,
     deployment,
     namespace,
     node,

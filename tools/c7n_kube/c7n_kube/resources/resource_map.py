@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 ResourceMap = {
     "k8s.config-map": "c7n_kube.resources.core.configmap.ConfigMap",
+    "k8s.cron-job": "c7n_kube.resources.batch.cronjob.CronJob",
     "k8s.custom-cluster-resource": "c7n_kube.resources.crd.CustomResourceDefinition",
     "k8s.custom-namespaced-resource": "c7n_kube.resources.crd.CustomNamespacedResourceDefinition",
     "k8s.daemon-set": "c7n_kube.resources.apps.daemonset.DaemonSet",

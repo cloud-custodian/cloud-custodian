@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import logging
+import copy
 
 from c7n.actions import Action as BaseAction
 from c7n.utils import local_session, chunks, type_schema
@@ -66,13 +67,37 @@ class PatchAction(MethodAction):
         return "".join([a.capitalize() for a in patch.split("_")])
 
     def patch_resources(self, client, resources, **patch_args):
+        from kubernetes.client.exceptions import ApiException
         op = getattr(client, self.manager.get_model().patch)
         namespaced = self.manager.get_model().namespaced
         for r in resources:
             patch_args["name"] = r["metadata"]["name"]
             if namespaced:
                 patch_args["namespace"] = r["metadata"]["namespace"]
-            op(**patch_args)
+            try:
+                op(**patch_args)
+            except ApiException as e:
+                if e.status == 404:
+                    log.warning(f"Resource {r['metadata']['name']} not found - it was likely deleted during execution")
+                else:
+                    raise
+
+    def patch_resources_replicas(self, client, resources, patch):
+        from kubernetes.client.exceptions import ApiException
+        op = getattr(client, self.manager.get_model().patch)
+        namespaced = self.manager.get_model().namespaced
+        for r in resources:
+            patch_args = patch[r['metadata']['name']]
+            patch_args['name'] = r['metadata']['name']
+            if namespaced:
+                patch_args['namespace'] = r['metadata']['namespace']
+            try:
+                op(**patch_args)
+            except ApiException as e:
+                if e.status == 404:
+                    log.warning(f"Resource {r['metadata']['name']} not found - it was likely deleted during execution")
+                else:
+                    raise
 
 
 class PatchResource(PatchAction):
@@ -93,11 +118,41 @@ class PatchResource(PatchAction):
                   replicas: 0
     """
 
-    schema = type_schema("patch", **{"options": {"type": "object"}})
+    schema = type_schema(
+        'patch',
+        **{
+            'options': {'type': 'object'},
+            'save-options-tag': {'type': 'string'},
+            'restore-options-tag': {'type': 'string'},
+        },
+    )
 
     def process_resource_set(self, client, resources):
-        patch_args = {"body": self.data.get("options", {})}
-        self.patch_resources(client, resources, **patch_args)
+
+        patch = {}
+
+        for r in resources:
+            patch_args = copy.deepcopy({'body': self.data.get('options', {})})
+
+            if 'save-options-tag' in self.data:
+                save_tag = self.data.get('save-options-tag', {})
+                replicas = r['spec']['replicas']
+                if not r['metadata']['labels']:
+                    r['metadata']['labels'] = {}
+                r['metadata']['labels'][save_tag] = f'replicas-{replicas}'
+                patch_args['body']['metadata'] = {}
+                patch_args['body']['metadata']['labels'] = r['metadata']['labels']
+                patch[r['metadata']['name']] = patch_args
+            elif 'restore-options-tag' in self.data:
+                restore_tag = self.data.get('restore-options-tag', {})
+
+                if restore_tag in r['metadata']['labels']:
+                    replicas = r['metadata']['labels'][restore_tag].split('-')[1]
+                    patch_args['body']['spec'] = {'replicas': int(replicas)}
+
+            patch[r['metadata']['name']] = patch_args
+
+        self.patch_resources_replicas(client, resources, patch)
 
     @classmethod
     def register_resources(klass, registry, resource_class):
@@ -123,13 +178,20 @@ class DeleteAction(MethodAction):
         return "".join([a.capitalize() for a in delete.split("_")])
 
     def delete_resources(self, client, resources, **delete_args):
+        from kubernetes.client.exceptions import ApiException
         op = getattr(client, self.manager.get_model().delete)
         namespaced = self.manager.get_model().namespaced
         for r in resources:
             delete_args["name"] = r["metadata"]["name"]
             if namespaced:
                 delete_args["namespace"] = r["metadata"]["namespace"]
-            op(**delete_args)
+            try:
+                op(**delete_args)
+            except ApiException as e:
+                if e.status == 404:
+                    log.warning(f"Resource {r['metadata']['name']} not found - it was likely already deleted")
+                else:
+                    raise
 
 
 class DeleteResource(DeleteAction):
@@ -167,3 +229,201 @@ class DeleteResource(DeleteAction):
             and hasattr(model, "namespaced")
         ):
             resource_class.action_registry.register("delete", klass)
+
+
+class PatchAndWaitAction(PatchAction):
+    """
+    Patches deployments or statefulsets sequentially and waits for each to be ready
+
+    .. code-block:: yaml
+      policies:
+        - name: start-deployments-with-wait
+          resource: k8s.deployment
+          actions:
+            - type: patch-and-wait
+              restore-options-tag: custodian_offhours_previous
+              timeout: 300
+
+        - name: start-statefulsets-with-wait
+          resource: k8s.stateful-set
+          actions:
+            - type: patch-and-wait
+              restore-options-tag: custodian_offhours_previous
+              timeout: 300
+    """
+
+    schema = type_schema(
+        'patch-and-wait',
+        **{
+            'options': {'type': 'object'},
+            'save-options-tag': {'type': 'string'},
+            'restore-options-tag': {'type': 'string'},
+            'timeout': {'type': 'integer', 'default': 300},
+            'priority-rules': {
+                'type': 'array',
+                'items': {
+                    'type': 'object',
+                    'properties': {
+                        'namespace': {'type': 'string'},
+                        'name-pattern': {'type': 'string'},
+                        'priority': {'type': 'integer'},
+                    },
+                    'required': ['priority'],
+                    'additionalProperties': False
+                }
+            },
+        },
+    )
+
+    def process_resource_set(self, client, resources):
+        import time
+        import threading
+
+        timeout = self.data.get('timeout', 300)
+
+        # Sort resources by priority: kyverno -> istio -> vault -> others
+        ordered_resources = self._sort_resources_by_priority(resources)
+
+        # Separate priority and non-priority resources
+        priority_rules = self.data.get('priority-rules', [])
+        max_priority = 0
+        if priority_rules:
+            max_priority = max(rule.get('priority', 0) for rule in priority_rules)
+
+        priority_resources = []
+        non_priority_resources = []
+        for r in ordered_resources:
+            resource_priority = self._get_resource_priority(r, priority_rules, max_priority)
+            if resource_priority <= max_priority:
+                priority_resources.append(r)
+            else:
+                non_priority_resources.append(r)
+
+        # Process priority resources sequentially
+        for r in priority_resources:
+            self._patch_and_wait_resource(client, r, timeout)
+
+        # Process non-priority resources concurrently
+        if non_priority_resources:
+            threads = []
+            for r in non_priority_resources:
+                thread = threading.Thread(
+                    target=self._patch_and_wait_resource,
+                    args=(client, r, timeout)
+                )
+                threads.append(thread)
+                thread.start()
+
+            # Wait for all non-priority resources to complete
+            for thread in threads:
+                thread.join()
+
+    def _patch_and_wait_resource(self, client, resource, timeout):
+        """Patch a single resource and wait for it to be ready"""
+        # First patch the deployment
+        patch_args = copy.deepcopy({'body': self.data.get('options', {})})
+
+        if 'restore-options-tag' in self.data:
+            restore_tag = self.data.get('restore-options-tag')
+            if restore_tag in resource.get('metadata', {}).get('labels', {}):
+                replicas_label = resource['metadata']['labels'][restore_tag]
+                if replicas_label.startswith('replicas-'):
+                    replicas = int(replicas_label.split('-')[1])
+                    patch_args['body'] = {'spec': {'replicas': replicas}}
+
+        # Patch deployment
+        patch_args['name'] = resource['metadata']['name']
+        if self.manager.get_model().namespaced:
+            patch_args['namespace'] = resource['metadata']['namespace']
+
+        op = getattr(client, self.manager.get_model().patch)
+        op(**patch_args)
+
+        # Wait for resource to be ready
+        self._wait_for_ready(client, resource, timeout)
+        resource_type = self.manager.get_model().plural[:-1].title()
+        log.info(f"✅ {resource_type} {resource['metadata']['name']} is ready")
+
+    def _get_resource_priority(self, resource, priority_rules, max_priority):
+        """Get the priority of a single resource"""
+        import re
+
+        namespace = resource['metadata']['namespace']
+        name = resource['metadata']['name']
+
+        # Check each priority rule
+        for rule in priority_rules:
+            # Check namespace match
+            if 'namespace' in rule and rule['namespace'] != namespace:
+                continue
+
+            # Check name pattern match
+            if 'name-pattern' in rule:
+                pattern = rule['name-pattern']
+                if not re.match(pattern, name):
+                    continue
+
+            # Rule matches - return priority
+            return rule['priority']
+
+        # Return a priority higher than max_priority for non-matching resources
+        return max_priority + 1
+
+    def _sort_resources_by_priority(self, resources):
+        """Sort resources by priority rules defined in policy"""
+        priority_rules = self.data.get('priority-rules', [])
+        max_priority = 0
+        if priority_rules:
+            max_priority = max(rule.get('priority', 0) for rule in priority_rules)
+
+        def get_priority(resource):
+            return self._get_resource_priority(resource, priority_rules, max_priority)
+
+        return sorted(resources, key=get_priority)
+
+    def _wait_for_ready(self, client, resource, timeout):
+        import time
+
+        name = resource['metadata']['name']
+        namespace = resource['metadata']['namespace']
+        start_time = time.time()
+        resource_type = self.manager.get_model().plural
+
+        while time.time() - start_time < timeout:
+            try:
+                if resource_type == 'deployments':
+                    obj = client.read_namespaced_deployment(name=name, namespace=namespace)
+                    # Check if deployment is available
+                    conditions = getattr(obj.status, 'conditions', []) or []
+                    for condition in conditions:
+                        if condition.type == "Available" and condition.status == "True":
+                            # Check replicas are ready
+                            desired = getattr(obj.spec, 'replicas', 0) or 0
+                            available = getattr(obj.status, 'available_replicas', 0) or 0
+                            if available >= desired:
+                                return True
+                elif resource_type == 'statefulsets':
+                    obj = client.read_namespaced_stateful_set(name=name, namespace=namespace)
+                    # Check if statefulset is ready
+                    desired = getattr(obj.spec, 'replicas', 0) or 0
+                    ready = getattr(obj.status, 'ready_replicas', 0) or 0
+                    if ready >= desired:
+                        return True
+
+                time.sleep(10)  # Wait 10 seconds before checking again
+            except Exception as e:
+                log.warning(f"Error checking {resource_type[:-1]} {name}: {e}")
+                time.sleep(10)
+
+        log.warning(
+            f"{resource_type[:-1].title()} {name} not ready within {timeout} seconds - "
+            "continuing execution"
+        )
+
+    @classmethod
+    def register_resources(klass, registry, resource_class):
+        model = resource_class.resource_type
+        if (hasattr(model, "patch") and
+            hasattr(model, "namespaced") and
+            getattr(model, 'plural', '') in ['deployments', 'statefulsets']):
+            resource_class.action_registry.register("patch-and-wait", klass)

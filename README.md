@@ -1,5 +1,5 @@
-Cloud Custodian (c7n)
-=================
+Cloud Custodian (c7n) - ManoMano Edition
+========================================
 
 <p align="center"><img src="https://cloudcustodian.io/img/logo_capone_devex_cloud_custodian.svg" alt="Cloud Custodian Logo" width="200px" height="200px" /></p>
 
@@ -11,6 +11,8 @@ Cloud Custodian (c7n)
 [![](https://codecov.io/gh/cloud-custodian/cloud-custodian/branch/master/graph/badge.svg)](https://codecov.io/gh/cloud-custodian/cloud-custodian)
 [![](https://requires.io/github/cloud-custodian/cloud-custodian/requirements.svg?branch=master)](https://requires.io/github/cloud-custodian/cloud-custodian/requirements/?branch=master)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/3402/badge)](https://bestpractices.coreinfrastructure.org/projects/3402)
+
+**Note:** This is a fork of Cloud Custodian maintained by ManoMano with custom modifications and enhancements specific to our infrastructure needs. See [CHANGELOG.md](CHANGELOG.md) for details on our additions.
 
 Cloud Custodian, also known as c7n, is a rules engine for managing
 public cloud accounts and resources. It allows users to define
@@ -76,11 +78,30 @@ Quick Install
 Custodian is published on pypi as a series of packages with the `c7n`
 prefix, its also available as a docker image.
 
+### Using Poetry (Recommended for ManoMano fork)
+
+```shell
+$ poetry install
+$ poetry shell
+```
+
+### Using pip
+
 ```shell
 $ python3 -m venv custodian
 $ source custodian/bin/activate
 (custodian) $ pip install c7n
 ```
+
+### Building and Pushing to ECR
+
+This fork includes a `build-and-push.sh` script to build Docker images and push them to AWS ECR:
+
+```shell
+$ ./build-and-push.sh
+```
+
+This script builds the customized Cloud Custodian images and pushes them to the ManoMano ECR registry.
 
 
 Usage
