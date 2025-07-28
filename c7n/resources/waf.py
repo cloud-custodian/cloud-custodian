@@ -209,7 +209,7 @@ class WAFV2LoggingFilter(ValueFilter):
 @WAFV2.filter_registry.register('web-acl-rules')
 class WAFV2ListAllRulesFilter(ListItemFilter):
     """
-    Return all rules inside the Web ACL, including rules in rule groups.
+    Return all rules inside the Web ACL, including rules in rule groups (customer and managed).
     Allows filtering based on any field within the rules data.
 
     :example:
@@ -265,48 +265,33 @@ class WAFV2ListAllRulesFilter(ListItemFilter):
             if rule_group_ref:
                 arn = rule_group_ref['ARN']
                 scope = resource['Scope']
-                try:
-                    resp = client.get_rule_group(
-                        Name=arn.split('/')[-2],
-                        Id=arn.split('/')[-1],
-                        Scope=scope
-                    )
-                    rg = resp.get('RuleGroup', {})
-                    all_rules.append({
-                        "Type": "CustomerRuleGroup",
-                        "Name": rule.get('Name'),
-                        "RuleGroupARN": arn,
-                        "Rules": rg.get('Rules', [])
-                    })
-                except client.exceptions.WAFNonexistentItemException:
-                    all_rules.append({
-                        "Type": "UnknownRuleGroup",
-                        "Name": rule.get('Name'),
-                        "RuleGroupARN": arn,
-                        "Error": "Unable to retrieve rule group"
-                    })
+                resp = client.get_rule_group(
+                    Name=arn.split('/')[-2],
+                    Id=arn.split('/')[-1],
+                    Scope=scope
+                )
+                rg = resp.get('RuleGroup', {})
+                all_rules.append({
+                    "Type": "CustomerRuleGroup",
+                    "Name": rule.get('Name'),
+                    "RuleGroupARN": arn,
+                    "Rules": rg.get('Rules', [])
+                })
 
             # AWS Managed Rule Groups
             elif managed_group_ref:
-                try:
-                    resp = client.describe_managed_rule_group(
-                        VendorName=managed_group_ref['VendorName'],
-                        Name=managed_group_ref['Name'],
-                        Scope=resource['Scope']
-                    )
-                    rules_meta = resp.get('Rules', [])
-                    all_rules.append({
-                        "Type": "ManagedRuleGroup",
-                        "Name": rule.get('Name'),
-                        "ManagedGroup": managed_group_ref['Name'],
-                        "Rules": [{"Name": r['Name'], "Action": r.get('Action', {})}
-                                  for r in rules_meta]
-                    })
-                except client.exceptions.WAFNonexistentItemException:
-                    all_rules.append({
-                        "Type": "ManagedRuleGroup",
-                        "Name": rule.get('Name'),
-                        "Error": "Unable to describe managed rule group"
-                    })
+                resp = client.describe_managed_rule_group(
+                    VendorName=managed_group_ref['VendorName'],
+                    Name=managed_group_ref['Name'],
+                    Scope=resource['Scope']
+                )
+                rules_meta = resp.get('Rules', [])
+                all_rules.append({
+                    "Type": "ManagedRuleGroup",
+                    "Name": rule.get('Name'),
+                    "ManagedGroup": managed_group_ref['Name'],
+                    "Rules": [{"Name": r['Name'], "Action": r.get('Action', {})}
+                                for r in rules_meta]
+                })
 
         return all_rules
