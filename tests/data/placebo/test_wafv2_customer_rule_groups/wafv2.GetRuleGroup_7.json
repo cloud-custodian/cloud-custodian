@@ -1,0 +1,21 @@
+{
+    "status_code": 200,
+    "data": {
+        "RuleGroup": {
+            "Name": "without-rules",
+            "Id": "e40cf518-948e-478d-aacd-70a43b17d7ae",
+            "Capacity": 1,
+            "ARN": "arn:aws:wafv2:us-east-1:644160558196:regional/rulegroup/without-rules/e40cf518-948e-478d-aacd-70a43b17d7ae",
+            "Description": "",
+            "Rules": [],
+            "VisibilityConfig": {
+                "SampledRequestsEnabled": true,
+                "CloudWatchMetricsEnabled": true,
+                "MetricName": "without-rules"
+            },
+            "LabelNamespace": "awswaf:644160558196:rulegroup:without-rules:"
+        },
+        "LockToken": "78e031e6-a5ec-49e4-929c-61cde8516329",
+        "ResponseMetadata": {}
+    }
+}

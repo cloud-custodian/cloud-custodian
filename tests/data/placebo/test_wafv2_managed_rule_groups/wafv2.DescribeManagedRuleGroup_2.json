@@ -1,0 +1,29 @@
+{
+    "status_code": 200,
+    "data": {
+        "Capacity": 50,
+        "Rules": [
+            {
+                "Name": "AnonymousIPList",
+                "Action": {
+                    "Block": {}
+                }
+            },
+            {
+                "Name": "HostingProviderIPList",
+                "Action": {
+                    "Block": {}
+                }
+            }
+        ],
+        "AvailableLabels": [
+            {
+                "Name": "awswaf:managed:aws:anonymous-ip-list:AnonymousIPList"
+            },
+            {
+                "Name": "awswaf:managed:aws:anonymous-ip-list:HostingProviderIPList"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

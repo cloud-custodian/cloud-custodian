@@ -2,20 +2,20 @@
     "status_code": 200,
     "data": {
         "WebACL": {
-            "Name": "compliant-waf-4",
-            "Id": "90d30873-92b9-42dd-b24e-b7f22bb25665",
-            "ARN": "arn:aws:wafv2:us-east-1:644160558196:regional/webacl/compliant-waf-4/90d30873-92b9-42dd-b24e-b7f22bb25665",
+            "Name": "noncompliant-waf-3",
+            "Id": "c30b5c62-c3de-48b6-91a9-778ba13e93ac",
+            "ARN": "arn:aws:wafv2:us-east-1:644160558196:regional/webacl/noncompliant-waf-3/c30b5c62-c3de-48b6-91a9-778ba13e93ac",
             "DefaultAction": {
                 "Allow": {}
             },
-            "Description": "1 Custum Rule Group and 0 Standalone",
+            "Description": "rule group with no rules",
             "Rules": [
                 {
-                    "Name": "rules",
+                    "Name": "no-rules",
                     "Priority": 0,
                     "Statement": {
                         "RuleGroupReferenceStatement": {
-                            "ARN": "arn:aws:wafv2:us-east-1:644160558196:regional/rulegroup/with-rules/60616042-d427-4c17-991c-ee3a39012c31"
+                            "ARN": "arn:aws:wafv2:us-east-1:644160558196:regional/rulegroup/without-rules/e40cf518-948e-478d-aacd-70a43b17d7ae"
                         }
                     },
                     "OverrideAction": {
@@ -24,24 +24,24 @@
                     "VisibilityConfig": {
                         "SampledRequestsEnabled": true,
                         "CloudWatchMetricsEnabled": true,
-                        "MetricName": "rules"
+                        "MetricName": "no-rules"
                     }
                 }
             ],
             "VisibilityConfig": {
                 "SampledRequestsEnabled": true,
                 "CloudWatchMetricsEnabled": true,
-                "MetricName": "compliant-waf-4"
+                "MetricName": "noncompliant-waf-3"
             },
             "Capacity": 1,
             "ManagedByFirewallManager": false,
-            "LabelNamespace": "awswaf:644160558196:webacl:compliant-waf-4:",
+            "LabelNamespace": "awswaf:644160558196:webacl:noncompliant-waf-3:",
             "RetrofittedByFirewallManager": false,
             "OnSourceDDoSProtectionConfig": {
                 "ALBLowReputationMode": "ACTIVE_UNDER_DDOS"
             }
         },
-        "LockToken": "0b7421a4-6cd0-423c-bccc-361f66f2cc79",
+        "LockToken": "ff61b70d-7e8c-44a3-82a6-7f497e798456",
         "ResponseMetadata": {}
     }
 }

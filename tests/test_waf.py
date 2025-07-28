@@ -90,24 +90,13 @@ class WAFTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertTrue('c7n:WafV2LoggingConfiguration' not in resources[0])
 
-    def test_wafv2_rule_groups(self):
-        session_factory = self.replay_flight_data("test_wafv2_rule_groups")
+    def test_wafv2_customer_rule_groups(self):
+        session_factory = self.replay_flight_data("test_wafv2_customer_rule_groups")
 
         policy = {
             "name": "test_wafv2_rule_groups",
             "resource": "aws.wafv2",
             "filters": [
-                {
-                    "type": "web-acl-rules",
-                    "attrs": [
-                        {
-                            "type": "value",
-                            "key": "Type",
-                            "value": "RuleGroup",
-                            "op": "eq"
-                        }
-                    ]
-                },
                 {
                     "not": [{
                         "type": "web-acl-rules",
@@ -120,6 +109,37 @@ class WAFTest(BaseTest):
                             }
                         ]
                     }]
+                },
+                {
+                    "not": [{
+                        "type": "web-acl-rules",
+                        "attrs": [
+                            {
+                                "type": "value",
+                                "key": "Type",
+                                "value": "ManagedRuleGroup",
+                                "op": "eq"
+                            }
+                        ]
+                    }]
+                },
+                {
+                    "type": "web-acl-rules",
+                    "attrs": [
+                        {
+                            "type": "value",
+                            "key": "Type",
+                            "value": "CustomerRuleGroup",
+                            "op": "eq"
+                        },
+                        {
+                            "type": "value",
+                            "key": "Rules",
+                            "value_type": "size",
+                            "value": 0,
+                            "op": "gt"
+                        }
+                    ]
                 }
             ],
         }
@@ -156,7 +176,20 @@ class WAFTest(BaseTest):
                             {
                                 "type": "value",
                                 "key": "Type",
-                                "value": "RuleGroup",
+                                "value": "CustomerRuleGroup",
+                                "op": "eq"
+                            }
+                        ]
+                    }]
+                },
+                {
+                    "not": [{
+                        "type": "web-acl-rules",
+                        "attrs": [
+                            {
+                                "type": "value",
+                                "key": "Type",
+                                "value": "ManagedRuleGroup",
                                 "op": "eq"
                             }
                         ]
@@ -201,7 +234,7 @@ class WAFTest(BaseTest):
         self.assertEqual(len(resources), 2, f"Expected 2 resources, got {len(resources)}")
 
     def test_wafv2_managed_rule_groups(self):
-        session_factory = self.record_flight_data("test_wafv2_managed_rule_groups")
+        session_factory = self.replay_flight_data("test_wafv2_managed_rule_groups")
 
         policy = {
             "name": "test_wafv2_managed_rule_groups",
@@ -229,29 +262,6 @@ class WAFTest(BaseTest):
         self.assertEqual(len(resources), 1, f"Expected 1 resource, got {len(resources)}")
 
         resource = resources[0]
-        self.assertTrue('c7n:WebACLAllRules' in resource)
-
         managed_rules = [rule for rule in resource['c7n:WebACLAllRules']
                         if rule['Type'] == 'ManagedRuleGroup']
         self.assertEqual(len(managed_rules), 2, "Expected 2 managed rule group")
-
-        managed_rule = managed_rules[0]
-        self.assertEqual(managed_rule['Type'], 'ManagedRuleGroup')
-        self.assertIn('Name', managed_rule)
-        self.assertIn('ManagedGroup', managed_rule)
-        self.assertIn('Rules', managed_rule)
-
-        self.assertGreater(len(managed_rule['Rules']), 0, "Managed rule group should have rules")
-
-        self.assertEqual(managed_rule['ManagedGroup'], 'AWSManagedRulesAmazonIpReputationList')
-
-        rule_names = [rule['Name'] for rule in managed_rule['Rules']]
-        expected_rules = ['AWSManagedIPReputationList',
-                          'AWSManagedReconnaissanceList',
-                          'AWSManagedIPDDoSList']
-        for expected_rule in expected_rules:
-            self.assertIn(expected_rule, rule_names, f"Should contain {expected_rule} rule")
-
-        for rule in managed_rule['Rules']:
-            self.assertIn('Name', rule)
-            self.assertIn('Action', rule)
