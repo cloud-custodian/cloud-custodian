@@ -1050,15 +1050,24 @@ class LambdaEventSourceMapping(query.ChildResourceManager):
         # Call the original augment method from ChildResourceManager
         resources = super().augment(resources)
 
-        # Add tag information to the resources
         client = local_session(self.session_factory).client('lambda')
+
+        # Part 1: Add tags from parent resources to child resources
         for resource in resources:
-            tags = client.list_tags(Resource=resource['FunctionArn']).get('Tags', {})
-            resource['Tags'] = [{'Key': k, 'Value': v} for k, v in tags.items()]
-            
+            if 'Tags' not in resource:
+                try:
+                    tags = client.list_tags(Resource=resource['FunctionArn']).get('Tags', {})
+                    resource['Tags'] = [{'Key': k, 'Value': v} for k, v in tags.items()]
+                except ClientError:
+                    resource['Tags'] = []
+
+        # Part 2: Get all event source mappings and add orphaned ones to resources
+        existing_uuids = {r['UUID'] for r in resources}
+        paginator = client.get_paginator('list_event_source_mappings')
+        paginator.PAGE_ITERATOR_CLS = query.RetryPageIterator
+        for page in paginator.paginate():
+            for mapping in page.get('EventSourceMappings', []):
+                if mapping['UUID'] not in existing_uuids:
+                    resources.append(mapping)
+
         return resources
-
-
-@LambdaEventSourceMapping.filter_registry.register('kms-key')
-class KmsFilter(KmsRelatedFilter):
-    RelatedIdsExpression = 'KMSKeyArn'
