@@ -102,20 +102,72 @@ class PatchAction(MethodAction):
 
 class PatchResource(PatchAction):
     """
-    Patches a resource
+    Patches a Kubernetes resource with enhanced capabilities
+    
+    Supports save/restore functionality for off-hours resource management
+    and improved error handling for production environments.
 
     .. code-block:: yaml
 
       policies:
-        - name: scale-resource
-          resource: k8s.deployment # k8s.{resource}
+        # Basic patching - scale deployment to 0 replicas
+        - name: scale-down-deployment
+          resource: k8s.deployment
           filters:
-            - 'metadata.name': 'test-{resource}'
+            - 'metadata.name': 'my-app'
           actions:
             - type: patch
               options:
                 spec:
                   replicas: 0
+        
+        # Save current replica count before scaling down (off-hours scaling)
+        - name: offhours-scale-down
+          resource: k8s.deployment
+          filters:
+            - 'metadata.name': 'my-app'
+            - type: value
+              key: 'spec.replicas'
+              op: gt
+              value: 0
+          actions:
+            - type: patch
+              save-options-tag: "custodian-original-replicas"
+              options:
+                spec:
+                  replicas: 0
+        
+        # Restore original replica count (business hours scaling)
+        - name: business-hours-scale-up
+          resource: k8s.deployment
+          filters:
+            - 'metadata.name': 'my-app'
+            - 'metadata.labels.custodian-original-replicas': present
+          actions:
+            - type: patch
+              restore-options-tag: "custodian-original-replicas"
+              
+        # Complex patching with multiple changes
+        - name: update-deployment-config
+          resource: k8s.deployment
+          filters:
+            - 'metadata.name': 'my-app'
+          actions:
+            - type: patch
+              options:
+                spec:
+                  replicas: 3
+                  template:
+                    metadata:
+                      labels:
+                        version: "v2.1"
+                    spec:
+                      containers:
+                        - name: app
+                          resources:
+                            requests:
+                              memory: "256Mi"
+                              cpu: "100m"
     """
 
     schema = type_schema(
