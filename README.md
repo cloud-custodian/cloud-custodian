@@ -103,6 +103,25 @@ $ ./build-and-push.sh
 
 This script builds the customized Cloud Custodian images and pushes them to the ManoMano ECR registry.
 
+## ManoMano Fork Management
+
+### Upstream Synchronization
+
+This fork maintains a structured approach to stay synchronized with the upstream Cloud Custodian repository while preserving our custom modifications:
+
+- **Branch Strategy**: We use an `upstream-mirror` branch as a protected clean mirror of the official repository
+- **Upgrade Process**: All upstream changes are integrated through Merge Requests following our corporate standards
+- **Custom Modifications**: Our enhancements are primarily in `tools/c7n_kube/c7n_kube/actions/` and include:
+  - Enhanced PatchAction with NodePool support (`core_mm.py`)
+  - PatchAndWaitAction with priority-based sequential patching
+  - OffHour/OnHour filters for custom resources
+  - NodePool CPU limit save/restore functionality
+
+For detailed upgrade procedures, conflict resolution strategies, and branch management guidelines, see **[UPGRADE_PROCEDURE.md](UPGRADE_PROCEDURE.md)**.
+
+### Test Coverage
+
+We maintain comprehensive test coverage for our custom modifications. See **[CLAUDE.md](CLAUDE.md)** for current test gap analysis and implementation status.
 
 Usage
 -----
