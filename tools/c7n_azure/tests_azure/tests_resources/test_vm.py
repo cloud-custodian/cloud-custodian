@@ -372,7 +372,7 @@ class VMTest(BaseTest):
         resources = p.run()
 
         self.assertEqual(len(resources), 1)
-        self.assertEqual('vm1226', resources[0]['name'])
+        self.assertEqual('c7n-test-vm', resources[0]['name'])
 
     def test_vm_jit_policy_port_filter(self):
         p = self.load_policy({
