@@ -13,7 +13,6 @@ from c7n.filters import CrossAccountAccessFilter, ValueFilter, Filter
 from c7n.filters.costhub import CostHubRecommendation
 from c7n.filters.kms import KmsRelatedFilter
 import c7n.filters.vpc as net_filters
-from c7n.filters import ListItemFilter
 from c7n.manager import resources
 from c7n import query, utils
 from c7n.resources.aws import shape_validate
