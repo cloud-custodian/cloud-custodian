@@ -1027,3 +1027,8 @@ class LambdaEventSourceMapping(query.ChildResourceManager):
                     resources.append(mapping)
 
         return resources
+
+
+@LambdaEventSourceMapping.filter_registry.register('kms-key')
+class KmsEventSourceMappingFilter(KmsRelatedFilter):
+    RelatedIdsExpression = 'KMSKeyArn'
