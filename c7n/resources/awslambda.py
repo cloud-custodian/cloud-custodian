@@ -992,48 +992,6 @@ class LambdaEdgeFilter(Filter):
         return results
 
 
-@AWSLambda.filter_registry.register('event-source-mapping')
-class EventSourceMappingFilter(ListItemFilter):
-    """
-    Return all event source mapping associated with lambda.
-    Allows filtering based on any field within the event source mapping data.
-
-    :example:
-
-    .. code-block:: yaml
-
-        policies:
-          - name: find-event-source-mappings
-            resource: aws.lambda
-            filters:
-              - type: event-source-mapping
-                attrs:
-                  - State: Enabled
-
-    """
-
-    schema = type_schema(
-        'event-source-mapping',
-        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'}
-    )
-    permissions = ('lambda:ListEventSourceMappings',)
-    annotate_items = True
-    annotation_key = 'c7n:EventSourceMappings'
-
-    def get_item_values(self, resource):
-        client = local_session(self.manager.session_factory).client(
-            'lambda', region_name=self.manager.region
-        )
-
-        paginator = client.get_paginator('list_event_source_mappings')
-        paginator.PAGE_ITERATOR_CLS = query.RetryPageIterator
-        mappings = []
-        for page in paginator.paginate(FunctionName=resource['FunctionName']):
-            mappings.extend(page.get('EventSourceMappings', []))
-        resource[self.annotation_key] = mappings
-        return mappings
-
-
 @resources.register('lambda-event-source-mapping')
 class LambdaEventSourceMapping(query.ChildResourceManager):
 
