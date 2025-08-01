@@ -1,0 +1,33 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "UUID": "332f71ae-ddb2-4bc2-a876-54d99204fdd7",
+        "BatchSize": 10,
+        "MaximumBatchingWindowInSeconds": 0,
+        "EventSourceArn": "arn:aws:sqs:us-east-1:644160558196:my-c7n-test",
+        "FilterCriteria": {
+            "Filters": [
+                {
+                    "Pattern": "{\"body\": {\"eventType\": [\"CreateUser\"]}}"
+                }
+            ]
+        },
+        "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:test-jerry",
+        "LastModified": {
+            "__class__": "datetime",
+            "year": 2025,
+            "month": 7,
+            "day": 23,
+            "hour": 19,
+            "minute": 54,
+            "second": 29,
+            "microsecond": 699000
+        },
+        "State": "Enabled",
+        "StateTransitionReason": "USER_INITIATED",
+        "FunctionResponseTypes": [],
+        "KMSKeyArn": "arn:aws:kms:us-east-1:644160558196:key/25d5725f-1a8c-4333-b305-4d7499c19776",
+        "EventSourceMappingArn": "arn:aws:lambda:us-east-1:644160558196:event-source-mapping:332f71ae-ddb2-4bc2-a876-54d99204fdd7"
+    }
+}

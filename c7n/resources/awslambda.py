@@ -988,3 +988,46 @@ class LambdaEdgeFilter(Filter):
             elif (r['FunctionArn'] not in lambda_edge_cf_map and not self.data.get('state')):
                 results.append(r)
         return results
+
+
+@resources.register('lambda-event-source-mapping')
+class LambdaEventSourceMapping(query.ChildResourceManager):
+
+    class resource_type(query.TypeInfo):
+        service = 'lambda'
+        enum_spec = ('list_event_source_mappings', 'EventSourceMappings', None)
+        detail_spec = ('get_event_source_mapping', 'UUID', 'UUID', None)
+        name = id = 'UUID'
+        arn = "EventSourceArn"
+        cfn_type = 'AWS::Lambda::EventSourceMapping'
+        permissions_augment = ("lambda:ListEventSourceMappings", "lambda:GetEventSourceMapping",
+                                 "lambda:ListTags")
+        parent_spec = ('lambda', 'FunctionName', True)
+
+    def augment(self, resources):
+        # Call the original augment method from ChildResourceManager
+        resources = super().augment(resources)
+
+        # Part 1: Add tags from parent resources to child resources
+        parent_resources = self.get_parent_manager().resources()
+        parent_tag_map = {p['FunctionArn']: p.get('Tags', []) for p in parent_resources}
+
+        for resource in resources:
+            resource['Tags'] = parent_tag_map.get(resource['FunctionArn'], [])
+
+        # Part 2: Get all event source mappings and add orphaned ones to resources
+        existing_uuids = {r['UUID'] for r in resources}
+        client = local_session(self.session_factory).client('lambda')
+        paginator = client.get_paginator('list_event_source_mappings')
+        paginator.PAGE_ITERATOR_CLS = query.RetryPageIterator
+        for page in paginator.paginate():
+            for mapping in page.get('EventSourceMappings', []):
+                if mapping['UUID'] not in existing_uuids:
+                    resources.append(mapping)
+
+        return resources
+
+
+@LambdaEventSourceMapping.filter_registry.register('kms-key')
+class KmsEventSourceMappingFilter(KmsRelatedFilter):
+    RelatedIdsExpression = 'KMSKeyArn'

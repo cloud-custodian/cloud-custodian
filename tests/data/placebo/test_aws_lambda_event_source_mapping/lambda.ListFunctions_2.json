@@ -1,0 +1,930 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Functions": [
+            {
+                "FunctionName": "custodian-post-ebs-snapshot-public-passed",
+                "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-post-ebs-snapshot-public-passed",
+                "Runtime": "python3.9",
+                "Role": "arn:aws:iam::644160558196:role/CloudCustodianRole",
+                "Handler": "custodian_policy.run",
+                "CodeSize": 608048,
+                "Description": "post findings if snapshot shared outside of org which includes if public",
+                "Timeout": 900,
+                "MemorySize": 512,
+                "LastModified": "2024-02-07T14:06:02.803+0000",
+                "CodeSha256": "u1KqyaW5aY3nIcxdWt8zoQjRy3KDMZQQ1NEAUZ79Poc=",
+                "Version": "$LATEST",
+                "VpcConfig": {
+                    "SubnetIds": [],
+                    "SecurityGroupIds": [],
+                    "VpcId": "",
+                    "Ipv6AllowedForDualStack": false
+                },
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                },
+                "RevisionId": "6d36e1aa-4d47-4536-9a7a-3bfd915b80e8",
+                "PackageType": "Zip",
+                "Architectures": [
+                    "arm64"
+                ],
+                "EphemeralStorage": {
+                    "Size": 512
+                },
+                "SnapStart": {
+                    "ApplyOn": "None",
+                    "OptimizationStatus": "Off"
+                },
+                "LoggingConfig": {
+                    "LogFormat": "Text",
+                    "LogGroup": "/aws/lambda/custodian-post-ebs-snapshot-public-passed"
+                }
+            },
+            {
+                "FunctionName": "test-jerry",
+                "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:test-jerry",
+                "Runtime": "nodejs22.x",
+                "Role": "arn:aws:iam::644160558196:role/lambda_basic_execution",
+                "Handler": "index.handler",
+                "CodeSize": 333,
+                "Description": "A starter AWS Lambda function.",
+                "Timeout": 3,
+                "MemorySize": 128,
+                "LastModified": "2025-07-27T04:08:08.859+0000",
+                "CodeSha256": "B8G936V1FE2ivB5h1XYq+7ksFkJkE8RFSdSJ6vDF1yg=",
+                "Version": "$LATEST",
+                "Environment": {
+                    "Variables": {}
+                },
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                },
+                "RevisionId": "e961431a-3739-45b7-b640-e33a823a29cb",
+                "PackageType": "Zip",
+                "Architectures": [
+                    "x86_64"
+                ],
+                "EphemeralStorage": {
+                    "Size": 512
+                },
+                "SnapStart": {
+                    "ApplyOn": "None",
+                    "OptimizationStatus": "Off"
+                },
+                "LoggingConfig": {
+                    "LogFormat": "Text",
+                    "LogGroup": "/aws/lambda/test-jerry"
+                }
+            },
+            {
+                "FunctionName": "custodian-post-ebs-snapshot-cross-account-passed",
+                "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-post-ebs-snapshot-cross-account-passed",
+                "Runtime": "python3.9",
+                "Role": "arn:aws:iam::644160558196:role/CloudCustodianRole",
+                "Handler": "custodian_policy.run",
+                "CodeSize": 608049,
+                "Description": "post findings if snapshot shared outside of org which includes if public",
+                "Timeout": 900,
+                "MemorySize": 512,
+                "LastModified": "2024-02-07T14:14:59.131+0000",
+                "CodeSha256": "pHXd6AQ5S9aLPwlA1VCpZCbwkHg8JgMV+zyUAs1bggs=",
+                "Version": "$LATEST",
+                "VpcConfig": {
+                    "SubnetIds": [],
+                    "SecurityGroupIds": [],
+                    "VpcId": "",
+                    "Ipv6AllowedForDualStack": false
+                },
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                },
+                "RevisionId": "aab4b889-5563-4d5e-beb4-20755376b149",
+                "PackageType": "Zip",
+                "Architectures": [
+                    "arm64"
+                ],
+                "EphemeralStorage": {
+                    "Size": 512
+                },
+                "SnapStart": {
+                    "ApplyOn": "None",
+                    "OptimizationStatus": "Off"
+                },
+                "LoggingConfig": {
+                    "LogFormat": "Text",
+                    "LogGroup": "/aws/lambda/custodian-post-ebs-snapshot-cross-account-passed"
+                }
+            },
+            {
+                "FunctionName": "CloudActionModulePoc3Stac-LogRetentionaae0aa3c5b4d-st0bpU8m2cTo",
+                "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:CloudActionModulePoc3Stac-LogRetentionaae0aa3c5b4d-st0bpU8m2cTo",
+                "Runtime": "nodejs14.x",
+                "Role": "arn:aws:iam::644160558196:role/CloudActionModulePoc3Stac-LogRetentionaae0aa3c5b4d-17CJW3ASN7MT1",
+                "Handler": "index.handler",
+                "CodeSize": 5220,
+                "Description": "",
+                "Timeout": 3,
+                "MemorySize": 128,
+                "LastModified": "2022-11-22T19:10:35.339+0000",
+                "CodeSha256": "ojIag4IfVmMig/2aX2+qQAkJkpMYnbeB3T3wZPzoOfQ=",
+                "Version": "$LATEST",
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                },
+                "RevisionId": "8f69ee50-ffc2-492e-9ca4-7351e2a86695",
+                "PackageType": "Zip",
+                "Architectures": [
+                    "x86_64"
+                ],
+                "EphemeralStorage": {
+                    "Size": 512
+                },
+                "SnapStart": {
+                    "ApplyOn": "None",
+                    "OptimizationStatus": "Off"
+                },
+                "LoggingConfig": {
+                    "LogFormat": "Text",
+                    "LogGroup": "/aws/lambda/CloudActionModulePoc3Stac-LogRetentionaae0aa3c5b4d-st0bpU8m2cTo"
+                }
+            },
+            {
+                "FunctionName": "custodian-cldhsmclstr-subnet-test-event",
+                "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-cldhsmclstr-subnet-test-event",
+                "Runtime": "python3.9",
+                "Role": "arn:aws:iam::644160558196:role/CloudCustodianRole",
+                "Handler": "custodian_policy.run",
+                "CodeSize": 532324,
+                "Description": "cloud-custodian lambda policy",
+                "Timeout": 900,
+                "MemorySize": 512,
+                "LastModified": "2022-11-29T15:58:26.585+0000",
+                "CodeSha256": "E8ORaeSH8zgOekonUIcIR7TdtF7u4zaZs/HVlmQ1m4o=",
+                "Version": "$LATEST",
+                "VpcConfig": {
+                    "SubnetIds": [],
+                    "SecurityGroupIds": [],
+                    "VpcId": "",
+                    "Ipv6AllowedForDualStack": false
+                },
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                },
+                "RevisionId": "3c8d2028-df7f-4567-baca-689b599de7ab",
+                "PackageType": "Zip",
+                "Architectures": [
+                    "x86_64"
+                ],
+                "EphemeralStorage": {
+                    "Size": 512
+                },
+                "SnapStart": {
+                    "ApplyOn": "None",
+                    "OptimizationStatus": "Off"
+                },
+                "LoggingConfig": {
+                    "LogFormat": "Text",
+                    "LogGroup": "/aws/lambda/custodian-cldhsmclstr-subnet-test-event"
+                }
+            },
+            {
+                "FunctionName": "custodian-enterprise-accnt-ebs-default-encrypt-existing-update",
+                "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-enterprise-accnt-ebs-default-encrypt-existing-update",
+                "Runtime": "python3.11",
+                "Role": "arn:aws:iam::644160558196:role/CloudCustodianRole",
+                "Handler": "custodian_policy.run",
+                "CodeSize": 617404,
+                "Description": "cloud-custodian lambda policy",
+                "Timeout": 900,
+                "MemorySize": 512,
+                "LastModified": "2024-03-07T00:05:52.826+0000",
+                "CodeSha256": "r+BjzzxrsJtAyrc96qxfwhCSMuAj9eRCYWZHvD5Ul5g=",
+                "Version": "$LATEST",
+                "VpcConfig": {
+                    "SubnetIds": [],
+                    "SecurityGroupIds": [],
+                    "VpcId": "",
+                    "Ipv6AllowedForDualStack": false
+                },
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                },
+                "RevisionId": "64cf8274-0bd4-4fcf-944c-141efb50e5ef",
+                "PackageType": "Zip",
+                "Architectures": [
+                    "arm64"
+                ],
+                "EphemeralStorage": {
+                    "Size": 512
+                },
+                "SnapStart": {
+                    "ApplyOn": "None",
+                    "OptimizationStatus": "Off"
+                },
+                "LoggingConfig": {
+                    "LogFormat": "Text",
+                    "LogGroup": "/aws/lambda/custodian-enterprise-accnt-ebs-default-encrypt-existing-update"
+                }
+            },
+            {
+                "FunctionName": "CloudActionModulePoc3Stack-IngestionLambdaEF25F265-mRpHWGSq9jhn",
+                "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:CloudActionModulePoc3Stack-IngestionLambdaEF25F265-mRpHWGSq9jhn",
+                "Runtime": "python3.9",
+                "Role": "arn:aws:iam::644160558196:role/CloudActionModulePoc3Stac-IngestionLambdaExecution-1E8ETFQJKUZ02",
+                "Handler": "ingestion.lambda_handler",
+                "CodeSize": 1895,
+                "Description": "",
+                "Timeout": 3,
+                "MemorySize": 128,
+                "LastModified": "2022-11-22T19:10:35.353+0000",
+                "CodeSha256": "asilXcEp63oQE3zcpCzM8zPl0tScqxkGysef0BNA54Q=",
+                "Version": "$LATEST",
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                },
+                "RevisionId": "c5fc115b-3cad-4eea-b2ff-424c718741d0",
+                "PackageType": "Zip",
+                "Architectures": [
+                    "x86_64"
+                ],
+                "EphemeralStorage": {
+                    "Size": 512
+                },
+                "SnapStart": {
+                    "ApplyOn": "None",
+                    "OptimizationStatus": "Off"
+                },
+                "LoggingConfig": {
+                    "LogFormat": "Text",
+                    "LogGroup": "/aws/lambda/CloudActionModulePoc3Stack-IngestionLambdaEF25F265-mRpHWGSq9jhn"
+                }
+            },
+            {
+                "FunctionName": "test-pratyush",
+                "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:test-pratyush",
+                "Runtime": "python3.9",
+                "Role": "arn:aws:iam::644160558196:role/service-role/test-pratyush-role-z8t69erp",
+                "Handler": "lambda_function.lambda_handler",
+                "CodeSize": 376,
+                "Description": "",
+                "Timeout": 3,
+                "MemorySize": 128,
+                "LastModified": "2023-08-30T17:01:07.000+0000",
+                "CodeSha256": "qxW4g+uEr2cGdO3l52WOfSVjv5TdNG6Pd+rj8YJFjAw=",
+                "Version": "$LATEST",
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                },
+                "RevisionId": "7e8f30ab-a087-47b6-8383-75b29a523c7e",
+                "PackageType": "Zip",
+                "Architectures": [
+                    "x86_64"
+                ],
+                "EphemeralStorage": {
+                    "Size": 512
+                },
+                "SnapStart": {
+                    "ApplyOn": "None",
+                    "OptimizationStatus": "Off"
+                },
+                "LoggingConfig": {
+                    "LogFormat": "Text",
+                    "LogGroup": "/aws/lambda/test-pratyush"
+                }
+            },
+            {
+                "FunctionName": "c7n-lambda-edge-new",
+                "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:c7n-lambda-edge-new",
+                "Runtime": "nodejs14.x",
+                "Role": "arn:aws:iam::644160558196:role/CloudCustodianRole",
+                "Handler": "index.handler",
+                "CodeSize": 376,
+                "Description": "Blueprint for returning HTTP redirect implemented in NodeJS.",
+                "Timeout": 1,
+                "MemorySize": 128,
+                "LastModified": "2023-08-30T03:28:55.000+0000",
+                "CodeSha256": "qxW4g+uEr2cGdO3l52WOfSVjv5TdNG6Pd+rj8YJFjAw=",
+                "Version": "$LATEST",
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                },
+                "RevisionId": "6780e2d7-4336-46c1-aba9-f5c6f7aa766a",
+                "PackageType": "Zip",
+                "Architectures": [
+                    "x86_64"
+                ],
+                "EphemeralStorage": {
+                    "Size": 512
+                },
+                "SnapStart": {
+                    "ApplyOn": "None",
+                    "OptimizationStatus": "Off"
+                },
+                "LoggingConfig": {
+                    "LogFormat": "Text",
+                    "LogGroup": "/aws/lambda/c7n-lambda-edge-new"
+                }
+            },
+            {
+                "FunctionName": "custodian-bedrock",
+                "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-bedrock",
+                "Runtime": "python3.11",
+                "Role": "arn:aws:iam::644160558196:role/CloudCustodianRole",
+                "Handler": "custodian_policy.run",
+                "CodeSize": 12571012,
+                "Description": "cloud-custodian lambda policy",
+                "Timeout": 900,
+                "MemorySize": 512,
+                "LastModified": "2024-02-14T04:00:13.000+0000",
+                "CodeSha256": "P/0sAvR6K8HdP4Qu0O2BIPYE0PhjMLK2Cgd3IYQcvvQ=",
+                "Version": "$LATEST",
+                "VpcConfig": {
+                    "SubnetIds": [],
+                    "SecurityGroupIds": [],
+                    "VpcId": "",
+                    "Ipv6AllowedForDualStack": false
+                },
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                },
+                "RevisionId": "8e5a5338-f7ab-4c1e-b2c6-85057af5afc7",
+                "PackageType": "Zip",
+                "Architectures": [
+                    "arm64"
+                ],
+                "EphemeralStorage": {
+                    "Size": 512
+                },
+                "SnapStart": {
+                    "ApplyOn": "None",
+                    "OptimizationStatus": "Off"
+                },
+                "LoggingConfig": {
+                    "LogFormat": "Text",
+                    "LogGroup": "bedrock"
+                }
+            },
+            {
+                "FunctionName": "custodian-ec2-auto-tag-instances",
+                "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-ec2-auto-tag-instances",
+                "Runtime": "python3.9",
+                "Role": "arn:aws:iam::644160558196:role/jerry-test-role",
+                "Handler": "custodian_policy.run",
+                "CodeSize": 569309,
+                "Description": "cloud-custodian lambda policy",
+                "Timeout": 900,
+                "MemorySize": 512,
+                "LastModified": "2023-06-06T03:52:08.849+0000",
+                "CodeSha256": "4potciXScuvkMPU/nQ+r78tsoemJttcZIIZZPYXDFK8=",
+                "Version": "$LATEST",
+                "VpcConfig": {
+                    "SubnetIds": [],
+                    "SecurityGroupIds": [],
+                    "VpcId": "",
+                    "Ipv6AllowedForDualStack": false
+                },
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                },
+                "RevisionId": "ef83e9e2-5d4e-407f-a531-82b8a7567e99",
+                "PackageType": "Zip",
+                "Architectures": [
+                    "x86_64"
+                ],
+                "EphemeralStorage": {
+                    "Size": 512
+                },
+                "SnapStart": {
+                    "ApplyOn": "None",
+                    "OptimizationStatus": "Off"
+                },
+                "LoggingConfig": {
+                    "LogFormat": "Text",
+                    "LogGroup": "/aws/lambda/custodian-ec2-auto-tag-instances"
+                }
+            },
+            {
+                "FunctionName": "powertools-quickstart-HelloWorldFunction-9x6lZ569OqOW",
+                "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:powertools-quickstart-HelloWorldFunction-9x6lZ569OqOW",
+                "Runtime": "python3.9",
+                "Role": "arn:aws:iam::644160558196:role/powertools-quickstart-HelloWorldFunctionRole-ZYp81wyUJxqN",
+                "Handler": "app.lambda_handler",
+                "CodeSize": 13180938,
+                "Description": "",
+                "Timeout": 3,
+                "MemorySize": 128,
+                "LastModified": "2023-12-24T18:10:59.975+0000",
+                "CodeSha256": "aVVGRXVr4cfKZO/3tJ+JfXTBuSQB+cRT6RB2a+R8BR0=",
+                "Version": "$LATEST",
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                },
+                "RevisionId": "673aea95-71d6-4fee-b51d-22524731fc70",
+                "PackageType": "Zip",
+                "Architectures": [
+                    "x86_64"
+                ],
+                "EphemeralStorage": {
+                    "Size": 512
+                },
+                "SnapStart": {
+                    "ApplyOn": "None",
+                    "OptimizationStatus": "Off"
+                },
+                "LoggingConfig": {
+                    "LogFormat": "Text",
+                    "LogGroup": "/aws/lambda/powertools-quickstart-HelloWorldFunction-9x6lZ569OqOW"
+                }
+            },
+            {
+                "FunctionName": "custodian-ec2-test-foo-1",
+                "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-ec2-test-foo-1",
+                "Runtime": "python3.9",
+                "Role": "arn:aws:iam::644160558196:role/CloudCustodianRole",
+                "Handler": "custodian_policy.run",
+                "CodeSize": 3562833,
+                "Description": "cloud-custodian lambda policy",
+                "Timeout": 900,
+                "MemorySize": 512,
+                "LastModified": "2023-03-31T04:10:00.439+0000",
+                "CodeSha256": "b7WDCQ9dPd9u1lQuvdG0icu8wGZUDnP73aOjtqzFp1I=",
+                "Version": "$LATEST",
+                "VpcConfig": {
+                    "SubnetIds": [],
+                    "SecurityGroupIds": [],
+                    "VpcId": "",
+                    "Ipv6AllowedForDualStack": false
+                },
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                },
+                "RevisionId": "f9588f1c-a6ae-4462-8f0f-b8f7f35edb36",
+                "PackageType": "Zip",
+                "Architectures": [
+                    "x86_64"
+                ],
+                "EphemeralStorage": {
+                    "Size": 512
+                },
+                "SnapStart": {
+                    "ApplyOn": "None",
+                    "OptimizationStatus": "Off"
+                },
+                "LoggingConfig": {
+                    "LogFormat": "Text",
+                    "LogGroup": "/aws/lambda/custodian-ec2-test-foo-1"
+                }
+            },
+            {
+                "FunctionName": "test-python",
+                "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:test-python",
+                "Runtime": "python3.8",
+                "Role": "arn:aws:iam::644160558196:role/BrentTestCustodianRole",
+                "Handler": "lambda_function.lambda_handler",
+                "CodeSize": 376,
+                "Description": "",
+                "Timeout": 3,
+                "MemorySize": 128,
+                "LastModified": "2023-10-18T17:50:27.000+0000",
+                "CodeSha256": "qxW4g+uEr2cGdO3l52WOfSVjv5TdNG6Pd+rj8YJFjAw=",
+                "Version": "$LATEST",
+                "VpcConfig": {
+                    "SubnetIds": [
+                        "subnet-914763e7"
+                    ],
+                    "SecurityGroupIds": [
+                        "sg-065a2edad041c289c"
+                    ],
+                    "VpcId": "vpc-d2d616b5",
+                    "Ipv6AllowedForDualStack": false
+                },
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                },
+                "RevisionId": "c2ac1e8a-be63-4e03-bbef-382e96daae1d",
+                "PackageType": "Zip",
+                "Architectures": [
+                    "x86_64"
+                ],
+                "EphemeralStorage": {
+                    "Size": 512
+                },
+                "SnapStart": {
+                    "ApplyOn": "None",
+                    "OptimizationStatus": "Off"
+                },
+                "LoggingConfig": {
+                    "LogFormat": "Text",
+                    "LogGroup": "/aws/lambda/test-python"
+                }
+            },
+            {
+                "FunctionName": "custodian-test-appsync-graphql",
+                "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-test-appsync-graphql",
+                "Runtime": "python3.9",
+                "Role": "arn:aws:iam::644160558196:role/CloudCustodianRole",
+                "Handler": "custodian_policy.run",
+                "CodeSize": 11521279,
+                "Description": "cloud-custodian lambda policy",
+                "Timeout": 900,
+                "MemorySize": 512,
+                "LastModified": "2023-06-14T17:54:22.640+0000",
+                "CodeSha256": "Nnrqik8046psknNEQs3zGfeKjY1Muw8cKmJS+ofpmSk=",
+                "Version": "$LATEST",
+                "VpcConfig": {
+                    "SubnetIds": [],
+                    "SecurityGroupIds": [],
+                    "VpcId": "",
+                    "Ipv6AllowedForDualStack": false
+                },
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                },
+                "RevisionId": "948b8993-4aff-466a-9b98-5f66ab176b9c",
+                "PackageType": "Zip",
+                "Architectures": [
+                    "arm64"
+                ],
+                "EphemeralStorage": {
+                    "Size": 512
+                },
+                "SnapStart": {
+                    "ApplyOn": "None",
+                    "OptimizationStatus": "Off"
+                },
+                "LoggingConfig": {
+                    "LogFormat": "Text",
+                    "LogGroup": "/aws/lambda/custodian-test-appsync-graphql"
+                }
+            },
+            {
+                "FunctionName": "test-lambda-edge",
+                "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:test-lambda-edge",
+                "Runtime": "nodejs14.x",
+                "Role": "arn:aws:iam::644160558196:role/CloudCustodianRole",
+                "Handler": "index.handler",
+                "CodeSize": 389,
+                "Description": "Blueprint for modifying CloudFront response header implemented in NodeJS.",
+                "Timeout": 1,
+                "MemorySize": 128,
+                "LastModified": "2023-03-15T01:20:54.053+0000",
+                "CodeSha256": "PRrkU1iZ2meuOdge3XCeQPebrEknjcZlEEMBbMAT70g=",
+                "Version": "$LATEST",
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                },
+                "RevisionId": "7e0c0cd4-45ec-4b9a-a33f-bf2e18d22cbc",
+                "PackageType": "Zip",
+                "Architectures": [
+                    "x86_64"
+                ],
+                "EphemeralStorage": {
+                    "Size": 512
+                },
+                "SnapStart": {
+                    "ApplyOn": "None",
+                    "OptimizationStatus": "Off"
+                },
+                "LoggingConfig": {
+                    "LogFormat": "Text",
+                    "LogGroup": "/aws/lambda/test-lambda-edge"
+                }
+            },
+            {
+                "FunctionName": "CloudActionModulePoc3Stac-LambdaRemediationLambdaB-KgXaIyUdBPsP",
+                "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:CloudActionModulePoc3Stac-LambdaRemediationLambdaB-KgXaIyUdBPsP",
+                "Runtime": "python3.9",
+                "Role": "arn:aws:iam::644160558196:role/CloudActionModulePoc3Stac-LambdaRemediationLambdaS-19OYFO3I3LIQB",
+                "Handler": "remediation.lambda_handler",
+                "CodeSize": 1667,
+                "Description": "",
+                "Timeout": 3,
+                "MemorySize": 128,
+                "LastModified": "2022-11-22T19:10:35.351+0000",
+                "CodeSha256": "tkiz0xd1i+Pt1PtjjhLfp27f38MoFKRK1QzxgAZoYPA=",
+                "Version": "$LATEST",
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                },
+                "RevisionId": "9c2f001a-ee5f-4671-b394-3cc2f903ac12",
+                "PackageType": "Zip",
+                "Architectures": [
+                    "x86_64"
+                ],
+                "EphemeralStorage": {
+                    "Size": 512
+                },
+                "SnapStart": {
+                    "ApplyOn": "None",
+                    "OptimizationStatus": "Off"
+                },
+                "LoggingConfig": {
+                    "LogFormat": "Text",
+                    "LogGroup": "/aws/lambda/CloudActionModulePoc3Stac-LambdaRemediationLambdaB-KgXaIyUdBPsP"
+                }
+            },
+            {
+                "FunctionName": "CloudActionModulePoc4Stack-IngestionLambda",
+                "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:CloudActionModulePoc4Stack-IngestionLambda",
+                "Runtime": "python3.8",
+                "Role": "arn:aws:iam::644160558196:role/CloudActionModulePoc3Stac-IngestionLambdaExecution-1E8ETFQJKUZ02",
+                "Handler": "lambda_function.lambda_handler",
+                "CodeSize": 510,
+                "Description": "",
+                "Timeout": 3,
+                "MemorySize": 128,
+                "LastModified": "2022-11-22T19:10:35.340+0000",
+                "CodeSha256": "e8czSxK4l5zWCyXdYI/Cjmy4pNrYTUtKVKe8fT9nIdE=",
+                "Version": "$LATEST",
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                },
+                "RevisionId": "621e43a3-a446-45a3-86e9-1917d2048a32",
+                "PackageType": "Zip",
+                "Architectures": [
+                    "x86_64"
+                ],
+                "EphemeralStorage": {
+                    "Size": 512
+                },
+                "SnapStart": {
+                    "ApplyOn": "None",
+                    "OptimizationStatus": "Off"
+                },
+                "LoggingConfig": {
+                    "LogFormat": "Text",
+                    "LogGroup": "/aws/lambda/CloudActionModulePoc4Stack-IngestionLambda"
+                }
+            },
+            {
+                "FunctionName": "custodian-tag-ec2",
+                "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-tag-ec2",
+                "Runtime": "python3.11",
+                "Role": "arn:aws:iam::644160558196:role/CloudCustodianRole",
+                "Handler": "custodian_policy.run",
+                "CodeSize": 617405,
+                "Description": "cloud-custodian lambda policy",
+                "Timeout": 900,
+                "MemorySize": 512,
+                "LastModified": "2024-03-06T16:06:14.899+0000",
+                "CodeSha256": "f3EJsUaP4efT3+rzOK2fu2kq3Gcu+UdCqirrpTxXlYM=",
+                "Version": "$LATEST",
+                "VpcConfig": {
+                    "SubnetIds": [],
+                    "SecurityGroupIds": [],
+                    "VpcId": "",
+                    "Ipv6AllowedForDualStack": false
+                },
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                },
+                "RevisionId": "8dcd3317-fed2-4a55-8872-697ec20ffa01",
+                "PackageType": "Zip",
+                "Architectures": [
+                    "arm64"
+                ],
+                "EphemeralStorage": {
+                    "Size": 512
+                },
+                "SnapStart": {
+                    "ApplyOn": "None",
+                    "OptimizationStatus": "Off"
+                },
+                "LoggingConfig": {
+                    "LogFormat": "Text",
+                    "LogGroup": "/aws/lambda/custodian-tag-ec2"
+                }
+            },
+            {
+                "FunctionName": "custodian-post-ebs-snapshot-cross-account",
+                "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-post-ebs-snapshot-cross-account",
+                "Runtime": "python3.9",
+                "Role": "arn:aws:iam::644160558196:role/CloudCustodianRole",
+                "Handler": "custodian_policy.run",
+                "CodeSize": 607989,
+                "Description": "cloud-custodian lambda policy",
+                "Timeout": 900,
+                "MemorySize": 512,
+                "LastModified": "2024-02-07T14:14:51.932+0000",
+                "CodeSha256": "lRo2YTYbdVmCjXwFwHNx59KlaNZzo0xK0nZERw4qXe4=",
+                "Version": "$LATEST",
+                "VpcConfig": {
+                    "SubnetIds": [],
+                    "SecurityGroupIds": [],
+                    "VpcId": "",
+                    "Ipv6AllowedForDualStack": false
+                },
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                },
+                "RevisionId": "b5775d96-a44e-4de1-b9b9-826c2dacb48b",
+                "PackageType": "Zip",
+                "Architectures": [
+                    "arm64"
+                ],
+                "EphemeralStorage": {
+                    "Size": 512
+                },
+                "SnapStart": {
+                    "ApplyOn": "None",
+                    "OptimizationStatus": "Off"
+                },
+                "LoggingConfig": {
+                    "LogFormat": "Text",
+                    "LogGroup": "/aws/lambda/custodian-post-ebs-snapshot-cross-account"
+                }
+            },
+            {
+                "FunctionName": "custodian-ec2-sechub-remediate-severity-with-findings",
+                "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-ec2-sechub-remediate-severity-with-findings",
+                "Runtime": "python3.8",
+                "Role": "arn:aws:iam::644160558196:role/CloudCustodianRole",
+                "Handler": "custodian_policy.run",
+                "CodeSize": 500498,
+                "Description": "Security Finding imported filtering on Severity >= Medium, Name, and a previous report of a Vulnerability",
+                "Timeout": 900,
+                "MemorySize": 256,
+                "LastModified": "2022-11-22T19:10:35.348+0000",
+                "CodeSha256": "EE6hQg6jszJXNmh3cSyX1lAmDCJY8GP3GCooKE0CiHA=",
+                "Version": "$LATEST",
+                "VpcConfig": {
+                    "SubnetIds": [],
+                    "SecurityGroupIds": [],
+                    "VpcId": "",
+                    "Ipv6AllowedForDualStack": false
+                },
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                },
+                "RevisionId": "99958e67-93fa-4150-975d-f82619d97989",
+                "PackageType": "Zip",
+                "Architectures": [
+                    "x86_64"
+                ],
+                "EphemeralStorage": {
+                    "Size": 512
+                },
+                "SnapStart": {
+                    "ApplyOn": "None",
+                    "OptimizationStatus": "Off"
+                },
+                "LoggingConfig": {
+                    "LogFormat": "Text",
+                    "LogGroup": "/aws/lambda/custodian-ec2-sechub-remediate-severity-with-findings"
+                }
+            },
+            {
+                "FunctionName": "custodian-ec2-sechub-remediate-severity-with-findings-delete",
+                "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-ec2-sechub-remediate-severity-with-findings-delete",
+                "Runtime": "python3.8",
+                "Role": "arn:aws:iam::644160558196:role/CloudCustodianRole",
+                "Handler": "custodian_policy.run",
+                "CodeSize": 500608,
+                "Description": "Security Finding imported filtering on Severity >= Medium, Name, and a previous report of a Vulnerability",
+                "Timeout": 900,
+                "MemorySize": 256,
+                "LastModified": "2022-11-22T19:10:35.338+0000",
+                "CodeSha256": "SyucS4M9bI9eQaZuSOE0NXWKN4lULT3NbevobKi5Va8=",
+                "Version": "$LATEST",
+                "VpcConfig": {
+                    "SubnetIds": [],
+                    "SecurityGroupIds": [],
+                    "VpcId": "",
+                    "Ipv6AllowedForDualStack": false
+                },
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                },
+                "RevisionId": "9caca6ad-f8d7-4bd4-bf28-3855fe262781",
+                "PackageType": "Zip",
+                "Architectures": [
+                    "x86_64"
+                ],
+                "EphemeralStorage": {
+                    "Size": 512
+                },
+                "SnapStart": {
+                    "ApplyOn": "None",
+                    "OptimizationStatus": "Off"
+                },
+                "LoggingConfig": {
+                    "LogFormat": "Text",
+                    "LogGroup": "/aws/lambda/custodian-ec2-sechub-remediate-severity-with-findings-delete"
+                }
+            },
+            {
+                "FunctionName": "custodian-test-ec2-lambda-graviton",
+                "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-test-ec2-lambda-graviton",
+                "Runtime": "python3.9",
+                "Role": "arn:aws:iam::644160558196:role/CloudCustodianRole",
+                "Handler": "custodian_policy.run",
+                "CodeSize": 529269,
+                "Description": "cloud-custodian lambda policy",
+                "Timeout": 900,
+                "MemorySize": 512,
+                "LastModified": "2022-11-22T19:10:35.334+0000",
+                "CodeSha256": "Qg93IWgQsyANLplatcaI04kuCCme469ohUUsF+JPZck=",
+                "Version": "$LATEST",
+                "VpcConfig": {
+                    "SubnetIds": [],
+                    "SecurityGroupIds": [],
+                    "VpcId": "",
+                    "Ipv6AllowedForDualStack": false
+                },
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                },
+                "RevisionId": "06a9fab3-557a-4c52-bd93-0a8c20f817ad",
+                "PackageType": "Zip",
+                "Architectures": [
+                    "x86_64"
+                ],
+                "EphemeralStorage": {
+                    "Size": 512
+                },
+                "SnapStart": {
+                    "ApplyOn": "None",
+                    "OptimizationStatus": "Off"
+                },
+                "LoggingConfig": {
+                    "LogFormat": "Text",
+                    "LogGroup": "/aws/lambda/custodian-test-ec2-lambda-graviton"
+                }
+            },
+            {
+                "FunctionName": "test-poc-4",
+                "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:test-poc-4",
+                "Runtime": "python3.9",
+                "Role": "arn:aws:iam::644160558196:role/test-poc-remediation",
+                "Handler": "lambda_function.lambda_handler",
+                "CodeSize": 500216,
+                "Description": "",
+                "Timeout": 843,
+                "MemorySize": 128,
+                "LastModified": "2022-11-22T19:10:35.338+0000",
+                "CodeSha256": "X9HQnz20i6UUJGYeZT141D1vh0zC8Yj00F1bBBBkh9c=",
+                "Version": "$LATEST",
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                },
+                "RevisionId": "c6e31716-a571-4acc-b368-560f1116287e",
+                "PackageType": "Zip",
+                "Architectures": [
+                    "x86_64"
+                ],
+                "EphemeralStorage": {
+                    "Size": 512
+                },
+                "SnapStart": {
+                    "ApplyOn": "None",
+                    "OptimizationStatus": "Off"
+                },
+                "LoggingConfig": {
+                    "LogFormat": "Text",
+                    "LogGroup": "/aws/lambda/test-poc-4"
+                }
+            },
+            {
+                "FunctionName": "custodian-lambda-sechub-lambda-remove-signature",
+                "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-lambda-sechub-lambda-remove-signature",
+                "Runtime": "python3.8",
+                "Role": "arn:aws:iam::644160558196:role/CloudCustodianRole",
+                "Handler": "custodian_policy.run",
+                "CodeSize": 500650,
+                "Description": "Security Finding imported filtering on Severity >= Medium, Name, and a previous report of a Vulnerability",
+                "Timeout": 900,
+                "MemorySize": 256,
+                "LastModified": "2022-11-22T19:10:35.335+0000",
+                "CodeSha256": "e3GcAUT6fCehERSotxo76cxMbJyi3rQzlJ1VhaZZBOM=",
+                "Version": "$LATEST",
+                "VpcConfig": {
+                    "SubnetIds": [],
+                    "SecurityGroupIds": [],
+                    "VpcId": "",
+                    "Ipv6AllowedForDualStack": false
+                },
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                },
+                "RevisionId": "ed8f42be-149a-41e2-9275-b3f20f4b12ba",
+                "PackageType": "Zip",
+                "Architectures": [
+                    "x86_64"
+                ],
+                "EphemeralStorage": {
+                    "Size": 512
+                },
+                "SnapStart": {
+                    "ApplyOn": "None",
+                    "OptimizationStatus": "Off"
+                },
+                "LoggingConfig": {
+                    "LogFormat": "Text",
+                    "LogGroup": "/aws/lambda/custodian-lambda-sechub-lambda-remove-signature"
+                }
+            }
+        ]
+    }
+}
