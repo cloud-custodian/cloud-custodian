@@ -991,6 +991,7 @@ class LambdaEdgeFilter(Filter):
                 results.append(r)
         return results
 
+
 @AWSLambda.filter_registry.register('event-source-mapping')
 class EventSourceMappingFilter(ListItemFilter):
     """
@@ -1043,7 +1044,8 @@ class LambdaEventSourceMapping(query.ChildResourceManager):
         name = id = 'UUID'
         arn = "EventSourceArn"
         cfn_type = 'AWS::Lambda::EventSourceMapping'
-        permissions_augment = ("lambda:ListEventSourceMappings", "lambda:GetEventSourceMapping", "lambda:ListTags")
+        permissions_augment = ("lambda:ListEventSourceMappings", "lambda:GetEventSourceMapping",
+                                 "lambda:ListTags")
         parent_spec = ('lambda', 'FunctionName', True)
 
     def augment(self, resources):

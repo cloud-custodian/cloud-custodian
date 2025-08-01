@@ -431,7 +431,8 @@ class LambdaTest(BaseTest):
                 "name": "lambda-event-source",
                 "resource": "lambda-event-source-mapping",
                 "filters": [
-                     {  "tag:team": "policy"
+                     {
+                        "tag:team": "policy"
                      }
                  ],
             },
