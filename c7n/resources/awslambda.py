@@ -37,7 +37,6 @@ ErrAccessDenied = "AccessDeniedException"
 class DescribeLambda(query.DescribeSource):
 
     def augment(self, resources):
-        # This ensures Lambda resources have tags
         return universal_augment(
             self.manager, super(DescribeLambda, self).augment(resources))
 
