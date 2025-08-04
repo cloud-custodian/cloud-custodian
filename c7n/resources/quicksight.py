@@ -143,15 +143,14 @@ class DescribeQuicksightWithAccountId(query.DescribeSource):
         }
         return super().resources(required)
 
-
-def augment_quicksight_tags(manager, resources):
-    client = local_session(manager.session_factory).client('quicksight')
-    for r in resources:
-        tags = manager.retry(client.list_tags_for_resource,
-                            ResourceArn=r['Arn'],
-                            ignore_err_codes=("ResourceNotFoundException",))['Tags']
-        r['Tags'] = tags
-    return resources
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('quicksight')
+        for r in resources:
+            tags = self.manager.retry(client.list_tags_for_resource,
+                                ResourceArn=r['Arn'],
+                                ignore_err_codes=("ResourceNotFoundException",))['Tags']
+            r['Tags'] = tags
+        return resources
 
 
 @resources.register("quicksight-dashboard")
@@ -169,9 +168,6 @@ class QuicksightDashboard(query.QueryResourceManager):
         "describe": DescribeQuicksightWithAccountId,
     }
 
-    def augment(self, resources):
-        return augment_quicksight_tags(self, resources)
-
 
 @resources.register("quicksight-datasource")
 class QuicksightDataSource(query.QueryResourceManager):
@@ -187,6 +183,3 @@ class QuicksightDataSource(query.QueryResourceManager):
     source_mapping = {
         "describe": DescribeQuicksightWithAccountId,
     }
-
-    def augment(self, resources):
-        return augment_quicksight_tags(self, resources)
