@@ -1,0 +1,25 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "TransitionDefaultMinimumObjectSize": "all_storage_classes_128K",
+        "Rules": [
+            {
+                "Expiration": {
+                    "ExpiredObjectDeleteMarker": true
+                },
+                "ID": "EnterpriseLifecycle",
+                "Filter": {
+                    "Prefix": ""
+                },
+                "Status": "Enabled",
+                "NoncurrentVersionExpiration": {
+                    "NoncurrentDays": 14
+                },
+                "AbortIncompleteMultipartUpload": {
+                    "DaysAfterInitiation": 4
+                }
+            }
+        ]
+    }
+}
