@@ -988,3 +988,64 @@ class LambdaEdgeFilter(Filter):
             elif (r['FunctionArn'] not in lambda_edge_cf_map and not self.data.get('state')):
                 results.append(r)
         return results
+
+
+class DescribeEventSourceMappings(query.ChildDescribeSource):
+
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client(
+            self.manager.resource_type.service)
+
+        resources = universal_augment(self.manager, super().augment(resources))
+
+        # Part 1: Add tags from parent resources to child resources
+        # This is used to identify the child resources from the parent lambda function
+        parent_resources = self.manager.get_parent_manager().resources()
+        parent_tag_map = {
+            p['FunctionArn']: [
+                {'Key': tag['Key'], 'Value': tag['Value']} for tag in p.get('Tags', [])
+            ]
+            for p in parent_resources
+        }
+        for r in resources:
+            parent_tags = parent_tag_map.get(r['FunctionArn'], [])
+            child_tags = r.get('Tags', [])
+            r['Tags'] = parent_tags + child_tags
+
+        # Part 2: Get all event source mappings and add orphaned ones to resources
+        # This is used to ensure that all event source mappings are included because
+        # some may have parent lambda function deleted.
+        existing_uuids = {r['UUID'] for r in resources}
+        paginator = client.get_paginator('list_event_source_mappings')
+        paginator.PAGE_ITERATOR_CLS = query.RetryPageIterator
+        for page in paginator.paginate():
+            for mapping in page.get('EventSourceMappings', []):
+                if mapping['UUID'] not in existing_uuids:
+                    resources.append(mapping)
+
+        return resources
+
+
+@resources.register('lambda-event-source-mapping')
+class LambdaEventSourceMapping(query.ChildResourceManager):
+
+    class resource_type(query.TypeInfo):
+        service = 'lambda'
+        enum_spec = ('list_event_source_mappings', 'EventSourceMappings', None)
+        detail_spec = ('get_event_source_mapping', 'UUID', 'UUID', None)
+        name = id = 'UUID'
+        arn = "EventSourceMappingArn"
+        cfn_type = 'AWS::Lambda::EventSourceMapping'
+        permissions_augment = ("lambda:ListEventSourceMappings", "lambda:GetEventSourceMapping",
+                                 "lambda:ListTags")
+        parent_spec = ('lambda', 'FunctionName', True)
+        universal_taggable = object
+
+    source_mapping = {
+        'describe-child': DescribeEventSourceMappings,
+    }
+
+
+@LambdaEventSourceMapping.filter_registry.register('kms-key')
+class KmsEventSourceMappingFilter(KmsRelatedFilter):
+    RelatedIdsExpression = 'KMSKeyArn'
