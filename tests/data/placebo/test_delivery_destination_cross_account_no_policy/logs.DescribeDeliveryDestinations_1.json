@@ -1,0 +1,17 @@
+{
+    "status_code": 200,
+    "data": {
+        "deliveryDestinations": [
+            {
+                "name": "c7n-test",
+                "arn": "arn:aws:logs:us-east-1:123456789012:delivery-destination:c7n-test",
+                "deliveryDestinationType": "CWL",
+                "outputFormat": "json",
+                "deliveryDestinationConfiguration": {
+                    "destinationResourceArn": "arn:aws:logs:us-east-1:123456789012:log-group:/BAEnterpriseCloudControl/test-ssm-session-manager-logging"
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

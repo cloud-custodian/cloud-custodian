@@ -1,7 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import click
-import tomli as toml
+import tomllib as toml
 from pathlib import Path
 
 
@@ -14,7 +14,16 @@ def cli():
 
 
 def project_roots(root):
+    lines = (Path(root) / "Makefile").read_text().splitlines()
+    for l in lines:
+        if not l.startswith('PKG_SET '):
+            continue
+        pkgs = [p.strip('tools/') for p in l.split(':=')[1].split()]
+    pkgs.append('')
+
     for config_path in Path(root).rglob("pyproject.toml"):
+        if config_path.parent.name not in pkgs:
+            continue
         yield config_path.parent
 
 
@@ -23,9 +32,16 @@ def project_roots(root):
 @click.option('-o', '--output', type=click.Path())
 def gen_qa_requires(root, output):
     packages = []
+
     for root in project_roots(root):
+
         data = toml.loads((root / "pyproject.toml").read_text())
-        pkg_data = data['package']
+        # not all tool subdirs were converted (logexporter, trailcreator)
+        # they are candidates for moving to a sandbox repo
+        if 'project' not in data:
+            continue
+        pkg_data = data['project']
+        print(pkg_data['name'])
         packages.append((pkg_data['name'], pkg_data['version']))
 
     with open(output, 'w') as fh:

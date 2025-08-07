@@ -24,7 +24,7 @@ jobs:
           python-version: ${{ env.DEFAULT_PY_VERSION }}
       - name: Install uv
         id: setup-uv-lint
-        uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # ratchet:astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@e92bafb6253dcd438e0484186d7669ea7a8ca1cc # ratchet:astral-sh/setup-uv@v6
         with:
           version: ${{ env.UV_VERSION }}
           enable-cache: true
@@ -57,7 +57,7 @@ jobs:
         with:
           python-version: ${{ env.DEFAULT_PY_VERSION }}
         id: setup-uv-analyzer
-      - uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # ratchet:astral-sh/setup-uv@v5
+      - uses: astral-sh/setup-uv@e92bafb6253dcd438e0484186d7669ea7a8ca1cc # ratchet:astral-sh/setup-uv@v6
         with:
           version: ${{ env.UV_VERSION }}
           enable-cache: true

@@ -200,19 +200,16 @@ class PolicyChecker:
         set_conditions = ('ForAllValues', 'ForAnyValues')
 
         for s_cond_op in list(s['Condition'].keys()):
-            cond = {'op': s_cond_op}
-
             if s_cond_op not in conditions:
                 if not any(s_cond_op.startswith(c) for c in set_conditions):
                     continue
 
-            cond['key'] = list(s['Condition'][s_cond_op].keys())[0]
-            cond['values'] = s['Condition'][s_cond_op][cond['key']]
-            cond['values'] = (
-                isinstance(cond['values'],
-                           str) and (cond['values'],) or cond['values'])
-            cond['key'] = cond['key'].lower()
-            s_cond.append(cond)
+            # Loop over all keys under each operator
+            for key, value in s['Condition'][s_cond_op].items():
+                cond = {'op': s_cond_op}
+                cond['key'] = key.lower()
+                cond['values'] = (value,) if isinstance(value, str) else value
+                s_cond.append(cond)
 
         return s_cond
 
@@ -247,6 +244,21 @@ class PolicyChecker:
         if not self.allowed_orgid:
             return True
         return bool(set(map(_account, c['values'])).difference(self.allowed_orgid))
+
+    def handle_aws_principalarn(self, s, c):
+        """Handle the aws:PrincipalArn condition key."""
+
+        return bool(set(map(_account, c['values'])).difference(self.allowed_accounts))
+
+    def handle_aws_resourceorgid(self, s, c):
+        """Handle the aws:resourceOrgID condition key."""
+
+        return bool(set(map(_account, c['values'])).difference(self.allowed_orgid))
+
+    def handle_aws_principalaccount(self, s, c):
+        """Handle the aws:PrincipalAccount condition key."""
+
+        return bool(set(map(_account, c['values'])).difference(self.allowed_accounts))
 
 
 class CrossAccountAccessFilter(Filter):
