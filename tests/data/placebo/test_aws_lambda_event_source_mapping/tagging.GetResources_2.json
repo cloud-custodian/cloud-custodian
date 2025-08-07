@@ -1,0 +1,314 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:lambda:us-east-1:644160558196:function:custodian-post-ebs-snapshot-public-passed",
+                "Tags": [
+                    {
+                        "Key": "custodian-info",
+                        "Value": "mode=cloudtrail:version=0.9.34"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:lambda:us-east-1:644160558196:function:test-jerry",
+                "Tags": [
+                    {
+                        "Key": "team",
+                        "Value": "policy"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:lambda:us-east-1:644160558196:function:custodian-post-ebs-snapshot-cross-account-passed",
+                "Tags": [
+                    {
+                        "Key": "custodian-info",
+                        "Value": "mode=cloudtrail:version=0.9.34"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:lambda:us-east-1:644160558196:function:CloudActionModulePoc3Stac-LogRetentionaae0aa3c5b4d-st0bpU8m2cTo",
+                "Tags": [
+                    {
+                        "Key": "aws:cloudformation:stack-name",
+                        "Value": "CloudActionModulePoc3Stack"
+                    },
+                    {
+                        "Key": "aws:cloudformation:stack-id",
+                        "Value": "arn:aws:cloudformation:us-east-1:644160558196:stack/CloudActionModulePoc3Stack/a9ffcfa0-b74a-11ec-95ce-0ea7f09e1d49"
+                    },
+                    {
+                        "Key": "aws:cloudformation:logical-id",
+                        "Value": "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aFD4BFC8A"
+                    },
+                    {
+                        "Key": "c7n-timestamp",
+                        "Value": "2022-11-22 19:10:34.442479"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:lambda:us-east-1:644160558196:function:custodian-cldhsmclstr-subnet-test-event",
+                "Tags": [
+                    {
+                        "Key": "custodian-info",
+                        "Value": "mode=cloudtrail:version=0.9.20"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:lambda:us-east-1:644160558196:function:custodian-enterprise-accnt-ebs-default-encrypt-existing-update",
+                "Tags": [
+                    {
+                        "Key": "custodian-info",
+                        "Value": "mode=cloudtrail:version=0.9.35"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:lambda:us-east-1:644160558196:function:CloudActionModulePoc3Stack-IngestionLambdaEF25F265-mRpHWGSq9jhn",
+                "Tags": [
+                    {
+                        "Key": "aws:cloudformation:stack-name",
+                        "Value": "CloudActionModulePoc3Stack"
+                    },
+                    {
+                        "Key": "aws:cloudformation:stack-id",
+                        "Value": "arn:aws:cloudformation:us-east-1:644160558196:stack/CloudActionModulePoc3Stack/a9ffcfa0-b74a-11ec-95ce-0ea7f09e1d49"
+                    },
+                    {
+                        "Key": "c7n:FindingId:lambda-force-vulnerabilities",
+                        "Value": "us-east-1/644160558196/8b34d68bb91a6355cb1f62e52cc471cc/b6e21b33259192f1efebaea71bf6a536:2022-04-12T20:55:33.185422+00:00"
+                    },
+                    {
+                        "Key": "aws:cloudformation:logical-id",
+                        "Value": "IngestionLambdaEF25F265"
+                    },
+                    {
+                        "Key": "c7n-timestamp",
+                        "Value": "2022-11-22 19:10:34.442479"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:lambda:us-east-1:644160558196:function:test-pratyush",
+                "Tags": [
+                    {
+                        "Key": "7ps:signature",
+                        "Value": "xyz"
+                    },
+                    {
+                        "Key": "bogie:gears:signature",
+                        "Value": "abc"
+                    },
+                    {
+                        "Key": "c7n-timestamp",
+                        "Value": "2022-11-22 19:10:34.442479"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:lambda:us-east-1:644160558196:function:c7n-lambda-edge-new",
+                "Tags": [
+                    {
+                        "Key": "lambda-console:blueprint",
+                        "Value": "cloudfront-http-redirect"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:lambda:us-east-1:644160558196:function:custodian-bedrock",
+                "Tags": [
+                    {
+                        "Key": "custodian-info",
+                        "Value": "mode=cloudtrail:version=0.9.34"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:lambda:us-east-1:644160558196:function:custodian-ec2-auto-tag-instances",
+                "Tags": [
+                    {
+                        "Key": "custodian-info",
+                        "Value": "mode=cloudtrail:version=0.9.27"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:lambda:us-east-1:644160558196:function:powertools-quickstart-HelloWorldFunction-9x6lZ569OqOW",
+                "Tags": [
+                    {
+                        "Key": "aws:cloudformation:stack-name",
+                        "Value": "powertools-quickstart"
+                    },
+                    {
+                        "Key": "lambda:createdBy",
+                        "Value": "SAM"
+                    },
+                    {
+                        "Key": "aws:cloudformation:stack-id",
+                        "Value": "arn:aws:cloudformation:us-east-1:644160558196:stack/powertools-quickstart/9314d190-a11e-11ee-85bd-0ee27b3dad9d"
+                    },
+                    {
+                        "Key": "aws:cloudformation:logical-id",
+                        "Value": "HelloWorldFunction"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:lambda:us-east-1:644160558196:function:custodian-ec2-test-foo-1",
+                "Tags": [
+                    {
+                        "Key": "custodian-info",
+                        "Value": "mode=cloudtrail:version=0.9.24"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:lambda:us-east-1:644160558196:function:test-python",
+                "Tags": [
+                    {
+                        "Key": "c7n:FindingId:lambda-force-vulnerabilities",
+                        "Value": "us-east-1/644160558196/a045b52dbdf3f1601befc59dd0c8526f/a317aa172505e9805fb207a8b22c1e72:2022-04-12T14:37:06.132664+00:00"
+                    },
+                    {
+                        "Key": "c7n-timestamp",
+                        "Value": "2022-11-22 19:10:34.442479"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:lambda:us-east-1:644160558196:function:custodian-test-appsync-graphql",
+                "Tags": [
+                    {
+                        "Key": "custodian-info",
+                        "Value": "mode=cloudtrail:version=0.9.27"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:lambda:us-east-1:644160558196:function:test-lambda-edge",
+                "Tags": [
+                    {
+                        "Key": "lambda-console:blueprint",
+                        "Value": "cloudfront-modify-response-header"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:lambda:us-east-1:644160558196:function:CloudActionModulePoc3Stac-LambdaRemediationLambdaB-KgXaIyUdBPsP",
+                "Tags": [
+                    {
+                        "Key": "aws:cloudformation:stack-name",
+                        "Value": "CloudActionModulePoc3Stack"
+                    },
+                    {
+                        "Key": "aws:cloudformation:stack-id",
+                        "Value": "arn:aws:cloudformation:us-east-1:644160558196:stack/CloudActionModulePoc3Stack/a9ffcfa0-b74a-11ec-95ce-0ea7f09e1d49"
+                    },
+                    {
+                        "Key": "aws:cloudformation:logical-id",
+                        "Value": "LambdaRemediationLambdaBB234D1C"
+                    },
+                    {
+                        "Key": "c7n-timestamp",
+                        "Value": "2022-11-22 19:10:34.442479"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:lambda:us-east-1:644160558196:function:CloudActionModulePoc4Stack-IngestionLambda",
+                "Tags": [
+                    {
+                        "Key": "c7n-timestamp",
+                        "Value": "2022-11-22 19:10:34.442479"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:lambda:us-east-1:644160558196:function:custodian-tag-ec2",
+                "Tags": [
+                    {
+                        "Key": "custodian-info",
+                        "Value": "mode=cloudtrail:version=0.9.35"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:lambda:us-east-1:644160558196:function:custodian-post-ebs-snapshot-cross-account",
+                "Tags": [
+                    {
+                        "Key": "custodian-info",
+                        "Value": "mode=cloudtrail:version=0.9.34"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:lambda:us-east-1:644160558196:function:custodian-ec2-sechub-remediate-severity-with-findings",
+                "Tags": [
+                    {
+                        "Key": "custodian-info",
+                        "Value": "mode=hub-finding:version=0.9.15"
+                    },
+                    {
+                        "Key": "c7n-timestamp",
+                        "Value": "2022-11-22 19:10:34.442479"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:lambda:us-east-1:644160558196:function:custodian-ec2-sechub-remediate-severity-with-findings-delete",
+                "Tags": [
+                    {
+                        "Key": "custodian-info",
+                        "Value": "mode=hub-finding:version=0.9.15"
+                    },
+                    {
+                        "Key": "c7n-timestamp",
+                        "Value": "2022-11-22 19:10:34.442479"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:lambda:us-east-1:644160558196:function:custodian-test-ec2-lambda-graviton",
+                "Tags": [
+                    {
+                        "Key": "custodian-info",
+                        "Value": "mode=cloudtrail:version=0.9.19"
+                    },
+                    {
+                        "Key": "c7n-timestamp",
+                        "Value": "2022-11-22 19:10:34.442479"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:lambda:us-east-1:644160558196:function:test-poc-4",
+                "Tags": [
+                    {
+                        "Key": "c7n-timestamp",
+                        "Value": "2022-11-22 19:10:34.442479"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:lambda:us-east-1:644160558196:function:custodian-lambda-sechub-lambda-remove-signature",
+                "Tags": [
+                    {
+                        "Key": "custodian-info",
+                        "Value": "mode=hub-finding:version=0.9.15"
+                    },
+                    {
+                        "Key": "c7n-timestamp",
+                        "Value": "2022-11-22 19:10:34.442479"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

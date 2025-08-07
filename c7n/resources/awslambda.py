@@ -1013,6 +1013,8 @@ class DescribeEventSourceMappings(query.ChildDescribeSource):
             r['Tags'] = parent_tags + child_tags
 
         # Part 2: Get all event source mappings and add orphaned ones to resources
+        # This is used to ensure that all event source mappings are included because
+        # some may have parent lambda function deleted.
         existing_uuids = {r['UUID'] for r in resources}
         paginator = client.get_paginator('list_event_source_mappings')
         paginator.PAGE_ITERATOR_CLS = query.RetryPageIterator
@@ -1037,60 +1039,11 @@ class LambdaEventSourceMapping(query.ChildResourceManager):
         permissions_augment = ("lambda:ListEventSourceMappings", "lambda:GetEventSourceMapping",
                                  "lambda:ListTags")
         parent_spec = ('lambda', 'FunctionName', True)
+        universal_taggable = object
 
     source_mapping = {
         'describe-child': DescribeEventSourceMappings,
     }
-
-    # def augment(self, resources):
-    #     # Call the original augment method from ChildResourceManager
-    #     resources = super().augment(resources)
-
-    #     # Part 1: Add tags from parent resources to child resources
-    #    parent_resources = self.get_parent_manager().resources()
-    #parent_tag_map = {p['FunctionArn']: [{'Key': tag['Key'], 'Value': tag['Value']} for tag in p.get('Tags', [])] for p in parent_resources}
-
-    #     client = local_session(self.session_factory).client('lambda')
-    #     tagging_client = local_session(self.session_factory).client('resourcegroupstaggingapi')
-
-    #     # Collect ARNs for Event Source Mappings
-    #     resource_arns = [r['EventSourceMappingArn'] for r in resources]
-
-    #     # Fetch tags using Resource Tagging API
-    #     try:
-    #         response = tagging_client.get_resources(
-    #             ResourceARNList=resource_arns,
-    #             TagFilters=[]
-    #         )
-    #         tag_map = {
-    #             tag['ResourceARN']: [{'Key': t['Key'], 'Value': t['Value']} for t in tag.get('Tags', [])]
-    #             for tag in response.get('ResourceTagMappingList', [])
-    #         }
-    #     except ClientError as e:
-    #         self.log.warning(f"Failed to fetch tags using Resource Tagging API: {e}")
-    #         tag_map = {}
-
-    #     for resource in resources:
-    #         # Get tags from parent resources
-    #         parent_tags = parent_tag_map.get(resource['FunctionArn'], [])
-
-    #         # Get tags from child resources (Event Source Mapping)
-    #         child_tags = tag_map.get(resource['EventSourceMappingArn'], [])
-
-    #         # Merge parent and child tags
-    #         merged_tags = parent_tags + child_tags
-    #         resource['Tags'] = merged_tags
-
-    #     # Part 2: Get all event source mappings and add orphaned ones to resources
-    #     existing_uuids = {r['UUID'] for r in resources}
-    #     paginator = client.get_paginator('list_event_source_mappings')
-    #     paginator.PAGE_ITERATOR_CLS = query.RetryPageIterator
-    #     for page in paginator.paginate():
-    #         for mapping in page.get('EventSourceMappings', []):
-    #             if mapping['UUID'] not in existing_uuids:
-    #                 resources.append(mapping)
-
-    #     return resources
 
 
 @LambdaEventSourceMapping.filter_registry.register('kms-key')
