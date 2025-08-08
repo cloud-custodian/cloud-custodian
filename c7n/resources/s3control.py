@@ -99,6 +99,26 @@ class MultiRegionAccessPoint(QueryResourceManager):
     source_mapping = {'describe': MultiRegionAccessPointDescribe}
 
 
+@MultiRegionAccessPoint.filter_registry.register('cross-account')
+class MultiRegionAccessPointCrossAccount(CrossAccountAccessFilter):
+
+    policy_attribute = 'c7n:Policy'
+    permissions = ('s3:GetMultiRegionAccessPointPolicy',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('s3control')
+        for r in resources:
+            if self.policy_attribute in r:
+                continue
+            r[self.policy_attribute] = self.manager.retry(
+                client.get_multi_region_access_point_policy,
+                AccountId=self.manager.config.account_id,
+                Name=r['Name']
+            ).get('Policy', {}).get('Established', {}).get('Policy')
+
+        return super().process(resources, event)
+
+
 class StorageLensDescribe(DescribeSource):
     def get_query_params(self, query_params):
         query_params = query_params or {}
