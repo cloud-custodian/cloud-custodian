@@ -4,7 +4,11 @@
 from .common import BaseTest, event_data
 from c7n.exceptions import PolicyValidationError
 from c7n.executor import MainThreadExecutor
-from c7n.resources.appelb import AppELB, AppELBTargetGroup, serialize_attribute_value
+from c7n.resources.appelb import (
+    AppELB, AppELBTargetGroup, AppELBDeleteListenerAction, serialize_attribute_value,
+)
+from unittest.mock import patch
+import logging
 
 
 def test_serialize():
@@ -735,6 +739,86 @@ class AppELBTest(BaseTest):
         self.assertTrue(
             'AWS/NetworkELB.TCP_ELB_Reset_Count.Sum.0.25' in resources[
                 0]['c7n.metrics'])
+
+    def test_appelb_delete_listener(self):
+        self.patch(AppELB, "executor_factory", MainThreadExecutor)
+        session_factory = self.replay_flight_data("test_appelb_delete_listener")
+        client = session_factory().client("elbv2")
+        # Create a policy that deletes listeners on a specific port
+        p = self.load_policy(
+            {
+                "name": "appelb-delete-listener",
+                "resource": "app-elb",
+                "filters": [
+                    {"type": "listener", "key": "[Protocol, Port]", "value": ["HTTP", 5432]}
+                ],
+                "actions": [{"type": "delete-listener"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        arn = resources[0]["LoadBalancerArn"]
+        listeners = client.describe_listeners(LoadBalancerArn=arn)["Listeners"]
+        # Assert that no listeners remain on the specified port
+        for l in listeners:
+            assert not (l["Protocol"] == "HTTP" and l["Port"] == 5432)
+
+    def test_appelb_delete_listener_not_found_exception(self):
+        self.patch(AppELB, "executor_factory", MainThreadExecutor)
+        session_factory = self.replay_flight_data("test_appelb_delete_listener_not_found_exception")
+        client = session_factory().client("elbv2")
+
+        class ListenerNotFound(Exception):
+            pass
+        client.exceptions.ListenerNotFoundException = ListenerNotFound
+
+        called = []
+
+        def fake_delete_listener(**kwargs):
+            called.append(True)
+            raise ListenerNotFound("Listener not found")
+        client.delete_listener = fake_delete_listener
+        dummy_listener_arn = (
+            "arn:aws:elasticloadbalancing:us-east-1:123456789012:listener/app/alb-testing-2/95e544fad78114e5/1234567890abcdef"
+    )
+        load_balancer_arn = (
+            "arn:aws:elasticloadbalancing:us-east-1:123456789012:loadbalancer/app/alb-testing-2/95e544fad78114e5")
+        alb = {
+            "LoadBalancerArn": load_balancer_arn,
+            "c7n:MatchedListeners": [
+                {
+                    "ListenerArn": dummy_listener_arn
+                }
+            ],
+        }
+
+        logger = logging.getLogger("test")
+
+        # Patch local_session only within this block
+        with patch("c7n.resources.appelb.local_session",
+                   return_value=type("Session", (), {"client": lambda self, service: client})()
+                   ):
+            action = AppELBDeleteListenerAction(
+                data={"type": "delete-listener"},
+                manager=type(
+                    "mgr", (), {
+                        "session_factory": session_factory, "log": logger, "data": {}
+                        }
+                    )()
+            )
+            action.process([alb])
+        self.assertTrue(called, "delete_listener is called")
+
+    def test_appelb_delete_listener_validation_failure(self):
+        # Loading a policy without a listener filter should fail validation
+        with self.assertRaises(PolicyValidationError):
+            self.load_policy(
+                {
+                    "name": "delete-listener-no-filter",
+                    "resource": "app-elb",
+                    "actions": [{"type": "delete-listener"}],
+                }
+            )
 
 
 class AppELBHealthcheckProtocolMismatchTest(BaseTest):
