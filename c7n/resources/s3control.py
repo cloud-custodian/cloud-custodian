@@ -79,6 +79,7 @@ class Delete(Action):
 
 
 class MultiRegionAccessPointDescribe(DescribeSource):
+
     def get_query_params(self, query_params):
         query_params = query_params or {}
         query_params['AccountId'] = self.manager.config.account_id
@@ -114,7 +115,7 @@ class MultiRegionAccessPointCrossAccount(CrossAccountAccessFilter):
                 client.get_multi_region_access_point_policy,
                 AccountId=self.manager.config.account_id,
                 Name=r['Name']
-            ).get('Policy', {}).get('Established', {}).get('Policy')
+            ).get('Policy').get('Established').get('Policy')
 
         return super().process(resources, event)
 
