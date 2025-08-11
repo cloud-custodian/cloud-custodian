@@ -38,6 +38,7 @@ dependencies = [
     "azure-mgmt-datafactory<2.0.0,>=1.0.0",
     "azure-mgmt-datalake-analytics<1.0.0,>=0.5.0",
     "azure-mgmt-datalake-store<1.0.0,>=0.5.0",
+    "azure-mgmt-dataprotection<2.0.0,>=1.4.0",
     "azure-mgmt-desktopvirtualization<2.0.0,>=1.0.0",
     "azure-mgmt-dns==8.0.0b1",
     "azure-mgmt-eventgrid<11.0.0,>=10.3.0b4",

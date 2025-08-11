@@ -593,6 +593,20 @@ wheels = [
 ]
 
 [[package]]
+name = "azure-mgmt-dataprotection"
+version = "1.4.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "azure-common" },
+    { name = "azure-mgmt-core" },
+    { name = "isodate" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/bb/53/75fdbd3c050105d3695f244365d777951efc8ce2bbb8fb0ed8c8d885fb08/azure-mgmt-dataprotection-1.4.0.tar.gz", hash = "sha256:4b632b7005f754c12ab934ae1b930eb6f9802e45fb0126cb426fe0857bb27dcf", size = 127150, upload-time = "2024-07-23T05:58:44.855Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/cd/2e/36468994258b1c7483ae65362bd09f22b65ca34dd255f6c32ca78746c97b/azure_mgmt_dataprotection-1.4.0-py3-none-any.whl", hash = "sha256:92f68d8d10d71062288be01b64d91c2b6658b8263064446d61d36a9b3d38b2ea", size = 210440, upload-time = "2024-07-23T05:58:46.689Z" },
+]
+
+[[package]]
 name = "azure-mgmt-desktopvirtualization"
 version = "1.1.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1412,6 +1426,7 @@ dependencies = [
     { name = "azure-mgmt-datafactory" },
     { name = "azure-mgmt-datalake-analytics" },
     { name = "azure-mgmt-datalake-store" },
+    { name = "azure-mgmt-dataprotection" },
     { name = "azure-mgmt-desktopvirtualization" },
     { name = "azure-mgmt-dns" },
     { name = "azure-mgmt-eventgrid" },
@@ -1501,6 +1516,7 @@ requires-dist = [
     { name = "azure-mgmt-datafactory", specifier = ">=1.0.0,<2.0.0" },
     { name = "azure-mgmt-datalake-analytics", specifier = ">=0.5.0,<1.0.0" },
     { name = "azure-mgmt-datalake-store", specifier = ">=0.5.0,<1.0.0" },
+    { name = "azure-mgmt-dataprotection", specifier = ">=1.4.0,<2.0.0" },
     { name = "azure-mgmt-desktopvirtualization", specifier = ">=1.0.0,<2.0.0" },
     { name = "azure-mgmt-dns", specifier = "==8.0.0b1" },
     { name = "azure-mgmt-eventgrid", specifier = ">=10.3.0b4,<11.0.0" },
@@ -2305,7 +2321,7 @@ name = "exceptiongroup"
 version = "1.3.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
+    { name = "typing-extensions", marker = "python_full_version < '3.11'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/0b/9f/a65090624ecf468cdca03533906e7c69ed7588582240cfe7cc9e770b50eb/exceptiongroup-1.3.0.tar.gz", hash = "sha256:b241f5885f560bc56a59ee63ca4c6a8bfa46ae4ad651af316d4e81817bb9fd88", size = 29749, upload-time = "2025-05-10T17:42:51.123Z" }
 wheels = [
