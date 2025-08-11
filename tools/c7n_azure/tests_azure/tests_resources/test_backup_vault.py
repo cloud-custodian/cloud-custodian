@@ -22,4 +22,3 @@ class BackupVaultTest(BaseTest):
         resources = p.run()
         self.assertEqual(1, len(resources))
         self.assertEqual('example-backup-vault', resources[0]['name'])
-
