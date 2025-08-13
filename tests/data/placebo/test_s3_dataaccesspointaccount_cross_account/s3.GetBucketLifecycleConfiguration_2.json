@@ -1,0 +1,11 @@
+{
+    "status_code": 404,
+    "data": {
+        "Error": {
+            "Code": "NoSuchLifecycleConfiguration",
+            "Message": "The lifecycle configuration does not exist",
+            "BucketName": "sbx-mqrbuh-bucket-noncompliant"
+        },
+        "ResponseMetadata": {}
+    }
+}
