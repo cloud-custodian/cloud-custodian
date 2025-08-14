@@ -83,6 +83,7 @@ ResourceMap = {
     "c7n.resources.comprehend.ComprehendTopicsDetectionJob",
   "aws.config-recorder": "c7n.resources.config.ConfigRecorder",
   "aws.config-rule": "c7n.resources.config.ConfigRule",
+  "aws.connect-analytics-association": "c7n.resources.connect.ConnectAnalyticsAssociation",
   "aws.connect-campaign": "c7n.resources.connect.ConnectCampaign",
   "aws.connect-instance": "c7n.resources.connect.Connect",
   "aws.customer-gateway": "c7n.resources.vpc.CustomerGateway",
