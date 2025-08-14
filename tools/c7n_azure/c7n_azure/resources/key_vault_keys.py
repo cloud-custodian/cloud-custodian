@@ -187,6 +187,6 @@ class KeyVaultKeyRotationFilter(Filter):
             client = self.manager.get_client(vault_url=id.vault_url)
             rotation = client.get_key_rotation_policy(id.name)
             if (self.data.get('state') == 'Disabled' and not rotation.id) or \
-               (self.data.get('state')  == 'Enabled' and rotation.id):
+               (self.data.get('state') == 'Enabled' and rotation.id):
                 matched.append(key)
         return matched

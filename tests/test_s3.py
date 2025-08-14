@@ -44,7 +44,7 @@ def test_s3_express(test):
         config={'account_id': '644160558196', 'region': 'us-east-1'},
         session_factory=session_factory)
     resources = p.run()
-    assert len(resources) ==  1
+    assert len(resources) == 1
     assert p.resource_manager.get_arns(resources) == [
         'arn:aws:s3express:us-east-1:644160558196:bucket/test-zone--use1-az4--x-s3'
     ]
