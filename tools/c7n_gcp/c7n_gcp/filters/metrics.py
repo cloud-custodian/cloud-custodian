@@ -157,6 +157,8 @@ class GCPMetricsFilter(Filter):
         batch_size = len(self.filter)
         for r in resources:
             resource_name = self.manager.resource_type.get_metric_resource_name(r)
+            if self.metric_key == 'resource.labels.instance_id':
+                resource_name = self.manager.resource_type.get_metric_resource_id(r)
             resource_filter_item = '{} = "{}"'.format(self.metric_key, resource_name)
             resource_filter.append(resource_filter_item)
             resource_filter.append(' OR ')
@@ -169,6 +171,7 @@ class GCPMetricsFilter(Filter):
 
         resource_filter.pop()
         batched_resources.append(resource_filter)
+
         return batched_resources
 
     def get_batched_query_filter(self, resources):
@@ -195,6 +198,8 @@ class GCPMetricsFilter(Filter):
     def process_resource(self, resource):
         resource_metric = resource.setdefault('c7n.metrics', {})
         resource_name = self.manager.resource_type.get_metric_resource_name(resource)
+        if self.metric_key == 'resource.labels.instance_id':
+            resource_name = self.manager.resource_type.get_metric_resource_id(resource)
         metric = self.resource_metric_dict.get(resource_name)
         if not metric and not self.missing_value:
             return False
