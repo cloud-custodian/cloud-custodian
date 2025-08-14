@@ -13,7 +13,6 @@ from c7n.filters.related import RelatedResourceFilter, RelatedResourceByIdFilter
 from c7n.filters.revisions import Diff
 from c7n import query, resolver
 from c7n.manager import resources
-from c7n.resources.aws import Arn
 from c7n.resources.securityhub import OtherResourcePostFinding, PostFinding
 from c7n.utils import (
     chunks,
@@ -3340,8 +3339,11 @@ class UsedByNetworkAddress(Filter):
 class ResolverQueryLoggingFilter(Filter):
     """Filter VPCs based on Route 53 Resolver query logging configuration.
 
-    This filter checks if VPCs have Route 53 Resolver query logging enabled
-    and optionally verifies if logs are being sent to a specific S3 destination.
+    This filter checks if VPCs have Route 53 Resolver query logging
+    enabled by checking for an association to a query logging config.
+
+    It annotates the VPC with the full association and config details,
+    allowing for addtional filtering with a `value` filter.
 
     :example:
 
@@ -3353,20 +3355,10 @@ class ResolverQueryLoggingFilter(Filter):
                 filters:
                   - type: resolver-query-logging
                     state: false
-
-              - name: vpc-resolver-logs-to-specific-bucket
-                resource: vpc
-                filters:
-                  - type: resolver-query-logging
-                    state: true
-                    bucket: my-logging-bucket
-
     """
     schema = type_schema(
         'resolver-query-logging',
-        state={'type': 'boolean', 'default': True},
-        bucket={'type': 'string'},
-        **{'s3-destination': {'type': 'boolean'}}
+        state={'type': 'boolean', 'default': True}
     )
 
     permissions = (
@@ -3378,82 +3370,40 @@ class ResolverQueryLoggingFilter(Filter):
 
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('route53resolver')
-
         target_state = self.data.get('state', True)
-        check_bucket = self.data.get('bucket')
-        check_s3_destination = self.data.get('s3-destination')
 
         try:
-            vpc_to_config = {}
+            associations = {}
             paginator = client.get_paginator('list_resolver_query_log_config_associations')
             for page in paginator.paginate():
                 for assoc in page.get('ResolverQueryLogConfigAssociations', []):
                     if assoc['Status'] in ['ACTIVE', 'CREATING']:
-                        vpc_to_config[assoc['ResourceId']] = assoc['ResolverQueryLogConfigId']
+                        associations[assoc['ResourceId']] = assoc
 
             log_configs = {}
-            if target_state:
+            if associations:
                 paginator = client.get_paginator('list_resolver_query_log_configs')
-                for page in paginator.paginate():
+                config_ids_to_fetch = {a['ResolverQueryLogConfigId'] for a in associations.values()}
+                for page in paginator.paginate(
+                    Filters=[{'Name': 'Id', 'Values': list(config_ids_to_fetch)}]):
                     for config in page.get('ResolverQueryLogConfigs', []):
-                        if config['Status'] in ['COMPLETE', 'CREATING', 'ACTIVE', 'CREATED']:
-                            log_configs[config['Id']] = config
+                        log_configs[config['Id']] = config
 
         except (client.exceptions.ClientError, client.exceptions.NoCredentialsError):
             raise
-        except Exception as e:
-            self.log.warning("Unexpected error fetching resolver query log configurations: %s", e)
-            return resources
 
+        for r in resources:
+            association = associations.get(r['VpcId'])
+            if association:
+                config = log_configs.get(association['ResolverQueryLogConfigId'], {})
+                r[self.annotation_key] = {
+                    'association': association,
+                    'config': config
+                }
         results = []
-        for vpc in resources:
-            vpc_id = vpc['VpcId']
-            has_logging = vpc_id in vpc_to_config
-            config_id = vpc_to_config.get(vpc_id, "")
-            config = log_configs.get(config_id, {})
-
-            vpc[self.annotation_key] = {
-                'enabled': has_logging,
-                'config_id': config_id,
-                'destination_arn': config.get('DestinationArn', ''),
-                'config_status': config.get('Status', ''),
-                'config_name': config.get('Name', ''),
-                'bucket_name': ''
-            }
-
-            destination_arn = config.get('DestinationArn', '')
-            if destination_arn and Arn:
-                try:
-                    parsed_arn = Arn.parse(destination_arn)
-                    if parsed_arn.service == 's3':
-                        bucket_name = parsed_arn.resource
-                        if '/' in bucket_name:
-                            bucket_name = bucket_name.split('/')[0]
-                        vpc[self.annotation_key]['bucket_name'] = bucket_name
-                except Exception:
-                    self.log.debug("Failed to parse ARN for bucket extraction: %s", destination_arn)
-
-            if has_logging != target_state:
-                continue
-
-            if (check_bucket or check_s3_destination) and has_logging:
-                destination_arn = config.get('DestinationArn', '')
-                is_s3 = False
-                if destination_arn and Arn:
-                    try:
-                        parsed_arn = Arn.parse(destination_arn)
-                        is_s3 = parsed_arn.service == 's3'
-                    except Exception:
-                        self.log.debug("Failed to parse ARN for S3 validation: %s", destination_arn)
-
-                if not is_s3:
-                    continue
-
-                if check_bucket:
-                    current_bucket = vpc[self.annotation_key]['bucket_name']
-                    if current_bucket != check_bucket:
-                        continue
-
-            results.append(vpc)
+        for r in resources:
+            has_logging = self.annotation_key in r
+            if has_logging == target_state:
+                results.append(r)
 
         return results

@@ -3,7 +3,7 @@
 import logging
 import time
 from .common import BaseTest, functional, event_data, load_data
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock
 
 from botocore.exceptions import ClientError as BotoClientError
 from c7n.exceptions import PolicyValidationError
@@ -511,140 +511,49 @@ class VpcTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertTrue("vpce-011d813b183878b82" in resources[0]["VpcEndpointId"])
 
-    @terraform('vpc_resolver_query_logging')
-    def test_vpc_resolver_query_logging(self):
+    def test_vpc_logging_compliance_with_existing_data(self):
+
         factory = self.replay_flight_data("test_vpc_resolver_query_logging")
 
-        vpc_with_logging_id = "vpc-0503a8b9ddbb3a5c5"
-        vpc_without_logging_id = "vpc-029d7b65096a4717d"
+        vpc_logging_to_s3_id = "vpc-0503a8b9ddbb3a5c5"
+        vpc_no_logging_id = "vpc-029d7b65096a4717d"
+        expected_bucket_arn = "arn:aws:s3:::resolver-query-logs-20250513181124788700000003"
 
-        def run_policy(name, vpc_id, filter_config, expected_count=1):
-            p = self.load_policy({
-                "name": name,
-                "resource": "vpc",
-                "filters": [{"VpcId": vpc_id}, filter_config]
-            }, session_factory=factory)
-            resources = p.run()
-            self.assertEqual(len(resources), expected_count)
-            return resources
-
-        # Test VPC without logging
-        resources = run_policy("vpc-without-logging", vpc_without_logging_id,
-                            {"type": "resolver-query-logging", "state": False})
-        self.assertEqual(resources[0]["VpcId"], vpc_without_logging_id)
-        self.assertEqual(resources[0]["c7n:resolver-logging"]["enabled"], False)
-
-        # Test VPC with logging
-        resources = run_policy("vpc-with-logging", vpc_with_logging_id,
-                            {"type": "resolver-query-logging", "state": True})
-        self.assertEqual(resources[0]["VpcId"], vpc_with_logging_id)
-        self.assertEqual(resources[0]["c7n:resolver-logging"]["enabled"], True)
-
-        # Test S3 destination filter
-        resources = run_policy("vpc-with-s3", vpc_with_logging_id,
-                        {"type": "resolver-query-logging", "state": True, "s3-destination": True})
-        self.assertEqual(resources[0]["VpcId"], vpc_with_logging_id)
-        self.assertTrue(resources[0]["c7n:resolver-logging"]["destination_arn"])
-
-        # Test inverse state filters
-        run_policy("vpc-with-logging-want-false", vpc_with_logging_id,
-                {"type": "resolver-query-logging", "state": False}, expected_count=0)
-        run_policy("vpc-without-logging-want-true", vpc_without_logging_id,
-                {"type": "resolver-query-logging", "state": True}, expected_count=0)
-
-        # Test bucket filters
-        run_policy("vpc-wrong-bucket", vpc_with_logging_id,
-                {"type": "resolver-query-logging", "state": True, "bucket": "wrong-bucket"},
-                expected_count=0)
-
-        resources = run_policy("vpc-correct-bucket", vpc_with_logging_id,
-                            {"type": "resolver-query-logging", "state": True,
-                            "bucket": "resolver-query-logs-20250513181124788700000003"})
-        self.assertEqual(resources[0]["VpcId"], vpc_with_logging_id)
-        self.assertEqual(resources[0]["c7n:resolver-logging"]["bucket_name"],
-                        "resolver-query-logs-20250513181124788700000003")
-
-        p = self.load_policy({
-            "name": "multiple-vpcs",
+        p_compliant = self.load_policy({
+            "name": "find-compliant-vpcs",
             "resource": "vpc",
-            "filters": [{"type": "resolver-query-logging", "state": False}]
+            "filters": [
+                {"type": "resolver-query-logging", "state": True},
+                {
+                    "type": "value",
+                    "key": '"c7n:resolver-logging".config.DestinationArn',
+                    "op": "glob",
+                    "value": "arn:aws:s3*"
+                }
+            ]
         }, session_factory=factory)
-        resources = p.run()
-        self.assertTrue(any(r["VpcId"] == vpc_without_logging_id for r in resources))
 
-    def test_vpc_resolver_query_logging_arn_exceptions(self):
-        """Test ARN parsing exceptions in resolver query logging filter"""
-        factory = self.replay_flight_data("test_vpc_resolver_query_logging")
+        compliant_resources = p_compliant.run()
 
-        with patch('c7n.resources.vpc.Arn.parse', side_effect=Exception("Invalid ARN")):
-            p = self.load_policy({
-                "name": "test-arn-exception",
-                "resource": "vpc",
-                "filters": [{"type": "resolver-query-logging", "state": True}]
-            }, session_factory=factory)
+        self.assertEqual(len(compliant_resources), 1)
+        compliant_vpc = compliant_resources[0]
+        self.assertEqual(compliant_vpc['VpcId'], vpc_logging_to_s3_id)
 
-            filter_instance = p.resource_manager.filters[0]
+        destination_arn = jmespath.search(
+            '"c7n:resolver-logging".config.DestinationArn', compliant_vpc)
+        self.assertEqual(destination_arn, expected_bucket_arn)
 
-            mock_client = MagicMock()
-            mock_paginator = MagicMock()
-            mock_paginator.paginate.return_value = [
-                {'ResolverQueryLogConfigAssociations': [{
-                    'Status': 'ACTIVE',
-                    'ResourceId': 'vpc-test',
-                    'ResolverQueryLogConfigId': 'cfg-1'
-                }]},
-                {'ResolverQueryLogConfigs': [{
-                    'Id': 'cfg-1',
-                    'Status': 'ACTIVE',
-                    'Name': 'test-config',
-                    'DestinationArn': 'arn:aws:s3:::bucket/prefix'
-                }]}
+        p_non_compliant = self.load_policy({
+            "name": "find-vpcs-with-logging-disabled",
+            "resource": "vpc",
+            "filters": [
+                {"type": "resolver-query-logging", "state": False}
             ]
-            mock_client.get_paginator.return_value = mock_paginator
+        }, session_factory=factory)
 
-            with patch('c7n.resources.vpc.local_session') as mock_session:
-                mock_session.return_value.client.return_value = mock_client
-
-                resources = filter_instance.process([{'VpcId': 'vpc-test'}])
-
-                self.assertEqual(len(resources), 1)
-                self.assertEqual(resources[0]['c7n:resolver-logging']['bucket_name'], '')
-
-        with patch('c7n.resources.vpc.Arn') as mock_arn:
-            mock_parsed = MagicMock(service='s3', resource='bucket')
-            mock_arn.parse.side_effect = [mock_parsed, Exception("Invalid ARN")]
-
-            p = self.load_policy({
-                "name": "test-s3-validation-exception",
-                "resource": "vpc",
-            "filters": [{"type": "resolver-query-logging", "state": True, "s3-destination": True}]
-            }, session_factory=factory)
-
-            filter_instance = p.resource_manager.filters[0]
-
-            mock_client = MagicMock()
-            mock_paginator = MagicMock()
-            mock_paginator.paginate.return_value = [
-                {'ResolverQueryLogConfigAssociations': [{
-                    'Status': 'ACTIVE',
-                    'ResourceId': 'vpc-test2',
-                    'ResolverQueryLogConfigId': 'cfg-2'
-                }]},
-                {'ResolverQueryLogConfigs': [{
-                    'Id': 'cfg-2',
-                    'Status': 'ACTIVE',
-                    'Name': 'test-config2',
-                    'DestinationArn': 'arn:aws:s3:::bucket2'
-                }]}
-            ]
-            mock_client.get_paginator.return_value = mock_paginator
-
-            with patch('c7n.resources.vpc.local_session') as mock_session:
-                mock_session.return_value.client.return_value = mock_client
-
-                resources = filter_instance.process([{'VpcId': 'vpc-test2'}])
-
-                self.assertEqual(len(resources), 0)
+        non_compliant_resources = p_non_compliant.run()
+        self.assertEqual(len(non_compliant_resources), 1)
+        self.assertEqual(non_compliant_resources[0]['VpcId'], vpc_no_logging_id)
 
 
 class NetworkLocationTest(BaseTest):
