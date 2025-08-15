@@ -3372,16 +3372,15 @@ class ResolverQueryLoggingFilter(Filter):
         client = local_session(self.manager.session_factory).client('route53resolver')
         target_state = self.data.get('state', True)
 
-        try:
-            associations = {}
-            paginator = client.get_paginator('list_resolver_query_log_config_associations')
-            for page in paginator.paginate():
+        associations = {}
+        paginator = client.get_paginator('list_resolver_query_log_config_associations')
+        for page in paginator.paginate():
                 for assoc in page.get('ResolverQueryLogConfigAssociations', []):
                     if assoc['Status'] in ['ACTIVE', 'CREATING']:
                         associations[assoc['ResourceId']] = assoc
 
-            log_configs = {}
-            if associations:
+        log_configs = {}
+        if associations:
                 paginator = client.get_paginator('list_resolver_query_log_configs')
                 config_ids_to_fetch = {a['ResolverQueryLogConfigId'] for a in associations.values()}
                 for page in paginator.paginate(
@@ -3389,8 +3388,6 @@ class ResolverQueryLoggingFilter(Filter):
                     for config in page.get('ResolverQueryLogConfigs', []):
                         log_configs[config['Id']] = config
 
-        except (client.exceptions.ClientError, client.exceptions.NoCredentialsError):
-            raise
 
         for r in resources:
             association = associations.get(r['VpcId'])
