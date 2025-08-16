@@ -3382,3 +3382,73 @@ class UsedByNetworkAddress(Filter):
                     if rtype == self.data.get('resource-type'):
                         results.append(r)
         return results
+
+
+@Vpc.filter_registry.register('resolver-query-logging')
+class ResolverQueryLoggingFilter(Filter):
+    """Filter VPCs based on Route 53 Resolver query logging configuration.
+
+    This filter checks if VPCs have Route 53 Resolver query logging
+    enabled by checking for an association to a query logging config.
+
+    It annotates the VPC with the full association and config details,
+    allowing for addtional filtering with a `value` filter.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: vpc-missing-resolver-query-logs
+                resource: vpc
+                filters:
+                  - type: resolver-query-logging
+                    state: false
+    """
+    schema = type_schema(
+        'resolver-query-logging',
+        state={'type': 'boolean', 'default': True}
+    )
+
+    permissions = (
+        'route53resolver:ListResolverQueryLogConfigs',
+        'route53resolver:ListResolverQueryLogConfigAssociations'
+    )
+
+    annotation_key = 'c7n:resolver-logging'
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('route53resolver')
+        target_state = self.data.get('state', True)
+
+        associations = {}
+        paginator = client.get_paginator('list_resolver_query_log_config_associations')
+        for page in paginator.paginate():
+            for assoc in page.get('ResolverQueryLogConfigAssociations', []):
+                if assoc['Status'] in ['ACTIVE', 'CREATING']:
+                    associations[assoc['ResourceId']] = assoc
+
+        log_configs = {}
+        if associations:
+            paginator = client.get_paginator('list_resolver_query_log_configs')
+            config_ids_to_fetch = {a['ResolverQueryLogConfigId'] for a in associations.values()}
+            for page in paginator.paginate(
+                Filters=[{'Name': 'Id', 'Values': list(config_ids_to_fetch)}]):
+                for config in page.get('ResolverQueryLogConfigs', []):
+                    log_configs[config['Id']] = config
+
+        results = []
+        for r in resources:
+            association = associations.get(r['VpcId'])
+            has_logging = association is not None
+
+            if has_logging == target_state:
+                if has_logging:
+                    config = log_configs.get(association['ResolverQueryLogConfigId'], {})
+                    r[self.annotation_key] = {
+                        'association': association,
+                        'config': config
+                    }
+                results.append(r)
+
+        return results
