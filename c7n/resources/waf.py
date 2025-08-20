@@ -240,10 +240,101 @@ class WAFV2ListAllRulesFilter(ListItemFilter):
     annotate_items = True
     item_annotation_key = 'c7n:WebACLAllRules'
 
+    def handle_rule_group_cache(self, client, rule_groups):
+
+        rgcache = {}
+        cache = self.manager._cache
+
+        with cache:
+            for rg_info in rule_groups:
+                arn = rg_info['arn']
+                scope = rg_info['scope']
+                cache_key = {
+                    'region': self.manager.config.region,
+                    'account_id': self.manager.config.account_id,
+                    'wafv2-rule-group': f"{arn}:{scope}"
+                }
+
+                rg_values = cache.get(cache_key)
+                if rg_values is not None:
+                    rgcache[f"{arn}:{scope}"] = rg_values
+                    continue
+
+                resp = client.get_rule_group(
+                    Name=arn.split('/')[-2],
+                    Id=arn.split('/')[-1],
+                    Scope=scope
+                )
+                rgcache[f"{arn}:{scope}"] = resp.get('RuleGroup', {})
+                cache.save(cache_key, rgcache[f"{arn}:{scope}"])
+
+        return rgcache
+
+    def handle_managed_rule_group_cache(self, client, managed_groups):
+
+        mgcache = {}
+        cache = self.manager._cache
+
+        with cache:
+            for mg_info in managed_groups:
+                vendor = mg_info['vendor']
+                name = mg_info['name']
+                scope = mg_info['scope']
+                cache_key = {
+                    'region': self.manager.config.region,
+                    'account_id': self.manager.config.account_id,
+                    'wafv2-managed-group': f"{vendor}:{name}:{scope}"
+                }
+
+                mg_values = cache.get(cache_key)
+                if mg_values is not None:
+                    mgcache[f"{vendor}:{name}:{scope}"] = mg_values
+                    continue
+
+                resp = client.describe_managed_rule_group(
+                    VendorName=vendor,
+                    Name=name,
+                    Scope=scope
+                )
+                mgcache[f"{vendor}:{name}:{scope}"] = resp.get('Rules', [])
+                cache.save(cache_key, mgcache[f"{vendor}:{name}:{scope}"])
+
+        return mgcache
+
     def get_item_values(self, resource):
         client = local_session(self.manager.session_factory).client(
             'wafv2', region_name=self.manager.region
         )
+
+        rule_groups = []
+        managed_groups = []
+
+        for rule in resource.get('Rules', []):
+            statement = rule.get("Statement", {})
+            rule_group_ref = statement.get('RuleGroupReferenceStatement')
+            managed_group_ref = statement.get('ManagedRuleGroupStatement')
+
+            if rule_group_ref:
+                rule_groups.append({
+                    'arn': rule_group_ref['ARN'],
+                    'scope': resource['Scope'],
+                    'rule': rule
+                })
+            elif managed_group_ref:
+                managed_groups.append({
+                    'vendor': managed_group_ref['VendorName'],
+                    'name': managed_group_ref['Name'],
+                    'scope': resource['Scope'],
+                    'rule': rule
+                })
+
+        rule_group_cache = {}
+        if rule_groups:
+            rule_group_cache = self.handle_rule_group_cache(client, rule_groups)
+
+        managed_group_cache = {}
+        if managed_groups:
+            managed_group_cache = self.handle_managed_rule_group_cache(client, managed_groups)
 
         all_rules = []
 
@@ -265,12 +356,9 @@ class WAFV2ListAllRulesFilter(ListItemFilter):
             if rule_group_ref:
                 arn = rule_group_ref['ARN']
                 scope = resource['Scope']
-                resp = client.get_rule_group(
-                    Name=arn.split('/')[-2],
-                    Id=arn.split('/')[-1],
-                    Scope=scope
-                )
-                rg = resp.get('RuleGroup', {})
+                cache_key = f"{arn}:{scope}"
+
+                rg = rule_group_cache.get(cache_key, {})
                 all_rules.append({
                     "Type": "CustomerRuleGroup",
                     "Name": rule.get('Name'),
@@ -280,16 +368,16 @@ class WAFV2ListAllRulesFilter(ListItemFilter):
 
             # AWS Managed Rule Groups
             elif managed_group_ref:
-                resp = client.describe_managed_rule_group(
-                    VendorName=managed_group_ref['VendorName'],
-                    Name=managed_group_ref['Name'],
-                    Scope=resource['Scope']
-                )
-                rules_meta = resp.get('Rules', [])
+                vendor = managed_group_ref['VendorName']
+                name = managed_group_ref['Name']
+                scope = resource['Scope']
+                cache_key = f"{vendor}:{name}:{scope}"
+
+                rules_meta = managed_group_cache.get(cache_key, [])
                 all_rules.append({
                     "Type": "ManagedRuleGroup",
                     "Name": rule.get('Name'),
-                    "ManagedGroup": managed_group_ref['Name'],
+                    "ManagedGroup": name,
                     "Rules": [{"Name": r['Name'], "Action": r.get('Action', {})}
                                 for r in rules_meta]
                 })
