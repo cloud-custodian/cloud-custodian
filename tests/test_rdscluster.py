@@ -6,6 +6,7 @@ from unittest.mock import patch
 import c7n.resources.rdscluster
 import pytest
 from c7n.executor import MainThreadExecutor
+from c7n.exceptions import PolicyValidationError
 from c7n.resources.rdscluster import RDSCluster, _run_cluster_method
 from c7n.testing import mock_datetime_now
 from dateutil import parser
@@ -801,6 +802,35 @@ class RDSClusterSnapshotTest(BaseTest):
             resources[0]["DBClusterSnapshotIdentifier"]
         )
         self.assertEqual(len(restore_permissions_after), 0)
+
+    def test_rds_cluster_cross_region_copy_lambda(self):
+        self.assertRaises(
+            PolicyValidationError,
+            self.load_policy,
+            {
+                "name": "rds-copy-fail",
+                "resource": "rds-cluster-snapshot",
+                "mode": {"type": "config-rule"},
+                "actions": [{"type": "region-copy", "target_region": "us-east-2"}],
+            },
+        )
+
+
+    def test_rds_cluster_cross_region_copy_skip_same_region(self):
+        factory = self.replay_flight_data("test_rds_cluster_snapshot_latest")
+        output = self.capture_logging("custodian.actions")
+        p = self.load_policy(
+            {
+                "name": "rds-cluster-copy-skip",
+                "resource": "rds-cluster-snapshot",
+                "actions": [{"type": "region-copy", "target_region": "us-east-2"}],
+            },
+            config={'region': 'us-east-2'},
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertFalse([r for r in resources if "c7n:CopiedClusterSnapshot" in r])
+        self.assertIn("Source and destination region are the same", output.getvalue())      
 
     def test_rds_cluster_cross_region_copy(self):
         # preconditions
