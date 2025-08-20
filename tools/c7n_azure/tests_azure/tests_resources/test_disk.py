@@ -154,6 +154,7 @@ class ModifyDiskTypeTests(BaseTest):
         for resource in resources:
             disk = self._fetch_disk(resource['id'])
             self.assertEqual(disk.sku.name, 'Standard_LRS')
+            self.assertIsNotNone(disk.last_ownership_update_time)
 
     @pytest.mark.vcr(record_mode='ALL')
     @arm_template('disk_type_modify.json')

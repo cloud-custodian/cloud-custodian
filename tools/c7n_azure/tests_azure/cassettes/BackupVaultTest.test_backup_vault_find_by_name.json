@@ -1,0 +1,83 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.DataProtection/backupVaults?api-version=2024-04-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-length": [
+                        "679"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "1099"
+                    ],
+                    "date": [
+                        "Mon, 11 Aug 2025 09:52:32 GMT"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: F854DC32795E457AB22B12CF43231461 Ref B: CPH011050218025 Ref C: 2025-08-11T09:52:32Z"
+                    ],
+                    "x-ms-original-request-ids": [
+                        ""
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "location": "westeurope",
+                                "tags": {},
+                                "identity": {
+                                    "type": "None"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "storageSettings": [
+                                        {
+                                            "datastoreType": "VaultStore",
+                                            "type": "LocallyRedundant"
+                                        }
+                                    ],
+                                    "isVaultProtectedByResourceGuard": false,
+                                    "securitySettings": {
+                                        "softDeleteSettings": {
+                                            "state": "On",
+                                            "retentionDurationInDays": 14.0
+                                        },
+                                        "immutabilitySettings": {
+                                            "state": "Disabled"
+                                        }
+                                    },
+                                    "secureScore": "None",
+                                    "bcdrSecurityLevel": "Poor",
+                                    "replicatedRegions": []
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/example-resources/providers/Microsoft.DataProtection/backupVaults/example-backup-vault",
+                                "name": "example-backup-vault",
+                                "type": "Microsoft.DataProtection/backupVaults"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

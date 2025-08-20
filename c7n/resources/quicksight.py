@@ -133,3 +133,53 @@ class QuicksightAccount(ResourceManager):
 
     def get_resources(self, resource_ids):
         return self._get_account()
+
+
+class DescribeQuicksightWithAccountId(query.DescribeSource):
+
+    def resources(self, query):
+        required = {
+            "AwsAccountId": self.manager.config.account_id
+        }
+        return super().resources(required)
+
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('quicksight')
+        for r in resources:
+            tags = self.manager.retry(client.list_tags_for_resource,
+                                ResourceArn=r['Arn'],
+                                ignore_err_codes=("ResourceNotFoundException",))['Tags']
+            r['Tags'] = tags
+        return resources
+
+
+@resources.register("quicksight-dashboard")
+class QuicksightDashboard(query.QueryResourceManager):
+    class resource_type(query.TypeInfo):
+        service = "quicksight"
+        enum_spec = ('list_dashboards', 'DashboardSummaryList', None)
+        arn_type = "dashboard"
+        arn = "Arn"
+        id = "DashboardId"
+        name = "Name"
+        permissions_augment = ("quicksight:ListTagsForResource",)
+
+    source_mapping = {
+        "describe": DescribeQuicksightWithAccountId,
+    }
+
+
+@resources.register("quicksight-datasource")
+class QuicksightDataSource(query.QueryResourceManager):
+    class resource_type(query.TypeInfo):
+        service = "quicksight"
+        enum_spec = ('list_data_sources', 'DataSources', None)
+        arn_type = "datasource"
+        arn = "Arn"
+        id = "DataSourceId"
+        name = "Name"
+        permissions_augment = ("quicksight:ListTagsForResource",)
+
+    source_mapping = {
+        "describe": DescribeQuicksightWithAccountId,
+    }
