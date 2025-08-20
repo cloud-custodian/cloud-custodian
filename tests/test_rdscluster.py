@@ -815,7 +815,6 @@ class RDSClusterSnapshotTest(BaseTest):
             },
         )
 
-
     def test_rds_cluster_cross_region_copy_skip_same_region(self):
         factory = self.replay_flight_data("test_rds_cluster_snapshot_latest")
         output = self.capture_logging("custodian.actions")
@@ -830,7 +829,7 @@ class RDSClusterSnapshotTest(BaseTest):
         )
         resources = p.run()
         self.assertFalse([r for r in resources if "c7n:CopiedClusterSnapshot" in r])
-        self.assertIn("Source and destination region are the same", output.getvalue())      
+        self.assertIn("Source and destination region are the same", output.getvalue())
 
     def test_rds_cluster_cross_region_copy(self):
         # preconditions
