@@ -420,6 +420,10 @@ class TypeInfo(metaclass=TypeMeta):
         return resource.get(cls.name)
 
     @classmethod
+    def get_metric_resource_id(cls, resource):
+        return resource['id']
+
+    @classmethod
     def get_urns(cls, resources, project_id):
         """Generate URNs for the resources.
 
