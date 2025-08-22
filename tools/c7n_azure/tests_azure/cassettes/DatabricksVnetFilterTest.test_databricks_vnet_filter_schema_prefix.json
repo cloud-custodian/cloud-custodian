@@ -1,0 +1,1454 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Databricks/workspaces?api-version=2018-04-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "1873"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Mon, 30 Jun 2025 21:36:59 GMT"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 5F11490D7E9D4795B3B5F84A3021E9AB Ref B: CPH011050219060 Ref C: 2025-06-30T21:36:59Z"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "eastus:fb05ac3e-4143-4229-ad54-f356d5e27771"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "249"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "properties": {
+                                    "publicNetworkAccess": "Enabled",
+                                    "managedResourceGroupId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/databricks-rg-databricks-rg",
+                                    "parameters": {
+                                        "customPrivateSubnetName": {
+                                            "type": "String",
+                                            "value": "databricks-private-subnet"
+                                        },
+                                        "customPublicSubnetName": {
+                                            "type": "String",
+                                            "value": "databricks-public-subnet"
+                                        },
+                                        "customVirtualNetworkId": {
+                                            "type": "String",
+                                            "value": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/databricks-rg/providers/Microsoft.Network/virtualNetworks/databricks-vnet"
+                                        },
+                                        "enableFedRampCertification": {
+                                            "type": "Bool",
+                                            "value": false
+                                        },
+                                        "enableNoPublicIp": {
+                                            "type": "Bool",
+                                            "value": true
+                                        },
+                                        "prepareEncryption": {
+                                            "type": "Bool",
+                                            "value": false
+                                        },
+                                        "requireInfrastructureEncryption": {
+                                            "type": "Bool",
+                                            "value": false
+                                        },
+                                        "resourceTags": {
+                                            "type": "Object",
+                                            "value": {
+                                                "application": "databricks",
+                                                "databricks-environment": "true"
+                                            }
+                                        },
+                                        "storageAccountName": {
+                                            "type": "String",
+                                            "value": "dbstoragewbeuhaymcezic"
+                                        },
+                                        "storageAccountSkuName": {
+                                            "type": "String",
+                                            "value": "Standard_GRS"
+                                        }
+                                    },
+                                    "provisioningState": "Succeeded",
+                                    "authorizations": [
+                                        {
+                                            "principalId": "9a74af6f-d153-4348-988a-e2672920bee9",
+                                            "roleDefinitionId": "8e3af657-a8ff-443c-a75c-2fe8c4bcb635"
+                                        }
+                                    ],
+                                    "createdBy": {
+                                        "oid": "b95cc733-b44c-43e8-a2b8-ad5bf922f668",
+                                        "puid": "00030000FD7B7555",
+                                        "applicationId": "04b07795-8ddb-461a-bbee-02f9e1bf7b46"
+                                    },
+                                    "updatedBy": {
+                                        "oid": "b95cc733-b44c-43e8-a2b8-ad5bf922f668",
+                                        "puid": "00030000FD7B7555",
+                                        "applicationId": "04b07795-8ddb-461a-bbee-02f9e1bf7b46"
+                                    },
+                                    "workspaceId": "3736718139241295",
+                                    "workspaceUrl": "adb-3736718139241295.15.azuredatabricks.net",
+                                    "createdDateTime": "2025-06-30T19:44:18.8374092Z"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/databricks-rg/providers/Microsoft.Databricks/workspaces/databricks-workspace",
+                                "name": "databricks-workspace",
+                                "type": "Microsoft.Databricks/workspaces",
+                                "sku": {
+                                    "name": "premium"
+                                },
+                                "location": "eastus",
+                                "tags": {}
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network?api-version=2025-03-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "201743"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Mon, 30 Jun 2025 21:37:00 GMT"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: A42B6DCE04414DEC99E01EA3F9E6A807 Ref B: CPH011050219060 Ref C: 2025-06-30T21:37:00Z"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network",
+                        "namespace": "Microsoft.Network",
+                        "authorizations": [],
+                        "resourceTypes": [
+                            {
+                                "resourceType": "dnszones",
+                                "apiVersions": [
+                                    "2023-07-01-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "dnsOperationResults",
+                                "apiVersions": [
+                                    "2023-07-01-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "dnsOperationStatuses",
+                                "apiVersions": [
+                                    "2023-07-01-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "getDnsResourceReference",
+                                "apiVersions": [
+                                    "2023-07-01-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "internalNotify",
+                                "apiVersions": [
+                                    "2023-07-01-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "dnszones/A",
+                                "apiVersions": [
+                                    "2023-07-01-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "dnszones/AAAA",
+                                "apiVersions": [
+                                    "2023-07-01-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "dnszones/CNAME",
+                                "apiVersions": [
+                                    "2023-07-01-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "dnszones/PTR",
+                                "apiVersions": [
+                                    "2023-07-01-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "dnszones/MX",
+                                "apiVersions": [
+                                    "2023-07-01-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "dnszones/TXT",
+                                "apiVersions": [
+                                    "2023-07-01-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "dnszones/SRV",
+                                "apiVersions": [
+                                    "2023-07-01-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "dnszones/SOA",
+                                "apiVersions": [
+                                    "2023-07-01-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "dnszones/NS",
+                                "apiVersions": [
+                                    "2023-07-01-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "dnszones/CAA",
+                                "apiVersions": [
+                                    "2023-07-01-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "dnszones/DS",
+                                "apiVersions": [
+                                    "2023-07-01-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "dnszones/TLSA",
+                                "apiVersions": [
+                                    "2023-07-01-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "dnszones/NAPTR",
+                                "apiVersions": [
+                                    "2023-07-01-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "dnszones/recordsets",
+                                "apiVersions": [
+                                    "2023-07-01-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "dnszones/all",
+                                "apiVersions": [
+                                    "2023-07-01-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "dnszones/dnssecConfigs",
+                                "apiVersions": [
+                                    "2023-07-01-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "dnsResolvers",
+                                "apiVersions": [
+                                    "2025-05-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "dnsResolvers/inboundEndpoints",
+                                "apiVersions": [
+                                    "2025-05-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "dnsResolvers/outboundEndpoints",
+                                "apiVersions": [
+                                    "2025-05-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "dnsForwardingRulesets",
+                                "apiVersions": [
+                                    "2025-05-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "dnsForwardingRulesets/forwardingRules",
+                                "apiVersions": [
+                                    "2025-05-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "dnsForwardingRulesets/virtualNetworkLinks",
+                                "apiVersions": [
+                                    "2025-05-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualNetworks/listDnsResolvers",
+                                "apiVersions": [
+                                    "2025-05-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualNetworks/listDnsForwardingRulesets",
+                                "apiVersions": [
+                                    "2025-05-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/dnsResolverOperationResults",
+                                "apiVersions": [
+                                    "2025-05-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/dnsResolverOperationStatuses",
+                                "apiVersions": [
+                                    "2025-05-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "dnsResolverPolicies",
+                                "apiVersions": [
+                                    "2025-05-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "dnsResolverPolicies/dnsSecurityRules",
+                                "apiVersions": [
+                                    "2025-05-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "dnsResolverPolicies/virtualNetworkLinks",
+                                "apiVersions": [
+                                    "2025-05-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualNetworks/listDnsResolverPolicies",
+                                "apiVersions": [
+                                    "2025-05-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "dnsResolverDomainLists",
+                                "apiVersions": [
+                                    "2025-05-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "dnsResolverDomainLists/bulk",
+                                "apiVersions": [
+                                    "2025-05-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/dnsResolverPolicyOperationResults",
+                                "apiVersions": [
+                                    "2025-05-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/dnsResolverPolicyOperationStatuses",
+                                "apiVersions": [
+                                    "2025-05-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "frontdoorOperationResults",
+                                "apiVersions": [
+                                    "2025-03-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "checkFrontdoorNameAvailability",
+                                "apiVersions": [
+                                    "2021-06-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "frontdoors",
+                                "apiVersions": [
+                                    "2021-06-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "frontdoors/frontendEndpoints",
+                                "apiVersions": [
+                                    "2021-06-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "frontdoors/frontendEndpoints/customHttpsConfiguration",
+                                "apiVersions": [
+                                    "2021-06-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "frontdoorWebApplicationFirewallPolicies",
+                                "apiVersions": [
+                                    "2025-03-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "frontdoorWebApplicationFirewallManagedRuleSets",
+                                "apiVersions": [
+                                    "2025-03-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "networkExperimentProfiles",
+                                "apiVersions": [
+                                    "2019-11-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualNetworkGateways",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "localNetworkGateways",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "connections",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "applicationGateways",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "expressRouteCircuits",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "expressRouteServiceProviders",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "applicationGatewayAvailableWafRuleSets",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "applicationGatewayAvailableSslOptions",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "applicationGatewayAvailableServerVariables",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "applicationGatewayAvailableRequestHeaders",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "applicationGatewayAvailableResponseHeaders",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "routeFilters",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "bgpServiceCommunities",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "vpnSites",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "vpnServerConfigurations",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualHubs",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "vpnGateways",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "p2sVpnGateways",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "expressRouteGateways",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "expressRoutePortsLocations",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "expressRoutePorts",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "securityPartnerProviders",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "azureFirewalls",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "azureFirewallFqdnTags",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "applicationGatewayWebApplicationFirewallPolicies",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/ApplicationGatewayWafDynamicManifests",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualWans",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "bastionHosts",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "queryExpressRoutePortsBandwidth",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "expressRouteProviderPorts",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/hybridEdgeZone",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "firewallPolicies",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "ipGroups",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "azureWebCategories",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/nfvOperations",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/nfvOperationResults",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualRouters",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "networkVirtualAppliances",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "networkVirtualApplianceSkus",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "assist",
+                                "apiVersions": [
+                                    "2024-06-01-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "privateDnsZones",
+                                "apiVersions": [
+                                    "2024-06-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "privateDnsZones/virtualNetworkLinks",
+                                "apiVersions": [
+                                    "2024-06-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "privateDnsOperationResults",
+                                "apiVersions": [
+                                    "2024-06-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "privateDnsOperationStatuses",
+                                "apiVersions": [
+                                    "2024-06-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "privateDnsZonesInternal",
+                                "apiVersions": [
+                                    "2024-06-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "privateDnsZones/A",
+                                "apiVersions": [
+                                    "2024-06-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "privateDnsZones/AAAA",
+                                "apiVersions": [
+                                    "2024-06-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "privateDnsZones/CNAME",
+                                "apiVersions": [
+                                    "2024-06-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "privateDnsZones/PTR",
+                                "apiVersions": [
+                                    "2024-06-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "privateDnsZones/MX",
+                                "apiVersions": [
+                                    "2024-06-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "privateDnsZones/TXT",
+                                "apiVersions": [
+                                    "2024-06-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "privateDnsZones/SRV",
+                                "apiVersions": [
+                                    "2024-06-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "privateDnsZones/SOA",
+                                "apiVersions": [
+                                    "2024-06-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "privateDnsZones/all",
+                                "apiVersions": [
+                                    "2024-06-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualNetworks/privateDnsZoneLinks",
+                                "apiVersions": [
+                                    "2024-06-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "trafficmanagerprofiles",
+                                "apiVersions": [
+                                    "2022-04-01-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "trafficmanagerprofiles/heatMaps",
+                                "apiVersions": [
+                                    "2022-04-01-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "trafficmanagerprofiles/azureendpoints",
+                                "apiVersions": [
+                                    "2022-04-01-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "trafficmanagerprofiles/externalendpoints",
+                                "apiVersions": [
+                                    "2022-04-01-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "trafficmanagerprofiles/nestedendpoints",
+                                "apiVersions": [
+                                    "2022-04-01-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "checkTrafficManagerNameAvailability",
+                                "apiVersions": [
+                                    "2022-04-01-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "checkTrafficManagerNameAvailabilityV2",
+                                "apiVersions": [
+                                    "2022-04-01-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "trafficManagerUserMetricsKeys",
+                                "apiVersions": [
+                                    "2022-04-01-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "trafficManagerGeographicHierarchies",
+                                "apiVersions": [
+                                    "2022-04-01-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualNetworks",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualNetworks/taggedTrafficConsumers",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "natGateways",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "publicIPAddresses",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "internalPublicIpAddresses",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "customIpPrefixes",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "networkInterfaces",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "dscpConfigurations",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "privateEndpoints",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "privateEndpoints/privateLinkServiceProxies",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "privateEndpointRedirectMaps",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "loadBalancers",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "networkSecurityGroups",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "applicationSecurityGroups",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "serviceEndpointPolicies",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "networkIntentPolicies",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "routeTables",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "publicIPPrefixes",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "networkWatchers",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "networkWatchers/connectionMonitors",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "networkWatchers/flowLogs",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "networkWatchers/pingMeshes",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/operations",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/operationResults",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/CheckDnsNameAvailability",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/setLoadBalancerFrontendPublicIpAddresses",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "cloudServiceSlots",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/usages",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/virtualNetworkAvailableEndpointServices",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/availableDelegations",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/serviceTags",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/availablePrivateEndpointTypes",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/availableServiceAliases",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/checkPrivateLinkServiceVisibility",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/autoApprovedPrivateLinkServices",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/batchValidatePrivateEndpointsForResourceMove",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/batchNotifyPrivateEndpointsForResourceMove",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/supportedVirtualMachineSizes",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/setAzureNetworkManagerConfiguration",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/publishResources",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/getAzureNetworkManagerConfiguration",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/checkAcceleratedNetworkingSupport",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/validateResourceOwnership",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/setResourceOwnership",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/effectiveResourceOwnership",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "operations",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualNetworkTaps",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "privateLinkServices",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/privateLinkServices",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "ddosProtectionPlans",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "networkProfiles",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/bareMetalTenants",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "ipAllocations",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/serviceTagDetails",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/dataTasks",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/startPacketTagging",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/deletePacketTagging",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/getPacketTagging",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/rnmEffectiveRouteTable",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/rnmEffectiveNetworkSecurityGroups",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "networkManagers",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "networkManagerConnections",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "networkSecurityPerimeters",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/perimeterAssociableResourceTypes",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/queryNetworkSecurityPerimeter",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualNetworks/listNetworkManagerEffectiveConnectivityConfigurations",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualNetworks/listNetworkManagerEffectiveSecurityAdminRules",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "networkGroupMemberships",
+                                "apiVersions": [
+                                    "2022-06-01-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/commitInternalAzureNetworkManagerConfiguration",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/internalAzureVirtualNetworkManagerOperation",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "networkManagers/ipamPools",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/ipamPoolOperationResults",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "networkManagers/verifierWorkspaces",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/verifierWorkspaceOperationResults",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "copilot",
+                                "apiVersions": [
+                                    "2024-06-01-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/networkSecurityPerimeterOperationStatuses",
+                                "apiVersions": [
+                                    "2024-10-01"
+                                ]
+                            }
+                        ],
+                        "registrationState": "Registered",
+                        "registrationPolicy": "RegistrationRequired"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/databricks-rg/providers/Microsoft.Network/virtualNetworks/databricks-vnet?api-version=2024-10-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "3797"
+                    ],
+                    "x-ms-arm-service-request-id": [
+                        "b28282fd-a816-45af-8a45-ab76bc58c42a"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Mon, 30 Jun 2025 21:37:02 GMT"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 835F2DDCE1C440298796705A999532DE Ref B: CPH011050219040 Ref C: 2025-06-30T21:37:02Z"
+                    ],
+                    "etag": [
+                        "W/\"9fe1a271-eafa-4ba4-b8df-fa65baa67a42\""
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "name": "databricks-vnet",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/databricks-rg/providers/Microsoft.Network/virtualNetworks/databricks-vnet",
+                        "etag": "W/\"9fe1a271-eafa-4ba4-b8df-fa65baa67a42\"",
+                        "type": "Microsoft.Network/virtualNetworks",
+                        "location": "eastus",
+                        "tags": {},
+                        "properties": {
+                            "provisioningState": "Succeeded",
+                            "resourceGuid": "6647f5a1-d3de-453f-8e14-309c688b56cd",
+                            "addressSpace": {
+                                "addressPrefixes": [
+                                    "10.0.0.0/16"
+                                ]
+                            },
+                            "privateEndpointVNetPolicies": "Disabled",
+                            "dhcpOptions": {
+                                "dnsServers": []
+                            },
+                            "subnets": [
+                                {
+                                    "name": "databricks-private-subnet",
+                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/databricks-rg/providers/Microsoft.Network/virtualNetworks/databricks-vnet/subnets/databricks-private-subnet",
+                                    "etag": "W/\"9fe1a271-eafa-4ba4-b8df-fa65baa67a42\"",
+                                    "properties": {
+                                        "provisioningState": "Succeeded",
+                                        "addressPrefix": "10.0.2.0/24",
+                                        "networkSecurityGroup": {
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/databricks-rg/providers/Microsoft.Network/networkSecurityGroups/databricks-private-nsg"
+                                        },
+                                        "networkIntentPolicies": [
+                                            {
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/DATABRICKS-RG/providers/Microsoft.Network/networkIntentPolicies/ADB-EASTUS-NPIP-25CE86F5BF37C7AC5BF4EBC4"
+                                            }
+                                        ],
+                                        "serviceEndpoints": [],
+                                        "delegations": [
+                                            {
+                                                "name": "delegation",
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/databricks-rg/providers/Microsoft.Network/virtualNetworks/databricks-vnet/subnets/databricks-private-subnet/delegations/delegation",
+                                                "etag": "W/\"9fe1a271-eafa-4ba4-b8df-fa65baa67a42\"",
+                                                "properties": {
+                                                    "provisioningState": "Succeeded",
+                                                    "serviceName": "Microsoft.Databricks/workspaces",
+                                                    "actions": [
+                                                        "Microsoft.Network/virtualNetworks/subnets/join/action",
+                                                        "Microsoft.Network/virtualNetworks/subnets/prepareNetworkPolicies/action",
+                                                        "Microsoft.Network/virtualNetworks/subnets/unprepareNetworkPolicies/action"
+                                                    ]
+                                                },
+                                                "type": "Microsoft.Network/virtualNetworks/subnets/delegations"
+                                            }
+                                        ],
+                                        "privateEndpointNetworkPolicies": "Disabled",
+                                        "privateLinkServiceNetworkPolicies": "Enabled",
+                                        "defaultOutboundAccess": true
+                                    },
+                                    "type": "Microsoft.Network/virtualNetworks/subnets"
+                                },
+                                {
+                                    "name": "databricks-public-subnet",
+                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/databricks-rg/providers/Microsoft.Network/virtualNetworks/databricks-vnet/subnets/databricks-public-subnet",
+                                    "etag": "W/\"9fe1a271-eafa-4ba4-b8df-fa65baa67a42\"",
+                                    "properties": {
+                                        "provisioningState": "Succeeded",
+                                        "addressPrefix": "10.0.1.0/24",
+                                        "networkSecurityGroup": {
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/databricks-rg/providers/Microsoft.Network/networkSecurityGroups/databricks-public-nsg"
+                                        },
+                                        "networkIntentPolicies": [
+                                            {
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/DATABRICKS-RG/providers/Microsoft.Network/networkIntentPolicies/ADB-EASTUS-NPIP-9EB4DFC94BD72C25EDDA8C03"
+                                            }
+                                        ],
+                                        "serviceEndpoints": [],
+                                        "delegations": [
+                                            {
+                                                "name": "delegation",
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/databricks-rg/providers/Microsoft.Network/virtualNetworks/databricks-vnet/subnets/databricks-public-subnet/delegations/delegation",
+                                                "etag": "W/\"9fe1a271-eafa-4ba4-b8df-fa65baa67a42\"",
+                                                "properties": {
+                                                    "provisioningState": "Succeeded",
+                                                    "serviceName": "Microsoft.Databricks/workspaces",
+                                                    "actions": [
+                                                        "Microsoft.Network/virtualNetworks/subnets/join/action",
+                                                        "Microsoft.Network/virtualNetworks/subnets/prepareNetworkPolicies/action",
+                                                        "Microsoft.Network/virtualNetworks/subnets/unprepareNetworkPolicies/action"
+                                                    ]
+                                                },
+                                                "type": "Microsoft.Network/virtualNetworks/subnets/delegations"
+                                            }
+                                        ],
+                                        "privateEndpointNetworkPolicies": "Disabled",
+                                        "privateLinkServiceNetworkPolicies": "Enabled",
+                                        "defaultOutboundAccess": true
+                                    },
+                                    "type": "Microsoft.Network/virtualNetworks/subnets"
+                                }
+                            ],
+                            "virtualNetworkPeerings": [],
+                            "enableDdosProtection": false
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}
