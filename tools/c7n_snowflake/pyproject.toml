@@ -29,6 +29,7 @@ documentation = "https://cloudcustodian.io/docs/"
 [dependency-groups]
 dev = [
     "pytest<8.0",
+    "vcrpy>=5.1.0",
 ]
 
 [build-system]

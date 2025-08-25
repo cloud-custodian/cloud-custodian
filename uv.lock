@@ -1887,6 +1887,8 @@ dependencies = [
 [package.dev-dependencies]
 dev = [
     { name = "pytest" },
+    { name = "vcrpy", version = "5.1.0", source = { registry = "https://pypi.org/simple" }, marker = "platform_python_implementation == 'PyPy'" },
+    { name = "vcrpy", version = "7.0.0", source = { registry = "https://pypi.org/simple" }, marker = "platform_python_implementation != 'PyPy'" },
 ]
 
 [package.metadata]
@@ -1898,7 +1900,10 @@ requires-dist = [
 ]
 
 [package.metadata.requires-dev]
-dev = [{ name = "pytest", specifier = "<8.0" }]
+dev = [
+    { name = "pytest", specifier = "<8.0" },
+    { name = "vcrpy", specifier = ">=5.1.0" },
+]
 
 [[package]]
 name = "c7n-sphinxext"
