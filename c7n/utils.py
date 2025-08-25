@@ -95,6 +95,7 @@ def loads(body):
 
 def dumps(data, fh=None, indent=0):
     if fh:
+        log.error(data)
         return json.dump(data, fh, cls=JsonEncoder, indent=indent)
     else:
         return json.dumps(data, cls=JsonEncoder, indent=indent)
