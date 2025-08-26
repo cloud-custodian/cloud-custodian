@@ -186,8 +186,12 @@ class TypeInfo(metaclass=TypeMeta):
     client = ''
 
     resource = DEFAULT_RESOURCE_AUTH_ENDPOINT
-    # Default id field, resources should override if different (used for meta filters, report etc)
+    # Default id and name fields, resources should override if different
+    # (used for meta filters, report etc)
     id = 'id'
+    name = 'name'
+
+    default_report_fields = ()
 
     @classmethod
     def extra_args(cls, resource_manager):

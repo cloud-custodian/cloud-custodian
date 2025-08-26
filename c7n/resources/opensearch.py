@@ -1,12 +1,13 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+from c7n.actions import BaseAction
+from c7n.filters import ValueFilter
+from c7n.filters.kms import KmsRelatedFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
-from c7n.utils import local_session, type_schema
-from c7n.actions import BaseAction
-from c7n.filters.kms import KmsRelatedFilter
+from c7n.utils import local_session, type_schema, yaml_load
 
 
 @resources.register('opensearch-serverless')
@@ -155,6 +156,60 @@ class OpensearchIngestion(QueryResourceManager):
 @OpensearchIngestion.filter_registry.register('kms-key')
 class OpensearchIngestionKmsFilter(KmsRelatedFilter):
     RelatedIdsExpression = 'EncryptionAtRestOptions.KmsKeyArn'
+
+
+@OpensearchIngestion.filter_registry.register('pipeline-config')
+class OpensearchIngestionPipelineConfigFilter(ValueFilter):
+    """Filter OpenSearch Ingestion Pipelines by their PipelineConfiguration.
+    Custodian substitutes the pipeline name key in the PipelineConfigurationBody with
+    'pipeline' so that its sub-fields can be referenced in the filter.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: osis-persistent-buffer-disabled
+            resource: opensearch-ingestion
+            filters:
+              - or:
+                - type: pipeline-config
+                  key: pipeline.source.http
+                  value: not-null
+                - type: pipeline-config
+                  key: pipeline.source.otel
+                  value: not-null
+              - type: value
+                key: BufferOptions.PersistentBufferEnabled
+                op: ne
+                value: True
+    """
+    annotation_key = 'c7n:PipelineConfiguration'
+    schema = type_schema(
+        'pipeline-config',
+        rinherit=ValueFilter.schema,
+    )
+    permissions = ('osis:ListPipelines',)
+    pipeline_name_key_substitute = "pipeline"
+
+    def substitute_pipeline_name_key(self, pipeline_config):
+        for key in list(pipeline_config.keys()):
+            if isinstance(pipeline_config[key], dict) and "source" in pipeline_config[key].keys():
+                pipeline_config[self.pipeline_name_key_substitute] = pipeline_config.pop(key)
+                continue
+
+    def augment(self, r):
+        if self.annotation_key not in r:
+            r[self.annotation_key] = yaml_load(r.get('PipelineConfigurationBody', '{}'))
+            self.substitute_pipeline_name_key(r[self.annotation_key])
+
+    def process(self, resources, event=None):
+        matched = []
+        for r in resources:
+            self.augment(r)
+            if self.match(r[self.annotation_key]):
+                matched.append(r)
+        return matched
 
 
 @OpensearchIngestion.action_registry.register('tag')

@@ -2649,6 +2649,22 @@ class VPNGateway(query.QueryResourceManager):
         id_prefix = "vgw-"
 
 
+@resources.register('client-vpn-endpoint')
+class ClientVpnEndpoint(query.QueryResourceManager):
+
+    class resource_type(query.TypeInfo):
+        service = 'ec2'
+        arn_type = 'client-vpn-endpoint'
+        enum_spec = ('describe_client_vpn_endpoints', 'ClientVpnEndpoints', None)
+        name = id = 'ClientVpnEndpointId'
+        filter_name = 'ClientVpnEndpointIds'
+        filter_type = 'list'
+        cfn_type = config_type = 'AWS::EC2::ClientVpnEndpoint'
+        id_prefix = 'cvpn-endpoint-'
+        metrics_namespace = 'AWS/ClientVPN'
+        dimension = 'ClientVpnEndpointId'
+
+
 @resources.register('vpc-endpoint')
 class VpcEndpoint(query.QueryResourceManager):
 
@@ -2782,6 +2798,39 @@ class SubnetEndpointFilter(RelatedResourceByIdFilter):
     schema = type_schema(
         'vpc-endpoint',
         rinherit=ValueFilter.schema)
+
+
+@resources.register('vpc-endpoint-service-configuration')
+class VPCEndpointServiceConfiguration(query.QueryResourceManager):
+    """
+    Resource manager for VPC Endpoint Service Configurations.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: acceptance-not-enabled
+            resource: aws.vpc-endpoint-service-configuration
+            filters:
+              - AcceptanceRequired: false
+
+    """
+    class resource_type(query.TypeInfo):
+        service = 'ec2'
+        enum_spec = ('describe_vpc_endpoint_service_configurations',
+                     'ServiceConfigurations', None)
+        name = id = 'ServiceId'  # ServiceName contains DNS
+        id_prefix = 'vpce-svc-'
+        filter_name = 'ServiceIds'
+        filter_type = 'list'
+        cfn_type = config_type = 'AWS::EC2::VPCEndpointService'
+        arn_type = 'vpc-endpoint-service'
+        arn_separator = '/'
+        default_report_fields = (
+            'ServiceId',
+            'ServiceState'
+        )
 
 
 @resources.register('key-pair')

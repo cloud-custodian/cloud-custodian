@@ -185,6 +185,11 @@ class DefenderSecurityContact(QueryResourceManager, metaclass=QueryMeta):
         resource_type = "Microsoft.Security/securityContacts"
         default_report_fields = ["id", "name"]
 
+        @classmethod
+        def extra_args(cls, resource_manager):
+            # fix for https://github.com/Azure/azure-sdk-for-python/issues/35996
+            return {'api_version': '2023-12-01-preview'}
+
 
 @resources.register("defender-jit-policy")
 class DefenderJitPolicy(QueryResourceManager, metaclass=QueryMeta):

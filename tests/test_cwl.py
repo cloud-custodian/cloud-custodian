@@ -577,7 +577,7 @@ class DestinationTest(BaseTest):
 
 
 class DeliveryDestinationTest(BaseTest):
-    def test_log_destination(self):
+    def test_delivery_destination(self):
         factory = self.replay_flight_data('test_delivery_destination')
         client = local_session(factory).client('logs')
         p = self.load_policy(
@@ -622,21 +622,35 @@ class DeliveryDestinationTest(BaseTest):
         tags = client.list_tags_for_resource(resourceArn=resources[0]['arn'])['tags']
         assert 'test-tag' not in tags
 
-    def test_log_destination_cross_account(self):
+    def test_delivery_destination_cross_account(self):
         factory = self.replay_flight_data('test_delivery_destination_cross_account')
         p = self.load_policy(
             {
                 'name': 'cross-account-delivery-destination',
                 'resource': 'delivery-destination',
                 'filters': [{
-                    'type': 'cross-account'
+                    'type': 'cross-account',
                 }],
             },
         session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-    def test_log_destination_delete(self):
+    def test_delivery_destination_cross_account_no_policy(self):
+        factory = self.replay_flight_data('test_delivery_destination_cross_account_no_policy')
+        p = self.load_policy(
+            {
+                'name': 'cross-account-delivery-destination-no-policy',
+                'resource': 'delivery-destination',
+                'filters': [{
+                    'type': 'cross-account',
+                }],
+            },
+        session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    def test_delivery_destination_delete(self):
         factory = self.replay_flight_data('test_delivery_destination_delete')
         client = local_session(factory).client('logs')
         p = self.load_policy(

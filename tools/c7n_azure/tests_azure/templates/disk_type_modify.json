@@ -25,21 +25,21 @@
 		},
 		"disk1Name": {
 			"type": "string",
-			"defaultValue": "disk1",
+			"defaultValue": "c7n-test-disk1",
 			"metadata": {
 				"description": "Name of the first managed disk."
 			}
 		},
 		"disk2Name": {
 			"type": "string",
-			"defaultValue": "disk2",
+			"defaultValue": "c7n-test-disk2",
 			"metadata": {
 				"description": "Name of the second managed disk."
 			}
 		},
 		"vmName": {
 			"type": "string",
-			"defaultValue": "vm-disk-test",
+			"defaultValue": "c7n-test-vm",
 			"metadata": {
 				"description": "Name of the virtual machine."
 			}

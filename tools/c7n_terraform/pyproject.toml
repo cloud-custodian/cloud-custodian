@@ -10,7 +10,7 @@ dependencies = [
     "python-hcl2<5.0.0,>=4.3.2",
 ]
 name = "c7n_terraform"
-version = "0.1.35"
+version = "0.1.36"
 readme = "readme.md"
 description = "Cloud Custodian Provider for evaluating Terraform"
 classifiers = [

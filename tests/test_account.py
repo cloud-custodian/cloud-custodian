@@ -1400,6 +1400,7 @@ class AccountTests(BaseTest):
         )
 
     def test_ec2_metadata_defaults(self):
+
         factory = self.replay_flight_data("test_ec2_metadata_defaults")
         p = self.load_policy(
             {
@@ -1439,6 +1440,34 @@ class AccountTests(BaseTest):
                 "enabled",
             ]
         )
+
+    def test_set_security_token_service_preferences(self):
+
+        factory = self.replay_flight_data("test_set_security_token_service_preferences")
+        p = self.load_policy(
+            {
+                "name": "set-sts-preferences",
+                "resource": "account",
+                "actions": [
+                    {
+                        "type": "set-security-token-service-preferences",
+                        "token_version": "v2Token",
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = local_session(factory).client("iam")
+        response = client.get_account_summary()
+        # self.assertIn("SummaryMap", response['SummaryMap'])
+        self.assertIn("SummaryMap", response)
+
+        # Verify that the token version was set correctly
+
+        self.assertEqual(2, response['SummaryMap']['GlobalEndpointTokenVersion'])
 
 
 class AccountDataEvents(BaseTest):

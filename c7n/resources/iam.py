@@ -3033,6 +3033,7 @@ class OpenIdProvider(QueryResourceManager):
         name = id = 'Arn'
         enum_spec = ('list_open_id_connect_providers', 'OpenIDConnectProviderList', None)
         detail_spec = ('get_open_id_connect_provider', 'OpenIDConnectProviderArn', 'Arn', None)
+        config_type = cfn_type = "AWS::IAM::OIDCProvider"
         arn = 'Arn'
         arn_type = 'oidc-provider'
         global_resource = True

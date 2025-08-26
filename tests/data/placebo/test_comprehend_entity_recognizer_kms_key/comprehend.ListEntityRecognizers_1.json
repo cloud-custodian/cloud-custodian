@@ -1,0 +1,725 @@
+{
+    "status_code": 200,
+    "data": {
+        "EntityRecognizerPropertiesList": [
+            {
+                "EntityRecognizerArn": "arn:aws:comprehend:us-east-1:644160558196:entity-recognizer/TestVpcEntityRecognizer/version/5",
+                "LanguageCode": "en",
+                "Status": "IN_ERROR",
+                "Message": "The file entities.csv could not be decoded as valid utf-8 at position 12 to 13. Bad data: b'\\x81'.\n, exit code: 255",
+                "SubmitTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 4,
+                    "day": 15,
+                    "hour": 8,
+                    "minute": 6,
+                    "second": 11,
+                    "microsecond": 96000
+                },
+                "EndTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 4,
+                    "day": 15,
+                    "hour": 8,
+                    "minute": 16,
+                    "second": 37,
+                    "microsecond": 833000
+                },
+                "TrainingStartTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 4,
+                    "day": 15,
+                    "hour": 8,
+                    "minute": 13,
+                    "second": 26,
+                    "microsecond": 772000
+                },
+                "TrainingEndTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 4,
+                    "day": 15,
+                    "hour": 8,
+                    "minute": 16,
+                    "second": 16,
+                    "microsecond": 858000
+                },
+                "InputDataConfig": {
+                    "DataFormat": "COMPREHEND_CSV",
+                    "EntityTypes": [
+                        {
+                            "Type": "PERSON"
+                        },
+                        {
+                            "Type": "ORGANIZATION"
+                        },
+                        {
+                            "Type": "LOCATION"
+                        },
+                        {
+                            "Type": "EMAIL"
+                        },
+                        {
+                            "Type": "PHONE_NUMBER"
+                        }
+                    ],
+                    "Documents": {
+                        "S3Uri": "s3://c7n-test-s3-bucket/sample.txt",
+                        "InputFormat": "ONE_DOC_PER_LINE"
+                    },
+                    "EntityList": {
+                        "S3Uri": "s3://c7n-test-s3-bucket/entities.csv"
+                    }
+                },
+                "DataAccessRoleArn": "arn:aws:iam::644160558196:role/ComprehendVpcAccessRole",
+                "VpcConfig": {
+                    "SecurityGroupIds": [
+                        "sg-0d74b07ab0b3288c0"
+                    ],
+                    "Subnets": [
+                        "subnet-0ebe9abf587c5070c"
+                    ]
+                },
+                "VersionName": "5"
+            },
+            {
+                "EntityRecognizerArn": "arn:aws:comprehend:us-east-1:644160558196:entity-recognizer/TestVpcEntityRecognizer/version/6",
+                "LanguageCode": "en",
+                "Status": "IN_ERROR",
+                "Message": "Validate user metadata failed.\n, exit code: 255",
+                "SubmitTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 4,
+                    "day": 15,
+                    "hour": 8,
+                    "minute": 42,
+                    "second": 28,
+                    "microsecond": 245000
+                },
+                "EndTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 4,
+                    "day": 15,
+                    "hour": 8,
+                    "minute": 55,
+                    "second": 7,
+                    "microsecond": 611000
+                },
+                "TrainingStartTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 4,
+                    "day": 15,
+                    "hour": 8,
+                    "minute": 50,
+                    "second": 25,
+                    "microsecond": 89000
+                },
+                "TrainingEndTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 4,
+                    "day": 15,
+                    "hour": 8,
+                    "minute": 53,
+                    "second": 35,
+                    "microsecond": 417000
+                },
+                "InputDataConfig": {
+                    "DataFormat": "COMPREHEND_CSV",
+                    "EntityTypes": [
+                        {
+                            "Type": "PERSON"
+                        },
+                        {
+                            "Type": "ORGANIZATION"
+                        },
+                        {
+                            "Type": "LOCATION"
+                        },
+                        {
+                            "Type": "EMAIL"
+                        },
+                        {
+                            "Type": "PHONE_NUMBER"
+                        }
+                    ],
+                    "Documents": {
+                        "S3Uri": "s3://c7n-test-s3-bucket/sample.txt",
+                        "InputFormat": "ONE_DOC_PER_LINE"
+                    },
+                    "EntityList": {
+                        "S3Uri": "s3://c7n-test-s3-bucket/TrainingData2 - Sheet1.csv"
+                    }
+                },
+                "DataAccessRoleArn": "arn:aws:iam::644160558196:role/ComprehendVpcAccessRole",
+                "VpcConfig": {
+                    "SecurityGroupIds": [
+                        "sg-0d74b07ab0b3288c0"
+                    ],
+                    "Subnets": [
+                        "subnet-0ebe9abf587c5070c"
+                    ]
+                },
+                "VersionName": "6"
+            },
+            {
+                "EntityRecognizerArn": "arn:aws:comprehend:us-east-1:644160558196:entity-recognizer/TestVpcEntityRecognizer/version/7",
+                "LanguageCode": "en",
+                "Status": "IN_ERROR",
+                "Message": "Validate user metadata failed.\n, exit code: 255",
+                "SubmitTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 4,
+                    "day": 15,
+                    "hour": 9,
+                    "minute": 5,
+                    "second": 17,
+                    "microsecond": 753000
+                },
+                "EndTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 4,
+                    "day": 15,
+                    "hour": 9,
+                    "minute": 16,
+                    "second": 27,
+                    "microsecond": 69000
+                },
+                "TrainingStartTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 4,
+                    "day": 15,
+                    "hour": 9,
+                    "minute": 13,
+                    "second": 8,
+                    "microsecond": 301000
+                },
+                "TrainingEndTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 4,
+                    "day": 15,
+                    "hour": 9,
+                    "minute": 16,
+                    "second": 3,
+                    "microsecond": 699000
+                },
+                "InputDataConfig": {
+                    "DataFormat": "COMPREHEND_CSV",
+                    "EntityTypes": [
+                        {
+                            "Type": "PERSON"
+                        },
+                        {
+                            "Type": "ORGANIZATION"
+                        },
+                        {
+                            "Type": "LOCATION"
+                        },
+                        {
+                            "Type": "EMAIL"
+                        },
+                        {
+                            "Type": "PHONE_NUMBER"
+                        },
+                        {
+                            "Type": "PRODUCT"
+                        }
+                    ],
+                    "Documents": {
+                        "S3Uri": "s3://c7n-test-s3-bucket/sample2.txt",
+                        "InputFormat": "ONE_DOC_PER_LINE"
+                    },
+                    "EntityList": {
+                        "S3Uri": "s3://c7n-test-s3-bucket/TrainingData2 - Sheet1.csv"
+                    }
+                },
+                "DataAccessRoleArn": "arn:aws:iam::644160558196:role/ComprehendVpcAccessRole",
+                "VpcConfig": {
+                    "SecurityGroupIds": [
+                        "sg-0d74b07ab0b3288c0"
+                    ],
+                    "Subnets": [
+                        "subnet-0ebe9abf587c5070c"
+                    ]
+                },
+                "VersionName": "7"
+            },
+            {
+                "EntityRecognizerArn": "arn:aws:comprehend:us-east-1:644160558196:entity-recognizer/TestVpcEntityRecognizer/version/8",
+                "LanguageCode": "en",
+                "Status": "IN_ERROR",
+                "Message": "The entity list file TrainingData3 - Sheet1.csv contains invalid column names: Index(['File', 'Line', 'Begin Offset', 'End Offset', 'Type'], dtype='object'). Expected column names are {'Type', 'Text'}.\n, exit code: 255",
+                "SubmitTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 4,
+                    "day": 15,
+                    "hour": 10,
+                    "minute": 0,
+                    "second": 37,
+                    "microsecond": 892000
+                },
+                "EndTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 4,
+                    "day": 15,
+                    "hour": 10,
+                    "minute": 11,
+                    "second": 32,
+                    "microsecond": 113000
+                },
+                "TrainingStartTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 4,
+                    "day": 15,
+                    "hour": 10,
+                    "minute": 8,
+                    "second": 22,
+                    "microsecond": 535000
+                },
+                "TrainingEndTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 4,
+                    "day": 15,
+                    "hour": 10,
+                    "minute": 11,
+                    "second": 7,
+                    "microsecond": 894000
+                },
+                "InputDataConfig": {
+                    "DataFormat": "COMPREHEND_CSV",
+                    "EntityTypes": [
+                        {
+                            "Type": "PERSON"
+                        },
+                        {
+                            "Type": "ORGANIZATION"
+                        },
+                        {
+                            "Type": "LOCATION"
+                        },
+                        {
+                            "Type": "EMAIL"
+                        },
+                        {
+                            "Type": "PHONE_NUMBER"
+                        },
+                        {
+                            "Type": "PRODUCT"
+                        }
+                    ],
+                    "Documents": {
+                        "S3Uri": "s3://c7n-test-s3-bucket/sample3.txt",
+                        "InputFormat": "ONE_DOC_PER_LINE"
+                    },
+                    "EntityList": {
+                        "S3Uri": "s3://c7n-test-s3-bucket/TrainingData3 - Sheet1.csv"
+                    }
+                },
+                "DataAccessRoleArn": "arn:aws:iam::644160558196:role/ComprehendVpcAccessRole",
+                "VpcConfig": {
+                    "SecurityGroupIds": [
+                        "sg-0d74b07ab0b3288c0"
+                    ],
+                    "Subnets": [
+                        "subnet-0ebe9abf587c5070c"
+                    ]
+                },
+                "VersionName": "8"
+            },
+            {
+                "EntityRecognizerArn": "arn:aws:comprehend:us-east-1:644160558196:entity-recognizer/TestVpcEntityRecognizer/version/10",
+                "LanguageCode": "en",
+                "Status": "IN_ERROR",
+                "Message": "Document sample.txt referred in annotation file doesn't exist in corresponding source documents.\n, exit code: 255",
+                "SubmitTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 4,
+                    "day": 15,
+                    "hour": 10,
+                    "minute": 25,
+                    "second": 11,
+                    "microsecond": 332000
+                },
+                "EndTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 4,
+                    "day": 15,
+                    "hour": 10,
+                    "minute": 38,
+                    "second": 3,
+                    "microsecond": 970000
+                },
+                "TrainingStartTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 4,
+                    "day": 15,
+                    "hour": 10,
+                    "minute": 33,
+                    "second": 31,
+                    "microsecond": 266000
+                },
+                "TrainingEndTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 4,
+                    "day": 15,
+                    "hour": 10,
+                    "minute": 36,
+                    "second": 11,
+                    "microsecond": 396000
+                },
+                "InputDataConfig": {
+                    "DataFormat": "COMPREHEND_CSV",
+                    "EntityTypes": [
+                        {
+                            "Type": "PERSON"
+                        },
+                        {
+                            "Type": "ORGANIZATION"
+                        },
+                        {
+                            "Type": "LOCATION"
+                        },
+                        {
+                            "Type": "EMAIL"
+                        },
+                        {
+                            "Type": "PHONE_NUMBER"
+                        },
+                        {
+                            "Type": "PRODUCT"
+                        }
+                    ],
+                    "Documents": {
+                        "S3Uri": "s3://c7n-test-s3-bucket/sample3.txt",
+                        "InputFormat": "ONE_DOC_PER_LINE"
+                    },
+                    "Annotations": {
+                        "S3Uri": "s3://c7n-test-s3-bucket/TrainingData3 - Sheet1.csv"
+                    }
+                },
+                "DataAccessRoleArn": "arn:aws:iam::644160558196:role/ComprehendVpcAccessRole",
+                "VpcConfig": {
+                    "SecurityGroupIds": [
+                        "sg-0d74b07ab0b3288c0"
+                    ],
+                    "Subnets": [
+                        "subnet-0ebe9abf587c5070c"
+                    ]
+                },
+                "VersionName": "10"
+            },
+            {
+                "EntityRecognizerArn": "arn:aws:comprehend:us-east-1:644160558196:entity-recognizer/TestVpcEntityRecognizer/version/11",
+                "LanguageCode": "en",
+                "Status": "IN_ERROR",
+                "Message": "The annotation file TrainingData3 - Sheet1.csv contains wrong annotation: sample.txt, 20, , 95, PHONE_NUMBER.Line, Begin Offset, and End Offset should be integers..\n, exit code: 255",
+                "SubmitTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 4,
+                    "day": 15,
+                    "hour": 10,
+                    "minute": 45,
+                    "second": 57,
+                    "microsecond": 637000
+                },
+                "EndTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 4,
+                    "day": 15,
+                    "hour": 10,
+                    "minute": 56,
+                    "second": 40,
+                    "microsecond": 401000
+                },
+                "TrainingStartTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 4,
+                    "day": 15,
+                    "hour": 10,
+                    "minute": 53,
+                    "second": 34,
+                    "microsecond": 522000
+                },
+                "TrainingEndTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 4,
+                    "day": 15,
+                    "hour": 10,
+                    "minute": 56,
+                    "second": 16,
+                    "microsecond": 60000
+                },
+                "InputDataConfig": {
+                    "DataFormat": "COMPREHEND_CSV",
+                    "EntityTypes": [
+                        {
+                            "Type": "PERSON"
+                        },
+                        {
+                            "Type": "ORGANIZATION"
+                        },
+                        {
+                            "Type": "LOCATION"
+                        },
+                        {
+                            "Type": "EMAIL"
+                        },
+                        {
+                            "Type": "PHONE_NUMBER"
+                        },
+                        {
+                            "Type": "PRODUCT"
+                        }
+                    ],
+                    "Documents": {
+                        "S3Uri": "s3://c7n-test-s3-bucket/sample.txt",
+                        "InputFormat": "ONE_DOC_PER_LINE"
+                    },
+                    "Annotations": {
+                        "S3Uri": "s3://c7n-test-s3-bucket/TrainingData3 - Sheet1.csv"
+                    }
+                },
+                "DataAccessRoleArn": "arn:aws:iam::644160558196:role/ComprehendVpcAccessRole",
+                "VpcConfig": {
+                    "SecurityGroupIds": [
+                        "sg-0d74b07ab0b3288c0"
+                    ],
+                    "Subnets": [
+                        "subnet-0ebe9abf587c5070c"
+                    ]
+                },
+                "VersionName": "11"
+            },
+            {
+                "EntityRecognizerArn": "arn:aws:comprehend:us-east-1:644160558196:entity-recognizer/TestVpcEntityRecognizer/version/12",
+                "LanguageCode": "en",
+                "Status": "IN_ERROR",
+                "Message": "Validate user metadata failed.\n, exit code: 255",
+                "SubmitTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 4,
+                    "day": 15,
+                    "hour": 11,
+                    "minute": 45,
+                    "second": 19,
+                    "microsecond": 46000
+                },
+                "EndTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 4,
+                    "day": 15,
+                    "hour": 11,
+                    "minute": 56,
+                    "second": 11,
+                    "microsecond": 946000
+                },
+                "TrainingStartTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 4,
+                    "day": 15,
+                    "hour": 11,
+                    "minute": 52,
+                    "second": 59,
+                    "microsecond": 120000
+                },
+                "TrainingEndTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 4,
+                    "day": 15,
+                    "hour": 11,
+                    "minute": 55,
+                    "second": 39,
+                    "microsecond": 354000
+                },
+                "InputDataConfig": {
+                    "DataFormat": "COMPREHEND_CSV",
+                    "EntityTypes": [
+                        {
+                            "Type": "EMAIL"
+                        },
+                        {
+                            "Type": "PHONE_NUMBER"
+                        },
+                        {
+                            "Type": "USERNAME"
+                        }
+                    ],
+                    "Documents": {
+                        "S3Uri": "s3://c7n-test-s3-bucket/sample.txt",
+                        "InputFormat": "ONE_DOC_PER_LINE"
+                    },
+                    "Annotations": {
+                        "S3Uri": "s3://c7n-test-s3-bucket/TrainingData5 - Sheet1.csv"
+                    }
+                },
+                "DataAccessRoleArn": "arn:aws:iam::644160558196:role/ComprehendVpcAccessRole",
+                "VpcConfig": {
+                    "SecurityGroupIds": [
+                        "sg-0d74b07ab0b3288c0"
+                    ],
+                    "Subnets": [
+                        "subnet-0ebe9abf587c5070c"
+                    ]
+                },
+                "VersionName": "12"
+            },
+            {
+                "EntityRecognizerArn": "arn:aws:comprehend:us-east-1:644160558196:entity-recognizer/TestVpcEntityRecognizer/version/KMS",
+                "LanguageCode": "en",
+                "Status": "IN_ERROR",
+                "Message": "NO_ACCESS_TO_KMS_KEY: Access denied to KMS Key: arn:aws:kms:us-east-1:644160558196:key/012af1cd-bef1-4ed5-b893-8b8d263ae6a4",
+                "SubmitTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 7,
+                    "day": 8,
+                    "hour": 13,
+                    "minute": 13,
+                    "second": 28,
+                    "microsecond": 931000
+                },
+                "EndTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 7,
+                    "day": 8,
+                    "hour": 13,
+                    "minute": 17,
+                    "second": 48,
+                    "microsecond": 10000
+                },
+                "TrainingEndTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 7,
+                    "day": 8,
+                    "hour": 13,
+                    "minute": 16,
+                    "second": 4,
+                    "microsecond": 199000
+                },
+                "InputDataConfig": {
+                    "DataFormat": "COMPREHEND_CSV",
+                    "EntityTypes": [
+                        {
+                            "Type": "EMAIL"
+                        },
+                        {
+                            "Type": "PHONE_NUMBER"
+                        },
+                        {
+                            "Type": "USERNAME"
+                        }
+                    ],
+                    "Documents": {
+                        "S3Uri": "s3://c7n-test-s3-bucket/sample.txt",
+                        "InputFormat": "ONE_DOC_PER_LINE"
+                    },
+                    "Annotations": {
+                        "S3Uri": "s3://c7n-test-s3-bucket/TrainingData5 - Sheet1.csv"
+                    }
+                },
+                "DataAccessRoleArn": "arn:aws:iam::644160558196:role/ComprehendVpcAccessRole",
+                "VolumeKmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/012af1cd-bef1-4ed5-b893-8b8d263ae6a4",
+                "VpcConfig": {
+                    "SecurityGroupIds": [
+                        "sg-0d74b07ab0b3288c0"
+                    ],
+                    "Subnets": [
+                        "subnet-0ebe9abf587c5070c"
+                    ]
+                },
+                "VersionName": "KMS"
+            },
+            {
+                "EntityRecognizerArn": "arn:aws:comprehend:us-east-1:644160558196:entity-recognizer/TestVpcEntityRecognizer/version/KMS-2",
+                "LanguageCode": "en",
+                "Status": "IN_ERROR",
+                "Message": "Amazon Comprehend can't process the request because there isn't enough capacity. Try again later.",
+                "SubmitTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 7,
+                    "day": 8,
+                    "hour": 13,
+                    "minute": 38,
+                    "second": 10,
+                    "microsecond": 871000
+                },
+                "EndTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 7,
+                    "day": 8,
+                    "hour": 18,
+                    "minute": 39,
+                    "second": 58,
+                    "microsecond": 582000
+                },
+                "TrainingEndTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 7,
+                    "day": 8,
+                    "hour": 18,
+                    "minute": 37,
+                    "second": 54,
+                    "microsecond": 528000
+                },
+                "InputDataConfig": {
+                    "DataFormat": "COMPREHEND_CSV",
+                    "EntityTypes": [
+                        {
+                            "Type": "APP_ID"
+                        }
+                    ],
+                    "Documents": {
+                        "S3Uri": "s3://c7n-test-s3-bucket/sample.txt",
+                        "InputFormat": "ONE_DOC_PER_LINE"
+                    },
+                    "EntityList": {
+                        "S3Uri": "s3://c7n-test-s3-bucket/TrainingData5 - Sheet1.csv"
+                    }
+                },
+                "DataAccessRoleArn": "arn:aws:iam::644160558196:role/ComprehendVpcAccessRole",
+                "VolumeKmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/20a0c3ed-99ff-4b38-92e6-e489628e0bfb",
+                "VpcConfig": {
+                    "SecurityGroupIds": [
+                        "sg-0d74b07ab0b3288c0"
+                    ],
+                    "Subnets": [
+                        "subnet-0ebe9abf587c5070c"
+                    ]
+                },
+                "VersionName": "KMS-2"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

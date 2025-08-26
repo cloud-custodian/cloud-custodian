@@ -2260,7 +2260,6 @@ def test_merge_locals_with_apply_time_values(tmp_path):
     }
 
 
-@pytest.mark.xfail(reason="https://github.com/cloud-custodian/cloud-custodian/issues/10119")
 def test_attribute_value_presence(tmp_path):
 
     resources = run_policy(

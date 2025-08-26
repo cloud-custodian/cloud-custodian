@@ -1,0 +1,11 @@
+{
+    "status_code": 404,
+    "data": {
+        "Error": {
+            "Code": "NoSuchWebsiteConfiguration",
+            "Message": "The specified bucket does not have a website configuration",
+            "BucketName": "sbx-mqrbuh-bucket-compliant"
+        },
+        "ResponseMetadata": {}
+    }
+}

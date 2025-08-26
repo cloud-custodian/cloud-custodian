@@ -3,7 +3,10 @@
 
 from pytest_terraform import terraform
 
+from tests.zpill import ACCOUNT_ID
+
 from .common import BaseTest
+from c7n.utils import local_session
 
 
 @terraform("quicksight_group")
@@ -18,6 +21,46 @@ def test_quicksight_group_query(test, quicksight_group):
     resources = policy.run()
     assert len(resources) > 0
     assert resources[0]['GroupName'] == 'tf-example'
+
+
+@terraform("quicksight_dashboard")
+def test_quicksight_dashboard(test, quicksight_dashboard):
+    session_factory = test.replay_flight_data("test_quicksight_dashboard")
+    client = session_factory().client("quicksight")
+    policy = test.load_policy({
+        "name": "test-aws-quicksight-dashboards",
+        'resource': 'aws.quicksight-dashboard',
+        'filters': [
+            {'tag:Owner': 'c7n'},
+        ],
+    }, session_factory=session_factory, config={'account_id': ACCOUNT_ID})
+
+    resources = policy.run()
+    test.assertEqual(len(resources), 1)
+
+    arn = resources[0]['Arn']
+    tags = client.list_tags_for_resource(ResourceArn=arn)["Tags"]
+    test.assertEqual(tags, resources[0]['Tags'])
+
+
+@terraform("quicksight_datasource")
+def test_quicksight_datasource(test, quicksight_datasource):
+    session_factory = test.replay_flight_data("test_quicksight_datasource")
+    client = session_factory().client("quicksight")
+    policy = test.load_policy({
+        "name": "test-aws-quicksight-datasource",
+        'resource': 'aws.quicksight-datasource',
+        'filters': [
+            {'tag:Owner': 'c7n'},
+        ],
+    }, session_factory=session_factory, config={'account_id': ACCOUNT_ID})
+
+    resources = policy.run()
+    test.assertEqual(len(resources), 1)
+
+    arn = resources[0]['Arn']
+    tags = client.list_tags_for_resource(ResourceArn=arn)["Tags"]
+    test.assertEqual(tags, resources[0]['Tags'])
 
 
 class TestQuicksight(BaseTest):
@@ -66,3 +109,35 @@ class TestQuicksight(BaseTest):
 
         resources = policy.run()
         self.assertEqual(resources, [])
+
+    def test_quicksight_user_query(self):
+        factory = self.replay_flight_data("test_quicksight_user_query")
+
+        policy = self.load_policy({
+            "name": "test-aws-quicksight-user",
+            "resource": "aws.quicksight-user"
+        }, session_factory=factory)
+
+        resources = policy.run()
+        self.assertGreater(len(resources), 0)
+        self.assertIn('UserName', resources[0])
+
+    def test_quicksight_user_delete(self):
+        factory = self.replay_flight_data("test_quicksight_user_delete")
+
+        policy = self.load_policy({
+            "name": "test-aws-quicksight-user-delete",
+            "resource": "aws.quicksight-user",
+            "actions": [{"type": "delete"}]
+        }, session_factory=factory)
+
+        resources = policy.run()
+        self.assertGreater(len(resources), 0)
+        self.assertIn('UserName', resources[0])
+
+        client = local_session(factory).client('quicksight')
+        users = client.list_users(
+            AwsAccountId=self.account_id,
+            Namespace='default'
+        )["UserList"]
+        self.assertEqual(len(users), 0)

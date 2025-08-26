@@ -147,3 +147,23 @@ class TestStorageLens(BaseTest):
                     ConfigId='test-3',
                     AccountId=self.account_id)
         self.assertEqual(e.exception.response['Error']['Code'], 'NoSuchConfiguration')
+
+
+class TestMultiRegionAccessPoint(BaseTest):
+
+    def test_s3_multi_region_access_point(self):
+        factory = self.replay_flight_data('test_s3_multi_region_access_point', region='us-west-2')
+        p = self.load_policy(
+            {
+                'name': 'mr-access-point',
+                'resource': 'aws.s3-access-point-multi',
+                'filters': [
+                    {'type': 'cross-account'}
+                ],
+            },
+            session_factory=factory,
+            config={'region': 'us-west-2'}
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
