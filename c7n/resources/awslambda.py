@@ -188,8 +188,6 @@ class AWSLambdaSigningConfigFilter(ValueFilter):
         sc = self.manager.get_resource_manager('code-signing-config')
         model = sc.get_model()
         configs = sc.resources()
-        if not configs:
-            return resources
 
         client = local_session(self.manager.session_factory).client('lambda')
 
@@ -209,7 +207,7 @@ class AWSLambdaSigningConfigFilter(ValueFilter):
                 for arn in f.result():
                     function_to_config[arn] = futures[f]
         for function in resources:
-            function[self.annotation_key] = function_to_config.get(function['FunctionArn'])
+            function[self.annotation_key] = function_to_config.get(function['FunctionArn']) or {}
         return super().process(resources, event)
 
     def __call__(self, i):
