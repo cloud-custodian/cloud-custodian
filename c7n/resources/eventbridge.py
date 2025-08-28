@@ -542,6 +542,7 @@ class StopPipe(BaseAction):
 
 @EventBridgePipes.action_registry.register('delete')
 class DeletePipe(BaseAction):
+    permissions = ('pipes:DeletePipe',)
     schema = type_schema('delete')
 
     def process(self, resources):
