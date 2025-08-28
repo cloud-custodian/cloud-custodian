@@ -511,7 +511,6 @@ class EventBridgePipes(QueryResourceManager):
 @EventBridgePipes.action_registry.register('tag')
 class TagPipe(Tag):
     permissions = ('pipes:TagResource',)
-    
     def process_resource_set(self, client, resources, new_tags):
         tags = {tag['Key']: tag['Value'] for tag in new_tags}
         for r in resources:
