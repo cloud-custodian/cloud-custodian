@@ -2,7 +2,7 @@ import pytest
 from pytest_terraform import terraform
 
 from .common import BaseTest
-from c7n.resources import cw
+from c7n.resources import eventbridge
 
 
 @pytest.mark.audited
@@ -243,13 +243,13 @@ class EventRuleTest(BaseTest):
                             'arn:aws:lambda:us-east-1:644160558196:function:custodian-code']
         }
         self.assertFalse(
-            cw.ValidEventRuleTargetFilter('event-rule').filter_unsupported_resources(r))
+            eventbridge.ValidEventRuleTargetFilter('event-rule').filter_unsupported_resources(r))
 
 
 class PipesTest(BaseTest):
 
     def test_event_bridge_pipes_tag(self):
-        factory = self.record_flight_data("test_event_bridge_pipes_tag")
+        factory = self.replay_flight_data("test_event_bridge_pipes_tag")
         p = self.load_policy(
             {
                 "name": "tag-event-bridge-pipes",
@@ -278,11 +278,11 @@ class PipesTest(BaseTest):
         self.assertEqual(response['Tags'], {})
 
     def test_event_bridge_pipes_stop(self):
-        factory = self.record_flight_data("test_event_bridge_pipes_stop", region="us-west-1")
+        factory = self.replay_flight_data("test_event_bridge_pipes_stop")
         p = self.load_policy(
             {
                 "name": "stop-event-bridge-pipes",
-                "resource": "aws.event-bridge-pipes",
+                "resource": "aws.eventbridge-pipes",
                 "filters": [{"Name": "c7n-test"}],
                 "actions": ["stop"],
             },
@@ -290,17 +290,16 @@ class PipesTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        client = factory().client("events")
+        client = factory().client("pipes")
         response = client.describe_pipe(Name=resources[0]['Name'])
-        breakpoint()
-        self.assertEqual(response['CurrentState'], 'STOPPED')
+        self.assertEqual(response['CurrentState'], 'STOPPING')
 
     def test_event_bridge_pipes_delete(self):
-        factory = self.record_flight_data("test_event_bridge_pipes_delete", region="us-west-1")
+        factory = self.record_flight_data("test_event_bridge_pipes_delete")
         p = self.load_policy(
             {
                 "name": "delete-event-bridge-pipes",
-                "resource": "aws.event-bridge-pipes",
+                "resource": "aws.eventbridge-pipes",
                 "filters": [{"Name": "c7n-test"}],
                 "actions": ["delete"],
             },
@@ -308,7 +307,6 @@ class PipesTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        client = factory().client("events")
-        remainder = client.list_pipes()["Pipes"]
-        breakpoint()
-        self.assertEqual(len(remainder), 0)
+        client = factory().client("pipes")
+        pipes = client.list_pipes()["Pipes"]
+        self.assertEqual(pipes[0]["CurrentState"], "DELETING")

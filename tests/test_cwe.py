@@ -9,6 +9,7 @@ from .common import event_data
 
 from c7n.cwe import CloudWatchEvents
 
+
 class JmespathEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, jmespath.parser.ParsedResult):

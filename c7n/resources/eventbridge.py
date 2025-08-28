@@ -9,11 +9,12 @@ from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.filters.related import ChildResourceFilter
 from c7n.manager import resources
-from c7n.query import ChildDescribeSource, ChildResourceManager, ChildResourceQuery, ConfigSource, DescribeWithResourceTags, QueryResourceManager, RetryPageIterator, TypeInfo
+from c7n.query import (ChildDescribeSource, ChildResourceManager, ChildResourceQuery, ConfigSource,
+    DescribeSource, DescribeWithResourceTags, QueryResourceManager, RetryPageIterator, TypeInfo)
 from c7n.resolver import ValuesFrom
 from c7n.resources import load_resources
 from c7n.resources.aws import ArnResolver
-from c7n.tags import universal_augment
+from c7n.tags import RemoveTag, Tag, universal_augment
 from c7n.utils import chunks, get_retry, local_session, type_schema
 
 
@@ -167,7 +168,7 @@ class EventRuleTargetFilter(EventChildResourceFilter):
                   value: "arn:aws:sqs:us-east-2:111111111111:my-queue"
     """
 
-    RelatedResource = "c7n.resources.cw.EventRuleTarget"
+    RelatedResource = "c7n.resources.eventbridge.EventRuleTarget"
     RelatedIdsExpression = 'Name'
     AnnotationKey = "EventRuleTargets"
 
@@ -195,7 +196,7 @@ class ValidEventRuleTargetFilter(EventChildResourceFilter):
                   all: true # defaults to false
     """
 
-    RelatedResource = "c7n.resources.cw.EventRuleTarget"
+    RelatedResource = "c7n.resources.eventbridge.EventRuleTarget"
     RelatedIdsExpression = 'Name'
     AnnotationKey = "EventRuleTargets"
 
@@ -473,6 +474,17 @@ class DeleteTarget(BaseAction):
                 Rule=rule_id,
                 EventBusName=event_bus)
 
+
+class EventBridgePipesDescribe(DescribeSource):
+
+    def augment(self, resources):
+        resources = super().augment(resources)
+        for r in resources:
+            if 'Tags' in r:
+                r['Tags'] = [{'Key': k, 'Value': v} for k, v in r['Tags'].items()]
+        return resources
+
+
 @resources.register('eventbridge-pipes')
 class EventBridgePipes(QueryResourceManager):
 
@@ -485,13 +497,32 @@ class EventBridgePipes(QueryResourceManager):
         id = name = 'Name'
         arn = 'Arn'
         cfn_type = 'AWS::Pipes::Pipe'
-        universal_taggable = object()
 
     retry = staticmethod(
         get_retry((
             'InternalException',
             'ConflictException',
             'ThrottlingException',)))
+    source_mapping = {
+        'describe': EventBridgePipesDescribe,
+    }
+
+
+@EventBridgePipes.action_registry.register('tag')
+class TagPipe(Tag):
+
+    def process_resource_set(self, client, resources, new_tags):
+        tags = {tag['Key']: tag['Value'] for tag in new_tags}
+        for r in resources:
+            self.manager.retry(client.tag_resource, resourceArn=r['Arn'], tags=tags)
+
+
+@EventBridgePipes.action_registry.register('remove-tag')
+class UntagTagPipe(RemoveTag):
+
+    def process_resource_set(self, client, resources, tags):
+        for r in resources:
+            self.manager.retry(client.untag_resource, resourceArn=r['Arn'], tagKeys=tags)
 
 
 @EventBridgePipes.action_registry.register('stop')
@@ -501,7 +532,11 @@ class StopPipe(BaseAction):
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('pipes')
         for resource in resources:
-            self.manager.retry(client.stop_pipe, Name=resource['Name'], ignore_err_codes=('NotFoundException',))
+            self.manager.retry(
+                client.stop_pipe,
+                Name=resource['Name'],
+                ignore_err_codes=('NotFoundException',)
+            )
 
 
 @EventBridgePipes.action_registry.register('delete')
@@ -511,4 +546,8 @@ class DeletePipe(BaseAction):
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('pipes')
         for resource in resources:
-            self.manager.retry(client.delete_pipe, Name=resource['Name'], ignore_err_codes=('NotFoundException',))
+            self.manager.retry(
+                client.delete_pipe,
+                Name=resource['Name'],
+                ignore_err_codes=('NotFoundException',)
+            )
