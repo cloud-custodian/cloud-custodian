@@ -528,6 +528,7 @@ class UntagTagPipe(RemoveTag):
 
 @EventBridgePipes.action_registry.register('stop')
 class StopPipe(BaseAction):
+    permissions = ('pipes:StopPipe',)
     schema = type_schema('stop')
 
     def process(self, resources):
