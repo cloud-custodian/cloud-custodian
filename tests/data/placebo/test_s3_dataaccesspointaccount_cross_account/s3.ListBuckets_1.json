@@ -1,0 +1,38 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Buckets": [
+            {
+                "Name": "sbx-mqrbuh-bucket-compliant",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 8,
+                    "day": 7,
+                    "hour": 21,
+                    "minute": 2,
+                    "second": 50,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "sbx-mqrbuh-bucket-noncompliant",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 8,
+                    "day": 7,
+                    "hour": 21,
+                    "minute": 2,
+                    "second": 50,
+                    "microsecond": 0
+                }
+            }
+       ],
+        "Owner": {
+            "DisplayName": "aws-us-sbx+put-cloud-ctls",
+            "ID": "9bc5907c3dcc0edea88a21fc6ada6f5e9120a2e204134503bb78f1492b1d287e"
+        }
+    }
+}
