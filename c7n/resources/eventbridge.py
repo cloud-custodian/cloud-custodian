@@ -520,6 +520,7 @@ class TagPipe(Tag):
 
 @EventBridgePipes.action_registry.register('remove-tag')
 class UntagTagPipe(RemoveTag):
+    permissions = ('pipes:UntagResource',)
 
     def process_resource_set(self, client, resources, tags):
         for r in resources:
