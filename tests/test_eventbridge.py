@@ -295,7 +295,7 @@ class PipesTest(BaseTest):
         self.assertEqual(response['CurrentState'], 'STOPPING')
 
     def test_event_bridge_pipes_delete(self):
-        factory = self.record_flight_data("test_event_bridge_pipes_delete")
+        factory = self.replay_flight_data("test_event_bridge_pipes_delete")
         p = self.load_policy(
             {
                 "name": "delete-event-bridge-pipes",
