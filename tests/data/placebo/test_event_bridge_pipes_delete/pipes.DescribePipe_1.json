@@ -1,0 +1,48 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Arn": "arn:aws:pipes:us-east-1:644160558196:pipe/c7n-test",
+        "Name": "c7n-test",
+        "DesiredState": "STOPPED",
+        "CurrentState": "STOPPED",
+        "StateReason": "User initiated",
+        "Source": "arn:aws:sqs:us-east-1:644160558196:origin-dev-test",
+        "SourceParameters": {
+            "SqsQueueParameters": {
+                "BatchSize": 1
+            }
+        },
+        "EnrichmentParameters": {},
+        "Target": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/pipes/c7n-test",
+        "TargetParameters": {},
+        "RoleArn": "arn:aws:iam::644160558196:role/service-role/Amazon_EventBridge_Pipe_Execution_831d6a25",
+        "Tags": {},
+        "CreationTime": {
+            "__class__": "datetime",
+            "year": 2025,
+            "month": 8,
+            "day": 28,
+            "hour": 10,
+            "minute": 40,
+            "second": 37,
+            "microsecond": 0
+        },
+        "LastModifiedTime": {
+            "__class__": "datetime",
+            "year": 2025,
+            "month": 8,
+            "day": 28,
+            "hour": 12,
+            "minute": 8,
+            "second": 41,
+            "microsecond": 0
+        },
+        "LogConfiguration": {
+            "CloudwatchLogsLogDestination": {
+                "LogGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/vendedlogs/pipes/c7n-test"
+            },
+            "Level": "ERROR"
+        }
+    }
+}
