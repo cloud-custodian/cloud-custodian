@@ -1,0 +1,74 @@
+{
+    "status_code": 200,
+    "data": {
+        "DeliveryStreamDescription": {
+            "DeliveryStreamName": "terraform-kinesis-firehose-extended-s3-test-stream-10",
+            "DeliveryStreamARN": "arn:aws:firehose:us-east-1:644160558196:deliverystream/terraform-kinesis-firehose-extended-s3-test-stream-10",
+            "DeliveryStreamStatus": "ACTIVE",
+            "DeliveryStreamEncryptionConfiguration": {
+                "Status": "DISABLED"
+            },
+            "DeliveryStreamType": "DirectPut",
+            "VersionId": "1",
+            "CreateTimestamp": {
+                "__class__": "datetime",
+                "year": 2025,
+                "month": 8,
+                "day": 20,
+                "hour": 10,
+                "minute": 54,
+                "second": 53,
+                "microsecond": 622000
+            },
+            "Destinations": [
+                {
+                    "DestinationId": "destinationId-644160558196",
+                    "S3DestinationDescription": {
+                        "RoleARN": "arn:aws:iam::644160558196:role/service-role/KinesisFirehoseServiceRole-PUT-S3-HFKce-us-east-1-1755701192910",
+                        "BucketARN": "arn:aws:s3:::test-c7n-brigade20231027135140188300000001",
+                        "Prefix": "",
+                        "BufferingHints": {
+                            "SizeInMBs": 5,
+                            "IntervalInSeconds": 300
+                        },
+                        "CompressionFormat": "UNCOMPRESSED",
+                        "EncryptionConfiguration": {
+                            "NoEncryptionConfig": "NoEncryption"
+                        },
+                        "CloudWatchLoggingOptions": {
+                            "Enabled": false
+                        }
+                    },
+                    "ExtendedS3DestinationDescription": {
+                        "RoleARN": "arn:aws:iam::644160558196:role/service-role/KinesisFirehoseServiceRole-PUT-S3-HFKce-us-east-1-1755701192910",
+                        "BucketARN": "arn:aws:s3:::test-c7n-brigade20231027135140188300000001",
+                        "Prefix": "",
+                        "BufferingHints": {
+                            "SizeInMBs": 5,
+                            "IntervalInSeconds": 300
+                        },
+                        "CompressionFormat": "UNCOMPRESSED",
+                        "EncryptionConfiguration": {
+                            "NoEncryptionConfig": "NoEncryption"
+                        },
+                        "CloudWatchLoggingOptions": {
+                            "Enabled": false
+                        },
+                        "ProcessingConfiguration": {
+                            "Enabled": false,
+                            "Processors": []
+                        },
+                        "S3BackupMode": "Disabled",
+                        "DataFormatConversionConfiguration": {
+                            "Enabled": false
+                        },
+                        "FileExtension": "",
+                        "CustomTimeZone": "UTC"
+                    }
+                }
+            ],
+            "HasMoreDestinations": false
+        },
+        "ResponseMetadata": {}
+    }
+}
