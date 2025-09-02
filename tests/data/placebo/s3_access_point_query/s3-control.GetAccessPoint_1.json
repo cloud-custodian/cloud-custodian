@@ -2,8 +2,8 @@
     "status_code": 200,
     "data": {
         "ResponseMetadata": {},
-        "Name": "c7n-ap-liberal-anemone",
-        "Bucket": "c7n-ap-liberal-anemone",
+        "Name": "c7n-ap-apparent-bulldog",
+        "Bucket": "c7n-ap-apparent-bulldog",
         "NetworkOrigin": "Internet",
         "PublicAccessBlockConfiguration": {
             "BlockPublicAcls": true,
@@ -13,13 +13,22 @@
         },
         "CreationDate": {
             "__class__": "datetime",
-            "year": 2021,
-            "month": 11,
-            "day": 22,
-            "hour": 17,
-            "minute": 24,
-            "second": 5,
+            "year": 2025,
+            "month": 9,
+            "day": 2,
+            "hour": 18,
+            "minute": 1,
+            "second": 47,
             "microsecond": 0
-        }
+        },
+        "Alias": "c7n-ap-apparent-bull-e6kb7536a8en9s9q8ox1piemn39q1use1b-s3alias",
+        "AccessPointArn": "arn:aws:s3:us-east-1:644160558196:accesspoint/c7n-ap-apparent-bulldog",
+        "Endpoints": {
+            "ipv4": "s3-accesspoint.us-east-1.amazonaws.com",
+            "fips": "s3-accesspoint-fips.us-east-1.amazonaws.com",
+            "fips_dualstack": "s3-accesspoint-fips.dualstack.us-east-1.amazonaws.com",
+            "dualstack": "s3-accesspoint.dualstack.us-east-1.amazonaws.com"
+        },
+        "BucketAccountId": "644160558196"
     }
 }

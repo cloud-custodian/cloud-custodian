@@ -1,12 +1,34 @@
 {
-    "status_code": 404,
+    "status_code": 200,
     "data": {
-        "Error": {
-            "Message": "The specified accesspoint does not exist",
-            "Code": "NoSuchAccessPoint",
-            "AccessPointName": "c7n-ap-liberal-anemone"
+        "ResponseMetadata": {},
+        "Name": "c7n-ap-no-policy-apparent-bulldog",
+        "Bucket": "c7n-ap-apparent-bulldog",
+        "NetworkOrigin": "Internet",
+        "PublicAccessBlockConfiguration": {
+            "BlockPublicAcls": true,
+            "IgnorePublicAcls": true,
+            "BlockPublicPolicy": false,
+            "RestrictPublicBuckets": false
         },
-        "HostId": "vXxC6U5Qfd+31g23s1w4B2B3I9V7pUZB53XKdZtpvpEasjzF0SRV3KiYhPlwkuOCZVObMKlHKCs=",
-        "ResponseMetadata": {}
+        "CreationDate": {
+            "__class__": "datetime",
+            "year": 2025,
+            "month": 9,
+            "day": 2,
+            "hour": 18,
+            "minute": 1,
+            "second": 47,
+            "microsecond": 0
+        },
+        "Alias": "c7n-ap-no-policy-app-9biamuc7wy3guaoqadkuq5hftgephuse1b-s3alias",
+        "AccessPointArn": "arn:aws:s3:us-east-1:644160558196:accesspoint/c7n-ap-no-policy-apparent-bulldog",
+        "Endpoints": {
+            "ipv4": "s3-accesspoint.us-east-1.amazonaws.com",
+            "fips": "s3-accesspoint-fips.us-east-1.amazonaws.com",
+            "fips_dualstack": "s3-accesspoint-fips.dualstack.us-east-1.amazonaws.com",
+            "dualstack": "s3-accesspoint.dualstack.us-east-1.amazonaws.com"
+        },
+        "BucketAccountId": "644160558196"
     }
 }

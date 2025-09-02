@@ -1,0 +1,12 @@
+{
+    "status_code": 404,
+    "data": {
+        "Error": {
+            "Message": "The specified accesspoint does not exist",
+            "Code": "NoSuchAccessPoint",
+            "AccessPointName": "c7n-ap-apparent-bulldog"
+        },
+        "HostId": "BlQZSmgj6IbuAiStLAMoacuBR+BvsWmPksgLQNOIKJWmdr9uW7lYBqHKj9zq8xntZUsniqu+iE8=",
+        "ResponseMetadata": {}
+    }
+}

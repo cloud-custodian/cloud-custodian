@@ -55,9 +55,12 @@ class AccessPointCrossAccount(CrossAccountAccessFilter):
             if self.policy_attribute in r:
                 continue
             arn = Arn.parse(r['AccessPointArn'])
-            r[self.policy_attribute] = client.get_access_point_policy(
-                AccountId=arn.account_id, Name=r['Name']
-            ).get('Policy')
+            resp = self.manager.retry(
+                client.get_access_point_policy,
+                AccountId=arn.account_id, Name=r['Name'],
+                ignore_err_codes=('NoSuchAccessPointPolicy',),
+            )
+            r[self.policy_attribute] = resp.get('Policy') if resp else None
 
         return super().process(resources, event)
 

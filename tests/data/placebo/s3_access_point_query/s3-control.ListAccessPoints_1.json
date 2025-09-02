@@ -4,10 +4,20 @@
         "ResponseMetadata": {},
         "AccessPointList": [
             {
-                "Name": "c7n-ap-liberal-anemone",
+                "Name": "c7n-ap-apparent-bulldog",
                 "NetworkOrigin": "Internet",
-                "Bucket": "c7n-ap-liberal-anemone",
-                "AccessPointArn": "arn:aws:s3:us-east-2:644160558196:accesspoint/c7n-ap-liberal-anemone"
+                "Bucket": "c7n-ap-apparent-bulldog",
+                "AccessPointArn": "arn:aws:s3:us-east-1:644160558196:accesspoint/c7n-ap-apparent-bulldog",
+                "Alias": "c7n-ap-apparent-bull-e6kb7536a8en9s9q8ox1piemn39q1use1b-s3alias",
+                "BucketAccountId": "644160558196"
+            },
+            {
+                "Name": "c7n-ap-no-policy-apparent-bulldog",
+                "NetworkOrigin": "Internet",
+                "Bucket": "c7n-ap-apparent-bulldog",
+                "AccessPointArn": "arn:aws:s3:us-east-1:644160558196:accesspoint/c7n-ap-no-policy-apparent-bulldog",
+                "Alias": "c7n-ap-no-policy-app-9biamuc7wy3guaoqadkuq5hftgephuse1b-s3alias",
+                "BucketAccountId": "644160558196"
             }
         ]
     }

@@ -9,7 +9,7 @@ from .common import (
 )
 
 
-@terraform('s3_access_point', teardown=terraform.TEARDOWN_IGNORE)
+@terraform('s3_access_point', teardown=terraform.TEARDOWN_IGNORE, replay=False)
 def test_s3_access_point(test, s3_access_point):
     factory = test.record_flight_data('s3_access_point_query')
     client = factory().client('s3control')
