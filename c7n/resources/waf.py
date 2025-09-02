@@ -352,7 +352,7 @@ class WAFV2ListAllRulesFilter(ListItemFilter):
                 })
                 continue
 
-            # Customer Managed Rule Groups
+            # Customer Managed Rule Groups Caching
             if rule_group_ref:
                 arn = rule_group_ref['ARN']
                 scope = resource['Scope']
@@ -366,7 +366,7 @@ class WAFV2ListAllRulesFilter(ListItemFilter):
                     "Rules": rg.get('Rules', [])
                 })
 
-            # AWS Managed Rule Groups
+            # AWS Managed Rule Groups Caching
             elif managed_group_ref:
                 vendor = managed_group_ref['VendorName']
                 name = managed_group_ref['Name']
