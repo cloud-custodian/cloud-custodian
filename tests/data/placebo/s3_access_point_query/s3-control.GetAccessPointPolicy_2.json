@@ -1,12 +1,7 @@
 {
-    "status_code": 404,
+    "status_code": 200,
     "data": {
-        "Error": {
-            "Message": "The specified accesspoint policy does not exist",
-            "Code": "NoSuchAccessPointPolicy",
-            "AccessPointName": "c7n-ap-no-policy-apparent-bulldog"
-        },
-        "HostId": "oFfBqix/tYltLaqCDqjabZqjZ1lIwaQlUnb2Koxw7JhJ8wOwEVufqfM1hLPquHpqU1sabYQiwROBsCT6YILqBBYSjh0E3xY51j2fyK4JL/E=",
-        "ResponseMetadata": {}
+        "ResponseMetadata": {},
+        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::644160558196:root\"},\"Action\":[\"s3:GetObject\",\"s3:PutObject\"],\"Resource\":\"arn:aws:s3:us-east-1:644160558196:accesspoint/c7n-ap-rapid-serval/object/*\"}]}"
     }
 }

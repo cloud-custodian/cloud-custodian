@@ -4,19 +4,19 @@
         "ResponseMetadata": {},
         "AccessPointList": [
             {
-                "Name": "c7n-ap-apparent-bulldog",
+                "Name": "c7n-ap-no-policy-rapid-serval",
                 "NetworkOrigin": "Internet",
-                "Bucket": "c7n-ap-apparent-bulldog",
-                "AccessPointArn": "arn:aws:s3:us-east-1:644160558196:accesspoint/c7n-ap-apparent-bulldog",
-                "Alias": "c7n-ap-apparent-bull-e6kb7536a8en9s9q8ox1piemn39q1use1b-s3alias",
+                "Bucket": "c7n-ap-rapid-serval",
+                "AccessPointArn": "arn:aws:s3:us-east-1:644160558196:accesspoint/c7n-ap-no-policy-rapid-serval",
+                "Alias": "c7n-ap-no-policy-rap-mp3ynbo4gbxh79tokx9t5jx46izbhuse1b-s3alias",
                 "BucketAccountId": "644160558196"
             },
             {
-                "Name": "c7n-ap-no-policy-apparent-bulldog",
+                "Name": "c7n-ap-rapid-serval",
                 "NetworkOrigin": "Internet",
-                "Bucket": "c7n-ap-apparent-bulldog",
-                "AccessPointArn": "arn:aws:s3:us-east-1:644160558196:accesspoint/c7n-ap-no-policy-apparent-bulldog",
-                "Alias": "c7n-ap-no-policy-app-9biamuc7wy3guaoqadkuq5hftgephuse1b-s3alias",
+                "Bucket": "c7n-ap-rapid-serval",
+                "AccessPointArn": "arn:aws:s3:us-east-1:644160558196:accesspoint/c7n-ap-rapid-serval",
+                "Alias": "c7n-ap-rapid-serval-s83ok3nwaogkt9fs9dndwctwidtwsuse1a-s3alias",
                 "BucketAccountId": "644160558196"
             }
         ]

@@ -4,9 +4,9 @@
         "Error": {
             "Message": "The specified accesspoint does not exist",
             "Code": "NoSuchAccessPoint",
-            "AccessPointName": "c7n-ap-apparent-bulldog"
+            "AccessPointName": "c7n-ap-rapid-serval"
         },
-        "HostId": "BlQZSmgj6IbuAiStLAMoacuBR+BvsWmPksgLQNOIKJWmdr9uW7lYBqHKj9zq8xntZUsniqu+iE8=",
+        "HostId": "eahKiAtgaGFSSeno4Kd3MMzCepIXmSCL5yWOS//5sL1HIu81nXVHbMUx3kgX3z1pBRgIC/aCE70=",
         "ResponseMetadata": {}
     }
 }
