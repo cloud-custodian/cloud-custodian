@@ -128,3 +128,39 @@ def test_athena_named_query(test, athena_named_query):
     resources = policy.run()
     assert len(resources) > 0
     assert resources[0]["Database"] == athena_named_query["aws_athena_named_query.foo.database"]
+
+
+def test_athena_query_execution_list(test):
+    factory = test.replay_flight_data("test_athena_query_execution_list")
+    policy = test.load_policy(
+        {
+            "name": "test-athena-query-execution-list",
+            "resource": "aws.athena-query-execution",
+        },
+        session_factory=factory,
+    )
+    resources = policy.run()
+    assert len(resources) > 0
+    assert all("QueryExecutionId" in r for r in resources)
+
+
+def test_athena_query_execution_runtime_statistics(test):
+    factory = test.replay_flight_data("test_athena_query_execution_runtime_statistics")
+    policy = test.load_policy(
+        {
+            "name": "test-athena-query-execution-runtime-stats",
+            "resource": "aws.athena-query-execution",
+            "filters": [
+                {
+                    "type": "runtime-statistics",
+                    "key": "QueryRuntimeStatistics.Timeline.TotalExecutionTimeInMillis",
+                    "op": "greater-than",
+                    "value": 1000,
+                }
+            ],
+        },
+        session_factory=factory,
+    )
+    resources = policy.run()
+    assert len(resources) > 0
+    assert "QueryRuntimeStatistics" in resources[0]
