@@ -7,6 +7,7 @@ from c7n.utils import type_schema, local_session
 from c7n.filters.core import ValueFilter
 
 from .aws import shape_validate
+from botocore.exceptions import ClientError
 
 
 @resources.register("athena-named-query")
@@ -144,7 +145,7 @@ class RuntimeStatisticsFilter(ValueFilter):
                 stats = resp.get("QueryRuntimeStatistics")
                 if stats is not None:
                     r["QueryRuntimeStatistics"] = stats
-            except Exception:
+            except ClientError:
                 # If API is not available/authorized, leave as-is and let matching fail
                 pass
         return super(RuntimeStatisticsFilter, self).process(resources, event)

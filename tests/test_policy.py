@@ -897,6 +897,7 @@ class PolicyMetaLint(BaseTest):
         whitelist_explicit = {
             'securityhub-finding', 'ssm-patch-group',
             'appdiscovery-agent', 'athena-named-query',
+            'athena-query-execution',
             'rest-account', 'shield-protection', 'shield-attack',
             'dlm-policy', 'efs', 'efs-mount-target', 'gamelift-build',
             'glue-connection', 'glue-dev-endpoint', 'cloudhsm-cluster',
