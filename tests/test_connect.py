@@ -145,3 +145,27 @@ class ConnectCampaignTest(BaseTest):
             }, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 2)
+
+
+class ConnectAnalyticsAssociationTest(BaseTest):
+
+    def test_connect_analytics_association_query(self):
+        session_factory = self.replay_flight_data(
+            "test_connect_analytics_association_query")
+        p = self.load_policy(
+            {
+                "name": "connect-analytics-association-query",
+                "resource": "connect-analytics-association",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "TargetAccountId",
+                        "op": "ne",
+                        "value": "644160558197"
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
