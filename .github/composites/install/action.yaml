@@ -29,7 +29,7 @@ runs:
       id: cache
       with:
         path: .venv
-        key: venv-${{ runner.os }}-${{ inputs.python-version }}-${{ hashFiles('uv.lock') }}
+        key: venv-${{ runner.os }}-${{ inputs.python-version }}-${{ hashFiles('uv.lock') }}-v2
 
     - name: Update PATH
       shell: bash
