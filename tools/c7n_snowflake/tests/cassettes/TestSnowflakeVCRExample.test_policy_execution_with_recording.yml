@@ -1,0 +1,111 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json
+      Authorization:
+      - REDACTED
+      User-Agent:
+      - python_api/1.7.0
+    method: GET
+    uri: https://scngbcm-lzb91549.snowflakecomputing.com/api/v2/warehouses
+  response:
+    body:
+      string: "[ {\n  \"name\" : \"COMPUTE_WH\",\n  \"warehouse_type\" : \"STANDARD\",\n
+        \ \"warehouse_size\" : \"X-Small\",\n  \"wait_for_completion\" : null,\n  \"max_cluster_count\"
+        : 1,\n  \"min_cluster_count\" : 1,\n  \"scaling_policy\" : \"STANDARD\",\n
+        \ \"auto_suspend\" : 30,\n  \"auto_resume\" : \"true\",\n  \"initially_suspended\"
+        : null,\n  \"resource_monitor\" : null,\n  \"comment\" : null,\n  \"enable_query_acceleration\"
+        : \"false\",\n  \"query_acceleration_max_scale_factor\" : 8,\n  \"max_concurrency_level\"
+        : 8,\n  \"statement_queued_timeout_in_seconds\" : 0,\n  \"statement_timeout_in_seconds\"
+        : 172800,\n  \"type\" : \"STANDARD\",\n  \"size\" : \"X-Small\",\n  \"state\"
+        : \"SUSPENDED\",\n  \"started_clusters\" : 0,\n  \"running\" : 0,\n  \"queued\"
+        : 0,\n  \"is_default\" : true,\n  \"is_current\" : true,\n  \"available\"
+        : \"\",\n  \"provisioning\" : \"\",\n  \"quiescing\" : \"\",\n  \"other\"
+        : \"\",\n  \"created_on\" : \"1970-01-21T07:18:56.734+00:00\",\n  \"resumed_on\"
+        : \"1970-01-21T07:44:51.646+00:00\",\n  \"updated_on\" : \"1970-01-21T07:44:51.646+00:00\",\n
+        \ \"owner\" : \"ACCOUNTADMIN\",\n  \"budget\" : null,\n  \"kind\" : null,\n
+        \ \"owner_role_type\" : \"ROLE\",\n  \"warehouse_credit_limit\" : null,\n
+        \ \"target_statement_size\" : null\n}, {\n  \"name\" : \"MY_WH\",\n  \"warehouse_type\"
+        : \"STANDARD\",\n  \"warehouse_size\" : \"Small\",\n  \"wait_for_completion\"
+        : null,\n  \"max_cluster_count\" : 1,\n  \"min_cluster_count\" : 1,\n  \"scaling_policy\"
+        : \"STANDARD\",\n  \"auto_suspend\" : 30,\n  \"auto_resume\" : \"true\",\n
+        \ \"initially_suspended\" : null,\n  \"resource_monitor\" : null,\n  \"comment\"
+        : null,\n  \"enable_query_acceleration\" : \"false\",\n  \"query_acceleration_max_scale_factor\"
+        : 8,\n  \"max_concurrency_level\" : 8,\n  \"statement_queued_timeout_in_seconds\"
+        : 0,\n  \"statement_timeout_in_seconds\" : 172800,\n  \"type\" : \"STANDARD\",\n
+        \ \"size\" : \"Small\",\n  \"state\" : \"SUSPENDED\",\n  \"started_clusters\"
+        : 0,\n  \"running\" : 0,\n  \"queued\" : 0,\n  \"is_default\" : false,\n  \"is_current\"
+        : false,\n  \"available\" : \"\",\n  \"provisioning\" : \"\",\n  \"quiescing\"
+        : \"\",\n  \"other\" : \"\",\n  \"created_on\" : \"1970-01-21T07:40:37.866+00:00\",\n
+        \ \"resumed_on\" : \"1970-01-21T07:40:37.866+00:00\",\n  \"updated_on\" :
+        \"1970-01-21T07:43:13.773+00:00\",\n  \"owner\" : \"ACCOUNTADMIN\",\n  \"budget\"
+        : null,\n  \"kind\" : null,\n  \"owner_role_type\" : \"ROLE\",\n  \"warehouse_credit_limit\"
+        : null,\n  \"target_statement_size\" : null\n}, {\n  \"name\" : \"SNOWFLAKE_LEARNING_WH\",\n
+        \ \"warehouse_type\" : \"STANDARD\",\n  \"warehouse_size\" : \"X-Small\",\n
+        \ \"wait_for_completion\" : null,\n  \"max_cluster_count\" : 1,\n  \"min_cluster_count\"
+        : 1,\n  \"scaling_policy\" : \"STANDARD\",\n  \"auto_suspend\" : 600,\n  \"auto_resume\"
+        : \"true\",\n  \"initially_suspended\" : null,\n  \"resource_monitor\" : null,\n
+        \ \"comment\" : \"Created by Snowflake during account provisioning\",\n  \"enable_query_acceleration\"
+        : \"false\",\n  \"query_acceleration_max_scale_factor\" : 8,\n  \"max_concurrency_level\"
+        : 8,\n  \"statement_queued_timeout_in_seconds\" : 0,\n  \"statement_timeout_in_seconds\"
+        : 172800,\n  \"type\" : \"STANDARD\",\n  \"size\" : \"X-Small\",\n  \"state\"
+        : \"SUSPENDED\",\n  \"started_clusters\" : 0,\n  \"running\" : 0,\n  \"queued\"
+        : 0,\n  \"is_default\" : false,\n  \"is_current\" : false,\n  \"available\"
+        : \"\",\n  \"provisioning\" : \"\",\n  \"quiescing\" : \"\",\n  \"other\"
+        : \"\",\n  \"created_on\" : \"1970-01-21T07:18:56.700+00:00\",\n  \"resumed_on\"
+        : \"1970-01-21T07:18:56.700+00:00\",\n  \"updated_on\" : \"1970-01-21T07:18:56.700+00:00\",\n
+        \ \"owner\" : \"ACCOUNTADMIN\",\n  \"budget\" : null,\n  \"kind\" : null,\n
+        \ \"owner_role_type\" : \"ROLE\",\n  \"warehouse_credit_limit\" : null,\n
+        \ \"target_statement_size\" : null\n}, {\n  \"name\" : \"SYSTEM$STREAMLIT_NOTEBOOK_WH\",\n
+        \ \"warehouse_type\" : \"STANDARD\",\n  \"warehouse_size\" : \"X-Small\",\n
+        \ \"wait_for_completion\" : null,\n  \"max_cluster_count\" : 1,\n  \"min_cluster_count\"
+        : 1,\n  \"scaling_policy\" : \"STANDARD\",\n  \"auto_suspend\" : 60,\n  \"auto_resume\"
+        : \"true\",\n  \"initially_suspended\" : null,\n  \"resource_monitor\" : null,\n
+        \ \"comment\" : null,\n  \"enable_query_acceleration\" : \"false\",\n  \"query_acceleration_max_scale_factor\"
+        : 8,\n  \"max_concurrency_level\" : 2,\n  \"statement_queued_timeout_in_seconds\"
+        : 0,\n  \"statement_timeout_in_seconds\" : 172800,\n  \"type\" : \"STANDARD\",\n
+        \ \"size\" : \"X-Small\",\n  \"state\" : \"SUSPENDED\",\n  \"started_clusters\"
+        : 0,\n  \"running\" : 0,\n  \"queued\" : 0,\n  \"is_default\" : false,\n  \"is_current\"
+        : false,\n  \"available\" : \"\",\n  \"provisioning\" : \"\",\n  \"quiescing\"
+        : \"\",\n  \"other\" : \"\",\n  \"created_on\" : \"1970-01-21T07:18:56.697+00:00\",\n
+        \ \"resumed_on\" : \"1970-01-21T07:18:56.697+00:00\",\n  \"updated_on\" :
+        \"1970-01-21T07:18:56.698+00:00\",\n  \"owner\" : \"ACCOUNTADMIN\",\n  \"budget\"
+        : null,\n  \"kind\" : null,\n  \"owner_role_type\" : \"ROLE\",\n  \"warehouse_credit_limit\"
+        : null,\n  \"target_statement_size\" : null\n} ]"
+    headers:
+      Content-Type:
+      - application/json
+      Date:
+      - Sat, 23 Aug 2025 16:47:42 GMT
+      Expect-Ct:
+      - enforce, max-age=3600
+      Server:
+      - SF-LB
+      Strict-Transport-Security:
+      - max-age=31536000
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding, User-Agent
+      X-Content-Type-Options:
+      - nosniff
+      X-Envoy-Attempt-Count:
+      - '1'
+      X-Envoy-Upstream-Service-Time:
+      - '298'
+      X-Frame-Options:
+      - deny
+      X-Snowflake-Fe-Config:
+      - v20250818.1.0-bf985c3e.1755548440.prod3.1755967551015
+      X-Snowflake-Fe-Instance:
+      - envoy-ingress-prod3-cpp8k
+      X-Snowflake-Request-Id:
+      - e41ac6a7-db86-45b8-9331-8433b7f3f4f0
+      X-Xss-Protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
+version: 1
