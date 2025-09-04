@@ -91,7 +91,7 @@ class Kinesis(BaseTest):
             DeliveryStream.resource_type, "enum_spec",
             ('list_delivery_streams', 'DeliveryStreamNames', {'Limit': 5})
         )
-        factory = self.record_flight_data("test_kinesis_hose_paginate")
+        factory = self.replay_flight_data("test_kinesis_hose_paginate")
         p = self.load_policy(
             {
                 "name": "paginate_hole",
