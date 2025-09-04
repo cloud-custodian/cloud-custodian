@@ -1,0 +1,80 @@
+{
+    "status_code": 200,
+    "data": {
+        "DeliveryStreamDescription": {
+            "DeliveryStreamName": "PUT-S3-HFKce",
+            "DeliveryStreamARN": "arn:aws:firehose:us-east-1:644160558196:deliverystream/PUT-S3-HFKce",
+            "DeliveryStreamStatus": "ACTIVE",
+            "DeliveryStreamEncryptionConfiguration": {
+                "Status": "DISABLED"
+            },
+            "DeliveryStreamType": "DirectPut",
+            "VersionId": "1",
+            "CreateTimestamp": {
+                "__class__": "datetime",
+                "year": 2025,
+                "month": 8,
+                "day": 20,
+                "hour": 10,
+                "minute": 47,
+                "second": 58,
+                "microsecond": 894000
+            },
+            "Destinations": [
+                {
+                    "DestinationId": "destinationId-644160558196",
+                    "S3DestinationDescription": {
+                        "RoleARN": "arn:aws:iam::644160558196:role/service-role/KinesisFirehoseServiceRole-PUT-S3-HFKce-us-east-1-1755701192910",
+                        "BucketARN": "arn:aws:s3:::test-c7n-brigade20231027135140188300000001",
+                        "Prefix": "stash",
+                        "ErrorOutputPrefix": "",
+                        "BufferingHints": {
+                            "SizeInMBs": 5,
+                            "IntervalInSeconds": 300
+                        },
+                        "CompressionFormat": "UNCOMPRESSED",
+                        "EncryptionConfiguration": {
+                            "NoEncryptionConfig": "NoEncryption"
+                        },
+                        "CloudWatchLoggingOptions": {
+                            "Enabled": true,
+                            "LogGroupName": "/aws/kinesisfirehose/PUT-S3-HFKce",
+                            "LogStreamName": "DestinationDelivery"
+                        }
+                    },
+                    "ExtendedS3DestinationDescription": {
+                        "RoleARN": "arn:aws:iam::644160558196:role/service-role/KinesisFirehoseServiceRole-PUT-S3-HFKce-us-east-1-1755701192910",
+                        "BucketARN": "arn:aws:s3:::test-c7n-brigade20231027135140188300000001",
+                        "Prefix": "stash",
+                        "ErrorOutputPrefix": "",
+                        "BufferingHints": {
+                            "SizeInMBs": 5,
+                            "IntervalInSeconds": 300
+                        },
+                        "CompressionFormat": "UNCOMPRESSED",
+                        "EncryptionConfiguration": {
+                            "NoEncryptionConfig": "NoEncryption"
+                        },
+                        "CloudWatchLoggingOptions": {
+                            "Enabled": true,
+                            "LogGroupName": "/aws/kinesisfirehose/PUT-S3-HFKce",
+                            "LogStreamName": "DestinationDelivery"
+                        },
+                        "ProcessingConfiguration": {
+                            "Enabled": false,
+                            "Processors": []
+                        },
+                        "S3BackupMode": "Disabled",
+                        "DataFormatConversionConfiguration": {
+                            "Enabled": false
+                        },
+                        "FileExtension": "",
+                        "CustomTimeZone": "UTC"
+                    }
+                }
+            ],
+            "HasMoreDestinations": false
+        },
+        "ResponseMetadata": {}
+    }
+}

@@ -1,5 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+from c7n.resources.kinesis import DeliveryStream
 from .common import BaseTest, event_data
 
 
@@ -84,6 +85,22 @@ class Kinesis(BaseTest):
         self.assertEqual(
             resources[0]['CrossAccountViolations'][0]['Resource'],
             'arn:aws:kinesis:us-east-1:644160558196:stream/test-stream-2')
+
+    def test_hose_paginate(self):
+        self.patch(
+            DeliveryStream.resource_type, "enum_spec",
+            ('list_delivery_streams', 'DeliveryStreamNames', {'Limit': 5})
+        )
+        factory = self.replay_flight_data("test_kinesis_hose_paginate")
+        p = self.load_policy(
+            {
+                "name": "paginate_hole",
+                "resource": "firehose"
+            },
+            session_factory=factory
+        )
+        resources = p.run()
+        assert len(resources) == 12
 
     def test_hose_query(self):
         factory = self.replay_flight_data("test_kinesis_hose_query")
