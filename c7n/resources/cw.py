@@ -1396,4 +1396,3 @@ class CanaryStateFilter(ValueFilter):
 
     def __call__(self, r):
         return self.match(r.get('Status', {}).get('State'))
-    
