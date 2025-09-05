@@ -1,0 +1,62 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "b777f201-ccef-11e6-b659-ed6e259ccfdb", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "b777f201-ccef-11e6-b659-ed6e259ccfdb", 
+                "vary": "Accept-Encoding", 
+                "content-length": "11625", 
+                "content-type": "text/xml", 
+                "date": "Wed, 28 Dec 2016 11:21:02 GMT"
+            }
+        }, 
+        "DBClusterSnapshots": [
+            {
+                "AvailabilityZones": [
+                    "us-east-1a",
+                    "us-east-1b",
+                    "us-east-1c"
+                ],
+                "DBClusterSnapshotIdentifier": "test-cluster-final-snapshot",
+                "DBClusterIdentifier": "test-cluster",
+                "SnapshotCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 2,
+                    "day": 19,
+                    "hour": 15,
+                    "minute": 37,
+                    "second": 8,
+                    "microsecond": 707000
+                },
+                "Engine": "docdb",
+                "AllocatedStorage": 0,
+                "Status": "available",
+                "Port": 0,
+                "VpcId": "vpc-d2d616b5",
+                "ClusterCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 1,
+                    "day": 15,
+                    "hour": 19,
+                    "minute": 18,
+                    "second": 24,
+                    "microsecond": 830000
+                },
+                "MasterUsername": "admintest",
+                "EngineVersion": "3.6.0",
+                "LicenseModel": "docdb",
+                "SnapshotType": "manual",
+                "PercentProgress": 100,
+                "StorageEncrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/b10f842a-feb7-4318-92d5-0640a75b7688",
+                "DBClusterSnapshotArn": "arn:aws:rds:us-east-1:644160558196:cluster-snapshot:test-cluster-final-snapshot",
+                "IAMDatabaseAuthenticationEnabled": false
+            }
+        ]
+    }
+}
