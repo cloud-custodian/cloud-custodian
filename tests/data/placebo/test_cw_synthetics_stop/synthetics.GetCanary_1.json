@@ -1,0 +1,78 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Canary": {
+            "Id": "3bd6ed9c-1eab-4aa0-9e15-1d3b51f6507d",
+            "Name": "c7n-test-canary-stop",
+            "Code": {
+                "Handler": "pageLoadBlueprint.handler"
+            },
+            "ExecutionRoleArn": "arn:aws:iam::644160558196:role/service-role/CloudWatchSyntheticsRole-c7n-test-canary-stop-800-474eec3cfc67",
+            "Schedule": {
+                "Expression": "rate(5 minutes)",
+                "DurationInSeconds": 0,
+                "RetryConfig": {
+                    "MaxRetries": 0
+                }
+            },
+            "RunConfig": {
+                "TimeoutInSeconds": 300,
+                "MemoryInMB": 1500,
+                "ActiveTracing": false,
+                "EphemeralStorage": 1024
+            },
+            "SuccessRetentionPeriodInDays": 31,
+            "FailureRetentionPeriodInDays": 31,
+            "Status": {
+                "State": "STOPPING"
+            },
+            "Timeline": {
+                "Created": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 9,
+                    "day": 1,
+                    "hour": 12,
+                    "minute": 31,
+                    "second": 26,
+                    "microsecond": 31000
+                },
+                "LastModified": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 9,
+                    "day": 1,
+                    "hour": 20,
+                    "minute": 13,
+                    "second": 13,
+                    "microsecond": 48000
+                },
+                "LastStarted": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 9,
+                    "day": 1,
+                    "hour": 20,
+                    "minute": 11,
+                    "second": 12,
+                    "microsecond": 599000
+                },
+                "LastStopped": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 9,
+                    "day": 1,
+                    "hour": 19,
+                    "minute": 7,
+                    "second": 52,
+                    "microsecond": 657000
+                }
+            },
+            "ArtifactS3Location": "cw-syn-results-644160558196-us-east-1/canary/us-east-1/c7n-test-canary-stop-800-474eec3cfc67",
+            "RuntimeVersion": "syn-nodejs-puppeteer-11.0",
+            "ProvisionedResourceCleanup": "AUTOMATIC",
+            "Tags": {}
+        }
+    }
+}
