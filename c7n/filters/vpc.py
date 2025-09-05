@@ -82,6 +82,7 @@ class SubnetFilter(MatchResourceValidator, RelatedResourceFilter):
     schema_alias = True
     RelatedResource = "c7n.resources.vpc.Subnet"
     AnnotationKey = "matched-subnets"
+    required_keys = set()
 
     def get_permissions(self):
         perms = super().get_permissions()
@@ -96,13 +97,19 @@ class SubnetFilter(MatchResourceValidator, RelatedResourceFilter):
         self.check_nat = self.data.get('nat')
 
     def match(self, related):
-        if self.check_igw in [True, False]:
-            if not self.match_igw(related):
-                return False
-        if self.check_nat in [True, False]:
-            if not self.match_nat(related):
-                return False
-        return super().match(related)
+        op = all if self.data.get('operator', 'and') == 'and' else any
+
+        # If the policy doesn't define value filter keys, implicitly
+        # pass and skip the value filter match.
+        value_match = {'key', 'value'}.difference(self.data) or super().match(related)
+
+        return op(
+            (
+                self.match_igw(related),
+                self.match_nat(related),
+                value_match,
+            )
+        )
 
     def process(self, resources, event=None):
         related = self.get_related(resources)
@@ -122,6 +129,8 @@ class SubnetFilter(MatchResourceValidator, RelatedResourceFilter):
         return route_tables
 
     def match_igw(self, subnet):
+        if self.check_igw is None:
+            return True
         rtable = self.route_tables.get(
             subnet['SubnetId'],
             self.route_tables.get(subnet['VpcId']))
@@ -140,6 +149,8 @@ class SubnetFilter(MatchResourceValidator, RelatedResourceFilter):
         return False
 
     def match_nat(self, subnet):
+        if self.check_nat is None:
+            return True
         rtable = self.route_tables.get(
             subnet['SubnetId'],
             self.route_tables.get(subnet['VpcId']))
