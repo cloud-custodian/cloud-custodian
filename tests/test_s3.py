@@ -3804,6 +3804,7 @@ class S3Test(BaseTest):
         assert {bucket["Name"] for bucket in resources} == {"bucket-with-data-events"}
 
     def test_s3_dataaccesspointaccount_cross_account(self):
+        self.patch(s3.S3, "executor_factory", MainThreadExecutor)
         session_factory = self.replay_flight_data("test_s3_dataaccesspointaccount_cross_account")
 
         p = self.load_policy(
