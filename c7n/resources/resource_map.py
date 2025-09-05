@@ -50,6 +50,7 @@ ResourceMap = {
   "aws.cloudsearch": "c7n.resources.cloudsearch.CloudSearch",
   "aws.cloudtrail": "c7n.resources.cloudtrail.CloudTrail",
   "aws.cloudwatch-dashboard": "c7n.resources.cw.CloudWatchDashboard",
+  "aws.cloudwatch-synthetics": "c7n.resources.cw.SyntheticsCanary",
   "aws.codebuild": "c7n.resources.code.CodeBuildProject",
   "aws.codebuild-credential": "c7n.resources.code.CodeBuildSourceCredentials",
   "aws.codecommit": "c7n.resources.code.CodeRepository",

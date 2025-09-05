@@ -10,7 +10,7 @@ import botocore.exceptions
 from botocore.config import Config
 
 from c7n import query
-from c7n.actions import BaseAction
+from c7n.actions import Action, BaseAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import Filter, MetricsFilter
 from c7n.filters.core import parse_date, ValueFilter
@@ -1296,3 +1296,103 @@ class DeliveryDestinationDelete(BaseAction):
                 ignore_err_codes=('ResourceNotFoundException',),
                 name=r['name'],
             )
+
+
+@resources.register('cloudwatch-synthetics')
+class SyntheticsCanary(QueryResourceManager):
+    """AWS CloudWatch Synthetics Canary
+
+    Example:
+        .. code-block:: yaml
+
+            policies:
+              - name: stop-failed-canaries
+                resource: aws.cloudwatch-synthetics
+                filters:
+                  - State.CurrentStatus.State: FAILED
+                actions:
+                  - type: delete
+    """
+
+    class resource_type(TypeInfo):
+        service = 'synthetics'
+        id = 'Id'
+        name = 'Name'
+        date = 'Created'
+        arn_type = 'canary'
+        arn = 'Arn'
+        dimension = 'CanaryName'
+        config_type = cfn_type = 'AWS::Synthetics::Canary'
+        enum_spec = ('describe_canaries', 'Canaries', None)
+        detail_spec = ('get_canary', 'Name', 'Name' 'Canary')
+        universal_taggable = True
+
+    permissions = (
+    "synthetics:DescribeCanaries",
+    "synthetics:ListTagsForResource",
+    "synthetics:StartCanary",
+    "synthetics:StopCanary",
+    "synthetics:DeleteCanary",)
+
+    def augment(self, resources):
+        client = local_session(self.session_factory).client('synthetics')
+        region = self.config.region
+
+        sts = local_session(self.session_factory).client('sts')
+        real_account_id = sts.get_caller_identity()["Account"]
+
+        for r in resources:
+            arn = r.get("Arn")
+            if not arn:
+                arn = f"arn:aws:synthetics:{region}:{real_account_id}:canary:{r['Name']}"
+                r["Arn"] = arn
+            # AWS returns tags as a dict { "Key": "Value" }
+            tag_dict = client.list_tags_for_resource(ResourceArn=arn).get("Tags", {})
+
+            # Custodian expects [{"Key": k, "Value": v}, ...]
+            r["Tags"] = [{"Key": k, "Value": v} for k, v in tag_dict.items()]
+
+        return resources
+
+
+@SyntheticsCanary.action_registry.register('start')
+class StartCanary(BaseAction):
+    schema = type_schema('start')
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('synthetics')
+        for r in resources:
+            client.start_canary(Name=r['Name'])
+
+
+@SyntheticsCanary.action_registry.register('stop')
+class StopCanary(BaseAction):
+    schema = type_schema('stop')
+
+    def process(self, resources):
+        """Stop all running resources"""
+        client = local_session(self.manager.session_factory).client('synthetics')
+        for r in resources:
+            client.stop_canary(Name=r['Name'])
+
+
+@SyntheticsCanary.action_registry.register('delete')
+class DeleteCanary(BaseAction):
+    schema = type_schema('delete')
+
+    def process(self, resources):
+        """Delete resources"""
+        client = local_session(self.manager.session_factory).client('synthetics')
+        for r in resources:
+            client.delete_canary(Name=r['Name'])
+
+
+@SyntheticsCanary.filter_registry.register('state')
+class CanaryStateFilter(ValueFilter):
+    """Filter canaries by their current state"""
+
+    schema = type_schema('state', rinherit=ValueFilter.schema)
+    permissions = ('synthetics:DescribeCanaries',)
+
+    def __call__(self, r):
+        return self.match(r.get('Status', {}).get('State'))
