@@ -10,7 +10,7 @@ import botocore.exceptions
 from botocore.config import Config
 
 from c7n import query
-from c7n.actions import Action, BaseAction
+from c7n.actions import BaseAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import Filter, MetricsFilter
 from c7n.filters.core import parse_date, ValueFilter
@@ -1396,3 +1396,4 @@ class CanaryStateFilter(ValueFilter):
 
     def __call__(self, r):
         return self.match(r.get('Status', {}).get('State'))
+    
