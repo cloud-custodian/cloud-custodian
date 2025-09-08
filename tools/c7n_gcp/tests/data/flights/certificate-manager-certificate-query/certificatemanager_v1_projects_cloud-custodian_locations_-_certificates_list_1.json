@@ -1,0 +1,42 @@
+{
+  "certificates": [
+    {
+      "name": "projects/cloud-custodian/locations/global/certificates/test-certificate-1",
+      "description": "Test certificate 1 for Cloud Custodian testing",
+      "createTime": "2023-01-15T10:30:00.000Z",
+      "updateTime": "2023-01-15T10:30:00.000Z",
+      "labels": {
+        "environment": "test",
+        "team": "cloud-custodian",
+        "purpose": "unit-testing"
+      },
+      "certificate": {
+        "pemCertificate": "-----BEGIN CERTIFICATE-----\nMIIDXTCCAkWgAwIBAgIJAKoK/heBjcOuMA0GCSqGSIb3DQEBBQUAMEUxCzAJBgNV\nBAYTAkFVMRMwEQYDVQQIDApTb21lLVN0YXRlMSEwHwYDVQQKDBhJbnRlcm5ldCBX\naWRnaXRzIFB0eSBMdGQwHhcNMTMwOTI5MTQwNTQwWhcNMjMwOTI3MTQwNTQwWjBF\nMQswCQYDVQQGEwJBVTETMBEGA1UECAwKU29tZS1TdGF0ZTEhMB8GA1UECgwYSW50\nZXJuZXQgV2lkZ2l0cyBQdHkgTHRkMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIB\nCgKCAQEAvpnKvgRFufQs7RFHz7kGq8/r1+RhTGatRBwY65DwkEV7WGNKaECMhBMu\n7n1B3V9cpHpuT8LpCOOyFYT7YHlUd5wm8T5VlJ3Y8J5VO8yW9tT5qyO7dR4uQ4Pd\n...\n-----END CERTIFICATE-----"
+      },
+      "sanDnsnames": [
+        "test-cert-1.example.com",
+        "*.test-cert-1.example.com"
+      ],
+      "scope": "DEFAULT"
+    },
+    {
+      "name": "projects/cloud-custodian/locations/global/certificates/test-certificate-2", 
+      "description": "Test certificate 2 for Cloud Custodian testing",
+      "createTime": "2023-01-16T11:30:00.000Z",
+      "updateTime": "2023-01-16T11:30:00.000Z",
+      "labels": {
+        "environment": "prod",
+        "team": "cloud-custodian",
+        "purpose": "production-use"
+      },
+      "certificate": {
+        "pemCertificate": "-----BEGIN CERTIFICATE-----\nMIIDXTCCAkWgAwIBAgIJAKoK/heBjcOvMA0GCSqGSIb3DQEBBQUAMEUxCzAJBgNV\nBAYTAkFVMRMwEQYDVQQIDApTb21lLVN0YXRlMSEwHwYDVQQKDBhJbnRlcm5ldCBX\naWRnaXRzIFB0eSBMdGQwHhcNMTMwOTI5MTQwNTQxWhcNMjMwOTI3MTQwNTQxWjBF\nMQswCQYDVQQGEwJBVTETMBEGA1UECAwKU29tZS1TdGF0ZTEhMB8GA1UECgwYSW50\nZXJuZXQgV2lkZ2l0cyBQdHkgTHRkMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIB\nCgKCAQEAvpnKvgRFufQs7RFHz7kGq8/r1+RhTGatRBwY65DwkEV7WGNKaECMhBMu\n7n1B3V9cpHpuT8LpCOOyFYT7YHlUd5wm8T5VlJ3Y8J5VO8yW9tT5qyO7dR4uQ4Pd\n...\n-----END CERTIFICATE-----"
+      },
+      "sanDnsnames": [
+        "test-cert-2.example.com",
+        "*.test-cert-2.example.com"
+      ],
+      "scope": "DEFAULT"
+    }
+  ]
+}
