@@ -2,6 +2,8 @@
     "status_code": 200,
     "data": {
         "ResponseMetadata": {},
-        "Tags": {}
+        "Tags": {
+            "MyTagKey": "MyTagValue"
+        }
     }
 }

@@ -4,8 +4,8 @@ from .common import BaseTest
 class SyntheticsCanaryTest(BaseTest):
 
     def test_canary_filter_by_tag(self):
-        # factory = self.replay_flight_data("test_cw_synthetics_tag_filter")
-        factory = self.record_flight_data("test_cw_synthetics_tag_filter")
+        factory = self.replay_flight_data("test_cw_synthetics_tag_filter")
+        # factory = self.record_flight_data("test_cw_synthetics_tag_filter")
         canary_name = "c7n-test-canary-tag"
 
         p = self.load_policy(
@@ -25,8 +25,8 @@ class SyntheticsCanaryTest(BaseTest):
         self.assertEqual(resources[0].get("c7n:MatchedFilters"), ["tag:MyTagKey"])
 
     def test_delete_canary(self):
-        # factory = self.replay_flight_data("test_cw_synthetics_delete")
-        factory = self.record_flight_data("test_cw_synthetics_delete")
+        factory = self.replay_flight_data("test_cw_synthetics_delete")
+        # factory = self.record_flight_data("test_cw_synthetics_delete")
         client = factory().client("synthetics")
 
         canary_name = "c7n-test-canary-delete"
@@ -48,8 +48,8 @@ class SyntheticsCanaryTest(BaseTest):
         self.assertFalse(any(c["Name"] == canary_name for c in canaries))
 
     def test_stop_canary(self):
-        # factory = self.replay_flight_data("test_cw_synthetics_stop")
-        factory = self.record_flight_data("test_cw_synthetics_stop")
+        factory = self.replay_flight_data("test_cw_synthetics_stop")
+        # factory = self.record_flight_data("test_cw_synthetics_stop")
         client = factory().client("synthetics")
 
         canary_name = "c7n-test-canary-stop"
@@ -71,8 +71,8 @@ class SyntheticsCanaryTest(BaseTest):
         self.assertIn(desc["Canary"]["Status"]["State"], ["STOPPED", "STOPPING"])
 
     def test_start_canary(self):
-        # factory = self.replay_flight_data("test_cw_synthetics_start")
-        factory = self.record_flight_data("test_cw_synthetics_start")
+        factory = self.replay_flight_data("test_cw_synthetics_start")
+        # factory = self.record_flight_data("test_cw_synthetics_start")
         client = factory().client("synthetics")
 
         canary_name = "c7n-test-canary-start"
