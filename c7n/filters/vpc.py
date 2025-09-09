@@ -63,8 +63,6 @@ class SubnetFilter(MatchResourceValidator, RelatedResourceFilter):
                operator: or
                igw: True
                nat: True
-               key: SubnetId
-               value: present
 
     """
 
