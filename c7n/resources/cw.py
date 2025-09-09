@@ -1322,16 +1322,16 @@ class SyntheticsCanary(QueryResourceManager):
         arn_type = 'canary'
         arn = 'Arn'
         dimension = 'CanaryName'
-        config_type = cfn_type = 'AWS::Synthetics::Canary'
+        cfn_type = 'AWS::Synthetics::Canary'
         enum_spec = ('describe_canaries', 'Canaries', None)
         universal_taggable = True
-
-    permissions = (
-    "synthetics:DescribeCanaries",
-    "synthetics:ListTagsForResource",
-    "synthetics:StartCanary",
-    "synthetics:StopCanary",
-    "synthetics:DeleteCanary",)
+        permissions_augment = (
+                "synthetics:DescribeCanaries",
+                "synthetics:ListTagsForResource",
+                "synthetics:StartCanary",
+                "synthetics:StopCanary",
+                "synthetics:DeleteCanary"
+            )
 
     def augment(self, resources):
         client = local_session(self.session_factory).client('synthetics')
@@ -1358,6 +1358,8 @@ class SyntheticsCanary(QueryResourceManager):
 class StartCanary(BaseAction):
     schema = type_schema('start')
 
+    permissions = ('synthetics:StartCanary',)
+
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('synthetics')
         for r in resources:
@@ -1367,6 +1369,8 @@ class StartCanary(BaseAction):
 @SyntheticsCanary.action_registry.register('stop')
 class StopCanary(BaseAction):
     schema = type_schema('stop')
+
+    permissions = ('synthetics:StopCanary',)
 
     def process(self, resources):
         """Stop all running resources"""
@@ -1378,6 +1382,8 @@ class StopCanary(BaseAction):
 @SyntheticsCanary.action_registry.register('delete')
 class DeleteCanary(BaseAction):
     schema = type_schema('delete')
+
+    permissions = ('synthetics:DeleteCanary',)
 
     def process(self, resources):
         """Delete resources"""
