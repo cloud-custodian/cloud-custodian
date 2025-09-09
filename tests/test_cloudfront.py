@@ -693,7 +693,7 @@ class CloudFront(BaseTest):
                             "Logging": {
                                 "Enabled": True,
                                 "IncludeCookies": False,
-                                "Bucket": 'test-logging.s3.amazonaws.com',
+                                "Bucket": 'e3q5uc7sqll7mn-cloudfront-log-test.s3.amazonaws.com',
                                 "Prefix": '',
                             }
                         }
