@@ -823,7 +823,7 @@ def merge_dict(a, b):
     Any subdictionaries will be recursively merged.
     Any leaf elements in the form of scalar will use the value from B.
     If A is a str and B is a list, A will be inserted into the front of the list.
-    If A is a list and B is a str, B will be appended to the list
+    If A is a list and B is a str, B will be appended to the list.
     If there are two lists for the same key, the lists will be merged
     deduplicated with values in A first, followed by any additional values from B.
     """

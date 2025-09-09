@@ -199,7 +199,6 @@ class UtilTest(BaseTest):
                      'userName': [
                          {'anything-but': 'deputy'}]}}})
 
-
     def test_merge_dict_iam_condition(self):
         a = {
             "Bool": {
