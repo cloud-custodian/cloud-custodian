@@ -846,6 +846,7 @@ class DistributionUpdateAction(BaseUpdateAction):
 
     def process_distribution(self, client, distribution):
         try:
+
             res = client.get_distribution_config(
                 Id=distribution[self.manager.get_model().id])
             default_config = self.validation_config
@@ -853,7 +854,7 @@ class DistributionUpdateAction(BaseUpdateAction):
 
             # Recursively merge config to allow piecemeal updates of
             # nested structures
-            updatedConfig = merge_dict(config, self.data['attributes'])
+            updatedConfig = merge_dict(self.data['attributes'], config)
             if config == updatedConfig:
                 return
             res = client.update_distribution(
