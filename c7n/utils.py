@@ -839,6 +839,8 @@ def merge_dict(a, b):
                     d[k].append(val)
         elif isinstance(v, str) and isinstance(d[k], list) and v not in d[k]:
             d[k].append(v)
+        elif isinstance(v, str) and isinstance(d[k], list) and v in d[k]:
+            continue
         elif isinstance(v, list) and isinstance(d[k], str) and d[k] in v:
             d[k] = v
         elif isinstance(v, list) and isinstance(d[k], str) and d[k] not in v:
