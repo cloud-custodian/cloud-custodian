@@ -65,11 +65,11 @@ class Snapshot(QueryResourceManager):
         )
 
     def resources(self, query=None):
-        qfilters = SnapshotQueryParser.parse(self.data.get('query', []))
         query = query or {}
-        if qfilters:
-            query['Filters'] = qfilters
-        if query.get('OwnerIds') is None:
+        queries = SnapshotQueryParser.parse(self.data.get('query', []))
+        for q in queries:
+            query.update(q)
+        if 'OwnerIds' not in query:
             query['OwnerIds'] = ['self']
         if 'MaxResults' not in query:
             query['MaxResults'] = 1000
@@ -136,20 +136,27 @@ class ErrorHandler:
 class SnapshotQueryParser(QueryParser):
 
     QuerySchema = {
-        'description': str,
-        'owner-alias': ('amazon', 'amazon-marketplace', 'microsoft'),
-        'owner-id': str,
-        'progress': str,
-        'snapshot-id': str,
-        'start-time': str,
-        'status': ('pending', 'completed', 'error'),
-        'tag': str,
-        'tag-key': str,
-        'volume-id': str,
-        'volume-size': str,
+        'Filters': {
+            'description': str,
+            'owner-alias': ('amazon', 'amazon-marketplace', 'microsoft'),
+            'owner-id': str,
+            'progress': str,
+            'snapshot-id': str,
+            'start-time': str,
+            'status': ('pending', 'completed', 'error'),
+            'tag': str,
+            'tag-key': str,
+            'volume-id': str,
+            'volume-size': str,
+        },
+        'OwnerIds': str,
+        'RestorableByUserIds': str,
+        'SnapshotIds': str,
+        'MaxResults': int,
     }
+    single_value_fields = ('MaxResults',)
 
-    type_name = 'EBS'
+    type_name = 'EBS Snapshot'
 
 
 @Snapshot.action_registry.register('tag')
