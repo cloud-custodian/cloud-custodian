@@ -846,8 +846,8 @@ def merge_dict(a, b):
             if d[k] in v:
                 d[k] = v
             else:
-                v.insert(0, d[k])
-                d[k] = v
+                d[k] = [d[k]]
+                d[k].extend(v)
         elif k in d and isinstance(v, (int, str, float, bool)):
             d[k] = v
         else:

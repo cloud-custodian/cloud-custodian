@@ -185,7 +185,8 @@ class UtilTest(BaseTest):
                 'detail': {
                     'eventName': 'CreateSubnet',
                     'eventSource': ['ec2.amazonaws.com'],
-                    'resources': [{'id': 1}]
+                    'resources': [{'id': 1}],
+                    'statusCode': 'Pending'
                 },
                 'detail-type': ['AWS API Call via CloudTrail']
             }
@@ -194,6 +195,8 @@ class UtilTest(BaseTest):
                 'detail': {
                     'eventName': 'UpdateSubnet',
                     'resources': [{'id': 2}],
+                    'eventSource': 's3.amazonaws.com',
+                    'statusCode': ['Success', 'Failure'],
                     'userIdentity': {
                         'userName': [{'anything-but': 'deputy'}]
                     }
@@ -207,8 +210,9 @@ class UtilTest(BaseTest):
                 'detail-type': ['AWS API Call via CloudTrail'],
                 'detail': {
                     'eventName': 'UpdateSubnet',
-                    'eventSource': ['ec2.amazonaws.com'],
+                    'eventSource': ['ec2.amazonaws.com', 's3.amazonaws.com'],
                     'resources': [{'id': 1}, {'id': 2}],
+                    'statusCode': ['Pending', 'Success', 'Failure'],
                     'userIdentity': {
                         'userName': [{'anything-but': 'deputy'}]
                     }
