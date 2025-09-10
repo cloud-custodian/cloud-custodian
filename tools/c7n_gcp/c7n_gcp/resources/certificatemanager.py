@@ -26,7 +26,7 @@ class CertificateManagerCertificate(QueryResourceManager):
         scope_key = 'parent'
         name = 'name'
         id = 'name'
-        labels = True
+        labels = False  # Disable automatic label registration
         labels_op = 'patch'
         default_report_fields = [
             'name', 'description', 'createTime', 'updateTime',
@@ -107,6 +107,9 @@ class CertificateSetLabelsAction(SetLabelsAction):
 
     permissions = ('certificatemanager.certs.update',)
 
+    def get_permissions(self):
+        return self.permissions
+
 
 @CertificateManagerCertificate.action_registry.register('mark-for-op')
 class CertificateMarkForOpAction(LabelDelayedAction):
@@ -126,3 +129,6 @@ class CertificateMarkForOpAction(LabelDelayedAction):
     """
 
     permissions = ('certificatemanager.certs.update',)
+
+    def get_permissions(self):
+        return self.permissions
