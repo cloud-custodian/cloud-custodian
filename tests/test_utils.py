@@ -181,23 +181,40 @@ class UtilTest(BaseTest):
                 'a': 1, 'b': 2, 'c': 3, 'x': 1}
 
     def test_merge_dict(self):
-        a = {'detail': {'eventName': 'CreateSubnet',
-                        'eventSource': ['ec2.amazonaws.com']},
-             'detail-type': ['AWS API Call via CloudTrail']}
-        b = {'detail': {
-            'eventName': 'UpdateSubnet',
-            'userIdentity': {
-            'userName': [{'anything-but': 'deputy'}]}}}
+        a = {
+                'detail': {
+                    'eventName': 'CreateSubnet',
+                    'eventSource': ['ec2.amazonaws.com'],
+                    'resources': [{'id': 1}]
+                },
+                'detail-type': ['AWS API Call via CloudTrail']
+            }
+        b = {
+                'awsregion': 'us-east-1',
+                'detail': {
+                    'eventName': 'UpdateSubnet',
+                    'resources': [{'id': 2}],
+                    'userIdentity': {
+                        'userName': [{'anything-but': 'deputy'}]
+                    }
+                }
+            }
 
         self.assertEqual(
             utils.merge_dict(a, b),
-            {'detail-type': ['AWS API Call via CloudTrail'],
-             'detail': {
-                 'eventName': 'UpdateSubnet',
-                 'eventSource': ['ec2.amazonaws.com'],
-                 'userIdentity': {
-                     'userName': [
-                         {'anything-but': 'deputy'}]}}})
+            {
+                'awsregion': 'us-east-1',
+                'detail-type': ['AWS API Call via CloudTrail'],
+                'detail': {
+                    'eventName': 'UpdateSubnet',
+                    'eventSource': ['ec2.amazonaws.com'],
+                    'resources': [{'id': 1}, {'id': 2}],
+                    'userIdentity': {
+                        'userName': [{'anything-but': 'deputy'}]
+                    }
+                }
+            }
+        )
 
     def test_merge_dict_iam_condition(self):
         a = {
