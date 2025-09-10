@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:lambda:us-east-1:644160558196:event-source-mapping:332f71ae-ddb2-4bc2-a876-54d99204fdd7",
+                "Tags": [
+                    {
+                        "Key": "test",
+                        "Value": "policyfoundry"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
