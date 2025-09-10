@@ -5,7 +5,6 @@ class SyntheticsCanaryTest(BaseTest):
 
     def test_canary_filter_by_tag(self):
         factory = self.replay_flight_data("test_cw_synthetics_tag_filter")
-        # factory = self.record_flight_data("test_cw_synthetics_tag_filter")
         canary_name = "c7n-test-canary-tag"
 
         p = self.load_policy(
@@ -26,7 +25,6 @@ class SyntheticsCanaryTest(BaseTest):
 
     def test_delete_canary(self):
         factory = self.replay_flight_data("test_cw_synthetics_delete")
-        # factory = self.record_flight_data("test_cw_synthetics_delete")
         client = factory().client("synthetics")
 
         canary_name = "c7n-test-canary-delete"
@@ -49,7 +47,6 @@ class SyntheticsCanaryTest(BaseTest):
 
     def test_stop_canary(self):
         factory = self.replay_flight_data("test_cw_synthetics_stop")
-        # factory = self.record_flight_data("test_cw_synthetics_stop")
         client = factory().client("synthetics")
 
         canary_name = "c7n-test-canary-stop"
@@ -67,12 +64,10 @@ class SyntheticsCanaryTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         desc = client.get_canary(Name=canary_name)
-        # self.assertEqual(desc["Canary"]["Status"]["State"], "STOPPED")
         self.assertIn(desc["Canary"]["Status"]["State"], ["STOPPED", "STOPPING"])
 
     def test_start_canary(self):
         factory = self.replay_flight_data("test_cw_synthetics_start")
-        # factory = self.record_flight_data("test_cw_synthetics_start")
         client = factory().client("synthetics")
 
         canary_name = "c7n-test-canary-start"

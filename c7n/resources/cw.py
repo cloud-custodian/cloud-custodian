@@ -1,5 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import functools
 import itertools
 import re
 from collections import defaultdict
@@ -25,7 +26,7 @@ from c7n.resolver import ValuesFrom
 from c7n.resources import load_resources
 from c7n.resources.aws import ArnResolver
 from c7n.tags import universal_augment
-from c7n.utils import type_schema, local_session, chunks, get_retry, jmespath_search
+from c7n.utils import generate_arn, type_schema, local_session, chunks, get_retry, jmespath_search
 
 
 class DescribeAlarm(DescribeSource):
@@ -1318,38 +1319,33 @@ class SyntheticsCanary(QueryResourceManager):
         service = 'synthetics'
         id = 'Id'
         name = 'Name'
-        date = 'Created'
+        date = 'LastModified'
         arn_type = 'canary'
-        arn = 'Arn'
         dimension = 'CanaryName'
         cfn_type = 'AWS::Synthetics::Canary'
         enum_spec = ('describe_canaries', 'Canaries', None)
-        universal_taggable = True
-        permissions_augment = (
-                "synthetics:DescribeCanaries",
-                "synthetics:ListTagsForResource",
-                "synthetics:StartCanary",
-                "synthetics:StopCanary",
-                "synthetics:DeleteCanary"
-            )
+        universal_taggable = object()
+
+    @property
+    def generate_arn(self):
+        """
+         Sample arn: arn:aws:synthetics:us-east-1::canary:test-canary
+         This method overrides c7n.utils.generate_arn and drops
+         account id from the generic arn.
+        """
+        if self._generate_arn is None:
+            self._generate_arn = functools.partial(
+                generate_arn,
+                self.resource_type.service,
+                region=self.config.region,
+                resource_type=self.resource_type.arn_type)
+        return self._generate_arn
 
     def augment(self, resources):
-        client = local_session(self.session_factory).client('synthetics')
-        region = self.config.region
-
-        sts = local_session(self.session_factory).client('sts')
-        real_account_id = sts.get_caller_identity()["Account"]
-
         for r in resources:
-            arn = r.get("Arn")
-            if not arn:
-                arn = f"arn:aws:synthetics:{region}:{real_account_id}:canary:{r['Name']}"
-                r["Arn"] = arn
             # AWS returns tags as a dict { "Key": "Value" }
-            tag_dict = client.list_tags_for_resource(ResourceArn=arn).get("Tags", {})
-
             # Custodian expects [{"Key": k, "Value": v}, ...]
-            r["Tags"] = [{"Key": k, "Value": v} for k, v in tag_dict.items()]
+            r["Tags"] = [{"Key": k, "Value": v} for k, v in r["Tags"].items()]
 
         return resources
 
@@ -1390,14 +1386,3 @@ class DeleteCanary(BaseAction):
         client = local_session(self.manager.session_factory).client('synthetics')
         for r in resources:
             client.delete_canary(Name=r['Name'])
-
-
-@SyntheticsCanary.filter_registry.register('state')
-class CanaryStateFilter(ValueFilter):
-    """Filter canaries by their current state"""
-
-    schema = type_schema('state', rinherit=ValueFilter.schema)
-    permissions = ('synthetics:DescribeCanaries',)
-
-    def __call__(self, r):
-        return self.match(r.get('Status', {}).get('State'))
