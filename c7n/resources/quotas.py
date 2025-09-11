@@ -140,7 +140,7 @@ class UsageFilter(MetricsFilter):
             - name: service-quota-usage-limit
               description: |
                   find any services that have usage stats of
-                  over 80%
+                  over 19%
               resource: aws.service-quota
               filters:
                 - UsageMetric: present
@@ -148,7 +148,7 @@ class UsageFilter(MetricsFilter):
                   limit: 19
     """
 
-    schema = type_schema('usage-metric', limit={'type': 'integer'}, min_period={'type': 'integer'})
+    schema = type_schema('usage-metric', limit={'type': 'integer'}, min_period={'type': 'integer'}, hard_limit={'type': 'integer'})
 
     cloudwatch_max_datapoints = 1440
     # https://boto3.amazonaws.com/v1/documentation/api/1.35.9/reference/services/cloudwatch/client/get_metric_statistics.html
@@ -211,6 +211,7 @@ class UsageFilter(MetricsFilter):
 
         limit = self.data.get('limit', 80)
         min_period = max(self.data.get('min_period', 300), self.cloudwatch_min_period)
+        hard_limit = self.data.get('hard_limit', None)
 
         result = []
 
@@ -273,6 +274,8 @@ class UsageFilter(MetricsFilter):
                         'quota': quota,
                         'metric_scale': metric_scale,
                     }
+                    if hard_limit is not None:
+                        r[self.annotation_key]['hard_limit'] = float(hard_limit)
                     result.append(r)
         return result
 
@@ -354,6 +357,12 @@ class Increase(Action):
             count = math.ceil(float(multiplier) * r['Value'])
             if not r['Adjustable']:
                 continue
+            # Skip if quota equals hard_limit
+            if 'c7n:UsageMetric' in r and 'hard_limit' in r['c7n:UsageMetric'] and r['c7n:UsageMetric']['quota'] == r['c7n:UsageMetric']['hard_limit']:
+                continue
+            # Cap count at hard_limit if it exceeds it
+            if 'c7n:UsageMetric' in r and 'hard_limit' in r['c7n:UsageMetric'] and count > r['c7n:UsageMetric']['hard_limit']:
+                count = int(r['c7n:UsageMetric']['hard_limit'])
             try:
                 client.request_service_quota_increase(
                     ServiceCode=r['ServiceCode'],
