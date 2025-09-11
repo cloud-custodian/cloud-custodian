@@ -145,15 +145,16 @@ class FirehoseQuery(ResourceQuery):
     # https://docs.aws.amazon.com/firehose/latest/APIReference/API_ListDeliveryStreams.html
     # https://docs.aws.amazon.com/kinesis/latest/APIReference/API_ListStreams.html
     def _invoke_client_enum(self, client, enum_op, params, path, retry=None):
-        data = self._enumerate_firehoses(client, enum_op, params, path)
+
+        data = self._enumerate_firehoses(client, enum_op, params, path, retry)
         return data
 
-    def _enumerate_firehoses(self, client, enum_op, params, path):
+    def _enumerate_firehoses(self, client, enum_op, params, path, retry):
         path = jmespath_compile(path)
         op = getattr(client, enum_op)
         data = []
         while True:
-            result = op(**params)
+            result = retry(op, **params)
             data.extend(path.search(result))
             if not result.get('HasMoreDeliveryStreams', False):
                 break
