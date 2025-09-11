@@ -148,7 +148,12 @@ class UsageFilter(MetricsFilter):
                   limit: 19
     """
 
-    schema = type_schema('usage-metric', limit={'type': 'integer'}, min_period={'type': 'integer'}, hard_limit={'type': 'integer'})
+    schema = type_schema(
+        'usage-metric',
+        limit={'type': 'integer'},
+        min_period={'type': 'integer'},
+        hard_limit={'type': 'integer'}
+    )
 
     cloudwatch_max_datapoints = 1440
     # https://boto3.amazonaws.com/v1/documentation/api/1.35.9/reference/services/cloudwatch/client/get_metric_statistics.html
@@ -358,10 +363,14 @@ class Increase(Action):
             if not r['Adjustable']:
                 continue
             # Skip if quota equals hard_limit
-            if 'c7n:UsageMetric' in r and 'hard_limit' in r['c7n:UsageMetric'] and r['c7n:UsageMetric']['quota'] == r['c7n:UsageMetric']['hard_limit']:
+            if ('c7n:UsageMetric' in r and
+                    'hard_limit' in r['c7n:UsageMetric'] and
+                    r['c7n:UsageMetric']['quota'] == r['c7n:UsageMetric']['hard_limit']):
                 continue
             # Cap count at hard_limit if it exceeds it
-            if 'c7n:UsageMetric' in r and 'hard_limit' in r['c7n:UsageMetric'] and count > r['c7n:UsageMetric']['hard_limit']:
+            if ('c7n:UsageMetric' in r and
+                    'hard_limit' in r['c7n:UsageMetric'] and
+                    count > r['c7n:UsageMetric']['hard_limit']):
                 count = int(r['c7n:UsageMetric']['hard_limit'])
             try:
                 client.request_service_quota_increase(
