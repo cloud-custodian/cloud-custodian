@@ -77,6 +77,76 @@ class TestQuotas(BaseTest):
         # In a real scenario, this would cap the requested value at the hard_limit
         self.assertEqual(len(resources), 1)
 
+    def test_request_increase_hard_limit_skip_when_quota_equals_hard_limit(self):
+        """Test that request-increase skips when quota equals hard_limit"""
+        from c7n.resources.quotas import Increase
+        from unittest.mock import Mock, patch
+        
+        # Create a mock resource where quota equals hard_limit
+        resource = {
+            'ServiceCode': 'ec2',
+            'QuotaCode': 'L-TEST123',
+            'Value': 50.0,  # Current quota value
+            'Adjustable': True,
+            'c7n:UsageMetric': {
+                'quota': 50.0,  # Same as hard_limit
+                'hard_limit': 50.0
+            }
+        }
+        
+        # Create the action with multiplier that would normally increase
+        action = Increase({'multiplier': 1.5})
+        action.manager = Mock()
+        action.log = Mock()
+        
+        with patch('c7n.resources.quotas.local_session') as mock_session:
+            mock_client = Mock()
+            mock_session.return_value.client.return_value = mock_client
+            
+            # Process the resource
+            action.process([resource])
+            
+            # Verify that request_service_quota_increase was NOT called
+            # because the quota equals hard_limit
+            mock_client.request_service_quota_increase.assert_not_called()
+
+    def test_request_increase_hard_limit_cap_when_count_exceeds_hard_limit(self):
+        """Test that request-increase caps count when it exceeds hard_limit"""
+        from c7n.resources.quotas import Increase
+        from unittest.mock import Mock, patch
+        
+        # Create a mock resource where calculated count would exceed hard_limit
+        resource = {
+            'ServiceCode': 'ec2',
+            'QuotaCode': 'L-TEST123',
+            'Value': 30.0,  # Current quota value
+            'Adjustable': True,
+            'c7n:UsageMetric': {
+                'quota': 30.0,
+                'hard_limit': 50.0  # Hard limit is 50
+            }
+        }
+        
+        # Create the action with multiplier that would exceed hard_limit
+        # 30 * 2.0 = 60, which exceeds hard_limit of 50
+        action = Increase({'multiplier': 2.0})
+        action.manager = Mock()
+        action.log = Mock()
+        
+        with patch('c7n.resources.quotas.local_session') as mock_session:
+            mock_client = Mock()
+            mock_session.return_value.client.return_value = mock_client
+            
+            # Process the resource
+            action.process([resource])
+            
+            # Verify that request_service_quota_increase was called with capped value
+            mock_client.request_service_quota_increase.assert_called_once_with(
+                ServiceCode='ec2',
+                QuotaCode='L-TEST123',
+                DesiredValue=50  # Should be capped at hard_limit
+            )
+
     # Given the ServiceQuota.augment.get_quotas is a nested function,can't patch it;
     # This test case is the best we can do at the moment.
     def test_service_quota_metadata_incl_filter(self):
