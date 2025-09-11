@@ -721,7 +721,7 @@ class CloudFront(BaseTest):
         # in cloudfront.py.
         factory = self.replay_flight_data("test_distribution_update_distribution")
 
-        with patch("c7n.utils.local_session") as mock_local_session:
+        with patch("c7n.resources.cloudfront.local_session", autospec=True) as mock_local_session:
             mock_client = MagicMock()
             mock_local_session.return_value.client.return_value = mock_client
 
