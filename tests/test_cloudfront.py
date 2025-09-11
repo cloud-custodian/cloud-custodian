@@ -720,7 +720,6 @@ class CloudFront(BaseTest):
         # to make sure this step does not get skipped based on the conditions
         # in cloudfront.py.
         factory = self.replay_flight_data("test_distribution_update_distribution")
-        client = factory().client("cloudfront")
 
         with patch("c7n.utils.local_session") as mock_local_session:
             mock_client = MagicMock()
