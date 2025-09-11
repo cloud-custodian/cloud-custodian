@@ -81,7 +81,7 @@ class TestQuotas(BaseTest):
         """Test that request-increase skips when quota equals hard_limit"""
         from c7n.resources.quotas import Increase
         from unittest.mock import Mock, patch
-        
+
         # Create a mock resource where quota equals hard_limit
         resource = {
             'ServiceCode': 'ec2',
@@ -93,19 +93,19 @@ class TestQuotas(BaseTest):
                 'hard_limit': 50.0
             }
         }
-        
+
         # Create the action with multiplier that would normally increase
         action = Increase({'multiplier': 1.5})
         action.manager = Mock()
         action.log = Mock()
-        
+
         with patch('c7n.resources.quotas.local_session') as mock_session:
             mock_client = Mock()
             mock_session.return_value.client.return_value = mock_client
-            
+
             # Process the resource
             action.process([resource])
-            
+
             # Verify that request_service_quota_increase was NOT called
             # because the quota equals hard_limit
             mock_client.request_service_quota_increase.assert_not_called()
@@ -114,7 +114,7 @@ class TestQuotas(BaseTest):
         """Test that request-increase caps count when it exceeds hard_limit"""
         from c7n.resources.quotas import Increase
         from unittest.mock import Mock, patch
-        
+
         # Create a mock resource where calculated count would exceed hard_limit
         resource = {
             'ServiceCode': 'ec2',
@@ -126,20 +126,20 @@ class TestQuotas(BaseTest):
                 'hard_limit': 50.0  # Hard limit is 50
             }
         }
-        
+
         # Create the action with multiplier that would exceed hard_limit
         # 30 * 2.0 = 60, which exceeds hard_limit of 50
         action = Increase({'multiplier': 2.0})
         action.manager = Mock()
         action.log = Mock()
-        
+
         with patch('c7n.resources.quotas.local_session') as mock_session:
             mock_client = Mock()
             mock_session.return_value.client.return_value = mock_client
-            
+
             # Process the resource
             action.process([resource])
-            
+
             # Verify that request_service_quota_increase was called with capped value
             mock_client.request_service_quota_increase.assert_called_once_with(
                 ServiceCode='ec2',
