@@ -134,18 +134,36 @@ class UsageFilter(MetricsFilter):
     Default min_period (minimal period) is 300 seconds and is automatically
     set to 60 seconds if users try to set it to anything lower than that.
 
+    The hard_limit parameter prevents quota increase requests from exceeding AWS's
+    maximum allowable limits. Without this, Cloud Custodian may repeatedly submit
+    invalid requests when calculated increases exceed AWS hard limits, creating
+    failed automation cycles.
+
     .. code-block:: yaml
 
         policies:
             - name: service-quota-usage-limit
               description: |
                   find any services that have usage stats of
-                  over 19%
+                  over 80%
               resource: aws.service-quota
               filters:
                 - UsageMetric: present
                 - type: usage-metric
-                  limit: 19
+                  limit: 80
+                  hard_limit: 5000
+
+            - name: service-quota-usage-with-period
+              description: |
+                  find service quotas with usage over 70% using
+                  custom monitoring period
+              resource: aws.service-quota
+              filters:
+                - UsageMetric: present
+                - type: usage-metric
+                  limit: 70
+                  min_period: 600
+                  hard_limit: 10000
     """
 
     schema = type_schema(
