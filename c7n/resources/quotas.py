@@ -145,25 +145,23 @@ class UsageFilter(MetricsFilter):
             - name: service-quota-usage-limit
               description: |
                   find any services that have usage stats of
-                  over 80%
-              resource: aws.service-quota
-              filters:
-                - UsageMetric: present
-                - type: usage-metric
-                  limit: 80
-                  hard_limit: 5000
-
-            - name: service-quota-usage-with-period
-              description: |
-                  find service quotas with usage over 70% using
-                  custom monitoring period
+                  over 70%
               resource: aws.service-quota
               filters:
                 - UsageMetric: present
                 - type: usage-metric
                   limit: 70
-                  min_period: 600
-                  hard_limit: 10000
+
+            - name: iam-roles-quota-with-hard-limit
+              description: |
+                  monitor IAM roles per account quota with hard limit
+              resource: aws.service-quota
+              filters:
+                - type: value
+                  key: QuotaCode
+                  value: L-FE177D64
+                - type: usage-metric
+                  hard_limit: 5000
     """
 
     schema = type_schema(
