@@ -134,21 +134,42 @@ class UsageFilter(MetricsFilter):
     Default min_period (minimal period) is 300 seconds and is automatically
     set to 60 seconds if users try to set it to anything lower than that.
 
+    The hard_limit parameter prevents quota increase requests from exceeding AWS's
+    maximum allowable limits. Without this, Cloud Custodian may repeatedly submit
+    invalid requests when calculated increases exceed AWS hard limits, creating
+    failed automation cycles.
+
     .. code-block:: yaml
 
         policies:
             - name: service-quota-usage-limit
               description: |
                   find any services that have usage stats of
-                  over 80%
+                  over 70%
               resource: aws.service-quota
               filters:
                 - UsageMetric: present
                 - type: usage-metric
-                  limit: 19
+                  limit: 70
+
+            - name: iam-roles-quota-with-hard-limit
+              description: |
+                  monitor IAM roles per account quota with hard limit
+              resource: aws.service-quota
+              filters:
+                - type: value
+                  key: QuotaCode
+                  value: L-FE177D64
+                - type: usage-metric
+                  hard_limit: 5000
     """
 
-    schema = type_schema('usage-metric', limit={'type': 'integer'}, min_period={'type': 'integer'})
+    schema = type_schema(
+        'usage-metric',
+        limit={'type': 'integer'},
+        min_period={'type': 'integer'},
+        hard_limit={'type': 'integer'}
+    )
 
     cloudwatch_max_datapoints = 1440
     # https://boto3.amazonaws.com/v1/documentation/api/1.35.9/reference/services/cloudwatch/client/get_metric_statistics.html
@@ -211,6 +232,7 @@ class UsageFilter(MetricsFilter):
 
         limit = self.data.get('limit', 80)
         min_period = max(self.data.get('min_period', 300), self.cloudwatch_min_period)
+        hard_limit = self.data.get('hard_limit', None)
 
         result = []
 
@@ -273,6 +295,8 @@ class UsageFilter(MetricsFilter):
                         'quota': quota,
                         'metric_scale': metric_scale,
                     }
+                    if hard_limit is not None:
+                        r[self.annotation_key]['hard_limit'] = float(hard_limit)
                     result.append(r)
         return result
 
@@ -354,6 +378,16 @@ class Increase(Action):
             count = math.ceil(float(multiplier) * r['Value'])
             if not r['Adjustable']:
                 continue
+            # Skip if quota equals hard_limit
+            if ('c7n:UsageMetric' in r and
+                    'hard_limit' in r['c7n:UsageMetric'] and
+                    r['c7n:UsageMetric']['quota'] == r['c7n:UsageMetric']['hard_limit']):
+                continue
+            # Cap count at hard_limit if it exceeds it
+            if ('c7n:UsageMetric' in r and
+                    'hard_limit' in r['c7n:UsageMetric'] and
+                    count > r['c7n:UsageMetric']['hard_limit']):
+                count = int(r['c7n:UsageMetric']['hard_limit'])
             try:
                 client.request_service_quota_increase(
                     ServiceCode=r['ServiceCode'],
