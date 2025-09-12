@@ -2777,9 +2777,9 @@ class UnusedVpcEndpoint(Filter):
             # Only consider endpoints in Available state
             if r.get('State') != 'Available':
                 continue
-                
+
             is_unused = False
-            
+
             if r.get('VpcEndpointType') == 'Gateway':
                 # Gateway endpoints are unused if they have no route table associations
                 route_tables = r.get('RouteTableIds', [])
@@ -2790,10 +2790,10 @@ class UnusedVpcEndpoint(Filter):
                 subnets = r.get('SubnetIds', [])
                 if not subnets:
                     is_unused = True
-            
+
             if is_unused:
                 results.append(r)
-                
+
         return results
 
 
@@ -2831,8 +2831,8 @@ class DeleteVpcEndpoint(BaseAction):
             except ClientError as e:
                 if e.response['Error']['Code'] not in ('InvalidVpcEndpointId.NotFound',):
                     self.log.exception(
-                        "Exception deleting VPC endpoint %s: %s", 
-                        r['VpcEndpointId'], 
+                        "Exception deleting VPC endpoint %s: %s",
+                        r['VpcEndpointId'],
                         e.response['Error']['Message']
                     )
 
@@ -2956,8 +2956,8 @@ class DeleteVpcEndpointServiceConfiguration(BaseAction):
             except ClientError as e:
                 if e.response['Error']['Code'] not in ('InvalidVpcEndpointServiceId.NotFound',):
                     self.log.exception(
-                        "Exception deleting VPC endpoint service configuration %s: %s", 
-                        r['ServiceId'], 
+                        "Exception deleting VPC endpoint service configuration %s: %s",
+                        r['ServiceId'],
                         e.response['Error']['Message']
                     )
 

@@ -3557,7 +3557,7 @@ class EndpointTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        
+
         # Verify deletion
         client = factory().client("ec2")
         with self.assertRaises(BotoClientError) as e:
@@ -3565,7 +3565,7 @@ class EndpointTest(BaseTest):
                 VpcEndpointIds=[resources[0]['VpcEndpointId']]
             )
         self.assertEqual(
-            e.exception.response['Error']['Code'], 
+            e.exception.response['Error']['Code'],
             'InvalidVpcEndpointId.NotFound'
         )
 
@@ -3575,7 +3575,7 @@ class EndpointTest(BaseTest):
         p = self.load_policy(
             {
                 "name": "delete-vpc-endpoints",
-                "resource": "vpc-endpoint", 
+                "resource": "vpc-endpoint",
                 "filters": [{"VpcEndpointId": "vpce-nonexistent"}],
                 "actions": [{"type": "delete"}],
             },
@@ -4458,7 +4458,7 @@ class TestVPCEndpointServiceConfiguration(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        
+
         # Verify deletion
         client = factory().client("ec2")
         with self.assertRaises(BotoClientError) as e:
@@ -4466,17 +4466,19 @@ class TestVPCEndpointServiceConfiguration(BaseTest):
                 ServiceIds=[resources[0]['ServiceId']]
             )
         self.assertEqual(
-            e.exception.response['Error']['Code'], 
+            e.exception.response['Error']['Code'],
             'InvalidVpcEndpointServiceId.NotFound'
         )
 
     def test_vpc_endpoint_service_configuration_delete_not_found_ignored(self):
         """Test that delete gracefully handles already-deleted service configurations"""
-        factory = self.replay_flight_data("test_vpc_endpoint_service_configuration_delete_not_found")
+        factory = self.replay_flight_data(
+            "test_vpc_endpoint_service_configuration_delete_not_found"
+        )
         p = self.load_policy(
             {
                 "name": "delete-endpoint-service-configs",
-                "resource": "vpc-endpoint-service-configuration", 
+                "resource": "vpc-endpoint-service-configuration",
                 "filters": [{"ServiceId": "vpce-svc-nonexistent"}],
                 "actions": [{"type": "delete"}],
             },
