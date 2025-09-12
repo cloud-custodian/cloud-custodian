@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "Results": [
+            "{\"resourceId\":\"test-snap-1\",\"configuration\":{\"allocatedStorage\":20.0,\"availabilityZone\":\"us-east-1c\",\"dbiResourceId\":\"db-77GTHWBLZZKR5H4JIZOSYSSXM4\",\"dBInstanceIdentifier\":\"database-1\",\"engine\":\"postgres\",\"vpcId\":\"vpc-02a140d528ca01476\",\"percentProgress\":100.0,\"iAMDatabaseAuthenticationEnabled\":false,\"dBSnapshotIdentifier\":\"test-snap-1\",\"optionGroupName\":\"default:postgres-12\",\"engineVersion\":\"12.5\",\"masterUsername\":\"postgres\",\"snapshotType\":\"manual\",\"instanceCreateTime\":\"2021-02-19T20:36:09.202Z\",\"dBSnapshotArn\":\"arn:aws:rds:us-east-1:644160558196:snapshot:test-snap-1\",\"processorFeatures\":[],\"tagList\":[],\"encrypted\":false,\"port\":5432.0,\"licenseModel\":\"postgresql-license\",\"storageType\":\"gp2\",\"status\":\"creating\"},\"supplementaryConfiguration\":{\"DBSnapshotAttributes\":[{\"attributeValues\":[],\"attributeName\":\"restore\"}],\"Tags\":[]}}"
+        ],
+        "QueryInfo": {
+            "SelectFields": [
+                {
+                    "Name": "resourceId"
+                },
+                {
+                    "Name": "configuration"
+                },
+                {
+                    "Name": "supplementaryConfiguration"
+                }
+            ]
+        },
+        "ResponseMetadata": {}
+    }
+}
