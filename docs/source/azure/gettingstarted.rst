@@ -3,48 +3,6 @@
 Getting Started
 ===============
 
-* :ref:`azure_install-cc`
-* :ref:`azure_write-policy`
-
-.. _azure_install-cc:
-
-Install Cloud Custodian and Azure Plugin
-----------------------------------------
-
-Cloud Custodian is a Python application and supports Python 2 and 3 on Linux and Windows.
-We recommend using Python 3.6 or higher.
-
-The Azure provider is an additional package which is installed in addition to c7n.
-
-Install latest from the repository to virtual Python environment
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-Linux and Mac OS
-+++++++++++++++++++++++++++
-
-To install Cloud Custodian, run::
-
-  $ python3 -m venv custodian
-  $ source custodian/bin/activate
-  $ git clone https://github.com/cloud-custodian/cloud-custodian.git
-  $ cd cloud-custodian
-  $ pip install -e .
-  $ pip install -e tools/c7n_azure
-
-
-Windows (CMD/PowerShell)
-+++++++++++++++++++++++++++
-
-To install Cloud Custodian, run::
-
-  $ python3 -m venv custodian
-  $ ./custodian/Scripts/activate
-  $ git clone https://github.com/cloud-custodian/cloud-custodian.git
-  $ cd cloud-custodian
-  $ pip install -e .
-  $ pip install -e tools/c7n_azure
-
-
 .. _azure_write-policy:
 
 Write your first policy

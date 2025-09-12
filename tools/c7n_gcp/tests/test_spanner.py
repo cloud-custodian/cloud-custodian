@@ -4,6 +4,8 @@
 from gcp_common import BaseTest, event_data
 import time
 
+from pytest_terraform import terraform
+
 
 class SpannerInstanceTest(BaseTest):
 
@@ -21,6 +23,12 @@ class SpannerInstanceTest(BaseTest):
 
         resources = policy.run()
         self.assertEqual(resources[0]['displayName'], 'test-instance')
+        self.assertEqual(
+            policy.resource_manager.get_urns(resources),
+            [
+                "gcp:spanner::cloud-custodian:instance/test-instance",
+            ],
+        )
 
     def test_spanner_instance_get(self):
         session_factory = self.replay_flight_data('spanner-instance-get')
@@ -42,6 +50,12 @@ class SpannerInstanceTest(BaseTest):
                          'projects/cloud-custodian/instanceConfigs/regional-asia-east1')
         self.assertEqual(instances[0]['name'],
                          'projects/cloud-custodian/instances/custodian-spanner-1')
+        self.assertEqual(
+            policy.resource_manager.get_urns(instances),
+            [
+                "gcp:spanner::cloud-custodian:instance/custodian-spanner-1",
+            ],
+        )
 
     def test_spanner_instance_delete(self):
         project_id = 'cloud-custodian'
@@ -211,6 +225,27 @@ class SpannerInstanceTest(BaseTest):
                           {'members': ['user:dkhanas@gmail.com'],
                            'role': 'roles/viewer'}])
 
+    def test_spanner_instance_filter_iam_query(self):
+        project_id = 'gcp-lab-custodian'
+        factory = self.replay_flight_data('spanner-instance-filter-iam', project_id=project_id)
+        p = self.load_policy({
+            'name': 'spanner-instance-filter-iam',
+            'resource': 'gcp.spanner-instance',
+            'filters': [{
+                'type': 'iam-policy',
+                'doc': {
+                    'key': "bindings[?(role=='roles\\editor' || role=='roles\\owner')]",
+                    'op': 'ne',
+                    'value': []
+                }
+            }]
+        }, session_factory=factory)
+        resources = p.run()
+
+        self.assertEqual(1, len(resources))
+        self.assertEqual('projects/cloud-custodian/instances/spanner-instance-2',
+                         resources[0]['name'])
+
 
 class SpannerDatabaseInstanceTest(BaseTest):
 
@@ -226,6 +261,13 @@ class SpannerDatabaseInstanceTest(BaseTest):
         self.assertEqual(resources[0]['c7n:spanner-instance']['displayName'], 'custodian-spanner')
         self.assertEqual(resources[0]['c7n:spanner-instance']['state'], 'READY')
         self.assertEqual(resources[0]['c7n:spanner-instance']['nodeCount'], 1)
+        self.assertEqual(
+            policy.resource_manager.get_urns(resources),
+            [
+                "gcp:spanner::cloud-custodian:database/custodian-spanner/custodian-database",
+                "gcp:spanner::cloud-custodian:database/custodian-spanner/custodian-favorite-database",  # noqa: E501
+            ],
+        )
 
     def test_spanner_database_instance_get(self):
         session_factory = self.replay_flight_data('spanner-database-instance-get')
@@ -247,6 +289,12 @@ class SpannerDatabaseInstanceTest(BaseTest):
         self.assertEqual(instances[0]['c7n:spanner-instance']['displayName'], 'custodian-spanner-1')
         self.assertEqual(instances[0]['c7n:spanner-instance']['name'],
                          'projects/cloud-custodian/instances/custodian-spanner-1')
+        self.assertEqual(
+            policy.resource_manager.get_urns(instances),
+            [
+                "gcp:spanner::cloud-custodian:database/custodian-spanner-1/db-1",
+            ],
+        )
 
     def test_spanner_database_instance_delete(self):
         session_factory = self.replay_flight_data('spanner-database-instance-delete')
@@ -332,3 +380,65 @@ class SpannerDatabaseInstanceTest(BaseTest):
                               'members': ['user:dkhanas@gmail.com']}]
 
         self.assertEqual(test_method(existing_bindings, bindings_to_remove), expected_bindings)
+
+
+class TestSpannerInstanceBackup(BaseTest):
+
+    def test_query(self):
+        project_id = 'cloud-custodian'
+        session_factory = self.replay_flight_data('test-spanner-instance-backup',
+                                                  project_id=project_id)
+        policy = self.load_policy(
+            {'name': 'spanner-instance-backup',
+             'resource': 'gcp.spanner-backup',
+             'filters': [{
+                 'type': 'time-range',
+                 'value': 29
+             }]},
+            session_factory=session_factory)
+
+        resources = policy.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'],
+                         'projects/cloud-custodian/instances/spanner-instance-0/backups/backup-1')
+
+    def test_spanner_instance_backup_filter_iam_query(self):
+        factory = self.replay_flight_data(
+            'spanner-instance-backup-filter-iam', project_id='cloud-custodian')
+        p = self.load_policy({
+            'name': 'spanner-instance-backup-filter-iam',
+            'resource': 'gcp.spanner-backup',
+            'filters': [{
+                'type': 'iam-policy',
+                'doc': {
+                    'key': "bindings[?(role=='roles/editor' || role=='roles/owner')]",
+                    'op': 'ne',
+                    'value': []
+                }
+            }]
+        }, session_factory=factory)
+        resources = p.run()
+
+        self.assertEqual(1, len(resources))
+
+
+@terraform('spanner_backup')
+def test_spanner_backup_iam(test):
+    session_factory = test.replay_flight_data('spanner-backup-iam')
+    policy = test.load_policy({
+        'name': 'spanner-backup-iam',
+        'resource': 'gcp.spanner-backup',
+        'filters': [{
+            'type': 'iam-policy',
+            'doc': {
+                'key': 'bindings[*].role',
+                'op': 'intersect',
+                'value': ['roles/editor', 'roles/owner']
+            }
+        }]
+    }, session_factory=session_factory)
+
+    resources = policy.run()
+    assert len(resources) == 1
+    assert resources[0]['c7n:iamPolicy']['bindings'][0]['role'] == 'roles/editor'

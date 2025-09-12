@@ -1,0 +1,20 @@
+{
+    "status_code": 200,
+    "data": {
+        "Organization": {
+            "Id": "o-vjtynx2e3h",
+            "Arn": "arn:aws:organizations::644160558196:organization/o-vjtynx4d1h",
+            "FeatureSet": "ALL",
+            "MasterAccountArn": "arn:aws:organizations::644160558196:account/o-vjtynx4d1h/644160558196",
+            "MasterAccountId": "644160558196",
+            "MasterAccountEmail": "kapilt@gmail.com",
+            "AvailablePolicyTypes": [
+                {
+                    "Type": "SERVICE_CONTROL_POLICY",
+                    "Status": "ENABLED"
+                }
+            ]
+        },
+        "ResponseMetadata": {}
+    }
+}

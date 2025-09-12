@@ -1,16 +1,15 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import json
-import datetime
 import os
-import mock
 import tempfile
 import time
-
+from unittest import mock
 from unittest import TestCase
-from .common import load_data, BaseTest, functional
-from .test_offhours import mock_datetime_now
 
+from .common import load_data, BaseTest, functional
+
+import freezegun
 import pytest
 from pytest_terraform import terraform
 from dateutil import parser
@@ -71,6 +70,31 @@ class UserCredentialReportTest(BaseTest):
             ["Hazmat", "kapilt"],
         )
 
+    def test_credential_report_generate_in_progress(self):
+        session_factory = self.replay_flight_data("test_iam_user_unused_keys_report_in_progress")
+        p = self.load_policy(
+            {
+                "name": "user-access-unused-keys",
+                "resource": "iam-user",
+                "filters": [
+                    {
+                        "type": "credential",
+                        "key": "access_keys.last_used_date",
+                        "report_delay": 0.01,
+                        "value": "empty",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+            cache=True,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(
+            sorted([r["UserName"] for r in resources]),
+            ["Hazmat", "kapilt"],
+        )
+
     def test_credential_access_key_multifilter_delete(self):
         factory = self.replay_flight_data('test_iam_user_credential_multi_delete')
         p = self.load_policy({
@@ -87,14 +111,16 @@ class UserCredentialReportTest(BaseTest):
                 {"type": "credential",
                  "report_max_age": 1543724277,
                  "key": "access_keys.last_rotated",
-                 "value": 700,
+                 "value": 900,
                  "op": "greater-than",
                  'value_type': 'age'}],
             'actions': [
                 {'type': 'remove-keys',
                  'matched': True}]},
             session_factory=factory)
-        resources = p.run()
+
+        with freezegun.freeze_time('2020-01-01'):
+            resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(len(resources[0]['c7n:matched-keys']), 1)
         client = factory().client('iam')
@@ -117,11 +143,13 @@ class UserCredentialReportTest(BaseTest):
             'filters': [
                 {'UserName': 'test1'},
                 {"type": "credential",
+                 "report_max_age": 1543724277,
                  "key": "access_keys.last_rotated",
                  "value": 30,
                  'op': 'gt',
                  "value_type": "age"},
                 {"type": "credential",
+                 "report_max_age": 1543724277,
                  "key": "access_keys.active",
                  "value": True,
                  "op": "eq"}],
@@ -137,26 +165,52 @@ class UserCredentialReportTest(BaseTest):
         self.assertEqual(len(keys), 2)
 
     def test_credential_access_key_reverse_filter_delete(self):
+        access_key_filters = [
+            {"type": "credential",
+             "report_max_age": 1585865564,
+             "key": "access_keys.last_used_date",
+             "value": 90,
+             'op': 'gte',
+             "value_type": "age"},
+            {"type": "credential",
+             "report_max_age": 1585865564,
+             "key": "access_keys.last_rotated",
+             "value": 90,
+             "op": "gte",
+             'value_type': 'age'}]
+
+        # Given:
+        # - Two access key filters
+        # - A single user with two access keys
+        # - Each access key matching one filter but not the other
+        #
+        # Nesting the access key filters inside an 'or' block
+        # should yield 2 matched keys, while the default 'and'
+        # behavior should match 1.
+
         factory = self.replay_flight_data(
             'test_iam_user_credential_reverse_filter_delete'
         )
         p = self.load_policy({
-            'name': 'user-cred-multi-reverse',
+            'name': 'user-cred-multi-reverse-or',
             'resource': 'iam-user',
             'filters': [
                 {'UserName': 'zscholl'},
-                {"type": "credential",
-                 "report_max_age": 1585865564,
-                 "key": "access_keys.last_used_date",
-                 "value": 90,
-                 'op': 'gte',
-                 "value_type": "age"},
-                {"type": "credential",
-                 "report_max_age": 1585865564,
-                 "key": "access_keys.last_rotated",
-                 "value": 90,
-                 "op": "gte",
-                 'value_type': 'age'}],
+                {'or': access_key_filters}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources[0]['c7n:matched-keys']), 2)
+
+        factory = self.replay_flight_data(
+            'test_iam_user_credential_reverse_filter_delete'
+        )
+        p = self.load_policy({
+            'name': 'user-cred-multi-reverse-and',
+            'resource': 'iam-user',
+            'filters': [
+                {'UserName': 'zscholl'},
+                *access_key_filters],
             'actions': [
                 {'type': 'remove-keys',
                  'disable': True,
@@ -185,7 +239,7 @@ class UserCredentialReportTest(BaseTest):
             session_factory=session_factory,
             cache=True,
         )
-        with mock_datetime_now(parser.parse("2016-11-25T20:27:00+00:00"), datetime):
+        with freezegun.freeze_time("2016-11-25T20:27"):
             resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(sorted([r["UserName"] for r in resources]), ["kapil"])
@@ -216,7 +270,7 @@ class UserCredentialReportTest(BaseTest):
             cache=True,
         )
 
-        with mock_datetime_now(parser.parse("2016-11-25T20:27:00+00:00"), datetime):
+        with freezegun.freeze_time("2016-11-25T20:27:00+00:00"):
             resources = p.run()
         self.assertEqual(len(resources), 3)
         self.assertEqual(
@@ -506,7 +560,13 @@ class IamRoleTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(
             p.resource_manager.get_arns(resources),
-            ['arn:aws:iam::644160558196:role/service-role/AmazonSageMaker-ExecutionRole-20180108T122369']) # NOQA
+            ['arn:aws:iam::644160558196:role/service-role/AmazonSageMaker-ExecutionRole-20180108T122369'])  # NOQA
+
+        self.assertDeprecation(p, """
+            policy 'iam-inuse-role'
+              filters:
+                unused: filter has been deprecated (use the 'used' filter with 'state' attribute)
+            """)
 
     def test_iam_role_get_resources(self):
         session_factory = self.replay_flight_data("test_iam_role_get_resource")
@@ -658,6 +718,55 @@ class IamUserTest(BaseTest):
         client = factory().client('iam')
         assert client.get_user(UserName='devbot')['User'].get('PermissionsBoundary', {}) == {}
 
+    def test_iam_user_set_policy(self):
+        session_factory = self.replay_flight_data("test_iam_user_set_policy")
+        client = session_factory().client("iam")
+
+        p = self.load_policy(
+            {
+                "name": "iam-user-set-policy",
+                "resource": "aws.iam-user",
+                "actions": [
+                    {
+                        "type": "set-policy",
+                        "state": "attached",
+                        "arn": "arn:aws:iam::123456789012:policy/my-iam-policy"
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertIn('test', resources[0]['UserName'])
+
+        policies = client.list_attached_user_policies(UserName="test")
+        self.assertEqual(len(policies['AttachedPolicies']), 1)
+        self.assertEqual(policies['AttachedPolicies'][0]["PolicyName"], "my-iam-policy")
+
+        p = self.load_policy(
+            {
+                "name": "iam-user-set-policy",
+                "resource": "aws.iam-user",
+                "actions": [
+                    {
+                        "type": "set-policy",
+                        "state": "detached",
+                        "arn": "*"
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertIn('test', resources[0]['UserName'])
+
+        policies = client.list_attached_user_policies(UserName="test")
+        self.assertEqual(len(policies['AttachedPolicies']), 0)
+
     def test_iam_user_usage_no_such_entity(self):
         p = self.load_policy({
             'name': 'usage-check',
@@ -702,6 +811,24 @@ class IamUserTest(BaseTest):
         resources = p.push({'detail': {
             'eventName': '', 'eventSource': '', 'ids': ['kapil']}}, None)
         self.assertEqual(len(resources), 1)
+
+    def test_iam_user_check_permissions_validation(self):
+        invalid_actions = ['', '*', ':', 'iam', 's3:', ':GetObject']
+        valid_actions = ['*:*', 's3:GetObject', 'iam:GetUser']
+
+        def _policy_with_action(action):
+            return {
+                "name": "check-permissions-test-policy",
+                "resource": "aws.iam-user",
+                'filters': [{'type': 'check-permissions', 'match': 'allowed', 'actions': [action]}],
+            }
+
+        for action in invalid_actions:
+            self.assertRaises(PolicyValidationError, self.load_policy, _policy_with_action(action))
+
+        for action in valid_actions:
+            p = self.load_policy(_policy_with_action(action))
+            p.validate()
 
     def test_iam_user_check_permissions(self):
         factory = self.replay_flight_data('test_iam_user_check_permissions')
@@ -904,6 +1031,31 @@ class IamUserTest(BaseTest):
         resources = p.run()
         self.assertEqual(resources[0]["UserName"], "alphabet_soup")
 
+    def test_iam_user_policy_include_via(self):
+        session_factory = self.replay_flight_data("test_iam_user_admin_policy_include_via")
+        self.patch(UserPolicy, "executor_factory", MainThreadExecutor)
+        p = self.load_policy(
+            {
+                "name": "iam-user-policy",
+                "resource": "iam-user",
+                "filters": [
+                    {
+                        "type": "policy",
+                        "key": "PolicyName",
+                        "value": "AdministratorAccess",
+                        "include-via": True,
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(resources[0]["UserName"], "alphabet_soup_1")
+        self.assertEqual(len(resources[0]["c7n:Policies"]), 2)
+        self.assertEqual(resources[1]["UserName"], "alphabet_soup_2")
+        self.assertEqual(len(resources[1]["c7n:Policies"]), 2)
+
     def test_iam_user_access_key_filter(self):
         session_factory = self.replay_flight_data("test_iam_user_access_key_active")
         self.patch(UserAccessKey, "executor_factory", MainThreadExecutor)
@@ -918,6 +1070,20 @@ class IamUserTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["UserName"], "alphabet_soup")
+
+    def test_iam_user_login_profile(self):
+        session_factory = self.replay_flight_data('test_iam_user_login_profile')
+        p = self.load_policy(
+            {
+                "name": "iam-users-with-console-access",
+                "resource": "iam-user",
+                "filters": [{"type": "login-profile"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["UserName"], "test-user-console-access")
 
 
 @terraform('iam_user', teardown=terraform.TEARDOWN_IGNORE)
@@ -1005,7 +1171,210 @@ class IamInstanceProfileFilterUsage(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 2)
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["Arn"], "arn:aws:iam::644160558196:instance-profile/mandeep")
+        self.assertEqual(resources[0]["InstanceProfileName"], "mandeep")
+
+
+class IamInstanceProfileActions(BaseTest):
+
+    def test_iam_instance_profile_set_role(self):
+        session_factory = self.replay_flight_data("test_iam_instance_profile_set_role")
+        client = session_factory().client("iam")
+        p = self.load_policy(
+            {
+                "name": "iam-instance-profile-set-role",
+                "resource": "iam-profile",
+                "actions": [
+                    {"type": "set-role", "role": "my-test-role"}
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 3)
+        instance_profiles = client.list_instance_profiles()
+        for profile in instance_profiles['InstanceProfiles']:
+            self.assertEqual(profile['Roles'][0]['RoleName'], 'my-test-role')
+
+    def test_iam_instance_profile_set_role_remove(self):
+        session_factory = self.replay_flight_data("test_iam_instance_profile_set_role_remove")
+        client = session_factory().client("iam")
+        p = self.load_policy(
+            {
+                "name": "iam-instance-profile-set-role-remove",
+                "resource": "iam-profile",
+                "actions": [
+                    {"type": "set-role", "role": ""}
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 3)
+        instance_profiles = client.list_instance_profiles()
+        for profile in instance_profiles['InstanceProfiles']:
+            self.assertEqual(len(profile['Roles']), 0)
+
+    def test_iam_instance_profile_set_policy_attached(self):
+        session_factory = self.replay_flight_data("test_iam_instance_profile_set_policy_attached")
+        client = session_factory().client("iam")
+        p = self.load_policy(
+            {
+                "name": "iam-instance-profile-set-policy",
+                "resource": "iam-profile",
+                "filters": [
+                    {
+                        "not": [
+                            {
+                                "type": "has-specific-managed-policy",
+                                "key": "PolicyArn",
+                                "value": "arn:aws:iam::aws:policy/AdministratorAccess"
+                            }
+                        ],
+                    },
+                    {
+                        "type": "value",
+                        "key": "Roles[].RoleName",
+                        "value": "AmazonSSMRoleForInstancesQuickSetup",
+                        "op": "in",
+                        "value_type": "swap"
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "set-policy",
+                        "state": "attached",
+                        "arn": "arn:aws:iam::aws:policy/AdministratorAccess"
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        instance_profiles = client.list_instance_profiles()
+        for profile in instance_profiles['InstanceProfiles']:
+            if profile['Roles'][0]['RoleName'] == "AmazonSSMRoleForInstancesQuickSetup":
+                policies = client.list_attached_role_policies(
+                        RoleName="AmazonSSMRoleForInstancesQuickSetup"
+                )
+                self.assertEqual(len(policies['AttachedPolicies']), 1)
+                self.assertEqual(
+                        policies['AttachedPolicies'][0]["PolicyName"], "AdministratorAccess"
+                )
+
+    def test_iam_instance_profile_set_policy_detached(self):
+        session_factory = self.replay_flight_data("test_iam_instance_profile_set_policy_detached")
+        client = session_factory().client("iam")
+        p = self.load_policy(
+            {
+                "name": "iam-instance-profile-set-policy",
+                "resource": "iam-profile",
+                "filters": [
+                    {
+                        "type": "has-specific-managed-policy",
+                        "key": "PolicyArn",
+                        "value": "arn:aws:iam::aws:policy/AdministratorAccess"
+                    },
+                    {
+                        "type": "value",
+                        "key": "Roles[].RoleName",
+                        "value": "AmazonSSMRoleForInstancesQuickSetup",
+                        "op": "in",
+                        "value_type": "swap"
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "set-policy",
+                        "state": "detached",
+                        "arn": "arn:aws:iam::aws:policy/AdministratorAccess"
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        instance_profiles = client.list_instance_profiles()
+        for profile in instance_profiles['InstanceProfiles']:
+            if profile['Roles'][0]['RoleName'] == "AmazonSSMRoleForInstancesQuickSetup":
+                policies = client.list_attached_role_policies(
+                        RoleName="AmazonSSMRoleForInstancesQuickSetup"
+                )
+                self.assertEqual(len(policies['AttachedPolicies']), 0)
+
+    def test_iam_instance_profile_set_policy_wildcard(self):
+        session_factory = self.replay_flight_data("test_iam_instance_profile_set_policy_wildcard")
+        client = session_factory().client("iam")
+        p = self.load_policy(
+            {
+                "name": "iam-instance-profile-set-policy",
+                "resource": "iam-profile",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "Roles[].RoleName",
+                        "value": "AmazonSSMRoleForInstancesQuickSetup",
+                        "op": "in",
+                        "value_type": "swap"
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "set-policy",
+                        "state": "detached",
+                        "arn": "*"
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        instance_profiles = client.list_instance_profiles()
+        for profile in instance_profiles['InstanceProfiles']:
+            if profile['Roles'][0]['RoleName'] == "AmazonSSMRoleForInstancesQuickSetup":
+                policies = client.list_attached_role_policies(
+                        RoleName="AmazonSSMRoleForInstancesQuickSetup"
+                )
+                self.assertEqual(len(policies['AttachedPolicies']), 0)
+
+    def test_iam_instance_profile_set_policy_nosuchentity(self):
+        session_factory = self.replay_flight_data(
+            "test_iam_instance_profile_set_policy_nosuchentity"
+        )
+        client = session_factory().client("iam")
+        p = self.load_policy(
+            {
+                "name": "iam-instance-profile-set-policy",
+                "resource": "iam-profile",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "Roles[].RoleName",
+                        "value": "AmazonSSMRoleForInstancesQuickSetup",
+                        "op": "in",
+                        "value_type": "swap"
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "set-policy",
+                        "state": "detached",
+                        "arn": "arn:aws:iam::aws:policy/AdministratorAccessDoesNotExist"
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertRaises(
+            client.exceptions.NoSuchEntityException,
+            client.get_policy,
+            PolicyArn="arn:aws:iam::aws:policy/AdministratorAccessDoesNotExist")
 
 
 class IamPolicyFilterUsage(BaseTest):
@@ -1054,7 +1423,7 @@ class IamPolicyFilterUsage(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 7)
+        self.assertEqual(len(resources), 6)
 
     def test_iam_unattached_policies(self):
         session_factory = self.replay_flight_data("test_iam_policy_unattached")
@@ -1068,7 +1437,7 @@ class IamPolicyFilterUsage(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 202)
+        self.assertEqual(len(resources), 1)
 
 
 class IamPolicy(BaseTest):
@@ -1121,7 +1490,7 @@ class IamPolicy(BaseTest):
                     {
                         "type": "value",
                         "key": "PolicyName",
-                        "value": "AdministratorAccess",
+                        "value": "MyAdminPolicy",
                     },
                     "has-allow-all",
                 ],
@@ -1170,6 +1539,112 @@ def test_iam_group_delete(test, iam_user_group):
 
     with pytest.raises(client.exceptions.NoSuchEntityException):
         client.get_group(GroupName=resources[0]['GroupName'])
+
+
+# The terraform fixture sets up resources, which happens before we
+# actually enter the test:
+@terraform('iam_delete_provider_oidc', teardown=terraform.TEARDOWN_IGNORE)
+def test_iam_delete_provider_oidc_action(test, iam_delete_provider_oidc):
+    # The 'iam_delete_provider_oidc' argument allows us to access the
+    # data in the 'tf_resources.json' file inside the
+    # 'tests/terraform/iam_delete_provider_oidc' directory.  Here's how
+    # we access the IAM provider's arn using a 'dotted' notation:
+    arn = iam_delete_provider_oidc['aws_iam_openid_connect_provider.test_oidc_provider.arn']
+
+    # Uncomment to following line when you're recording the first time:
+    # session_factory = test.record_flight_data('iam_delete_provider_oidc')
+
+    # If you already recorded the interaction with AWS for this test,
+    # you can just replay it.  In which case, the files containing the
+    # responses from AWS are gonna be found inside the
+    # 'tests/data/placebo/iam_delete_provider_oidc' directory:
+    session_factory = test.replay_flight_data('iam_delete_provider_oidc')
+
+    # Set up an 'iam' boto client for the test:
+    client = session_factory().client('iam')
+
+    # Execute the 'delete' action that we want to test:
+    pdata = {
+        'name': 'delete',
+        'resource': 'iam-oidc-provider',
+        'filters': [
+            {
+                'type': 'value',
+                'key': 'Url',
+                'value': 'accounts.google.com',
+            },
+        ],
+        'actions': [
+            {
+                'type': 'delete',
+            },
+        ],
+    }
+    policy = test.load_policy(pdata, session_factory=session_factory)
+    resources = policy.run()
+
+    # Here's the number of resources that the policy resolved,
+    # i.e. the resources that passed the filters:
+    assert len(resources) == 1
+    assert resources[0]['Arn'] == arn
+
+    # We're testing that our delete action worked because the iam
+    # provider now no longer exists:
+    with pytest.raises(client.exceptions.NoSuchEntityException):
+        client.get_open_id_connect_provider(OpenIDConnectProviderArn=arn)
+
+
+# The terraform fixture sets up resources, which happens before we
+# actually enter the test:
+@terraform('iam_delete_provider_saml', teardown=terraform.TEARDOWN_IGNORE)
+def test_iam_delete_provider_saml_action(test, iam_delete_provider_saml):
+    # The 'iam_delete_provider_saml' argument allows us to access the
+    # data in the 'tf_resources.json' file inside the
+    # 'tests/terraform/iam_delete_provider_saml' directory.  Here's how
+    # we access the IAM provider's arn using a 'dotted' notation:
+    arn = iam_delete_provider_saml['aws_iam_saml_provider.test_saml_provider.arn']
+
+    # Uncomment to following line when you're recording the first time:
+    # session_factory = test.record_flight_data('iam_delete_provider_saml')
+
+    # If you already recorded the interaction with AWS for this test,
+    # you can just replay it.  In which case, the files containing the
+    # responses from AWS are gonna be found inside the
+    # 'tests/data/placebo/iam_delete_provider_saml' directory:
+    session_factory = test.replay_flight_data('iam_delete_provider_saml')
+
+    # Set up an 'iam' boto client for the test:
+    client = session_factory().client('iam')
+
+    # Execute the 'delete' action that we want to test:
+    pdata = {
+        'name': 'delete',
+        'resource': 'iam-saml-provider',
+        'filters': [
+            {
+                'type': 'value',
+                'key': 'tag:Name',
+                'value': 'testprovider',
+            },
+        ],
+        'actions': [
+            {
+                'type': 'delete',
+            },
+        ],
+    }
+    policy = test.load_policy(pdata, session_factory=session_factory)
+    resources = policy.run()
+
+    # Here's the number of resources that the policy resolved,
+    # i.e. the resources that passed the filters:
+    assert len(resources) == 1
+    assert resources[0]['Arn'] == arn
+
+    # We're testing that our delete action worked because the iam
+    # provider now no longer exists:
+    with pytest.raises(client.exceptions.NoSuchEntityException):
+        client.get_saml_provider(SAMLProviderArn=arn)
 
 
 # The terraform fixture sets up resources, which happens before we
@@ -1272,6 +1747,72 @@ class IamGroupTests(BaseTest):
         )
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["GroupId"], "AGPAI6NICSNT546VPVZGS")
+
+    def test_iam_group_with_managed_policy(self):
+        session_factory = self.replay_flight_data("test_iam_group_with_managed_policy")
+        p = self.load_policy(
+            {
+                "name": "iam-groups-have-ses-send-policy",
+                "resource": "aws.iam-group",
+                "filters": [
+                    {
+                        "type": "has-specific-managed-policy",
+                        "value": "AmazonSESFullAccess"
+                    }
+                ]
+            },
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_iam_group_set_policy(self):
+        session_factory = self.replay_flight_data("test_iam_group_set_policy")
+        client = session_factory().client("iam")
+
+        p = self.load_policy(
+            {
+                "name": "iam-group-set-policy",
+                "resource": "aws.iam-group",
+                "actions": [
+                    {
+                        "type": "set-policy",
+                        "state": "attached",
+                        "arn": "arn:aws:iam::123456789012:policy/my-iam-policy"
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertIn('test', resources[0]['GroupName'])
+
+        policies = client.list_attached_group_policies(GroupName="test")
+        self.assertEqual(len(policies['AttachedPolicies']), 1)
+        self.assertEqual(policies['AttachedPolicies'][0]["PolicyName"], "my-iam-policy")
+
+        p = self.load_policy(
+            {
+                "name": "iam-group-set-policy",
+                "resource": "aws.iam-group",
+                "actions": [
+                    {
+                        "type": "set-policy",
+                        "state": "detached",
+                        "arn": "*"
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertIn('test', resources[0]['GroupName'])
+
+        policies = client.list_attached_group_policies(GroupName="test")
+        self.assertEqual(len(policies['AttachedPolicies']), 0)
 
 
 class IamManagedPolicyUsage(BaseTest):
@@ -1476,60 +2017,6 @@ class IamInlinePolicyUsage(BaseTest):
         client = session_factory().client("iam")
         inline_policies_after = client.list_group_policies(GroupName=noncompliant_group)
         self.assertEqual(len(inline_policies_after["PolicyNames"]), 0)
-
-
-class KMSCrossAccount(BaseTest):
-
-    def test_kms_cross_account(self):
-        self.patch(CrossAccountAccessFilter, "executor_factory", MainThreadExecutor)
-        session_factory = self.replay_flight_data("test_cross_account_kms")
-        client = session_factory().client("kms")
-
-        policy = {
-            "Id": "Lulu",
-            "Version": "2012-10-17",
-            "Statement": [
-                {
-                    "Sid": "Enable IAM User Permissions",
-                    "Effect": "Allow",
-                    "Principal": {"AWS": "arn:aws:iam::644160558196:root"},
-                    "Action": "kms:*",
-                    "Resource": "*",
-                },
-                {
-                    "Sid": "Enable Cross Account",
-                    "Effect": "Allow",
-                    "Principal": "*",
-                    "Action": "kms:Encrypt",
-                    "Resource": "*",
-                },
-            ],
-        }
-
-        key_info = client.create_key(
-            Policy=json.dumps(policy), Description="test-cross-account-3"
-        )[
-            "KeyMetadata"
-        ]
-
-        # disable and schedule deletion
-        self.addCleanup(
-            client.schedule_key_deletion, KeyId=key_info["KeyId"], PendingWindowInDays=7
-        )
-        self.addCleanup(client.disable_key, KeyId=key_info["KeyId"])
-
-        p = self.load_policy(
-            {
-                "name": "kms-cross",
-                "resource": "kms-key",
-                "filters": [{"KeyState": "Enabled"}, "cross-account"],
-            },
-            session_factory=session_factory,
-        )
-
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]["KeyId"], key_info["KeyId"])
 
 
 class GlacierCrossAccount(BaseTest):
@@ -1803,6 +2290,7 @@ class SNSCrossAccount(BaseTest):
                     {
                         "type": "cross-account",
                         "whitelist_endpoints": ["@whitelist.com"],
+                        "whitelist_conditions": ["aws:UserName"]
                     },
                 ],
             },
@@ -1839,6 +2327,21 @@ class CrossAccountChecker(TestCase):
         checker = PolicyChecker({"allowed_accounts": {"221800032964"}})
         for p, expected in zip(
             policies, [False, True, True, False, False, False, False, False]
+        ):
+            violations = checker.check(p)
+            self.assertEqual(bool(violations), expected)
+
+    def test_iam_policies(self):
+        policies = load_data("iam/iam-policies.json")
+
+        checker = PolicyChecker({
+            "allowed_accounts": [
+                "111111111111",
+                "cognito-identity.amazonaws.com",
+            ]
+        })
+        for p, expected in zip(
+            policies, [False, True, True, False, False, True]
         ):
             violations = checker.check(p)
             self.assertEqual(bool(violations), expected)
@@ -1945,6 +2448,13 @@ class CrossAccountChecker(TestCase):
             violations = checker.check(p)
             self.assertEqual(bool(violations), expected)
 
+    def test_s3_return_allowed_only(self):
+        policies = load_data("iam/s3-principal.json")
+        checker = PolicyChecker({"return_allowed": True})
+        for p, expected in zip(policies, [False, False, False, True, True, True]):
+            allowances = checker.check(p)
+            self.assertEqual(bool(allowances), expected)
+
     def test_s3_principal_org_id(self):
         policies = load_data("iam/s3-orgid.json")
         checker = PolicyChecker(
@@ -1953,6 +2463,75 @@ class CrossAccountChecker(TestCase):
             }
         )
         for p, expected in zip(policies, [False, True]):
+            violations = checker.check(p)
+            self.assertEqual(bool(violations), expected)
+
+    def test_s3_policies_multiple_keys(self):
+        policies = load_data("iam/s3-condition-multi-keys.json")
+        checker = PolicyChecker(
+            {
+                "allowed_accounts": {"123456789012"},
+                "allowed_orgid": {"o-goodorg"}
+            }
+        )
+        for p, expected in zip(policies, [False, True]):
+            violations = checker.check(p)
+            self.assertEqual(bool(violations), expected)
+
+    def test_s3_resource_org_id(self):
+        policies = load_data("iam/s3-resource-orgid.json")
+        checker = PolicyChecker(
+            {
+                "allowed_orgid": {"o-goodorg"}
+            }
+        )
+        for p, expected in zip(policies, [False, True]):
+            violations = checker.check(p)
+            self.assertEqual(bool(violations), expected)
+        checker = PolicyChecker(
+            {
+                "allowed_orgid": {}
+            }
+        )
+        for p, expected in zip(policies, [True, True]):
+            violations = checker.check(p)
+            self.assertEqual(bool(violations), expected)
+
+    def test_s3_arn_condition(self):
+        policies = load_data("iam/s3-arn-conditions.json")
+        checker = PolicyChecker(
+            {
+                "allowed_accounts": {"123456789012"}
+            }
+        )
+        for p, expected in zip(policies, [False, True]):
+            violations = checker.check(p)
+            self.assertEqual(bool(violations), expected)
+        checker = PolicyChecker(
+            {
+                "allowed_accounts": {}
+            }
+        )
+        for p, expected in zip(policies, [True, True]):
+            violations = checker.check(p)
+            self.assertEqual(bool(violations), expected)
+
+    def test_s3_principal_account(self):
+        policies = load_data("iam/s3-principal-accounts.json")
+        checker = PolicyChecker(
+            {
+                "allowed_accounts": {"123456789012"}
+            }
+        )
+        for p, expected in zip(policies, [False, True]):
+            violations = checker.check(p)
+            self.assertEqual(bool(violations), expected)
+        checker = PolicyChecker(
+            {
+                "allowed_accounts": {}
+            }
+        )
+        for p, expected in zip(policies, [True, True]):
             violations = checker.check(p)
             self.assertEqual(bool(violations), expected)
 
@@ -2103,6 +2682,46 @@ class DeleteRoleAction(BaseTest):
             }
         )
 
+    def test_set_policy_arn_construction(self):
+        factory = self.replay_flight_data("test_set_policy_arn_construction")
+
+        # Use set-policy with an explicit ARN
+        p = self.load_policy(
+            {
+                "name": "iam-policy-error",
+                "resource": "iam-role",
+                "source": "config",
+                "query": [{"clause": "resourceName = 'custodian-testing'"}],
+                "actions": [{
+                    "type": "set-policy",
+                    "state": "attached",
+                    "arn": "arn:aws:iam::{account_id}:policy/DeleteMe"
+                }],
+            },
+            session_factory=factory
+        )
+        p.expand_variables(p.get_variables())
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        if self.recording:
+            time.sleep(1)
+
+        # Use a policy name
+        p = self.load_policy(
+            {
+                "name": "iam-policy-error",
+                "resource": "iam-role",
+                "source": "config",
+                "query": [{"clause": "resourceName = 'custodian-testing'"}],
+                "filters": [{"type": "has-specific-managed-policy", "value": "DeleteMe"}],
+                "actions": [{"type": "set-policy", "state": "detached", "arn": "DeleteMe"}],
+            },
+            session_factory=factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_force_delete_role(self):
         factory = self.replay_flight_data("test_force_delete_role")
         policy = self.load_policy(
@@ -2135,3 +2754,25 @@ class DeleteRoleAction(BaseTest):
         client = factory().client("iam")
         self.assertTrue(
             client.get_role(RoleName=resources[0]['RoleName']), 'AWSServiceRoleForSupport')
+
+
+class TestIamProfileHasSpecificManagedPolicyFilter(BaseTest):
+
+    def test_iam_profile_has_specific_managed_policy_filter(self):
+        factory = self.replay_flight_data("test_iam_profile_has_specific_managed_policy")
+        p = self.load_policy(
+            {
+                "name": "iam-profile-has-admin-policy",
+                "resource": "iam-profile",
+                "filters": [
+                    {
+                        "type": "has-specific-managed-policy",
+                        "value": "admin-policy",
+                    }
+                ],
+            },
+            config={"region": "us-west-2"},
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 3)

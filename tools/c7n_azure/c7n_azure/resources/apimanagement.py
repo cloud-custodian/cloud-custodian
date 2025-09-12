@@ -4,6 +4,7 @@ from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 from azure.mgmt.resource.resources.models import GenericResource
+from c7n.filters import ListItemFilter
 
 from c7n.utils import type_schema
 
@@ -39,6 +40,25 @@ class ApiManagement(ArmResourceManager):
             'sku.[name, capacity]'
         )
         resource_type = 'Microsoft.ApiManagement/service'
+
+
+@ApiManagement.filter_registry.register("certificates")
+class Certificate(ListItemFilter):
+    schema = type_schema(
+        "certificates",
+        attrs={"$ref": "#/definitions/filters_common/list_item_attrs"},
+        count={"type": "number"},
+        count_op={"$ref": "#/definitions/filters_common/comparison_operators"}
+    )
+    annotate_items = True
+    item_annotation_key = "c7n:Certificates"
+
+    def get_item_values(self, resource):
+        certs = self.manager.get_client().certificate.list_by_service(
+            resource_group_name=resource['resourceGroup'],
+            service_name=resource['name']
+        )
+        return [c.serialize(True) for c in certs]
 
 
 @ApiManagement.action_registry.register('resize')

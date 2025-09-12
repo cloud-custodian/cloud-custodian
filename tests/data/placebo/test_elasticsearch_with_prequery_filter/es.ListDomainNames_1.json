@@ -1,0 +1,22 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "407fb4ad-477b-11e7-b0ab-1f7d120d52ca", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "407fb4ad-477b-11e7-b0ab-1f7d120d52ca", 
+                "date": "Fri, 02 Jun 2017 10:07:14 GMT", 
+                "content-length": "43", 
+                "content-type": "application/json"
+            }
+        }, 
+        "DomainNames": [
+            {
+                "DomainName": "c7n-test-opensearch",
+                "EngineType": "OpenSearch"
+            }
+        ]
+    }
+}

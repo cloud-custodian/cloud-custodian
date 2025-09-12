@@ -1,0 +1,21 @@
+{
+    "version": "1.3",
+    "accountId": "644160558196",
+    "configurationItemCaptureTime": "2022-07-21T08:54:37.664000-04:00",
+    "configurationItemStatus": "ResourceDiscovered",
+    "configurationStateId": "1658408077664",
+    "configurationItemMD5Hash": "",
+    "arn": "arn:aws:kinesis:us-east-1:644160558196:stream/stream-encrypted",
+    "resourceType": "AWS::Kinesis::Stream",
+    "resourceId": "stream-encrypted",
+    "resourceName": "stream-encrypted",
+    "awsRegion": "us-east-1",
+    "availabilityZone": "Regional",
+    "tags": {
+        "App": "Magic"
+    },
+    "relatedEvents": [],
+    "relationships": [],
+    "configuration": "{\"Arn\":\"arn:aws:kinesis:us-east-1:644160558196:stream/stream-encrypted\",\"Name\":\"stream-encrypted\",\"RetentionPeriodHours\":24,\"ShardCount\":4,\"Tags\":[{\"Key\":\"App\",\"Value\":\"Magic\"}],\"StreamEncryption\":{\"EncryptionType\":\"KMS\",\"KeyId\":\"alias/aws/kinesis\"}}",
+    "supplementaryConfiguration": {}
+}

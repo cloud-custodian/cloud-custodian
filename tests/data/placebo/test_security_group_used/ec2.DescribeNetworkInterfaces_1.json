@@ -69,6 +69,127 @@
                 "OwnerId": "644160558196", 
                 "TagSet": [], 
                 "PrivateIpAddress": "172.31.26.53"
+            },
+            {
+                "AvailabilityZone": "us-west-2a",
+                "Description": "AWS Lambda VPC ENI: 26578289-8b35-4f36-a046-ceda51a45800",
+                "Groups": [
+                    {
+                        "GroupName": "VPC Lambda Sec Group",
+                        "GroupId": "sg-1c8a186c"
+                    }
+                ],
+                "InterfaceType": "interface",
+                "Ipv6Addresses": [],
+                "MacAddress": "02:d3:b3:31:71:46",
+                "NetworkInterfaceId": "eni-0c779745aaa5e430d",
+                "OwnerId": "644160558196", 
+                "PrivateDnsName": "ip-10-81-74-32.us-west-2.compute.internal",
+                "PrivateIpAddress": "10.81.74.32",
+                "PrivateIpAddresses": [
+                    {
+                        "Primary": true,
+                        "PrivateDnsName": "ip-10-81-74-32.us-west-2.compute.internal",
+                        "PrivateIpAddress": "10.81.74.32"
+                    }
+                ],
+                "RequesterId": "AROAIYDDMMXM3QFS5LEKZ:deploy-lambda",
+                "RequesterManaged": false,
+                "SourceDestCheck": true,
+                "Status": "available",
+                "SubnetId": "subnet-9fa08df9",
+                "TagSet": [],
+                "VpcId": "vpc-0e03e277"
+            },
+            {
+                "Attachment": {
+                    "AttachmentId": "ela-attach-4613347a",
+                    "DeleteOnTermination": false,
+                    "DeviceIndex": 1,
+                    "InstanceOwnerId": "amazon-aws",
+                    "Status": "attached"
+                },
+                "AvailabilityZone": "us-west-2c",
+                "Description": "VPC Endpoint Interface vpce-0929ee4b892d1ad5d",
+                "Groups": [
+                    {
+                        "GroupName": "default",
+                        "GroupId": "sg-f9cc4d9f"
+                    },
+                    {
+                        "GroupName": "InstanceSecurityGroup-1A6Y8I3R4AP02",
+                        "GroupId": "sg-0a2cb503a229c31c1"
+                    }
+                ],
+                "InterfaceType": "vpc_endpoint",
+                "Ipv6Addresses": [],
+                "MacAddress": "0a:29:89:47:c9:2c",
+                "NetworkInterfaceId": "eni-04b74850b90891a7c",
+                "OwnerId": "644160558196",
+                "PrivateDnsName": "ip-10-81-74-164.us-west-2.compute.internal",
+                "PrivateIpAddress": "10.81.74.164",
+                "PrivateIpAddresses": [
+                    {
+                        "Primary": true,
+                        "PrivateDnsName": "ip-10-81-74-164.us-west-2.compute.internal",
+                        "PrivateIpAddress": "10.81.74.164"
+                    }
+                ],
+                "RequesterId": "644160558196",
+                "RequesterManaged": true,
+                "SourceDestCheck": true,
+                "Status": "in-use",
+                "SubnetId": "subnet-193bdf43",
+                "TagSet": [],
+                "VpcId": "vpc-0e03e277"
+            },            
+            {
+                "AvailabilityZone": "us-west-2c",
+                "Description": "aws-k8s-branch-eni",
+                "Groups": [
+                    {
+                        "GroupName": "default",
+                        "GroupId": "sg-f9cc4d9f"
+                    },
+                    {
+                        "GroupName": "InstanceSecurityGroup-1A6Y8I3R4AP02",
+                        "GroupId": "sg-0a2cb503a229c31c1"
+                    }
+                ],
+                "InterfaceType": "branch",
+                "Ipv6Addresses": [],
+                "MacAddress": "0a:e1:96:2a:14:03",
+                "NetworkInterfaceId": "eni-05f8e0f783bfe84f0",
+                "OwnerId": "01234567890",
+                "PrivateDnsName": "ip-100-71-36-229.us-west-2.compute.internal",
+                "PrivateIpAddress": "100.71.36.229",
+                "PrivateIpAddresses": [
+                    {
+                        "Primary": true,
+                        "PrivateDnsName": "ip-100-71-36-229.us-west-2.compute.internal",
+                        "PrivateIpAddress": "100.71.36.229"
+                    }
+                ],
+                "RequesterId": "01234567890",
+                "RequesterManaged": false,
+                "SourceDestCheck": true,
+                "Status": "in-use",
+                "SubnetId": "subnet-193bdf43",
+                "TagSet": [
+                    {
+                        "Key": "vpcresources.k8s.aws/vlan-id",
+                        "Value": "1"
+                    },
+                    {
+                        "Key": "eks:eni:owner",
+                        "Value": "eks-vpc-resource-controller"
+                    },
+                    {
+                        "Key": "vpcresources.k8s.aws/trunk-eni-id",
+                        "Value": "eni-0e769e3bf64c37e57"
+                    }
+                ],
+                "VpcId": "vpc-0e03e277"
             }
         ]
     }

@@ -1,0 +1,64 @@
+{
+  "headers": {
+    "etag": "wG7Xxphfx8hoy_1PT9oZh2Jayo4=/JA2I66q3dl4Flfov3kxcre5dZNQ=",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Fri, 23 Jun 2023 15:04:43 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "1403",
+    "-content-encoding": "gzip",
+    "content-location": "https://compute.googleapis.com/compute/v1/projects/cloud-custodian/global/images?filter=name+%3D+image-1&alt=json"
+  },
+  "body": {
+    "kind": "compute#imageList",
+    "id": "projects/cloud-custodian/global/images",
+    "items": [
+      {
+        "kind": "compute#image",
+        "id": "6295399062274840336",
+        "creationTimestamp": "2023-06-23T07:19:44.398-07:00",
+        "name": "image-1",
+        "sourceType": "RAW",
+        "status": "READY",
+        "archiveSizeBytes": "641466688",
+        "diskSizeGb": "10",
+        "sourceDisk": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a/disks/c7n-test-instance",
+        "sourceDiskId": "563869659377572944",
+        "licenses": [
+          "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/licenses/debian-11-bullseye"
+        ],
+        "family": "n2",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/images/image-1",
+        "labels": {
+          "test_label": "test_value"
+        },
+        "labelFingerprint": "CHILmtzyjdE=",
+        "guestOsFeatures": [
+          {
+            "type": "UEFI_COMPATIBLE"
+          },
+          {
+            "type": "VIRTIO_SCSI_MULTIQUEUE"
+          },
+          {
+            "type": "GVNIC"
+          }
+        ],
+        "licenseCodes": [
+          "3853522013536123851"
+        ],
+        "storageLocations": [
+          "us"
+        ],
+        "architecture": "X86_64"
+      }
+    ],
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/images"
+  }
+}

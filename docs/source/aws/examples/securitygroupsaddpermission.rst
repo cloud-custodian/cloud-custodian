@@ -25,7 +25,7 @@ User defined rule is added to the filtered results.
            events:
              - source: ec2.amazonaws.com
                event: AuthorizeSecurityGroupIngress
-               ids: "requestParameters.groupId"
+               ids: "responseElements.securityGroupRuleSet.items[].groupId"
              - source: ec2.amazonaws.com
                event: RevokeSecurityGroupIngress
                ids: "requestParameters.groupId"

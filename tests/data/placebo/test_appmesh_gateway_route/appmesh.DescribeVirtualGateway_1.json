@@ -1,0 +1,89 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "virtualGateway": {
+            "meshName": "m1",
+            "metadata": {
+                "arn": "arn:aws:appmesh:us-east-1:644160558196:mesh/m1/virtualGateway/g1",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 4,
+                    "day": 16,
+                    "hour": 19,
+                    "minute": 40,
+                    "second": 41,
+                    "microsecond": 631000
+                },
+                "lastUpdatedAt": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 4,
+                    "day": 16,
+                    "hour": 19,
+                    "minute": 40,
+                    "second": 41,
+                    "microsecond": 631000
+                },
+                "meshOwner": "644160558196",
+                "resourceOwner": "644160558196",
+                "uid": "d4766559-ce21-43d6-a0e8-a56d78b31ee4",
+                "version": 1
+            },
+            "spec": {
+                "backendDefaults": {
+                    "clientPolicy": {
+                        "tls": {
+                            "enforce": true,
+                            "validation": {
+                                "trust": {
+                                    "file": {
+                                        "certificateChain": "/certs/ca.pem"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "listeners": [
+                    {
+                        "healthCheck": {
+                            "healthyThreshold": 2,
+                            "intervalMillis": 5000,
+                            "path": "/",
+                            "port": 8443,
+                            "protocol": "http",
+                            "timeoutMillis": 2000,
+                            "unhealthyThreshold": 2
+                        },
+                        "portMapping": {
+                            "port": 8443,
+                            "protocol": "http"
+                        },
+                        "tls": {
+                            "certificate": {
+                                "file": {
+                                    "certificateChain": "/certs/cert.pem",
+                                    "privateKey": "/certs/key.pem"
+                                }
+                            },
+                            "mode": "STRICT"
+                        }
+                    }
+                ],
+                "logging": {
+                    "accessLog": {
+                        "file": {
+                            "path": "/dev/stdout"
+                        }
+                    }
+                }
+            },
+            "status": {
+                "status": "ACTIVE"
+            },
+            "virtualGatewayName": "g1"
+        }
+    }
+}

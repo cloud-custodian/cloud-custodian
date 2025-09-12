@@ -1,0 +1,24 @@
+{
+    "status_code": 200,
+    "data": {
+        "Items": [
+            {
+                "app_name": {
+                    "S": "cicd"
+                },
+                "env": {
+                    "S": "shared"
+                }
+            },
+            {
+                "app_name": {
+                    "S": "app1"
+                },
+                "env": {
+                    "S": "prod"
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

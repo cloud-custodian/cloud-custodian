@@ -1,0 +1,62 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.insights/logprofiles?api-version=2016-03-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Mon, 22 May 2023 17:35:00 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "512"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.insights/logprofiles/testlogprofile",
+                                "type": null,
+                                "name": "testlogprofile",
+                                "location": null,
+                                "kind": null,
+                                "tags": null,
+                                "properties": {
+                                    "storageAccountId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-xtoqhiqs/providers/Microsoft.Storage/storageAccounts/c7nsuccesssa",
+                                    "serviceBusRuleId": null,
+                                    "locations": [
+                                        "centralus"
+                                    ],
+                                    "categories": [
+                                        "Delete"
+                                    ],
+                                    "retentionPolicy": {
+                                        "enabled": false,
+                                        "days": 0
+                                    }
+                                },
+                                "identity": null
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

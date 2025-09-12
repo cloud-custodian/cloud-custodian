@@ -4,12 +4,9 @@
 Monitoring Metrics suppport for resources
 """
 from datetime import datetime, timedelta
-import pytz
-
-import jmespath
 
 from c7n.filters.core import Filter, OPERATORS, FilterValidationError
-from c7n.utils import local_session, type_schema
+from c7n.utils import local_session, type_schema, jmespath_search
 
 from c7n_gcp.provider import resources as gcp_resources
 
@@ -74,7 +71,6 @@ class GCPMetricsFilter(Filter):
         filters:
         - type: metrics
           name: firewallinsights.googleapis.com/subnet/firewall_hit_count
-          resource-key: name
           aligner: ALIGN_COUNT
           days: 14
           value: 1
@@ -84,7 +80,6 @@ class GCPMetricsFilter(Filter):
     schema = type_schema(
         'metrics',
         **{'name': {'type': 'string'},
-          'resource-key': {'type': 'string'},
           'metric-key': {'type': 'string'},
           'group-by-fields': {'type': 'array', 'items': {'type': 'string'}},
           'days': {'type': 'number'},
@@ -109,13 +104,12 @@ class GCPMetricsFilter(Filter):
         duration = timedelta(days)
 
         self.metric = self.data['name']
-        self.resource_key = self.data.get('resource-key', self.manager.resource_type.name)
-        self.metric_key = self.data.get('metric-key', self.manager.resource_type.metric_key)
+        self.metric_key = self.data.get('metric-key') or self.manager.resource_type.metric_key
         self.aligner = self.data.get('aligner', 'ALIGN_NONE')
         self.reducer = self.data.get('reducer', 'REDUCE_NONE')
         self.group_by_fields = self.data.get('group-by-fields', [])
         self.missing_value = self.data.get('missing-value')
-        self.end = datetime.now(pytz.timezone('UTC'))
+        self.end = datetime.utcnow().replace(microsecond=0)
         self.start = self.end - duration
         self.period = str((self.end - self.start).total_seconds()) + 's'
         self.resource_metric_dict = {}
@@ -132,8 +126,8 @@ class GCPMetricsFilter(Filter):
         for batched_filter in self.get_batched_query_filter(resources):
             query_params = {
                 'filter': batched_filter,
-                'interval_startTime': self.start.isoformat(),
-                'interval_endTime': self.end.isoformat(),
+                'interval_startTime': self.start.isoformat() + 'Z',
+                'interval_endTime': self.end.isoformat() + 'Z',
                 'aggregation_alignmentPeriod': self.period,
                 "aggregation_perSeriesAligner": self.aligner,
                 "aggregation_crossSeriesReducer": self.reducer,
@@ -162,12 +156,11 @@ class GCPMetricsFilter(Filter):
         resource_filter = []
         batch_size = len(self.filter)
         for r in resources:
-            resource_name = jmespath.search(self.resource_key, r)
+            resource_name = self.manager.resource_type.get_metric_resource_name(r)
             resource_filter_item = '{} = "{}"'.format(self.metric_key, resource_name)
             resource_filter.append(resource_filter_item)
             resource_filter.append(' OR ')
             batch_size += len(resource_filter_item) + 4
-
             if batch_size >= BATCH_SIZE:
                 resource_filter.pop()
                 batched_resources.append(resource_filter)
@@ -196,13 +189,12 @@ class GCPMetricsFilter(Filter):
 
     def split_by_resource(self, metric_list):
         for m in metric_list:
-            resource_name = jmespath.search(self.metric_key, m)
+            resource_name = jmespath_search(self.metric_key, m)
             self.resource_metric_dict[resource_name] = m
 
     def process_resource(self, resource):
         resource_metric = resource.setdefault('c7n.metrics', {})
-
-        resource_name = jmespath.search(self.resource_key, resource)
+        resource_name = self.manager.resource_type.get_metric_resource_name(resource)
         metric = self.resource_metric_dict.get(resource_name)
         if not metric and not self.missing_value:
             return False
@@ -218,7 +210,8 @@ class GCPMetricsFilter(Filter):
 
     @classmethod
     def register_resources(klass, registry, resource_class):
-        resource_class.filter_registry.register('metrics', klass)
+        if resource_class.filter_registry:
+            resource_class.filter_registry.register('metrics', klass)
 
 
 gcp_resources.subscribe(GCPMetricsFilter.register_resources)

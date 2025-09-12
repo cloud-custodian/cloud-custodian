@@ -6,13 +6,17 @@ from functools import wraps
 import json
 import itertools
 import logging
+import argparse
 import os
 import sys
+from typing import List
 
 import yaml
 from yaml.constructor import ConstructorError
 
+from c7n import deprecated
 from c7n.exceptions import ClientError, PolicyValidationError
+from c7n.loader import SourceLocator
 from c7n.provider import clouds
 from c7n.policy import Policy, PolicyCollection, load as policy_load
 from c7n.schema import ElementSchema, StructureParser, generate
@@ -192,9 +196,12 @@ def validate(options):
 
     used_policy_names = set()
     structure = StructureParser()
-    errors = []
+    all_errors = {}
+    found_deprecations = False
+    footnotes = deprecated.Footnotes()
 
     for config_file in options.configs:
+        errors = []
 
         config_file = os.path.expanduser(config_file)
         if not os.path.exists(config_file):
@@ -205,7 +212,8 @@ def validate(options):
 
         with open(config_file) as fh:
             if fmt in ('yml', 'yaml', 'json'):
-                data = yaml.load(fh.read(), Loader=DuplicateKeyCheckLoader)
+                # our loader is safe loader derived.
+                data = yaml.load(fh.read(), Loader=DuplicateKeyCheckLoader)  # nosec nosemgrep
             else:
                 log.error("The config file must end in .json, .yml or .yaml.")
                 raise ValueError("The config file must end in .json, .yml or .yaml.")
@@ -215,7 +223,7 @@ def validate(options):
         except PolicyValidationError as e:
             log.error("Configuration invalid: {}".format(config_file))
             log.error("%s" % e)
-            errors.append(e)
+            all_errors[config_file] = e
             continue
 
         load_resources(structure.get_resource_types(data))
@@ -231,12 +239,31 @@ def validate(options):
                 )
             ))
         used_policy_names = used_policy_names.union(conf_policy_names)
+        source_locator = None
+        if fmt in ('yml', 'yaml'):
+            # For yaml files there is at least the expectation that the policy
+            # name is on a line by itself. With JSON, the file could be one big
+            # line. At this stage we are only attempting to find line number for
+            # policies in yaml files.
+            source_locator = SourceLocator(config_file)
         if not errors:
             null_config = Config.empty(dryrun=True, account_id='na', region='na')
             for p in data.get('policies', ()):
                 try:
                     policy = Policy(p, null_config, Bag())
                     policy.validate()
+                    # If the policy is invalid, there isn't much point checking
+                    # for deprecated usage as there is no guarantee as to the
+                    # state of the policy.
+                    if options.check_deprecations != deprecated.SKIP:
+                        report = deprecated.report(policy)
+                        if report:
+                            found_deprecations = True
+                            log.warning("deprecated usage found in policy\n" +
+                                        report.format(
+                                            source_locator=source_locator,
+                                            footnotes=footnotes))
+
                 except Exception as e:
                     msg = "Policy: %s is invalid: %s" % (
                         p.get('name', 'unknown'), e)
@@ -245,27 +272,37 @@ def validate(options):
             log.info("Configuration valid: {}".format(config_file))
             continue
 
+        all_errors[config_file] = errors
         log.error("Configuration invalid: {}".format(config_file))
         for e in errors:
             log.error("%s" % e)
-    if errors:
+    if found_deprecations:
+        notes = footnotes()
+        if notes:
+            log.warning("deprecation footnotes:\n" + notes)
+        if options.check_deprecations == deprecated.STRICT:
+            sys.exit(1)
+    if all_errors:
         sys.exit(1)
 
 
 @policy_command
-def run(options, policies):
+def run(options, policies: List[Policy]) -> None:
     exit_code = 0
 
     # AWS - Sanity check that we have an assumable role before executing policies
     # Todo - move this behind provider interface
     if options.assume_role and [p for p in policies if p.provider_name == 'aws']:
+        # the cli options we're being handed haven't been initialized by the
+        # provider, instead use one of the provider's policy options.
+        sample_aws = [p for p in policies if p.provider_name == 'aws'].pop()
         try:
-            local_session(clouds['aws']().get_session_factory(options))
+            local_session(clouds['aws']().get_session_factory(sample_aws.options))
         except ClientError:
             log.exception("Unable to assume role %s", options.assume_role)
             sys.exit(1)
 
-    errored_policies = []
+    errored_policies: List[str] = []
     for policy in policies:
         try:
             policy()
@@ -545,3 +582,21 @@ def version_cmd(options):
     if 'openstack' in found:
         packages.append('c7n_openstack')
     print(generate_requirements(packages))
+
+
+class LoadSessionPolicyJson(argparse.Action):
+
+    @staticmethod
+    def load_session_policy_from_file(session_pol_file_name):
+        # try to read json object
+        try:
+            with open(session_pol_file_name, "r") as sp:
+                s_pol = json.load(sp)
+            return s_pol
+        except Exception as e:
+            raise e
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        file_name = values
+        p = self.load_session_policy_from_file(file_name)
+        setattr(namespace, self.dest, p)

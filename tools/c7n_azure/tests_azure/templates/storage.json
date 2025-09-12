@@ -20,7 +20,9 @@
       "kind": "Storage",
       "location": "South Central US",
       "tags": {},
-      "properties": {},
+      "properties": {
+        "supportsHttpsTrafficOnly":true
+      },
       "resources": [
         {
             "type": "blobServices/containers",
@@ -30,7 +32,7 @@
                 "[parameters('StorageAccountName')]"
             ],
             "properties": {
-                "publicAccess": "Container"
+                "publicAccess": "None"
             }
         },
         {
@@ -43,8 +45,22 @@
             "properties": {
                 "publicAccess": "None"
             }
+        },
+        {
+          "type": "blobServices",
+          "apiVersion": "2021-09-01",
+          "name": "default",
+          "dependsOn": [
+              "[parameters('StorageAccountName')]"
+          ],
+          "properties": {
+              "deleteRetentionPolicy":{
+                "days": 7,
+                "enabled": true
+              } 
+          }
         }
-    ]
+      ]
     },
     {
       "name": "[concat('cclgstorage', uniqueString(resourceGroup().id))]",
@@ -56,7 +72,9 @@
       "kind": "Storage",
       "location": "South Central US",
       "tags": {},
-      "properties": {}
+      "properties": {
+          "supportsHttpsTrafficOnly":true
+      }
     },
     {
       "type": "Microsoft.Storage/storageAccounts",
@@ -69,6 +87,7 @@
       },
       "kind": "Storage",
       "properties": {
+        "supportsHttpsTrafficOnly":true,
         "networkAcls": {
           "bypass": "AzureServices",
           "virtualNetworkRules": [],

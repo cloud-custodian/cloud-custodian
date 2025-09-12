@@ -1,0 +1,98 @@
+             
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "profiles_cctestcdnprofile_name": {
+            "defaultValue": "cctestcdnprofile",
+            "type": "string"
+        },
+        "endpoints_cctestcdnendpoint_name": {
+            "defaultValue": "cctestcdnendpoint",
+            "type": "string"
+        },
+        "domains_cctestcdndomain_name": {
+            "defaultValue": "cctestcdndomain",
+            "type": "string"
+        }
+        },
+        "variables": {},
+        "resources": [
+            {
+                "name": "[parameters('profiles_cctestcdnprofile_name')]",
+                "type": "Microsoft.Cdn/profiles",
+                "location": "eastus",
+                "apiVersion": "2020-09-01",
+                "properties": {
+                    "provisioningState": "Succeeded",
+                    "resourceState": "Active"
+                },
+                "kind": "cdn",
+                "sku": {
+                    "name": "Standard_Microsoft"
+                },
+                "resources": [
+                    {
+                        "type": "endpoints",
+                        "sku": {
+                            "name": "Standard_Microsoft"
+                        },
+                        "name": "[parameters('endpoints_cctestcdnendpoint_name')]",
+                        "apiVersion": "2020-09-01",
+                        "dependsOn": [
+                            "[resourceId('Microsoft.Cdn/profiles', parameters('profiles_cctestcdnprofile_name'))]"
+                        ],
+                        "location": "EastUs",
+                        "tags": {},
+                        "scale": null,
+                        "properties": {
+                            "hostName": "cctestcdnendpoint.azureedge.net",
+                            "isCompressionEnabled": false,
+                            "isHttpAllowed": true,
+                            "isHttpsAllowed": true,
+                            "queryStringCachingBehavior": "IgnoreQueryString",
+                        "origins": [
+                        {
+                            "name": "host",
+                            "properties": {
+                                "hostName": "cdnowolabi.z13.web.core.windows.net",
+                                "httpPort": 80,
+                                "httpsPort": 443
+                            }
+                        }
+                        ]
+                    },
+                    "resources": [
+                        {
+                            "apiVersion": "2020-09-01",
+                            "location": "EastUs",
+                            "name": "[concat(parameters('profiles_cctestcdnprofile_name'), '/', parameters('endpoints_cctestcdnendpoint_name'), '/', parameters('domains_cctestcdndomain_name'))]",
+                            "type": "Microsoft.Cdn/profiles/endpoints/customDomains",
+                            "dependsOn": [
+                                "[resourceId('Microsoft.Cdn/profiles', parameters('profiles_cctestcdnprofile_name'))]",
+                                "[resourceId('Microsoft.Cdn/profiles/endpoints', parameters('profiles_cctestcdnprofile_name'), parameters('endpoints_cctestcdnendpoint_name'))]"
+                            ],
+                            "properties": {
+                                "hostName": "www.roromart.com",
+                                "validationData": null,
+                                "resourceState": "Active",
+                                "customHttpsProvisioningState": "Enabled",
+                                "customHttpsProvisioningSubstate": "CertificateDeployed",
+                                "customHttpsParameters": {
+                                    "certificateSource": "Cdn",
+                                "certificateSourceParameters": {
+                                    "certificateType": "Dedicated",
+                                    "@odata.type": "#Microsoft.Azure.Cdn.Models.CdnCertificateSourceParameters"
+                                },
+                                "protocolType": "ServerNameIndication",
+                                "minimumTlsVersion": "TLS12"
+                            },
+                                "provisioningState": "Succeeded"
+                            }
+                        }
+                    ]
+                }]
+            }
+        ],
+    "outputs": {}
+}

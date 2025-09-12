@@ -1,0 +1,38 @@
+{
+    "status_code": 200,
+    "data": {
+        "Clusters": [
+            {
+                "Name": "test-cluster",
+                "Description": "Easy created demo cluster on 2024-05-29T20:55:32.568Z",
+                "Status": "deleting",
+                "NumberOfShards": 1,
+                "ClusterEndpoint": {
+                    "Address": "clustercfg.test-cluster.qgcgte.memorydb.us-east-1.amazonaws.com",
+                    "Port": 6379
+                },
+                "NodeType": "db.t4g.small",
+                "EngineVersion": "7.1",
+                "EnginePatchVersion": "7.1.0",
+                "ParameterGroupName": "default.memorydb-redis7",
+                "ParameterGroupStatus": "in-sync",
+                "SecurityGroups": [
+                    {
+                        "SecurityGroupId": "sg-03c0b84cdad91744f",
+                        "Status": "active"
+                    }
+                ],
+                "SubnetGroupName": "test-subnet",
+                "TLSEnabled": true,
+                "ARN": "arn:aws:memorydb:us-east-1:644160558196:cluster/test-cluster",
+                "SnapshotRetentionLimit": 1,
+                "MaintenanceWindow": "mon:08:30-mon:09:30",
+                "SnapshotWindow": "04:00-05:00",
+                "ACLName": "open-access",
+                "AutoMinorVersionUpgrade": true,
+                "DataTiering": "false"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

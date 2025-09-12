@@ -1,0 +1,92 @@
+{
+    "status_code": 200,
+    "data": {
+        "EntityRecognizerProperties": {
+            "EntityRecognizerArn": "arn:aws:comprehend:us-east-1:644160558196:entity-recognizer/TestVpcEntityRecognizer/version/8",
+            "LanguageCode": "en",
+            "Status": "IN_ERROR",
+            "Message": "The entity list file TrainingData3 - Sheet1.csv contains invalid column names: Index(['File', 'Line', 'Begin Offset', 'End Offset', 'Type'], dtype='object'). Expected column names are {'Type', 'Text'}.\n, exit code: 255",
+            "SubmitTime": {
+                "__class__": "datetime",
+                "year": 2025,
+                "month": 4,
+                "day": 15,
+                "hour": 10,
+                "minute": 0,
+                "second": 37,
+                "microsecond": 892000
+            },
+            "EndTime": {
+                "__class__": "datetime",
+                "year": 2025,
+                "month": 4,
+                "day": 15,
+                "hour": 10,
+                "minute": 11,
+                "second": 32,
+                "microsecond": 113000
+            },
+            "TrainingStartTime": {
+                "__class__": "datetime",
+                "year": 2025,
+                "month": 4,
+                "day": 15,
+                "hour": 10,
+                "minute": 8,
+                "second": 22,
+                "microsecond": 535000
+            },
+            "TrainingEndTime": {
+                "__class__": "datetime",
+                "year": 2025,
+                "month": 4,
+                "day": 15,
+                "hour": 10,
+                "minute": 11,
+                "second": 7,
+                "microsecond": 894000
+            },
+            "InputDataConfig": {
+                "DataFormat": "COMPREHEND_CSV",
+                "EntityTypes": [
+                    {
+                        "Type": "PERSON"
+                    },
+                    {
+                        "Type": "ORGANIZATION"
+                    },
+                    {
+                        "Type": "LOCATION"
+                    },
+                    {
+                        "Type": "EMAIL"
+                    },
+                    {
+                        "Type": "PHONE_NUMBER"
+                    },
+                    {
+                        "Type": "PRODUCT"
+                    }
+                ],
+                "Documents": {
+                    "S3Uri": "s3://c7n-test-s3-bucket/sample3.txt",
+                    "InputFormat": "ONE_DOC_PER_LINE"
+                },
+                "EntityList": {
+                    "S3Uri": "s3://c7n-test-s3-bucket/TrainingData3 - Sheet1.csv"
+                }
+            },
+            "DataAccessRoleArn": "arn:aws:iam::644160558196:role/ComprehendVpcAccessRole",
+            "VpcConfig": {
+                "SecurityGroupIds": [
+                    "sg-0d74b07ab0b3288c0"
+                ],
+                "Subnets": [
+                    "subnet-0ebe9abf587c5070c"
+                ]
+            },
+            "VersionName": "8"
+        },
+        "ResponseMetadata": {}
+    }
+}

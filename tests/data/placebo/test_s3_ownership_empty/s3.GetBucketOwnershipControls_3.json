@@ -1,0 +1,13 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "OwnershipControls": {
+            "Rules": [
+                {
+                    "ObjectOwnership": "BucketOwnerEnforced"
+                }
+            ]
+        }
+    }
+}

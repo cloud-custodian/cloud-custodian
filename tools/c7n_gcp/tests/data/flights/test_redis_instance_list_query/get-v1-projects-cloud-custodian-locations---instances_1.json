@@ -1,0 +1,60 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 13 Jul 2022 09:42:10 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "2653",
+    "-content-encoding": "gzip",
+    "content-location": "https://redis.googleapis.com/v1/projects/cloud-custodian/locations/-/instances?alt=json"
+  },
+  "body": {
+    "instances": [
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/instances/instance-test",
+        "displayName": "test",
+        "locationId": "us-central1-a",
+        "redisVersion": "REDIS_6_X",
+        "reservedIpRange": "10.22.50.64/29",
+        "host": "10.22.50.67",
+        "port": 6378,
+        "currentLocationId": "us-central1-a",
+        "createTime": "2022-07-13T09:27:17.875427555Z",
+        "state": "READY",
+        "tier": "BASIC",
+        "memorySizeGb": 1,
+        "authorizedNetwork": "projects/cloud-custodian/global/networks/default",
+        "persistenceIamIdentity": "serviceAccount:service-443732426401@cloud-redis.iam.gserviceaccount.com",
+        "connectMode": "DIRECT_PEERING",
+        "authEnabled": true,
+        "serverCaCerts": [
+          {
+            "serialNumber": "0",
+            "cert": "-----BEGIN CERTIFICATE-----\nMIIDnTCCAoWgAwIBAgIBADANBgkqhkiG9w0BAQsFADCBhTEtMCsGA1UELhMkMzYx\nOTMwMTctZjc5Yy00N2UxLWE0NDEtYzAwYzJjZjQ0OWE1MTEwLwYDVQQDEyhHb29n\nbGUgQ2xvdWQgTWVtb3J5c3RvcmUgUmVkaXMgU2VydmVyIENBMRQwEgYDVQQKEwtH\nb29nbGUsIEluYzELMAkGA1UEBhMCVVMwHhcNMjIwNzEzMDkyNjI1WhcNMzIwNzEw\nMDkyNzI1WjCBhTEtMCsGA1UELhMkMzYxOTMwMTctZjc5Yy00N2UxLWE0NDEtYzAw\nYzJjZjQ0OWE1MTEwLwYDVQQDEyhHb29nbGUgQ2xvdWQgTWVtb3J5c3RvcmUgUmVk\naXMgU2VydmVyIENBMRQwEgYDVQQKEwtHb29nbGUsIEluYzELMAkGA1UEBhMCVVMw\nggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDUQ8Exa+By1jaCOjd9hcTN\nREAGJxwS7kvLOk8VkYAvKi5rs8tlmWD6Cmx88BAyXOev+ZcMmzuJvnLDqZ/v3MzT\nHeY0STdcuD9jJ8NWDVYBxHiQzF1iiB20oRsLdnNHhs6uV8+ayYbiTwmue2dp7Viq\nu9dPV4310CHImT4ji0U9beKeB61Ct4k1n9GnjY0Z4a12fmMVF+wDJ99aXSJl4a6Q\nFCpnB8eda1rqdX9KLZULK4s4tI5ZCjwrecFaCgC/4QZye1ErxOpCaNOveRUdkVKv\nPG7nB7X+Yl9rqg42LDLhQbDRG/D8tqZ8fkUinG469Ijb2Sch6f5kwAHldU/mO9C9\nAgMBAAGjFjAUMBIGA1UdEwEB/wQIMAYBAf8CAQAwDQYJKoZIhvcNAQELBQADggEB\nALr/T7XsD7l6HYwdVpdVXEKbvF5g8Li9pTQDUoaPPMI/B7u/uOnF/Dx3lRXLpmae\nX8ac6Hd/Ka3A9k/6G3ICjuKDMRKnSpLgYaJ1hzhmvab+BR5NMB/jH79QXyi8zf8s\nvZRH6wpGu/FRbsQalqJfNdZbr/3g1ReceM3U9fQ6xjx6ht2TBuBRQub+Rjto8I28\nVbqpUS8dpd0h33qM5RA8GIuLVZ9+rmuon6CGstJrIsaoznI2cHmN6wfV3DWbrkCJ\n3zhp7vxFKwKK46IOa9bumZ41Br+3Y5COvD0Ihjmbf68de7bdBMoC+B52BuDvnFWg\nNKbiaZWq2phxEL9YL7xhOQc=\n-----END CERTIFICATE-----",
+            "createTime": "2022-07-13T09:27:25.211582Z",
+            "expireTime": "2032-07-10T09:27:25.028Z",
+            "sha1Fingerprint": "335692b53ee8e2a9c05bd7e509ff25a7779726c7"
+          }
+        ],
+        "transitEncryptionMode": "SERVER_AUTHENTICATION",
+        "nodes": [
+          {
+            "id": "node-0",
+            "zone": "us-central1-a"
+          }
+        ],
+        "readReplicasMode": "READ_REPLICAS_DISABLED",
+        "persistenceConfig": {
+          "persistenceMode": "DISABLED"
+        }
+      }
+    ]
+  }
+}

@@ -1,7 +1,8 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
-import jmespath
+from c7n.utils import jmespath_search
+
 import copy
 
 
@@ -44,7 +45,7 @@ class Lookup:
 
     @staticmethod
     def is_lookup(source):
-        return type(source) is dict
+        return isinstance(source, dict)
 
     @staticmethod
     def get_value(source, data=None):
@@ -53,7 +54,7 @@ class Lookup:
 
     @staticmethod
     def get_value_from_resource(source, resource):
-        value = jmespath.search(source['key'], resource)
+        value = jmespath_search(source['key'], resource)
 
         if value is not None:
             return value

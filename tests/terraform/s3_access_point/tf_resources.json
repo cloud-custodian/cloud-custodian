@@ -1,0 +1,169 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_caller_identity": {
+            "current": {
+                "account_id": "644160558196",
+                "arn": "arn:aws:iam::644160558196:user/matt@capitalone.com",
+                "id": "644160558196",
+                "user_id": "AIDAZL6XWCR2MLDRO6EIG"
+            }
+        },
+        "aws_region": {
+            "current": {
+                "description": "US East (N. Virginia)",
+                "endpoint": "ec2.us-east-1.amazonaws.com",
+                "id": "us-east-1",
+                "name": "us-east-1",
+                "region": "us-east-1"
+            }
+        },
+        "aws_s3_access_point": {
+            "example": {
+                "account_id": "644160558196",
+                "alias": "c7n-ap-rapid-serval-s83ok3nwaogkt9fs9dndwctwidtwsuse1a-s3alias",
+                "arn": "arn:aws:s3:us-east-1:644160558196:accesspoint/c7n-ap-rapid-serval",
+                "bucket": "c7n-ap-rapid-serval",
+                "bucket_account_id": "644160558196",
+                "domain_name": "c7n-ap-rapid-serval-644160558196.s3-accesspoint.us-east-1.amazonaws.com",
+                "endpoints": {
+                    "dualstack": "s3-accesspoint.dualstack.us-east-1.amazonaws.com",
+                    "fips": "s3-accesspoint-fips.us-east-1.amazonaws.com",
+                    "fips_dualstack": "s3-accesspoint-fips.dualstack.us-east-1.amazonaws.com",
+                    "ipv4": "s3-accesspoint.us-east-1.amazonaws.com"
+                },
+                "has_public_access_policy": false,
+                "id": "644160558196:c7n-ap-rapid-serval",
+                "name": "c7n-ap-rapid-serval",
+                "network_origin": "Internet",
+                "policy": "{\"Statement\":[{\"Action\":[\"s3:GetObject\",\"s3:PutObject\"],\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"644160558196\"},\"Resource\":[\"arn:aws:s3:us-east-1:644160558196:accesspoint/c7n-ap-rapid-serval/object/*\"]}],\"Version\":\"2012-10-17\"}",
+                "public_access_block_configuration": [
+                    {
+                        "block_public_acls": true,
+                        "block_public_policy": false,
+                        "ignore_public_acls": true,
+                        "restrict_public_buckets": false
+                    }
+                ],
+                "region": "us-east-1",
+                "tags": null,
+                "tags_all": {
+                    "App": "CloudCustodian",
+                    "Env": "Dev",
+                    "Owner": "dev@example.com"
+                },
+                "vpc_configuration": []
+            },
+            "no_policy": {
+                "account_id": "644160558196",
+                "alias": "c7n-ap-no-policy-rap-mp3ynbo4gbxh79tokx9t5jx46izbhuse1b-s3alias",
+                "arn": "arn:aws:s3:us-east-1:644160558196:accesspoint/c7n-ap-no-policy-rapid-serval",
+                "bucket": "c7n-ap-rapid-serval",
+                "bucket_account_id": "644160558196",
+                "domain_name": "c7n-ap-no-policy-rapid-serval-644160558196.s3-accesspoint.us-east-1.amazonaws.com",
+                "endpoints": {
+                    "dualstack": "s3-accesspoint.dualstack.us-east-1.amazonaws.com",
+                    "fips": "s3-accesspoint-fips.us-east-1.amazonaws.com",
+                    "fips_dualstack": "s3-accesspoint-fips.dualstack.us-east-1.amazonaws.com",
+                    "ipv4": "s3-accesspoint.us-east-1.amazonaws.com"
+                },
+                "has_public_access_policy": false,
+                "id": "644160558196:c7n-ap-no-policy-rapid-serval",
+                "name": "c7n-ap-no-policy-rapid-serval",
+                "network_origin": "Internet",
+                "policy": "",
+                "public_access_block_configuration": [
+                    {
+                        "block_public_acls": true,
+                        "block_public_policy": false,
+                        "ignore_public_acls": true,
+                        "restrict_public_buckets": false
+                    }
+                ],
+                "region": "us-east-1",
+                "tags": null,
+                "tags_all": {
+                    "App": "CloudCustodian",
+                    "Env": "Dev",
+                    "Owner": "dev@example.com"
+                },
+                "vpc_configuration": []
+            }
+        },
+        "aws_s3_bucket": {
+            "example": {
+                "acceleration_status": "",
+                "acl": null,
+                "arn": "arn:aws:s3:::c7n-ap-rapid-serval",
+                "bucket": "c7n-ap-rapid-serval",
+                "bucket_domain_name": "c7n-ap-rapid-serval.s3.amazonaws.com",
+                "bucket_prefix": "",
+                "bucket_region": "us-east-1",
+                "bucket_regional_domain_name": "c7n-ap-rapid-serval.s3.us-east-1.amazonaws.com",
+                "cors_rule": [],
+                "force_destroy": false,
+                "grant": [
+                    {
+                        "id": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15",
+                        "permissions": [
+                            "FULL_CONTROL"
+                        ],
+                        "type": "CanonicalUser",
+                        "uri": ""
+                    }
+                ],
+                "hosted_zone_id": "Z3AQBSTGFYJSTF",
+                "id": "c7n-ap-rapid-serval",
+                "lifecycle_rule": [],
+                "logging": [],
+                "object_lock_configuration": [],
+                "object_lock_enabled": false,
+                "policy": "",
+                "region": "us-east-1",
+                "replication_configuration": [],
+                "request_payer": "BucketOwner",
+                "server_side_encryption_configuration": [
+                    {
+                        "rule": [
+                            {
+                                "apply_server_side_encryption_by_default": [
+                                    {
+                                        "kms_master_key_id": "",
+                                        "sse_algorithm": "AES256"
+                                    }
+                                ],
+                                "bucket_key_enabled": false
+                            }
+                        ]
+                    }
+                ],
+                "tags": null,
+                "tags_all": {
+                    "App": "CloudCustodian",
+                    "Env": "Dev",
+                    "Owner": "dev@example.com"
+                },
+                "timeouts": null,
+                "versioning": [
+                    {
+                        "enabled": false,
+                        "mfa_delete": false
+                    }
+                ],
+                "website": [],
+                "website_domain": null,
+                "website_endpoint": null
+            }
+        },
+        "random_pet": {
+            "bucket": {
+                "id": "rapid-serval",
+                "keepers": null,
+                "length": 2,
+                "prefix": null,
+                "separator": "-"
+            }
+        }
+    }
+}

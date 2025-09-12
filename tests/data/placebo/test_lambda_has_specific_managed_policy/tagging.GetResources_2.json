@@ -1,0 +1,47 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:lambda:us-east-1:644160558196:function:aws-controltower-NotificationForwarder",
+                "Tags": [
+                    {
+                        "Key": "aws:cloudformation:stack-name",
+                        "Value": "StackSet-AWSControlTowerBP-BASELINE-CLOUDWATCH-fb2abe63-5df2-45d3-8de0-84007c34dae4"
+                    },
+                    {
+                        "Key": "aws:cloudformation:stack-id",
+                        "Value": "arn:aws:cloudformation:us-east-1:644160558196:stack/StackSet-AWSControlTowerBP-BASELINE-CLOUDWATCH-fb2abe63-5df2-45d3-8de0-84007c34dae4/07ec9fc0-7318-11ec-9f63-123a596f344f"
+                    },
+                    {
+                        "Key": "product_id",
+                        "Value": "12462"
+                    },
+                    {
+                        "Key": "aws:cloudformation:logical-id",
+                        "Value": "ForwardSnsNotification"
+                    },
+                    {
+                        "Key": "used_for",
+                        "Value": ""
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:lambda:us-east-1:644160558196:function:cfb-ygaovtob-fail",
+                "Tags": [
+                    {
+                        "Key": "c7n",
+                        "Value": "true"
+                    },
+                    {
+                        "Key": "test_id",
+                        "Value": "F100795C-10BD-465E-9918-26CFA5A3675C"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,25 @@
+{
+    "status_code": 200,
+    "data": {
+        "Users": [
+            {
+                "Path": "/",
+                "UserName": "test",
+                "UserId": "AGPAXYCHC33BXM77IX3NL",
+                "Arn": "arn:aws:iam::644160558196:user/test",
+                "CreateDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 6,
+                    "day": 15,
+                    "hour": 16,
+                    "minute": 58,
+                    "second": 27,
+                    "microsecond": 0
+                }
+            }
+        ],
+        "IsTruncated": false,
+        "ResponseMetadata": {}
+    }
+}

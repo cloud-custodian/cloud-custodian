@@ -1,0 +1,69 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "cluster": {
+            "name": "tagging-compliant-test",
+            "arn": "arn:aws:eks:us-east-1:644160558196:cluster/tagging-compliant-test",
+            "createdAt": {
+                "__class__": "datetime",
+                "year": 2022,
+                "month": 6,
+                "day": 1,
+                "hour": 15,
+                "minute": 53,
+                "second": 18,
+                "microsecond": 955000
+            },
+            "version": "1.21",
+            "endpoint": "https://85B2B1FED8DD2D2095C515C57AE01AF5.gr7.us-east-1.eks.amazonaws.com",
+            "roleArn": "arn:aws:iam::644160558196:role/EKS-signaldancer-ServiceR-AWSServiceRoleForAmazonE-69A4RAE40IF6",
+            "resourcesVpcConfig": {
+                "subnetIds": [
+                    "subnet-0472841b16adf7476",
+                    "subnet-0707ce1b2a6305995"
+                ],
+                "securityGroupIds": [],
+                "clusterSecurityGroupId": "sg-09aa34fa764294a96",
+                "vpcId": "vpc-0d4f819d13b730139",
+                "endpointPublicAccess": true,
+                "endpointPrivateAccess": false,
+                "publicAccessCidrs": [
+                    "0.0.0.0/0"
+                ]
+            },
+            "kubernetesNetworkConfig": {
+                "serviceIpv4Cidr": "172.20.0.0/16",
+                "ipFamily": "ipv4"
+            },
+            "logging": {
+                "clusterLogging": [
+                    {
+                        "types": [
+                            "api",
+                            "audit",
+                            "authenticator",
+                            "controllerManager",
+                            "scheduler"
+                        ],
+                        "enabled": true
+                    }
+                ]
+            },
+            "identity": {
+                "oidc": {
+                    "issuer": "https://oidc.eks.us-east-1.amazonaws.com/id/85B2B1FED8DD2D2095C515C57AE01AF5"
+                }
+            },
+            "status": "ACTIVE",
+            "certificateAuthority": {
+                "data": "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUM1ekNDQWMrZ0F3SUJBZ0lCQURBTkJna3Foa2lHOXcwQkFRc0ZBREFWTVJNd0VRWURWUVFERXdwcmRXSmwKY201bGRHVnpNQjRYRFRJeU1EWXdNVEU1TlRrek5Wb1hEVE15TURVeU9URTVOVGt6TlZvd0ZURVRNQkVHQTFVRQpBeE1LYTNWaVpYSnVaWFJsY3pDQ0FTSXdEUVlKS29aSWh2Y05BUUVCQlFBRGdnRVBBRENDQVFvQ2dnRUJBSjR0CmJDRVFIaWdHUGlnclI3cTd1RkhXRDNCYk5iYzhxTFFXeUFzVUhZSzk0SHMwbWtsRkN4aFRPMllEckRhVzVzMXoKc1R2QURzVnd6dGJ0bno5dlg1RFhwVEMzNzYxQ01kODdCRnRBY09wNUtDcG1uemdKd0VMUXBsc090ME5CR2tDcApoWVN3cy9Nek5TeDJiOUVscFc4d1BDQ0NPVVAyeFJ3WklSMUY2LzRESzZKa2JxSmFSRVRLLzZ2dlFOakF3RzI3Ckw5TUVLUTVjZHRlc1VEc3llWW5uU1NtTkhQK2lYSmt1QU5pSkVoZUZ4Y3I5VDNVRnZ0ZkFSbDRvNC9YOU9KTmoKd1lpYld4Tm5aZjhtTnRPS0FGellyQkllUmdTVjNyVHJJczlaZXo0STIvU2xpTnV0QXRxN2dZQ05UcmVMTUdkNwozVzdHSW5KK2NRais5bkhIaFVrQ0F3RUFBYU5DTUVBd0RnWURWUjBQQVFIL0JBUURBZ0trTUE4R0ExVWRFd0VCCi93UUZNQU1CQWY4d0hRWURWUjBPQkJZRUZEV3VlTVZkNG1xTGlCV1lSdTl5akRXcU5WNzNNQTBHQ1NxR1NJYjMKRFFFQkN3VUFBNElCQVFDUkpVZjZEMlI5S1JVaWxSZ3ZjZjJZMnNub1BlZnFhd0JkSytTZVMyMGFpellHZERkYgp2L2F4YVI2bEVNcGw4c2s1OG52K2p1aXk1N3ZYNDAweUU2bkhJdFVjbXdPcEQ4YTV1SGpFMG1WQklZUmRSOXQ1CjdvRXhNWGVqTU5qdHJqUlFUN0xvNFdIZlBXMThNNWdzeU1jQWhtTXBWT0pwZm5qVGhUN0NVSkI0WGNPalU3UDQKeU5GYTRENW1BRlZYSE50ejh5TFpydWU2SVprdHZrTXN6U2pJYUxrTzZXcUNXMjlNT3pWUm5xellLZjRKaE1GNApxQ0l4Q1dKb3BqdTFOUlBnNktXSUlDUnE1U2lwSzJzVmtSY3A5aG85WlJ6c21hTVRJempDRHY1N1pkcnpmaVlkCnNreEN3cXAwdWJTNmxMeGVuY2dZdm5tM0FlSnRxcVhZZnBiUgotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg=="
+            },
+            "platformVersion": "eks.9",
+            "tags": {
+                "OwnerContact": "matthew.heidelbaugh@capitalone.com",
+                "BA": "BAEnterpriseCloudControl"
+            }
+        }
+    }
+}

@@ -11,7 +11,6 @@ from dateutil.tz import tzoffset, tzutc
 from dateutil.parser import parse
 from fnmatch import fnmatch
 from functools import partial, reduce
-import jmespath
 import json
 import logging
 import shutil
@@ -27,7 +26,7 @@ from c7n.credentials import SessionFactory
 from c7n.policy import PolicyCollection as BaseCollection
 from c7n.policy import Policy as BasePolicy
 from c7n.resources import load_available
-from c7n.utils import get_retry
+from c7n.utils import get_retry, jmespath_search
 
 import boto3
 
@@ -243,9 +242,11 @@ def commit_date(commit):
     return datetime.fromtimestamp(float(commit.author.time), tzinfo)
 
 
-def policy_path_matcher(path):
-    if (path.endswith('.yaml') or path.endswith('.yml')) and not path.startswith('.'):
-        return True
+def policy_path_matcher(path, patterns=('*.yaml', '*.yml')):
+    for p in patterns:
+        if fnmatch(path, p):
+            return True
+    return False
 
 
 class PolicyRepo:
@@ -275,7 +276,7 @@ class PolicyRepo:
         while q:
             t, prefix = q.popleft()
             for fent in t:
-                if fent.type == pygit2.GIT_OBJ_TREE:
+                if fent.type == pygit2.GIT_OBJECT_TREE:
                     q.append((
                         self.repo.get(fent.id),
                         os.path.join(prefix, fent.name)))
@@ -304,7 +305,7 @@ class PolicyRepo:
 
         # Modified
         for f in set(baseline_files).intersection(target_files):
-            if baseline_files[f].hex == target_files[f].hex:
+            if baseline_files[f].id == target_files[f].id:
                 continue
             target_policies += self._policy_file_rev(f, target)
             baseline_policies += self._policy_file_rev(f, baseline)
@@ -312,7 +313,7 @@ class PolicyRepo:
         return CollectionDelta(
             baseline_policies, target_policies, target, self.repo_uri).delta()
 
-    def delta_stream(self, target='HEAD', limit=None,
+    def delta_stream(self, target='HEAD', limit=65536,
                      sort=pygit2.GIT_SORT_TIME | pygit2.GIT_SORT_REVERSE,
                      after=None, before=None):
         """Return an iterator of policy changes along a commit lineage in a repo.
@@ -335,7 +336,7 @@ class PolicyRepo:
             if limit and len(commits) > limit:
                 break
 
-        if limit:
+        if limit and limit < len(commits):
             self.initialize_tree(commits[limit].tree)
             commits.pop(-1)
 
@@ -661,17 +662,17 @@ def github_repos(organization, github_url, github_token):
     while next_cursor is not False:
         params = {'query': query, 'variables': {
             'organization': organization, 'cursor': next_cursor}}
-        response = requests.post(github_url, headers=headers, json=params)
+        response = requests.post(github_url, headers=headers, json=params, timeout=60)
         result = response.json()
         if response.status_code != 200 or 'errors' in result:
             raise ValueError("Github api error %s" % (
                 response.content.decode('utf8'),))
 
-        repos = jmespath.search(
+        repos = jmespath_search(
             'data.organization.repositories.edges[].node', result)
         for r in repos:
             yield r
-        page_info = jmespath.search(
+        page_info = jmespath_search(
             'data.organization.repositories.pageInfo', result)
         if page_info:
             next_cursor = (page_info['hasNextPage'] and
@@ -696,9 +697,11 @@ def github_repos(organization, github_url, github_token):
                     "(default stdout supports jsonline/kinesis/sqs/sqlalchemy)"))
 @click.option('--assume', '--assume',
               help="Assume role for cloud stream destinations")
+@click.option('-m', '--max-repo', default=1024,
+              help="Maximum number of repositories to process")
 @click.pass_context
 def org_stream(ctx, organization, github_url, github_token, clone_dir,
-               verbose, filter, exclude, stream_uri, assume):
+               verbose, filter, exclude, stream_uri, assume, max_repo):
     """Stream changes for repos in a GitHub organization.
     """
     logging.basicConfig(
@@ -718,7 +721,11 @@ def org_stream(ctx, organization, github_url, github_token, clone_dir,
 
     log.info('Streaming org changes')
     change_count = 0
+    repo_count = 0
     for r in repos:
+        if repo_count > max_repo:
+            break
+        repo_count += 1
         change_count += ctx.invoke(
             stream,
             repo_uri=r,
@@ -778,7 +785,7 @@ def org_checkout(organization, github_url, github_token, clone_dir,
         else:
             repo = pygit2.Repository(repo_path)
             if repo.status():
-                log.warning('repo %s not clean skipping update')
+                log.warning('repo %s not clean skipping update', r['name'])
                 continue
             log.debug("Syncing repo: %s/%s" % (organization, r['name']))
             pull(repo, callbacks)
@@ -879,10 +886,12 @@ def diff(repo_uri, source, target, output, verbose):
 @click.option('--assume', help="Role assumption for AWS stream outputs")
 @click.option('--before', help="Only stream commits before given date")
 @click.option('--after', help="Only stream commits after given date")
+@click.option('--policy-pattern', multiple=True, default=[],
+              help="Only look at policy files matching the giving glob pattern (including dir)")
 @click.option('--sort', multiple=True, default=["reverse", "time"],
               type=click.Choice(SORT_TYPE.keys()),
               help="Git sort ordering")
-def stream(repo_uri, stream_uri, verbose, assume, sort, before=None, after=None):
+def stream(repo_uri, stream_uri, verbose, assume, sort, before=None, after=None, policy_pattern=()):
     """Stream git history policy changes to destination.
 
 
@@ -908,6 +917,9 @@ def stream(repo_uri, stream_uri, verbose, assume, sort, before=None, after=None)
         after = parse(after)
     if sort:
         sort = reduce(operator.or_, [SORT_TYPE[s] for s in sort])
+    matcher = None
+    if policy_pattern:
+        matcher = partial(policy_path_matcher, patterns=policy_pattern)
 
     with contextlib.closing(TempDir().open()) as temp_dir:
         if repo_uri is None:
@@ -919,7 +931,7 @@ def stream(repo_uri, stream_uri, verbose, assume, sort, before=None, after=None)
         else:
             repo = pygit2.Repository(repo_uri)
         load_available()
-        policy_repo = PolicyRepo(repo_uri, repo)
+        policy_repo = PolicyRepo(repo_uri, repo, matcher)
         change_count = 0
 
         with contextlib.closing(transport(stream_uri, assume)) as t:

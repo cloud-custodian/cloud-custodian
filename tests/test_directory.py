@@ -3,6 +3,8 @@
 import json
 
 from .common import BaseTest, load_data
+from c7n.resources.directory import CloudDirectoryQueryParser
+from c7n.exceptions import PolicyValidationError
 
 
 class CloudDirectoryTest(BaseTest):
@@ -49,6 +51,51 @@ class CloudDirectoryTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_cloud_directory_disable(self):
+        factory = self.replay_flight_data("test_cloud_directory_disable")
+        p = self.load_policy(
+            {
+                "name": "disable-cloud-directory",
+                "resource": "cloud-directory",
+                "filters": [{"Name": "test-cloud"}],
+                "actions": [{"type": "disable"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            sorted([r["Name"] for r in resources]),
+            ["test-cloud"],
+        )
+        self.assertEqual(resources[0]["State"], "ENABLED")
+        client = factory().client("clouddirectory")
+        remainder = client.list_directories()["Directories"]
+        self.assertEqual(len(remainder), 1)
+        self.assertEqual(remainder[0]["State"], "DISABLED")
+
+    def test_cloud_directory_delete(self):
+        factory = self.replay_flight_data("test_cloud_directory_delete")
+        p = self.load_policy(
+            {
+                "name": "delete-cloud-directory",
+                "resource": "cloud-directory",
+                "filters": [{"Name": "test-cloud"}],
+                "actions": [{"type": "delete"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            sorted([r["Name"] for r in resources]),
+            ["test-cloud"],
+        )
+        client = factory().client("clouddirectory")
+        remainder = client.list_directories()["Directories"]
+        self.assertEqual(len(remainder), 1)
+        self.assertEqual(remainder[0]["State"], "DELETED")
+
 
 class DirectoryTests(BaseTest):
 
@@ -88,3 +135,180 @@ class DirectoryTests(BaseTest):
         self.assertEqual(resources[0]["DirectoryId"], "d-90672a7419")
         tags = client.list_tags_for_resource(ResourceId="d-90672a7419")["Tags"]
         self.assertEqual(len(tags), 0)
+
+    def test_directory_delete(self):
+        factory = self.replay_flight_data("test_directory_delete")
+        p = self.load_policy(
+            {
+                "name": "delete-directory",
+                "resource": "directory",
+                "filters": [{"Name": "test.example.com"}],
+                "actions": ["delete"],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            sorted([r["Name"] for r in resources]),
+            ["test.example.com"],
+        )
+        self.assertEqual(resources[0]["Stage"], "Creating")
+        client = factory().client("ds")
+        remainder = client.describe_directories()["DirectoryDescriptions"]
+        self.assertEqual(len(remainder), 2)
+        self.assertEqual(remainder[1]["Stage"], "Deleting")
+
+    def test_directory_log_subscriptions(self):
+        factory = self.replay_flight_data("test_directory_log_subscriptions")
+        p = self.load_policy(
+            {
+                "name": "directory-log-subscriptions",
+                "resource": "directory",
+                "filters": [{
+                    "type": "is-log-forwarding",
+                }],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["DirectoryId"], "d-9067d77ae2")
+        self.assertIn("c7n:LogSubscriptions", resources[0])
+
+    def test_directory_ldap_setting_no_settings(self):
+        factory = self.replay_flight_data("test_directory_ldap_setting")
+        p = self.load_policy(
+            {
+                "name": "ldap-disabled",
+                "resource": "directory",
+                "filters": [{"type": "ldap", "status": "Disabled"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue("c7n:LDAPSSettings" in resources[0])
+
+    def test_directory_ldap_setting_enabled(self):
+        factory = self.replay_flight_data("test_directory_ldap_setting_enabled")
+        p = self.load_policy(
+            {
+                "name": "ldap-enabled",
+                "resource": "directory",
+                "filters": [{"type": "ldap", "status": "Enabled"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["c7n:LDAPSSettings"][0]['LDAPSStatus'], "Enabled")
+
+    def test_directory_settings(self):
+        factory = self.replay_flight_data("test_directory_settings")
+        p = self.load_policy(
+            {
+                "name": "tls_1_0-enabled",
+                "resource": "directory",
+                "filters": [{"type": "settings", "key": "TLS_1_0", "value": "Enable"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue("c7n:Settings" in resources[0])
+
+    def test_directory_trust_relationship(self):
+        factory = self.replay_flight_data("test_directory_trust_relationship")
+        # Test filtering directories with a specific trust relationship
+        p = self.load_policy(
+            {
+                "name": "trust-relationship",
+                "resource": "directory",
+                "filters": [{"type": "trust", "key": "RemoteDomainName",
+                        "value": "cloudcustodian.io"},
+                        {"type": "trust", "key": "TrustDirection",
+                            "value": "One-Way: Outgoing"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue("c7n:Trusts" in resources[0])
+        self.assertEqual(resources[0]["c7n:Trusts"][0]['RemoteDomainName'], "cloudcustodian.io")
+
+        # Test filtering directories without a specific trust relationship
+        p = self.load_policy(
+            {
+                "name": "trust-relationship",
+                "resource": "directory",
+                "filters": [{"not": [{"type": "trust", "key": "RemoteDomainName",
+                        "value": "valid.cloudcustodian.io"},
+                        {"type": "trust", "key": "TrustDirection",
+                            "value": "One-Way: Outgoing"}]}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+
+        # Test filtering for directories with no trust relationships
+        p = self.load_policy(
+            {
+                "name": "trust-relationship-absent",
+                "resource": "directory",
+                "filters": [{"type": "trust", "key": "DirectoryId",
+                        "value": "absent"}],
+
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue("c7n:Trusts" in resources[0])
+        self.assertEqual(resources[0]["c7n:Trusts"], [])
+
+        # Test filtering for directories with only with trust relationships
+        p = self.load_policy(
+            {
+                "name": "trust-relationship-absent",
+                "resource": "directory",
+                "filters": [{"type": "trust", "key": "DirectoryId",
+                        "value": "present"}],
+
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        for resource in resources:
+            self.assertTrue("c7n:Trusts" in resource)
+            for trust in resource["c7n:Trusts"]:
+                self.assertTrue("DirectoryId" in trust)
+
+
+class CloudDirectoryQueryParse(BaseTest):
+
+    def test_query(self):
+        query_filters = [
+            {'Name': 'tag:Name', 'Values': ['Test']},
+            {'Name': 'state', 'Values': ['DISABLED']}]
+        self.assertEqual(query_filters, CloudDirectoryQueryParser.parse(query_filters))
+
+    def test_invalid_query(self):
+        self.assertRaises(
+            PolicyValidationError, CloudDirectoryQueryParser.parse, {})
+
+        self.assertRaises(
+            PolicyValidationError, CloudDirectoryQueryParser.parse, [None])
+
+        self.assertRaises(
+            PolicyValidationError, CloudDirectoryQueryParser.parse, [{'X': 1}])
+
+        self.assertRaises(
+            PolicyValidationError, CloudDirectoryQueryParser.parse, [
+                {'name': 'state', 'Values': 'disabled'}])
+
+        self.assertRaises(
+            PolicyValidationError, CloudDirectoryQueryParser.parse, [
+                {'name': 'state', 'Values': ['disabled']}])

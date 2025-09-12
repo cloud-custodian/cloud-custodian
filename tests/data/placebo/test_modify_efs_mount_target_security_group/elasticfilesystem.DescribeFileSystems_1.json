@@ -1,0 +1,104 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "FileSystems": [
+            {
+                "OwnerId": "644160558196",
+                "CreationToken": "quickCreated-40d740fe-ee7b-40c7-9e71-968bc2650b8e",
+                "FileSystemId": "fs-028d2a86fa813320a",
+                "FileSystemArn": "arn:aws:elasticfilesystem:us-east-1:644160558196:file-system/fs-028d2a86fa813320a",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 6,
+                    "day": 3,
+                    "hour": 18,
+                    "minute": 45,
+                    "second": 31,
+                    "microsecond": 0
+                },
+                "LifeCycleState": "available",
+                "Name": "test-2",
+                "NumberOfMountTargets": 1,
+                "SizeInBytes": {
+                    "Value": 6144,
+                    "Timestamp": {
+                        "__class__": "datetime",
+                        "year": 2023,
+                        "month": 6,
+                        "day": 8,
+                        "hour": 13,
+                        "minute": 56,
+                        "second": 46,
+                        "microsecond": 0
+                    },
+                    "ValueInIA": 0,
+                    "ValueInStandard": 6144
+                },
+                "PerformanceMode": "generalPurpose",
+                "Encrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/d38e6df4-3a19-4516-9f4b-ab568e9bccc5",
+                "ThroughputMode": "elastic",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "test-2"
+                    },
+                    {
+                        "Key": "aws:elasticfilesystem:default-backup",
+                        "Value": "enabled"
+                    }
+                ]
+            },
+            {
+                "OwnerId": "644160558196",
+                "CreationToken": "quickCreated-dd5279f3-c1bf-4673-9d6a-150bb0973613",
+                "FileSystemId": "fs-017557a9f00b1bec9",
+                "FileSystemArn": "arn:aws:elasticfilesystem:us-east-1:644160558196:file-system/fs-017557a9f00b1bec9",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 5,
+                    "day": 25,
+                    "hour": 12,
+                    "minute": 27,
+                    "second": 28,
+                    "microsecond": 0
+                },
+                "LifeCycleState": "available",
+                "Name": "test",
+                "NumberOfMountTargets": 2,
+                "SizeInBytes": {
+                    "Value": 6144,
+                    "Timestamp": {
+                        "__class__": "datetime",
+                        "year": 2023,
+                        "month": 6,
+                        "day": 8,
+                        "hour": 14,
+                        "minute": 21,
+                        "second": 21,
+                        "microsecond": 0
+                    },
+                    "ValueInIA": 0,
+                    "ValueInStandard": 6144
+                },
+                "PerformanceMode": "generalPurpose",
+                "Encrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/d38e6df4-3a19-4516-9f4b-ab568e9bccc5",
+                "ThroughputMode": "elastic",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "test"
+                    },
+                    {
+                        "Key": "aws:elasticfilesystem:default-backup",
+                        "Value": "enabled"
+                    }
+                ]
+            }
+        ]
+    }
+}

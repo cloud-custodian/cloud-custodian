@@ -1,0 +1,40 @@
+{
+  "headers": {
+    "x-guploader-uploadid": "ADPycdvDLTjxmXSIj89WY5k_-x_YoTfSuN92brWk3oiu7inceaZn5s7dGEBQpzlaqiznF8TI_OZT4Lt_2pKfGrN1_A2uVbyt4OHo",
+    "etag": "CAE=",
+    "content-type": "application/json; charset=UTF-8",
+    "date": "Tue, 04 Apr 2023 14:09:04 GMT",
+    "vary": "Origin, X-Origin",
+    "cache-control": "private, max-age=0, must-revalidate, no-transform",
+    "expires": "Tue, 04 Apr 2023 14:09:04 GMT",
+    "content-length": "687",
+    "server": "UploadServer",
+    "status": "200",
+    "content-location": "https://storage.googleapis.com/storage/v1/b/cfb-gcuvtiqb?alt=json"
+  },
+  "body": {
+    "kind": "storage#bucket",
+    "selfLink": "https://www.googleapis.com/storage/v1/b/cfb-gcuvtiqb",
+    "id": "cfb-gcuvtiqb",
+    "name": "cfb-gcuvtiqb",
+    "projectNumber": "365206961407",
+    "metageneration": "1",
+    "location": "US-CENTRAL1",
+    "storageClass": "STANDARD",
+    "etag": "CAE=",
+    "timeCreated": "2023-04-04T14:08:42.044Z",
+    "updated": "2023-04-04T14:08:42.044Z",
+    "iamConfiguration": {
+      "bucketPolicyOnly": {
+        "enabled": true,
+        "lockedTime": "2023-07-03T14:08:42.044Z"
+      },
+      "uniformBucketLevelAccess": {
+        "enabled": true,
+        "lockedTime": "2023-07-03T14:08:42.044Z"
+      },
+      "publicAccessPrevention": "inherited"
+    },
+    "locationType": "region"
+  }
+}

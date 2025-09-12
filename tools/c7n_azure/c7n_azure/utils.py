@@ -123,7 +123,7 @@ def custodian_azure_send_override(self, request, headers=None, content=None, **k
     """ Overrides ServiceClient.send() function to implement retries & log headers
     """
     retries = 0
-    max_retries = 3
+    max_retries = 8
     while retries < max_retries:
         response = self.orig_send(request, headers, content, **kwargs)
 
@@ -138,21 +138,22 @@ def custodian_azure_send_override(self, request, headers=None, content=None, **k
             for k in response.headers.keys():
                 if StringUtils.equal('retry-after', k):
                     retry_after = int(response.headers[k])
-            if retry_after is None:
-                # we want to attempt retries even when azure fails to send a header
-                # this has been a constant source of instability in larger environments
-                retry_after = (constants.DEFAULT_RETRY_AFTER * retries) + \
-                    random.randint(1, constants.DEFAULT_RETRY_AFTER)
-            if retry_after < constants.DEFAULT_MAX_RETRY_AFTER:
-                send_logger.warning('Received retriable error code %i. Retry-After: %i'
-                                    % (response.status_code, retry_after))
-                time.sleep(retry_after)
-                retries += 1
-            else:
+            if retry_after and retry_after > constants.DEFAULT_MAX_RETRY_AFTER:
                 send_logger.error("Received throttling error, retry time is %i"
                                   "(retry only if < %i seconds)."
                                   % (retry_after or 0, constants.DEFAULT_MAX_RETRY_AFTER))
                 break
+            if retry_after is None:
+                # we want to attempt retries even when azure fails to send a header
+                # this has been a constant source of instability in larger environments
+                retry_after = max(
+                    constants.DEFAULT_MAX_RETRY_AFTER,
+                    constants.DEFAULT_RETRY_AFTER * retries
+                ) + random.randint(1, constants.DEFAULT_RETRY_AFTER)
+            send_logger.warning('Received retriable error code %i. Retry-After: %i'
+                                % (response.status_code, retry_after))
+            time.sleep(retry_after)
+            retries += 1
         else:
             break
     return response
@@ -308,7 +309,7 @@ class PortsRangeHelper:
             Returns an array of PortsRange tuples
         """
         properties = rule['properties']
-        if 'destinationPortRange' in properties:
+        if 'destinationPortRange' in properties and properties['destinationPortRange']:
             return [PortsRangeHelper._get_port_range(properties['destinationPortRange'])]
         else:
             return [PortsRangeHelper._get_port_range(r)
@@ -595,7 +596,7 @@ def get_keyvault_auth_endpoint(cloud_endpoints):
 # These objects store variables with an underscore prefix, so we strip it.
 def serialize(data):
     d = {}
-    if type(data) is dict:
+    if isinstance(data, dict):
         items = data.items()
     else:
         items = vars(data).items()

@@ -7,7 +7,6 @@ import time
 
 from azure.mgmt.eventgrid.models import \
     StorageQueueEventSubscriptionDestination, StringInAdvancedFilter, EventSubscriptionFilter
-import jmespath
 
 from c7n_azure.azure_events import AzureEvents, AzureEventSubscription
 from c7n_azure.constants import (
@@ -21,6 +20,7 @@ from c7n_azure.function_package import FunctionPackage
 from c7n_azure.functionapp_utils import FunctionAppUtilities
 from c7n_azure.resources.arm import ArmResourceManager
 from c7n_azure.storage_utils import StorageUtilities
+from c7n_azure.query import ChildResourceManager
 from c7n_azure.utils import ResourceIdParser, StringUtils
 
 from c7n import utils
@@ -28,7 +28,7 @@ from c7n.actions import EventAction
 from c7n.exceptions import PolicyValidationError, PolicyExecutionError
 from c7n.mu import generate_requirements
 from c7n.policy import PullMode, ServerlessExecutionMode, execution
-from c7n.utils import local_session
+from c7n.utils import local_session, jmespath_search
 
 
 class AzureFunctionMode(ServerlessExecutionMode):
@@ -119,7 +119,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
 
     def validate(self):
         super().validate()
-        identity = jmespath.search(
+        identity = jmespath_search(
             'mode."provision-options".identity', self.policy.data)
         if (identity and identity['type'] == AUTH_TYPE_UAI and
                 'id' not in identity):
@@ -197,7 +197,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
         return params
 
     def _get_identity(self, session):
-        identity = jmespath.search(
+        identity = jmespath_search(
             'mode."provision-options".identity', self.policy.data) or {
                 'type': AUTH_TYPE_EMBED}
         if identity['type'] != AUTH_TYPE_UAI:
@@ -255,7 +255,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
     def provision(self):
         # Make sure we have auth data for function provisioning
         session = local_session(self.policy.session_factory)
-        if jmespath.search(
+        if jmespath_search(
                 'mode."provision-options".identity.type',
                 self.policy.data) in (AUTH_TYPE_EMBED, None):
             session.get_functions_auth_string("")
@@ -275,7 +275,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
             self.function_params.function_app['name'])
 
         requirements = generate_requirements('c7n-azure',
-                                             ignore=['boto3', 'botocore', 'pywin32'],
+                                             ignore=['pywin32'],
                                              exclude='c7n')
         package = FunctionPackage(self.policy_name, target_sub_ids=target_subscription_ids)
         package.build(self.policy.data,
@@ -313,52 +313,58 @@ class AzureModeCommon:
         return re.search(extract_regex, event['subject'], re.IGNORECASE).group()
 
     @staticmethod
+    def annotate_parent(policy, resources):
+        if not issubclass(policy.resource_manager.__class__, ChildResourceManager):
+            return
+
+        for r in resources:
+            r[policy.resource_manager.resource_type.parent_key] = \
+                policy.resource_manager.__class__.extract_parent(r)
+
+    @staticmethod
     def run_for_event(policy, event=None):
         s = time.time()
 
-        with policy.ctx:
-            resources = policy.resource_manager.get_resources(
-                [AzureModeCommon.extract_resource_id(policy, event)])
+        resources = policy.resource_manager.get_resources(
+            [AzureModeCommon.extract_resource_id(policy, event)]
+        )
 
-            resources = policy.resource_manager.filter_resources(
-                resources, event)
+        AzureModeCommon.annotate_parent(policy, resources)
+        resources = policy.resource_manager.filter_resources(resources, event)
 
-        with policy.ctx:
+        if not resources:
+            policy.log.info(
+                "policy: %s resources: %s no resources found" % (policy.name, policy.resource_type)
+            )
+            return
+
+        with policy.ctx as ctx:
             rt = time.time() - s
 
-            policy.ctx.metrics.put_metric(
-                'ResourceCount', len(resources), 'Count', Scope="Policy",
-                buffer=False)
-            policy.ctx.metrics.put_metric(
-                "ResourceTime", rt, "Seconds", Scope="Policy")
-            policy._write_file(
-                'resources.json', utils.dumps(resources, indent=2))
-
-            if not resources:
-                policy.log.info(
-                    "policy: %s resources: %s no resources found" % (
-                        policy.name, policy.resource_type))
-                return
+            ctx.metrics.put_metric("ResourceCount", len(resources), "Count", Scope="Policy")
+            ctx.metrics.put_metric("ResourceTime", rt, "Seconds", Scope="Policy")
+            ctx.output.write_file("resources.json", utils.dumps(resources, indent=2))
 
             at = time.time()
             for action in policy.resource_manager.actions:
                 policy.log.info(
                     "policy: %s invoking action: %s resources: %d",
-                    policy.name, action.name, len(resources))
-                with policy.ctx.tracer.subsegment('action:%s' % action.type):
+                    policy.name,
+                    action.name,
+                    len(resources),
+                )
+                with ctx.tracer.subsegment('action:%s' % action.type):
                     if isinstance(action, EventAction):
                         results = action.process(resources, event)
                     else:
                         results = action.process(resources)
                 try:
-                    policy._write_file(
-                        "action-%s" % action.name, utils.dumps(results))
+                    ctx.output.write_file("action-%s" % action.name, utils.dumps(results))
                 except (TypeError, OverflowError):
                     pass
 
-        policy.ctx.metrics.put_metric(
-            "ActionTime", time.time() - at, "Seconds", Scope="Policy")
-        return resources
+            ctx.metrics.put_metric("ActionTime", time.time() - at, "Seconds", Scope="Policy")
+            return resources
 
 
 @execution.register(FUNCTION_TIME_TRIGGER_MODE)

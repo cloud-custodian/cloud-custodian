@@ -1,0 +1,84 @@
+{
+    "status_code": 200,
+    "data": {
+        "LoadBalancerDescriptions": [
+            {
+                "LoadBalancerName": "test-elb",
+                "DNSName": "test-elb-798013825.us-east-1.elb.amazonaws.com",
+                "CanonicalHostedZoneName": "test-elb-798013825.us-east-1.elb.amazonaws.com",
+                "CanonicalHostedZoneNameID": "Z35SXDOTRQ7X7K",
+                "ListenerDescriptions": [
+                    {
+                        "Listener": {
+                            "Protocol": "HTTPS",
+                            "LoadBalancerPort": 443,
+                            "InstanceProtocol": "HTTP",
+                            "InstancePort": 80,
+                            "SSLCertificateId": "arn:aws:acm:us-east-1:644160558196:certificate/80d45f1f-e9b3-4e46-8118-8504079d27b3"
+                        },
+                        "PolicyNames": [
+                            "testpolicy-1493768308000"
+                        ]
+                    },
+                    {
+                        "Listener": {
+                            "Protocol": "HTTP",
+                            "LoadBalancerPort": 80,
+                            "InstanceProtocol": "HTTP",
+                            "InstancePort": 80
+                        },
+                        "PolicyNames": []
+                    }
+                ],
+                "Policies": {
+                    "AppCookieStickinessPolicies": [],
+                    "LBCookieStickinessPolicies": [],
+                    "OtherPolicies": [
+                        "testpolicy-1493768308000",
+                        "AWSConsole-SSLNegotiationPolicy-test-elb-1646121490434",
+                        "ELBSecurityPolicy-2016-08"
+                    ]
+                },
+                "BackendServerDescriptions": [],
+                "AvailabilityZones": [
+                    "us-east-1c",
+                    "us-east-1b",
+                    "us-east-1a"
+                ],
+                "Subnets": [
+                    "subnet-00aa684a0a65865fb",
+                    "subnet-04c15af10f1dce5f7",
+                    "subnet-0cc0fb16a54f63d1c"
+                ],
+                "VPCId": "vpc-052db4896ba2ce07e",
+                "Instances": [],
+                "HealthCheck": {
+                    "Target": "HTTP:80/index.html",
+                    "Interval": 30,
+                    "Timeout": 5,
+                    "UnhealthyThreshold": 2,
+                    "HealthyThreshold": 10
+                },
+                "SourceSecurityGroup": {
+                    "OwnerAlias": "644160558196",
+                    "GroupName": "default"
+                },
+                "SecurityGroups": [
+                    "sg-0fa58d0a1dd89f274"
+                ],
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 3,
+                    "day": 1,
+                    "hour": 7,
+                    "minute": 58,
+                    "second": 8,
+                    "microsecond": 990000
+                },
+                "Scheme": "internet-facing"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

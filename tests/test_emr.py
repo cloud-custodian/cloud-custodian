@@ -35,7 +35,7 @@ class TestEMR(BaseTest):
                 {"Values": ["val3"], "Name": "tag:bar"},
                 # default query
                 {
-                    "Values": ["WAITING", "RUNNING", "BOOTSTRAPPING"],
+                    "Values": ["WAITING", "BOOTSTRAPPING", "RUNNING", "STARTING"],
                     "Name": "ClusterStates",
                 },
             ],
@@ -166,6 +166,34 @@ class TestEMR(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["Name"], "pratyush-emr-test")
 
+    def test_emr_security_configuration(self):
+        session_factory = self.replay_flight_data("test_emr_sc")
+        p = self.load_policy(
+            {
+                "name": "emr-sc-filter",
+                "resource": "emr",
+                "filters": [
+                    {
+                        "type": "security-configuration",
+                        "key": "EncryptionConfiguration.EnableAtRestEncryption",
+                        "value": True
+                    }
+                ],
+            },
+            config={"region": "us-west-2"},
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]["c7n:SecurityConfiguration"],
+            {'EncryptionConfiguration': {
+                'AtRestEncryptionConfiguration': {
+                    'S3EncryptionConfiguration': {
+                        'EncryptionMode': 'SSE-S3'}},
+                'EnableAtRestEncryption': True,
+                'EnableInTransitEncryption': False}})
+
 
 class TestEMRQueryFilter(unittest.TestCase):
 
@@ -251,7 +279,6 @@ class TestEMRSecurityConfiguration(BaseTest):
             },
             session_factory=session_factory)
         resources = p.run()
-        print(resources)
         self.assertEqual(resources[0]["SecurityConfiguration"]['EncryptionConfiguration']
              ['EnableInTransitEncryption'], False)
 
@@ -274,3 +301,74 @@ class TestEMRSecurityConfiguration(BaseTest):
         self.assertFalse(
             resp['SecurityConfigurations']
         )
+
+
+class TestEMRServerless(BaseTest):
+    def test_emr_serverless_tag(self):
+        session_factory = self.replay_flight_data("test_emr_serverless_tag")
+        p = self.load_policy(
+            {
+                "name": "emr-serverless-tag",
+                "resource": "aws.emr-serverless-app",
+                "filters": [{"tag:foo": "absent"}],
+                "actions": [{"type": "tag", "tags": {"foo": "bar"}}]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client("emr-serverless")
+        tags = client.list_tags_for_resource(resourceArn=resources[0]["arn"])["tags"]
+        self.assertEqual(len(tags), 1)
+        self.assertEqual(tags, {"foo": "bar"})
+
+    def test_emr_serverless_remove_tag(self):
+        session_factory = self.replay_flight_data("test_emr_serverless_remove_tag")
+        p = self.load_policy(
+            {
+                'name': "test-emr-serverless-tag",
+                'resource': "aws.emr-serverless-app",
+                'filters': [{'tag:foo': 'present'}],
+                'actions': [{'type': 'remove-tag', 'tags': ['foo']}]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client("emr-serverless")
+        tags = client.list_tags_for_resource(resourceArn=resources[0]["arn"])["tags"]
+        self.assertEqual(len(tags), 0)
+
+    def test_emr_serverless_delete(self):
+        session_factory = self.replay_flight_data('test_emr_serverless_delete')
+        p = self.load_policy(
+            {
+                'name': 'test-emr-serverless-delete',
+                'resource': 'aws.emr-serverless-app',
+                'actions': [{'type': 'delete'}]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client('emr-serverless')
+        applications = client.list_applications()['applications']
+        self.assertEqual(len(applications), 0)
+
+    def test_emr_serverless_markop(self):
+        session_factory = self.replay_flight_data("test_emr_serverless_markop")
+        p = self.load_policy(
+            {
+                "name": "emr-serverless-markop",
+                "resource": "aws.emr-serverless-app",
+                "filters": [{"tag:foo": "absent"}],
+                "actions": [{"type": "mark-for-op", "op": "notify", "tag": "foo", "days": 2}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client('emr-serverless')
+        tags = client.list_tags_for_resource(resourceArn=resources[0]["arn"])['tags']
+        self.assertEqual(len(tags), 1)
+        self.assertEqual(tags, {'foo': 'Resource does not meet policy: notify@2023/01/26'})

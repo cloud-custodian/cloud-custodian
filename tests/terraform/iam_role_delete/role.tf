@@ -1,5 +1,5 @@
 resource "aws_iam_role" "test_role" {
-  name = "test_role"
+  name_prefix = "test_role"
 
   assume_role_policy = <<EOF
 {
@@ -23,15 +23,15 @@ EOF
 }
 
 resource "aws_iam_instance_profile" "test_profile" {
-  name = "test_profile"
-  role = aws_iam_role.test_role.name
+  name_prefix = "test_profile"
+  role        = aws_iam_role.test_role.name
 }
 
 
 // inline policy
 resource "aws_iam_role_policy" "test_policy" {
-  name = "test_policy"
-  role = aws_iam_role.test_role.id
+  name_prefix = "test_policy"
+  role        = aws_iam_role.test_role.id
 
   policy = <<-EOF
   {
@@ -52,7 +52,7 @@ resource "aws_iam_role_policy" "test_policy" {
 
 // attached policy
 resource "aws_iam_policy" "policy" {
-  name        = "test-policy"
+  name_prefix = "test-policy"
   description = "A test policy"
 
   policy = <<EOF

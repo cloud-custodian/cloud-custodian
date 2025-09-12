@@ -1,0 +1,47 @@
+{
+    "status_code": 200,
+    "data": {
+        "CompositeAlarms": [],
+        "MetricAlarms": [
+            {
+                "AlarmName": "TestAlarm",
+                "AlarmArn": "arn:aws:cloudwatch:us-east-2:644160558196:alarm:TestAlarm",
+                "AlarmConfigurationUpdatedTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 5,
+                    "day": 19,
+                    "hour": 3,
+                    "minute": 54,
+                    "second": 24,
+                    "microsecond": 73000
+                },
+                "ActionsEnabled": true,
+                "OKActions": [],
+                "AlarmActions": [],
+                "InsufficientDataActions": [],
+                "StateValue": "INSUFFICIENT_DATA",
+                "StateReason": "Unchecked: Initial alarm creation",
+                "StateUpdatedTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 5,
+                    "day": 19,
+                    "hour": 3,
+                    "minute": 54,
+                    "second": 24,
+                    "microsecond": 73000
+                },
+                "MetricName": "TestCount",
+                "Namespace": "TestNamespace",
+                "Statistic": "Sum",
+                "Dimensions": [],
+                "Period": 86400,
+                "EvaluationPeriods": 1,
+                "Threshold": 0.0,
+                "ComparisonOperator": "GreaterThanThreshold"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

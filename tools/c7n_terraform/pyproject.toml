@@ -1,26 +1,29 @@
-[tool.poetry]
+[project]
+authors = [
+    {name = "Cloud Custodian Project"},
+]
+license = "Apache-2.0"
+requires-python = "<4.0.0,>=3.9.2"
+dependencies = [
+    "c7n",
+    "click<9.0,>=8.0",
+    "python-hcl2<5.0.0,>=4.3.2",
+]
 name = "c7n_terraform"
-version = "0.1.2"
+version = "0.1.36"
 readme = "readme.md"
 description = "Cloud Custodian Provider for evaluating Terraform"
+classifiers = [
+    "License :: OSI Approved :: Apache Software License",
+    "Topic :: System :: Systems Administration",
+    "Topic :: System :: Distributed Computing",
+]
+
+[project.urls]
+homepage = "https://cloudcustodian.io"
 repository = "https://github.com/cloud-custodian/cloud-custodian"
 documentation = "https://cloudcustodian.io/docs/"
-authors = ["Cloud Custodian Project"]
-license = "Apache-2.0"
-classifiers = [
-   "Topic :: System :: Systems Administration",
-   "Topic :: System :: Distributed Computing"]
-
-[tool.poetry.dependencies]
-python = "^3.7"
-rich = "^1.1.9"
-click = "^7.1.2"
-python-hcl2 = "^2.0"
-
-[tool.poetry.dev-dependencies]
-pytest = "~5.3.5"
-c7n = {path = "../..", develop = true}
 
 [build-system]
-requires = ["poetry>=0.12"]
-build-backend = "poetry.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"

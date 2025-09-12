@@ -3,7 +3,7 @@
 from collections import deque
 import logging
 
-from c7n import cache
+from c7n import cache, deprecated
 from c7n.executor import ThreadPoolExecutor
 from c7n.provider import clouds
 from c7n.registry import PluginRegistry
@@ -39,6 +39,8 @@ class ResourceManager:
     executor_factory = ThreadPoolExecutor
     retry = None
     permissions = ()
+    get_client = None
+    get_schema = None
 
     def __init__(self, ctx, data):
         self.ctx = ctx
@@ -145,3 +147,7 @@ class ResourceManager:
                     plural: crontabs
         """
         pass
+
+    def get_deprecations(self):
+        """Return any matching deprecations for the resource itself."""
+        return deprecated.check_deprecations(self)

@@ -46,7 +46,7 @@ def run(event, context=None):
 
 
 def get_tmp_output_dir():
-    output_dir = '/tmp/' + str(uuid.uuid4())
+    output_dir = '/tmp/' + str(uuid.uuid4())  # nosec
     if not os.path.exists(output_dir):
         try:
             os.mkdir(output_dir)

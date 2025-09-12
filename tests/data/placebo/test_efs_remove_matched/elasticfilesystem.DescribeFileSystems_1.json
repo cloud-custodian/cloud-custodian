@@ -1,0 +1,356 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "FileSystems": [
+            {
+                "OwnerId": "644160558196",
+                "CreationToken": "terraform-20250104015422335900000002",
+                "FileSystemId": "fs-0e75dd241f036173d",
+                "FileSystemArn": "arn:aws:elasticfilesystem:us-east-1:644160558196:file-system/fs-0e75dd241f036173d",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 1,
+                    "day": 3,
+                    "hour": 20,
+                    "minute": 54,
+                    "second": 22,
+                    "microsecond": 0
+                },
+                "LifeCycleState": "available",
+                "Name": "example-efs",
+                "NumberOfMountTargets": 0,
+                "SizeInBytes": {
+                    "Value": 6144,
+                    "ValueInIA": 0,
+                    "ValueInStandard": 6144,
+                    "ValueInArchive": 0
+                },
+                "PerformanceMode": "generalPurpose",
+                "Encrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/d38e6df4-3a19-4516-9f4b-ab568e9bccc5",
+                "ThroughputMode": "bursting",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "example-efs"
+                    }
+                ],
+                "FileSystemProtection": {
+                    "ReplicationOverwriteProtection": "ENABLED"
+                }
+            },
+            {
+                "OwnerId": "644160558196",
+                "CreationToken": "terraform-20250104015422335900000001",
+                "FileSystemId": "fs-0db9bce66be0fefd6",
+                "FileSystemArn": "arn:aws:elasticfilesystem:us-east-1:644160558196:file-system/fs-0db9bce66be0fefd6",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 1,
+                    "day": 3,
+                    "hour": 20,
+                    "minute": 54,
+                    "second": 22,
+                    "microsecond": 0
+                },
+                "LifeCycleState": "available",
+                "Name": "example_client_error",
+                "NumberOfMountTargets": 0,
+                "SizeInBytes": {
+                    "Value": 6144,
+                    "ValueInIA": 0,
+                    "ValueInStandard": 6144,
+                    "ValueInArchive": 0
+                },
+                "PerformanceMode": "generalPurpose",
+                "Encrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/d38e6df4-3a19-4516-9f4b-ab568e9bccc5",
+                "ThroughputMode": "bursting",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "example_client_error"
+                    }
+                ],
+                "FileSystemProtection": {
+                    "ReplicationOverwriteProtection": "ENABLED"
+                }
+            },
+            {
+                "OwnerId": "644160558196",
+                "CreationToken": "terraform-20250104015422335900000003",
+                "FileSystemId": "fs-05b97e2b1be5b25f8",
+                "FileSystemArn": "arn:aws:elasticfilesystem:us-east-1:644160558196:file-system/fs-05b97e2b1be5b25f8",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 1,
+                    "day": 3,
+                    "hour": 20,
+                    "minute": 54,
+                    "second": 22,
+                    "microsecond": 0
+                },
+                "LifeCycleState": "available",
+                "Name": "example_remove_named",
+                "NumberOfMountTargets": 0,
+                "SizeInBytes": {
+                    "Value": 6144,
+                    "ValueInIA": 0,
+                    "ValueInStandard": 6144,
+                    "ValueInArchive": 0
+                },
+                "PerformanceMode": "generalPurpose",
+                "Encrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/d38e6df4-3a19-4516-9f4b-ab568e9bccc5",
+                "ThroughputMode": "bursting",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "example_remove_named"
+                    }
+                ],
+                "FileSystemProtection": {
+                    "ReplicationOverwriteProtection": "ENABLED"
+                }
+            },
+            {
+                "OwnerId": "644160558196",
+                "CreationToken": "e26f0a91-da7f-4e09-ae35-82c3a22717d2",
+                "FileSystemId": "fs-095fec21dd6d065fb",
+                "FileSystemArn": "arn:aws:elasticfilesystem:us-east-1:644160558196:file-system/fs-095fec21dd6d065fb",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 12,
+                    "day": 2,
+                    "hour": 20,
+                    "minute": 48,
+                    "second": 3,
+                    "microsecond": 0
+                },
+                "LifeCycleState": "available",
+                "NumberOfMountTargets": 0,
+                "SizeInBytes": {
+                    "Value": 6144,
+                    "Timestamp": {
+                        "__class__": "datetime",
+                        "year": 2025,
+                        "month": 1,
+                        "day": 3,
+                        "hour": 20,
+                        "minute": 37,
+                        "second": 27,
+                        "microsecond": 0
+                    },
+                    "ValueInIA": 0,
+                    "ValueInStandard": 6144,
+                    "ValueInArchive": 0
+                },
+                "PerformanceMode": "generalPurpose",
+                "Encrypted": false,
+                "ThroughputMode": "bursting",
+                "Tags": [],
+                "FileSystemProtection": {
+                    "ReplicationOverwriteProtection": "ENABLED"
+                }
+            },
+            {
+                "OwnerId": "644160558196",
+                "CreationToken": "destination-1675f421-ab78-4ff5-9c24-3abdee474ea0",
+                "FileSystemId": "fs-030e1f760ebb81b2b",
+                "FileSystemArn": "arn:aws:elasticfilesystem:us-east-1:644160558196:file-system/fs-030e1f760ebb81b2b",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 11,
+                    "day": 15,
+                    "hour": 21,
+                    "minute": 1,
+                    "second": 1,
+                    "microsecond": 0
+                },
+                "LifeCycleState": "available",
+                "NumberOfMountTargets": 0,
+                "SizeInBytes": {
+                    "Value": 12666880,
+                    "Timestamp": {
+                        "__class__": "datetime",
+                        "year": 2025,
+                        "month": 1,
+                        "day": 3,
+                        "hour": 20,
+                        "minute": 33,
+                        "second": 40,
+                        "microsecond": 0
+                    },
+                    "ValueInIA": 0,
+                    "ValueInStandard": 12666880,
+                    "ValueInArchive": 0
+                },
+                "PerformanceMode": "generalPurpose",
+                "Encrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/d38e6df4-3a19-4516-9f4b-ab568e9bccc5",
+                "ThroughputMode": "elastic",
+                "Tags": [],
+                "FileSystemProtection": {
+                    "ReplicationOverwriteProtection": "REPLICATING"
+                }
+            },
+            {
+                "OwnerId": "644160558196",
+                "CreationToken": "quickCreated-8e4627e5-4481-4843-8e40-7d6884a1e019",
+                "FileSystemId": "fs-0a006c1f99c7fdb28",
+                "FileSystemArn": "arn:aws:elasticfilesystem:us-east-1:644160558196:file-system/fs-0a006c1f99c7fdb28",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 6,
+                    "day": 11,
+                    "hour": 11,
+                    "minute": 39,
+                    "second": 31,
+                    "microsecond": 0
+                },
+                "LifeCycleState": "available",
+                "Name": "publicAccess",
+                "NumberOfMountTargets": 1,
+                "SizeInBytes": {
+                    "Value": 6144,
+                    "Timestamp": {
+                        "__class__": "datetime",
+                        "year": 2025,
+                        "month": 1,
+                        "day": 3,
+                        "hour": 20,
+                        "minute": 50,
+                        "second": 34,
+                        "microsecond": 0
+                    },
+                    "ValueInIA": 0,
+                    "ValueInStandard": 6144,
+                    "ValueInArchive": 0
+                },
+                "PerformanceMode": "generalPurpose",
+                "Encrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/d38e6df4-3a19-4516-9f4b-ab568e9bccc5",
+                "ThroughputMode": "elastic",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "publicAccess"
+                    },
+                    {
+                        "Key": "aws:elasticfilesystem:default-backup",
+                        "Value": "enabled"
+                    }
+                ],
+                "FileSystemProtection": {
+                    "ReplicationOverwriteProtection": "ENABLED"
+                }
+            },
+            {
+                "OwnerId": "644160558196",
+                "CreationToken": "d-natxtc67bdmy",
+                "FileSystemId": "fs-0b18aab08df189b56",
+                "FileSystemArn": "arn:aws:elasticfilesystem:us-east-1:644160558196:file-system/fs-0b18aab08df189b56",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 4,
+                    "day": 17,
+                    "hour": 15,
+                    "minute": 45,
+                    "second": 11,
+                    "microsecond": 0
+                },
+                "LifeCycleState": "available",
+                "NumberOfMountTargets": 4,
+                "SizeInBytes": {
+                    "Value": 3008512,
+                    "Timestamp": {
+                        "__class__": "datetime",
+                        "year": 2025,
+                        "month": 1,
+                        "day": 3,
+                        "hour": 20,
+                        "minute": 46,
+                        "second": 3,
+                        "microsecond": 0
+                    },
+                    "ValueInIA": 0,
+                    "ValueInStandard": 3008512,
+                    "ValueInArchive": 0
+                },
+                "PerformanceMode": "generalPurpose",
+                "Encrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/d38e6df4-3a19-4516-9f4b-ab568e9bccc5",
+                "ThroughputMode": "bursting",
+                "Tags": [
+                    {
+                        "Key": "ManagedByAmazonSageMakerResource",
+                        "Value": "arn:aws:sagemaker:us-east-1:644160558196:domain/d-natxtc67bdmy"
+                    }
+                ],
+                "FileSystemProtection": {
+                    "ReplicationOverwriteProtection": "ENABLED"
+                }
+            },
+            {
+                "OwnerId": "644160558196",
+                "CreationToken": "quickCreated-dd5279f3-c1bf-4673-9d6a-150bb0973613",
+                "FileSystemId": "fs-017557a9f00b1bec9",
+                "FileSystemArn": "arn:aws:elasticfilesystem:us-east-1:644160558196:file-system/fs-017557a9f00b1bec9",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 5,
+                    "day": 25,
+                    "hour": 12,
+                    "minute": 27,
+                    "second": 28,
+                    "microsecond": 0
+                },
+                "LifeCycleState": "available",
+                "Name": "test",
+                "NumberOfMountTargets": 2,
+                "SizeInBytes": {
+                    "Value": 12288,
+                    "Timestamp": {
+                        "__class__": "datetime",
+                        "year": 2025,
+                        "month": 1,
+                        "day": 3,
+                        "hour": 20,
+                        "minute": 49,
+                        "second": 50,
+                        "microsecond": 0
+                    },
+                    "ValueInIA": 0,
+                    "ValueInStandard": 12288,
+                    "ValueInArchive": 0
+                },
+                "PerformanceMode": "generalPurpose",
+                "Encrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/d38e6df4-3a19-4516-9f4b-ab568e9bccc5",
+                "ThroughputMode": "elastic",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "test"
+                    },
+                    {
+                        "Key": "aws:elasticfilesystem:default-backup",
+                        "Value": "enabled"
+                    }
+                ],
+                "FileSystemProtection": {
+                    "ReplicationOverwriteProtection": "ENABLED"
+                }
+            }
+        ]
+    }
+}

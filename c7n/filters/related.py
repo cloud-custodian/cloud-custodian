@@ -1,11 +1,11 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import importlib
-
-import jmespath
+from functools import lru_cache
 
 from .core import ValueFilter, OPERATORS
 from c7n.query import ChildResourceQuery
+from c7n.utils import jmespath_search
 
 
 class RelatedResourceFilter(ValueFilter):
@@ -35,7 +35,7 @@ class RelatedResourceFilter(ValueFilter):
         return super(RelatedResourceFilter, self).validate()
 
     def get_related_ids(self, resources):
-        return set(jmespath.search(
+        return set(jmespath_search(
             "[].%s" % self.RelatedIdsExpression, resources))
 
     def get_related(self, resources):
@@ -46,9 +46,14 @@ class RelatedResourceFilter(ValueFilter):
             related = resource_manager.get_resources(list(related_ids))
         else:
             related = resource_manager.resources()
+
+        if related is None:
+            return {}
+
         return {r[model.id]: r for r in related
                 if r[model.id] in related_ids}
 
+    @lru_cache(maxsize=None)
     def get_resource_manager(self):
         mod_path, class_name = self.RelatedResource.rsplit('.', 1)
         module = importlib.import_module(mod_path)
@@ -74,17 +79,18 @@ class RelatedResourceFilter(ValueFilter):
         for rid in related_ids:
             robj = related.get(rid, None)
             if robj is None:
-                self.log.warning(
-                    "Resource %s:%s references non existant %s: %s",
-                    self.manager.type,
-                    resource[model.id],
-                    self.RelatedResource.rsplit('.', 1)[-1],
-                    rid)
                 # in the event that the filter is looking specifically for absent values, we can
-                # safely assume that the non-existant related resource will have an absent value at
+                # safely assume that the non-existent related resource will have an absent value at
                 # any given key
                 if self.data['value'] == 'absent':
                     found.append(rid)
+                else:
+                    self.log.warning(
+                        "Resource %s:%s references non existent %s: %s",
+                        self.manager.type,
+                        resource[model.id],
+                        self.RelatedResource.rsplit('.', 1)[-1],
+                        rid)
                 continue
             if self.match(robj):
                 found.append(rid)
@@ -132,7 +138,7 @@ class RelatedResourceByIdFilter(RelatedResourceFilter):
 
     def get_related_by_ids(self, resources):
         RelatedResourceKey = self.RelatedResourceByIdExpression or self.RelatedIdsExpression
-        ids = jmespath.search("%s" % RelatedResourceKey, resources)
+        ids = jmespath_search("%s" % RelatedResourceKey, resources)
         if isinstance(ids, str):
             ids = [ids]
         return set(ids)

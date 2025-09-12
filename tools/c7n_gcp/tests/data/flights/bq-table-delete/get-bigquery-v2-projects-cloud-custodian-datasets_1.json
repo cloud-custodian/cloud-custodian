@@ -1,0 +1,37 @@
+{
+  "headers": {
+    "etag": "cgxiS2qKFS79lfscFI9BcQ==",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Tue, 28 Feb 2023 20:28:03 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "417",
+    "-content-encoding": "gzip",
+    "content-location": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets?alt=json"
+  },
+  "body": {
+    "kind": "bigquery#datasetList",
+    "etag": "cgxiS2qKFS79lfscFI9BcQ==",
+    "datasets": [
+      {
+        "kind": "bigquery#dataset",
+        "id": "premise-governance-rd:custodian_test",
+        "datasetReference": {
+          "datasetId": "custodian_test",
+          "projectId": "premise-governance-rd"
+        },
+        "labels": {
+          "delete_me": "yes"
+        },
+        "friendlyName": "custodian_test",
+        "location": "US"
+      }
+    ]
+  }
+}

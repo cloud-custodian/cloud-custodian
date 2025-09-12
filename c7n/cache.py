@@ -3,11 +3,12 @@
 """Provide basic caching services to avoid extraneous queries over
 multiple policies on the same resource type.
 """
-import pickle
+import pickle  # nosec nosemgrep
 
+from datetime import datetime, timedelta
 import os
 import logging
-import time
+import sqlite3
 
 log = logging.getLogger('custodian.cache')
 
@@ -30,12 +31,11 @@ def factory(config):
         if not CACHE_NOTIFY:
             log.debug("Using in-memory cache")
             CACHE_NOTIFY = True
-        return InMemoryCache()
+        return InMemoryCache(config)
+    return SqlKvCache(config)
 
-    return FileCacheManager(config)
 
-
-class NullCache:
+class Cache:
 
     def __init__(self, config):
         self.config = config
@@ -52,74 +52,120 @@ class NullCache:
     def size(self):
         return 0
 
+    def close(self):
+        pass
 
-class InMemoryCache:
+    def __enter__(self):
+        self.load()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.close()
+
+
+class NullCache(Cache):
+    pass
+
+
+class InMemoryCache(Cache):
     # Running in a temporary environment, so keep as a cache.
 
     __shared_state = {}
 
-    def __init__(self):
+    def __init__(self, config):
+        super().__init__(config)
         self.data = self.__shared_state
 
     def load(self):
         return True
 
     def get(self, key):
-        return self.data.get(pickle.dumps(key))
+        return self.data.get(encode(key))
 
     def save(self, key, data):
-        self.data[pickle.dumps(key)] = data
+        self.data[encode(key)] = data
 
     def size(self):
         return sum(map(len, self.data.values()))
 
 
-class FileCacheManager:
+def encode(key):
+    return pickle.dumps(key, protocol=pickle.HIGHEST_PROTOCOL)  # nosemgrep
+
+
+def resolve_path(path):
+    return os.path.abspath(
+        os.path.expanduser(
+            os.path.expandvars(path)))
+
+
+class SqlKvCache(Cache):
+
+    create_table = """
+    create table if not exists c7n_cache (
+        key blob primary key,
+        value blob,
+        create_date timestamp
+    )
+    """
 
     def __init__(self, config):
-        self.config = config
+        super().__init__(config)
         self.cache_period = config.cache_period
-        self.cache_path = os.path.abspath(
-            os.path.expanduser(
-                os.path.expandvars(
-                    config.cache)))
-        self.data = {}
+        self.cache_path = resolve_path(config.cache)
+        self.conn = None
 
-    def get(self, key):
-        k = pickle.dumps(key)
-        return self.data.get(k)
+    def init(self):
+        # migration from pickle cache file
+        if os.path.exists(self.cache_path):
+            with open(self.cache_path, 'rb') as fh:
+                header = fh.read(15)
+                if header != b'SQLite format 3':
+                    log.debug('removing old cache file')
+                    os.remove(self.cache_path)
+        elif not os.path.exists(os.path.dirname(self.cache_path)):
+            # parent directory creation
+            os.makedirs(os.path.dirname(self.cache_path))
+        self.conn = sqlite3.connect(self.cache_path)
+        self.conn.execute(self.create_table)
+        with self.conn as cursor:
+            result = cursor.execute(
+                'delete from c7n_cache where create_date < ?',
+                [datetime.utcnow() - timedelta(minutes=self.cache_period)])
+            if result.rowcount:
+                log.debug('expired %d stale cache entries', result.rowcount)
 
     def load(self):
-        if self.data:
-            return True
-        if os.path.isfile(self.cache_path):
-            if (time.time() - os.stat(self.cache_path).st_mtime >
-                    self.config.cache_period * 60):
-                return False
-            with open(self.cache_path, 'rb') as fh:
-                try:
-                    self.data = pickle.load(fh)
-                except EOFError:
-                    return False
-            log.debug("Using cache file %s" % self.cache_path)
-            return True
+        if not self.conn:
+            self.init()
+        return True
 
-    def save(self, key, data):
-        try:
-            with open(self.cache_path, 'wb') as fh:
-                self.data[pickle.dumps(key)] = data
-                pickle.dump(self.data, fh, protocol=2)
-        except Exception as e:
-            log.warning("Could not save cache %s err: %s" % (
-                self.cache_path, e))
-            if not os.path.exists(self.cache_path):
-                directory = os.path.dirname(self.cache_path)
-                log.info('Generating Cache directory: %s.' % directory)
-                try:
-                    os.makedirs(directory)
-                except Exception as e:
-                    log.warning("Could not create directory: %s err: %s" % (
-                        directory, e))
+    def get(self, key):
+        with self.conn as cursor:
+            r = cursor.execute(
+                'select value, create_date from c7n_cache where key = ?',
+                [sqlite3.Binary(encode(key))]
+            )
+            row = r.fetchone()
+            if row is None:
+                return None
+            value, create_date = row
+            create_date = sqlite3.converters['TIMESTAMP'](create_date.encode('utf8'))
+            if (datetime.utcnow() - create_date).total_seconds() / 60.0 > self.cache_period:
+                return None
+            return pickle.loads(value)  # nosec nosemgrep
+
+    def save(self, key, data, timestamp=None):
+        with self.conn as cursor:
+            timestamp = timestamp or datetime.utcnow()
+            cursor.execute(
+                'replace into c7n_cache (key, value, create_date) values (?, ?, ?)',
+                (sqlite3.Binary(encode(key)), sqlite3.Binary(encode(data)), timestamp))
 
     def size(self):
         return os.path.exists(self.cache_path) and os.path.getsize(self.cache_path) or 0
+
+    def close(self):
+        if self.conn:
+            self.conn.close()
+            self.conn = None

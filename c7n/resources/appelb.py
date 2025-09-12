@@ -5,12 +5,19 @@ Application & Network Load Balancers
 """
 import json
 import logging
+import re
 
 from collections import defaultdict
 from c7n.actions import ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
-    Filter, FilterRegistry, DefaultVpcBase, MetricsFilter, ValueFilter)
+    Filter,
+    FilterRegistry,
+    MetricsFilter,
+    ValueFilter,
+    WafV2FilterBase,
+    WafClassicRegionalFilterBase
+)
 import c7n.filters.vpc as net_filters
 from c7n import tags
 from c7n.manager import resources
@@ -80,6 +87,7 @@ class AppELB(QueryResourceManager):
         arn = "LoadBalancerArn"
         # The suffix varies by type of loadbalancer (app vs net)
         arn_type = 'loadbalancer/app'
+        permissions_augment = ("elasticloadbalancing:DescribeTags",)
 
     retry = staticmethod(get_retry(('Throttling',)))
     source_mapping = {
@@ -179,68 +187,97 @@ class VpcFilter(net_filters.VpcFilter):
 
 
 @AppELB.filter_registry.register('waf-enabled')
-class WafEnabled(Filter):
+class WafEnabled(WafClassicRegionalFilterBase):
+    """Filter Application LoadBalancer by waf-regional web-acl
 
-    schema = type_schema(
-        'waf-enabled', **{
-            'web-acl': {'type': 'string'},
-            'state': {'type': 'boolean'}})
+    :example:
 
-    permissions = ('waf-regional:ListResourcesForWebACL', 'waf-regional:ListWebACLs')
+    .. code-block:: yaml
 
-    # TODO verify name uniqueness within region/account
-    # TODO consider associated resource fetch in augment
-    def process(self, resources, event=None):
-        client = local_session(self.manager.session_factory).client(
-            'waf-regional')
+            policies:
+              - name: filter-elb-waf-regional
+                resource: app-elb
+                filters:
+                  - type: waf-enabled
+                    state: false
+                    web-acl: test
+    """
 
-        target_acl = self.data.get('web-acl')
-        state = self.data.get('state', False)
+    # application load balancers don't hold a reference to the associated web acl
+    # so we have to look them up via the associations on the web acl directly
+    def get_associated_web_acl(self, resource):
+        return self.get_web_acl_from_associations(
+            'APPLICATION_LOAD_BALANCER',
+            resource['LoadBalancerArn']
+        )
 
-        name_id_map = {}
-        resource_map = {}
 
-        wafs = self.manager.get_resource_manager('waf-regional').resources(augment=False)
+@AppELB.filter_registry.register('wafv2-enabled')
+class WafV2Enabled(WafV2FilterBase):
+    """Filter Application LoadBalancer by wafv2 web-acl
 
-        for w in wafs:
-            if 'c7n:AssociatedResources' not in w:
-                arns = client.list_resources_for_web_acl(
-                    WebACLId=w['WebACLId']).get('ResourceArns', [])
-                w['c7n:AssociatedResources'] = arns
-            name_id_map[w['Name']] = w['WebACLId']
-            for r in w['c7n:AssociatedResources']:
-                resource_map[r] = w['WebACLId']
+    Supports regex expression for web-acl.
+    Firewall Manager pushed WebACL's name varies by account and region.
+    Regex expression can support both local and Firewall Managed WebACL.
 
-        target_acl_id = name_id_map.get(target_acl, target_acl)
+    :example:
 
-        # generally frown on runtime validation errors, but also frown on
-        # api calls during validation.
-        if target_acl and target_acl_id not in name_id_map.values():
-            raise ValueError("Invalid target acl:%s, acl not found" % target_acl)
+    .. code-block:: yaml
 
-        arn_key = self.manager.resource_type.id
+            policies:
+              - name: filter-wafv2-elb
+                resource: app-elb
+                filters:
+                  - type: wafv2-enabled
+                    state: false
+                    web-acl: testv2
 
-        state_map = {}
-        for r in resources:
-            arn = r[arn_key]
-            if arn in resource_map:
-                r['c7n_webacl'] = resource_map[arn]
-                if not target_acl:
-                    state_map[arn] = True
-                    continue
-                r_acl = resource_map[arn]
-                if r_acl == target_acl_id:
-                    state_map[arn] = True
-                    continue
-                state_map[arn] = False
-            else:
-                state_map[arn] = False
-        return [r for r in resources if state_map[r[arn_key]] == state]
+              - name: filter-wafv2-elb-regex
+                resource: app-elb
+                filters:
+                  - type: wafv2-enabled
+                    state: false
+                    web-acl: .*FMManagedWebACLV2-?FMS-.*
+    """
+
+    # application load balancers don't hold a reference to the associated web acl
+    # so we have to look them up via the associations on the web acl directly
+    def get_associated_web_acl(self, resource):
+        return self.get_web_acl_from_associations(
+            'APPLICATION_LOAD_BALANCER',
+            resource['LoadBalancerArn']
+        )
 
 
 @AppELB.action_registry.register('set-waf')
 class SetWaf(BaseAction):
-    """Enable/Disable waf protection on applicable resource.
+    """Enable wafv2 protection on Application LoadBalancer.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: set-waf-for-elb
+                resource: app-elb
+                filters:
+                  - type: waf-enabled
+                    state: false
+                    web-acl: test
+                actions:
+                  - type: set-waf
+                    state: true
+                    web-acl: test
+
+              - name: disassociate-wafv2-associate-waf-regional-elb
+                resource: app-elb
+                filters:
+                  - type: wafv2-enabled
+                    state: true
+                actions:
+                  - type: set-waf
+                    state: true
+                    web-acl: test
 
     """
     permissions = ('waf-regional:AssociateWebACL', 'waf-regional:ListWebACLs')
@@ -254,14 +291,14 @@ class SetWaf(BaseAction):
     def validate(self):
         found = False
         for f in self.manager.iter_filters():
-            if isinstance(f, WafEnabled):
+            if isinstance(f, WafEnabled) or isinstance(f, WafV2Enabled):
                 found = True
                 break
         if not found:
             # try to ensure idempotent usage
             raise PolicyValidationError(
-                "set-waf should be used in conjunction with waf-enabled filter on %s" % (
-                    self.manager.data,))
+                "set-waf should be used in conjunction with waf-enabled or wafv2-enabled \
+                    filter on %s" % (self.manager.data,))
         return self
 
     def process(self, resources):
@@ -288,6 +325,112 @@ class SetWaf(BaseAction):
             else:
                 client.disassociate_web_acl(
                     WebACLId=target_acl_id, ResourceArn=r[arn_key])
+
+
+@AppELB.action_registry.register('set-wafv2')
+class SetWafV2(BaseAction):
+    """Enable wafv2 protection on Application LoadBalancer.
+
+    Supports regex expression for web-acl
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: set-wafv2-for-elb
+                resource: app-elb
+                filters:
+                  - type: wafv2-enabled
+                    state: false
+                    web-acl: testv2
+                actions:
+                  - type: set-wafv2
+                    state: true
+                    web-acl: testv2
+
+              - name: disassociate-waf-regional-associate-wafv2-elb
+                resource: app-elb
+                filters:
+                  - type: waf-enabled
+                    state: true
+                actions:
+                  - type: set-wafv2
+                    state: true
+
+            policies:
+              - name: set-wafv2-for-elb-regex
+                resource: app-elb
+                filters:
+                  - type: wafv2-enabled
+                    state: false
+                    web-acl: .*FMManagedWebACLV2-?FMS-.*
+                actions:
+                  - type: set-wafv2
+                    state: true
+                    web-acl: FMManagedWebACLV2-?FMS-TestWebACL
+
+    """
+    permissions = ('wafv2:AssociateWebACL',
+                   'wafv2:DisassociateWebACL',
+                   'wafv2:ListWebACLs')
+
+    schema = type_schema(
+        'set-wafv2', **{
+            'web-acl': {'type': 'string'},
+            'state': {'type': 'boolean'}})
+
+    retry = staticmethod(get_retry((
+        'ThrottlingException',
+        'RequestLimitExceeded',
+        'Throttled',
+        'ThrottledException',
+        'Throttling',
+        'Client.RequestLimitExceeded')))
+
+    def validate(self):
+        found = False
+        for f in self.manager.iter_filters():
+            if isinstance(f, WafV2Enabled) or isinstance(f, WafEnabled):
+                found = True
+                break
+        if not found:
+            # try to ensure idempotent usage
+            raise PolicyValidationError(
+                "set-wafv2 should be used in conjunction with wafv2-enabled or waf-enabled \
+                    filter on %s" % (self.manager.data,))
+        return self
+
+    def process(self, resources):
+        wafs = self.manager.get_resource_manager('wafv2').resources(augment=False)
+        name_id_map = {w['Name']: w['ARN'] for w in wafs}
+        state = self.data.get('state', True)
+
+        target_acl_id = ''
+        if state:
+            target_acl = self.data.get('web-acl', '')
+            target_acl_ids = [v for k, v in name_id_map.items() if
+                              re.match(target_acl, k)]
+            if len(target_acl_ids) != 1:
+                raise ValueError(f'{target_acl} matching to none or '
+                                 f'multiple webacls')
+            target_acl_id = target_acl_ids[0]
+
+        client = local_session(
+            self.manager.session_factory).client('wafv2')
+
+        arn_key = self.manager.resource_type.id
+
+        # TODO implement force to reassociate.
+        # TODO investigate limits on waf association.
+        for r in resources:
+            if state:
+                self.retry(client.associate_web_acl,
+                           WebACLArn=target_acl_id,
+                           ResourceArn=r[arn_key])
+            else:
+                self.retry(client.disassociate_web_acl,
+                           ResourceArn=r[arn_key])
 
 
 @AppELB.action_registry.register('set-s3-logging')
@@ -478,9 +621,12 @@ class AppELBDeleteAction(BaseAction):
                 client.delete_load_balancer, LoadBalancerArn=alb['LoadBalancerArn'])
         except client.exceptions.LoadBalancerNotFoundException:
             pass
-        except client.exceptions.OperationNotPermittedException as e:
+        except (
+            client.exceptions.OperationNotPermittedException,
+            client.exceptions.ResourceInUseException
+        ) as e:
             self.log.warning(
-                "Exception trying to delete ALB: %s error: %s",
+                "Exception trying to delete load balancer: %s error: %s",
                 alb['LoadBalancerArn'], e)
 
 
@@ -560,11 +706,9 @@ class AppELBListenerFilterBase:
         client = local_session(self.manager.session_factory).client('elbv2')
         self.listener_map = defaultdict(list)
         for alb in albs:
-            try:
-                results = client.describe_listeners(
-                    LoadBalancerArn=alb['LoadBalancerArn'])
-            except client.exceptions.LoadBalancerNotFoundException:
-                continue
+            results = self.manager.retry(client.describe_listeners,
+                            LoadBalancerArn=alb['LoadBalancerArn'],
+                            ignore_err_codes=('LoadBalancerNotFoundException',))
             self.listener_map[alb['LoadBalancerArn']] = results['Listeners']
 
 
@@ -936,7 +1080,7 @@ class AppELBTargetGroupFilter(ValueFilter, AppELBTargetGroupFilterBase):
 
 
 @AppELB.filter_registry.register('default-vpc')
-class AppELBDefaultVpcFilter(DefaultVpcBase):
+class AppELBDefaultVpcFilter(net_filters.DefaultVpcBase):
     """Filter all ELB that exist within the default vpc
 
     :example:
@@ -1086,7 +1230,7 @@ class AppELBTargetGroupRemoveTagAction(tags.RemoveTag):
 
 
 @AppELBTargetGroup.filter_registry.register('default-vpc')
-class AppELBTargetGroupDefaultVpcFilter(DefaultVpcBase):
+class AppELBTargetGroupDefaultVpcFilter(net_filters.DefaultVpcBase):
     """Filter all application elb target groups within the default vpc
 
     :example:
@@ -1139,3 +1283,145 @@ class AppELBTargetGroupDeleteAction(BaseAction):
         self.manager.retry(
             client.delete_target_group,
             TargetGroupArn=target_group['TargetGroupArn'])
+
+
+class TargetGroupAttributeFilterBase:
+    """ Mixin base class for filters that query Target Group attributes.
+    """
+
+    def initialize(self, tgs):
+        client = local_session(self.manager.session_factory).client('elbv2')
+
+        def _process_attributes(tg):
+            if 'c7n:TargetGroupAttributes' not in tg:
+                tg['c7n:TargetGroupAttributes'] = {}
+                results = self.manager.retry(client.describe_target_group_attributes,
+                    TargetGroupArn=tg['TargetGroupArn'],
+                    ignore_err_codes=('TargetGroupNotFoundException',))
+                # flatten out the list of dicts and cast
+                for pair in results['Attributes']:
+                    k = pair['Key']
+                    v = parse_attribute_value(pair['Value'])
+                    tg['c7n:TargetGroupAttributes'][k] = v
+
+        with self.manager.executor_factory(max_workers=2) as w:
+            list(w.map(_process_attributes, tgs))
+
+
+@AppELBTargetGroup.filter_registry.register('attributes')
+class TargetGroupCheckAttributes(ValueFilter, TargetGroupAttributeFilterBase):
+    """ Value filter that allows filtering on Target group attributes
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+                - name: target-group-check-attributes
+                  resource: app-elb-target-group
+                  filters:
+                    - type: attributes
+                      key: preserve_client_ip.enabled
+                      value: True
+                      op: eq
+    """
+    annotate: False  # no annotation from value Filter
+    permissions = ("elasticloadbalancing:DescribeTargetGroupAttributes",)
+    schema = type_schema('attributes', rinherit=ValueFilter.schema)
+    schema_alias = False
+
+    def process(self, resources, event=None):
+        self.augment(resources)
+        return super().process(resources, event)
+
+    def augment(self, resources):
+        self.initialize(resources)
+
+    def __call__(self, r):
+        return super().__call__(r['c7n:TargetGroupAttributes'])
+
+
+@AppELBTargetGroup.action_registry.register('modify-attributes')
+class AppELBTargetGroupModifyAttributes(BaseAction):
+    """Modify target group attributes.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: modify-preserve-client-ip-enable
+                resource: app-elb-target-group
+                filters:
+                  - type: attributes
+                    key: "preserve_client_ip.enabled"
+                    value: False
+                actions:
+                  - type: modify-attributes
+                    attributes:
+                      "preserve_client_ip.enabled": "true"
+    """
+    schema = {
+        'type': 'object',
+        'additionalProperties': False,
+        'properties': {
+            'type': {
+                'enum': ['modify-attributes']},
+            'attributes': {
+                'type': 'object',
+                'additionalProperties': False,
+                'properties': {
+                    'proxy_protocol_v2.enabled': {
+                        'enum': ['true', 'false', True, False]},
+                    'preserve_client_ip.enabled': {
+                        'enum': ['true', 'false', True, False]},
+                    'stickiness.enabled': {
+                        'enum': ['true', 'false', True, False]},
+                    'lambda.multi_value_headers.enabled': {
+                        'enum': ['true', 'false', True, False]},
+                    'deregistration_delay.connection_termination.enabled': {
+                        'enum': ['true', 'false', True, False]},
+                    'target_group_health.unhealthy_state_routing.'
+                    'minimum_healthy_targets.count': {'type': 'number'},
+                    'target_group_health.unhealthy_state_routing.'
+                    'minimum_healthy_targets.percentage': {'type': 'string'},
+                    'deregistration_delay.timeout_seconds': {'type': 'number'},
+                    'target_group_health.dns_failover.minimum_healthy_targets.count': {
+                        'type': 'string'},
+                    'stickiness.type': {
+                        'enum': ['lb_cookie', 'app_cookie', 'source_ip',
+                                 'source_ip_dest_ip', 'source_ip_dest_ip_proto']},
+                    'load_balancing.cross_zone.enabled': {
+                        'enum': ['true', 'false', True, False, 'use_load_balancer_configuration']},
+                    'target_group_health.dns_failover.minimum_healthy_targets.percentage': {
+                        'type': 'string'},
+                    'stickiness.app_cookie.cookie_name': {'type': 'string'},
+                    'stickiness.lb_cookie.duration_seconds': {'type': 'number'},
+                    'slow_start.duration_seconds': {'type': 'number'},
+                    'stickiness.app_cookie.duration_seconds': {'type': 'number'},
+                    'load_balancing.algorithm.type': {
+                        'enum': ['round_robin', 'least_outstanding_requests']},
+                    'target_failover.on_deregistration': {
+                        'enum': ['rebalance', 'no_rebalance']},
+                    'target_failover.on_unhealthy': {
+                        'enum': ['rebalance', 'no_rebalance']},
+                },
+            },
+        },
+    }
+    permissions = ("elasticloadbalancing:ModifyTargetGroupAttributes",)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('elbv2')
+        self.log.info(resources)
+        for targetgroup in resources:
+            self.manager.retry(
+                client.modify_target_group_attributes,
+                TargetGroupArn=targetgroup['TargetGroupArn'],
+                Attributes=[
+                    {'Key': key, 'Value': serialize_attribute_value(value)}
+                    for (key, value) in self.data['attributes'].items()
+                ],
+                ignore_err_codes=('TargetGroupNotFoundException',),
+            )
+        return resources

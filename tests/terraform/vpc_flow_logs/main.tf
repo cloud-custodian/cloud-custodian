@@ -1,9 +1,14 @@
+provider "aws" {
+  region = "us-east-1"
+}
+
 resource "aws_vpc" "example" {
   cidr_block = "10.1.0.0/16"
 }
 
 resource "aws_vpc" "example_no_flow_log" {
   cidr_block = "10.2.0.0/16"
+  tags       = { Env = "Dev" }
 }
 
 resource "aws_flow_log" "example" {
@@ -18,7 +23,7 @@ resource "aws_cloudwatch_log_group" "example" {
 }
 
 resource "aws_iam_role" "example" {
-  name = "example"
+  name_prefix = "example"
 
   assume_role_policy = <<EOF
 {

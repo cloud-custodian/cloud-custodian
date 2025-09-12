@@ -1,0 +1,45 @@
+{
+    "status_code": 200,
+    "data": {
+        "Quotas": [
+            {
+                "ServiceCode": "firehose",
+                "ServiceName": "Amazon Kinesis Data Firehose",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:firehose/L-14BB0BE7",
+                "QuotaCode": "L-14BB0BE7",
+                "QuotaName": "Delivery streams",
+                "Value": 50.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false,
+                "UsageMetric": {
+                    "MetricNamespace": "AWS/Usage",
+                    "MetricName": "ResourceCount",
+                    "MetricDimensions": {
+                        "Class": "None",
+                        "Resource": "DeliveryStreams",
+                        "Service": "Firehose",
+                        "Type": "Resource"
+                    },
+                    "MetricStatisticRecommendation": "Maximum"
+                },
+                "Period": {
+                    "PeriodValue": 300,
+                    "PeriodUnit": "SECOND"
+                }
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "2374979e-0783-4e70-b1d6-2266c159907f",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Thu, 31 Oct 2019 17:52:33 GMT",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "555",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "2374979e-0783-4e70-b1d6-2266c159907f"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

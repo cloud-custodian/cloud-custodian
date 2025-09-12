@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 import json
 import logging
-import mock
+from unittest import mock
 import os
 
 from .common import BaseTest
@@ -30,7 +30,7 @@ class HandleTest(BaseTest):
                     'execution-options': {
                         'metrics_enabled': True,
                         'assume_role': 'arn::::007:foo',
-                        'output_dir': 's3://mybucket/output'}},
+                        'output_dir': 's3://mybucket/output?region=us-east-1'}},
                  'resource': 'aws.ec2',
                  'name': 'check-dev'}
             ]}
@@ -41,15 +41,19 @@ class HandleTest(BaseTest):
              'tracer': 'xray',
              'account_id': '007',
              'region': 'us-east-1',
-             'output_dir': 's3://mybucket/output',
+             # S3 uploads use a session in the output bucket's home region.
+             # When initiating a policy config we expect to identify the
+             # output bucket region so it's available at upload time.
+             'output_dir': 's3://mybucket/output?region=us-east-1',
 
              # defaults
              'external_id': None,
+             'session_policy': None,
              'dryrun': False,
              'profile': None,
              'authorization_file': None,
              'cache': '',
-             'regions': (),
+             'regions': ['us-east-1'],
              'cache_period': 0,
              'log_group': None,
              'metrics': None})
@@ -104,9 +108,9 @@ class HandleTest(BaseTest):
 
     @mock.patch('c7n.handler.PolicyCollection')
     def test_dispatch_err_event(self, mock_collection):
-        output, executions = self.setupLambdaEnv({
+        output, _ = self.setupLambdaEnv({
             'execution-options': {
-                'output_dir': 's3://xyz',
+                'output_dir': 's3://xyz?region=us-east-1',
                 'account_id': '004'},
             'policies': [{'resource': 'ec2', 'name': 'xyz'}]},
             log_level=logging.DEBUG)
@@ -120,8 +124,9 @@ class HandleTest(BaseTest):
         mock_collection.from_data.assert_called_once()
 
     def test_dispatch_err_handle(self):
-        output, executions = self.setupLambdaEnv({
-            'execution-options': {'output_dir': 's3://xyz', 'account_id': '004'},
+        output, _ = self.setupLambdaEnv({
+            'execution-options': {
+                'output_dir': 's3://xyz?region=us-east-1', 'account_id': '004'},
             'policies': [{'resource': 'ec2', 'name': 'xyz'}]},
             err_execs=[PolicyExecutionError("foo")] * 2)
 
@@ -135,7 +140,7 @@ class HandleTest(BaseTest):
         self.assertEqual(output.getvalue().count('error during'), 2)
 
     def test_handler(self):
-        output, executions = self.setupLambdaEnv({
+        _, executions = self.setupLambdaEnv({
             'policies': [{
                 'resource': 'asg', 'name': 'auto'}]},
         )

@@ -1,0 +1,37 @@
+{
+    "status_code": 201,
+    "data": {
+        "ResponseMetadata": {},
+        "FunctionName": "custodian-ec2-foo-bar",
+        "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-ec2-foo-bar",
+        "Runtime": "python3.9",
+        "Role": "arn:aws:iam::644160558196:role/custodian-mu",
+        "Handler": "custodian_policy.run",
+        "CodeSize": 530080,
+        "Description": "cloud-custodian lambda policy",
+        "Timeout": 900,
+        "MemorySize": 512,
+        "LastModified": "2022-10-26T15:19:23.873+0000",
+        "CodeSha256": "w/2LuI41TjR+c4a8nRpbL3TvCofA8FVvLMGG0QbJmcY=",
+        "Version": "109",
+        "VpcConfig": {
+            "SubnetIds": [],
+            "SecurityGroupIds": [],
+            "VpcId": ""
+        },
+        "TracingConfig": {
+            "Mode": "PassThrough"
+        },
+        "RevisionId": "d891ff1e-252b-4711-b31a-d456bee61eab",
+        "State": "Pending",
+        "StateReason": "The function is being created.",
+        "StateReasonCode": "Creating",
+        "PackageType": "Zip",
+        "Architectures": [
+            "arm64"
+        ],
+        "EphemeralStorage": {
+            "Size": 512
+        }
+    }
+}

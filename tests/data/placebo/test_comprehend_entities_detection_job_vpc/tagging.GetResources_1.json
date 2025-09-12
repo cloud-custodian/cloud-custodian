@@ -1,0 +1,13 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:comprehend:us-east-1:644160558196:entities-detection-job/7b092acd3f54408891ad6302b0ca10eb",
+                "Tags": []
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

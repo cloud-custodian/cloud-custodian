@@ -12,13 +12,12 @@ from azure.storage.common.models import Logging, RetentionPolicy
 from azure.storage.file import FileService
 from azure.storage.queue import QueueServiceClient
 from c7n.exceptions import PolicyValidationError
-from c7n.filters.core import type_schema
+from c7n.filters.core import type_schema, ListItemFilter
 from c7n.utils import get_annotation_prefix, local_session
 from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.actions.firewall import SetFirewallAction
 from c7n_azure.constants import BLOB_TYPE, FILE_TYPE, QUEUE_TYPE, TABLE_TYPE
-from c7n_azure.filters import (FirewallBypassFilter, FirewallRulesFilter,
-                               ValueFilter)
+from c7n_azure.filters import (FirewallBypassFilter, FirewallRulesFilter, ValueFilter)
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 from c7n_azure.storage_utils import StorageUtilities
@@ -57,6 +56,69 @@ class Storage(ArmResourceManager):
             'kind',
             'sku.name'
         )
+
+
+@Storage.filter_registry.register("file-services")
+class StorageFileServicesFilter(ListItemFilter):
+    """
+    Filters Storage Accounts by their file services configuration.
+
+    :example:
+
+    Find storage accounts with file services soft delete disabled
+
+    .. code-block:: yaml
+
+        policies:
+          - name: storage-no-file-services-delete-policy
+            resource: azure.storage
+            filters:
+              - type: file-services
+                attrs:
+                  - type: value
+                    key: properties.shareDeleteRetentionPolicy.enabled
+                    value: false
+
+    """
+    schema = type_schema(
+        "file-services",
+        attrs={"$ref": "#/definitions/filters_common/list_item_attrs"},
+        count={"type": "number"},
+        count_op={"$ref": "#/definitions/filters_common/comparison_operators"}
+    )
+    item_annotation_key = "c7n:FileServices"
+    annotate_items = True
+
+    def _process_resources(self, resources, event=None, client=None):
+        if client is None:
+            client = self.manager.get_client()
+
+        for res in resources:
+            if self.item_annotation_key in res:
+                continue
+            file_services = client.file_services.list(
+                resource_group_name=res["resourceGroup"],
+                account_name=res["name"],
+            )
+            # at least one default is present
+            res[self.item_annotation_key] = file_services.serialize(True).get('value', [])
+
+    def process(self, resources, event=None):
+
+        _, exceptions = ThreadHelper.execute_in_parallel(
+            resources=resources,
+            event=event,
+            execution_method=self._process_resources,
+            executor_factory=self.executor_factory,
+            log=self.log,
+            client=self.manager.get_client()  # seems like Azure mgmt clients are thread-safe
+        )
+        if exceptions:
+            raise exceptions[0]  # pragma: no cover
+        return super().process(resources, event)
+
+    def get_item_values(self, resource):
+        return resource.pop(self.item_annotation_key, [])
 
 
 @Storage.action_registry.register('set-firewall-rules')
@@ -180,6 +242,52 @@ class StorageSetFirewallAction(SetFirewallAction):
             resource['resourceGroup'],
             resource['name'],
             StorageAccountUpdateParameters(network_rule_set=rule_set))
+
+
+@Storage.filter_registry.register("management-policy-rules")
+class StorageAccountManagementPolicyRulesFilter(ListItemFilter):
+    """
+    Filter Storage Accounts based on their management policy rules
+
+    :example:
+
+    Find storage accounts where lifecycle policy configured to remove base Blob
+    after less or equal than 3 days
+
+    .. code-block:: yaml
+
+        policies:
+          - name: storage-delete-blob-le-3-days
+            resource: azure.storage
+            filters:
+              - type: management-policy-rules
+                attrs:
+                  - type: value
+                    key: definition.actions.baseBlob.delete.daysAfterModificationGreaterThan
+                    value: 3
+                    op: le
+
+    """
+    schema = type_schema(
+        "management-policy-rules",
+        attrs={"$ref": "#/definitions/filters_common/list_item_attrs"},
+        count={"type": "number"},
+        count_op={"$ref": "#/definitions/filters_common/comparison_operators"}
+    )
+    item_annotation_key = "c7n:management-policy-rules"
+    annotate_items = True
+
+    def get_item_values(self, resource):
+        try:
+            item = self.manager.get_client().management_policies.get(
+                resource_group_name=resource["resourceGroup"],
+                account_name=resource["name"],
+                management_policy_name="default"
+            )
+            return item.serialize(True)["properties"]["policy"].get("rules", [])
+        except Exception as e:  # azure.core.exceptions.ResourceNotFoundError
+            self.log.error(e)
+            return []  # no rules
 
 
 @Storage.filter_registry.register('firewall-rules')
@@ -321,7 +429,7 @@ class StorageDiagnosticSettingsFilter(ValueFilter):
 
     def process(self, resources, event=None):
         session = local_session(self.manager.session_factory)
-        result, errors = ThreadHelper.execute_in_parallel(
+        result, _ = ThreadHelper.execute_in_parallel(
             resources=resources,
             event=event,
             execution_method=self.process_resource_set,
@@ -349,7 +457,7 @@ class StorageDiagnosticSettingsFilter(ValueFilter):
     def _get_settings(self, storage_account, session=None):
         storage_prefix_property = get_annotation_prefix(self.storage_type)
 
-        if not (storage_prefix_property in storage_account):
+        if storage_prefix_property not in storage_account:
             settings = StorageSettingsUtilities.get_settings(
                 self.storage_type, storage_account, session)
             storage_account[storage_prefix_property] = serialize(settings)
@@ -529,11 +637,25 @@ class RequireSecureTransferAction(AzureBaseAction):
               actions:
               - type: require-secure-transfer
                 value: True
+
+    You can also set the minimum tls version on a bucket,
+    valid values: TLS1_0, TLS1_1, TLS1_2:
+
+    .. code-block:: yaml
+
+        policies:
+            - name: require-secure-transfer-with-tls-v1-2
+              resource: azure.storage
+              actions:
+              - type: require-secure-transfer
+                value: True
+                minimum_tls_version: TLS1_2
     """
 
     # Default to true assuming user wants secure connection
     schema = type_schema(
         'require-secure-transfer',
+        minimum_tls_version={"type": "string"},
         **{
             'value': {'type': 'boolean', "default": True},
         })
@@ -545,8 +667,84 @@ class RequireSecureTransferAction(AzureBaseAction):
         self.client = self.manager.get_client()
 
     def _process_resource(self, resource):
+        kwargs = {
+            "enable_https_traffic_only": self.data.get("value")
+        }
+
+        if self.data.get("minimum_tls_version"):
+            kwargs["minimum_tls_version"] = self.data.get("minimum_tls_version")
+
+        update_params = StorageAccountUpdateParameters(**kwargs)
         self.client.storage_accounts.update(
             resource['resourceGroup'],
             resource['name'],
-            StorageAccountUpdateParameters(enable_https_traffic_only=self.data.get('value'))
+            update_params,
         )
+
+
+@Storage.filter_registry.register('blob-services')
+class BlobServicesFilter(ValueFilter):
+    """
+    Filter by the current blob services
+    configuration for this storage account.
+
+    :example:
+
+    Find storage accounts with blob services soft delete disabled
+    or retention less than 7 days
+
+    .. code-block:: yaml
+
+        policies:
+          - name: storage-no-soft-delete
+            resource: azure.storage
+            filters:
+              - or:
+                  - type: blob-services
+                    key: deleteRetentionPolicy.enabled
+                    value: false
+                  - type: blob-services
+                    key: deleteRetentionPolicy.days
+                    value: 7
+                    op: lt
+    """
+
+    schema = type_schema('blob-services', rinherit=ValueFilter.schema)
+
+    log = logging.getLogger('custodian.azure.storage.blob-services-filter')
+
+    def __init__(self, data, manager=None):
+        super(BlobServicesFilter, self).__init__(data, manager)
+
+    def process(self, resources, event=None):
+        resources, exceptions = ThreadHelper.execute_in_parallel(
+            resources=resources,
+            event=event,
+            execution_method=self._process_resource_set,
+            executor_factory=self.executor_factory,
+            log=self.log
+        )
+        if exceptions:
+            raise exceptions[0]
+        return resources
+
+    def _process_resource_set(self, resources, event=None):
+        client = self.manager.get_client()
+        result = []
+        for resource in resources:
+            if 'c7n:blobServices' not in resource['properties']:
+                blob_services = client.blob_services.get_service_properties(
+                    resource['resourceGroup'],
+                    resource['name'])
+
+                resource['properties']['c7n:blobServices'] = \
+                    blob_services.serialize(True).get('properties', {})
+
+            filtered_resources = super(BlobServicesFilter, self).process(
+                [resource['properties']['c7n:blobServices']],
+                event)
+
+            if filtered_resources:
+                result.append(resource)
+
+        return result

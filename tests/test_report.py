@@ -1,6 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-from c7n.reports.csvout import Formatter
+from c7n.reports.csvout import Formatter, strip_output_path
 from .common import BaseTest, load_data
 
 
@@ -60,6 +60,24 @@ class TestEC2Report(BaseTest):
         recs = [self.records["full"]]
         rows = [self.rows["minimal_custom"]]
         self.assertEqual(formatter.to_csv(recs), rows)
+
+    def test_formatter_jmespath_key(self):
+        # models a k8s resource, or any that has a jmespath expression for
+        # their id and name
+        class FakeResource:
+            class TypeInfo:
+                id = 'metadata.uid'
+                name = 'metadata.name'
+
+        formatter = Formatter(
+            resource_type=FakeResource.TypeInfo
+        )
+        records = [
+            {'metadata': {'uid': 'foo', 'name': 'bar'}},
+            {'metadata': {'uid': 'foo', 'name': 'bar'}}
+        ]
+        result = formatter.uniq_by_id(records=records)
+        self.assertEqual(len(result), 1)
 
 
 class TestASGReport(BaseTest):
@@ -129,3 +147,20 @@ class TestMultiReport(BaseTest):
             recs = list(map(lambda x: self.records[x], rec_ids))
             rows = list(map(lambda x: self.rows[x], row_ids))
             self.assertEqual(formatter.to_csv(recs), rows)
+
+    def test_s3_base_output_path(self):
+        """When searching S3 to populate a report, the base output path
+        should end with the policy name."""
+
+        policy_name = "my_c7n_policy"
+        output_paths = [
+            f"logs/{policy_name}",
+            f"/logs/{policy_name}",
+            f"logs/{policy_name}/2021/01/01/01/",
+            f"/logs/{policy_name}/with/more/extra/path/segments",
+        ]
+
+        self.assertTrue(all(
+            strip_output_path(p, policy_name) == f"logs/{policy_name}"
+            for p in output_paths
+        ))

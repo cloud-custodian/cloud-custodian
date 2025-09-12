@@ -1,23 +1,12 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "8621d8c1-e3d1-49a2-b713-bdeb6f7501ea", 
-            "HTTPHeaders": {
-                "date": "Wed, 17 Jan 2018 20:12:12 GMT", 
-                "x-amzn-requestid": "8621d8c1-e3d1-49a2-b713-bdeb6f7501ea", 
-                "content-length": "45", 
-                "content-type": "application/x-amz-json-1.1", 
-                "connection": "keep-alive"
-            }
-        }, 
         "Tags": [
             {
-                "Value": "hello", 
-                "Key": "DeleteMe"
+                "Key": "DeleteMe",
+                "Value": "TestValue"
             }
-        ]
+        ],
+        "ResponseMetadata": {}
     }
 }

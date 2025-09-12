@@ -1,0 +1,14 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "apiCache": {
+            "ttl": 60,
+            "apiCachingBehavior": "FULL_REQUEST_CACHING",
+            "transitEncryptionEnabled": false,
+            "atRestEncryptionEnabled": false,
+            "type": "SMALL",
+            "status": "AVAILABLE"
+        }
+    }
+}

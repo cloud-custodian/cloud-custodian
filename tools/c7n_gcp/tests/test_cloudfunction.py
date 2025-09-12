@@ -19,8 +19,21 @@ class FunctionTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['status'], 'ACTIVE')
+        self.assertEqual(
+            p.resource_manager.get_urns(resources),
+            [
+                'gcp:cloudfunctions:us-central1:cloud-custodian:function/hello_http'
+            ],
+        )
+
         client = p.resource_manager.get_client()
         func = client.execute_query(
             'get', {'name': resources[0]['name']})
         self.maxDiff = None
         self.assertEqual(func['status'], 'DELETE_IN_PROGRESS')
+        self.assertEqual(
+            p.resource_manager.get_urns([func]),
+            [
+                'gcp:cloudfunctions:us-central1:cloud-custodian:function/hello_http'
+            ],
+        )

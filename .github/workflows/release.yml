@@ -1,0 +1,152 @@
+name: "Release"
+
+on:
+  workflow_dispatch: {}
+env:
+  UV_VERSION: "0.7.12"
+  DEFAULT_PY_VERSION: "3.12"
+
+jobs:
+  BuildWheels:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+      checks: write
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # ratchet:actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Custodian
+        uses: ./.github/composites/install
+        with:
+          uv-version: ${{ env.UV_VERSION }}
+          python-version: ${{ env.DEFAULT_PY_VERSION }}
+
+      - name: Build Wheels
+        shell: bash
+        run: |
+          make pkg-build-wheel
+
+      - name: Build ChangeLog
+        shell: bash
+        run: |
+          uv run python tools/dev/changelog.py --output release.md \
+             --path . --since last --skip-provider awscc
+          cat release.md
+
+      - uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # ratchet:aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_FTEST_ROLE }}
+          aws-region: us-east-1
+
+      - name: Auth Staging Repository
+        shell: bash
+        env:
+          AWS_DEFAULT_REGION: us-east-1
+          PKG_DOMAIN: release-staging
+          PKG_REPO: stagec7n
+        run: |
+          ./tools/dev/staging-auth.sh >> /dev/null
+
+      - name: Stage Wheels
+        shell: bash
+        env:
+          AWS_DEFAULT_REGION: us-east-1
+          PKG_DOMAIN: release-staging
+          PKG_REPO: stagec7n
+        run: |
+          set -euxo pipefail
+          uv run python tools/dev/staging-clean.py
+          uv run python tools/dev/devpkg.py gen-qa-requires -r . --output wheels-manifest.txt
+          make pkg-publish-wheel PKG_REPO=${{ env.PKG_REPO }}
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # ratchet:actions/upload-artifact@v4
+        with:
+          name: built-wheels
+          path: |
+            **/*.whl
+            release.md
+            wheels-manifest.txt
+
+  TestWheels:
+    runs-on: ubuntu-latest
+    needs: BuildWheels
+    permissions:
+      id-token: write
+      contents: read
+      checks: write
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # ratchet:actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@8d9ed9ac5c53483de85588cdf95a591a75ab9f55 # ratchet:actions/setup-python@v5
+        with:
+          python-version: ${{ env.DEFAULT_PY_VERSION }}
+
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # ratchet:actions/download-artifact@v4
+        with:
+          name: built-wheels
+
+      - uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # ratchet:aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_FTEST_ROLE }}
+          aws-region: us-east-1
+
+      - name: Auth Staging Repository
+        shell: bash
+        env:
+          AWS_DEFAULT_REGION: us-east-1
+          PKG_DOMAIN: release-staging
+          PKG_REPO: stagec7n
+        run: |
+          ./tools/dev/staging-auth.sh >> /dev/null
+
+      - name: Install Staged
+        shell: bash
+        run: |
+          set -euxo pipefail
+          pip install -r wheels-manifest.txt  --index-url ${{ env.STAGE_INDEX_URL }} --extra-index-url https://pypi.org/simple/
+
+      - name: Smoke Test
+        shell: bash
+        run: |
+          set -euxo pipefail
+          custodian version --debug
+          custodian schema --json > schema.json
+
+  Publish:
+    runs-on: ubuntu-latest
+    needs: TestWheels
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # ratchet:actions/checkout@v4
+      - name: Install Custodian
+        uses: ./.github/composites/install
+        with:
+          python-version: ${{ env.DEFAULT_PY_VERSION }}
+          uv-version: ${{ env.UV_VERSION }}
+
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # ratchet:actions/download-artifact@v4
+        with:
+          name: built-wheels
+
+      - name: Get Tag
+        shell: bash
+        run: |
+          echo "release=$(uv version --short).0" >> "$GITHUB_ENV"
+
+#      - name: Create Release
+#        uses: ncipollo/release-action@v1
+#        if: startsWith(github.ref, 'refs/tags/')
+#        with:
+#          artifacts: "**/dist/*.whl"
+#          token: ${{ secrets.GITHUB_TOKEN }}
+#          tag: ${{ env.release_tag }}
+#          commit: main
+#          draft: true
+#          bodyFile: release.md
+
+#      - name: Publish
+#        if: startsWith(github.ref, 'refs/tags/')
+#        run: |
+#          make pkg-publish PKG_REPO=pypi

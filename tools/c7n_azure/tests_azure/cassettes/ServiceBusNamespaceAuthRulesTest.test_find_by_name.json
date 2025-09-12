@@ -1,0 +1,128 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.ServiceBus/namespaces?api-version=2021-11-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "server-sb": [
+                        "Service-Bus-Resource-Provider/SN1"
+                    ],
+                    "date": [
+                        "Fri, 05 May 2023 16:58:42 GMT"
+                    ],
+                    "x-ms-inline-count": [
+                        ""
+                    ],
+                    "content-length": [
+                        "669"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "sku": {
+                                    "name": "Standard",
+                                    "tier": "Standard"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-ikbnnpjt/providers/Microsoft.ServiceBus/namespaces/c7nfail-sbnamespace",
+                                "name": "c7nfail-sbnamespace",
+                                "type": "Microsoft.ServiceBus/Namespaces",
+                                "location": "Central US",
+                                "tags": {
+                                    "product_id": "13742"
+                                },
+                                "properties": {
+                                    "disableLocalAuth": false,
+                                    "zoneRedundant": false,
+                                    "provisioningState": "Succeeded",
+                                    "metricId": "ea42f556-5106-4743-99b0-c129bfa71a47:c7nfail-sbnamespace",
+                                    "createdAt": "2023-05-04T16:36:04.057Z",
+                                    "updatedAt": "2023-05-04T16:36:47.877Z",
+                                    "serviceBusEndpoint": "https://c7nfail-sbnamespace.servicebus.windows.net:443/",
+                                    "status": "Active"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-ikbnnpjt/providers/Microsoft.ServiceBus/namespaces/c7nfail-sbnamespace/AuthorizationRules?api-version=2021-11-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 05 May 2023 16:58:43 GMT"
+                    ],
+                    "content-length": [
+                        "741"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cfb-ikbnnpjt/providers/Microsoft.ServiceBus/namespaces/c7nfail-sbnamespace/authorizationrules/RootManageSharedAccessKey",
+                                "name": "RootManageSharedAccessKey",
+                                "type": "Microsoft.ServiceBus/Namespaces/AuthorizationRules",
+                                "location": "centralus",
+                                "properties": {
+                                    "rights": [
+                                        "Listen",
+                                        "Manage",
+                                        "Send"
+                                    ]
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cfb-ikbnnpjt/providers/Microsoft.ServiceBus/namespaces/c7nfail-sbnamespace/authorizationrules/c7nfail-sbnamespace-arule",
+                                "name": "c7nfail-sbnamespace-arule",
+                                "type": "Microsoft.ServiceBus/Namespaces/AuthorizationRules",
+                                "location": "centralus",
+                                "properties": {
+                                    "rights": [
+                                        "Listen",
+                                        "Send",
+                                        "Manage"
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

@@ -1,0 +1,18 @@
+{
+    "status_code": 202,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "ffa335ec-e362-4ef1-a634-06c311996d2a",
+            "HTTPStatusCode": 202,
+            "HTTPHeaders": {
+                "date": "Wed, 10 Aug 2022 10:35:01 GMT",
+                "content-type": "application/json",
+                "content-length": "0",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "ffa335ec-e362-4ef1-a634-06c311996d2a",
+                "x-amz-apigw-id": "WpJ5SJXAjoEEcxA="
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

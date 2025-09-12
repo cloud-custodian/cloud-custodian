@@ -1,7 +1,51 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import time
+import pytest
+import os
+import json
+from botocore.exceptions import ClientError
 from .common import BaseTest
+from c7n.exceptions import PolicyValidationError
+
+from pytest_terraform import terraform
+
+
+@pytest.mark.skiplive
+@terraform('eks_nodegroup_delete')
+def test_eks_nodegroup_delete(test, eks_nodegroup_delete):
+    aws_region = 'eu-central-1'
+    session_factory = test.replay_flight_data('test_eks_nodegroup_delete', region=aws_region)
+
+    client = session_factory().client('eks')
+    eks_cluster_name = eks_nodegroup_delete['aws_eks_node_group.deleted_example.cluster_name']
+    eks_nodegroup_name = eks_nodegroup_delete['aws_eks_node_group.deleted_example.node_group_name']
+
+    p = test.load_policy(
+        {
+            'name': 'eks-nodegroup-delete',
+            'resource': 'eks-nodegroup',
+            'filters': [
+                {'clusterName': eks_cluster_name},
+                {'and': [
+                    {'tag:Name': eks_nodegroup_name},
+                    {'tag:ClusterName': eks_cluster_name},
+                ]},
+            ],
+            'actions': [{'type': 'delete'}],
+        },
+        session_factory=session_factory,
+        config={'region': aws_region},
+    )
+
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+
+    nodegroup = client.describe_nodegroup(
+        clusterName=eks_cluster_name,
+        nodegroupName=eks_nodegroup_name
+    )['nodegroup']
+    test.assertEqual(nodegroup['status'], 'DELETING')
 
 
 class EKS(BaseTest):
@@ -34,6 +78,23 @@ class EKS(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['name'], 'dev')
+
+    def test_update_config_schema_validation(self):
+        with self.assertRaises(PolicyValidationError) as err:
+            self.load_policy(
+                {
+                    "name": "update-eks-config",
+                    "resource": "eks",
+                    "actions": [{
+                        "type": "update-config",
+                        "unknownOption": True,
+                    }],
+                },
+            )
+        self.assertIn(
+            "unknownOption",
+            str(err.exception)
+        )
 
     def test_update_config(self):
         factory = self.replay_flight_data('test_eks_update_config')
@@ -121,3 +182,226 @@ class EKS(BaseTest):
             client.describe_cluster(
                 name='devx')['cluster']['tags'],
             {'App': 'Custodian'})
+
+    def test_kms_filter(self):
+        factory = self.replay_flight_data('test_eks_kms_filter')
+        kms = factory().client('kms')
+        p = self.load_policy(
+            {
+                'name': 'test-eks-kms-filter',
+                'resource': 'aws.eks',
+                'filters': [
+                    {
+                        'type': 'kms-key',
+                        'key': 'c7n:AliasName',
+                        'value': '^(alias/eks)',
+                        'op': 'regex'
+                    }
+                ]
+            },
+            session_factory=factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        kmsKeyId = resources[0]['encryptionConfig'][0]['provider']['keyArn']
+        aliases = kms.list_aliases(KeyId=kmsKeyId)
+        self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/eks')
+
+    def test_network_location_filter(self):
+        factory = self.replay_flight_data("test_eks_network_location_filter")
+
+        p = self.load_policy(
+            {
+                "name": "test_eks_network_location_filter",
+                "resource": "eks",
+                "filters": [
+                    {
+                        "type": "network-location",
+                        "compare": ["resource", "security-group"],
+                        "key": "tag:NetworkLocation",
+                        "match": "equal"
+                    }
+                ]
+            },
+            session_factory=factory
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        matched = resources.pop()
+        self.assertEqual(
+            matched["Tags"],
+            [
+                {
+                    'Key': 'NetworkLocation',
+                    'Value': 'Customer'
+                }
+            ]
+        )
+
+    def test_associate_encryption_config(self):
+        factory = self.replay_flight_data("test_eks_associate_encryption_config")
+
+        p = self.load_policy(
+            {
+                'name': 'test-eks-associate-encryption-config',
+                'resource': 'aws.eks',
+                'filters': [
+                    {
+                        'type': 'value',
+                        'key': 'encryptionConfig[].provider.keyArn',
+                        'value': 'absent'
+                    }
+                ],
+                'actions': [
+                    {
+                        'type': 'associate-encryption-config',
+                        'encryptionConfig': [
+                            {
+                                'provider': {
+                                    'keyArn': 'alias/eks'
+                                },
+                                'resources': [
+                                    'secrets'
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            session_factory=factory
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        matched = resources.pop()
+        self.assertEqual(matched['status'], 'ACTIVE')
+        update_json = os.path.join(self.placebo_dir, "test_eks_associate_encryption_config",
+        "eks.AssociateEncryptionConfig_1.json")
+        with open(update_json) as f:
+            data = json.load(f)
+        self.assertEqual(data['status_code'], 200)
+        self.assertEqual(data['data']['update']['type'], 'AssociateEncryptionConfig')
+        self.assertEqual(data['data']['update']['status'], 'InProgress')
+
+    def test_associate_encryption_config_key_arn(self):
+        factory = self.replay_flight_data("test_eks_associate_encryption_config_key_arn")
+
+        p = self.load_policy(
+            {
+                'name': 'test-eks-associate-encryption-config',
+                'resource': 'aws.eks',
+                'filters': [
+                    {
+                        'type': 'value',
+                        'key': 'encryptionConfig[].provider.keyArn',
+                        'value': 'absent'
+                    }
+                ],
+                'actions': [
+                    {
+                        'type': 'associate-encryption-config',
+                        'encryptionConfig': [
+                            {
+                                'provider': {
+                                    'keyArn':
+                                    'arn:aws:kms:us-east-1:644160558196:key/361001ad-9c5e-42cb-9a09-5de1e80e822f'
+                                },
+                                'resources': [
+                                    'secrets'
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            session_factory=factory
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        matched = resources.pop()
+        self.assertEqual(matched['status'], 'ACTIVE')
+        update_json = os.path.join(
+            self.placebo_dir,
+            "test_eks_associate_encryption_config_key_arn", "eks.AssociateEncryptionConfig_1.json"
+        )
+        with open(update_json) as f:
+            data = json.load(f)
+        self.assertEqual(data['status_code'], 200)
+        self.assertEqual(data['data']['update']['type'], 'AssociateEncryptionConfig')
+        self.assertEqual(data['data']['update']['status'], 'InProgress')
+
+    def test_associate_encryption_config_invalid_kms(self):
+        factory = self.replay_flight_data("test_eks_associate_encryption_config_invalid_kms")
+
+        p = self.load_policy(
+            {
+                'name': 'test-eks-associate-encryption-config',
+                'resource': 'aws.eks',
+                'filters': [
+                    {
+                        'type': 'value',
+                        'key': 'encryptionConfig[].provider.keyArn',
+                        'value': 'absent'
+                    }
+                ],
+                'actions': [
+                    {
+                        'type': 'associate-encryption-config',
+                        'encryptionConfig': [
+                            {
+                                'provider': {
+                                    'keyArn': 'alias/eks_invalid_key'
+                                },
+                                'resources': [
+                                    'secrets'
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            session_factory=factory
+        )
+        with self.assertRaises(ClientError) as error:
+            resources = p.run()
+            self.assertEqual(len(resources), 1)
+        self.assertEqual(error.exception.response['Error']['Code'], 'NotFoundException')
+
+    def test_associate_encryption_config_invalid_kms_key(self):
+        factory = self.replay_flight_data("test_eks_associate_encryption_config_invalid_kms_key")
+
+        p = self.load_policy(
+            {
+                'name': 'test-eks-associate-encryption-config',
+                'resource': 'aws.eks',
+                'filters': [
+                    {
+                        'type': 'value',
+                        'key': 'encryptionConfig[].provider.keyArn',
+                        'value': 'absent'
+                    }
+                ],
+                'actions': [
+                    {
+                        'type': 'associate-encryption-config',
+                        'encryptionConfig': [
+                            {
+                                'provider': {
+                                    'keyArn': 'arn:aws:kms:us-east-1:644160558196:key/123'
+                                },
+                                'resources': [
+                                    'secrets'
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            session_factory=factory
+        )
+        with self.assertRaises(ClientError) as error:
+            resources = p.run()
+            self.assertEqual(len(resources), 1)
+        self.assertEqual(error.exception.response['Error']['Code'], 'InvalidParameterException')

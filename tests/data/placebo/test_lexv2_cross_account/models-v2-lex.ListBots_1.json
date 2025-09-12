@@ -1,0 +1,42 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "botSummaries": [
+            {
+                "botId": "NPXOSCEEZD",
+                "botName": "c7n-test",
+                "botStatus": "Available",
+                "lastUpdatedDateTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 1,
+                    "day": 13,
+                    "hour": 22,
+                    "minute": 18,
+                    "second": 27,
+                    "microsecond": 656000
+                },
+                "botType": "Bot"
+            },
+            {
+                "botId": "OTM2WO3PEY",
+                "botName": "hello",
+                "description": "ABC",
+                "botStatus": "Available",
+                "latestBotVersion": "1",
+                "lastUpdatedDateTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 1,
+                    "day": 13,
+                    "hour": 22,
+                    "minute": 31,
+                    "second": 20,
+                    "microsecond": 233000
+                },
+                "botType": "Bot"
+            }
+        ]
+    }
+}

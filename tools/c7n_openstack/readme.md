@@ -7,7 +7,7 @@ Work in Progress - Not Ready For Use.
 ### Installation
 
 ```
-pip install c7n_openstack
+pip install c7n-openstack
 ```
 
 ### OpenStack Environment Configration

@@ -1,0 +1,10 @@
+{
+  "status_code": 200,
+  "data": {
+    "deploymentConfigsList": [
+      "my-test-configuration",
+      "CodeDeployDefault.ECSCanary10Percent15Minutes"
+    ],
+    "ResponseMetadata": {}
+  }
+}

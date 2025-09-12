@@ -5,8 +5,9 @@ from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 
-from c7n.filters.core import ValueFilter, type_schema
+from c7n.filters.core import ValueFilter, type_schema, ListItemFilter
 from c7n.filters.related import RelatedResourceFilter
+from c7n.utils import local_session
 
 
 @resources.register('vm')
@@ -180,6 +181,87 @@ class InstanceViewFilter(ValueFilter):
         return super(InstanceViewFilter, self).__call__(i['instanceView'])
 
 
+@VirtualMachine.filter_registry.register('vm-extensions')
+class VMExtensionsFilter(ValueFilter):
+    """
+        Provides a value filter targetting the virtual machine
+        extensions array.  Requires an additional API call per
+        virtual machine to retrieve the extensions.
+
+        Here is an example of the data returned:
+
+        .. code-block:: json
+
+          [{
+            "id": "/subscriptions/...",
+            "name": "CustomScript",
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "location": "centralus",
+            "properties": {
+              "publisher": "Microsoft.Azure.Extensions",
+              "type": "CustomScript",
+              "typeHandlerVersion": "2.0",
+              "autoUpgradeMinorVersion": true,
+              "settings": {
+                "fileUris": []
+              },
+              "provisioningState": "Succeeded"
+            }
+          }]
+
+        :examples:
+
+        Find VM's with Custom Script extensions
+
+        .. code-block:: yaml
+
+            policies:
+              - name: vm-with-customscript
+                description: |
+                  Find all virtual machines with a custom
+                  script extension installed.
+                resource: azure.vm
+                filters:
+                  - type: vm-extensions
+                    op: in
+                    key: "[].properties.type"
+                    value: CustomScript
+                    value_type: swap
+
+
+        Find VM's without the OMS agent installed
+
+        .. code-block:: yaml
+
+            policies:
+              - name: vm-without-oms
+                description: |
+                  Find all virtual machines without the
+                  OMS agent installed.
+                resource: azure.vm
+                filters:
+                  - type: vm-extensions
+                    op: not-in
+                    key: "[].properties.type"
+                    value: OmsAgentForLinux
+                    value_type: swap
+
+        """
+    schema = type_schema('vm-extensions', rinherit=ValueFilter.schema)
+    annotate = False  # cannot annotate arrays
+
+    def __call__(self, i):
+        if 'c7n:vm-extensions' not in i:
+            client = self.manager.get_client()
+            extensions = (
+                client.virtual_machine_extensions
+                .list(i['resourceGroup'], i['name'])
+            )
+            i['c7n:vm-extensions'] = [e.serialize(True) for e in extensions.value]
+
+        return super(VMExtensionsFilter, self).__call__(i['c7n:vm-extensions'])
+
+
 @VirtualMachine.filter_registry.register('network-interface')
 class NetworkInterfaceFilter(RelatedResourceFilter):
 
@@ -187,6 +269,78 @@ class NetworkInterfaceFilter(RelatedResourceFilter):
 
     RelatedResource = "c7n_azure.resources.network_interface.NetworkInterface"
     RelatedIdsExpression = "properties.networkProfile.networkInterfaces[0].id"
+
+
+@VirtualMachine.filter_registry.register('backup-status')
+class BackupStatusFilter(ValueFilter):
+    """Filters Virtual Machines by their backup protection status.
+
+    :example:
+
+    This policy will get Virtual Machine resources that Protected backup protection status.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: vm-backup-status-protected
+            resource: azure.vm
+            filters:
+              - type: backup-status
+                key: protectionStatus
+                value: Protected
+    """
+    schema = type_schema(
+        'backup-status',
+        rinherit=ValueFilter.schema
+    )
+
+    backup_annotation_key = "c7n:BackupStatus"
+    annotate = False
+
+    def process(self, resources, event=None):
+        s = local_session(self.manager.session_factory)
+        client = s.client('azure.mgmt.recoveryservicesbackup.RecoveryServicesBackupClient')
+
+        for resource in resources:
+            if self.backup_annotation_key in resource:
+                continue
+            resource[self.backup_annotation_key] = client.backup_status.get(
+                azure_region=resource['location'],
+                parameters=dict(resourceId=resource['id'], resourceType='VM')
+            ).serialize(True)
+        return super().process(resources, event)
+
+    def __call__(self, r):
+        return super().__call__(r[self.backup_annotation_key])
+
+
+@VirtualMachine.filter_registry.register('jit-policy-port')
+class VirtualMachineJitPortsFilter(ListItemFilter):
+    schema = type_schema(
+        'jit-policy-port',
+        attrs={"$ref": "#/definitions/filters_common/list_item_attrs"},
+        count={"type": "number"},
+        count_op={"$ref": "#/definitions/filters_common/comparison_operators"}
+    )
+    annotation_key = 'c7n:JitPolicyPorts'
+
+    def __init__(self, data, manager=None):
+        data['key'] = f'"{self.annotation_key}"'
+        super().__init__(data, manager)
+
+    def process(self, resources, event=None):
+        policies = self.manager.get_resource_manager('azure.defender-jit-policy').resources()
+        vm_id_to_ports = {}
+        for p in policies:
+            for machine in p['properties'].get('virtualMachines', []):
+                for port in machine.get('ports', []):
+                    port['c7n:JitPolicyName'] = p['name']
+                vm_id_to_ports.setdefault(machine['id'].lower(), []).extend(
+                    machine.get('ports', [])
+                )
+        for r in resources:
+            r[self.annotation_key] = vm_id_to_ports.get(r['id'].lower(), [])
+        return super().process(resources, event)
 
 
 @VirtualMachine.action_registry.register('poweroff')

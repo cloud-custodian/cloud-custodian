@@ -23,7 +23,8 @@ in your Azure subscription:
 Successive policy deployments will only create a new Function App for the policy, 
 because the rest of the infrastructure can be shared.
 
-Note: Python 3.6 or higher is required to deploy a policy to an Azure Function.
+Note: Ensure you are using at least the minimum `actively supported
+<https://devguide.python.org/#status-of-python-branches>`_ version of Python.
 
 Azure Modes
 ###########
@@ -133,11 +134,11 @@ turned on. Based on the RAM consumption in the underlying VMs, the App Service P
                 skuName: B1
                 autoScale:
                   enabled: true
-                  minCapacity: 1
-                  maxCapacity: 3
-                  defaultCapacity: 1
-         resource: azure.vm
-         filters:
+                  minCapacity: "1"
+                  maxCapacity: "3"
+                  defaultCapacity: "1"
+        resource: azure.vm
+        filters:
           - type: instance-view
             key: statuses[].code
             op: not-in
@@ -166,8 +167,8 @@ of the supporting infrastructure:
               storageAccount:
                 name: sampleaccount
                 location: East US
-         resource: azure.vm
-         filters:
+        resource: azure.vm
+        filters:
           - type: instance-view
             key: statuses[].code
             op: not-in
@@ -188,8 +189,8 @@ The final example shows how to use resource ids to specify existing infrastructu
               servicePlan: /subscriptions/<subscription_id>/resourceGroups/cloud-custodian/providers/Microsoft.Web/serverFarms/existingResource
               appInsights: /subscriptions/<subscription_id>/resourceGroups/cloud-custodian/providers/microsoft.insights/components/existingResource
               storageAccount: /subscriptions/<subscription_id>/resourceGroups/cloud-custodian/providers/Microsoft.Storage/storageAccounts/existingResource
-         resource: azure.vm
-         filters:
+        resource: azure.vm
+        filters:
           - type: instance-view
             key: statuses[].code
             op: not-in
@@ -223,8 +224,8 @@ of one per policy function.
             provision-options:
               identity:
                 type: UserAssigned
-		id: my-custodian-identity
-         resource: azure.vm
+                id: my-custodian-identity
+        resource: azure.vm
 
 The identity id can be provided as the user assigned identity's name
 or the id, it will be resolved and verified as the policy is
@@ -244,7 +245,7 @@ before the policy will be able to successfully execute.
             provision-options:
               identity:
                 type: SystemAssigned
-         resource: azure.vm
+        resource: azure.vm
 
 
 Execution Options
@@ -277,8 +278,8 @@ the default Function location.
             execution-options:
               output_dir: azure://yourstorageaccount.blob.core.windows.net/custodian
               metrics: azure://<resource_group_name>/<app_insights_name>
-         resource: azure.vm
-         filters:
+        resource: azure.vm
+        filters:
           - type: instance-view
             key: statuses[].code
             op: not-in

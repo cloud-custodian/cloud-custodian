@@ -1,0 +1,20 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "MountTargets": [
+            {
+                "OwnerId": "644160558196",
+                "MountTargetId": "fsmt-07e238762319765b9",
+                "FileSystemId": "fs-028d2a86fa813320a",
+                "SubnetId": "subnet-914763e7",
+                "LifeCycleState": "available",
+                "IpAddress": "172.31.7.53",
+                "NetworkInterfaceId": "eni-06a7f784c86ba0f34",
+                "AvailabilityZoneId": "use1-az4",
+                "AvailabilityZoneName": "us-east-1a",
+                "VpcId": "vpc-d2d616b5"
+            }
+        ]
+    }
+}

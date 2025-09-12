@@ -1,0 +1,80 @@
+{
+    "status_code": 200,
+    "data": {
+        "Cluster": {
+            "Id": "j-1OBEPJWLJBMDO",
+            "Name": "Test cluster1",
+            "Status": {
+                "State": "WAITING",
+                "StateChangeReason": {
+                    "Message": "Cluster ready to run steps."
+                },
+                "Timeline": {
+                    "CreationDateTime": {
+                        "__class__": "datetime",
+                        "year": 2023,
+                        "month": 1,
+                        "day": 18,
+                        "hour": 21,
+                        "minute": 7,
+                        "second": 52,
+                        "microsecond": 540000
+                    },
+                    "ReadyDateTime": {
+                        "__class__": "datetime",
+                        "year": 2023,
+                        "month": 1,
+                        "day": 18,
+                        "hour": 21,
+                        "minute": 13,
+                        "second": 18,
+                        "microsecond": 256000
+                    }
+                }
+            },
+            "Ec2InstanceAttributes": {
+                "Ec2SubnetId": "subnet-0f3b0ee5d4a7da815",
+                "RequestedEc2SubnetIds": [
+                    "subnet-0f3b0ee5d4a7da815"
+                ],
+                "Ec2AvailabilityZone": "us-west-2a",
+                "RequestedEc2AvailabilityZones": [],
+                "IamInstanceProfile": "EMR_EC2_DefaultRole",
+                "EmrManagedMasterSecurityGroup": "sg-05e325f9b09aa11fc",
+                "EmrManagedSlaveSecurityGroup": "sg-03c8063bd682c0ebe",
+                "ServiceAccessSecurityGroup": "sg-0b238edeeb3fe44eb",
+                "AdditionalMasterSecurityGroups": [],
+                "AdditionalSlaveSecurityGroups": []
+            },
+            "InstanceCollectionType": "INSTANCE_GROUP",
+            "ReleaseLabel": "emr-6.9.0",
+            "AutoTerminate": false,
+            "TerminationProtected": true,
+            "VisibleToAllUsers": true,
+            "Applications": [
+                {
+                    "Name": "Spark",
+                    "Version": "3.3.0"
+                },
+                {
+                    "Name": "Zeppelin",
+                    "Version": "0.10.1"
+                }
+            ],
+            "Tags": [],
+            "ServiceRole": "EMR_DefaultRole",
+            "NormalizedInstanceHours": 0,
+            "MasterPublicDnsName": "ip-10-0-2-44.us-west-2.compute.internal",
+            "Configurations": [],
+            "SecurityConfiguration": "AtRestEnabled",
+            "ScaleDownBehavior": "TERMINATE_AT_TASK_COMPLETION",
+            "EbsRootVolumeSize": 10,
+            "KerberosAttributes": {},
+            "ClusterArn": "arn:aws:elasticmapreduce:us-west-2:644160558196:cluster/j-1OBEPJWLJBMDO",
+            "StepConcurrencyLevel": 1,
+            "PlacementGroups": [],
+            "OSReleaseLabel": "2.0.20221210.1"
+        },
+        "ResponseMetadata": {}
+    }
+}

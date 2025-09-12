@@ -3,34 +3,29 @@
     "data": {
         "KeyMetadata": {
             "AWSAccountId": "644160558196",
-            "KeyId": "f1f33a6b-91aa-4b0a-904c-f2a0378277f0",
-            "Arn": "arn:aws:kms:us-east-1:644160558196:key/f1f33a6b-91aa-4b0a-904c-f2a0378277f0",
+            "KeyId": "4d327245-234d-4bf9-8c26-afd6ee1a65c8",
+            "Arn": "arn:aws:kms:us-east-1:644160558196:key/4d327245-234d-4bf9-8c26-afd6ee1a65c8",
             "CreationDate": {
                 "__class__": "datetime",
-                "year": 2017,
-                "month": 10,
-                "day": 31,
-                "hour": 5,
-                "minute": 2,
-                "second": 54,
-                "microsecond": 335000
+                "year": 2021,
+                "month": 4,
+                "day": 12,
+                "hour": 17,
+                "minute": 37,
+                "second": 42,
+                "microsecond": 624000
             },
             "Enabled": true,
-            "Description": "Default master key that protects my DMS replication instance volumes when no other key is defined",
+            "Description": "",
             "KeyUsage": "ENCRYPT_DECRYPT",
             "KeyState": "Enabled",
             "Origin": "AWS_KMS",
-            "KeyManager": "AWS"
+            "KeyManager": "CUSTOMER",
+            "CustomerMasterKeySpec": "SYMMETRIC_DEFAULT",
+            "EncryptionAlgorithms": [
+                "SYMMETRIC_DEFAULT"
+            ]
         },
-        "ResponseMetadata": {
-            "RequestId": "3dd71770-1cfe-47cd-8290-2423a492424c",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "3dd71770-1cfe-47cd-8290-2423a492424c",
-                "content-type": "application/x-amz-json-1.1",
-                "content-length": "427"
-            },
-            "RetryAttempts": 0
-        }
+        "ResponseMetadata": {}
     }
 }

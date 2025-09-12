@@ -10,12 +10,9 @@ from botocore.exceptions import ClientError
 
 from c7n.actions import ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction
 from c7n.exceptions import PolicyValidationError
-from c7n.filters import (
-    Filter, FilterRegistry, DefaultVpcBase, ValueFilter,
-    ShieldMetrics)
+from c7n.filters import Filter, FilterRegistry, ValueFilter, ShieldMetrics
 import c7n.filters.vpc as net_filters
 from datetime import datetime
-from dateutil.tz import tzutc
 from c7n import tags
 from c7n.manager import resources
 from c7n.query import ConfigSource, QueryResourceManager, DescribeSource, TypeInfo
@@ -55,6 +52,7 @@ class ELB(QueryResourceManager):
         date = 'CreatedTime'
         dimension = 'LoadBalancerName'
         cfn_type = config_type = "AWS::ElasticLoadBalancing::LoadBalancer"
+        permissions_augment = ("elasticloadbalancing:DescribeTags",)
         default_report_fields = (
             'LoadBalancerName',
             'DNSName',
@@ -164,7 +162,7 @@ class RemoveTag(tags.RemoveTag):
     def process_resource_set(self, client, resource_set, tag_keys):
         client.remove_tags(
             LoadBalancerNames=[r['LoadBalancerName'] for r in resource_set],
-            Tags=[{'Key': k for k in tag_keys}])
+            Tags=[{'Key': k} for k in tag_keys])
 
 
 @actions.register('delete')
@@ -206,21 +204,38 @@ class SetSslListenerPolicy(BaseAction):
     .. code-block:: yaml
 
             policies:
-              - name: elb-set-listener-policy
+              - name: elb-set-listener-custom-policy
                 resource: elb
                 actions:
                   - type: set-ssl-listener-policy
-                    name: SSLNegotiation-Policy-01
+                    name: SSLNegotiation-Custom-Policy-01
                     attributes:
                       - Protocol-SSLv3
                       - Protocol-TLSv1.1
                       - DHE-RSA-AES256-SHA256
+
+
+    Alternatively, you can specify one of AWS recommended policies
+    (https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/elb-security-policy-table.html)
+    by specifying an attribute where key=Reference-Security-Policy
+    and value=name of the predefined policy. For example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: elb-set-listener-predefined-policy
+                resource: elb
+                actions:
+                  - type: set-ssl-listener-policy
+                    name: SSLNegotiation-Predefined-Policy-01
+                    attributes:
+                      Reference-Security-Policy: ELBSecurityPolicy-TLS-1-2-2017-01
     """
 
     schema = type_schema(
         'set-ssl-listener-policy',
         name={'type': 'string'},
-        attributes={'type': 'array', 'items': {'type': 'string'}},
+        attributes={'anyOf': [{'type': 'object'}, {'type': 'array', 'items': {'type': 'string'}}]},
         required=['name', 'attributes'])
 
     permissions = (
@@ -255,11 +270,16 @@ class SetSslListenerPolicy(BaseAction):
         # to make it unique within the
         # set of policies for this load balancer.
         policy_name = self.data.get('name') + '-' + \
-            str(int(datetime.now(tz=tzutc()).strftime("%s")) * 1000)
+            str(int(datetime.utcnow().timestamp() * 1000))
         lb_name = elb['LoadBalancerName']
         attrs = self.data.get('attributes')
-        policy_attributes = [{'AttributeName': attr, 'AttributeValue': 'true'}
-            for attr in attrs]
+
+        if isinstance(attrs, dict):
+            policy_attributes = [{'AttributeName': name, 'AttributeValue': value}
+                for name, value in attrs.items()]
+        else:
+            policy_attributes = [{'AttributeName': attr, 'AttributeValue': 'true'}
+                for attr in attrs]
 
         try:
             client.create_load_balancer_policy(
@@ -302,9 +322,9 @@ class ELBModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
         client = local_session(self.manager.session_factory).client('elb')
         groups = super(ELBModifyVpcSecurityGroups, self).get_groups(
             load_balancers)
-        for idx, l in enumerate(load_balancers):
+        for idx, lb in enumerate(load_balancers):
             client.apply_security_groups_to_load_balancer(
-                LoadBalancerName=l['LoadBalancerName'],
+                LoadBalancerName=lb['LoadBalancerName'],
                 SecurityGroups=groups[idx])
 
 
@@ -717,7 +737,7 @@ class HealthCheckProtocolMismatch(Filter):
 
 
 @filters.register('default-vpc')
-class DefaultVpc(DefaultVpcBase):
+class DefaultVpc(net_filters.DefaultVpcBase):
     """ Matches if an elb database is in the default vpc
 
     :example:

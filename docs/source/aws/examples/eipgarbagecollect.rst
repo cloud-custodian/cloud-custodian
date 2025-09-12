@@ -42,16 +42,12 @@ date will be filtered in when utilizing the ``marked-for-op`` filter.
           env: "tools"
           account: "{account_id}"
       eip_filters: &eip_filters
-        - type: value
-          key: InstanceId
-          value: absent
-        - type: value
-          key: AssociationId
-          value: absent
+        - InstanceId: absent
+        - AssociationId: absent
 
     policies:
       - name: unused-eip-mark
-        resource: network-addr
+        resource: elastic-ip
         description: "Mark any EIP with no instances attached for action in 7 days"
         filters:
           - "tag:maid_status_eip": absent
@@ -65,12 +61,12 @@ date will be filtered in when utilizing the ``marked-for-op`` filter.
             op: release
 
       - name: unused-eip-unmark-if-in-use
-        resource: network-addr
+        resource: elastic-ip
         description: |
           Remove the maid_status_eip tag from any eip which has instances attached
         filters:
           - "tag:maid_status_eip": not-null
-          - not: 
+          - not:
             - or: *eip_filters
         mode:
           <<: *run_mode
@@ -79,7 +75,7 @@ date will be filtered in when utilizing the ``marked-for-op`` filter.
             tags: [maid_status_eip]
 
       - name: unused-eip-action
-        resource: network-addr
+        resource: elastic-ip
         description: "Release EIP after 7 days of having no instances"
         filters:
           - "tag:maid_status_eip": not-null

@@ -1,0 +1,72 @@
+{
+    "status_code": 200,
+    "data": {
+        "Snapshots": [
+            {
+                "Description": "",
+                "Encrypted": false,
+                "OwnerId": "644160558196",
+                "Progress": "100%",
+                "SnapshotId": "snap-083a14886f4681675",
+                "StartTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 4,
+                    "day": 25,
+                    "hour": 17,
+                    "minute": 58,
+                    "second": 2,
+                    "microsecond": 497000
+                },
+                "State": "completed",
+                "VolumeId": "vol-04c1b309bb8d18d71",
+                "VolumeSize": 8,
+                "Tags": [
+                    {
+                        "Key": "c7n:FindingId:EBS Testing",
+                        "Value": "us-east-1/644160558196/57402be6307c0f11923fe36774c8da01/92b282108436c43a75508be7868d9e34:2021-07-01T22:51:01.755837+00:00"
+                    },
+                    {
+                        "Key": "Test",
+                        "Value": "Test"
+                    }
+                ]
+            },
+            {
+                "Description": "This snapshot is created by the AWS Backup service.",
+                "Encrypted": false,
+                "OwnerId": "644160558196",
+                "Progress": "100%",
+                "SnapshotId": "snap-0ef116d892da25144",
+                "StartTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 7,
+                    "day": 30,
+                    "hour": 14,
+                    "minute": 59,
+                    "second": 24,
+                    "microsecond": 693000
+                },
+                "State": "completed",
+                "VolumeId": "vol-02e9c0677eba008b5",
+                "VolumeSize": 100,
+                "Tags": [
+                    {
+                        "Key": "test-backup",
+                        "Value": "true"
+                    },
+                    {
+                        "Key": "c7n:FindingId:EBS Testing",
+                        "Value": "us-east-1/644160558196/57402be6307c0f11923fe36774c8da01/230644c2c860997cb2541d91f258a10f:2021-07-01T22:51:01.755837+00:00"
+                    },
+                    {
+                        "Key": "aws:backup:source-resource",
+                        "Value": "6eebb97a-9bb6-4f74-b986-954eba222c34"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

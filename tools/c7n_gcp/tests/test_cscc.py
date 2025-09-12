@@ -12,7 +12,7 @@ class PostFinding(BaseTest):
         factory = self.replay_flight_data('cscc-post-finding')
         session = factory()
         findings = session.client(
-            'securitycenter', 'v1beta1', 'organizations.sources.findings')
+            'securitycenter', 'v1', 'organizations.sources.findings')
 
         p = self.load_policy({
             'name': 'sketchy-drive',

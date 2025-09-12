@@ -5,7 +5,7 @@ from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 
 
-@resources.register('containerregistry')
+@resources.register('container-registry', aliases=['containerregistry'])
 class ContainerRegistry(ArmResourceManager):
     """Container Registry Resource
 
@@ -17,7 +17,7 @@ class ContainerRegistry(ArmResourceManager):
 
         policies:
         - name: get-container-registry
-          resource: azure.containerregistry
+          resource: azure.container-registry
           filters:
             - type: value
               key: name

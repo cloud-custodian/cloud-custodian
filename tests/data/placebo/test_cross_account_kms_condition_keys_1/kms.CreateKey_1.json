@@ -1,0 +1,33 @@
+{
+    "status_code": 200,
+    "data": {
+        "KeyMetadata": {
+            "AWSAccountId": "644160558196",
+            "KeyId": "598c62cd-5123-43e2-a519-60b3b89ad6ab",
+            "Arn": "arn:aws:kms:af-south-1:644160558196:key/598c62cd-5123-43e2-a519-60b3b89ad6ab",
+            "CreationDate": {
+                "__class__": "datetime",
+                "year": 2022,
+                "month": 8,
+                "day": 22,
+                "hour": 10,
+                "minute": 25,
+                "second": 25,
+                "microsecond": 766000
+            },
+            "Enabled": true,
+            "Description": "test-cross-account-2",
+            "KeyUsage": "ENCRYPT_DECRYPT",
+            "KeyState": "Enabled",
+            "Origin": "AWS_KMS",
+            "KeyManager": "CUSTOMER",
+            "CustomerMasterKeySpec": "SYMMETRIC_DEFAULT",
+            "KeySpec": "SYMMETRIC_DEFAULT",
+            "EncryptionAlgorithms": [
+                "SYMMETRIC_DEFAULT"
+            ],
+            "MultiRegion": false
+        },
+        "ResponseMetadata": {}
+    }
+}

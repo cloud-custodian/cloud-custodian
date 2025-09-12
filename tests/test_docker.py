@@ -18,8 +18,8 @@ except ImportError:
 
 TEST_DOCKER = docker and os.environ.get("TEST_DOCKER", "no") == "yes"
 
-CUSTODIAN_ORG_IMAGE = os.environ.get("CUSTODIAN_ORG_IMAGE")
-CUSTODIAN_IMAGE = os.environ.get("CUSTODIAN_CLI_IMAGE")
+CUSTODIAN_ORG_IMAGE = os.environ.get("CUSTODIAN_C7N_ORG_IMAGE")
+CUSTODIAN_IMAGE = os.environ.get("CUSTODIAN_C7N_IMAGE")
 CUSTODIAN_MAILER_IMAGE = os.environ.get("CUSTODIAN_MAILER_IMAGE")
 CUSTODIAN_PSTREAM_IMAGE = os.environ.get("CUSTODIAN_POLICYSTREAM_IMAGE")
 
@@ -139,9 +139,12 @@ def test_image_metadata(image_name):
         "org.opencontainers.image.description",
         "org.opencontainers.image.documentation",
         "org.opencontainers.image.licenses",
+        "org.opencontainers.image.ref.name",
         "org.opencontainers.image.title",
         "org.opencontainers.image.source",
         "org.opencontainers.image.revision",
+        "org.opencontainers.image.url",
+        "org.opencontainers.image.version",
     }
 
 
@@ -151,7 +154,7 @@ def test_image_metadata(image_name):
 def test_cli_providers_available():
     providers = os.environ.get("CUSTODIAN_PROVIDERS", None)
     if providers is None:
-        providers = {"aws", "azure", "gcp", "k8s", "openstack"}
+        providers = {"aws", "azure", "gcp", "k8s", "openstack", "tencentcloud", "oci", "awscc"}
     elif providers == "":
         providers = {"aws"}
     else:
@@ -159,6 +162,7 @@ def test_cli_providers_available():
 
     client = docker.from_env()
     output = client.containers.run(CUSTODIAN_IMAGE, "schema", stderr=True)
+    print(output)
     resources = yaml.safe_load(output.strip())["resources"]
     found_providers = {r.split(".", 1)[0] for r in resources}
     assert providers == found_providers

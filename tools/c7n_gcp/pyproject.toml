@@ -1,32 +1,41 @@
-[tool.poetry]
+[project]
+authors = [
+    {name = "Cloud Custodian Project"},
+]
+license = "Apache-2.0"
+requires-python = "<4.0.0,>=3.9.2"
+dependencies = [
+    "c7n",
+    "google-api-python-client<3.0,>=2.0",
+    "google-auth<3.0.0,>=2.1.0",
+    "google-cloud-logging<4.0,>=3.2",
+    "google-cloud-monitoring<3.0.0,>=2.5.0",
+    "google-cloud-storage<3.0,>=2.7",
+    "pyrate-limiter<3.0.0,>=2.8.4",
+    "retrying<2.0.0,>=1.3.3",
+]
 name = "c7n_gcp"
-version = "0.4.11"
+version = "0.4.46"
 description = "Cloud Custodian - Google Cloud Provider"
 readme = "readme.md"
+classifiers = [
+    "License :: OSI Approved :: Apache Software License",
+    "Topic :: System :: Systems Administration",
+    "Topic :: System :: Distributed Computing",
+]
+
+[project.urls]
 homepage = "https://cloudcustodian.io"
 repository = "https://github.com/cloud-custodian/cloud-custodian"
 documentation = "https://cloudcustodian.io/docs/"
-authors = ["Cloud Custodian Project"]
-license = "Apache-2.0"
-classifiers = [
-   "Topic :: System :: Systems Administration",
-   "Topic :: System :: Distributed Computing"
+
+[dependency-groups]
+dev = [
+    "freezegun<2.0.0,>=1.2.2",
+    "pytest<8.0",
+    "pytest-terraform<1.0.0,>=0.7.0",
 ]
 
-[tool.poetry.dependencies]
-python = "^3.6"
-retrying = "^1.3.3"
-google-api-python-client = "^1.7"
-google-cloud-logging = "^1.14"
-google-auth = "^1.11.0"
-ratelimiter = "^1.2.0"
-google-cloud-monitoring = "^0.34.0"
-google-cloud-storage = "^1.28.1"
-
-[tool.poetry.dev-dependencies]
-pytest = "~6.0.0"
-c7n = {path = "../..", develop = true}
-
 [build-system]
-requires = ["poetry>=0.12", "setuptools"]
-build-backend = "poetry.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"

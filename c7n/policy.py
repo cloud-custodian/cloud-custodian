@@ -7,21 +7,24 @@ import itertools
 import logging
 import os
 import time
+from typing import List
 
 from dateutil import parser, tz as tzutil
-import jmespath
 
 from c7n.cwe import CloudWatchEvents
 from c7n.ctx import ExecutionContext
 from c7n.exceptions import PolicyValidationError, ClientError, ResourceLimitExceeded
 from c7n.filters import FilterRegistry, And, Or, Not
 from c7n.manager import iter_filters
-from c7n.output import DEFAULT_NAMESPACE, NullBlobOutput
+from c7n.output import DEFAULT_NAMESPACE
 from c7n.resources import load_resources
 from c7n.registry import PluginRegistry
 from c7n.provider import clouds, get_resource_class
-from c7n import utils
+from c7n import deprecated, utils
 from c7n.version import version
+from c7n.query import RetryPageIterator
+from c7n.varfmt import VarFormat
+from c7n.utils import get_policy_provider, jmespath_compile
 
 log = logging.getLogger('c7n.policy')
 
@@ -31,8 +34,16 @@ def load(options, path, format=None, validate=True, vars=None):
     if not os.path.exists(path):
         raise IOError("Invalid path for config %r" % path)
 
-    from c7n.schema import validate, StructureParser
-    data = utils.load_file(path, format=format, vars=vars)
+    from c7n.schema import validate as schema_validate, StructureParser
+    if os.path.isdir(path):
+        from c7n.loader import DirectoryLoader
+        collection = DirectoryLoader(options).load_directory(path, validate)
+        if validate:
+            [p.validate() for p in collection]
+        return collection
+
+    if os.path.isfile(path):
+        data = utils.load_file(path, format=format, vars=vars)
 
     structure = StructureParser()
     structure.validate(data)
@@ -44,7 +55,7 @@ def load(options, path, format=None, validate=True, vars=None):
         return None
 
     if validate:
-        errors = validate(data, resource_types=rtypes)
+        errors = schema_validate(data, resource_types=rtypes)
         if errors:
             raise PolicyValidationError(
                 "Failed to validate policy %s \n %s" % (
@@ -65,12 +76,12 @@ class PolicyCollection:
 
     log = logging.getLogger('c7n.policies')
 
-    def __init__(self, policies, options):
+    def __init__(self, policies: 'List[Policy]', options):
         self.options = options
         self.policies = policies
 
     @classmethod
-    def from_data(cls, data, options, session_factory=None):
+    def from_data(cls, data: dict, options, session_factory=None):
         # session factory param introduction needs an audit and review
         # on tests.
         sf = session_factory if session_factory else cls.session_factory()
@@ -81,10 +92,11 @@ class PolicyCollection:
     def __add__(self, other):
         return self.__class__(self.policies + other.policies, self.options)
 
-    def filter(self, policy_patterns=[], resource_types=[]):
+    def filter(self, policy_patterns=(), resource_types=(), modes=()):
         results = self.policies
         results = self._filter_by_patterns(results, policy_patterns)
         results = self._filter_by_resource_types(results, resource_types)
+        results = self._filter_by_modes(results, modes)
         # next line brings the result set in the original order of self.policies
         results = [x for x in self.policies if x in results]
         return PolicyCollection(results, self.options)
@@ -149,6 +161,32 @@ class PolicyCollection:
                 'Resource type "{}" '
                 'did not match any policies.').format(resource_type))
 
+        return results
+
+    def _filter_by_modes(self, policies, modes):
+        """
+        Takes a list of policies and returns only those matching a given mode
+        """
+        if not modes:
+            return policies
+        results = []
+        for mode in modes:
+            result = self._filter_by_mode(policies, mode)
+            results.extend(x for x in result if x not in results)
+        return results
+
+    def _filter_by_mode(self, policies, mode):
+        """
+        Takes a list of policies and returns only those matching a given mode
+        """
+        results = []
+        for policy in policies:
+            if policy.get_execution_mode().type == mode:
+                results.append(policy)
+        if not results:
+            self.log.warning((
+                'Filter by modes type "{}" '
+                'did not match any policies.').format(mode))
         return results
 
     def __iter__(self):
@@ -242,6 +280,11 @@ class PolicyExecutionMode:
             values[m] = results['Datapoints']
         return values
 
+    def get_deprecations(self):
+        # The execution mode itself doesn't have a data dict, so we grab the
+        # mode part from the policy data dict itself.
+        return deprecated.check_deprecations(self, data=self.policy.data.get('mode', {}))
+
 
 class ServerlessExecutionMode(PolicyExecutionMode):
     def run(self, event=None, lambda_context=None):
@@ -273,35 +316,39 @@ class PullMode(PolicyExecutionMode):
         if not self.policy.is_runnable():
             return []
 
-        with self.policy.ctx:
+        with self.policy.ctx as ctx:
             self.policy.log.debug(
                 "Running policy:%s resource:%s region:%s c7n:%s",
-                self.policy.name, self.policy.resource_type,
+                self.policy.name,
+                self.policy.resource_type,
                 self.policy.options.region or 'default',
-                version)
+                version,
+            )
 
             s = time.time()
             try:
                 resources = self.policy.resource_manager.resources()
             except ResourceLimitExceeded as e:
                 self.policy.log.error(str(e))
-                self.policy.ctx.metrics.put_metric(
-                    'ResourceLimitExceeded', e.selection_count, "Count")
+                ctx.metrics.put_metric(
+                    'ResourceLimitExceeded', e.selection_count, "Count"
+                )
                 raise
 
             rt = time.time() - s
             self.policy.log.info(
-                "policy:%s resource:%s region:%s count:%d time:%0.2f" % (
-                    self.policy.name,
-                    self.policy.resource_type,
-                    self.policy.options.region,
-                    len(resources), rt))
-            self.policy.ctx.metrics.put_metric(
-                "ResourceCount", len(resources), "Count", Scope="Policy")
-            self.policy.ctx.metrics.put_metric(
-                "ResourceTime", rt, "Seconds", Scope="Policy")
-            self.policy._write_file(
-                'resources.json', utils.dumps(resources, indent=2))
+                "policy:%s resource:%s region:%s count:%d time:%0.2f",
+                self.policy.name,
+                self.policy.resource_type,
+                self.policy.options.region,
+                len(resources),
+                rt,
+            )
+            ctx.metrics.put_metric(
+                "ResourceCount", len(resources), "Count", Scope="Policy"
+            )
+            ctx.metrics.put_metric("ResourceTime", rt, "Seconds", Scope="Policy")
+            ctx.output.write_file('resources.json', utils.dumps(resources, indent=2))
 
             if not resources:
                 return []
@@ -313,19 +360,19 @@ class PullMode(PolicyExecutionMode):
             at = time.time()
             for a in self.policy.resource_manager.actions:
                 s = time.time()
-                with self.policy.ctx.tracer.subsegment('action:%s' % a.type):
+                with ctx.tracer.subsegment('action:%s' % a.type):
                     results = a.process(resources)
                 self.policy.log.info(
                     "policy:%s action:%s"
                     " resources:%d"
-                    " execution_time:%0.2f" % (
-                        self.policy.name, a.name,
-                        len(resources), time.time() - s))
+                    " execution_time:%0.2f"
+                    % (self.policy.name, a.name, len(resources), time.time() - s)
+                )
                 if results:
-                    self.policy._write_file(
-                        "action-%s" % a.name, utils.dumps(results))
-            self.policy.ctx.metrics.put_metric(
-                "ActionTime", time.time() - at, "Seconds", Scope="Policy")
+                    ctx.output.write_file("action-%s" % a.name, utils.dumps(results))
+            ctx.metrics.put_metric(
+                "ActionTime", time.time() - at, "Seconds", Scope="Policy"
+            )
             return resources
 
 
@@ -345,9 +392,10 @@ class LambdaMode(ServerlessExecutionMode):
             # Lambda passthrough config
             'layers': {'type': 'array', 'items': {'type': 'string'}},
             'concurrency': {'type': 'integer'},
-            'runtime': {'enum': ['python2.7', 'python3.6',
-                                 'python3.7', 'python3.8']},
+            'runtime': {'enum': ['python3.10', 'python3.11', 'python3.12',
+                                 'python3.13']},
             'role': {'type': 'string'},
+            'handler': {'type': 'string'},
             'pattern': {'type': 'object', 'minProperties': 1},
             'timeout': {'type': 'number'},
             'memory': {'type': 'number'},
@@ -364,10 +412,26 @@ class LambdaMode(ServerlessExecutionMode):
     def validate(self):
         super(LambdaMode, self).validate()
         prefix = self.policy.data['mode'].get('function-prefix', 'custodian-')
-        if len(prefix + self.policy.name) > 64:
+        MAX_LAMBDA_FUNCTION_NAME_LENGTH = 64
+        if len(prefix + self.policy.name) > MAX_LAMBDA_FUNCTION_NAME_LENGTH:
             raise PolicyValidationError(
-                "Custodian Lambda policies have a max length with prefix of 64"
-                " policy:%s prefix:%s" % (prefix, self.policy.name))
+                "Custodian Lambda policies have a max length with prefix of %s"
+                " policy:%s prefix:%s" % (
+                    MAX_LAMBDA_FUNCTION_NAME_LENGTH,
+                    self.policy.name,
+                    prefix
+                )
+            )
+        MAX_LAMBDA_FUNCTION_DESCRIPTION_LENGTH = 256
+        if len(self.policy.description) > MAX_LAMBDA_FUNCTION_DESCRIPTION_LENGTH:
+            raise PolicyValidationError(
+                'Custodian Lambda policies have a max description length of %s'
+                ' policy: %s description: %s' % (
+                    MAX_LAMBDA_FUNCTION_DESCRIPTION_LENGTH,
+                    self.policy.name,
+                    self.policy.description
+                )
+            )
         tags = self.policy.data['mode'].get('tags')
         if not tags:
             return
@@ -462,29 +526,37 @@ class LambdaMode(ServerlessExecutionMode):
 
     def run_resource_set(self, event, resources):
         from c7n.actions import EventAction
-        with self.policy.ctx:
-            self.policy.ctx.metrics.put_metric(
-                'ResourceCount', len(resources), 'Count', Scope="Policy",
-                buffer=False)
+
+        with self.policy.ctx as ctx:
+            ctx.metrics.put_metric(
+                'ResourceCount', len(resources), 'Count', Scope="Policy", buffer=False
+            )
 
             if 'debug' in event:
                 self.policy.log.info(
-                    "Invoking actions %s", self.policy.resource_manager.actions)
+                    "Invoking actions %s", self.policy.resource_manager.actions
+                )
 
-            self.policy._write_file(
-                'resources.json', utils.dumps(resources, indent=2))
+            ctx.output.write_file('resources.json', utils.dumps(resources, indent=2))
 
             for action in self.policy.resource_manager.actions:
                 self.policy.log.info(
                     "policy:%s invoking action:%s resources:%d",
-                    self.policy.name, action.name, len(resources))
+                    self.policy.name,
+                    action.name,
+                    len(resources),
+                )
                 if isinstance(action, EventAction):
                     results = action.process(resources, event)
                 else:
                     results = action.process(resources)
-                self.policy._write_file(
-                    "action-%s" % action.name, utils.dumps(results))
+                ctx.output.write_file("action-%s" % action.name, utils.dumps(results))
         return resources
+
+    @property
+    def policy_lambda(self):
+        from c7n import mu
+        return mu.PolicyLambda
 
     def provision(self):
         # auto tag lambda policies with mode and version, we use the
@@ -492,6 +564,13 @@ class LambdaMode(ServerlessExecutionMode):
         tags = self.policy.data['mode'].setdefault('tags', {})
         tags['custodian-info'] = "mode=%s:version=%s" % (
             self.policy.data['mode']['type'], version)
+        # auto tag with schedule name and group to link function to
+        # EventBridge schedule when using schedule mode
+        if self.policy.data['mode']['type'] == 'schedule':
+            prefix = self.policy.data['mode'].get('function-prefix', 'custodian-')
+            name = self.policy.data['name']
+            group = self.policy.data['mode'].get('group-name', 'default')
+            tags['custodian-schedule'] = f'name={prefix + name}:group={group}'
 
         from c7n import mu
         with self.policy.ctx:
@@ -506,7 +585,7 @@ class LambdaMode(ServerlessExecutionMode):
                 manager = mu.LambdaManager(
                     lambda assume=False: self.policy.session_factory(assume))
             return manager.publish(
-                mu.PolicyLambda(self.policy),
+                self.policy_lambda(self.policy),
                 role=self.policy.options.assume_role)
 
 
@@ -514,13 +593,37 @@ class LambdaMode(ServerlessExecutionMode):
 class PeriodicMode(LambdaMode, PullMode):
     """A policy that runs in pull mode within lambda.
 
-    Runs Custodian in AWS lambda at user defined cron interval.
+    Runs Custodian in AWS lambda at user defined cron interval using EventBridge rules.
     """
 
     POLICY_METRICS = ('ResourceCount', 'ResourceTime', 'ActionTime')
 
     schema = utils.type_schema(
         'periodic', schedule={'type': 'string'}, rinherit=LambdaMode.schema)
+
+    def run(self, event, lambda_context):
+        return PullMode.run(self)
+
+
+@execution.register('schedule')
+class ScheduleMode(LambdaMode, PullMode):
+    """A policy that runs in pull mode within lambda.
+
+    Runs Custodian in AWS lambda at user defined cron interval using EventBridge Scheduler.
+    """
+
+    POLICY_METRICS = ('ResourceCount', 'ResourceTime', 'ActionTime')
+
+    schema = utils.type_schema(
+        'schedule',
+        schedule={'type': 'string'},
+        timezone={'type': 'string'},
+        **{'start-date': {'type': 'string'},
+           'end-date': {'type': 'string'},
+           'scheduler-role': {'type': 'string'},
+           'group-name': {'type': 'string'}},
+        required=['schedule'],
+        rinherit=LambdaMode.schema)
 
     def run(self, event, lambda_context):
         return PullMode.run(self)
@@ -565,6 +668,7 @@ class PHDMode(LambdaMode):
         entities = []
         paginator = client.get_paginator('describe_affected_entities')
         for event_set in utils.chunks(event_arns, 10):
+            # Note: we aren't using event_set here, just event_arns.
             entities.extend(list(itertools.chain(
                             *[p['entities'] for p in paginator.paginate(
                                 filter={'eventArns': event_arns})])))
@@ -617,7 +721,7 @@ class CloudTrailMode(LambdaMode):
             if isinstance(e, str):
                 assert e in CloudWatchEvents.trail_events, "event shortcut not defined: %s" % e
             if isinstance(e, dict):
-                jmespath.compile(e['ids'])
+                jmespath_compile(e['ids'])
         if isinstance(self.policy.resource_manager, query.ChildResourceManager):
             if not getattr(self.policy.resource_manager.resource_type,
                            'supports_trailevents', False):
@@ -682,9 +786,9 @@ class GuardDutyMode(LambdaMode):
     supported_resources = ('account', 'ec2', 'iam-user')
 
     id_exprs = {
-        'account': jmespath.compile('detail.accountId'),
-        'ec2': jmespath.compile('detail.resource.instanceDetails.instanceId'),
-        'iam-user': jmespath.compile('detail.resource.accessKeyDetails.userName')}
+        'account': jmespath_compile('detail.accountId'),
+        'ec2': jmespath_compile('detail.resource.instanceDetails.instanceId'),
+        'iam-user': jmespath_compile('detail.resource.accessKeyDetails.userName')}
 
     def get_member_account_id(self, event):
         return event['detail']['accountId']
@@ -722,11 +826,39 @@ class ConfigPollRuleMode(LambdaMode, PullMode):
 
     The primary benefit this mode offers is to support additional resources
     beyond what config supports natively, as it can post evaluations for
-    any resource which has a cloudformation type. If a resource is natively
-    supported by config its highly recommended to use a `config-rule`
-    mode instead.
+    any resource which has a cloudformation type.
 
-    This mode effectively receives no data from config, instead its
+    If a resource is natively supported by config it's highly recommended
+    to use a `config-rule` mode instead. Deployment will fail unless
+    the policy explicitly opts out of that check with `ignore-support-check`.
+    This can be useful in cases when a policy resource has native Config
+    support, but filters based on related resource attributes.
+
+    :example:
+
+    VPCs have native Config support, but flow logs are a separate resource.
+    This policy forces `config-poll-rule` mode to bypass the Config support
+    check and evaluate VPC compliance on a schedule.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: vpc-flow-logs
+            resource: vpc
+            mode:
+              type: config-poll-rule
+              role: arn:aws:iam::{account_id}:role/MyRole
+              ignore-support-check: True
+            filters:
+              - not:
+                - type: flow-logs
+                  destination-type: "s3"
+                  enabled: True
+                  status: active
+                  traffic-type: all
+                  destination: "arn:aws:s3:::mys3flowlogbucket"
+
+    This mode effectively receives no data from config, instead it's
     periodically executed by config and polls and evaluates all
     resources. It is equivalent to a periodic policy, except it also
     pushes resource evaluations to config.
@@ -739,6 +871,7 @@ class ConfigPollRuleMode(LambdaMode, PullMode):
             "Six_Hours",
             "Twelve_Hours",
             "TwentyFour_Hours"]},
+        **{'ignore-support-check': {'type': 'boolean'}},
         rinherit=LambdaMode.schema)
 
     def validate(self):
@@ -747,7 +880,10 @@ class ConfigPollRuleMode(LambdaMode, PullMode):
             raise PolicyValidationError(
                 "policy:%s config-poll-rule schedule required" % (
                     self.policy.name))
-        if self.policy.resource_manager.resource_type.config_type:
+        if (
+            self.policy.resource_manager.resource_type.config_type
+            and not self.policy.data['mode'].get('ignore-support-check')
+        ):
             raise PolicyValidationError(
                 "resource:%s fully supported by config and should use mode: config-rule" % (
                     self.policy.resource_type))
@@ -759,6 +895,35 @@ class ConfigPollRuleMode(LambdaMode, PullMode):
             raise PolicyValidationError((
                 'policy:%s resource:%s does not have a cloudformation type'
                 ' and is there-fore not supported by config-poll-rule'))
+
+    @staticmethod
+    def get_obsolete_evaluations(client, cfg_rule_name, ordering_ts, evaluations):
+        """Get list of evaluations that are no longer applicable due to resources being deleted
+        """
+        latest_resource_ids = set()
+        for latest_eval in evaluations:
+            latest_resource_ids.add(latest_eval['ComplianceResourceId'])
+
+        obsolete_evaluations = []
+        paginator = client.get_paginator('get_compliance_details_by_config_rule')
+        paginator.PAGE_ITERATOR_CLS = RetryPageIterator
+        old_evals = paginator.paginate(
+            ConfigRuleName=cfg_rule_name,
+            ComplianceTypes=['COMPLIANT', 'NON_COMPLIANT'],
+            PaginationConfig={'PageSize': 100}).build_full_result().get('EvaluationResults', [])
+
+        for old_eval in old_evals:
+            eval_res_qual = old_eval['EvaluationResultIdentifier']['EvaluationResultQualifier']
+            old_resource_id = eval_res_qual['ResourceId']
+            if old_resource_id not in latest_resource_ids:
+                obsolete_evaluation = {
+                    'ComplianceResourceType': eval_res_qual['ResourceType'],
+                    'ComplianceResourceId': old_resource_id,
+                    'Annotation': 'The rule does not apply.',
+                    'ComplianceType': 'NOT_APPLICABLE',
+                    'OrderingTimestamp': ordering_ts}
+                obsolete_evaluations.append(obsolete_evaluation)
+        return obsolete_evaluations
 
     def _get_client(self):
         return utils.local_session(
@@ -774,40 +939,49 @@ class ConfigPollRuleMode(LambdaMode, PullMode):
     def run(self, event, lambda_context):
         cfg_event = json.loads(event['invokingEvent'])
         resource_type = self.policy.resource_manager.resource_type.cfn_type
-        resource_id = self.policy.resource_manager.resource_type.id
+        resource_id = self.policy.resource_manager.resource_type.config_id or \
+            self.policy.resource_manager.resource_type.id
         client = self._get_client()
         token = event.get('resultToken')
+        cfg_rule_name = event['configRuleName']
+        ordering_ts = cfg_event['notificationCreationTime']
+        policy_data = self.policy.data.copy()
+        policy_data.pop("filters", None)
 
         matched_resources = set()
+        unmatched_resources = set()
         for r in PullMode.run(self):
             matched_resources.add(r[resource_id])
-        unmatched_resources = set()
         for r in self.policy.resource_manager.get_resource_manager(
-                self.policy.resource_type).resources():
+                self.policy.resource_type,
+                policy_data).resources():
             if r[resource_id] not in matched_resources:
                 unmatched_resources.add(r[resource_id])
 
-        evaluations = [dict(
+        non_compliant_evals = [dict(
             ComplianceResourceType=resource_type,
             ComplianceResourceId=r,
             ComplianceType='NON_COMPLIANT',
-            OrderingTimestamp=cfg_event['notificationCreationTime'],
+            OrderingTimestamp=ordering_ts,
             Annotation='The resource is not compliant with policy:%s.' % (
                 self.policy.name))
             for r in matched_resources]
-        if evaluations and token:
-            self.put_evaluations(client, token, evaluations)
-
-        evaluations = [dict(
+        compliant_evals = [dict(
             ComplianceResourceType=resource_type,
             ComplianceResourceId=r,
             ComplianceType='COMPLIANT',
-            OrderingTimestamp=cfg_event['notificationCreationTime'],
+            OrderingTimestamp=ordering_ts,
             Annotation='The resource is compliant with policy:%s.' % (
                 self.policy.name))
             for r in unmatched_resources]
+        evaluations = non_compliant_evals + compliant_evals
+        obsolete_evaluations = self.get_obsolete_evaluations(
+            client, cfg_rule_name, ordering_ts, evaluations)
+        evaluations = evaluations + obsolete_evaluations
+
         if evaluations and token:
             self.put_evaluations(client, token, evaluations)
+
         return list(matched_resources)
 
 
@@ -916,8 +1090,6 @@ class PolicyConditions:
 
     def __init__(self, policy, data):
         self.policy = policy
-        self.data = data
-        self.filters = self.data.get('conditions', [])
         # for value_from usage / we use the conditions class
         # to mimic a resource manager interface. we can't use
         # the actual resource manager as we're overriding block
@@ -929,6 +1101,11 @@ class PolicyConditions:
         self.session_factory = rm.session_factory
         # used by c7n-org to extend evaluation conditions
         self.env_vars = {}
+        self.update(data)
+
+    def update(self, data):
+        self.data = data
+        self.filters = self.data.get('conditions', [])
         self.initialized = False
 
     def validate(self):
@@ -960,6 +1137,7 @@ class PolicyConditions:
         return iter_filters(self.filters, block_end=block_end)
 
     def convert_deprecated(self):
+        """These deprecated attributes are now recorded as deprecated against the policy."""
         filters = []
         if 'region' in self.policy.data:
             filters.append({'region': self.policy.data['region']})
@@ -979,10 +1157,23 @@ class PolicyConditions:
                 'value': self.policy.data['end']})
         return filters
 
+    def get_deprecations(self):
+        """Return any matching deprecations for the policy fields itself."""
+        deprecations = []
+        for f in self.filters:
+            deprecations.extend(f.get_deprecations())
+        return deprecations
+
 
 class Policy:
 
     log = logging.getLogger('custodian.policy')
+
+    deprecations = (
+        deprecated.field('region', 'region in condition block'),
+        deprecated.field('start', 'value filter in condition block'),
+        deprecated.field('end', 'value filter in condition block'),
+    )
 
     def __init__(self, data, options, session_factory=None):
         self.data = data
@@ -1000,20 +1191,20 @@ class Policy:
             self.resource_type, self.name, self.options.region)
 
     @property
-    def name(self):
+    def name(self) -> str:
         return self.data['name']
 
     @property
-    def resource_type(self):
+    def description(self) -> str:
+        return self.data.get('description', '')
+
+    @property
+    def resource_type(self) -> str:
         return self.data['resource']
 
     @property
-    def provider_name(self):
-        if '.' in self.resource_type:
-            provider_name, resource_type = self.resource_type.split('.', 1)
-        else:
-            provider_name = 'aws'
-        return provider_name
+    def provider_name(self) -> str:
+        return get_policy_provider(self.data)
 
     def is_runnable(self, event=None):
         return self.conditions.evaluate(event)
@@ -1079,9 +1270,9 @@ class Policy:
         if not variables:
             variables = {}
 
+        partition = utils.get_partition(self.options.region)
         if 'mode' in self.data:
             if 'role' in self.data['mode'] and not self.data['mode']['role'].startswith("arn:aws"):
-                partition = utils.get_partition(self.options.region)
                 self.data['mode']['role'] = "arn:%s:iam::%s:role/%s" % \
                     (partition, self.options.account_id, self.data['mode']['role'])
 
@@ -1089,6 +1280,7 @@ class Policy:
             # standard runtime variables for interpolation
             'account': '{account}',
             'account_id': self.options.account_id,
+            'partition': partition,
             'region': self.options.region,
             # non-standard runtime variables from local filter/action vocabularies
             #
@@ -1099,13 +1291,19 @@ class Policy:
             'op': '{op}',
             'action_date': '{action_date}',
             # tag action pyformat-date handling
-            'now': utils.FormatDate(datetime.utcnow()),
+            # defer expansion until runtime for serverless modes
+            'now': (
+                utils.DeferredFormatString('now')
+                if isinstance(self.get_execution_mode(), ServerlessExecutionMode)
+                else utils.FormatDate(datetime.utcnow())
+            ),
             # account increase limit action
             'service': '{service}',
             # s3 set logging action :-( see if we can revisit this one.
             'bucket_region': '{bucket_region}',
             'bucket_name': '{bucket_name}',
             'source_bucket_name': '{source_bucket_name}',
+            'source_bucket_region': '{source_bucket_region}',
             'target_bucket_name': '{target_bucket_name}',
             'target_prefix': '{target_prefix}',
             'LoadBalancerName': '{LoadBalancerName}'
@@ -1118,7 +1316,9 @@ class Policy:
         Updates the policy data in-place.
         """
         # format string values returns a copy
-        updated = utils.format_string_values(self.data, **variables)
+        var_fmt = VarFormat()
+        updated = utils.format_string_values(
+            self.data, formatter=var_fmt.format, **variables)
 
         # Several keys should only be expanded at runtime, perserve them.
         if 'member-role' in updated.get('mode', {}):
@@ -1126,6 +1326,10 @@ class Policy:
 
         # Update ourselves in place
         self.data = updated
+
+        # NOTE update the policy conditions base on the new self.data
+        self.conditions.update(self.data)
+
         # Reload filters/actions using updated data, we keep a reference
         # for some compatiblity preservation work.
         m = self.resource_manager
@@ -1182,17 +1386,17 @@ class Policy:
             resources = mode.provision()
         else:
             resources = mode.run()
-        # clear out resource manager post run, to clear cache
-        self.resource_manager = self.load_resource_manager()
+
         return resources
 
     run = __call__
 
     def _write_file(self, rel_path, value):
-        if isinstance(self.ctx.output, NullBlobOutput):
-            return
-        with open(os.path.join(self.ctx.log_dir, rel_path), 'w') as fh:
-            fh.write(value)
+        """This method is no longer called within c7n, and despite being a private
+        method, caution is taken here to not break any external callers.
+        """
+        log.warning("policy _write_file is deprecated, use ctx.output.write_file")
+        self.ctx.output.write_file(rel_path, value)
 
     def load_resource_manager(self):
         factory = get_resource_class(self.data.get('resource'))
@@ -1226,3 +1430,7 @@ class Policy:
                 except Exception as e:
                     raise ValueError(
                         "Policy: %s Date/Time not parsable: %s, %s" % (policy_name, i, e))
+
+    def get_deprecations(self):
+        """Return any matching deprecations for the policy fields itself."""
+        return deprecated.check_deprecations(self, "policy")

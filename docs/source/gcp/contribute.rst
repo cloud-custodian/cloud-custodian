@@ -8,8 +8,8 @@ in the makefile:
 
 .. code-block:: bash
 
-    $ make install
-    $ source bin/activate
+    make install
+    source bin/activate
 
 This creates a virtual env in your enlistment and installs all packages as editable.
 

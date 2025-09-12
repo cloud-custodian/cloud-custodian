@@ -1,0 +1,190 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.DBForMySQL/servers?api-version=2017-12-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Tue, 21 Jun 2022 10:26:02 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "2706"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "sku": {
+                                    "name": "B_Gen5_2",
+                                    "tier": "Basic",
+                                    "family": "Gen5",
+                                    "capacity": 2
+                                },
+                                "properties": {
+                                    "administratorLogin": "terragoat-dev",
+                                    "storageProfile": {
+                                        "storageMB": 5120,
+                                        "backupRetentionDays": 7,
+                                        "geoRedundantBackup": "Disabled",
+                                        "storageAutogrow": "Enabled"
+                                    },
+                                    "version": "5.7",
+                                    "sslEnforcement": "Disabled",
+                                    "minimalTlsVersion": "TLSEnforcementDisabled",
+                                    "userVisibleState": "Ready",
+                                    "fullyQualifiedDomainName": "terragoat-mysql-dev604.mysql.database.azure.com",
+                                    "earliestRestoreDate": "2022-06-21T07:27:58.307+00:00",
+                                    "replicationRole": "",
+                                    "masterServerId": "",
+                                    "byokEnforcement": "Disabled",
+                                    "privateEndpointConnections": [],
+                                    "infrastructureEncryption": "Disabled",
+                                    "publicNetworkAccess": "Enabled"
+                                },
+                                "location": "eastus",
+                                "tags": {},
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/terragoat-dev/providers/Microsoft.DBforMySQL/servers/terragoat-mysql-dev604",
+                                "name": "terragoat-mysql-dev604",
+                                "type": "Microsoft.DBforMySQL/servers"
+                            },
+                            {
+                                "sku": {
+                                    "name": "B_Gen5_2",
+                                    "tier": "Basic",
+                                    "family": "Gen5",
+                                    "capacity": 2
+                                },
+                                "properties": {
+                                    "administratorLogin": "TTuIIlYc",
+                                    "storageProfile": {
+                                        "storageMB": 5120,
+                                        "backupRetentionDays": 7,
+                                        "geoRedundantBackup": "Disabled",
+                                        "storageAutogrow": "Enabled"
+                                    },
+                                    "version": "5.7",
+                                    "sslEnforcement": "Enabled",
+                                    "minimalTlsVersion": "TLS1_1",
+                                    "userVisibleState": "Ready",
+                                    "fullyQualifiedDomainName": "344-mysql-server-red.mysql.database.azure.com",
+                                    "earliestRestoreDate": "2022-06-21T09:59:41.257+00:00",
+                                    "replicationRole": "",
+                                    "masterServerId": "",
+                                    "byokEnforcement": "Disabled",
+                                    "privateEndpointConnections": [],
+                                    "infrastructureEncryption": "Disabled",
+                                    "publicNetworkAccess": "Enabled"
+                                },
+                                "location": "eastus",
+                                "tags": {},
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/344-rg-red/providers/Microsoft.DBforMySQL/servers/344-mysql-server-red",
+                                "name": "344-mysql-server-red",
+                                "type": "Microsoft.DBforMySQL/servers"
+                            },
+                            {
+                                "sku": {
+                                    "name": "GP_Gen5_8",
+                                    "tier": "GeneralPurpose",
+                                    "family": "Gen5",
+                                    "capacity": 8
+                                },
+                                "properties": {
+                                    "administratorLogin": "BcwKvtNz",
+                                    "storageProfile": {
+                                        "storageMB": 5120,
+                                        "backupRetentionDays": 7,
+                                        "geoRedundantBackup": "Disabled",
+                                        "storageAutogrow": "Enabled"
+                                    },
+                                    "version": "5.7",
+                                    "sslEnforcement": "Enabled",
+                                    "minimalTlsVersion": "TLS1_1",
+                                    "userVisibleState": "Ready",
+                                    "fullyQualifiedDomainName": "344-mysql-server-green.mysql.database.azure.com",
+                                    "earliestRestoreDate": "2022-06-21T10:04:20.183+00:00",
+                                    "replicationRole": "",
+                                    "masterServerId": "",
+                                    "byokEnforcement": "Disabled",
+                                    "privateEndpointConnections": [],
+                                    "infrastructureEncryption": "Disabled",
+                                    "publicNetworkAccess": "Enabled"
+                                },
+                                "location": "eastus",
+                                "tags": {},
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/344-rg-green/providers/Microsoft.DBforMySQL/servers/344-mysql-server-green",
+                                "name": "344-mysql-server-green",
+                                "type": "Microsoft.DBforMySQL/servers"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/344-rg-green/providers/Microsoft.DBforMySQL/servers/344-mysql-server-green/securityAlertPolicies/Default?api-version=2017-12-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Tue, 21 Jun 2022 10:26:02 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "471"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "properties": {
+                            "state": "Enabled",
+                            "disabledAlerts": [
+                                ""
+                            ],
+                            "emailAddresses": [
+                                ""
+                            ],
+                            "emailAccountAdmins": false,
+                            "storageEndpoint": "",
+                            "storageAccountAccessKey": "",
+                            "retentionDays": 0,
+                            "creationTime": "2022-06-21T09:56:22.317Z"
+                        },
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/344-rg-green/providers/Microsoft.DBforMySQL/servers/344-mysql-server-green/securityAlertPolicies/Default",
+                        "name": "Default",
+                        "type": "Microsoft.DBforMySQL/servers/securityAlertPolicies"
+                    }
+                }
+            }
+        }
+    ]
+}

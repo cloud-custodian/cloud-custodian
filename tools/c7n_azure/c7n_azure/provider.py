@@ -47,10 +47,17 @@ class Azure(Provider):
         return policy_collection
 
     def get_session_factory(self, options):
+        cloud_endpoint = self.cloud_endpoints
+
+        # c7n-org will have a region set to either global or the specified region
+        region = options.get('region')
+        if region:
+            cloud_endpoint = self.region_to_cloud.get(region, AZURE_PUBLIC_CLOUD)
+
         return partial(Session,
                        subscription_id=options.account_id,
                        authorization_file=options.authorization_file,
-                       cloud_endpoints=self.cloud_endpoints)
+                       cloud_endpoints=cloud_endpoint)
 
     def _get_cloud_endpoints(self, options):
         cloud_list = options.get('regions')

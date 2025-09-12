@@ -1,0 +1,140 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Findings": [
+            {
+                "SchemaVersion": "2018-10-08",
+                "Id": "arn:aws:inspector2:us-east-1:644160558196:finding/3371dd4acbb7041a1feb7a7f82c1d20e",
+                "ProductArn": "arn:aws:securityhub:us-east-1::product/aws/inspector",
+                "ProductName": "Inspector",
+                "CompanyName": "Amazon",
+                "Region": "us-east-1",
+                "GeneratorId": "AWSInspector",
+                "AwsAccountId": "644160558196",
+                "Types": [
+                    "Software and Configuration Checks/Vulnerabilities/CVE"
+                ],
+                "FirstObservedAt": "2022-01-17T16:03:05.186Z",
+                "LastObservedAt": "2022-01-17T16:03:05.186Z",
+                "CreatedAt": "2022-01-17T16:03:05.186Z",
+                "UpdatedAt": "2022-01-17T16:03:05.186Z",
+                "Severity": {
+                    "Label": "CRITICAL",
+                    "Normalized": 90
+                },
+                "Title": "CVE-2021-44228 - org.apache.logging.log4j:log4j-api, org.apache.logging.log4j:log4j-core",
+                "Description": "Apache Log4j2 2.0-beta9 through 2.15.0 (excluding security releases 2.12.2, 2.12.3, and 2.3.1) JNDI features used in configuration, log messages, and parameters do not protect against attacker controlled LDAP and other JNDI related endpoints. An attacker who can control log messages or log message parameters can execute arbitrary code loaded from LDAP servers when message lookup substitution is enabled. From log4j 2.15.0, this behavior has been disabled by default. From version 2.16.0 (along with 2.12.2, 2.12.3, and 2.3.1), this functionality has been completely removed. Note that this vulnerability is specific to log4j-core and does not affect log4net, log4cxx, or other Apache Logging Services projects.",
+                "Remediation": {
+                    "Recommendation": {
+                        "Text": "None Provided"
+                    }
+                },
+                "ProductFields": {
+                    "aws/inspector/FindingStatus": "ACTIVE",
+                    "aws/inspector/inspectorScore": "10.0",
+                    "aws/inspector/ProductVersion": "2",
+                    "aws/inspector/packageVulnerabilityDetails/vulnerablePackages/1/sourceLayerHash": "sha256:c182a1c16707219422e92cf7025b399e23f0fd6615a87664f60cc9ad53a29ce5",
+                    "aws/inspector/packageVulnerabilityDetails/vulnerablePackages/2/sourceLayerHash": "sha256:c182a1c16707219422e92cf7025b399e23f0fd6615a87664f60cc9ad53a29ce5",
+                    "aws/inspector/resources/1/resourceDetails/awsEcrContainerImageDetails/platform": "ALPINE_LINUX_3_8",
+                    "aws/securityhub/FindingId": "arn:aws:securityhub:us-east-1::product/aws/inspector/arn:aws:inspector2:us-east-1:644160558196:finding/3371dd4acbb7041a1feb7a7f82c1d20e",
+                    "aws/securityhub/ProductName": "Inspector",
+                    "aws/securityhub/CompanyName": "Amazon"
+                },
+                "Resources": [
+                    {
+                        "Type": "AwsEcrContainerImage",
+                        "Id": "arn:aws:ecr:us-east-1:644160558196:repository/sas-log4j-test/sha256:1a65e73f85a7e2fc26ca1baa4cc9d4fbdbe9bbb46f7a2bf32db01de22759df94",
+                        "Partition": "aws",
+                        "Region": "us-east-1",
+                        "Details": {
+                            "AwsEcrContainerImage": {
+                                "RegistryId": "644160558196",
+                                "RepositoryName": "sas-log4j-test",
+                                "Architecture": "amd64",
+                                "ImageDigest": "sha256:1a65e73f85a7e2fc26ca1baa4cc9d4fbdbe9bbb46f7a2bf32db01de22759df94",
+                                "ImageTags": [
+                                    "latest"
+                                ],
+                                "ImagePublishedAt": "2022-01-17T16:02:58Z"
+                            }
+                        }
+                    }
+                ],
+                "WorkflowState": "NEW",
+                "Workflow": {
+                    "Status": "NEW"
+                },
+                "RecordState": "ACTIVE",
+                "Vulnerabilities": [
+                    {
+                        "Id": "CVE-2021-44228",
+                        "VulnerablePackages": [
+                            {
+                                "Name": "org.apache.logging.log4j:log4j-api",
+                                "Version": "2.14.1",
+                                "Epoch": "0"
+                            },
+                            {
+                                "Name": "org.apache.logging.log4j:log4j-core",
+                                "Version": "2.14.1",
+                                "Epoch": "0"
+                            }
+                        ],
+                        "Cvss": [
+                            {
+                                "Version": "2.0",
+                                "BaseScore": 9.3,
+                                "BaseVector": "AV:N/AC:M/Au:N/C:C/I:C/A:C"
+                            },
+                            {
+                                "Version": "3.1",
+                                "BaseScore": 10,
+                                "BaseVector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H"
+                            },
+                            {
+                                "Version": "3.1",
+                                "BaseScore": 10,
+                                "BaseVector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H",
+                                "Source": "NVD",
+                                "Adjustments": []
+                            }
+                        ],
+                        "Vendor": {
+                            "Name": "NVD",
+                            "Url": "https://nvd.nist.gov/vuln/detail/CVE-2021-44228",
+                            "VendorSeverity": "CRITICAL",
+                            "VendorCreatedAt": "2021-12-10T10:15:00Z",
+                            "VendorUpdatedAt": "2022-01-12T18:15:00Z"
+                        },
+                        "ReferenceUrls": [
+                            "https://www.intel.com/content/www/us/en/security-center/advisory/intel-sa-00646.html",
+                            "https://msrc-blog.microsoft.com/2021/12/11/microsofts-response-to-cve-2021-44228-apache-log4j2/",
+                            "https://logging.apache.org/log4j/2.x/security.html",
+                            "https://www.debian.org/security/2021/dsa-5020",
+                            "https://cert-portal.siemens.com/productcert/pdf/ssa-479842.pdf",
+                            "https://www.oracle.com/security-alerts/alert-cve-2021-44228.html",
+                            "https://cert-portal.siemens.com/productcert/pdf/ssa-714170.pdf",
+                            "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/M5CSVUNV4HWZZXGOKNSK6L7RPM7BOKIB/",
+                            "https://cert-portal.siemens.com/productcert/pdf/ssa-397453.pdf",
+                            "https://cert-portal.siemens.com/productcert/pdf/ssa-661247.pdf",
+                            "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/VU57UJDCFIASIO35GC55JMKSRXJMCDFM/",
+                            "https://twitter.com/kurtseifried/status/1469345530182455296",
+                            "https://lists.debian.org/debian-lts-announce/2021/12/msg00007.html",
+                            "https://tools.cisco.com/security/center/content/CiscoSecurityAdvisory/cisco-sa-apache-log4j-qRuKNEbd",
+                            "https://www.kb.cert.org/vuls/id/930724"
+                        ]
+                    }
+                ],
+                "FindingProviderFields": {
+                    "Severity": {
+                        "Label": "CRITICAL"
+                    },
+                    "Types": [
+                        "Software and Configuration Checks/Vulnerabilities/CVE"
+                    ]
+                }
+            }
+        ]
+    }
+}

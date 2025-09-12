@@ -1,0 +1,14 @@
+{
+    "status_code": 200,
+    "data": {
+        "Instances": [
+            {
+                "Id": "testnik",
+                "Attributes": {
+                    "AWS_INSTANCE_CNAME": "testnik.local"
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

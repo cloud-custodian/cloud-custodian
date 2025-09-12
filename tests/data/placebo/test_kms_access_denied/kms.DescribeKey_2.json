@@ -1,0 +1,31 @@
+{
+    "status_code": 200,
+    "data": {
+        "KeyMetadata": {
+            "AWSAccountId": "644160558196",
+            "KeyId": "fb019403-0594-4a97-b987-8e493fb76181",
+            "Arn": "arn:aws:kms:us-west-1:644160558196:key/fb019403-0594-4a97-b987-8e493fb76181",
+            "CreationDate": {
+                "__class__": "datetime",
+                "year": 2021,
+                "month": 5,
+                "day": 20,
+                "hour": 13,
+                "minute": 43,
+                "second": 8,
+                "microsecond": 989000
+            },
+            "Enabled": true,
+            "Description": "Access testing - permissive policy",
+            "KeyUsage": "ENCRYPT_DECRYPT",
+            "KeyState": "Enabled",
+            "Origin": "AWS_KMS",
+            "KeyManager": "CUSTOMER",
+            "CustomerMasterKeySpec": "SYMMETRIC_DEFAULT",
+            "EncryptionAlgorithms": [
+                "SYMMETRIC_DEFAULT"
+            ]
+        },
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "Name": "SSM-SessionManagerRunShell",
+        "CreatedDate": {
+            "__class__": "datetime",
+            "year": 2024,
+            "month": 5,
+            "day": 23,
+            "hour": 14,
+            "minute": 20,
+            "second": 49,
+            "microsecond": 310000
+        },
+        "DocumentVersion": "1",
+        "Status": "Active",
+        "Content": "{\"schemaVersion\":\"1.0\",\"description\":\"Document to hold regional settings for Session Manager\",\"sessionType\":\"Standard_Stream\",\"inputs\":{\"s3BucketName\":\"\",\"s3KeyPrefix\":\"\",\"s3EncryptionEnabled\":true,\"cloudWatchLogGroupName\":\"\",\"cloudWatchEncryptionEnabled\":true,\"idleSessionTimeout\":\"20\",\"maxSessionDuration\":\"\",\"cloudWatchStreamingEnabled\":false,\"kmsKeyId\":\"\",\"runAsEnabled\":false,\"runAsDefaultUser\":\"\",\"shellProfile\":{\"windows\":\"\",\"linux\":\"\"}}}",
+        "DocumentType": "Session",
+        "DocumentFormat": "JSON",
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,16 @@
+{
+    "status_code": 200,
+    "data": {
+        "Attributes": {
+            "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"SNS:Subscribe\",\"Resource\":\"arn:aws:sns:us-east-1:644160558196:c7n-test-rbp-no-sid\"},{\"Sid\":\"AddMe\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"SNS:GetTopicAttributes\",\"Resource\":\"arn:aws:sns:us-east-1:644160558196:c7n-test-rbp-no-sid\"}]}",
+            "Owner": "644160558196",
+            "SubscriptionsPending": "0",
+            "TopicArn": "arn:aws:sns:us-east-1:644160558196:c7n-test-rbp-no-sid",
+            "EffectiveDeliveryPolicy": "{\"http\":{\"defaultHealthyRetryPolicy\":{\"minDelayTarget\":20,\"maxDelayTarget\":20,\"numRetries\":3,\"numMaxDelayRetries\":0,\"numNoDelayRetries\":0,\"numMinDelayRetries\":0,\"backoffFunction\":\"linear\"},\"disableSubscriptionOverrides\":false,\"defaultRequestPolicy\":{\"headerContentType\":\"text/plain; charset=UTF-8\"}}}",
+            "SubscriptionsConfirmed": "0",
+            "DisplayName": "",
+            "SubscriptionsDeleted": "0"
+        },
+        "ResponseMetadata": {}
+    }
+}

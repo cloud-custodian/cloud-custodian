@@ -1,0 +1,11 @@
+{
+    "status_code": 404,
+    "data": {
+        "Error": {
+            "Code": "NoSuchPublicAccessBlockConfiguration",
+            "Message": "The public access block configuration was not found",
+            "BucketName": "644160558196-us-east-1-s3-logs"
+        },
+        "ResponseMetadata": {}
+    }
+}

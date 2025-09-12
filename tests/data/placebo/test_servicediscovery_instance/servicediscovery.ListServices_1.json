@@ -1,0 +1,58 @@
+{
+    "status_code": 200,
+    "data": {
+        "Services": [
+            {
+                "Id": "srv-1",
+                "Arn": "arn:aws:servicediscovery:us-east-1:644160558196:service/srv-1",
+                "Name": "testnik",
+                "Type": "DNS_HTTP",
+                "DnsConfig": {
+                    "RoutingPolicy": "WEIGHTED",
+                    "DnsRecords": [
+                        {
+                            "Type": "CNAME",
+                            "TTL": 10
+                        }
+                    ]
+                },
+                "CreateDate": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 4,
+                    "day": 16,
+                    "hour": 15,
+                    "minute": 12,
+                    "second": 59,
+                    "microsecond": 73000
+                }
+            },
+            {
+                "Id": "srv-2",
+                "Arn": "arn:aws:servicediscovery:us-east-1:644160558196:service/srv-2",
+                "Name": "test",
+                "Type": "DNS_HTTP",
+                "DnsConfig": {
+                    "RoutingPolicy": "WEIGHTED",
+                    "DnsRecords": [
+                        {
+                            "Type": "A",
+                            "TTL": 300
+                        }
+                    ]
+                },
+                "CreateDate": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 7,
+                    "day": 1,
+                    "hour": 19,
+                    "minute": 11,
+                    "second": 21,
+                    "microsecond": 908000
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

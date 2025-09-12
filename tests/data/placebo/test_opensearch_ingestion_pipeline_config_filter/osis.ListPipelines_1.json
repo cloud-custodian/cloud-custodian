@@ -1,0 +1,82 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Pipelines": [
+            {
+                "Status": "ACTIVE",
+                "StatusReason": {
+                    "Description": "WARN: There is no \"available\" VPC endpoint associated with this pipeline. You must configure an interface vpc endpoint to ingest data."
+                },
+                "PipelineName": "c7n-test",
+                "PipelineArn": "arn:aws:osis:us-east-1:123456789012:pipeline/c7n-test",
+                "MinUnits": 2,
+                "MaxUnits": 4,
+                "CreatedAt": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 6,
+                    "day": 30,
+                    "hour": 15,
+                    "minute": 3,
+                    "second": 40,
+                    "microsecond": 0
+                },
+                "LastUpdatedAt": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 6,
+                    "day": 30,
+                    "hour": 15,
+                    "minute": 3,
+                    "second": 40,
+                    "microsecond": 0
+                },
+                "Destinations": [
+                    {
+                        "ServiceName": "OpenSearch",
+                        "Endpoint": "https://vpc-c7n-test-ug4l2nqtnwwrktaeagxsqso27u.us-east-1.es.amazonaws.com"
+                    }
+                ],
+                "Tags": []
+            },
+            {
+                "Status": "ACTIVE",
+                "StatusReason": {
+                    "Description": " "
+                },
+                "PipelineName": "c7n-test-1",
+                "PipelineArn": "arn:aws:osis:us-east-1:123456789012:pipeline/c7n-test-1",
+                "MinUnits": 2,
+                "MaxUnits": 4,
+                "CreatedAt": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 6,
+                    "day": 30,
+                    "hour": 16,
+                    "minute": 12,
+                    "second": 25,
+                    "microsecond": 0
+                },
+                "LastUpdatedAt": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 6,
+                    "day": 30,
+                    "hour": 16,
+                    "minute": 12,
+                    "second": 25,
+                    "microsecond": 0
+                },
+                "Destinations": [
+                    {
+                        "ServiceName": "OpenSearch",
+                        "Endpoint": "https://vpc-c7n-test-ug4l2nqtnwwrktaeagxsqso27u.us-east-1.es.amazonaws.com"
+                    }
+                ],
+                "Tags": []
+            }
+        ]
+    }
+}

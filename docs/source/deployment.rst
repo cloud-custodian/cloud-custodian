@@ -28,11 +28,11 @@ to add a README or any other files to it first.
 
 .. code-block:: bash
 
-    $ mkdir my-policies
-    $ cd my-policies
-    $ git init
-    $ git remote add origin <github repo url>
-    $ touch policy.yml
+    mkdir my-policies
+    cd my-policies
+    git init
+    git remote add origin <github repo url>
+    touch policy.yml
 
 Next, we'll add a policy to our new ``policy.yml`` file.
 
@@ -48,11 +48,11 @@ working directory and push it up to our remote:
 .. code-block:: bash
 
     # this should show your policy.yml as an untracked file
-    $ git status
+    git status
 
-    $ git add policy.yml
-    $ git commit -m 'init my first policy'
-    $ git push -u origin master
+    git add policy.yml
+    git commit -m 'init my first policy'
+    git push -u origin master
 
 Once you've pushed your changes you should be able to see your new changes inside
 of Github. Congratulations, you're now ready to start automatically validating and
@@ -166,7 +166,12 @@ In AWS, you will need ReadOnly access as well as the following permissions:
                     "lambda:CreateAlias",
                     "logs:CreateLogStream",
                     "logs:PutLogEvents",
-                    "logs:CreateLogGroup"
+                    "logs:CreateLogGroup",
+                    "scheduler:CreateSchedule",
+                    "scheduler:DeleteSchedule",
+                    "scheduler:GetSchedule",
+                    "scheduler:ListScheduleGroups",
+                    "scheduler:UpdateSchedule"
                 ],
                 "Resource": "*"
             }
@@ -199,7 +204,7 @@ in the  :ref:`install-cc` guide.
 Once you have Cloud Custodian installed, download your policies that you created
 in the :ref:`compliance_as_code` section. If using git, just simply do a ``git clone``::
 
-    $ git clone <repository-url>
+    git clone <repository-url>
 
 You now have your policies and custodian available on the instance. Typically, policies
 that query the extant resources in the account/project/subscription should be run
@@ -218,13 +223,13 @@ When executing Custodian, you can enable metrics simply by adding the ``-m`` fla
 cloud provider::
 
   # AWS
-  $ custodian run -s output -m aws policy.yml
+  custodian run -s output -m aws policy.yml
 
   # Azure
-  $ custodian run -s output -m azure policy.yml
+  custodian run -s output -m azure policy.yml
 
   # GCP
-  $ custodian run -s output -m gcp policy.yml
+  custodian run -s output -m gcp policy.yml
 
 When you enable metrics, a new namespace will be created and the following metrics will be
 recorded there:
@@ -236,29 +241,29 @@ recorded there:
 To enable logging to CloudWatch logs, Stackdriver, or Azure AppInsights, use the ``-l`` flag::
 
   # AWS CloudWatch Logs
-  $ custodian run -s output -l /cloud-custodian/policies policy.yml
+  custodian run -s output -l /cloud-custodian/policies policy.yml
 
   # Azure App Insights Logs
-  $ custodian run -s output -l azure://cloud-custodian/policies policy.yml
+  custodian run -s output -l azure://cloud-custodian/policies policy.yml
 
   # Stackdriver Logs
-  $ custodian run -s output -l gcp://cloud-custodian/policies policy.yml
+  custodian run -s output -l gcp://cloud-custodian/policies policy.yml
 
 You can also store the output of your Custodian logs in a cloud provider's blob storage like S3
 or Azure Storage accounts::
 
   # AWS S3
-  $ custodian run -s s3://my-custodian-bucket policy.yml
+  custodian run -s s3://my-custodian-bucket policy.yml
 
   # Azure Storage Accounts
-  $ custodian run -s azure://my-custodian-storage-account policy.yml
+  custodian run -s azure://my-custodian-storage-account policy.yml
 
 .. _mailer_and_notifications_deployment:
 
 Mailer and Notifications Deployment
 -----------------------------------
 
-For instructions on how to deploy the mailer for notifications, see :doc:`/tools/c7n-mailer`
+For instructions on how to deploy the mailer for notifications, see :doc:`/tools/c7n-mailer`.
 
 .. _multi_account_execution:
 
@@ -287,9 +292,9 @@ recent commit and master.
 .. code-block:: bash
 
     # in your git directory for policies
-    $ docker pull cloudcustodian/policystream
-    $ docker run -v $(pwd):/home/custodian/policies cloudcustodian > policystream-diff.yml
-    $ custodian run -s output -v --dryrun policystream-diff.yml
+    docker pull cloudcustodian/policystream
+    docker run -v $(pwd):/home/custodian/policies cloudcustodian > policystream-diff.yml
+    custodian run -s output -v --dryrun policystream-diff.yml
 
 After running your new policy file (policystream-diff.yml), the outputs will be stored
 in the output directory.

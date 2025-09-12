@@ -1,5 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import hashlib
 
 from .core import BaseAction
 from c7n import utils
@@ -39,6 +40,11 @@ def remove_statements(match_ids, statements, matched=()):
     if not found:
         return None, found
     return statements, found
+
+
+def statement_id(s):
+    # for statements without a sid, use a checksum for identity
+    return hashlib.sha224(utils.dumps(s, indent=0).encode('utf8')).hexdigest()
 
 
 class ModifyPolicyBase(BaseAction):
@@ -97,8 +103,8 @@ class ModifyPolicyBase(BaseAction):
         self.manager = manager
 
     def add_statements(self, policy_statements):
-        current = {s['Sid']: s for s in policy_statements}
-        additional = {s['Sid']: s for s in self.data.get('add-statements', [])}
+        current = {s.get('Sid', statement_id(s)): s for s in policy_statements}
+        additional = {s.get('Sid', statement_id(s)): s for s in self.data.get('add-statements', [])}
         current.update(additional)
         return list(current.values()), bool(additional)
 

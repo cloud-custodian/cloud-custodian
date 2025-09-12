@@ -1,0 +1,11 @@
+{
+    "status_code": 400,
+    "data": {
+        "Error": {
+            "Message": "Keyspace c7n_test does not exist",
+            "Code": "ResourceNotFoundException"
+        },
+        "ResponseMetadata": {},
+        "message": "Keyspace c7n_test does not exist"
+    }
+}

@@ -25,16 +25,19 @@ rule additions on them!
            events:
              - source: ec2.amazonaws.com
                event: AuthorizeSecurityGroupIngress
-               ids: "requestParameters.groupId"
+               ids: "responseElements.securityGroupRuleSet.items[].groupId"
              - source: ec2.amazonaws.com
                event: AuthorizeSecurityGroupEgress
-               ids: "requestParameters.groupId"
+               ids: "responseElements.securityGroupRuleSet.items[].groupId"
              - source: ec2.amazonaws.com
                event: RevokeSecurityGroupEgress
                ids: "requestParameters.groupId"
              - source: ec2.amazonaws.com
                event: RevokeSecurityGroupIngress
                ids: "requestParameters.groupId"
+             - source: ec2.amazonaws.com
+               event: ModifySecurityGroupRules
+               ids: "requestParameters.ModifySecurityGroupRulesRequest.GroupId"
        filters:
          - or:
                - type: ingress

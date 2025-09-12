@@ -1,0 +1,33 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "ReplicationConfiguration": {
+            "Role": "arn:aws:iam::644160558196:role/service-role/s3crr_role_for_custodian-repl-test-1",
+            "Rules": [
+                {
+                    "ID": "replication-1",
+                    "Priority": 0,
+                    "Filter": {
+                        "And": {
+                            "Prefix": "abc",
+                            "Tags": [
+                                {
+                                    "Key": "Owner",
+                                    "Value": "c7n"
+                                }
+                            ]
+                        }
+                    },
+                    "Status": "Enabled",
+                    "Destination": {
+                        "Bucket": "arn:aws:s3:::custodian-replication-west"
+                    },
+                    "DeleteMarkerReplication": {
+                        "Status": "Disabled"
+                    }
+                }
+            ]
+        }
+    }
+}

@@ -1,0 +1,24 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "namespaceName": {
+        "type": "string",
+        "defaultValue": "[concat('cctestservicebusnamespace', uniqueString(resourceGroup().id))]"
+      }
+    },
+    "resources": [
+      {
+        "type": "Microsoft.ServiceBus/namespaces",
+        "apiVersion": "2021-11-01",
+        "name": "[parameters('namespaceName')]",
+        "location": "eastus",
+        "properties": {
+          "sku": {
+            "name": "Standard"
+          },
+          "enableHttpsTrafficOnly": true
+        }
+      }
+    ]
+  }

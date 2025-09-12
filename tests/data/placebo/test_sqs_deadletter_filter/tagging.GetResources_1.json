@@ -1,0 +1,40 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:sqs:us-east-1:644160558196:bar",
+                "Tags": [
+                    {
+                        "Key": "App",
+                        "Value": "dev"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:sqs:us-east-1:644160558196:bar_dlq",
+                "Tags": []
+            },
+            {
+                "ResourceARN": "arn:aws:sqs:us-east-1:644160558196:test",
+                "Tags": [
+                    {
+                        "Key": "Foo",
+                        "Value": "bar"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:sqs:us-east-1:644160558196:test-dlq",
+                "Tags": [
+                    {
+                        "Key": "Foo",
+                        "Value": "bar"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

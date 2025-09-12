@@ -1,0 +1,80 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.AppPlatform/Spring?api-version=2022-12-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Wed, 10 May 2023 22:49:12 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "11999"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "921"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "zoneRedundant": false,
+                                    "version": 3,
+                                    "serviceId": "3678cebb6e5b4b43a2c79d9a257f9009",
+                                    "networkProfile": {
+                                        "outboundIPs": {
+                                            "publicIPs": [
+                                                "20.221.83.90"
+                                            ]
+                                        },
+                                        "outboundType": "loadBalancer"
+                                    },
+                                    "powerState": "Running",
+                                    "fqdn": "test-spring-service2.azuremicroservices.io"
+                                },
+                                "type": "Microsoft.AppPlatform/Spring",
+                                "sku": {
+                                    "name": "B0",
+                                    "tier": "Basic"
+                                },
+                                "location": "centralus",
+                                "tags": {
+                                    "product_id": "13742",
+                                    "created_by": "abc@def.com"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/temp-test-spring-apps/providers/Microsoft.AppPlatform/Spring/test-spring-service2",
+                                "name": "test-spring-service2",
+                                "systemData": {
+                                    "createdBy": "abc@def.com",
+                                    "createdByType": "User",
+                                    "createdAt": "2023-05-10T21:14:40.0760641Z",
+                                    "lastModifiedBy": "5248d4c8-2530-4bc3-98d3-a01744561df5",
+                                    "lastModifiedByType": "Application",
+                                    "lastModifiedAt": "2023-05-10T22:15:18.0213302Z"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

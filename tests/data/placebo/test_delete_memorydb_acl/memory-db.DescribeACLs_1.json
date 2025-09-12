@@ -1,0 +1,28 @@
+{
+    "status_code": 200,
+    "data": {
+        "ACLs": [
+            {
+                "Name": "open-access",
+                "Status": "active",
+                "UserNames": [
+                    "default"
+                ],
+                "MinimumEngineVersion": "6.2",
+                "Clusters": [
+                    "test-cluster"
+                ],
+                "ARN": "arn:aws:memorydb:us-east-1:644160558196:acl/open-access"
+            },
+            {
+                "Name": "test-acl",
+                "Status": "active",
+                "UserNames": [],
+                "MinimumEngineVersion": "6.2",
+                "Clusters": [],
+                "ARN": "arn:aws:memorydb:us-east-1:644160558196:acl/test-acl"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

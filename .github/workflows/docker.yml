@@ -1,65 +1,46 @@
 name: "Docker Build"
-
 on:
+  workflow_dispatch: {}
+  # build a daily dev image
+  schedule:
+    - cron: "42 6 * * *"
   push:
-    branches:
-      - master
     tags:
       # todo: update for 1.0
       - 0.*
-
 jobs:
-
   Publish:
-    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    strategy:
+      matrix:
+        image:
+          - c7n
+          - c7n-org
+          - mailer
+          - policystream
+          - c7n-left
+    runs-on: ubuntu-latest-8-cores
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v1
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # ratchet:actions/checkout@v4
+      - name: ${{ matrix.image }} build and push
+        uses: ./.github/composites/docker-build-push
+        env:
+          HUB_USER: c7nbuild
+          HUB_TOKEN: ${{ secrets.DOCKER_CI_HUB_TOKEN }}
         with:
-          python-version: 3.8
-      - name: Install Docker Build Env
-        # bin directory is in .dockerignore
-        run: |
-          python -m pip install --upgrade pip
-          pip install docker click pytest pyyaml
-          mkdir -p bin
-          wget -q -O bin/trivy.tgz https://github.com/aquasecurity/trivy/releases/download/v0.5.4/trivy_0.5.4_Linux-64bit.tar.gz
-          cd bin && tar xzf trivy.tgz
+          name: ${{ matrix.image }}
+          push: true
+          platforms: linux/arm64,linux/amd64
 
-      # For *lightweight* functional image tests
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
+      - name: Notify Slack
+        uses: ravsamhq/notify-slack-action@be814b201e233b2dc673608aa46e5447c8ab13f2 # ratchet:ravsamhq/notify-slack-action@v2
+        if: always()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_CI_HOOK }}
         with:
-          aws-access-key-id: ${{ secrets.DOCKER_CI_AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.DOCKER_CI_AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
-
-      # Ubuntu images
-      - name: cli
-        env:
-          HUB_USER: c7nbuild
-          HUB_TOKEN: ${{ secrets.DOCKER_CI_HUB_TOKEN }}
-        run: |
-          python tools/dev/dockerpkg.py build -v --test --scan --push -t auto -r cloudcustodian -i cli
-
-      - name: org
-        env:
-          HUB_USER: c7nbuild
-          HUB_TOKEN: ${{ secrets.DOCKER_CI_HUB_TOKEN }}
-        run: |
-          python tools/dev/dockerpkg.py build -v --test --scan --push -t auto -r cloudcustodian -i org
-
-      - name: mailer
-        env:
-          HUB_USER: c7nbuild
-          HUB_TOKEN: ${{ secrets.DOCKER_CI_HUB_TOKEN }}
-        run: |
-          python tools/dev/dockerpkg.py build -v --test --scan --push -t auto -r cloudcustodian -i mailer
-
-      - name: policystream
-        env:
-          HUB_USER: c7nbuild
-          HUB_TOKEN: ${{ secrets.DOCKER_CI_HUB_TOKEN }}
-        run: |
-          python tools/dev/dockerpkg.py build -v --test --scan --push -t auto -r cloudcustodian -i policystream
+          status: ${{ job.status }}
+          notification_title: "{workflow}:{job} has {status_message}"
+          message_format: "{emoji} *{workflow}:{job}* {status_message} in <{repo_url}|{repo}>"
+          footer: "Logs <{run_url}|{job}>"
+          notify_when: "failure,success"

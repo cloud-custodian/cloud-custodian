@@ -1,19 +1,11 @@
 {
-    "status_code": 400, 
+    "status_code": 400,
     "data": {
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 400, 
-            "RequestId": "4a6e82e2-ca20-11e7-88c3-5362196d3a6b", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "4a6e82e2-ca20-11e7-88c3-5362196d3a6b", 
-                "content-length": "126", 
-                "content-type": "application/x-amz-json-1.1"
-            }
-        }, 
         "Error": {
-            "Message": "Alias arn:aws:kms:us-east-1:015929227155:alias/some-nonexistant-alias is not found.", 
+            "Message": "Alias arn:aws:kms:us-east-1:644160558196:alias/some-nonexistant-alias is not found.",
             "Code": "NotFoundException"
-        }
+        },
+        "ResponseMetadata": {},
+        "message": "Alias arn:aws:kms:us-east-1:644160558196:alias/some-nonexistant-alias is not found."
     }
 }

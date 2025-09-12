@@ -1,0 +1,26 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Tue, 20 Jun 2023 17:06:09 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "505",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "name": "operation-1687280769226-baa1eac7-ef83-4b11-92a7-48b427d59b3e",
+    "zone": "us-central1",
+    "operationType": "UPDATE_CLUSTER",
+    "status": "RUNNING",
+    "selfLink": "https://container.googleapis.com/v1/projects/cloud-custodian/locations/us-central1/operations/operation-1687280769226-baa1eac7-ef83-4b11-92a7-48b427d59b3e",
+    "targetLink": "https://container.googleapis.com/v1/projects/cloud-custodian/locations/us-central1/clusters/standard-cluster-1",
+    "startTime": "2023-06-20T17:06:09.226966818Z"
+  }
+}

@@ -1,19 +1,7 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
-        "Location": "/custodian-byebye", 
-        "ResponseMetadata": {
-            "HTTPStatusCode": 200, 
-            "HostId": "VPFIlAju4FZh7vmsgWoZbrmo/ScZAqciqhf4HLzW3wg1SQ4ShuGiTwqhwcQzyo83lip/AQmkrhM=", 
-            "RequestId": "B6D734D0D3405613", 
-            "HTTPHeaders": {
-                "content-length": "0", 
-                "x-amz-id-2": "VPFIlAju4FZh7vmsgWoZbrmo/ScZAqciqhf4HLzW3wg1SQ4ShuGiTwqhwcQzyo83lip/AQmkrhM=", 
-                "server": "AmazonS3", 
-                "x-amz-request-id": "B6D734D0D3405613", 
-                "location": "/custodian-byebye", 
-                "date": "Mon, 05 Sep 2016 17:54:50 GMT"
-            }
-        }
+        "ResponseMetadata": {},
+        "Location": "/custodian-byebye"
     }
 }

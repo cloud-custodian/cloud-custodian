@@ -1,9 +1,9 @@
 resource "aws_route53_zone" "test_hosted_zone" {
-    name = "custodian.net"
+  name = "custodian.net"
 
-    tags = {
-        "TestTag" = "yes"
-    }
+  tags = {
+    "TestTag" = "yes"
+  }
 }
 
 resource "aws_route53_record" "test_r53_record" {

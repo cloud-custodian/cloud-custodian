@@ -1,0 +1,131 @@
+interactions:
+- request:
+    body: '{"Offset": 0, "Limit": 20}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '26'
+      Content-Type:
+      - application/json
+      Host:
+      - cdb.ap-guangzhou.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - DescribeDBInstances
+      X-TC-Region:
+      - ap-guangzhou
+      X-TC-Version:
+      - '2017-03-20'
+    method: POST
+    uri: https://cdb.ap-guangzhou.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"Items":[{"AutoRenew":0,"CageId":"","CdbError":0,"Cpu":2,"CreateTime":"2022-10-29
+        11:03:31","DeadlineTime":"0000-00-00 00:00:00","DeployGroupId":"","DeployMode":0,"DeviceClass":"","DeviceType":"UNIVERSAL","DiskType":"","DrInfo":[],"EngineType":"InnoDB","EngineVersion":"5.7","ExClusterId":"","ExClusterName":"","HourFeeStatus":1,"InitFlag":1,"InstanceId":"cdb-o6tjxap7","InstanceName":"ft-mysql\u5b9e\u4f8b","InstanceNodes":2,"InstanceType":1,"IsolateTime":"0000-00-00
+        00:00:00","MasterInfo":null,"MaxDelayTime":0,"Memory":4000,"OfflineTime":"","ParamVersionFlow":570010001,"PayType":1,"PhysicalId":"","ProjectId":0,"ProtectMode":0,"Qps":4400,"Region":"ap-guangzhou","RegionId":1,"ResourceId":"","RoGroups":[],"RoInstType":"","RoVipInfo":null,"SecurityGroupIds":[],"SlaveInfo":{"First":{"Region":"ap-guangzhou","Vip":"","VpcId":0,"Vport":0,"Zone":"ap-guangzhou-6"},"Second":null},"Status":1,"SubnetId":3706288,"TagList":null,"TaskStatus":0,"UniqSubnetId":"subnet-82l7uf8e","UniqVpcId":"vpc-o7qfjq5j","Vip":"10.0.6.5","Volume":200,"VpcId":5609423,"Vport":3306,"WanDomain":"gz-cdb-o6tjxap7.sql.tencentcdb.com","WanPort":56880,"WanStatus":1,"Zone":"ap-guangzhou-6","ZoneId":100006,"ZoneName":""}],"RequestId":"16a66cea-983e-4b71-bcfc-ea141f63ef43","TotalCount":1}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1274'
+      Content-Type:
+      - application/json
+      Date:
+      - Fri, 11 Nov 2022 06:34:12 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"ResourceList": ["qcs::cdb:ap-guangzhou:uin/100000750436:instanceId/cdb-o6tjxap7"]}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '84'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-guangzhou.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetResources
+      X-TC-Region:
+      - ap-guangzhou
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-guangzhou.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"","ResourceTagMappingList":[],"RequestId":"7cf6e2f9-a7f3-4b9b-8edd-f2c0b66720dc"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '114'
+      Content-Type:
+      - application/json
+      Date:
+      - Fri, 11 Nov 2022 06:34:12 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"Namespace": "QCE/CDB", "MetricName": "MaxConnections", "Period": 3600,
+      "StartTime": "2022-11-08T06:34:12+00:00", "EndTime": "2022-11-11T06:34:12+00:00",
+      "Instances": [{"Dimensions": [{"Name": "InstanceId", "Value": "cdb-o6tjxap7"},
+      {"Name": "InstanceType", "Value": "1"}]}]}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '276'
+      Content-Type:
+      - application/json
+      Host:
+      - monitor.ap-guangzhou.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetMonitorData
+      X-TC-Region:
+      - ap-guangzhou
+      X-TC-Version:
+      - '2018-07-24'
+    method: POST
+    uri: https://monitor.ap-guangzhou.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"StartTime":"2022-11-08T06:00:00+00:00","EndTime":"2022-11-11T06:00:00+00:00","Period":3600,"MetricName":"MaxConnections","DataPoints":[{"Dimensions":[{"Name":"InstanceType","Value":"1"},{"Name":"InstanceId","Value":"cdb-o6tjxap7"}],"Timestamps":[1667887200,1667890800,1667894400,1667898000,1667901600,1667905200,1667908800,1667912400,1667916000,1667919600,1667923200,1667926800,1667930400,1667934000,1667937600,1667941200,1667944800,1667948400,1667952000,1667955600,1667959200,1667962800,1667966400,1667970000,1667973600,1667977200,1667980800,1667984400,1667988000,1667991600,1667995200,1667998800,1668002400,1668006000,1668009600,1668013200,1668016800,1668020400,1668024000,1668027600,1668031200,1668034800,1668038400,1668042000,1668045600,1668049200,1668052800,1668056400,1668060000,1668063600,1668067200,1668070800,1668074400,1668078000,1668081600,1668085200,1668088800,1668092400,1668096000,1668099600,1668103200,1668106800,1668110400,1668114000,1668117600,1668121200,1668124800,1668128400,1668132000,1668135600,1668139200,1668142800],"Values":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]}],"RequestId":"566c0d8f-29f7-429d-99fe-f9d21c0fa75e","Msg":""}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1487'
+      Content-Type:
+      - application/json
+      Date:
+      - Fri, 11 Nov 2022 06:34:13 GMT
+    status:
+      code: 200
+      message: OK
+version: 1

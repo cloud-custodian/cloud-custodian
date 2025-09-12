@@ -1,0 +1,65 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "nodegroup": {
+            "nodegroupName": "deleted-example",
+            "nodegroupArn": "arn:aws:eks:eu-central-1:644160558196:nodegroup/example/deleted-example/b4bcf913-32c7-2459-26d9-66ee6025e572",
+            "clusterName": "example",
+            "version": "1.19",
+            "releaseVersion": "1.19.6-20210526",
+            "createdAt": {
+                "__class__": "datetime",
+                "year": 2021,
+                "month": 6,
+                "day": 9,
+                "hour": 22,
+                "minute": 1,
+                "second": 15,
+                "microsecond": 601000
+            },
+            "modifiedAt": {
+                "__class__": "datetime",
+                "year": 2021,
+                "month": 6,
+                "day": 9,
+                "hour": 22,
+                "minute": 3,
+                "second": 15,
+                "microsecond": 960000
+            },
+            "status": "ACTIVE",
+            "capacityType": "ON_DEMAND",
+            "scalingConfig": {
+                "minSize": 1,
+                "maxSize": 1,
+                "desiredSize": 1
+            },
+            "instanceTypes": [
+                "t3.medium"
+            ],
+            "subnets": [
+                "subnet-090b5147c5840ff04",
+                "subnet-0a87c93ecb21f181f"
+            ],
+            "amiType": "AL2_x86_64",
+            "nodeRole": "arn:aws:iam::644160558196:role/eks-node-group-example",
+            "labels": {},
+            "resources": {
+                "autoScalingGroups": [
+                    {
+                        "name": "eks-b4bcf913-32c7-2459-26d9-66ee6025e572"
+                    }
+                ]
+            },
+            "diskSize": 20,
+            "health": {
+                "issues": []
+            },
+            "tags": {
+                "ClusterName": "example",
+                "Name": "deleted-example"
+            }
+        }
+    }
+}

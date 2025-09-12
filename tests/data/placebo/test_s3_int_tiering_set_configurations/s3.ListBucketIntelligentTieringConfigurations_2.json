@@ -1,0 +1,40 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "IsTruncated": false,
+        "IntelligentTieringConfigurationList": [
+            {
+                "Id": "hello-1",
+                "Status": "Enabled",
+                "Tierings": [
+                    {
+                        "Days": 149,
+                        "AccessTier": "ARCHIVE_ACCESS"
+                    }
+                ]
+            },
+            {
+                "Id": "test-config",
+                "Filter": {
+                    "And": {
+                        "Prefix": "test",
+                        "Tags": [
+                            {
+                                "Key": "Owner",
+                                "Value": "c7n"
+                            }
+                        ]
+                    }
+                },
+                "Status": "Enabled",
+                "Tierings": [
+                    {
+                        "Days": 100,
+                        "AccessTier": "ARCHIVE_ACCESS"
+                    }
+                ]
+            }
+        ]
+    }
+}

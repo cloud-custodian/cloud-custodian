@@ -1,0 +1,150 @@
+interactions:
+- request:
+    body: '{"Offset": 0, "Limit": 20}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '26'
+      Content-Type:
+      - application/json
+      Host:
+      - vpc.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - DescribeNatGateways
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2017-03-12'
+    method: POST
+    uri: https://vpc.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: "{\n    \"Response\": {\n        \"NatGatewaySet\": [\n            {\n
+        \               \"NatGatewayId\": \"nat-okb10oqo\",\n                \"NatGatewayName\":
+        \"ritch-demo\",\n                \"GatewayType\": \"HYPER\",\n                \"VpcId\":
+        \"vpc-7fyzh7ml\",\n                \"CreatedTime\": \"2022-09-29 22:36:33\",\n
+        \               \"State\": \"AVAILABLE\",\n                \"NetworkState\":
+        \"AVAILABLE\",\n                \"InternetMaxBandwidthOut\": 10,\n                \"MaxConcurrentConnection\":
+        1000000,\n                \"PublicIpAddressSet\": [\n                    {\n
+        \                       \"AddressId\": \"eip-m41810is\",\n                        \"PublicIpAddress\":
+        \"43.132.34.141\",\n                        \"IsBlocked\": false\n                    }\n
+        \               ],\n                \"DestinationIpPortTranslationNatRuleSet\":
+        [],\n                \"Zone\": \"ap-singapore-1\",\n                \"SourceIpTranslationNatRuleSet\":
+        [],\n                \"NatType\": \"NAT\",\n                \"NatProductVersion\":
+        1,\n                \"IsExclusive\": false,\n                \"RestrictState\":
+        \"NORMAL\",\n                \"TagSet\": [\n                    {\n                        \"Key\":
+        \"\u6D4B\u8BD5\u4EBA\u5458\",\n                        \"Value\": \"ritchiecai\"\n
+        \                   }\n                ],\n                \"SharedCount\":
+        null,\n                \"DirectConnectGatewayIds\": [],\n                \"SubnetId\":
+        \"\",\n                \"SecurityGroupSet\": [],\n                \"ExclusiveGatewayBandwidth\":
+        null\n            }\n        ],\n        \"TotalCount\": 1,\n        \"RequestId\":
+        \"32d9026e-6f47-4ac9-8d7c-42e65cef22a8\"\n    }\n}"
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1552'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 18 Oct 2022 02:28:19 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"ResourceList": ["qcs::vpc:ap-singapore:uin/100000750436:nat/nat-okb10oqo"]}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '77'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetResources
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"","ResourceTagMappingList":[{"Resource":"qcs::vpc:ap-singapore:uin\/100000750436:nat\/nat-okb10oqo","Tags":[{"TagKey":"\u6d4b\u8bd5\u4eba\u5458","TagValue":"ritchiecai"}]}],"RequestId":"9d1b0ed9-4306-4d55-b6d7-5bcf9ae368e3"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '257'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 18 Oct 2022 02:28:19 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"Namespace": "QCE/NAT_GATEWAY", "MetricName": "Conns", "Period": 3600,
+      "StartTime": "2022-10-11T02:28:18+00:00", "EndTime": "2022-10-18T02:28:18+00:00",
+      "Instances": [{"Dimensions": [{"Name": "natId", "Value": "nat-okb10oqo"}]}]}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '230'
+      Content-Type:
+      - application/json
+      Host:
+      - monitor.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetMonitorData
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2018-07-24'
+    method: POST
+    uri: https://monitor.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"StartTime":"2022-10-11 10:00:00","EndTime":"2022-10-18
+        10:00:00","Period":3600,"MetricName":"Conns","DataPoints":[{"Dimensions":[{"Name":"natId","Value":"nat-okb10oqo"}],"Timestamps":[1665453600,1665457200,1665460800,1665464400,1665468000,1665471600,1665475200,1665478800,1665482400,1665486000,1665489600,1665493200,1665496800,1665500400,1665504000,1665507600,1665511200,1665514800,1665518400,1665522000,1665525600,1665529200,1665532800,1665536400,1665540000,1665543600,1665547200,1665550800,1665554400,1665558000,1665561600,1665565200,1665568800,1665572400,1665576000,1665579600,1665583200,1665586800,1665590400,1665594000,1665597600,1665601200,1665604800,1665608400,1665612000,1665615600,1665619200,1665622800,1665626400,1665630000,1665633600,1665637200,1665640800,1665644400,1665648000,1665651600,1665655200,1665658800,1665662400,1665666000,1665669600,1665673200,1665676800,1665680400,1665684000,1665687600,1665691200,1665694800,1665698400,1665702000,1665705600,1665709200,1665712800,1665716400,1665720000,1665723600,1665727200,1665730800,1665734400,1665738000,1665741600,1665745200,1665748800,1665752400,1665756000,1665759600,1665763200,1665766800,1665770400,1665774000,1665777600,1665781200,1665784800,1665788400,1665792000,1665795600,1665799200,1665802800,1665806400,1665810000,1665813600,1665817200,1665820800,1665824400,1665828000,1665831600,1665835200,1665838800,1665842400,1665846000,1665849600,1665853200,1665856800,1665860400,1665864000,1665867600,1665871200,1665874800,1665878400,1665882000,1665885600,1665889200,1665892800,1665896400,1665900000,1665903600,1665907200,1665910800,1665914400,1665918000,1665921600,1665925200,1665928800,1665932400,1665936000,1665939600,1665943200,1665946800,1665950400,1665954000,1665957600,1665961200,1665964800,1665968400,1665972000,1665975600,1665979200,1665982800,1665986400,1665990000,1665993600,1665997200,1666000800,1666004400,1666008000,1666011600,1666015200,1666018800,1666022400,1666026000,1666029600,1666033200,1666036800,1666040400,1666044000,1666047600,1666051200,1666054800],"Values":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]}],"RequestId":"07dfdee5-96f1-445b-b4e1-4ae7aa350892","Msg":""}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '2457'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 18 Oct 2022 02:28:20 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+version: 1

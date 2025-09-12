@@ -1,10 +1,12 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import difflib
 from functools import partial
 import hashlib
 import logging
 import operator
 import os
+import sys
 
 import click
 import yaml
@@ -60,6 +62,12 @@ def eperm(provider, el, r=None):
             r = Bag({'type': 'instance'})
         elif provider == 'azure':
             r = Bag({'type': 'vm'})
+        elif provider == 'awscc':
+            r = Bag({'type': 'logs_loggroup'})
+        elif provider == 'tencentcloud':
+            r = Bag({'type': 'ami'})
+        elif provider == 'oci':
+            r = Bag({'type': 'instance'})
 
     # print(f'policy construction lookup {r.type}.{element_type}.{el.type}')
 
@@ -72,11 +80,15 @@ def eperm(provider, el, r=None):
 
     try:
         pset = loader.load_data({'policies': [pdata]}, ':mem:', validate=False)
-    except Exception as e:
-        print(f'error loading {el} as {element_type}:{el.type} error: {e} \n {pdata}')
+    except Exception:
+        eperm.errors.append(el)
+        # print(f'error loading {el} as {element_type}:{el.type} error: {e} \n {pdata}')
         return []
     el = get_policy_element(el, list(pset)[0])
     return el.get_permissions()
+
+
+eperm.errors = []
 
 
 def get_policy_element(el, p):
@@ -158,11 +170,12 @@ class CustodianResource(CustodianDirective):
     @classmethod
     def render_resource(cls, resource_path):
         resource_class = cls.resolve(resource_path)
-        provider_name, resource_name = resource_path.split('.', 1)
+        provider_type, _ = resource_path.split('.', 1)
         return cls._render('resource.rst',
             variables=dict(
-                provider_name=provider_name,
-                resource_name="%s.%s" % (provider_name, resource_class.type),
+                provider_name=clouds[provider_type].display_name,
+                provider_type=provider_type,
+                resource_name="%s.%s" % (provider_type, resource_class.type),
                 filters=ElementSchema.elements(resource_class.filter_registry),
                 actions=ElementSchema.elements(resource_class.action_registry),
                 resource=resource_class))
@@ -247,23 +260,35 @@ def main(provider, output_dir, group_by):
     try:
         _main(provider, output_dir, group_by)
     except Exception:
-        import traceback, pdb, sys
+        import traceback, pdb
         traceback.print_exc()
         pdb.post_mortem(sys.exc_info()[-1])
 
 
-def write_modified_file(fpath, content):
+def write_modified_file(fpath, content, diff_changes=False):
     content_md5 = hashlib.md5(content.encode('utf8'))
+    file_md5 = disk_content = None
 
     if os.path.exists(fpath):
         with open(fpath, 'rb') as fh:
-            file_md5 = hashlib.md5(fh.read())
-    else:
-        file_md5 = None
+            disk_content = fh.read()
+
+    if disk_content:
+        file_md5 = hashlib.md5(disk_content)
+        disk_content = disk_content.decode('utf8')
 
     if file_md5 and content_md5.hexdigest() == file_md5.hexdigest():
         return False
 
+    if diff_changes and disk_content:
+        sys.stdout.writelines(
+            difflib.context_diff(
+                content.split('\n'),
+                disk_content.split('\n'),
+                fromfile='a/%s' % fpath, tofile='b/%s' % fpath)
+        )
+
+    log.info(f'wrote {fpath}')
     with open(fpath, 'w') as fh:
         fh.write(content)
     return True
@@ -299,12 +324,23 @@ def _main(provider, output_dir, group_by):
 
     # Create individual resources pages
     for r in provider_class.resources.values():
+        # FIXME / TODO: temporary work arounds for a few types that have recursion
+        # in jsonschema on these types.
+        if provider == 'awscc' and r.type in (
+                'wafv2_rulegroup',
+                'wafv2_webacl',
+                'amplifyuibuilder_theme',
+                'amplifyuibuilder_component',
+                'amplifybuilder_component'):
+            continue
         rpath = resource_file_name(output_dir, r)
         t = env.get_template('provider-resource.rst')
         written += write_modified_file(
             rpath, t.render(
                 provider_name=provider,
-                resource=r))
+                provider_type=provider,
+                resource=r),
+            diff_changes=not written)
 
     # Create files for all groups
     for key, group in sorted(groups.items()):
@@ -316,6 +352,7 @@ def _main(provider, output_dir, group_by):
             rpath,
             t.render(
                 provider_name=provider,
+                provider_type=provider_class.type,
                 key=key,
                 resource_files=[os.path.basename(
                     resource_file_name(output_dir, r)) for r in group],
@@ -345,6 +382,7 @@ def _main(provider, output_dir, group_by):
         fpath,
         t.render(
             provider_name=provider_class.display_name,
+            provider_type=provider_class.type,
             element_type='filters',
             elements=[common_filters[k] for k in sorted(common_filters)]))
     files.insert(0, os.path.basename(fpath))
@@ -357,6 +395,7 @@ def _main(provider, output_dir, group_by):
         fpath,
         t.render(
             provider_name=provider_class.display_name,
+            provider_type=provider_class.type,
             element_type='actions',
             elements=[common_actions[k] for k in sorted(common_actions)]))
     files.insert(0, os.path.basename(fpath))
@@ -369,6 +408,7 @@ def _main(provider, output_dir, group_by):
         mode_path,
         t.render(
             provider_name=provider_class.display_name,
+            provider_type=provider_class.type,
             modes=modes))
     files.insert(0, os.path.basename(mode_path))
 
@@ -379,7 +419,10 @@ def _main(provider, output_dir, group_by):
         provider_path,
         t.render(
             provider_name=provider_class.display_name,
+            provider_type=provider_class.type,
             files=files))
 
+    if eperm.errors:
+        log.info("%s permission errors %d", provider.title(), len(eperm.errors))
     if written:
         log.info("%s Wrote %d files", provider.title(), written)

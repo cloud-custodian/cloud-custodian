@@ -28,16 +28,16 @@ def load_resources(resource_types=('*',)):
     return missing
 
 
-def should_load_provider(name, provider_types):
+def should_load_provider(name, provider_types, no_wild=False):
     global LOADED
     if (name not in LOADED and
-        ('*' in provider_types or
-         name in provider_types)):
+        (('*' in provider_types and not no_wild)
+         or name in provider_types)):
         return True
     return False
 
 
-PROVIDER_NAMES = ('aws', 'azure', 'gcp', 'k8s', 'openstack')
+PROVIDER_NAMES = ('aws', 'azure', 'gcp', 'k8s', 'openstack', 'awscc', 'tencentcloud', 'oci', 'terraform')
 
 
 def load_available(resources=True):
@@ -50,7 +50,7 @@ def load_available(resources=True):
     for provider in PROVIDER_NAMES:
         try:
             load_providers((provider,))
-        except ImportError as e: # pragma: no cover
+        except ImportError: # pragma: no cover
             continue
         else:
             found.append(provider)
@@ -69,6 +69,10 @@ def load_providers(provider_types):
         import c7n.resources.sfn
         import c7n.resources.ssm # NOQA
 
+    if should_load_provider('awscc', provider_types):
+        from c7n_awscc.entry import initialize_awscc
+        initialize_awscc()
+
     if should_load_provider('azure', provider_types):
         from c7n_azure.entry import initialize_azure
         initialize_azure()
@@ -84,6 +88,18 @@ def load_providers(provider_types):
     if should_load_provider('openstack', provider_types):
         from c7n_openstack.entry import initialize_openstack
         initialize_openstack()
+
+    if should_load_provider('terraform', provider_types, no_wild=True):
+        from c7n_left.entry import initialize_iac
+        initialize_iac()
+
+    if should_load_provider('tencentcloud', provider_types):
+        from c7n_tencentcloud.entry import initialize_tencentcloud
+        initialize_tencentcloud()
+
+    if should_load_provider('oci', provider_types):
+        from c7n_oci.entry import initialize_oci
+        initialize_oci()
 
     if should_load_provider('c7n', provider_types):
         from c7n import data  # noqa

@@ -1,22 +1,12 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
         "repositories": [
             {
-                "repositoryName": "custodian-config-repo", 
-                "repositoryId": "44b2224c-7f2a-497c-a6c8-b70013069b59"
+                "repositoryName": "demo-policies",
+                "repositoryId": "3a297b68-8c6d-4170-a5b5-7bd220840980"
             }
-        ], 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "b6eb2635-d17d-11e6-bdc1-53f524badcfc", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "b6eb2635-d17d-11e6-bdc1-53f524badcfc", 
-                "date": "Tue, 03 Jan 2017 06:27:35 GMT", 
-                "content-length": "115", 
-                "content-type": "application/x-amz-json-1.1"
-            }
-        }
+        ],
+        "ResponseMetadata": {}
     }
 }

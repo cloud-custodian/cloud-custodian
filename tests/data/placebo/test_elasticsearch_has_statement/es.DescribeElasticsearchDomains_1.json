@@ -1,0 +1,84 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "DomainStatusList": [
+            {
+                "DomainId": "644160558196/my-test-cluster",
+                "DomainName": "my-test-cluster",
+                "ARN": "arn:aws:es:us-east-1:644160558196:domain/my-test-cluster",
+                "Created": true,
+                "Deleted": false,
+                "Processing": true,
+                "UpgradeProcessing": false,
+                "ElasticsearchVersion": "OpenSearch_1.3",
+                "ElasticsearchClusterConfig": {
+                    "InstanceType": "t3.small.elasticsearch",
+                    "InstanceCount": 1,
+                    "DedicatedMasterEnabled": false,
+                    "ZoneAwarenessEnabled": false,
+                    "WarmEnabled": false,
+                    "ColdStorageOptions": {
+                        "Enabled": false
+                    }
+                },
+                "EBSOptions": {
+                    "EBSEnabled": true,
+                    "VolumeType": "gp3",
+                    "VolumeSize": 10,
+                    "Iops": 3000
+                },
+                "AccessPolicies": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Deny\",\"Principal\":{\"AWS\":\"*\"},\"Action\":\"es:*\",\"Resource\":\"arn:aws:es:us-east-1:644160558196:domain/my-test-cluster/*\"}]}",
+                "SnapshotOptions": {},
+                "CognitoOptions": {
+                    "Enabled": false
+                },
+                "EncryptionAtRestOptions": {
+                    "Enabled": true,
+                    "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/0215f288-e10e-44fd-b4d3-31e1685af8e6"
+                },
+                "NodeToNodeEncryptionOptions": {
+                    "Enabled": true
+                },
+                "AdvancedOptions": {
+                    "indices.fielddata.cache.size": "20",
+                    "indices.query.bool.max_clause_count": "1024",
+                    "override_main_response_version": "false",
+                    "rest.action.multi.allow_explicit_index": "true"
+                },
+                "ServiceSoftwareOptions": {
+                    "CurrentVersion": "",
+                    "NewVersion": "",
+                    "UpdateAvailable": false,
+                    "Cancellable": false,
+                    "UpdateStatus": "COMPLETED",
+                    "Description": "There is no software update available for this domain.",
+                    "AutomatedUpdateDate": {
+                        "__class__": "datetime",
+                        "year": 1969,
+                        "month": 12,
+                        "day": 31,
+                        "hour": 16,
+                        "minute": 0,
+                        "second": 0,
+                        "microsecond": 0
+                    },
+                    "OptionalDeployment": true
+                },
+                "DomainEndpointOptions": {
+                    "EnforceHTTPS": true,
+                    "TLSSecurityPolicy": "Policy-Min-TLS-1-0-2019-07",
+                    "CustomEndpointEnabled": false
+                },
+                "AdvancedSecurityOptions": {
+                    "Enabled": true,
+                    "InternalUserDatabaseEnabled": true,
+                    "AnonymousAuthEnabled": false
+                },
+                "AutoTuneOptions": {
+                    "State": "ENABLE_IN_PROGRESS"
+                }
+            }
+        ]
+    }
+}

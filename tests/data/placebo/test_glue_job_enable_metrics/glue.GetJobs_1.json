@@ -1,0 +1,144 @@
+{
+    "status_code": 200,
+    "data": {
+        "Jobs": [
+            {
+                "Name": "test-job-1",
+                "Description": "",
+                "Role": "arn:aws:iam::644160558196:role/my-glue-role",
+                "CreatedOn": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 10,
+                    "day": 12,
+                    "hour": 12,
+                    "minute": 35,
+                    "second": 18,
+                    "microsecond": 390000
+                },
+                "LastModifiedOn": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 10,
+                    "day": 12,
+                    "hour": 13,
+                    "minute": 17,
+                    "second": 21,
+                    "microsecond": 111000
+                },
+                "ExecutionProperty": {
+                    "MaxConcurrentRuns": 1
+                },
+                "Command": {
+                    "Name": "glueetl",
+                    "ScriptLocation": "s3://aws-glue-assets-644160558196-us-east-1/scripts/test-job-1.py",
+                    "PythonVersion": "3"
+                },
+                "MaxRetries": 0,
+                "AllocatedCapacity": 10,
+                "Timeout": 2880,
+                "MaxCapacity": 10.0,
+                "WorkerType": "G.1X",
+                "NumberOfWorkers": 10,
+                "GlueVersion": "4.0",
+                "ExecutionClass": "STANDARD"
+            },
+            {
+                "Name": "test-job-2",
+                "Description": "",
+                "Role": "arn:aws:iam::644160558196:role/my-glue-role",
+                "CreatedOn": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 10,
+                    "day": 12,
+                    "hour": 13,
+                    "minute": 32,
+                    "second": 5,
+                    "microsecond": 140000
+                },
+                "LastModifiedOn": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 10,
+                    "day": 12,
+                    "hour": 13,
+                    "minute": 32,
+                    "second": 5,
+                    "microsecond": 140000
+                },
+                "ExecutionProperty": {
+                    "MaxConcurrentRuns": 1
+                },
+                "Command": {
+                    "Name": "glueray",
+                    "ScriptLocation": "s3://aws-glue-assets-644160558196-us-east-1/scripts/test-job-2.py",
+                    "PythonVersion": "3.9",
+                    "Runtime": "Ray2.4"
+                },
+                "DefaultArguments": {},
+                "MaxRetries": 0,
+                "AllocatedCapacity": 6,
+                "Timeout": 480,
+                "MaxCapacity": 6.0,
+                "WorkerType": "Z.2X",
+                "NumberOfWorkers": 3,
+                "GlueVersion": "4.0",
+                "ExecutionClass": "STANDARD"
+            },
+            {
+                "Name": "test-job-3",
+                "Description": "",
+                "Role": "arn:aws:iam::644160558196:role/my-glue-role",
+                "CreatedOn": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 10,
+                    "day": 12,
+                    "hour": 13,
+                    "minute": 20,
+                    "second": 27,
+                    "microsecond": 504000
+                },
+                "LastModifiedOn": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 10,
+                    "day": 12,
+                    "hour": 13,
+                    "minute": 30,
+                    "second": 19,
+                    "microsecond": 543000
+                },
+                "ExecutionProperty": {
+                    "MaxConcurrentRuns": 1
+                },
+                "Command": {
+                    "Name": "glueetl",
+                    "ScriptLocation": "s3://aws-glue-assets-644160558196-us-east-1/scripts/test-job-3.scala",
+                    "PythonVersion": "3"
+                },
+                "DefaultArguments": {
+                    "--class": "GlueApp",
+                    "--enable-spark-ui": "true",
+                    "--spark-event-logs-path": "s3://aws-glue-assets-644160558196-us-east-1/sparkHistoryLogs/",
+                    "--enable-job-insights": "false",
+                    "--enable-glue-datacatalog": "true",
+                    "--enable-continuous-cloudwatch-log": "true",
+                    "--job-bookmark-option": "job-bookmark-disable",
+                    "--job-language": "scala",
+                    "--TempDir": "s3://aws-glue-assets-644160558196-us-east-1/temporary/"
+                },
+                "MaxRetries": 0,
+                "AllocatedCapacity": 10,
+                "Timeout": 2880,
+                "MaxCapacity": 10.0,
+                "WorkerType": "G.1X",
+                "NumberOfWorkers": 10,
+                "GlueVersion": "4.0",
+                "ExecutionClass": "STANDARD"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

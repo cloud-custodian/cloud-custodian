@@ -1,0 +1,7 @@
+{
+    "status_code": 200,
+    "data": {
+        "RuleArn": "arn:aws:events:us-east-1:644160558196:rule/custodian-ec2-foo-bar",
+        "ResponseMetadata": {}
+    }
+}

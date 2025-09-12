@@ -1,0 +1,45 @@
+interactions:
+- request:
+    body: '{"InstanceIds": "hello"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '24'
+      Content-Type:
+      - application/json
+      Host:
+      - cvm.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - StopInstances
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2017-03-12'
+    method: POST
+    uri: https://cvm.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: "{\"Response\":{\"Error\":{\"Code\":\"InvalidParameter\",\"Message\":\"\u53C2\u6570
+        `InstanceIds` \u53D6\u503C\u7C7B\u578B\u9519\u8BEF\u3002\"},\"RequestId\":\"35bdee09-dfd1-4c81-8116-00c048989867\"}}"
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '156'
+      Content-Type:
+      - application/json
+      Date:
+      - Fri, 09 Sep 2022 10:24:06 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+version: 1

@@ -1,0 +1,36 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json
+      Content-Type:
+      - application/json
+      User-Agent:
+      - Swagger-Codegen/10.0.1/python
+    method: GET
+    uri: https://ghost/api/v1/namespaces
+  response:
+    body:
+      string: '{"kind":"NamespaceList","apiVersion":"v1","metadata":{"resourceVersion":"855569"},"items":[{"metadata":{"name":"default","uid":"28b9c33c-a54e-4016-9db2-6ab8a72331ef","resourceVersion":"201","creationTimestamp":"2022-08-24T00:03:32Z","labels":{"kubernetes.io/metadata.name":"default"},"managedFields":[{"manager":"kube-apiserver","operation":"Update","apiVersion":"v1","time":"2022-08-24T00:03:32Z","fieldsType":"FieldsV1","fieldsV1":{"f:metadata":{"f:labels":{".":{},"f:kubernetes.io/metadata.name":{}}}}}]},"spec":{"finalizers":["kubernetes"]},"status":{"phase":"Active"}},{"metadata":{"name":"kube-node-lease","uid":"51c82bd1-62f5-4629-989e-f984a184fa38","resourceVersion":"25","creationTimestamp":"2022-08-24T00:03:29Z","labels":{"kubernetes.io/metadata.name":"kube-node-lease"},"managedFields":[{"manager":"kube-apiserver","operation":"Update","apiVersion":"v1","time":"2022-08-24T00:03:29Z","fieldsType":"FieldsV1","fieldsV1":{"f:metadata":{"f:labels":{".":{},"f:kubernetes.io/metadata.name":{}}}}}]},"spec":{"finalizers":["kubernetes"]},"status":{"phase":"Active"}},{"metadata":{"name":"kube-public","uid":"9c3a8e73-650c-4afd-8851-635b41cc39c3","resourceVersion":"9","creationTimestamp":"2022-08-24T00:03:29Z","labels":{"kubernetes.io/metadata.name":"kube-public"},"managedFields":[{"manager":"kube-apiserver","operation":"Update","apiVersion":"v1","time":"2022-08-24T00:03:29Z","fieldsType":"FieldsV1","fieldsV1":{"f:metadata":{"f:labels":{".":{},"f:kubernetes.io/metadata.name":{}}}}}]},"spec":{"finalizers":["kubernetes"]},"status":{"phase":"Active"}},{"metadata":{"name":"kube-system","uid":"e042a45b-bd39-44e9-ad41-4759fff69290","resourceVersion":"4","creationTimestamp":"2022-08-24T00:03:29Z","labels":{"kubernetes.io/metadata.name":"kube-system"},"managedFields":[{"manager":"kube-apiserver","operation":"Update","apiVersion":"v1","time":"2022-08-24T00:03:29Z","fieldsType":"FieldsV1","fieldsV1":{"f:metadata":{"f:labels":{".":{},"f:kubernetes.io/metadata.name":{}}}}}]},"spec":{"finalizers":["kubernetes"]},"status":{"phase":"Active"}},{"metadata":{"name":"local-path-storage","uid":"4fcec66d-77be-49bb-88d0-6ac29a0e2efd","resourceVersion":"312","creationTimestamp":"2022-08-24T00:03:41Z","labels":{"kubernetes.io/metadata.name":"local-path-storage"},"annotations":{"kubectl.kubernetes.io/last-applied-configuration":"{\"apiVersion\":\"v1\",\"kind\":\"Namespace\",\"metadata\":{\"annotations\":{},\"name\":\"local-path-storage\"}}\n"},"managedFields":[{"manager":"kubectl-client-side-apply","operation":"Update","apiVersion":"v1","time":"2022-08-24T00:03:41Z","fieldsType":"FieldsV1","fieldsV1":{"f:metadata":{"f:annotations":{".":{},"f:kubectl.kubernetes.io/last-applied-configuration":{}},"f:labels":{".":{},"f:kubernetes.io/metadata.name":{}}}}}]},"spec":{"finalizers":["kubernetes"]},"status":{"phase":"Active"}}]}
+
+        '
+    headers:
+      Audit-Id:
+      - 045a4c1d-55ef-41e9-be1c-ad6adcdf1935
+      Cache-Control:
+      - no-cache, private
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 11 Oct 2022 19:05:29 GMT
+      Transfer-Encoding:
+      - chunked
+      X-Kubernetes-Pf-Flowschema-Uid:
+      - d422d7eb-8530-4a9c-9ec5-6627b6278afb
+      X-Kubernetes-Pf-Prioritylevel-Uid:
+      - d9f6e8b6-319f-4d3c-9699-6cbd7976d79a
+    status:
+      code: 200
+      message: OK
+version: 1

@@ -38,6 +38,11 @@ class FunctionTest(BaseTest):
         archive.close()
         return mu.CloudFunction(config, archive)
 
+    def test_archive_files(self):
+        archive = mu.custodian_archive()
+        archive.close()
+        assert "c7n_gcp/filters/recommender.json" in archive.get_filenames()
+
     def test_deploy_function(self):
         factory = self.replay_flight_data('mu-deploy')
         manager = mu.CloudFunctionManager(factory, 'us-central1')
@@ -89,7 +94,7 @@ class FunctionTest(BaseTest):
             'name': 'instance', 'resource': 'gcp.instance'},
             session_factory=factory)
         exec_mode = policy.FunctionMode(p)
-        self.assertRaises(NotImplementedError, exec_mode.run)
+        self.assertRaises(NotImplementedError, exec_mode.run, {}, None)
         self.assertRaises(NotImplementedError, exec_mode.provision)
         self.assertEqual(None, exec_mode.validate())
 
@@ -99,6 +104,7 @@ class FunctionTest(BaseTest):
             'resource': 'gcp.instance',
             'mode': {
                 'type': 'gcp-periodic',
+                'service-account': 'foo',
                 'schedule': 'every 2 hours'}},
             output_dir='gs://somebucket/some-prefix',
             log_group='gcp',
@@ -117,8 +123,41 @@ class FunctionTest(BaseTest):
             {'name': 'instance-off',
              'resource': 'gcp.instance',
              'mode': {'type': 'gcp-periodic',
+                      'service-account': 'foo',
                       'schedule': 'every 2 hours',
                       'tz': 'zulugold'}})
+
+    def test_periodic_validate_service_account(self):
+        # no target type or http should require service-account
+        self.assertRaises(
+            PolicyValidationError,
+            self.load_policy,
+            {'name': 'instance-off',
+             'resource': 'gcp.instance',
+             'mode': {'type': 'gcp-periodic',
+                      'schedule': 'every 2 hours'}})
+
+        self.assertRaises(
+            PolicyValidationError,
+            self.load_policy,
+            {'name': 'instance-off',
+             'resource': 'gcp.instance',
+             'mode': {'type': 'gcp-periodic',
+                      'target-type': 'http',
+                      'schedule': 'every 2 hours'}})
+
+        # pubsub target type should not require service-account
+        self.load_policy(
+            {
+                'name': 'instance-off',
+                'resource': 'gcp.instance',
+                'mode': {
+                    'type': 'gcp-periodic',
+                    'target-type': 'pubsub',
+                    'schedule': 'every 2 hours'
+                }
+            }
+        )
 
     def test_periodic_update_schedule(self):
         factory = self.replay_flight_data('mu-perodic-update-schedule')
@@ -135,7 +174,10 @@ class FunctionTest(BaseTest):
         p = self.load_policy({
             'name': 'gcp-find-instances',
             'resource': 'gcp.instance',
-            'mode': {'type': 'gcp-periodic', 'schedule': 'every 2 hours'}},
+            'mode': {
+                'type': 'gcp-periodic',
+                'schedule': 'every 2 hours',
+                'service-account': 'foo'}},
             session_factory=factory)
         p.run()
 
@@ -152,7 +194,11 @@ class FunctionTest(BaseTest):
         p = self.load_policy({
             'name': 'instance-off',
             'resource': 'gcp.instance',
-            'mode': {'type': 'gcp-periodic', 'schedule': 'every 2 hours'}},
+            'mode': {
+                'type': 'gcp-periodic',
+                'environment': {'Env': 'Dev'},
+                'schedule': 'every 2 hours',
+                'service-account': 'foo'}},
             session_factory=factory)
 
         p.provision()
@@ -262,3 +308,80 @@ class FunctionTest(BaseTest):
             # function requirements building primarily.
             time.sleep(42)
         p.get_execution_mode().deprovision()
+
+    @functional
+    def test_scc_subscriber(self):
+
+        project_id = 'cloud-custodian'
+        org = 111111111111
+        factory = self.replay_flight_data('mu-scc-subscriber', project_id=project_id)
+        p = self.load_policy(
+            {'name': 'test-scc',
+             'resource': 'gcp.bucket',
+             'mode': {
+                 'type': 'gcp-scc',
+                 'org': org}},
+            session_factory=factory)
+
+        # Create all policy resources.
+        p.provision()
+
+        session = factory()
+        region = 'us-central1'
+        func_client = session.client('cloudfunctions', 'v1', 'projects.locations.functions')
+        pubsub_client = session.client('pubsub', 'v1', 'projects.topics')
+        notification_client = session.client('securitycenter', 'v1',
+            'organizations.notificationConfigs')
+
+        # Check on the resources for the scc subscription
+
+        pubsub_topic = 'projects/{}/topics/custodian-auto-scc-bucket'.format(
+            project_id)
+        # check function exists
+        func_info = func_client.execute_command(
+            'get', {'name': 'projects/{}/locations/{}/functions/test-scc'.format(
+                project_id, region)})
+        self.assertEqual(
+            func_info['eventTrigger']['eventType'],
+            'providers/cloud.pubsub/eventTypes/topic.publish')
+        self.assertEqual(
+            func_info['eventTrigger']['resource'],
+            pubsub_topic)
+
+        # check notification config exists
+        config_name = "organizations/{}/notificationConfigs/{}".format(org,
+         "custodian-auto-scc-bucket")
+
+        notification_config = notification_client.execute_command(
+            'get', {'name': config_name})
+        self.assertEqual(
+            notification_config['pubsubTopic'], pubsub_topic)
+
+        # check topic exists
+        topic_info = pubsub_client.execute_command(
+            'get', {'topic': pubsub_topic})
+        self.assertEqual(
+            topic_info['name'], pubsub_topic)
+
+        if self.recording:
+            # we sleep to allow time for in progress operations on creation to complete
+            # function requirements building primarily.
+            time.sleep(42)
+        p.get_execution_mode().deprovision()
+
+    def test_scc_subscriber_run(self):
+        project_id = "cloud-custodian"
+        factory = self.replay_flight_data('mu-scc-subscriber-run', project_id=project_id)
+        p = self.load_policy({
+            'name': 'test-scc-run',
+            'resource': 'gcp.subnet',
+            'mode': {
+                'type': 'gcp-scc',
+                'org': 111111111111}},
+            session_factory=factory)
+        exec_mode = p.get_execution_mode()
+        self.assertTrue(isinstance(exec_mode, policy.SecurityCenterMode))
+        event = event_data('network-finding.json')
+        resources = exec_mode.run(event, None)
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['id'], "a22222222222222222")

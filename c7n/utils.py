@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import copy
+from collections import UserString
 from datetime import datetime, timedelta
 from dateutil.tz import tzutc
 import json
@@ -14,10 +15,13 @@ import sys
 import threading
 import time
 from urllib import parse as urlparse
-from urllib.request import getproxies
-
+from urllib.request import getproxies, proxy_bypass
 
 from dateutil.parser import ParserError, parse
+
+import jmespath
+from jmespath import functions
+from jmespath.parser import Parser, ParsedResult
 
 from c7n import config
 from c7n.exceptions import ClientError, PolicyValidationError
@@ -91,9 +95,9 @@ def loads(body):
 
 def dumps(data, fh=None, indent=0):
     if fh:
-        return json.dump(data, fh, cls=DateTimeEncoder, indent=indent)
+        return json.dump(data, fh, cls=JsonEncoder, indent=indent)
     else:
-        return json.dumps(data, cls=DateTimeEncoder, indent=indent)
+        return json.dumps(data, cls=JsonEncoder, indent=indent)
 
 
 def format_event(evt):
@@ -208,11 +212,15 @@ def type_schema(
     return s
 
 
-class DateTimeEncoder(json.JSONEncoder):
+class JsonEncoder(json.JSONEncoder):
 
     def default(self, obj):
         if isinstance(obj, datetime):
             return obj.isoformat()
+        if isinstance(obj, FormatDate):
+            return obj.datetime.isoformat()
+        if isinstance(obj, bytes):
+            return obj.decode('utf8', errors="ignore")
         return json.JSONEncoder.default(self, obj)
 
 
@@ -312,9 +320,11 @@ def query_instances(session, client=None, **query):
 CONN_CACHE = threading.local()
 
 
-def local_session(factory):
+def local_session(factory, region=None):
     """Cache a session thread local for up to 45m"""
     factory_region = getattr(factory, 'region', 'global')
+    if region:
+        factory_region = region
     s = getattr(CONN_CACHE, factory_region, {}).get('session')
     t = getattr(CONN_CACHE, factory_region, {}).get('time')
 
@@ -330,6 +340,9 @@ def local_session(factory):
 def reset_session_cache():
     for k in [k for k in dir(CONN_CACHE) if not k.startswith('_')]:
         setattr(CONN_CACHE, k, {})
+
+    from .credentials import CustodianSession
+    CustodianSession.close()
 
 
 def annotation(i, k):
@@ -464,7 +477,7 @@ def backoff_delays(start, stop, factor=2.0, jitter=False):
     cur = start
     while cur <= stop:
         if jitter:
-            yield cur - (cur * random.random())
+            yield cur - (cur * random.random() / 5)
         else:
             yield cur
         cur = cur * factor
@@ -472,6 +485,8 @@ def backoff_delays(start, stop, factor=2.0, jitter=False):
 
 def parse_cidr(value):
     """Process cidr ranges."""
+    if isinstance(value, list) or isinstance(value, set):
+        return IPv4List([parse_cidr(item) for item in value])
     klass = IPv4Network
     if '/' not in value:
         klass = ipaddress.ip_address
@@ -510,6 +525,20 @@ class IPv4Network(ipaddress.IPv4Network):
             return self._is_subnet_of(other, self)
 
 
+class IPv4List:
+    def __init__(self, ipv4_list):
+        self.ipv4_list = ipv4_list
+
+    def __contains__(self, other):
+        if other is None:
+            return False
+        in_networks = any([other in y_elem for y_elem in self.ipv4_list
+          if isinstance(y_elem, IPv4Network)])
+        in_addresses = any([other == y_elem for y_elem in self.ipv4_list
+          if isinstance(y_elem, ipaddress.IPv4Address)])
+        return any([in_networks, in_addresses])
+
+
 def reformat_schema(model):
     """ Reformat schema to be in a more displayable format. """
     if not hasattr(model, 'schema'):
@@ -521,7 +550,7 @@ def reformat_schema(model):
     ret = copy.deepcopy(model.schema['properties'])
 
     if 'type' in ret:
-        del(ret['type'])
+        del ret['type']
 
     for key in model.schema.get('required', []):
         if key in ret:
@@ -562,7 +591,7 @@ def set_value_from_jmespath(source, expression, value, is_first=True):
     source[current_key] = value
 
 
-def format_string_values(obj, err_fallback=(IndexError, KeyError), *args, **kwargs):
+def format_string_values(obj, err_fallback=(IndexError, KeyError), formatter=None, *args, **kwargs):
     """
     Format all string values in an object.
     Return the updated object
@@ -570,16 +599,19 @@ def format_string_values(obj, err_fallback=(IndexError, KeyError), *args, **kwar
     if isinstance(obj, dict):
         new = {}
         for key in obj.keys():
-            new[key] = format_string_values(obj[key], *args, **kwargs)
+            new[key] = format_string_values(obj[key], formatter=formatter, *args, **kwargs)
         return new
     elif isinstance(obj, list):
         new = []
         for item in obj:
-            new.append(format_string_values(item, *args, **kwargs))
+            new.append(format_string_values(item, formatter=formatter, *args, **kwargs))
         return new
     elif isinstance(obj, str):
         try:
-            return obj.format(*args, **kwargs)
+            if formatter:
+                return formatter(obj, *args, **kwargs)
+            else:
+                return obj.format(*args, **kwargs)
         except err_fallback:
             return obj
     else:
@@ -599,22 +631,72 @@ def parse_url_config(url):
     return conf
 
 
+def join_output_path(output_path, *parts):
+    # allow users to specify interpolated output paths
+    if '{' in output_path:
+        return output_path
+
+    if "://" not in output_path:
+        return os.path.join(output_path, *parts)
+
+    # handle urls with query strings
+    parsed = urlparse.urlparse(output_path)
+    updated_path = "/".join((parsed.path, *parts))
+    parts = list(parsed)
+    parts[2] = updated_path
+    return urlparse.urlunparse(parts)
+
+
+def get_policy_provider(policy_data):
+    if isinstance(policy_data['resource'], list):
+        provider_name, _ = policy_data['resource'][0].split('.', 1)
+    elif '.' in policy_data['resource']:
+        provider_name, _ = policy_data['resource'].split('.', 1)
+    else:
+        provider_name = 'aws'
+    return provider_name
+
+
 def get_proxy_url(url):
     proxies = getproxies()
-    url_parts = parse_url_config(url)
+    parsed = urlparse.urlparse(url)
 
     proxy_keys = [
-        url_parts['scheme'] + '://' + url_parts['netloc'],
-        url_parts['scheme'],
-        'all://' + url_parts['netloc'],
+        parsed.scheme + '://' + parsed.netloc,
+        parsed.scheme,
+        'all://' + parsed.netloc,
         'all'
     ]
+
+    # Set port if not defined explicitly in url.
+    port = parsed.port
+    if port is None and parsed.scheme == 'http':
+        port = 80
+    elif port is None and parsed.scheme == 'https':
+        port = 443
+
+    hostname = parsed.hostname is not None and parsed.hostname or ''
+
+    # Determine if proxy should be used based on no_proxy entries.
+    # Note this does not support no_proxy ip or cidr entries.
+    if proxy_bypass("%s:%s" % (hostname, port)):
+        return None
 
     for key in proxy_keys:
         if key in proxies:
             return proxies[key]
 
     return None
+
+
+class DeferredFormatString(UserString):
+    """A string that returns itself when formatted
+
+    Let any format spec pass through. This lets us selectively defer
+    expansion of runtime variables without losing format spec details.
+    """
+    def __format__(self, format_spec):
+        return "".join(("{", self.data, f":{format_spec}" if format_spec else "", "}"))
 
 
 class FormatDate:
@@ -624,6 +706,9 @@ class FormatDate:
 
     def __init__(self, d=None):
         self._d = d
+
+    def __str__(self):
+        return str(self._d)
 
     @property
     def datetime(self):
@@ -733,21 +818,96 @@ def merge_dict_list(dict_iter):
 
 
 def merge_dict(a, b):
-    """Perform a merge of dictionaries a and b
+    """Perform a merge of dictionaries A and B
 
     Any subdictionaries will be recursively merged.
-    Any leaf elements in the form of a list or scalar will use the value from a
+    Any leaf elements in the form of scalar will use the value from A.
+    If there is a scalar and list for the same key, the scalar will be appended to the list.
+    If there are two lists for the same key, the list from B will be treated like a set
+    and be appended to the list from A.
     """
-    d = {}
-    for k, v in a.items():
-        if k not in b:
-            d[k] = v
-        elif isinstance(v, dict) and isinstance(b[k], dict):
-            d[k] = merge_dict(v, b[k])
+    d = copy.deepcopy(a)
     for k, v in b.items():
         if k not in d:
             d[k] = v
+        elif isinstance(d[k], dict) and isinstance(v, dict):
+            d[k] = merge_dict(d[k], v)
+        elif isinstance(d[k], list) and isinstance(v, list):
+            for val in v:
+                if val not in d[k]:
+                    d[k].append(val)
+        elif isinstance(v, str) and isinstance(d[k], list) and v not in d[k]:
+            d[k].append(v)
+        elif isinstance(v, list) and isinstance(d[k], str) and d[k] in v:
+            d[k] = v
+        elif isinstance(v, list) and isinstance(d[k], str) and d[k] not in v:
+            v.insert(0, d[k])
+            d[k] = v
+        elif k in d and isinstance(v, (int, str, float, bool)):
+            continue
+        else:
+            raise Exception(f"k={k}, {type(v)} and {type(d[k])} not conformable.")
     return d
+
+
+def compare_dicts_using_sets(a, b) -> bool:
+    """Compares two dicts and replaces any lists or strings with sets
+
+    Compares any lists in the dict as sets.
+    """
+
+    if a.keys() != b.keys():
+        return False
+
+    for k, v in b.items():
+        if isinstance(v, list):
+            v = format_to_set(v)
+            if isinstance(a[k], str):
+                a[k] = format_to_set(a[k])
+        if isinstance(a[k], list):
+            a[k] = format_to_set(a[k])
+            if isinstance(v, str):
+                v = format_to_set(v)
+        if isinstance(a[k], dict) and isinstance(v, dict):
+            if compare_dicts_using_sets(a[k], v):
+                continue
+        if v != a[k]:
+            return False
+    return True
+
+
+def format_to_set(x) -> set:
+    """Formats lists and strings to sets.
+
+    Strings return as a set with one string.
+    Lists return as a set.
+    Variables of other datatypes will return as the original datatype.
+    """
+    if isinstance(x, str):
+        return set([x])
+    if isinstance(x, list):
+        return set(x)
+    else:
+        return x
+
+
+def format_dict_with_sets(x: dict) -> dict:
+    """Formats string and list values in a dict to sets.
+
+    Any string value returns as a set with one string.
+    Any list values return as a set.
+    Returns a formatted dict.
+    """
+    if isinstance(x, dict):
+        format_dict = {}
+        for key, value in x.items():
+            if isinstance(value, dict):
+                format_dict[key] = format_dict_with_sets(value)
+            else:
+                format_dict[key] = format_to_set(value)
+        return format_dict
+    else:
+        return x
 
 
 def select_keys(d, keys):
@@ -767,3 +927,161 @@ def get_human_size(size, precision=2):
         size = size / 1024.0
 
     return "%.*f %s" % (precision, size, suffixes[suffixIndex])
+
+
+def get_support_region(manager):
+    # support is a unique service in that it doesnt support regional endpoints
+    # thus, we need to construct the client based off the regions found here:
+    # https://docs.aws.amazon.com/general/latest/gr/awssupport.html
+    #
+    # aws-cn uses cn-north-1 for both the Beijing and Ningxia regions
+    # https://docs.amazonaws.cn/en_us/aws/latest/userguide/endpoints-Beijing.html
+    # https://docs.amazonaws.cn/en_us/aws/latest/userguide/endpoints-Ningxia.html
+
+    partition = get_partition(manager.config.region)
+    support_region = None
+    if partition == "aws":
+        support_region = "us-east-1"
+    elif partition == "aws-us-gov":
+        support_region = "us-gov-west-1"
+    elif partition == "aws-cn":
+        support_region = "cn-north-1"
+    return support_region
+
+
+def get_resource_tagging_region(resource_type, region):
+    # For global resources, tags don't populate in the get_resources call
+    # unless the call is being made to us-east-1. For govcloud this is us-gov-west-1.
+
+    partition = get_partition(region)
+    if partition == "aws":
+        return getattr(resource_type, 'global_resource', None) and 'us-east-1' or region
+    elif partition == "aws-us-gov":
+        return getattr(resource_type, 'global_resource', None) and 'us-gov-west-1' or region
+    return region
+
+
+def get_eni_resource_type(eni):
+    if eni.get('Attachment'):
+        instance_id = eni['Attachment'].get('InstanceId')
+    else:
+        instance_id = None
+    description = eni.get('Description')
+    # EC2
+    if instance_id:
+        rtype = 'ec2'
+    # ELB/ELBv2
+    elif description.startswith('ELB app/'):
+        rtype = 'elb-app'
+    elif description.startswith('ELB net/'):
+        rtype = 'elb-net'
+    elif description.startswith('ELB gwy/'):
+        rtype = 'elb-gwy'
+    elif description.startswith('ELB'):
+        rtype = 'elb'
+    # Other Resources
+    elif description == 'ENI managed by APIGateway':
+        rtype = 'apigw'
+    elif description.startswith('AWS CodeStar Connections'):
+        rtype = 'codestar'
+    elif description.startswith('DAX'):
+        rtype = 'dax'
+    elif description.startswith('AWS created network interface for directory'):
+        rtype = 'dir'
+    elif description == 'DMSNetworkInterface':
+        rtype = 'dms'
+    elif description.startswith('arn:aws:ecs:'):
+        rtype = 'ecs'
+    elif description.startswith('EFS mount target for'):
+        rtype = 'fsmt'
+    elif description.startswith('ElastiCache'):
+        rtype = 'elasticache'
+    elif description.startswith('AWS ElasticMapReduce'):
+        rtype = 'emr'
+    elif description.startswith('CloudHSM Managed Interface'):
+        rtype = 'hsm'
+    elif description.startswith('CloudHsm ENI'):
+        rtype = 'hsmv2'
+    elif description.startswith('AWS Lambda VPC ENI'):
+        rtype = 'lambda'
+    elif description.startswith('AWS Lambda VPC'):
+        rtype = 'lambda'
+    elif description.startswith('Interface for NAT Gateway'):
+        rtype = 'nat'
+    elif (description == 'RDSNetworkInterface' or
+            description.startswith('Network interface for DBProxy')):
+        rtype = 'rds'
+    elif description == 'RedshiftNetworkInterface':
+        rtype = 'redshift'
+    elif description.startswith('Network Interface for Transit Gateway Attachment'):
+        rtype = 'tgw'
+    elif description.startswith('VPC Endpoint Interface'):
+        rtype = 'vpce'
+    elif description.startswith('aws-k8s-branch-eni'):
+        rtype = 'eks'
+    else:
+        rtype = 'unknown'
+    return rtype
+
+
+class C7NJmespathFunctions(functions.Functions):
+    @functions.signature(
+        {'types': ['string']}, {'types': ['string']}
+    )
+    def _func_split(self, sep, string):
+        return string.split(sep)
+
+    @functions.signature(
+        {'types': ['string']}
+    )
+    def _func_from_json(self, string):
+        try:
+            return json.loads(string)
+        except json.JSONDecodeError:
+            return None
+
+
+class C7NJMESPathParser(Parser):
+    def parse(self, expression):
+        result = super().parse(expression)
+        return ParsedResultWithOptions(
+            expression=result.expression,
+            parsed=result.parsed
+        )
+
+
+class ParsedResultWithOptions(ParsedResult):
+    def search(self, value, options=None):
+        # if options are explicitly passed in, we honor those
+        if not options:
+            options = jmespath.Options(custom_functions=C7NJmespathFunctions())
+        return super().search(value, options)
+
+
+def jmespath_search(*args, **kwargs):
+    return jmespath.search(
+        *args,
+        **kwargs,
+        options=jmespath.Options(custom_functions=C7NJmespathFunctions())
+    )
+
+
+def get_path(path: str, resource: dict):
+    """
+    This function provides a wrapper to obtain a value from a resource
+    in an efficient manner.
+    jmespath_search is expensive and it's rarely the case that
+    there is a path in the id field, therefore this wrapper is an optimisation.
+
+    :param path: the path or field name to fetch
+    :param resource: the resource instance description
+    :return: the field/path value
+    """
+    if '.' in path:
+        return jmespath_search(path, resource)
+    return resource[path]
+
+
+def jmespath_compile(expression):
+    parsed = C7NJMESPathParser().parse(expression)
+    return parsed

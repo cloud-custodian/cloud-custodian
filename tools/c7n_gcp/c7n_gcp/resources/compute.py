@@ -5,12 +5,15 @@ import re
 
 from datetime import datetime
 
-from c7n.utils import type_schema
+from c7n.utils import local_session, type_schema
 
 from c7n_gcp.actions import MethodAction
+from c7n_gcp.filters import IamPolicyFilter
+from c7n_gcp.filters.iampolicy import IamPolicyValueFilter
 from c7n_gcp.provider import resources
-from c7n_gcp.query import QueryResourceManager, TypeInfo
+from c7n_gcp.query import QueryResourceManager, TypeInfo, ChildResourceManager, ChildTypeInfo
 
+from c7n.filters.core import ValueFilter
 from c7n.filters.offhours import OffHour, OnHour
 
 
@@ -27,7 +30,10 @@ class Instance(QueryResourceManager):
         labels = True
         default_report_fields = ['name', 'status', 'creationTimestamp', 'machineType', 'zone']
         asset_type = "compute.googleapis.com/Instance"
+        scc_type = "google.compute.Instance"
         metric_key = 'metric.labels.instance_name'
+        urn_component = "instance"
+        urn_zonal = True
 
         @staticmethod
         def get(client, resource_info):
@@ -41,8 +47,8 @@ class Instance(QueryResourceManager):
 
         @staticmethod
         def get_label_params(resource, all_labels):
-            path_param_re = re.compile('.*?/projects/(.*?)/zones/(.*?)/instances/(.*)')
-            project, zone, instance = path_param_re.match(
+            project, zone, instance = re.match(
+                '.*?/projects/(.*?)/zones/(.*?)/instances/(.*)',
                 resource['selfLink']).groups()
             return {'project': project, 'zone': zone, 'instance': instance,
                     'body': {
@@ -50,19 +56,74 @@ class Instance(QueryResourceManager):
                         'labelFingerprint': resource['labelFingerprint']
                     }}
 
+        @classmethod
+        def refresh(cls, client, resource):
+            project, zone, name = re.match(
+                '.*?/projects/(.*?)/zones/(.*?)/instances/(.*)',
+                resource['selfLink']).groups()
+            return cls.get(
+                client,
+                {
+                    'project_id': project,
+                    'zone': zone,
+                    'resourceName': name
+                }
+            )
 
-@Instance.filter_registry.register('offhour')
-class InstanceOffHour(OffHour):
 
-    def get_tag_value(self, instance):
-        return instance.get('labels', {}).get(self.tag_key, False)
+Instance.filter_registry.register('offhour', OffHour)
+Instance.filter_registry.register('onhour', OnHour)
 
 
-@Instance.filter_registry.register('onhour')
-class InstanceOnHour(OnHour):
+@Instance.filter_registry.register('effective-firewall')
+class EffectiveFirewall(ValueFilter):
+    """Filters instances by their effective firewall rules.
+    See `getEffectiveFirewalls
+    <https://cloud.google.com/compute/docs/reference/rest/v1/instances/getEffectiveFirewalls>`_
+    for valid fields.
 
-    def get_tag_value(self, instance):
-        return instance.get('labels', {}).get(self.tag_key, False)
+    :example:
+
+    Filter all instances that have a firewall rule that allows public
+    acess
+
+    .. code-block:: yaml
+
+        policies:
+           - name: find-publicly-accessable-instances
+             resource: gcp.instance
+             filters:
+             - type: effective-firewall
+               key: firewalls[*].sourceRanges[]
+               op: contains
+               value: "0.0.0.0/0"
+    """
+
+    schema = type_schema('effective-firewall', rinherit=ValueFilter.schema)
+    permissions = ('compute.instances.getEffectiveFirewalls',)
+
+    def get_resource_params(self, resource):
+        path_param_re = re.compile('.*?/projects/(.*?)/zones/(.*?)/instances/.*')
+        project, zone = path_param_re.match(resource['selfLink']).groups()
+        return {'project': project, 'zone': zone, 'instance': resource["name"]}
+
+    def process_resource(self, client, resource):
+        params = self.get_resource_params(resource)
+        effective_firewalls = []
+        for interface in resource["networkInterfaces"]:
+            effective_firewalls.append(client.execute_command(
+                'getEffectiveFirewalls', {"networkInterface": interface["name"], **params}))
+        return super(EffectiveFirewall, self).process(effective_firewalls, None)
+
+    def get_client(self, session, model):
+        return session.client(
+            model.service, model.version, model.component)
+
+    def process(self, resources, event=None):
+        model = self.manager.get_model()
+        session = local_session(self.manager.session_factory)
+        client = self.get_client(session, model)
+        return [r for r in resources if self.process_resource(client, r)]
 
 
 class InstanceAction(MethodAction):
@@ -83,10 +144,49 @@ class Start(InstanceAction):
 
 @Instance.action_registry.register('stop')
 class Stop(InstanceAction):
+    """Caution: `stop` in GCP is closer to terminate in terms of effect.
 
-    schema = type_schema('stop')
+    The `discard_local_ssd` specifies if local SSD should be discarded
+    or not while stopping the instance. The default behavior from
+    Google Cloud console is to keep the local SSD.  Default
+    `discard_local_ssd` is False.
+    https://cloud.google.com/compute/docs/instances/stop-start-instance#stop-vm-local-ssd
+
+    `suspend` is closer to stop in other providers.
+
+    See https://cloud.google.com/compute/docs/instances/instance-life-cycle
+
+    """
+
+    schema = type_schema('stop', discard_local_ssd={'type': 'boolean'})
     method_spec = {'op': 'stop'}
     attr_filter = ('status', ('RUNNING',))
+
+    def get_resource_params(self, model, resource):
+        params = super().get_resource_params(model, resource)
+
+        # support stopping instance with local SSD, it requires to pass an additional param to
+        # the stop request to discard local SSD (true/false)
+        discard_local_ssd = self.data.get('discard_local_ssd', False)
+        params['discardLocalSsd'] = discard_local_ssd
+
+        return params
+
+
+@Instance.action_registry.register('suspend')
+class Suspend(InstanceAction):
+
+    schema = type_schema('suspend')
+    method_spec = {'op': 'suspend'}
+    attr_filter = ('status', ('RUNNING',))
+
+
+@Instance.action_registry.register('resume')
+class Resume(InstanceAction):
+
+    schema = type_schema('resume')
+    method_spec = {'op': 'resume'}
+    attr_filter = ('status', ('SUSPENDED',))
 
 
 @Instance.action_registry.register('delete')
@@ -200,14 +300,60 @@ class Image(QueryResourceManager):
         name = id = 'name'
         default_report_fields = [
             "name", "description", "sourceType", "status", "creationTimestamp",
-            "storageLocation", "diskSizeGb", "family"]
+            "diskSizeGb", "family"]
         asset_type = "compute.googleapis.com/Image"
+        urn_component = "image"
+        labels = True
 
         @staticmethod
         def get(client, resource_info):
             return client.execute_command(
                 'get', {'project': resource_info['project_id'],
-                        'resourceId': resource_info['image_id']})
+                        'image': resource_info['image_id']})
+
+        @staticmethod
+        def get_label_params(resource, all_labels):
+            project, resource_id = re.match(
+                '.*?/projects/(.*?)/global/images/(.*)',
+                resource['selfLink']).groups()
+            return {'project': project, 'resource': resource_id,
+                    'body': {
+                        'labels': all_labels,
+                        'labelFingerprint': resource['labelFingerprint']
+                    }}
+
+        @classmethod
+        def refresh(cls, client, resource):
+            project, resource_id = re.match(
+                '.*?/projects/(.*?)/global/images/(.*)',
+                resource['selfLink']).groups()
+            return cls.get(
+                client,
+                {
+                    'project_id': project,
+                    'image_id': resource_id
+                }
+            )
+
+
+@Image.filter_registry.register('iam-policy')
+class ImageIamPolicyFilter(IamPolicyFilter):
+    """
+    Overrides the base implementation to process images resources correctly.
+    """
+    permissions = ('compute.images.getIamPolicy',)
+
+    def _verb_arguments(self, resource):
+        project, _ = re.match(
+            '.*?/projects/(.*?)/global/images/(.*)',
+            resource['selfLink']).groups()
+        verb_arguments = {'resource': resource[self.manager.resource_type.id], 'project': project}
+        return verb_arguments
+
+    def process_resources(self, resources):
+        value_filter = IamPolicyValueFilter(self.data['doc'], self.manager)
+        value_filter._verb_arguments = self._verb_arguments
+        return value_filter.process(resources)
 
 
 @Image.action_registry.register('delete')
@@ -236,13 +382,15 @@ class Disk(QueryResourceManager):
         labels = True
         default_report_fields = ["name", "sizeGb", "status", "zone"]
         asset_type = "compute.googleapis.com/Disk"
+        urn_component = "disk"
+        urn_zonal = True
 
         @staticmethod
         def get(client, resource_info):
             return client.execute_command(
                 'get', {'project': resource_info['project_id'],
                         'zone': resource_info['zone'],
-                        'resourceId': resource_info['disk_id']})
+                        'disk': resource_info['disk_id']})
 
         @staticmethod
         def get_label_params(resource, all_labels):
@@ -336,12 +484,13 @@ class Snapshot(QueryResourceManager):
         name = id = 'name'
         default_report_fields = ["name", "status", "diskSizeGb", "creationTimestamp"]
         asset_type = "compute.googleapis.com/Snapshot"
+        urn_component = "snapshot"
 
         @staticmethod
         def get(client, resource_info):
             return client.execute_command(
                 'get', {'project': resource_info['project_id'],
-                        'snapshot_id': resource_info['snapshot_id']})
+                        'snapshot': resource_info['snapshot_id']})
 
 
 @Snapshot.action_registry.register('delete')
@@ -373,6 +522,7 @@ class InstanceTemplate(QueryResourceManager):
             name, "description", "creationTimestamp",
             "properties.machineType", "properties.description"]
         asset_type = "compute.googleapis.com/InstanceTemplate"
+        urn_component = "instance-template"
 
         @staticmethod
         def get(client, resource_info):
@@ -424,6 +574,8 @@ class Autoscaler(QueryResourceManager):
             "name", "description", "status", "target", "recommendedSize"]
         asset_type = "compute.googleapis.com/Autoscaler"
         metric_key = "resource.labels.autoscaler_name"
+        urn_component = "autoscaler"
+        urn_zonal = True
 
         @staticmethod
         def get(client, resource_info):
@@ -547,3 +699,54 @@ class AutoscalerSet(MethodAction):
                   }}
 
         return result
+
+
+@resources.register('zone')
+class Zone(QueryResourceManager):
+    """GC resource: https://cloud.google.com/compute/docs/reference/rest/v1/zones"""
+    class resource_type(TypeInfo):
+        service = 'compute'
+        version = 'v1'
+        component = 'zones'
+        enum_spec = ('list', 'items[]', None)
+        scope = 'project'
+        name = id = 'name'
+        default_report_fields = ['id', 'name', 'dnsName', 'creationTime', 'visibility']
+        asset_type = "compute.googleapis.com/compute"
+        scc_type = "google.cloud.dns.ManagedZone"
+
+
+@resources.register('compute-project')
+class Project(QueryResourceManager):
+    """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/projects"""
+    class resource_type(TypeInfo):
+        service = 'compute'
+        version = 'v1'
+        component = 'projects'
+        enum_spec = ('get', '[@]', None)
+        name = id = 'name'
+        default_report_fields = ["name"]
+        asset_type = 'compute.googleapis.com/Project'
+
+        @staticmethod
+        def get(client, resource_info):
+            return client.execute_command(
+                'get', {'project': resource_info['project_id']})
+
+
+@resources.register('instance-group-manager')
+class InstanceGroupManager(ChildResourceManager):
+
+    class resource_type(ChildTypeInfo):
+        service = 'compute'
+        version = 'v1'
+        component = 'instanceGroupManagers'
+        enum_spec = ('list', 'items[]', None)
+        name = id = 'name'
+        parent_spec = {
+            'resource': 'zone',
+            'child_enum_params': {
+                ('name', 'zone')},
+            'use_child_query': False,
+        }
+        default_report_fields = ['id', 'name', 'dnsName', 'creationTime', 'visibility']

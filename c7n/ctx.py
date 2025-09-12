@@ -11,7 +11,8 @@ from c7n.output import (
     log_outputs,
     metrics_outputs,
     sys_stats_outputs,
-    tracer_outputs)
+    tracer_outputs,
+)
 
 from c7n.utils import reset_session_cache, dumps, local_session
 from c7n.version import version
@@ -91,8 +92,7 @@ class ExecutionContext:
     def __exit__(self, exc_type=None, exc_value=None, exc_traceback=None):
         if exc_type is not None and self.metrics:
             self.metrics.put_metric('PolicyException', 1, "Count")
-        self.policy._write_file(
-            'metadata.json', dumps(self.get_metadata(), indent=2))
+        self.output.write_file('metadata.json', dumps(self.get_metadata(), indent=2))
         self.api_stats.__exit__(exc_type, exc_value, exc_traceback)
 
         with self.tracer.subsegment('output'):
@@ -121,8 +121,9 @@ class ExecutionContext:
                 'id': self.execution_id,
                 'start': self.start_time,
                 'end_time': t,
-                'duration': t - self.start_time},
-            'config': dict(self.options)
+                'duration': t - self.start_time,
+            },
+            'config': dict(self.options),
         }
 
         if 'sys-stats' in include and self.sys_stats:

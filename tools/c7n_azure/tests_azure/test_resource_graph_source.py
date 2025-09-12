@@ -57,7 +57,9 @@ class ResourceGraphSource(BaseTest):
 
         resources_resource_graph = json.loads(json.dumps(p2.run()[0]))
 
-        self.assertTrue(resource_cmp(resources_arm, resources_resource_graph))
+        self.assertTrue(resource_cmp(resources_arm,
+                                     resources_resource_graph,
+                                     ignore_properties=['keyCreationTime']))
 
     @arm_template('vm.json')
     def test_resource_graph_and_arm_sources_vm_are_equivalent(self):
@@ -102,13 +104,14 @@ def resource_cmp(res1, res2, ignore_properties=[]):
     :param res2: dictionary that represents the Resource Graph resource
     :return: True if every property for ARM is returned in the Resource Graph, else False
     """
-    if type(res1) != type(res2):
+    if not isinstance(res1, type(res2)):
         return False
 
     if isinstance(res1, dict):
         for prop in res1:
             if prop not in ignore_properties and \
-                    (prop not in res2 or not resource_cmp(res1[prop], res2[prop])):
+                    (prop not in res2 or not resource_cmp(
+                        res1[prop], res2[prop], ignore_properties)):
                 return False
 
     elif isinstance(res1, list):
@@ -116,7 +119,7 @@ def resource_cmp(res1, res2, ignore_properties=[]):
             return False
 
         for item1, item2 in zip(res1, res2):
-            if not resource_cmp(item1, item2):
+            if not resource_cmp(item1, item2, ignore_properties):
                 return False
 
     elif isinstance(res1, str):

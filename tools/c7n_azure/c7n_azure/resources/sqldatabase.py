@@ -29,7 +29,7 @@ from c7n_azure.filters import scalar_ops
 from c7n_azure.provider import resources
 from c7n_azure.query import ChildTypeInfo
 from c7n_azure.resources.arm import ChildArmResourceManager
-from c7n_azure.utils import ResourceIdParser, RetentionPeriod, ThreadHelper
+from c7n_azure.utils import ResourceIdParser, RetentionPeriod, ThreadHelper, StringUtils
 
 log = logging.getLogger('custodian.azure.sqldatabase')
 
@@ -38,7 +38,7 @@ log = logging.getLogger('custodian.azure.sqldatabase')
 class SqlDatabase(ChildArmResourceManager):
     """SQL Server Database Resource
 
-    The ``azure.sqldatabase`` resource is a child resource of the SQL Server resource,
+    The ``azure.sql-database`` resource is a child resource of the SQL Server resource,
     and the SQL Server parent id is available as the ``c7n:parent-id`` property.
 
     :example:
@@ -49,7 +49,7 @@ class SqlDatabase(ChildArmResourceManager):
 
         policies:
             - name: find-all-sql-databases
-              resource: azure.sqldatabase
+              resource: azure.sql-database
 
     """
     class resource_type(ChildArmResourceManager.resource_type):
@@ -72,6 +72,162 @@ class SqlDatabase(ChildArmResourceManager):
         def extra_args(cls, parent_resource):
             return {'resource_group_name': parent_resource['resourceGroup'],
                     'server_name': parent_resource['name']}
+
+
+@SqlDatabase.filter_registry.register('transparent-data-encryption')
+class TransparentDataEncryptionFilter(Filter):
+    """
+    Filter by the current Transparent Data Encryption
+    configuration for this database.
+
+    :example:
+
+    Find SQL databases with TDE disabled
+
+    .. code-block:: yaml
+
+        policies:
+          - name: sql-database-no-tde
+            resource: azure.sql-database
+            filters:
+              - type: transparent-data-encryption
+                enabled: false
+
+    """
+
+    schema = type_schema(
+        'transparent-data-encryption',
+        required=['type', 'enabled'],
+        **{
+            'enabled': {"type": "boolean"},
+        }
+    )
+
+    log = logging.getLogger('custodian.azure.sqldatabase.transparent-data-encryption-filter')
+
+    def __init__(self, data, manager=None):
+        super(TransparentDataEncryptionFilter, self).__init__(data, manager)
+        self.enabled = self.data['enabled']
+
+    def process(self, resources, event=None):
+        resources, exceptions = ThreadHelper.execute_in_parallel(
+            resources=resources,
+            event=event,
+            execution_method=self._process_resource_set,
+            executor_factory=self.executor_factory,
+            log=log
+        )
+        if exceptions:
+            raise exceptions[0]
+        return resources
+
+    def _process_resource_set(self, resources, event=None):
+        client = self.manager.get_client()
+        result = []
+        for resource in resources:
+            if 'transparentDataEncryption' not in resource['properties']:
+                server_id = resource[ChildTypeInfo.parent_key]
+                server_name = ResourceIdParser.get_resource_name(server_id)
+
+                tde = client.transparent_data_encryptions.get(
+                    resource['resourceGroup'],
+                    server_name,
+                    resource['name'],
+                    "current")
+
+                resource['properties']['transparentDataEncryption'] = \
+                    tde.serialize(True).get('properties', {})
+
+            required_status = 'Enabled' if self.enabled else 'Disabled'
+
+            if StringUtils.equal(
+                    resource['properties']['transparentDataEncryption'].get('status'),
+                    required_status):
+                result.append(resource)
+
+        return result
+
+
+@SqlDatabase.filter_registry.register('data-masking-policy')
+class DataMaskingPolicyFilter(Filter):
+    """
+    Filter by the current data masking policy
+    configuration for this database.
+
+    This filter will exclude the `master` database
+    because data masking can not be configured on it.
+
+    :example:
+
+    Find SQL databases with data masking disabled
+
+    .. code-block:: yaml
+
+        policies:
+          - name: sql-database-masking
+            resource: azure.sql-database
+            filters:
+              - type: data-masking-policy
+                enabled: false
+
+    """
+
+    schema = type_schema(
+        'data-masking-policy',
+        required=['type', 'enabled'],
+        **{
+            'enabled': {"type": "boolean"},
+        }
+    )
+
+    log = logging.getLogger('custodian.azure.sqldatabase.data-masking-policy-filter')
+
+    def __init__(self, data, manager=None):
+        super(DataMaskingPolicyFilter, self).__init__(data, manager)
+        self.enabled = self.data['enabled']
+
+    def process(self, resources, event=None):
+        resources, exceptions = ThreadHelper.execute_in_parallel(
+            resources=resources,
+            event=event,
+            execution_method=self._process_resource_set,
+            executor_factory=self.executor_factory,
+            log=log
+        )
+        if exceptions:
+            raise exceptions[0]
+        return resources
+
+    def _process_resource_set(self, resources, event=None):
+        client = self.manager.get_client()
+        result = []
+        for resource in resources:
+            database_name = resource['name']
+            if StringUtils.equal(database_name, "master"):
+                continue
+
+            if 'c7n:data-masking-policy' not in resource:
+                server_id = resource[ChildTypeInfo.parent_key]
+                server_name = ResourceIdParser.get_resource_name(server_id)
+
+                dmr = client.data_masking_policies.get(
+                    resource['resourceGroup'],
+                    server_name,
+                    database_name)
+
+                if dmr:
+                    resource['c7n:data-masking-policy'] = dmr.serialize(True).get('properties', {})
+                else:
+                    resource['c7n:data-masking-policy'] = {}
+
+            required_status = 'Enabled' if self.enabled else 'Disabled'
+
+            if StringUtils.equal(
+                    resource['c7n:data-masking-policy'].get('dataMaskingState'),
+                    required_status):
+                result.append(resource)
+
+        return result
 
 
 class BackupRetentionPolicyHelper:
@@ -538,3 +694,9 @@ class Resize(AzureBaseAction):
             database['name'],
             DatabaseUpdate(sku=sku, max_size_bytes=max_size_bytes)
         )
+
+
+@SqlDatabase.filter_registry.register('data-encryption')
+class SqlDatabaseDataEncryptionFilter(TransparentDataEncryptionFilter):
+
+    schema = type_schema('data-encryption', rinherit=TransparentDataEncryptionFilter.schema)

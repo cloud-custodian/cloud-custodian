@@ -1,0 +1,37 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 17 Jun 2021 22:51:34 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "179",
+    "-content-encoding": "gzip",
+    "content-location": "https://cloudkms.googleapis.com/v1/projects/custodian/locations/global/keyRings/cloud-custodian-test/cryptoKeys/test2:getIamPolicy?alt=json"
+  },
+  "body": {
+    "version": 1,
+    "etag": "BwXE/gnR8t4=",
+    "bindings": [
+      {
+        "role": "roles/cryptoKeyDecrypter",
+        "members": [
+          "user:test123@gmail.com",
+          "user:testabc@gmail.com"
+        ]
+      },
+      {
+        "role": "roles/cloudkms.admin",
+        "members": [
+          "user:test123@gmail.com"
+        ]
+      }
+    ]
+  }
+}

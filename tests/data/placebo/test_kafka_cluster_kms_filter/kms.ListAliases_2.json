@@ -1,0 +1,34 @@
+{
+    "status_code": 200,
+    "data": {
+        "Aliases": [
+            {
+                "AliasName": "alias/aws/kafka",
+                "AliasArn": "arn:aws:kms:ap-northeast-2:644160558196:alias/aws/kafka",
+                "TargetKeyId": "d0e564f4-ec4c-43bd-b379-a22f92253dbe",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 12,
+                    "day": 9,
+                    "hour": 15,
+                    "minute": 13,
+                    "second": 39,
+                    "microsecond": 173000
+                },
+                "LastUpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 12,
+                    "day": 9,
+                    "hour": 15,
+                    "minute": 13,
+                    "second": 39,
+                    "microsecond": 173000
+                }
+            }
+        ],
+        "Truncated": false,
+        "ResponseMetadata": {}
+    }
+}

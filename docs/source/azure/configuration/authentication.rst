@@ -90,7 +90,7 @@ For fake test authentication, environment variables should be configured:
     AZURE_ACCESS_TOKEN=fake_token
     AZURE_SUBSCRIPTION_ID=ea42f556-5106-4743-99b0-c129bfa71a47
 
-You will also find this configuration in tox.ini.
+You will also find this configuration in `test.env`.
 
 Managed Service Identity
 ------------------------

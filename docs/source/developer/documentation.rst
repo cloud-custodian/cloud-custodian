@@ -7,7 +7,9 @@ Cloud Custodian makes every effort to provide comprehensive documentation.
 Any new features you add should be documented.
 
 The documentation is built using `sphinx <http://www.sphinx-doc.org>`_.
-The documentation is written using reStructured Text (``rst``).
+
+The documentation is written using reStructured Text (``rst``) and Markdown (``md``)
+
 The sphinx documentation contains `a useful introduction <https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html>`_ to ``rst`` syntax.
 
 Find the Documentation
@@ -25,6 +27,7 @@ Within the documentation, topics are organized according to the following main a
 
 In addition, the api documentation will be built from docstrings on classes and methods in source code.
 The ``rst`` files for these may be found in the ``generated`` subdirectory.
+
 
 Edit the Documentation
 ----------------------
@@ -77,26 +80,22 @@ Within docstrings, ``rst`` directives allow for highlighting code examples:
 Render the Documentation
 ------------------------
 
-In general, you should use tox to build the documentation:
+To build the documentation use the make target:
 
-.. code-block::
+.. code-block:: shell
 
-    $ tox -e docs
+    make sphinx
 
-This command will clean previously built files and rebuild the entire documentation tree.
+Builds are cached locally and incremental.
 
-When developing, you may prefer to build only those files you have edited.
-To do so, use the following command:
+You can browse the locally built documentation by starting a web server in the build directory
+and navigating in a browser to http://localhost:8000
 
-.. code-block::
+.. code-block:: shell
 
-    $ make -f docs/Makefile.sphinx html
+   cd docs/build/html
+   python -m http.server
 
 
-You can also build documentation via the provided tox dockerfile.  You will need to build and
-run from the root of your source enlistment each time you edit documentation files:
-
-.. code-block::
-
-    $ docker build -t tox_linux --build-arg TOX_ENV=docs . -f tools/dev/docker_tox_linux/Dockerfile
-    $ docker run -v 'pwd'/docs/build:/src/docs/build -it tox_linux
+Note the home page for cloudcustodian.io is built out of a separate repo.
+https://github.com/cloud-custodian/www.cloudcustodian.io

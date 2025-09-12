@@ -1,0 +1,64 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 07 Apr 2021 14:23:15 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "25536",
+    "-content-encoding": "gzip",
+    "content-location": "https://securitycenter.googleapis.com/v1/organizations/111111111111/sources/-/findings?filter=resourceName%3A%22gcf-sources-2222222222222-us-central1%22+OR+resourceName%3A%22gcf-sources-2222222222222-us-east1%22&pageSize=1000&alt=json"
+  },
+  "body": {
+    "listFindingsResults": [
+      {
+        "finding": {
+          "name": "organizations/111111111111/sources/333333333333/findings/a2809d4331514d51fa3d117ead9a5c02",
+          "parent": "organizations/111111111111/sources/333333333333",
+          "resourceName": "//storage.googleapis.com/gcf-sources-2222222222222-us-east1",
+          "state": "ACTIVE",
+          "category": "BUCKET_LOGGING_DISABLED",
+          "externalUri": "https://cloud.google.com/storage/docs/access-logs",
+          "sourceProperties": {
+            "Recommendation": "To set up logging for a bucket, complete the usage logs & storage logs guide at: https://cloud.google.com/storage/docs/access-logs",
+            "ReactivationCount": 0,
+            "ExceptionInstructions": "Add the security mark \"allow_bucket_logging_disabled\" to the asset with a value of \"true\" to prevent this finding from being activated again.",
+            "Explanation": "To help investigate security issues and monitor storage consumption, enable usage logs and storage logs for your Cloud Storage buckets. Usage logs provide information for all of the requests made on a specified bucket, and the storage logs provide information about the storage consumption of that bucket.",
+            "ScannerName": "LOGGING_SCANNER",
+            "compliance_standards": {
+              "cis": [
+                {
+                  "ids": [
+                    "5.3"
+                  ]
+                }
+              ]
+            }
+          },
+          "securityMarks": {
+            "name": "organizations/111111111111/sources/333333333333/findings/a2809d4331514d51fa3d117ead9a5c02/securityMarks"
+          },
+          "eventTime": "2021-03-31T00:49:31.333Z",
+          "createTime": "2021-03-31T00:49:32.095Z",
+          "severity": "LOW",
+          "canonicalName": "projects/cloud-custodian/sources/333333333333/findings/a2809d4331514d51fa3d117ead9a5c02"
+        },
+        "resource": {
+          "name": "//storage.googleapis.com/gcf-sources-2222222222222-us-east1",
+          "projectName": "//cloudresourcemanager.googleapis.com/projects/2222222222222",
+          "projectDisplayName": "cloud-custodian",
+          "parentName": "//cloudresourcemanager.googleapis.com/projects/2222222222222",
+          "parentDisplayName": "cloud-custodian"
+        }
+      }
+    ],
+    "readTime": "2021-04-07T14:23:14.461Z",
+    "totalSize": 10
+  }
+}

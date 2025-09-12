@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "Name": "AtRestEnabled",
+        "SecurityConfiguration": "{\"EncryptionConfiguration\":{\"AtRestEncryptionConfiguration\":{\"S3EncryptionConfiguration\":{\"EncryptionMode\":\"SSE-S3\"}},\"EnableInTransitEncryption\":false,\"EnableAtRestEncryption\":true}}",
+        "CreationDateTime": {
+            "__class__": "datetime",
+            "year": 2023,
+            "month": 1,
+            "day": 18,
+            "hour": 21,
+            "minute": 5,
+            "second": 46,
+            "microsecond": 879000
+        },
+        "ResponseMetadata": {}
+    }
+}

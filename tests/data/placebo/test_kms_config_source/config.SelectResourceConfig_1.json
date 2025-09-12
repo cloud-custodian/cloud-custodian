@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "Results": [
+            "{\"resourceId\":\"9975ba19-f8ff-444b-9c21-8d42cc6dc45b\",\"configuration\":{\"customerMasterKeySpec\":\"SYMMETRIC_DEFAULT\",\"keyState\":\"Enabled\",\"origin\":\"AWS_KMS\",\"encryptionAlgorithms\":[\"SYMMETRIC_DEFAULT\"],\"keyId\":\"9975ba19-f8ff-444b-9c21-8d42cc6dc45b\",\"description\":\"For testing the KMS config source\",\"creationDate\":\"2021-05-20T18:12:43.927Z\",\"signingAlgorithms\":[],\"enabled\":true,\"keyManager\":\"CUSTOMER\",\"keyUsage\":\"ENCRYPT_DECRYPT\",\"arn\":\"arn:aws:kms:us-east-2:644160558196:key/9975ba19-f8ff-444b-9c21-8d42cc6dc45b\",\"awsaccountId\":\"644160558196\"},\"supplementaryConfiguration\":{\"Policy\":\"{\\n  \\\"Version\\\" : \\\"2012-10-17\\\",\\n  \\\"Id\\\" : \\\"key-consolepolicy-3\\\",\\n  \\\"Statement\\\" : [ {\\n    \\\"Sid\\\" : \\\"Enable IAM User Permissions\\\",\\n    \\\"Effect\\\" : \\\"Allow\\\",\\n    \\\"Principal\\\" : {\\n      \\\"AWS\\\" : \\\"arn:aws:iam::644160558196:root\\\"\\n    },\\n    \\\"Action\\\" : \\\"kms:*\\\",\\n    \\\"Resource\\\" : \\\"*\\\"\\n  } ]\\n}\",\"KeyRotationStatus\":false,\"Tags\":[{\"tagValue\":\"Test\",\"tagKey\":\"ConfigTesting\"}]}}"
+        ],
+        "QueryInfo": {
+            "SelectFields": [
+                {
+                    "Name": "resourceId"
+                },
+                {
+                    "Name": "configuration"
+                },
+                {
+                    "Name": "supplementaryConfiguration"
+                }
+            ]
+        },
+        "ResponseMetadata": {}
+    }
+}

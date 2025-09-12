@@ -60,7 +60,14 @@ class AutoTagUser(EventAction):
                       ]}},
            'update': {'type': 'boolean'},
            'tag': {'type': 'string'},
-           'principal_id_tag': {'type': 'string'}
+           'principal_id_tag': {'type': 'string'},
+           'value': {'type': 'string',
+                     'enum': [
+                         'userName',
+                         'arn',
+                         'sourceIPAddress',
+                         'principalId'
+                     ]},
            }
     )
 
@@ -80,6 +87,28 @@ class AutoTagUser(EventAction):
                 "auto-tag action requires 'tag'")
         return self
 
+    def get_user_info_value(self, utype, event):
+        value = None
+
+        vtype = self.data.get('value', None)
+        if vtype is None:
+            return
+
+        if vtype == "userName":
+            if utype == "IAMUser":
+                value = event['userIdentity'].get('userName', '')
+            elif utype == "AssumedRole" or utype == "FederatedUser":
+                value = event['userIdentity'].get('sessionContext', {}).get(
+                    'sessionIssuer', {}).get('userName', '')
+        elif vtype == "arn":
+            value = event['userIdentity'].get('arn', '')
+        elif vtype == "sourceIPAddress":
+            value = event.get('sourceIPAddress', '')
+        elif vtype == "principalId":
+            value = event['userIdentity'].get('principalId', '')
+
+        return value
+
     def get_tag_value(self, event):
         event = event['detail']
         utype = event['userIdentity']['type']
@@ -92,7 +121,7 @@ class AutoTagUser(EventAction):
             principal_id_value = event['userIdentity'].get('principalId', '')
         elif utype == "AssumedRole" or utype == "FederatedUser":
             user = event['userIdentity']['arn']
-            prefix, user = user.rsplit('/', 1)
+            _, user = user.rsplit('/', 1)
             principal_id_value = event['userIdentity'].get('principalId', '').split(':')[0]
             # instance role
             if user.startswith('i-'):
@@ -101,14 +130,19 @@ class AutoTagUser(EventAction):
             elif user.startswith('awslambda'):
                 return
 
+        value = self.get_user_info_value(utype, event)
+
         # if the auto-tag-user policy set update to False (or it's unset) then we
-        return {'user': user, 'id': principal_id_value}
+        return {'user': user, 'id': principal_id_value, 'value': value}
 
     def process(self, resources, event):
         if event is None:
             return
 
         user_info = self.get_tag_value(event)
+        if user_info is None:
+            self.log.warning("user info not found in event")
+            return
 
         # will skip writing their UserName tag and not overwrite pre-existing values
         if not self.data.get('update', False):
@@ -128,7 +162,9 @@ class AutoTagUser(EventAction):
             untagged_resources = resources
 
         new_tags = {}
-        if user_info['user']:
+        if user_info['value']:
+            new_tags[self.data['tag']] = user_info['value']
+        elif user_info['user']:
             new_tags[self.data['tag']] = user_info['user']
 
         # if principal_id_key is set (and value), we'll set the principalId tag.

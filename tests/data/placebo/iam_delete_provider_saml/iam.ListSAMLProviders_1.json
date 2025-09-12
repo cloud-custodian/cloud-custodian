@@ -1,0 +1,31 @@
+{
+    "status_code": 200,
+    "data": {
+        "SAMLProviderList": [
+            {
+                "Arn": "arn:aws:iam::644160558196:saml-provider/testprovider",
+                "ValidUntil": {
+                    "__class__": "datetime",
+                    "year": 2125,
+                    "month": 4,
+                    "day": 14,
+                    "hour": 15,
+                    "minute": 56,
+                    "second": 37,
+                    "microsecond": 0
+                },
+                "CreateDate": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 4,
+                    "day": 14,
+                    "hour": 15,
+                    "minute": 56,
+                    "second": 37,
+                    "microsecond": 0
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

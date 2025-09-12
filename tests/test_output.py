@@ -3,8 +3,8 @@
 import datetime
 import gzip
 import logging
-import mock
 import shutil
+from unittest import mock
 import os
 
 from dateutil.parser import parse as date_parse
@@ -12,10 +12,13 @@ from dateutil.parser import parse as date_parse
 from c7n.ctx import ExecutionContext
 from c7n.config import Config
 from c7n.output import DirectoryOutput, BlobOutput, LogFile, metrics_outputs
-from c7n.resources.aws import S3Output, MetricsOutput
+from c7n.resources.aws import S3Output, MetricsOutput, inspect_bucket_region
 from c7n.testing import mock_datetime_now, TestUtils
 
 from .common import Bag, BaseTest
+
+import pytest
+import vcr
 
 
 class MetricsTest(BaseTest):
@@ -38,7 +41,7 @@ class DirOutputTest(BaseTest):
         )
 
     def test_dir_output(self):
-        work_dir, output = self.get_dir_output("file://myoutput")
+        work_dir, _ = self.get_dir_output("file://myoutput")
         self.assertEqual(os.listdir(work_dir), ["myoutput"])
         self.assertTrue(os.path.isdir(os.path.join(work_dir, "myoutput")))
 
@@ -48,12 +51,13 @@ class S3OutputTest(TestUtils):
     def get_s3_output(self, output_url=None, cleanup=True, klass=S3Output):
         if output_url is None:
             output_url = "s3://cloud-custodian/policies"
-        output = klass(
-            ExecutionContext(
-                lambda assume=False: mock.MagicMock(),
-                Bag(name="xyz", provider_name="ostack"),
-                Config.empty(output_dir=output_url, account_id='112233445566')),
-            {'url': output_url, 'test': True})
+        with mock.patch('c7n.resources.aws.inspect_bucket_region', return_value='us-east-1'):
+            output = klass(
+                ExecutionContext(
+                    lambda assume=False, region="us-east-1": mock.MagicMock(),
+                    Bag(name="xyz", provider_name="ostack"),
+                    Config.empty(output_dir=output_url, account_id='112233445566')),
+                {'url': output_url, 'test': True})
 
         if cleanup:
             self.addCleanup(shutil.rmtree, output.root_dir)
@@ -144,8 +148,8 @@ class S3OutputTest(TestUtils):
         with open(os.path.join(output.root_dir, "foo.txt"), "w") as fh:
             fh.write("abc")
 
-        output.transfer = mock.MagicMock()
-        output.transfer.upload_file = m = mock.MagicMock()
+        output._transfer = mock.MagicMock()
+        output._transfer.upload_file = m = mock.MagicMock()
 
         output.upload()
 
@@ -162,8 +166,8 @@ class S3OutputTest(TestUtils):
         with open(os.path.join(output.root_dir, "foo.txt"), "w") as fh:
             fh.write("abc")
 
-        output.transfer = mock.MagicMock()
-        output.transfer.upload_file = m = mock.MagicMock()
+        output._transfer = mock.MagicMock()
+        output._transfer.upload_file = m = mock.MagicMock()
 
         output.upload()
 
@@ -173,3 +177,43 @@ class S3OutputTest(TestUtils):
             "%s/foo.txt" % output.key_prefix.lstrip('/'),
             extra_args={"ACL": "bucket-owner-full-control", "ServerSideEncryption": "AES256"},
         )
+
+
+@pytest.mark.parametrize(
+    'bucket, endpoint, expected_region',
+    [
+        pytest.param(
+            'gis-publicportal',
+            'https://s3-us-gov-east-1.amazonaws.com',
+            'us-gov-west-1',
+            id='govcloud-cross-region',
+        ),
+        pytest.param(
+            'gis-publicportal',
+            'https://s3-us-gov-west-1.amazonaws.com',
+            'us-gov-west-1',
+            id='govcloud-same-region',
+        ),
+        pytest.param(
+            'apigateway',
+            'https://s3.us-east-1.amazonaws.com',
+            'us-east-1',
+            id='us-same-region',
+        ),
+        pytest.param(
+            'apigateway',
+            'https://s3.us-west-2.amazonaws.com',
+            'us-east-1',
+            id='us-cross-region',
+        ),
+    ]
+)
+def test_get_bucket_region_http(bucket, endpoint, expected_region, request):
+    """Test finding the output bucket region via HTTP requests"""
+
+    with vcr.use_cassette(
+        f'tests/data/vcr_cassettes/test_output/{request.node.name}.yaml',
+        record_mode='none'
+    ):
+        region = inspect_bucket_region(bucket, endpoint)
+        assert region == expected_region

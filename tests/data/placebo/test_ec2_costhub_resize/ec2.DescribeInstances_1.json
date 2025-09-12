@@ -1,0 +1,195 @@
+{
+    "status_code": 200,
+    "data": {
+        "Reservations": [
+            {
+                "Groups": [],
+                "Instances": [
+                    {
+                        "AmiLaunchIndex": 0,
+                        "ImageId": "ami-00399ec92321828f5",
+                        "InstanceId": "i-000ce83ee0c70e572",
+                        "InstanceType": "m5a.xlarge",
+                        "KeyName": "kapil-sandbox-us-east-2",
+                        "LaunchTime": {
+                            "__class__": "datetime",
+                            "year": 2021,
+                            "month": 10,
+                            "day": 13,
+                            "hour": 14,
+                            "minute": 59,
+                            "second": 51,
+                            "microsecond": 0
+                        },
+                        "Monitoring": {
+                            "State": "disabled"
+                        },
+                        "Placement": {
+                            "AvailabilityZone": "us-east-2a",
+                            "GroupName": "",
+                            "Tenancy": "default"
+                        },
+                        "PrivateDnsName": "ip-172-31-4-66.us-east-2.compute.internal",
+                        "PrivateIpAddress": "172.31.4.66",
+                        "ProductCodes": [],
+                        "PublicDnsName": "",
+                        "State": {
+                            "Code": 80,
+                            "Name": "stopped"
+                        },
+                        "StateTransitionReason": "User initiated (2024-02-08 17:03:16 GMT)",
+                        "SubnetId": "subnet-04d3383552d0e5fcb",
+                        "VpcId": "vpc-0011443044d315155",
+                        "Architecture": "x86_64",
+                        "BlockDeviceMappings": [
+                            {
+                                "DeviceName": "/dev/sda1",
+                                "Ebs": {
+                                    "AttachTime": {
+                                        "__class__": "datetime",
+                                        "year": 2021,
+                                        "month": 10,
+                                        "day": 13,
+                                        "hour": 14,
+                                        "minute": 59,
+                                        "second": 52,
+                                        "microsecond": 0
+                                    },
+                                    "DeleteOnTermination": true,
+                                    "Status": "attached",
+                                    "VolumeId": "vol-07ce74970f20cf68b"
+                                }
+                            }
+                        ],
+                        "ClientToken": "",
+                        "EbsOptimized": true,
+                        "EnaSupport": true,
+                        "Hypervisor": "xen",
+                        "IamInstanceProfile": {
+                            "Arn": "arn:aws:iam::644160558196:instance-profile/assetdb-functional",
+                            "Id": "AIPAXEGRT7KTUCEPDUG3Y"
+                        },
+                        "NetworkInterfaces": [
+                            {
+                                "Attachment": {
+                                    "AttachTime": {
+                                        "__class__": "datetime",
+                                        "year": 2021,
+                                        "month": 10,
+                                        "day": 13,
+                                        "hour": 14,
+                                        "minute": 59,
+                                        "second": 51,
+                                        "microsecond": 0
+                                    },
+                                    "AttachmentId": "eni-attach-0f1d706dba234a4d6",
+                                    "DeleteOnTermination": true,
+                                    "DeviceIndex": 0,
+                                    "Status": "attached",
+                                    "NetworkCardIndex": 0
+                                },
+                                "Description": "",
+                                "Groups": [
+                                    {
+                                        "GroupName": "launch-wizard-1",
+                                        "GroupId": "sg-08b7e147e621bbd7f"
+                                    }
+                                ],
+                                "Ipv6Addresses": [],
+                                "MacAddress": "02:2f:0b:3b:64:be",
+                                "NetworkInterfaceId": "eni-078156fca4353cd1a",
+                                "OwnerId": "644160558196",
+                                "PrivateDnsName": "ip-172-31-4-66.us-east-2.compute.internal",
+                                "PrivateIpAddress": "172.31.4.66",
+                                "PrivateIpAddresses": [
+                                    {
+                                        "Primary": true,
+                                        "PrivateDnsName": "ip-172-31-4-66.us-east-2.compute.internal",
+                                        "PrivateIpAddress": "172.31.4.66"
+                                    }
+                                ],
+                                "SourceDestCheck": true,
+                                "Status": "in-use",
+                                "SubnetId": "subnet-04d3383552d0e5fcb",
+                                "VpcId": "vpc-0011443044d315155",
+                                "InterfaceType": "interface"
+                            }
+                        ],
+                        "RootDeviceName": "/dev/sda1",
+                        "RootDeviceType": "ebs",
+                        "SecurityGroups": [
+                            {
+                                "GroupName": "launch-wizard-1",
+                                "GroupId": "sg-08b7e147e621bbd7f"
+                            }
+                        ],
+                        "SourceDestCheck": true,
+                        "StateReason": {
+                            "Code": "Client.UserInitiatedShutdown",
+                            "Message": "Client.UserInitiatedShutdown: User initiated shutdown"
+                        },
+                        "Tags": [
+                            {
+                                "Key": "ActionNeeded",
+                                "Value": "Investigate shutting down or terminating this EC2 instance which is over 365 days old"
+                            },
+                            {
+                                "Key": "CostSavingsEligible",
+                                "Value": "True"
+                            },
+                            {
+                                "Key": "Owner",
+                                "Value": "kapil@stacklet.io"
+                            }
+                        ],
+                        "VirtualizationType": "hvm",
+                        "CpuOptions": {
+                            "CoreCount": 2,
+                            "ThreadsPerCore": 2
+                        },
+                        "CapacityReservationSpecification": {
+                            "CapacityReservationPreference": "open"
+                        },
+                        "HibernationOptions": {
+                            "Configured": false
+                        },
+                        "MetadataOptions": {
+                            "State": "applied",
+                            "HttpTokens": "optional",
+                            "HttpPutResponseHopLimit": 1,
+                            "HttpEndpoint": "enabled",
+                            "HttpProtocolIpv6": "disabled",
+                            "InstanceMetadataTags": "disabled"
+                        },
+                        "EnclaveOptions": {
+                            "Enabled": false
+                        },
+                        "PlatformDetails": "Linux/UNIX",
+                        "UsageOperation": "RunInstances",
+                        "UsageOperationUpdateTime": {
+                            "__class__": "datetime",
+                            "year": 2021,
+                            "month": 10,
+                            "day": 13,
+                            "hour": 14,
+                            "minute": 59,
+                            "second": 51,
+                            "microsecond": 0
+                        },
+                        "PrivateDnsNameOptions": {
+                            "HostnameType": "ip-name",
+                            "EnableResourceNameDnsARecord": false,
+                            "EnableResourceNameDnsAAAARecord": false
+                        },
+                        "MaintenanceOptions": {
+                            "AutoRecovery": "default"
+                        }
+                    }
+                ],
+                "OwnerId": "644160558196",
+                "ReservationId": "r-06e021d3accdc77a2"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

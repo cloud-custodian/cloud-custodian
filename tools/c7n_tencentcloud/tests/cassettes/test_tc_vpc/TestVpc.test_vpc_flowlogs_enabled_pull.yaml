@@ -1,0 +1,146 @@
+interactions:
+- request:
+    body: '{"VpcIds": ["vpc-ha7fbuzt"], "Offset": "0", "Limit": "20"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '58'
+      Content-Type:
+      - application/json
+      Host:
+      - vpc.ap-guangzhou.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.27.1
+      X-TC-Action:
+      - DescribeVpcs
+      X-TC-Region:
+      - ap-guangzhou
+      X-TC-Version:
+      - '2017-03-12'
+    method: POST
+    uri: https://vpc.ap-guangzhou.tencentcloudapi.com/
+  response:
+    body:
+      string: "{\n    \"Response\": {\n        \"VpcSet\": [\n            {\n                \"VpcId\":
+        \"vpc-ha7fbuzt\",\n                \"VpcName\": \"stevenan\",\n                \"CidrBlock\":
+        \"10.0.0.0/16\",\n                \"Ipv6CidrBlock\": \"\",\n                \"IsDefault\":
+        false,\n                \"EnableMulticast\": false,\n                \"CreatedTime\":
+        \"2022-09-30 12:12:46\",\n                \"EnableDhcp\": true,\n                \"DhcpOptionsId\":
+        \"dopt-3b6dldp8\",\n                \"DnsServerSet\": [\n                    \"183.60.83.19\",\n
+        \                   \"183.60.82.98\"\n                ],\n                \"DomainName\":
+        \"\",\n                \"VpcFlag\": 0,\n                \"IsShare\": false,\n
+        \               \"EnableRouteVpcPublish\": false,\n                \"TagSet\":
+        [],\n                \"AssistantCidrSet\": [\n                    {\n                        \"CidrBlock\":
+        \"172.16.0.0/16\",\n                        \"AssistantType\": 1,\n                        \"SubnetSet\":
+        []\n                    }\n                ]\n            }\n        ],\n
+        \       \"TotalCount\": 1,\n        \"RequestId\": \"57e85275-365f-456d-8267-6bb63632b65d\"\n
+        \   }\n}"
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1088'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 27 Oct 2022 07:08:29 GMT
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"ResourceList": ["qcs::vpc:ap-guangzhou:uin/100000750436:vpc/vpc-ha7fbuzt"]}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '77'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-guangzhou.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.27.1
+      X-TC-Action:
+      - GetResources
+      X-TC-Region:
+      - ap-guangzhou
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-guangzhou.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"","ResourceTagMappingList":[],"RequestId":"26070f55-26c9-4f75-87fb-3aa04d24ba02"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '114'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 27 Oct 2022 07:08:30 GMT
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"Offset": 0, "Limit": 20}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '26'
+      Content-Type:
+      - application/json
+      Host:
+      - vpc.ap-guangzhou.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.27.1
+      X-TC-Action:
+      - DescribeFlowLogs
+      X-TC-Region:
+      - ap-guangzhou
+      X-TC-Version:
+      - '2017-03-12'
+    method: POST
+    uri: https://vpc.ap-guangzhou.tencentcloudapi.com/
+  response:
+    body:
+      string: "{\n    \"Response\": {\n        \"FlowLog\": [\n            {\n                \"VpcId\":
+        \"vpc-ha7fbuzt\",\n                \"FlowLogId\": \"fl-gjdtklll\",\n                \"FlowLogName\":
+        \"test\",\n                \"ResourceType\": \"NETWORKINTERFACE\",\n                \"ResourceId\":
+        \"eni-jz0khx7n\",\n                \"TrafficType\": \"ACCEPT\",\n                \"CloudLogId\":
+        \"d8e1dda2-082d-4001-a1a0-be24589efd4d\",\n                \"CloudLogRegion\":
+        \"ap-guangzhou\",\n                \"CloudLogState\": \"SUCCESS\",\n                \"FlowLogDescription\":
+        \"\",\n                \"CreatedTime\": \"2022-10-26 16:49:58\",\n                \"Enable\":
+        true,\n                \"StorageType\": \"cls\",\n                \"FlowLogStorage\":
+        {\n                    \"StorageId\": \"d8e1dda2-082d-4001-a1a0-be24589efd4d\"\n
+        \               },\n                \"TagSet\": []\n            }\n        ],\n
+        \       \"TotalNum\": 1,\n        \"RequestId\": \"9bc97e72-7b91-486d-a6ad-573ef7048bb7\"\n
+        \   }\n}"
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '919'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 27 Oct 2022 07:08:30 GMT
+    status:
+      code: 200
+      message: OK
+version: 1

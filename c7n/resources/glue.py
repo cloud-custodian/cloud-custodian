@@ -5,7 +5,7 @@ from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 from c7n.manager import resources, ResourceManager
 from c7n.query import QueryResourceManager, TypeInfo
-from c7n.utils import local_session, chunks, type_schema
+from c7n.utils import local_session, chunks, type_schema, generate_arn
 from c7n.actions import BaseAction, ActionRegistry, RemovePolicyBase
 from c7n.exceptions import PolicyValidationError
 from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter
@@ -22,11 +22,14 @@ class GlueConnection(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'glue'
-        enum_spec = ('get_connections', 'ConnectionList', None)
+        enum_spec = ('get_connections', 'ConnectionList', {'HidePassword': True})
         id = name = 'Name'
         date = 'CreationTime'
         arn_type = "connection"
         cfn_type = 'AWS::Glue::Connection'
+        universal_taggable = object()
+
+    augment = universal_augment
 
 
 @GlueConnection.filter_registry.register('subnet')
@@ -165,6 +168,71 @@ class DeleteJob(BaseAction):
                 continue
 
 
+@GlueJob.action_registry.register('toggle-metrics')
+class GlueJobToggleMetrics(BaseAction):
+    """Enable or disable CloudWatch metrics for a Glue job
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: gluejob-enable-metrics
+            resource: glue-job
+            filters:
+              - type: value
+                key: 'DefaultArguments."--enable-metrics"'
+                value: absent
+            actions:
+              - type: toggle-metrics
+                enabled: true
+    """
+    schema = type_schema(
+        'toggle-metrics',
+        enabled={'type': 'boolean'},
+        required=['enabled'],
+    )
+    permissions = ('glue:UpdateJob',)
+
+    def prepare_params(self, r):
+        client = local_session(self.manager.session_factory).client('glue')
+        update_keys = client.meta._service_model.shape_for('JobUpdate').members
+        want_keys = set(r).intersection(update_keys) - {'AllocatedCapacity'}
+        params = {k: r[k] for k in want_keys}
+
+        # Can't specify MaxCapacity when updating/creating a job if
+        # job configuration includes WorkerType or NumberOfWorkers
+        if 'WorkerType' in params or 'NumberOfWorkers' in params:
+            del params['MaxCapacity']
+
+        # Can't specify Timeout when updating Ray jobs.
+        # Removing Timeout preserves default setting.
+        if params['Command']['Name'] == 'glueray':
+            del params['Timeout']
+
+        if self.data.get('enabled'):
+            if 'DefaultArguments' not in params:
+                params['DefaultArguments'] = {}
+            params["DefaultArguments"]["--enable-metrics"] = ""
+        else:
+            if 'DefaultArguments' in params and \
+                '--enable-metrics' in params['DefaultArguments']:
+                del params["DefaultArguments"]["--enable-metrics"]
+
+        return params
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('glue')
+
+        for r in resources:
+            try:
+                job_name = r["Name"]
+                updated_resource = self.prepare_params(r)
+                client.update_job(JobName=job_name, JobUpdate=updated_resource)
+            except Exception as e:
+                self.log.error('Error updating glue job: {}'.format(e))
+
+
 @resources.register('glue-crawler')
 class GlueCrawler(QueryResourceManager):
 
@@ -296,14 +364,15 @@ class GlueTable(query.ChildResourceManager):
         date = 'CreatedOn'
         arn_type = 'table'
 
+    def get_arns(self, resources):
+        return [self.generate_arn(r['DatabaseName'] + '/' + r['Name']) for r in resources]
+
 
 @query.sources.register('describe-table')
 class DescribeTable(query.ChildDescribeSource):
 
     def get_query(self):
-        query = super(DescribeTable, self).get_query()
-        query.capture_parent_id = True
-        return query
+        return super(DescribeTable, self).get_query(capture_parent_id=True)
 
     def augment(self, resources):
         result = []
@@ -337,7 +406,7 @@ class GlueClassifier(QueryResourceManager):
         id = name = 'Name'
         date = 'CreationTime'
         arn_type = 'classifier'
-        cfn_type = 'AWS::Glue::Classifier'
+        config_type = cfn_type = 'AWS::Glue::Classifier'
 
 
 @GlueClassifier.action_registry.register('delete')
@@ -368,9 +437,10 @@ class GlueMLTransform(QueryResourceManager):
         id = 'TransformId'
         arn_type = 'mlTransform'
         universal_taggable = object()
-        cfn_type = 'AWS::Glue::MLTransform'
+        config_type = cfn_type = 'AWS::Glue::MLTransform'
 
-    augment = universal_augment
+    source_mapping = {'describe': query.DescribeWithResourceTags,
+                      'config': query.ConfigSource}
 
     def get_permissions(self):
         return ('glue:GetMLTransforms',)
@@ -405,23 +475,7 @@ class GlueSecurityConfiguration(QueryResourceManager):
 
 @GlueSecurityConfiguration.filter_registry.register('kms-key')
 class KmsFilter(KmsRelatedFilter):
-    """
-    Filter a resource by its associcated kms key and optionally the alias name
-    of the kms key by using 'c7n:AliasName'
 
-    :example:
-
-    .. code-block:: yaml
-
-        policies:
-          - name: glue-security-configuration-kms-key
-            resource: glue-security-configuration
-            filters:
-              - type: kms-key
-                key: c7n:AliasName
-                value: "^(alias/aws/)"
-                op: regex
-    """
     schema = type_schema(
         'kms-key',
         rinherit=ValueFilter.schema,
@@ -546,6 +600,21 @@ class GlueDataCatalog(ResourceManager):
     def has_arn(cls):
         return True
 
+    def get_arns(self, resources):
+        return [self.generate_arn(res) for res in resources]
+
+    def generate_arn(self, res):
+        """
+        https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsglue.html
+        One resource per region and one arn per region
+        """
+        return generate_arn(
+            service=self.resource_type.service,
+            resource=self.resource_type.arn_type,
+            region=self.config.region,
+            account_id=self.config.account_id
+        )
+
     def get_model(self):
         return self.resource_type
 
@@ -561,6 +630,32 @@ class GlueDataCatalog(ResourceManager):
 
     def get_resources(self, resource_ids):
         return [{'CatalogId': self.config.account_id}]
+
+
+@GlueDataCatalog.filter_registry.register('kms-key')
+class GlueCatalogKmsFilter(KmsRelatedFilter):
+
+    schema = type_schema(
+        'kms-key',
+        rinherit=ValueFilter.schema,
+        **{'key-type': {'type': 'string', 'enum': [
+            'EncryptionAtRest', 'ConnectionPasswordEncryption']},
+            'required': ['key-type'],
+            'match-resource': {'type': 'boolean'},
+            'operator': {'enum': ['and', 'or']}})
+
+    permissions = ('glue:GetDataCatalogEncryptionSettings',)
+
+    RelatedIdsExpression = ''
+
+    def __init__(self, data, manager=None):
+        super().__init__(data, manager)
+        key_type_to_related_ids = {
+            'EncryptionAtRest': 'DataCatalogEncryptionSettings.EncryptionAtRest.SseAwsKmsKeyId',
+            'ConnectionPasswordEncryption':
+              'DataCatalogEncryptionSettings.ConnectionPasswordEncryption.AwsKmsKeyId'
+        }
+        self.RelatedIdsExpression = key_type_to_related_ids.get(self.data.get('key-type'))
 
 
 @GlueDataCatalog.action_registry.register('set-encryption')
@@ -622,9 +717,18 @@ class GlueDataCatalogEncryption(BaseAction):
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('glue')
+        self.process_catalog_encryption(client, resources)
+
+    def process_catalog_encryption(self, client, resources):
         # there is one glue data catalog per account
+        if 'DataCatalogEncryptionSettings' not in resources[0]:
+            resources = self.manager.resources()
+        enc_config = resources[0]['DataCatalogEncryptionSettings']
+        updated_config = {**enc_config, **self.data['attributes']}
+        if enc_config == updated_config:
+            return
         client.put_data_catalog_encryption_settings(
-            DataCatalogEncryptionSettings=self.data['attributes'])
+            DataCatalogEncryptionSettings=updated_config)
 
 
 @GlueDataCatalog.filter_registry.register('glue-security-config')

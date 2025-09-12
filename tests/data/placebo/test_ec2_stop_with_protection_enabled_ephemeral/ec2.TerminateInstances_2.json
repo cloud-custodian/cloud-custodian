@@ -1,0 +1,32 @@
+{
+    "status_code": 200,
+    "data": {
+        "StoppingInstances": [
+            {
+                "CurrentState": {
+                    "Code": 32, 
+                    "Name": "shutting-down"
+                },
+                "InstanceId": "i-0a3e363a5366795dd",
+                "PreviousState": {
+                    "Code": 16,
+                    "Name": "running"
+                }
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "8b13ab9d-fcd2-4734-85b4-caa975c441a8",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "8b13ab9d-fcd2-4734-85b4-caa975c441a8",
+                "cache-control": "no-cache, no-store",
+                "strict-transport-security": "max-age=31536000; includeSubDomains",
+                "content-type": "text/xml;charset=UTF-8",
+                "content-length": "579",
+                "date": "Thu, 17 Nov 2022 10:53:37 GMT",
+                "server": "AmazonEC2"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

@@ -1,0 +1,40 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResourceDataSyncItems": [
+            {
+                "SyncName": "invsync",
+                "S3Destination": {
+                    "BucketName": "c7n-ssm",
+                    "Prefix": "inv",
+                    "SyncFormat": "JsonSerDe",
+                    "Region": "us-east-1"
+                },
+                "LastStatus": "Successful",
+                "LastSyncStatusMessage": "The sync was successfully completed"
+            },
+            {
+                "SyncName": "test-data-sync",
+                "S3Destination": {
+                    "BucketName": "data-sync-destination-bucket",
+                    "SyncFormat": "JsonSerDe",
+                    "Region": "us-east-1"
+                },
+                "LastStatus": "Successful",
+                "LastSyncStatusMessage": "The sync was successfully completed"
+            },
+            {
+                "SyncName": "test-data-sync-2",
+                "S3Destination": {
+                    "BucketName": "data-sync-destination-bucket",
+                    "SyncFormat": "JsonSerDe",
+                    "Region": "us-east-1",
+                    "AWSKMSKeyARN": "arn:aws:kms:us-east-1:644160558196:key/7d9388c0-8c78-4acb-ad3c-b9d1764522b2"
+                },
+                "LastStatus": "Successful",
+                "LastSyncStatusMessage": "The sync was successfully completed"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

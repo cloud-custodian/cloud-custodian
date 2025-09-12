@@ -1,0 +1,35 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "experimentTemplates": [
+            {
+                "id": "EXT3dBw7DdJZ2v8p",
+                "description": "kraken",
+                "creationTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 6,
+                    "day": 14,
+                    "hour": 7,
+                    "minute": 36,
+                    "second": 48,
+                    "microsecond": 788000
+                },
+                "lastUpdateTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 6,
+                    "day": 14,
+                    "hour": 7,
+                    "minute": 36,
+                    "second": 48,
+                    "microsecond": 788000
+                },
+                "tags": {
+                    "Name": "Charybdis"
+                }
+            }
+        ]
+    }
+}

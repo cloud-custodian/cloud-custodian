@@ -57,6 +57,19 @@
                     "minute": 12
                 }, 
                 "Name": "hazmat-audit-logs"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 45, 
+                    "microsecond": 0, 
+                    "year": 2022, 
+                    "day": 18, 
+                    "minute": 15
+                }, 
+                "Name": "custodian-policy-test1"
             }
         ], 
         "ResponseMetadata": {

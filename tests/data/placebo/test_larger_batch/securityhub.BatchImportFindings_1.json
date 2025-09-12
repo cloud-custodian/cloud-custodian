@@ -1,0 +1,9 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "FailedCount": 0,
+        "SuccessCount": 2,
+        "FailedFindings": []
+    }
+}

@@ -31,7 +31,7 @@ class ResourceQuery:
     def __init__(self, session_factory):
         self.session_factory = session_factory
 
-    def filter(self, resource_manager, **params):
+    def filter(self, resource_manager, query=None, **params):
         m = resource_manager.resource_type
         enum_op, list_op, extra_args = m.enum_spec
 
@@ -42,6 +42,9 @@ class ResourceQuery:
 
         try:
             op = getattr(getattr(resource_manager.get_client(), enum_op), list_op)
+            if query:
+                params.update(**query[0])
+
             result = op(**params)
 
             if isinstance(result, Iterable):
@@ -78,7 +81,7 @@ class DescribeSource:
         pass
 
     def get_resources(self, query):
-        return self.query.filter(self.manager)
+        return self.query.filter(self.manager, query)
 
     def get_permissions(self):
         return ()
@@ -100,9 +103,6 @@ class ResourceGraphSource:
                 % self.manager.data['resource'])
 
     def get_resources(self, _):
-        log.warning('The Azure Resource Graph source '
-                    'should not be used in production scenarios at this time.')
-
         session = self.manager.get_session()
         client = session.client('azure.mgmt.resourcegraph.ResourceGraphClient')
 
@@ -133,7 +133,7 @@ class ChildResourceQuery(ResourceQuery):
     parents identifiers. ie. SQL and Cosmos databases
     """
 
-    def filter(self, resource_manager, **params):
+    def filter(self, resource_manager, query=None, **params):
         """Query a set of resources."""
         m = self.resolve(resource_manager.resource_type)  # type: ChildTypeInfo
 
@@ -162,7 +162,6 @@ class ChildResourceQuery(ResourceQuery):
                             .format(parent[parents.resource_type.id], e))
                 if m.raise_on_exception:
                     raise e
-
         return results
 
 
@@ -187,8 +186,12 @@ class TypeInfo(metaclass=TypeMeta):
     client = ''
 
     resource = DEFAULT_RESOURCE_AUTH_ENDPOINT
-    # Default id field, resources should override if different (used for meta filters, report etc)
+    # Default id and name fields, resources should override if different
+    # (used for meta filters, report etc)
     id = 'id'
+    name = 'name'
+
+    default_report_fields = ()
 
     @classmethod
     def extra_args(cls, resource_manager):
@@ -226,8 +229,8 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
     class resource_type(TypeInfo):
         pass
 
-    def __init__(self, data, options):
-        super(QueryResourceManager, self).__init__(data, options)
+    def __init__(self, ctx, data):
+        super(QueryResourceManager, self).__init__(ctx, data)
         self.source = self.get_source(self.source_type)
         self._session = None
 
@@ -266,6 +269,9 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
         return self.data.get('source', 'describe-azure')
 
     def resources(self, query=None, augment=True):
+        if self.data.get("query"):
+            query = self.data["query"]
+
         cache_key = self.get_cache_key(query)
 
         resources = None
@@ -284,6 +290,8 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
                 with self.ctx.tracer.subsegment('resource-augment'):
                     resources = self.augment(resources)
             self._cache.save(cache_key, resources)
+
+        self._cache.close()
 
         with self.ctx.tracer.subsegment('filter'):
             resource_count = len(resources)
@@ -329,6 +337,43 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
 class ChildResourceManager(QueryResourceManager, metaclass=QueryMeta):
     child_source = 'describe-child-azure'
     parent_manager = None
+
+    @staticmethod
+    def _extract_parent(resource):
+        """
+        Returns a parent id from a child resource.
+
+        This is a reference implementation for child resources, and may need to
+        be reimplemented on specific resource types
+        """
+        # /
+        # subscriptions
+        # /
+        # <subscription id>
+        # /
+        # resourceGroups
+        # /
+        # <resource group id>
+        # /
+        # providers
+        # /
+        # <provider id>
+        # /
+        # <parent type>
+        # /
+        # <parent id>
+        # /
+        # ...
+        return resource['id'].split('/', 9)[-2]
+
+    @staticmethod
+    def extract_parent(resource):
+        """
+        Extract the parent id out of the child resource metadata
+        """
+        if ChildTypeInfo.parent_key in resource:
+            return resource[ChildTypeInfo.parent_key]
+        return ChildResourceManager._extract_parent(resource)
 
     @property
     def source_type(self):

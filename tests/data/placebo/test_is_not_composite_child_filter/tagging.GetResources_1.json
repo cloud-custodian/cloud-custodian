@@ -1,0 +1,26 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-tags-filter",
+                "Tags": [
+                    {
+                        "Key": "some-tag",
+                        "Value": "some-value"
+                    },
+                    {
+                        "Key": "OwnerName",
+                        "Value": "SomeName"
+                    },
+                    {
+                        "Key": "pratyush",
+                        "Value": "test"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,24 @@
+{
+    "status_code": 200,
+    "data": {
+        "subscriptionFilters": [
+            {
+                "filterName": "r53query-log-644160558196",
+                "logGroupName": "/aws/route53/custodian.io",
+                "filterPattern": "",
+                "destinationArn": "arn:aws:logs:us-east-1:644160558196:destination:r53query-log-destination-644160558196",
+                "distribution": "Random",
+                "creationTime": 1668764961184
+            },
+            {
+                "filterName": "testsubscription",
+                "logGroupName": "/aws/route53/custodian.io",
+                "filterPattern": "",
+                "destinationArn": "arn:aws:lambda:us-east-1:644160558196:function:ResolverEnableQueryLogging",
+                "distribution": "ByLogStream",
+                "creationTime": 1668751940196
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

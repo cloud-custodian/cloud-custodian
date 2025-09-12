@@ -20,6 +20,13 @@ class BucketTest(BaseTest):
         self.assertEqual(resources[0]['id'], "staging.cloud-custodian.appspot.com")
         self.assertEqual(resources[0]['storageClass'], "STANDARD")
 
+        self.assertEqual(
+            p.resource_manager.get_urns(resources),
+            [
+                "gcp:storage::cloud-custodian:bucket/staging.cloud-custodian.appspot.com",
+            ],
+        )
+
     def test_bucket_get(self):
         project_id = 'cloud-custodian'
         bucket_name = "staging.cloud-custodian.appspot.com"
@@ -34,6 +41,13 @@ class BucketTest(BaseTest):
         self.assertEqual(bucket['id'], "staging.cloud-custodian.appspot.com")
         self.assertEqual(bucket['storageClass'], "STANDARD")
         self.assertEqual(bucket['location'], "EU")
+
+        self.assertEqual(
+            p.resource_manager.get_urns([bucket]),
+            [
+                "gcp:storage::cloud-custodian:bucket/staging.cloud-custodian.appspot.com",
+            ],
+        )
 
     def test_enable_uniform_bucket_level_access(self):
         project_id = 'custodian-1291'
@@ -61,3 +75,49 @@ class BucketTest(BaseTest):
         self.assertEqual(bucket['storageClass'], "REGIONAL")
         self.assertEqual(bucket['location'], "US-EAST1")
         self.assertJmes('iamConfiguration.uniformBucketLevelAccess.enabled', bucket, True)
+
+    def test_bucket_iam_policy_filter(self):
+        factory = self.replay_flight_data('bucket-iam-policy')
+        p = self.load_policy(
+            {'name': 'bucket',
+             'resource': 'gcp.bucket',
+             'filters': [{
+                 'type': 'iam-policy',
+                 'doc': {'key': 'bindings[*].members[]',
+                 'op': 'intersect',
+                 'value': ['allUsers', 'allAuthenticatedUsers']}
+             }]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+
+        for resource in resources:
+            self.assertTrue('c7n:iamPolicy' in resource)
+            bindings = resource['c7n:iamPolicy']['bindings']
+            members = set()
+            for binding in bindings:
+                for member in binding['members']:
+                    members.add(member)
+            self.assertTrue('allUsers' in members or 'allAuthenticatedUsers' in members)
+
+    def test_bucket_scc_mode(self):
+        project_id = "cloud-custodian"
+        bucket_name = "staging.cloud-custodian.appspot.com"
+        factory = self.replay_flight_data("bucket-get-resource", project_id)
+        p = self.load_policy(
+            {"name": "bucket", "resource": "gcp.bucket", "mode": {"type": "gcp-scc", "org": 12345}},
+            session_factory=factory,
+        )
+        [bucket] = p.push(
+            # Fake a minimal scc finding for a bucket.
+            {"finding": {"resourceName": "//storage.googleapis.com/" + bucket_name}, "resource": {}}
+        )
+
+        assert bucket["name"] == bucket_name
+        assert bucket["id"] == "staging.cloud-custodian.appspot.com"
+        assert bucket["storageClass"] == "STANDARD"
+        assert bucket["location"] == "EU"
+
+        assert p.resource_manager.get_urns([bucket]) == [
+            "gcp:storage::cloud-custodian:bucket/staging.cloud-custodian.appspot.com",
+        ]

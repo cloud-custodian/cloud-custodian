@@ -16,7 +16,7 @@ class TestECR(BaseTest):
         with self.assertRaises(PolicyValidationError) as ecm:
             lifecycle_rule_validate(
                 policy, {'selection': {'tagStatus': 'tagged'}})
-        self.assertIn('tagPrefixList required', str(ecm.exception))
+        self.assertIn('tagPrefixList or tagPatternList required', str(ecm.exception))
         with self.assertRaises(PolicyValidationError) as ecm:
             lifecycle_rule_validate(
                 policy, {'selection': {
@@ -24,6 +24,15 @@ class TestECR(BaseTest):
                     'countNumber': 10, 'countUnit': 'days',
                     'countType': 'imageCountMoreThan'}})
         self.assertIn('countUnit invalid', str(ecm.exception))
+        r = lifecycle_rule_validate(policy, {'selection': {
+            'tagStatus': 'tagged', 'tagPatternList': ["prod*"],
+            'countType': 'sinceImagePushed', 'countUnit': 'days',
+            'countNumber': 14}})
+        self.assertEqual(r, None)
+        r = lifecycle_rule_validate(policy, {'selection': {
+            'tagStatus': 'tagged', 'tagPatternList': ["prod"],
+            'countType': 'imageCountMoreThan', 'countNumber': 1}})
+        self.assertEqual(r, None)
 
     def create_repository(self, client, name):
         """ Create the named repository. Delete existing one first if applicable. """
@@ -288,3 +297,164 @@ class TestECR(BaseTest):
 
     def test_ecr_set_lifecycle(self):
         pass
+
+    def test_ecr_image_query(self):
+        session_factory = self.replay_flight_data("test_ecr_image_query")
+        p = self.load_policy(
+            {
+                "name": "query-ecr-image",
+                "resource": "aws.ecr-image",
+                "query": [
+                    {
+                        "filter": {
+                            "tagStatus": "TAGGED"
+                        }
+                    }
+                ]
+            },
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_ecr_image_filter_security_finding(self):
+        session_factory = self.replay_flight_data("test_ecr_image_filter_security_finding")
+        p = self.load_policy(
+            {
+                "name": "query-ecr-image-with-finding",
+                "resource": "aws.ecr-image",
+                "filters": [
+                    {
+                        "type": "finding",
+                        "query": {
+                            "RecordState": [
+                                {
+                                    "Value": "ACTIVE",
+                                    "Comparison": "EQUALS"
+                                }
+                            ],
+                            "Title": [
+                                {
+                                    "Value": "CVE-2021-44228",
+                                    "Comparison": "PREFIX"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_ecr_image_modify_policy(self):
+        session_factory = self.replay_flight_data("test_ecr_image_modify_policy")
+        p = self.load_policy(
+            {
+                "name": "modify-ecr-repo-policy-image-with-finding",
+                "resource": "aws.ecr-image",
+                "filters": [
+                    {
+                        "type": "finding"
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "modify-ecr-policy",
+                        "add-statements": [
+                            {
+                                "Sid": "StatementAddedByC7N",
+                                "Effect": "Deny",
+                                "Principal": "*",
+                                "Action": [
+                                    "ecr:BatchGetImage"
+                                ]
+                            }
+                        ],
+                        "remove-statements": [
+                            "OldStatementToDelete"
+                        ]
+                    }
+                ]
+            },
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_ecr_repo_modify_policy(self):
+        session_factory = self.replay_flight_data("test_ecr_repo_modify_policy")
+        p = self.load_policy(
+            {
+                "name": "modify-ecr-repo-policy",
+                "resource": "aws.ecr",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "createdAt",
+                        "value_type": "date",
+                        "op": "lt",
+                        "value": "2021/12/15"
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "modify-ecr-policy",
+                        "add-statements": [
+                            {
+                                "Sid": "StatementAddedByC7N",
+                                "Effect": "Deny",
+                                "Principal": "*",
+                                "Action": [
+                                    "ecr:BatchGetImage"
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_ecr_metrics_filter(self):
+        session_factory = self.replay_flight_data("test_ecr_metrics_filter")
+        p = self.load_policy(
+            {
+                "name": "ecr-metrics-filter",
+                "resource": "aws.ecr",
+                "filters": [
+                    {
+                        "type": "metrics",
+                        "statistics": "Sum",
+                        "days": 5,
+                        "period": 86400,
+                        "op": "greater-than",
+                        "value": 1,
+                        "name": "RepositoryPullCount"
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_ecr_cross_account_filter_config(self):
+        session_factory = self.replay_flight_data("test_ecr_cross_account_filter_config")
+        p = self.load_policy(
+            {
+                "name": "ecr-cross-account-config",
+                "resource": "aws.ecr",
+                "source": "config",
+                "filters": [
+                    {
+                        "type": "cross-account",
+                        "whitelist": ["644160558196"],
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 4)
+        self.assertEqual({"testrepo", "testing", "test-ecr-modify-policy", "demodev"}, {r.get(
+            "repositoryName") for r in resources})

@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:workspaces:us-east-1:644160558196:workspaceimage/wsi-3j5p8pys7",
+                "Tags": [
+                    {
+                        "Key": "DeleteMe",
+                        "Value": ""
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

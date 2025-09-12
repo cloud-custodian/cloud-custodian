@@ -1,0 +1,81 @@
+name: "Install"
+description: "Install Cloud Custodian"
+inputs:
+  python-version:
+    required: true
+  uv-version:
+    required: true
+outputs:
+  uv-version:
+    description: "uv version"
+    value: ${{ steps.echo-uv-version.outputs.uv-version }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install uv
+      uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # ratchet:astral-sh/setup-uv@v5
+      with:
+        version: ${{ inputs.uv-version }}
+        enable-cache: true
+
+    - name: Set up Python ${{ inputs.python-version }}
+      uses: actions/setup-python@8d9ed9ac5c53483de85588cdf95a591a75ab9f55 # ratchet:actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python-version }}
+
+    - name: Set up cache
+      uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # ratchet:actions/cache@v4
+      id: cache
+      with:
+        path: .venv
+        key: venv-${{ runner.os }}-${{ inputs.python-version }}-${{ hashFiles('uv.lock') }}
+
+    - name: Update PATH
+      shell: bash
+      run: |
+        if [[ "$OSTYPE" == "msys" ]]
+        then
+          echo "$PWD\.venv\Scripts" >> $GITHUB_PATH
+          echo "VIRTUAL_ENV=$PWD\.venv" >> $GITHUB_ENV
+        else
+          echo "$PWD/.venv/bin" >> $GITHUB_PATH
+          echo "VIRTUAL_ENV=$PWD/.venv" >> $GITHUB_ENV
+        fi
+
+    - name: Ensure cache is healthy
+      if: steps.cache.outputs.cache-hit == 'true'
+      id: cache_check
+      shell: bash
+      run: |
+        if uv run custodian version ; then
+           echo "venv=success" >> $GITHUB_OUTPUT
+           echo "Cache Green"
+        else
+           rm -rf .venv
+           echo "venv==recreate" >> $GITHUB_OUTPUT
+           echo "Cache Red"
+        fi
+
+    - name: Install
+      if: steps.cache.outputs.cache-hit != 'true' || steps.cache_check.outputs.venv != 'success'
+      shell: bash
+      env:
+        CHECK_VENV: ${{ steps.cache_check.outputs.venv }}
+        CACHE_HIT: ${{ steps.cache.outputs.cache-hit }}
+      run: |
+        echo "check venv $CHECK_VENV"
+        echo "cache hit $CACHE_HIT"
+        if [ -d ".venv" ]; then
+          mv .venv .venv-old
+        fi
+        make install
+
+    - name: Output UV Version
+      shell: bash
+      id: echo-uv-version
+      run: echo "uv-version=${{ inputs.uv-version }}" >> $GITHUB_OUTPUT
+
+    - name: Build awscc data files
+      shell: bash
+      run: cd tools/c7n_awscc && python build.py

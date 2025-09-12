@@ -1,0 +1,21 @@
+{
+    "status_code": 200,
+    "data": {
+        "RuleSets": [
+            {
+                "Name": "test-set",
+                "CreatedTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 6,
+                    "day": 22,
+                    "hour": 18,
+                    "minute": 37,
+                    "second": 9,
+                    "microsecond": 607000
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

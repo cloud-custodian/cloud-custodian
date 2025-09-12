@@ -5,6 +5,7 @@
 import json
 import time
 import datetime
+from contextlib import suppress
 from botocore.exceptions import ClientError
 from fnmatch import fnmatch
 from dateutil.parser import parse as parse_date
@@ -16,14 +17,15 @@ from c7n.filters import Filter, FilterRegistry, ValueFilter
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters.multiattr import MultiAttrFilter
 from c7n.filters.missing import Missing
-from c7n.manager import ResourceManager, resources
-from c7n.utils import local_session, type_schema, generate_arn
-from c7n.query import QueryResourceManager, TypeInfo
+from c7n.manager import resources
+from c7n.utils import local_session, type_schema, generate_arn, get_support_region, jmespath_search
+from c7n.query import QueryResourceManager, TypeInfo, DescribeSource
+from c7n.filters import ListItemFilter
 
 from c7n.resources.iam import CredentialReport
 from c7n.resources.securityhub import OtherResourcePostFinding
 
-from .aws import shape_validate
+from .aws import shape_validate, Arn
 
 filters = FilterRegistry('aws.account.filters')
 actions = ActionRegistry('aws.account.actions')
@@ -32,22 +34,30 @@ retry = staticmethod(QueryResourceManager.retry)
 filters.register('missing', Missing)
 
 
-def get_account(session_factory, config):
-    session = local_session(session_factory)
-    client = session.client('iam')
-    aliases = client.list_account_aliases().get(
-        'AccountAliases', ('',))
-    name = aliases and aliases[0] or ""
-    return {'account_id': config.account_id,
-            'account_name': name}
+class DescribeAccount(DescribeSource):
+
+    def get_account(self):
+        client = local_session(self.manager.session_factory).client("iam")
+        aliases = client.list_account_aliases().get(
+            'AccountAliases', ('',))
+        name = aliases and aliases[0] or ""
+        return {'account_id': self.manager.config.account_id,
+                'account_name': name}
+
+    def resources(self, query=None):
+        return [self.get_account()]
+
+    def get_resources(self, resource_ids):
+        return [self.get_account()]
 
 
 @resources.register('account')
-class Account(ResourceManager):
+class Account(QueryResourceManager):
 
     filter_registry = filters
     action_registry = actions
     retry = staticmethod(QueryResourceManager.retry)
+    source_type = 'describe'
 
     class resource_type(TypeInfo):
         id = 'account_id'
@@ -56,6 +66,12 @@ class Account(ResourceManager):
         global_resource = True
         # fake this for doc gen
         service = "account"
+        # for posting config rule evaluations
+        cfn_type = 'AWS::::Account'
+
+    source_mapping = {
+        'describe': DescribeAccount
+    }
 
     @classmethod
     def get_permissions(cls):
@@ -67,15 +83,6 @@ class Account(ResourceManager):
 
     def get_arns(self, resources):
         return ["arn:::{account_id}".format(**r) for r in resources]
-
-    def get_model(self):
-        return self.resource_type
-
-    def resources(self):
-        return self.filter_resources([get_account(self.session_factory, self.config)])
-
-    def get_resources(self, resource_ids):
-        return [get_account(self.session_factory, self.config)]
 
 
 @filters.register('credential')
@@ -95,12 +102,77 @@ class AccountCredentialReport(CredentialReport):
         return results
 
 
+@filters.register('organization')
+class AccountOrganization(ValueFilter):
+    """Check organization enrollment and configuration
+
+    :example:
+
+    determine if an account is not in an organization
+
+    .. code-block:: yaml
+
+      policies:
+        - name: no-org
+          resource: account
+          filters:
+            - type: organization
+              key: Id
+              value: absent
+
+
+    :example:
+
+    determine if an account is setup for organization policies
+
+    .. code-block:: yaml
+
+       policies:
+         - name: org-policies-not-enabled
+           resource: account
+           filters:
+             - type: organization
+               key: FeatureSet
+               value: ALL
+               op: not-equal
+    """
+    schema = type_schema('organization', rinherit=ValueFilter.schema)
+    schema_alias = False
+
+    annotation_key = 'c7n:org'
+    annotate = False
+
+    permissions = ('organizations:DescribeOrganization',)
+
+    def get_org_info(self, account):
+        client = local_session(
+            self.manager.session_factory).client('organizations')
+        try:
+            org_info = client.describe_organization().get('Organization')
+        except client.exceptions.AWSOrganizationsNotInUseException:
+            org_info = {}
+        except ClientError as e:
+            self.log.warning('organization filter error accessing org info %s', e)
+            org_info = None
+        account[self.annotation_key] = org_info
+
+    def process(self, resources, event=None):
+        if self.annotation_key not in resources[0]:
+            self.get_org_info(resources[0])
+        # if we can't access org info, we've already logged, and return
+        if resources[0][self.annotation_key] is None:
+            return []
+        if super().process([resources[0][self.annotation_key]]):
+            return resources
+        return []
+
+
 @filters.register('check-macie')
 class MacieEnabled(ValueFilter):
     """Check status of macie v2 in the account.
 
     Gets the macie session info for the account, and
-    the macie master account for the current account if
+    the macie adminstrator account for the current account if
     configured.
     """
 
@@ -108,7 +180,7 @@ class MacieEnabled(ValueFilter):
     schema_alias = False
     annotation_key = 'c7n:macie'
     annotate = False
-    permissions = ('macie2:GetMacieSession', 'macie2:GetMasterAccount',)
+    permissions = ('macie2:GetMacieSession', 'macie2:GetAdministratorAccount',)
 
     def process(self, resources, event=None):
 
@@ -117,6 +189,8 @@ class MacieEnabled(ValueFilter):
 
         if super().process([resources[0][self.annotation_key]]):
             return resources
+
+        return []
 
     def get_macie_info(self, account):
         client = local_session(
@@ -129,12 +203,13 @@ class MacieEnabled(ValueFilter):
             info = {}
 
         try:
-            minfo = client.get_master_account().get('master')
+            minfo = client.get_administrator_account().get('administrator')
         except (client.exceptions.AccessDeniedException,
                 client.exceptions.ResourceNotFoundException):
             info['master'] = {}
         else:
             info['master'] = minfo
+        info['administrator'] = info['master']
         account[self.annotation_key] = info
 
 
@@ -146,6 +221,9 @@ class CloudTrailEnabled(Filter):
 
     Of particular note, the current-region option will evaluate whether cloudtrail is available
     in the current region, either as a multi region trail or as a trail with it as the home region.
+
+    The log-metric-filter-pattern option checks for the existence of a cloudwatch alarm and a
+    corresponding SNS subscription for a specific filter pattern
 
     :example:
 
@@ -160,6 +238,24 @@ class CloudTrailEnabled(Filter):
                     global-events: true
                     multi-region: true
                     running: true
+                    include-management-events: true
+                    log-metric-filter-pattern: "{ ($.eventName = \\"ConsoleLogin\\") }"
+
+    Check for CloudWatch log group with a metric filter that has a filter pattern
+    matching a regex pattern:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: account-cloudtrail-with-matching-log-metric-filter
+                resource: account
+                region: us-east-1
+                filters:
+                  - type: check-cloudtrail
+                    log-metric-filter-pattern:
+                        type: value
+                        op: regex
+                        value: '\\{ ?(\\()? ?\\$\\.eventName ?= ?(")?ConsoleLogin(")? ?(\\))? ?\\}'
     """
     schema = type_schema(
         'check-cloudtrail',
@@ -170,15 +266,22 @@ class CloudTrailEnabled(Filter):
            'notifies': {'type': 'boolean'},
            'file-digest': {'type': 'boolean'},
            'kms': {'type': 'boolean'},
-           'kms-key': {'type': 'string'}})
+           'kms-key': {'type': 'string'},
+           'include-management-events': {'type': 'boolean'},
+           'log-metric-filter-pattern':  {'oneOf': [
+                {'$ref': '#/definitions/filters/value'},
+                {'type': 'string'}]}})
 
-    permissions = ('cloudtrail:DescribeTrails', 'cloudtrail:GetTrailStatus')
+    permissions = ('cloudtrail:DescribeTrails', 'cloudtrail:GetTrailStatus',
+                   'cloudtrail:GetEventSelectors', 'cloudwatch:DescribeAlarmsForMetric',
+                   'logs:DescribeMetricFilters', 'sns:GetTopicAttributes')
 
     def process(self, resources, event=None):
         session = local_session(self.manager.session_factory)
         client = session.client('cloudtrail')
         trails = client.describe_trails()['trailList']
         resources[0]['c7n:cloudtrails'] = trails
+
         if self.data.get('global-events'):
             trails = [t for t in trails if t.get('IncludeGlobalServiceEvents')]
         if self.data.get('current-region'):
@@ -206,6 +309,80 @@ class CloudTrailEnabled(Filter):
                         'LatestDeliveryError'):
                     running.append(t)
             trails = running
+        if self.data.get('include-management-events'):
+            matched = []
+            for t in list(trails):
+                selectors = client.get_event_selectors(TrailName=t['TrailARN'])
+                if 'EventSelectors' in selectors.keys():
+                    for s in selectors['EventSelectors']:
+                        if s['IncludeManagementEvents'] and s['ReadWriteType'] == 'All':
+                            matched.append(t)
+                elif 'AdvancedEventSelectors' in selectors.keys():
+                    for s in selectors['AdvancedEventSelectors']:
+                        management = False
+                        readonly = False
+                        for field_selector in s['FieldSelectors']:
+                            if field_selector['Field'] == 'eventCategory' and \
+                                    'Management' in field_selector['Equals']:
+                                management = True
+                            elif field_selector['Field'] == 'readOnly':
+                                readonly = True
+                        if management and not readonly:
+                            matched.append(t)
+
+            trails = matched
+        if self.data.get('log-metric-filter-pattern'):
+            client_logs = session.client('logs')
+            client_cw = session.client('cloudwatch')
+            client_sns = session.client('sns')
+            matched = []
+            pattern = self.data.get('log-metric-filter-pattern')
+            if isinstance(pattern, str):
+                vf = ValueFilter({'key': 'filterPattern', 'value': pattern})
+            else:
+                pattern.setdefault('key', 'filterPattern')
+                vf = ValueFilter(pattern)
+
+            for t in list(trails):
+                if 'CloudWatchLogsLogGroupArn' not in t.keys():
+                    continue
+                log_group_name = t['CloudWatchLogsLogGroupArn'].split(':')[6]
+                try:
+                    metric_filters_log_group = \
+                        client_logs.describe_metric_filters(
+                            logGroupName=log_group_name)['metricFilters']
+                except ClientError as e:
+                    if e.response['Error']['Code'] == 'ResourceNotFoundException':
+                        continue
+                filter_matched = None
+                if metric_filters_log_group:
+                    for f in metric_filters_log_group:
+                        if vf(f):
+                            filter_matched = f
+                            break
+                if not filter_matched:
+                    continue
+                alarms = client_cw.describe_alarms_for_metric(
+                    MetricName=filter_matched["metricTransformations"][0]["metricName"],
+                    Namespace=filter_matched["metricTransformations"][0]["metricNamespace"]
+                )['MetricAlarms']
+                alarm_actions = []
+                for a in alarms:
+                    alarm_actions.extend(a['AlarmActions'])
+                if not alarm_actions:
+                    continue
+                alarm_actions = set(alarm_actions)
+                for a in alarm_actions:
+                    try:
+                        sns_topic_attributes = client_sns.get_topic_attributes(TopicArn=a)
+                        sns_topic_attributes = sns_topic_attributes.get('Attributes')
+                        if sns_topic_attributes.get('SubscriptionsConfirmed', '0') != '0':
+                            matched.append(t)
+                    except client_sns.exceptions.InvalidParameterValueException:
+                        # we can ignore any exception here, the alarm action might
+                        # not be an sns topic for instance
+                        continue
+            trails = matched
         if trails:
             return []
         return resources
@@ -247,7 +424,7 @@ class GuardDutyEnabled(MultiAttrFilter):
 
     annotation = "c7n:guard-duty"
     permissions = (
-        'guardduty:GetMasterAccount',
+        'guardduty:GetAdministratorAccount',
         'guardduty:ListDetectors',
         'guardduty:GetDetector')
 
@@ -274,7 +451,7 @@ class GuardDutyEnabled(MultiAttrFilter):
 
         detector = client.get_detector(DetectorId=detector_id)
         detector.pop('ResponseMetadata', None)
-        master = client.get_master_account(DetectorId=detector_id).get('Master')
+        master = client.get_administrator_account(DetectorId=detector_id).get('Master')
         resource[self.annotation] = r = {'Detector': detector, 'Master': master}
         return r
 
@@ -686,7 +863,14 @@ class ServiceLimit(Filter):
 
         # Check status and if necessary refresh checks
         if checks['status'] == 'not_available':
-            client.refresh_trusted_advisor_check(checkId=check_id)
+            try:
+                client.refresh_trusted_advisor_check(checkId=check_id)
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'InvalidParameterValueException':
+                    cls.log.warning("InvalidParameterValueException: %s",
+                     e.response['Error']['Message'])
+                    return
+
             for _ in range(cls.poll_max_intervals):
                 time.sleep(cls.poll_interval)
                 refresh_response = client.describe_trusted_advisor_check_refresh_statuses(
@@ -724,9 +908,9 @@ class ServiceLimit(Filter):
         return True
 
     def process(self, resources, event=None):
+        support_region = get_support_region(self.manager)
         client = local_session(self.manager.session_factory).client(
-            'support', region_name='us-east-1')
-
+            'support', region_name=support_region)
         checks = self.get_available_checks(client)
         exceeded = []
         for check in checks:
@@ -747,6 +931,9 @@ class ServiceLimit(Filter):
         region = self.manager.config.region
         results = self.get_check_result(client, check['id'])
 
+        if results is None or 'flaggedResources' not in results:
+            return []
+
         # trim to only results for this region
         results['flaggedResources'] = [
             r
@@ -763,7 +950,13 @@ class ServiceLimit(Filter):
         delta = datetime.timedelta(self.data.get('refresh_period', 1))
         check_date = parse_date(results['timestamp'])
         if datetime.datetime.now(tz=tzutc()) - delta > check_date:
-            client.refresh_trusted_advisor_check(checkId=check['id'])
+            try:
+                client.refresh_trusted_advisor_check(checkId=check['id'])
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'InvalidParameterValueException':
+                    self.log.warning("InvalidParameterValueException: %s",
+                     e.response['Error']['Message'])
+                    return
 
         services = self.data.get('services')
         limits = self.data.get('limits')
@@ -855,8 +1048,9 @@ class RequestLimitIncrease(BaseAction):
     }
 
     def process(self, resources):
-        session = local_session(self.manager.session_factory)
-        client = session.client('support', region_name='us-east-1')
+        support_region = get_support_region(self.manager)
+        client = local_session(self.manager.session_factory).client(
+            'support', region_name=support_region)
         account_id = self.manager.config.account_id
         service_map = {}
         region_map = {}
@@ -1080,7 +1274,8 @@ class HasVirtualMFA(Filter):
     permissions = ('iam:ListVirtualMFADevices',)
 
     def mfa_belongs_to_root_account(self, mfa):
-        return mfa['SerialNumber'].endswith(':mfa/root-account-mfa-device')
+        mfa_user = mfa.get('User', {}).get('Arn', '').split(':')[-1]
+        return mfa_user == 'root'
 
     def account_has_virtual_mfa(self, account):
         if not account.get('c7n:VirtualMFADevices'):
@@ -1719,11 +1914,9 @@ class EMRBlockPublicAccessConfiguration(ValueFilter):
             'emr', region_name=self.manager.config.region)
 
         for r in resources:
-            try:
-                r[self.annotation_key] = client.get_block_public_access_configuration()
-                r[self.annotation_key].pop('ResponseMetadata')
-            except client.exceptions.NoSuchPublicAccessBlockConfiguration:
-                r[self.annotation_key] = {}
+            r[self.annotation_key] = self.manager.retry(
+                client.get_block_public_access_configuration)
+            r[self.annotation_key].pop('ResponseMetadata')
 
     def __call__(self, r):
         return super(EMRBlockPublicAccessConfiguration, self).__call__(r[self.annotation_key])
@@ -1833,3 +2026,615 @@ class SecHubEnabled(Filter):
         if state == bool(sechub):
             return resources
         return []
+
+
+@filters.register('lakeformation-s3-cross-account')
+class LakeformationFilter(Filter):
+    """Flags an account if its using a lakeformation s3 bucket resource from a different account.
+
+    :example:
+
+    .. code-block:: yaml
+
+       policies:
+         - name: lakeformation-cross-account-bucket
+           resource: aws.account
+           filters:
+            - type: lakeformation-s3-cross-account
+
+    """
+
+    schema = type_schema('lakeformation-s3-cross-account', rinherit=ValueFilter.schema)
+    schema_alias = False
+    permissions = ('lakeformation:ListResources',)
+    annotation = 'c7n:lake-cross-account-s3'
+
+    def process(self, resources, event=None):
+        results = []
+        for r in resources:
+            if self.process_account(r):
+                results.append(r)
+        return results
+
+    def process_account(self, account):
+        client = local_session(self.manager.session_factory).client('lakeformation')
+        lake_buckets = {
+            Arn.parse(r).resource for r in jmespath_search(
+                'ResourceInfoList[].ResourceArn',
+                client.list_resources())
+        }
+        buckets = {
+            b['Name'] for b in
+            self.manager.get_resource_manager('s3').resources(augment=False)}
+        cross_account = lake_buckets.difference(buckets)
+        if not cross_account:
+            return False
+        account[self.annotation] = list(cross_account)
+        return True
+
+
+@actions.register('toggle-config-managed-rule')
+class ToggleConfigManagedRule(BaseAction):
+    """Enables or disables an AWS Config Managed Rule
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: config-managed-s3-bucket-public-write-remediate-event
+            description: |
+              This policy detects if S3 bucket allows public write by the bucket policy
+              or ACL and remediates.
+            comment: |
+              This policy detects if S3 bucket policy or ACL allows public write access.
+              When the bucket is evaluated as 'NON_COMPLIANT', the action
+              'AWS-DisableS3BucketPublicReadWrite' is triggered and remediates.
+            resource: account
+            filters:
+              - type: missing
+                policy:
+                  resource: config-rule
+                  filters:
+                    - type: remediation
+                      rule_name: &rule_name 'config-managed-s3-bucket-public-write-remediate-event'
+                      remediation: &remediation-config
+                        TargetId: AWS-DisableS3BucketPublicReadWrite
+                        Automatic: true
+                        MaximumAutomaticAttempts: 5
+                        RetryAttemptSeconds: 211
+                        Parameters:
+                          AutomationAssumeRole:
+                            StaticValue:
+                              Values:
+                                - 'arn:aws:iam::{account_id}:role/myrole'
+                          S3BucketName:
+                            ResourceValue:
+                              Value: RESOURCE_ID
+            actions:
+              - type: toggle-config-managed-rule
+                rule_name: *rule_name
+                managed_rule_id: S3_BUCKET_PUBLIC_WRITE_PROHIBITED
+                resource_types:
+                  - 'AWS::S3::Bucket'
+                rule_parameters: '{}'
+                remediation: *remediation-config
+    """
+
+    permissions = (
+        'config:DescribeConfigRules',
+        'config:DescribeRemediationConfigurations',
+        'config:PutRemediationConfigurations',
+        'config:PutConfigRule',
+    )
+
+    schema = type_schema('toggle-config-managed-rule',
+        enabled={'type': 'boolean', 'default': True},
+        rule_name={'type': 'string'},
+        rule_prefix={'type': 'string'},
+        managed_rule_id={'type': 'string'},
+        resource_types={'type': 'array', 'items':
+                        {'pattern': '^AWS::*', 'type': 'string'}},
+        resource_tag={
+            'type': 'object',
+            'properties': {
+                'key': {'type': 'string'},
+                'value': {'type': 'string'},
+            },
+            'required': ['key', 'value'],
+        },
+        resource_id={'type': 'string'},
+        rule_parameters={'type': 'string'},
+        remediation={
+            'type': 'object',
+            'properties': {
+                'TargetType': {'type': 'string'},
+                'TargetId': {'type': 'string'},
+                'Automatic': {'type': 'boolean'},
+                'Parameters': {'type': 'object'},
+                'MaximumAutomaticAttempts': {
+                    'type': 'integer',
+                    'minimum': 1, 'maximum': 25,
+                },
+                'RetryAttemptSeconds': {
+                    'type': 'integer',
+                    'minimum': 1, 'maximum': 2678000,
+                },
+                'ExecutionControls': {'type': 'object'},
+            },
+        },
+        tags={'type': 'object'},
+        required=['rule_name'],
+    )
+
+    def validate(self):
+        if (
+            self.data.get('enabled', True) and
+            not self.data.get('managed_rule_id')
+        ):
+            raise PolicyValidationError("managed_rule_id required to enable a managed rule")
+        return self
+
+    def process(self, accounts):
+        client = local_session(self.manager.session_factory).client('config')
+        rule = self.ConfigManagedRule(self.data)
+        params = self.get_rule_params(rule)
+
+        if self.data.get('enabled', True):
+            client.put_config_rule(**params)
+
+            if rule.remediation:
+                remediation_params = self.get_remediation_params(rule)
+                client.put_remediation_configurations(
+                    RemediationConfigurations=[remediation_params]
+                )
+        else:
+            with suppress(client.exceptions.NoSuchRemediationConfigurationException):
+                client.delete_remediation_configuration(
+                    ConfigRuleName=rule.name
+                )
+
+            with suppress(client.exceptions.NoSuchConfigRuleException):
+                client.delete_config_rule(
+                    ConfigRuleName=rule.name
+                )
+
+    def get_rule_params(self, rule):
+        params = dict(
+            ConfigRuleName=rule.name,
+            Description=rule.description,
+            Source={
+                'Owner': 'AWS',
+                'SourceIdentifier': rule.managed_rule_id,
+            },
+            InputParameters=rule.rule_parameters
+        )
+
+        # A config rule scope can include one or more resource types,
+        # a combination of a tag key and value, or a combination of
+        # one resource type and one resource ID
+        params.update({'Scope': {'ComplianceResourceTypes': rule.resource_types}})
+        if rule.resource_tag:
+            params.update({'Scope': {
+                'TagKey': rule.resource_tag['key'],
+                'TagValue': rule.resource_tag['value']}
+            })
+        elif rule.resource_id:
+            params.update({'Scope': {'ComplianceResourceId': rule.resource_id}})
+
+        return dict(ConfigRule=params)
+
+    def get_remediation_params(self, rule):
+        rule.remediation['ConfigRuleName'] = rule.name
+        if 'TargetType' not in rule.remediation:
+            rule.remediation['TargetType'] = 'SSM_DOCUMENT'
+        return rule.remediation
+
+    class ConfigManagedRule:
+        """Wraps the action data into an AWS Config Managed Rule.
+        """
+
+        def __init__(self, data):
+            self.data = data
+
+        @property
+        def name(self):
+            prefix = self.data.get('rule_prefix', 'custodian-')
+            return "%s%s" % (prefix, self.data.get('rule_name', ''))
+
+        @property
+        def description(self):
+            return self.data.get(
+                'description', 'cloud-custodian AWS Config Managed Rule policy')
+
+        @property
+        def tags(self):
+            return self.data.get('tags', {})
+
+        @property
+        def resource_types(self):
+            return self.data.get('resource_types', [])
+
+        @property
+        def managed_rule_id(self):
+            return self.data.get('managed_rule_id', '')
+
+        @property
+        def resource_tag(self):
+            return self.data.get('resource_tag', {})
+
+        @property
+        def resource_id(self):
+            return self.data.get('resource_id', '')
+
+        @property
+        def rule_parameters(self):
+            return self.data.get('rule_parameters', '')
+
+        @property
+        def remediation(self):
+            return self.data.get('remediation', {})
+
+
+@filters.register('ses-agg-send-stats')
+class SesAggStats(ValueFilter):
+    """This filter queries SES send statistics and aggregates all
+    the data points into a single report.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: ses-aggregated-send-stats-policy
+                resource: account
+                filters:
+                  - type: ses-agg-send-stats
+    """
+
+    schema = type_schema('ses-agg-send-stats', rinherit=ValueFilter.schema)
+    annotation_key = 'c7n:ses-send-agg'
+    permissions = ("ses:GetSendStatistics",)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('ses')
+        get_send_stats = client.get_send_statistics()
+        results = []
+
+        if not get_send_stats or not get_send_stats.get('SendDataPoints'):
+            return results
+
+        resource_counter = {'DeliveryAttempts': 0,
+                            'Bounces': 0,
+                            'Complaints': 0,
+                            'Rejects': 0,
+                            'BounceRate': 0}
+        for d in get_send_stats.get('SendDataPoints', []):
+            resource_counter['DeliveryAttempts'] += d['DeliveryAttempts']
+            resource_counter['Bounces'] += d['Bounces']
+            resource_counter['Complaints'] += d['Complaints']
+            resource_counter['Rejects'] += d['Rejects']
+        resource_counter['BounceRate'] = round(
+            (resource_counter['Bounces'] /
+             resource_counter['DeliveryAttempts']) * 100)
+        resources[0][self.annotation_key] = resource_counter
+
+        return resources
+
+
+@filters.register('ses-send-stats')
+class SesConsecutiveStats(Filter):
+    """This filter annotates the account resource with SES send statistics for the
+    last n number of days, not including the current date.
+
+    The stats are aggregated into daily metrics. Additionally, the filter also
+    calculates and annotates the max daily bounce rate (percentage). Using this filter,
+    users can alert when the bounce rate for a particular day is higher than the limit.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: ses-send-stats
+                resource: account
+                filters:
+                  - type: ses-send-stats
+                    days: 5
+                  - type: value
+                    key: '"c7n:ses-max-bounce-rate"'
+                    op: ge
+                    value: 10
+    """
+    schema = type_schema('ses-send-stats', days={'type': 'number', 'minimum': 2},
+                         required=['days'])
+    send_stats_annotation = 'c7n:ses-send-stats'
+    max_bounce_annotation = 'c7n:ses-max-bounce-rate'
+    permissions = ("ses:GetSendStatistics",)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('ses')
+        get_send_stats = client.get_send_statistics()
+        results = []
+        check_days = self.data.get('days', 2)
+        utcnow = datetime.datetime.utcnow()
+        expected_dates = set()
+
+        for days in range(1, check_days + 1):
+            expected_dates.add((utcnow - datetime.timedelta(days=days)).strftime('%Y-%m-%d'))
+
+        if not get_send_stats or not get_send_stats.get('SendDataPoints'):
+            return results
+
+        metrics = {}
+        for d in get_send_stats.get('SendDataPoints', []):
+            ts = d['Timestamp'].strftime('%Y-%m-%d')
+            if ts not in expected_dates:
+                continue
+
+            if not metrics.get(ts):
+                metrics[ts] = {'DeliveryAttempts': 0,
+                               'Bounces': 0,
+                               'Complaints': 0,
+                               'Rejects': 0}
+            metrics[ts]['DeliveryAttempts'] += d['DeliveryAttempts']
+            metrics[ts]['Bounces'] += d['Bounces']
+            metrics[ts]['Complaints'] += d['Complaints']
+            metrics[ts]['Rejects'] += d['Rejects']
+
+        max_bounce_rate = 0
+        for ts, metric in metrics.items():
+            metric['BounceRate'] = round((metric['Bounces'] / metric['DeliveryAttempts']) * 100)
+            if max_bounce_rate < metric['BounceRate']:
+                max_bounce_rate = metric['BounceRate']
+            metric['Date'] = ts
+
+        resources[0][self.send_stats_annotation] = list(metrics.values())
+        resources[0][self.max_bounce_annotation] = max_bounce_rate
+
+        return resources
+
+
+@filters.register('bedrock-model-invocation-logging')
+class BedrockModelInvocationLogging(ListItemFilter):
+    """Filter for account to look at bedrock model invocation logging configuration
+
+    The schema to supply to the attrs follows the schema here:
+     https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/bedrock/client/get_model_invocation_logging_configuration.html
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: bedrock-model-invocation-logging-configuration
+                resource: account
+                filters:
+                  - type: bedrock-model-invocation-logging
+                    attrs:
+                      - imageDataDeliveryEnabled: True
+
+    """
+    schema = type_schema(
+        'bedrock-model-invocation-logging',
+        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'},
+        count={'type': 'number'},
+        count_op={'$ref': '#/definitions/filters_common/comparison_operators'}
+    )
+    permissions = ('bedrock:GetModelInvocationLoggingConfiguration',)
+    annotation_key = 'c7n:BedrockModelInvocationLogging'
+
+    def get_item_values(self, resource):
+        item_values = []
+        client = local_session(self.manager.session_factory).client('bedrock')
+        invocation_logging_config = client \
+                .get_model_invocation_logging_configuration().get('loggingConfig')
+        if invocation_logging_config is not None:
+            item_values.append(invocation_logging_config)
+            resource[self.annotation_key] = invocation_logging_config
+        return item_values
+
+
+@actions.register('set-bedrock-model-invocation-logging')
+class SetBedrockModelInvocationLogging(BaseAction):
+    """Set Bedrock Model Invocation Logging Configuration on an account.
+     https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/bedrock/client/put_model_invocation_logging_configuration.html
+
+     To delete a configuration, supply enabled to False
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: set-bedrock-model-invocation-logging
+                resource: account
+                actions:
+                  - type: set-bedrock-model-invocation-logging
+                    enabled: True
+                    loggingConfig:
+                      textDataDeliveryEnabled: True
+                      s3Config:
+                        bucketName: test-bedrock-1
+                        keyPrefix:  logging/
+
+              - name: delete-bedrock-model-invocation-logging
+                resource: account
+                actions:
+                  - type: set-bedrock-model-invocation-logging
+                    enabled: False
+    """
+
+    schema = {
+        'type': 'object',
+        'additionalProperties': False,
+        'properties': {
+            'type': {'enum': ['set-bedrock-model-invocation-logging']},
+            'enabled': {'type': 'boolean'},
+            'loggingConfig': {'type': 'object'}
+        },
+    }
+
+    permissions = ('bedrock:PutModelInvocationLoggingConfiguration',)
+    shape = 'PutModelInvocationLoggingConfigurationRequest'
+    service = 'bedrock'
+
+    def validate(self):
+        cfg = dict(self.data)
+        enabled = cfg.get('enabled')
+        if enabled:
+            cfg.pop('type')
+            cfg.pop('enabled')
+            return shape_validate(
+                cfg,
+                self.shape,
+                self.service)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('bedrock')
+        if self.data.get('enabled'):
+            params = self.data.get('loggingConfig')
+            client.put_model_invocation_logging_configuration(loggingConfig=params)
+        else:
+            client.delete_model_invocation_logging_configuration()
+
+
+@filters.register('ec2-metadata-defaults')
+class EC2MetadataDefaults(ValueFilter):
+    """Filter on the default instance metadata service (IMDS) settings for the specified account and
+    region.  NOTE: Any configuration that has never been set (or is set to 'No Preference'), will
+    not be returned in the response.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: ec2-imds-defaults
+                resource: account
+                filters:
+                - or:
+                  - type: ec2-metadata-defaults
+                    key: HttpTokens
+                    value: optional
+                  - type: ec2-metadata-defaults
+                    key: HttpTokens
+                    value: absent
+    """
+
+    annotation_key = 'c7n:EC2MetadataDefaults'
+    annotate = False  # no annotation from value filter
+    schema = type_schema('ec2-metadata-defaults', rinherit=ValueFilter.schema)
+    permissions = ('ec2:GetInstanceMetadataDefaults',)
+
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('ec2')
+        for r in resources:
+            r[self.annotation_key] = self.manager.retry(
+                client.get_instance_metadata_defaults)["AccountLevel"]
+
+    def process(self, resources, event=None):
+        self.augment([r for r in resources if self.annotation_key not in r])
+        return super(EC2MetadataDefaults, self).process(resources, event)
+
+    def __call__(self, r):
+        return super(EC2MetadataDefaults, self).__call__(r[self.annotation_key])
+
+
+@actions.register('set-ec2-metadata-defaults')
+class SetEC2MetadataDefaults(BaseAction):
+    """Modifies the default instance metadata service (IMDS) settings at the account level.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: set-ec2-metadata-defaults
+                resource: account
+                filters:
+                  - or:
+                    - type: ec2-metadata-defaults
+                      key: HttpTokens
+                      op: eq
+                      value: optional
+                    - type: ec2-metadata-defaults
+                      key: HttpTokens
+                      value: absent
+                actions:
+                  - type: set-ec2-metadata-defaults
+                    HttpTokens: required
+
+    """
+
+    schema = type_schema(
+        'set-ec2-metadata-defaults',
+        HttpTokens={'enum': ['optional', 'required', 'no-preference']},
+        HttpPutResponseHopLimit={'type': 'integer'},
+        HttpEndpoint={'enum': ['enabled', 'disabled', 'no-preference']},
+        InstanceMetadataTags={'enum': ['enabled', 'disabled', 'no-preference']},
+    )
+
+    permissions = ('ec2:ModifyInstanceMetadataDefaults',)
+    service = 'ec2'
+    shape = 'ModifyInstanceMetadataDefaultsRequest'
+
+    def validate(self):
+        req = dict(self.data)
+        req.pop('type')
+        return shape_validate(
+            req, self.shape, self.service
+        )
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client(self.service)
+        self.data.pop('type')
+        client.modify_instance_metadata_defaults(**self.data)
+
+
+@actions.register('set-security-token-service-preferences')
+class SetSecurityTokenServicePreferences(BaseAction):
+    """Action to set STS preferences."""
+
+    """Action to set STS preferences.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: set-sts-preferences
+                resource: account
+                filters:
+                  - or:
+                    - type: iam-summary
+                      key: GlobalEndpointTokenVersion
+                      value: absent
+                      value: optional
+                    - type: iam-summary
+                      key: GlobalEndpointTokenVersion
+                      op: ne
+                      value: 2
+                actions:
+                  - type: set-security-token-service-preferences
+                    token_version: v2Token
+
+    """
+
+    schema = type_schema(
+        'set-security-token-service-preferences',
+        token_version={'type': 'string', 'enum': ['v1Token', 'v2Token']}
+    )
+
+    permissions = ('iam:SetSecurityTokenServicePreferences',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('iam')
+        token_version = self.data.get('token_version', 'v2Token')
+        for resource in resources:
+            self.set_sts_preferences(client, token_version)
+
+    def set_sts_preferences(self, client, token_version):
+        client.set_security_token_service_preferences(
+            GlobalEndpointTokenVersion=token_version
+        )

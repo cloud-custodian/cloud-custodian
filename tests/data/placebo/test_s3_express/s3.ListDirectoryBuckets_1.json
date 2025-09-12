@@ -1,0 +1,21 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Buckets": [
+            {
+                "Name": "test-zone--use1-az4--x-s3",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 12,
+                    "day": 4,
+                    "hour": 16,
+                    "minute": 6,
+                    "second": 8,
+                    "microsecond": 871000
+                }
+            }
+        ]
+    }
+}

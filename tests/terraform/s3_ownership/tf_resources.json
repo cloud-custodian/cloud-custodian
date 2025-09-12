@@ -1,0 +1,127 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_s3_bucket": {
+            "no_ownership_controls": {
+                "acceleration_status": "",
+                "acl": "private",
+                "arn": "arn:aws:s3:::c7ntest-20211227212502652800000001",
+                "bucket": "c7ntest-20211227212502652800000001",
+                "bucket_domain_name": "c7ntest-20211227212502652800000001.s3.amazonaws.com",
+                "bucket_prefix": "c7ntest-",
+                "bucket_regional_domain_name": "c7ntest-20211227212502652800000001.s3.amazonaws.com",
+                "cors_rule": [],
+                "force_destroy": false,
+                "grant": [],
+                "hosted_zone_id": "Z3AQBSTGFYJSTF",
+                "id": "c7ntest-20211227212502652800000001",
+                "lifecycle_rule": [],
+                "logging": [],
+                "object_lock_configuration": [],
+                "policy": null,
+                "region": "us-east-1",
+                "replication_configuration": [],
+                "request_payer": "BucketOwner",
+                "server_side_encryption_configuration": [],
+                "tags": null,
+                "tags_all": {},
+                "versioning": [
+                    {
+                        "enabled": false,
+                        "mfa_delete": false
+                    }
+                ],
+                "website": [],
+                "website_domain": null,
+                "website_endpoint": null
+            },
+            "owner_enforced": {
+                "acceleration_status": "",
+                "acl": "private",
+                "arn": "arn:aws:s3:::c7ntest-20211227212502652900000003",
+                "bucket": "c7ntest-20211227212502652900000003",
+                "bucket_domain_name": "c7ntest-20211227212502652900000003.s3.amazonaws.com",
+                "bucket_prefix": "c7ntest-",
+                "bucket_regional_domain_name": "c7ntest-20211227212502652900000003.s3.amazonaws.com",
+                "cors_rule": [],
+                "force_destroy": false,
+                "grant": [],
+                "hosted_zone_id": "Z3AQBSTGFYJSTF",
+                "id": "c7ntest-20211227212502652900000003",
+                "lifecycle_rule": [],
+                "logging": [],
+                "object_lock_configuration": [],
+                "policy": null,
+                "region": "us-east-1",
+                "replication_configuration": [],
+                "request_payer": "BucketOwner",
+                "server_side_encryption_configuration": [],
+                "tags": null,
+                "tags_all": {},
+                "versioning": [
+                    {
+                        "enabled": false,
+                        "mfa_delete": false
+                    }
+                ],
+                "website": [],
+                "website_domain": null,
+                "website_endpoint": null
+            },
+            "owner_preferred": {
+                "acceleration_status": "",
+                "acl": "private",
+                "arn": "arn:aws:s3:::c7ntest-20211227212502652900000002",
+                "bucket": "c7ntest-20211227212502652900000002",
+                "bucket_domain_name": "c7ntest-20211227212502652900000002.s3.amazonaws.com",
+                "bucket_prefix": "c7ntest-",
+                "bucket_regional_domain_name": "c7ntest-20211227212502652900000002.s3.amazonaws.com",
+                "cors_rule": [],
+                "force_destroy": false,
+                "grant": [],
+                "hosted_zone_id": "Z3AQBSTGFYJSTF",
+                "id": "c7ntest-20211227212502652900000002",
+                "lifecycle_rule": [],
+                "logging": [],
+                "object_lock_configuration": [],
+                "policy": null,
+                "region": "us-east-1",
+                "replication_configuration": [],
+                "request_payer": "BucketOwner",
+                "server_side_encryption_configuration": [],
+                "tags": null,
+                "tags_all": {},
+                "versioning": [
+                    {
+                        "enabled": false,
+                        "mfa_delete": false
+                    }
+                ],
+                "website": [],
+                "website_domain": null,
+                "website_endpoint": null
+            }
+        },
+        "aws_s3_bucket_ownership_controls": {
+            "owner_enforced": {
+                "bucket": "c7ntest-20211227212502652900000003",
+                "id": "c7ntest-20211227212502652900000003",
+                "rule": [
+                    {
+                        "object_ownership": "BucketOwnerEnforced"
+                    }
+                ]
+            },
+            "owner_preferred": {
+                "bucket": "c7ntest-20211227212502652900000002",
+                "id": "c7ntest-20211227212502652900000002",
+                "rule": [
+                    {
+                        "object_ownership": "BucketOwnerPreferred"
+                    }
+                ]
+            }
+        }
+    }
+}

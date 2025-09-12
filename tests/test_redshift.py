@@ -3,6 +3,12 @@
 from .common import BaseTest
 from unittest.mock import MagicMock
 import time
+import datetime
+import logging
+from c7n.testing import mock_datetime_now
+from dateutil import parser
+import c7n.resources.redshift
+import c7n.filters.backup
 
 
 class TestRedshift(BaseTest):
@@ -408,6 +414,96 @@ class TestRedshift(BaseTest):
             self.fail('should not raise')
         mock_factory().client('redshift').modify_cluster.assert_called_once()
 
+    def test_redshift_consecutive_snapshot_count_filter(self):
+        session_factory = self.replay_flight_data("test_redshift_consecutive_snapshot_count_filter")
+        p = self.load_policy(
+            {
+                "name": "redshift_consecutive_snapshot_count_filter",
+                "resource": "redshift",
+                "filters": [
+                    {
+                        "type": "consecutive-snapshots",
+                        "count": 2,
+                        "period": "days",
+                        "status": "available"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        with mock_datetime_now(parser.parse("2022-09-09T00:00:00+00:00"), c7n.resources.redshift):
+            resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['c7n:RedshiftSnapshots'][0]['Status'], "available")
+        self.assertEqual(resources[0]['c7n:RedshiftSnapshots'][0]['SnapshotCreateTime'],
+            datetime.datetime(2022, 9, 9, 22, 4, 52, 776000, tzinfo=datetime.timezone.utc))
+
+    def test_redshift_consecutive_snapshot_hourly_count_filter(self):
+        session_factory = self.replay_flight_data(
+            "test_redshift_consecutive_snapshot_count_filter")
+        p = self.load_policy(
+            {
+                "name": "redshift_consecutive_snapshot_hourly_count_filter",
+                "resource": "redshift",
+                "filters": [
+                    {
+                        "type": "consecutive-snapshots",
+                        "count": 2,
+                        "period": "hours",
+                        "status": "available"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        with mock_datetime_now(parser.parse("2022-09-08T21:00:00+00:00"), c7n.resources.redshift):
+            resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_redshift_consecutive_snapshot_weekly_count_filter(self):
+        session_factory = self.replay_flight_data(
+            "test_redshift_consecutive_snapshot_count_filter")
+        p = self.load_policy(
+            {
+                "name": "redshift_consecutive_snapshot_weekly_count_filter",
+                "resource": "redshift",
+                "filters": [
+                    {
+                        "type": "consecutive-snapshots",
+                        "count": 1,
+                        "period": "weeks",
+                        "status": "available"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        with mock_datetime_now(parser.parse("2022-09-09T00:00:00+00:00"), c7n.resources.redshift):
+            resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_redshift_consecutive_aws_backups_count_filter(self):
+        session_factory = self.replay_flight_data(
+            "test_redshift_consecutive_aws_backups_count_filter")
+        p = self.load_policy(
+            {
+                "name": "redshift_consecutive_aws_backups_count_filter",
+                "resource": "redshift",
+                "filters": [
+                    {
+                        "type": "consecutive-aws-backups",
+                        "count": 1,
+                        "period": "days",
+                        "status": "COMPLETED"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        with mock_datetime_now(parser.parse("2022-09-09T00:00:00+00:00"), c7n.filters.backup):
+            resources = p.run()
+        self.assertEqual(len(resources), 1)
+
 
 class TestRedshiftSnapshot(BaseTest):
 
@@ -535,6 +631,35 @@ class TestRedshiftSnapshot(BaseTest):
             "Snapshots"
         ]
         self.assertFalse(ss[0].get("AccountsWithRestoreAccess"))
+
+    def test_redshift_snapshot_copy_related_tags(self):
+        factory = self.replay_flight_data("test_redshift_snapshot_copy_related_tags")
+        client = factory().client("redshift")
+        p = self.load_policy(
+            {
+                "name": "rds-snapshot-copy-related-tags",
+                "resource": "redshift-snapshot",
+                "filters": [{"tag:Owner": "absent"}],
+                "actions": [
+                    {
+                        "type": "copy-related-tag",
+                        "key": "ClusterIdentifier",
+                        "resource": "redshift",
+                        "tags": ["Owner"]
+                    }],
+            },
+            session_factory=factory,
+        )
+        output = self.capture_logging("custodian.actions", level=logging.INFO)
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        log_output = output.getvalue()
+        self.assertIn("Tagged 2 resources from related", log_output)
+        arns = p.resource_manager.get_arns(resources)
+        for arn in arns:
+            tags = client.describe_tags(ResourceName=arn)["TaggedResources"]
+            tag_map = {t["Tag"]["Key"] for t in tags}
+            self.assertTrue("Owner" in tag_map)
 
 
 class TestModifyVpcSecurityGroupsAction(BaseTest):

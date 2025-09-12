@@ -1,0 +1,39 @@
+{
+    "status_code": 200,
+    "data": {
+        "SecurityGroups": [
+            {
+                "Description": "fake-policy-name=b",
+                "GroupName": "sg-test-1",
+                "IpPermissions": [],
+                "OwnerId": "999999999999",
+                "GroupId": "sg-0e630ac9094eff5c5",
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1",
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": [],
+                        "UserIdGroupPairs": []
+                    }
+                ],
+                "Tags": [
+                    {
+                        "Key": "fake-policy-name",
+                        "Value": "b"
+                    },
+                    {
+                        "Key": "environment",
+                        "Value": "production"
+                    }
+                ],
+                "VpcId": "vpc-07bd7be62998ee0f2"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

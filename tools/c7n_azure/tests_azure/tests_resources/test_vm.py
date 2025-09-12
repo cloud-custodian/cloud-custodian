@@ -3,7 +3,7 @@
 import datetime
 
 from azure.mgmt.compute.models import HardwareProfile, VirtualMachineUpdate
-from ..azure_common import BaseTest, arm_template
+from ..azure_common import BaseTest, arm_template, cassette_name
 from c7n_azure.session import Session
 from dateutil import tz as tzutils
 from mock import patch
@@ -41,6 +41,28 @@ class VMTest(BaseTest):
             self.assertTrue(p)
 
     @arm_template('vm.json')
+    @cassette_name('virtual_machine_extensions')
+    def test_vm_extensions_filter(self):
+        p = self.load_policy({
+            'name': 'test-azure-vm-extensions',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'},
+                {'type': 'vm-extensions',
+                 'key': '[].properties.type',
+                 'op': 'in',
+                 'value_type': 'swap',
+                 'value': 'CustomScript'}],
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    @arm_template('vm.json')
+    @cassette_name('virtual_machine')
     def test_find_by_name(self):
         p = self.load_policy({
             'name': 'test-azure-vm',
@@ -56,6 +78,7 @@ class VMTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     @arm_template('vm.json')
+    @cassette_name('virtual_machine_instance')
     def test_find_running(self):
         p = self.load_policy({
             'name': 'test-azure-vm',
@@ -81,6 +104,7 @@ class VMTest(BaseTest):
     }]
 
     @arm_template('vm.json')
+    @cassette_name('virtual_machine')
     @patch('c7n_azure.resources.vm.InstanceViewFilter.process', return_value=fake_running_vms)
     def test_stop(self, filter_mock):
         with patch(self._get_vm_client_string() + '.begin_deallocate') as stop_action_mock:
@@ -108,6 +132,7 @@ class VMTest(BaseTest):
                 self.fake_running_vms[0]['name'])
 
     @arm_template('vm.json')
+    @cassette_name('virtual_machine')
     @patch('c7n_azure.resources.vm.InstanceViewFilter.process', return_value=fake_running_vms)
     def test_poweroff(self, filter_mock):
         with patch(self._get_vm_client_string() + '.begin_power_off') as poweroff_action_mock:
@@ -137,6 +162,7 @@ class VMTest(BaseTest):
             )
 
     @arm_template('vm.json')
+    @cassette_name('virtual_machine')
     @patch('c7n_azure.resources.vm.InstanceViewFilter.process', return_value=fake_running_vms)
     def test_start(self, filter_mock):
         with patch(self._get_vm_client_string() + '.begin_start') as start_action_mock:
@@ -165,6 +191,7 @@ class VMTest(BaseTest):
                 self.fake_running_vms[0]['name'])
 
     @arm_template('vm.json')
+    @cassette_name('virtual_machine')
     @patch('c7n_azure.resources.vm.InstanceViewFilter.process', return_value=fake_running_vms)
     def test_restart(self, filter_mock):
         with patch(self._get_vm_client_string() + '.begin_restart') as restart_action_mock:
@@ -192,6 +219,7 @@ class VMTest(BaseTest):
                 self.fake_running_vms[0]['name'])
 
     @arm_template('vm.json')
+    @cassette_name('virtual_machine')
     @patch('c7n_azure.resources.vm.InstanceViewFilter.process', return_value=fake_running_vms)
     def test_resize(self, resize_action_mock):
         with patch(self._get_vm_client_string() + '.begin_update') as resize_action_mock:
@@ -220,6 +248,7 @@ class VMTest(BaseTest):
         )
 
     @arm_template('vm.json')
+    @cassette_name('virtual_machine')
     @patch('c7n_azure.resources.vm.InstanceViewFilter.process', return_value=fake_running_vms)
     @patch('c7n_azure.actions.delete.DeleteAction.process', return_value='')
     def test_delete(self, delete_action_mock, filter_mock):
@@ -246,6 +275,7 @@ class VMTest(BaseTest):
         delete_action_mock.assert_called_with(self.fake_running_vms)
 
     @arm_template('vm.json')
+    @cassette_name('virtual_machine_interface')
     def test_find_vm_with_public_ip(self):
 
         p = self.load_policy({
@@ -285,6 +315,7 @@ class VMTest(BaseTest):
         self.assertEqual(len(resources), 0)
 
     @arm_template('vm.json')
+    @cassette_name('virtual_machine_tags')
     def test_on_off_hours(self):
 
         t = datetime.datetime.now(tzutils.gettz("pt"))
@@ -326,3 +357,38 @@ class VMTest(BaseTest):
         client = local_session(Session)\
             .client('azure.mgmt.compute.ComputeManagementClient').virtual_machines
         return client.__module__ + '.' + client.__class__.__name__
+
+    @arm_template('vm.json')
+    def test_vm_backup_status_protected(self):
+        p = self.load_policy({
+            'name': 'vm-backup-status-protected',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'backup-status',
+                 "key": "protectionStatus",
+                 "value": "Protected"}
+            ]
+        })
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual('c7n-test-vm', resources[0]['name'])
+
+    def test_vm_jit_policy_port_filter(self):
+        p = self.load_policy({
+            'name': 'vm-jit-policy-ports',
+            'resource': 'azure.vm',
+            'filters': [{
+                'type': 'jit-policy-port',
+                'attrs': [{
+                    'type': 'value',
+                    'key': 'number',
+                    'value': 22
+                }],
+                'count': 1
+            }]
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], 'cctestvm')
+        self.assertEqual(resources[0]['c7n:JitPolicyPorts'][0]['number'], 22)

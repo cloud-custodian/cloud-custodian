@@ -1,24 +1,8 @@
 {
     "status_code": 200,
     "data": {
-        "ResponseMetadata": {
-            "RequestId": "03e84107-24af-11e9-a8cd-41093073219c",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "content-type": "application/json",
-                "content-length": "123",
-                "connection": "keep-alive",
-                "date": "Wed, 30 Jan 2019 16:49:32 GMT",
-                "x-amzn-requestid": "03e84107-24af-11e9-a8cd-41093073219c",
-                "x-amz-apigw-id": "UU5QSGLBIAMF8Tw=",
-                "x-amzn-trace-id": "Root=1-5c51d59b-7112e188a1824f74e8765fd0;Sampled=0",
-                "x-cache": "Miss from cloudfront",
-                "via": "1.1 e6d15137ec23376f4c8a22e6edb289bd.cloudfront.net (CloudFront)",
-                "x-amz-cf-id": "YfAaxUTmjnjo7EE2isWtG8ABWmyp7wM1nUwxL1KxOofV6lWEWU-ngw=="
-            },
-            "RetryAttempts": 0
-        },
-        "ClusterArn": "arn:aws:kafka:us-east-1:644160558196:cluster/dev/fde9077e-25d9-4292-918a-c299ca3086c2-2",
+        "ResponseMetadata": {},
+        "ClusterArn": "arn:aws:kafka:ap-northeast-2:644160558196:cluster/demo-cluster-1/a4128f17-d0a5-4b03-b858-ea13108e7286-4",
         "State": "DELETING"
     }
 }

@@ -1,0 +1,126 @@
+{
+  "version": 1,
+  "interactions": [
+    {
+      "request": {
+        "method": "GET",
+        "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.DBforPostgreSQL/flexibleServers?api-version=2024-11-01-preview",
+        "body": null,
+        "headers": {}
+      },
+      "response": {
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "headers": {
+          "cache-control": [
+            "no-cache"
+          ],
+          "content-type": [
+            "application/json; charset=utf-8"
+          ],
+          "date": [
+            "Tue, 21 Feb 2023 16:59:06 GMT"
+          ],
+          "content-length": [
+            "2898"
+          ]
+        },
+        "body": {
+          "data": {
+            "value": [
+              {
+                "sku": {
+                  "name": "Standard_D4s_v3",
+                  "tier": "GeneralPurpose"
+                },
+                "properties": {
+                  "fullyQualifiedDomainName": "c7d7483a8ceb.test-private-dns-zone.postgres.database.azure.com",
+                  "version": "12",
+                  "minorVersion": "6",
+                  "administratorLogin": "cloudsa",
+                  "state": "Ready",
+                  "availabilityZone": "1",
+                  "storage": {
+                    "storageSizeGB": 512,
+                    "autoGrow": "Disabled"
+                  },
+                  "authConfig": {
+                    "activeDirectoryAuth": "Disabled",
+                    "passwordAuth": "Enabled"
+                  },
+                  "backup": {
+                    "backupRetentionDays": 7,
+                    "geoRedundantBackup": "Disabled",
+                    "earliestRestoreDate": "2021-05-26T01:16:58.3723361+00:00"
+                  },
+                  "network": {
+                    "publicNetworkAccess": "Disabled",
+                    "delegatedSubnetResourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/testrg/providers/Microsoft.Network/virtualNetworks/test-vnet/subnets/test-vnet-subnet",
+                    "privateDnsZoneArmResourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/testrg/providers/Microsoft.Network/privateDnsZones/test-private-dns-zone.postgres.database.azure.com"
+                  },
+                  "highAvailability": {
+                    "mode": "ZoneRedundant",
+                    "state": "Healthy",
+                    "standbyAvailabilityZone": "2"
+                  }
+                },
+                "location": "westus",
+                "tags": {
+                  "ElasticServer": "1"
+                },
+                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/testrg/providers/Microsoft.DBforPostgreSQL/flexibleServers/pgtestsvc4",
+                "name": "pgtestsvc4",
+                "type": "Microsoft.DBforPostgreSQL/flexibleServers"
+              },
+              {
+                "sku": {
+                  "name": "Standard_D4s_v3",
+                  "tier": "GeneralPurpose"
+                },
+                "properties": {
+                  "fullyQualifiedDomainName": "pgtestsvc1.postgres.database.azure.com",
+                  "version": "12",
+                  "minorVersion": "6",
+                  "administratorLogin": "cloudsa",
+                  "state": "Ready",
+                  "availabilityZone": "1",
+                  "storage": {
+                    "storageSizeGB": 512,
+                    "autoGrow": "Enabled",
+                    "tier": "P20",
+                    "iops": 2300
+                  },
+                  "authConfig": {
+                    "activeDirectoryAuth": "Disabled",
+                    "passwordAuth": "Enabled"
+                  },
+                  "backup": {
+                    "backupRetentionDays": 7,
+                    "geoRedundantBackup": "Disabled",
+                    "earliestRestoreDate": "2021-05-26T23:15:38.8131437+00:00"
+                  },
+                  "network": {
+                    "publicNetworkAccess": "Enabled"
+                  },
+                  "highAvailability": {
+                    "mode": "Disabled",
+                    "state": "NotEnabled"
+                  }
+                },
+                "location": "eastus",
+                "tags": {
+                  "ElasticServer": "1"
+                },
+                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/testrg/providers/Microsoft.DBforPostgreSQL/flexibleServers/pgtestsvc1",
+                "name": "pgtestsvc1",
+                "type": "Microsoft.DBforPostgreSQL/flexibleServers"
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

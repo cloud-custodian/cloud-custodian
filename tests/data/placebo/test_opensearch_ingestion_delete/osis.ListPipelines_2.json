@@ -1,0 +1,39 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Pipelines": [
+            {
+                "Status": "DELETING",
+                "StatusReason": {
+                    "Description": " "
+                },
+                "PipelineName": "custodian-test",
+                "PipelineArn": "arn:aws:osis:us-east-1:644160558196:pipeline/custodian-test",
+                "MinUnits": 2,
+                "MaxUnits": 4,
+                "CreatedAt": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 7,
+                    "day": 31,
+                    "hour": 16,
+                    "minute": 27,
+                    "second": 34,
+                    "microsecond": 0
+                },
+                "LastUpdatedAt": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 8,
+                    "day": 1,
+                    "hour": 15,
+                    "minute": 50,
+                    "second": 54,
+                    "microsecond": 0
+                },
+                "Tags": []
+            }
+        ]
+    }
+}

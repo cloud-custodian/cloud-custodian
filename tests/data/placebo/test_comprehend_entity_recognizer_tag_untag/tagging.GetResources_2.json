@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:comprehend:us-east-1:644160558196:entity-recognizer/TestVpcEntityRecognizer/version/3",
+                "Tags": [
+                    {
+                        "Key": "ASV",
+                        "Value": "PolicyTestASV"
+                    },
+                    {
+                        "Key": "OwnerContact",
+                        "Value": "test@c7n.com"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

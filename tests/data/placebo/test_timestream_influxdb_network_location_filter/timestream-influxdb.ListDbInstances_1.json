@@ -1,0 +1,20 @@
+{
+    "status_code": 200,
+    "data": {
+        "items": [
+            {
+                "id": "lv40n6cotp",
+                "name": "test-db",
+                "arn": "arn:aws:timestream-influxdb:us-east-1:644160558196:db-instance/lv40n6cotp",
+                "status": "AVAILABLE",
+                "endpoint": "lv40n6cotp-kx3to6fbi4fumn.timestream-influxdb.us-east-1.on.aws",
+                "port": 8086,
+                "dbInstanceType": "db.influx.medium",
+                "dbStorageType": "InfluxIOIncludedT1",
+                "allocatedStorage": 20,
+                "deploymentType": "SINGLE_AZ"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

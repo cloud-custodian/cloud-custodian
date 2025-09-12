@@ -1,0 +1,73 @@
+{
+    "status_code": 200,
+    "data": {
+        "DBSnapshots": [
+            {
+                "DBSnapshotIdentifier": "manual-testx",
+                "DBInstanceIdentifier": "kapilt-testx-testx",
+                "SnapshotCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 7,
+                    "day": 25,
+                    "hour": 13,
+                    "minute": 22,
+                    "second": 6,
+                    "microsecond": 244000
+                },
+                "Engine": "postgres",
+                "AllocatedStorage": 30,
+                "Status": "available",
+                "Port": 5432,
+                "AvailabilityZone": "us-east-1d",
+                "VpcId": "vpc-029654b93830acd5a",
+                "InstanceCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 5,
+                    "day": 17,
+                    "hour": 18,
+                    "minute": 26,
+                    "second": 31,
+                    "microsecond": 598000
+                },
+                "MasterUsername": "testx",
+                "EngineVersion": "14.7",
+                "LicenseModel": "postgresql-license",
+                "SnapshotType": "manual",
+                "OptionGroupName": "default:postgres-14",
+                "PercentProgress": 100,
+                "StorageType": "gp2",
+                "Encrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/e426740f-3b07-4d07-ad22-3cb504d65620",
+                "DBSnapshotArn": "arn:aws:rds:us-east-1:644160558196:snapshot:manual-testx",
+                "IAMDatabaseAuthenticationEnabled": true,
+                "ProcessorFeatures": [],
+                "DbiResourceId": "db-CR3ECGHYRFFMW4ACZACV4Y7FUU",
+                "TagList": [
+                    {
+                        "Key": "App",
+                        "Value": "Testx"
+                    },
+                    {
+                        "Key": "Env",
+                        "Value": "Dev"
+                    }
+                ],
+                "OriginalSnapshotCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 7,
+                    "day": 25,
+                    "hour": 13,
+                    "minute": 22,
+                    "second": 6,
+                    "microsecond": 244000
+                },
+                "SnapshotTarget": "region",
+                "StorageThroughput": 0
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

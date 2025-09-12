@@ -1,0 +1,30 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:cloudfront::644160558196:distribution/E1XRY7J5866V6G",
+                "Tags": [
+                    {
+                        "Key": "App",
+                        "Value": "cloudfront-testing"
+                    },
+                    {
+                        "Key": "Owner",
+                        "Value": "aj@stacklet.io"
+                    },
+                    {
+                        "Key": "c7n:FindingId:cloudfront-post-finding",
+                        "Value": "us-east-2/644160558196/bade9762d7fe23d7d78dc22fd454723b/bed93b6f658e0d0bf475f0e56d0d9d50:2022-06-15T17:18:30.146987+00:00"
+                    },
+                    {
+                        "Key": "Env",
+                        "Value": "dev"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

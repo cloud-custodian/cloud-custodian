@@ -548,7 +548,7 @@ def detect_partition_strategy(bid, delimiters=('/', '-'), prefix=''):
 
     (contents_key,
      contents_method,
-     continue_tokens) = BUCKET_OBJ_DESC[versioned]
+     _) = BUCKET_OBJ_DESC[versioned]
 
     with bucket_ops(bid, 'detect'):
         keys = set()
@@ -699,7 +699,7 @@ def process_bucket_inventory(bid, inventory_bucket, inventory_prefix):
     """
     log.info("Loading bucket %s keys from inventory s3://%s/%s",
              bid, inventory_bucket, inventory_prefix)
-    account, bucket = bid.split(':', 1)
+    account, _ = bid.split(':', 1)
     region = connection.hget('bucket-regions', bid)
     versioned = bool(int(connection.hget('bucket-versions', bid)))
     session = boto3.Session()
@@ -739,7 +739,7 @@ def process_bucket_iterator(bid, prefix="", delimiter="", **continuation):
         json.loads(connection.hget('bucket-accounts', account)))
     s3 = session.client('s3', region_name=region, config=s3config)
 
-    (contents_key, contents_method, _) = BUCKET_OBJ_DESC[versioned]
+    (_, contents_method, _) = BUCKET_OBJ_DESC[versioned]
 
     params = dict(Bucket=bucket)
     if prefix:

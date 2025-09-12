@@ -1,0 +1,184 @@
+{
+    "status_code": 200,
+    "data": {
+        "Reservations": [
+            {
+                "Groups": [],
+                "Instances": [
+                    {
+                        "AmiLaunchIndex": 0,
+                        "ImageId": "ami-0df435f331839b2d6",
+                        "InstanceId": "i-05fccf7da99ad47f7",
+                        "InstanceType": "t2.micro",
+                        "LaunchTime": {
+                            "__class__": "datetime",
+                            "year": 2023,
+                            "month": 10,
+                            "day": 24,
+                            "hour": 16,
+                            "minute": 4,
+                            "second": 51,
+                            "microsecond": 0
+                        },
+                        "Monitoring": {
+                            "State": "disabled"
+                        },
+                        "Placement": {
+                            "AvailabilityZone": "us-east-1a",
+                            "GroupName": "",
+                            "Tenancy": "default"
+                        },
+                        "PrivateDnsName": "ip-10-146-96-44.ec2.internal",
+                        "PrivateIpAddress": "10.146.96.44",
+                        "ProductCodes": [],
+                        "PublicDnsName": "",
+                        "State": {
+                            "Code": 16,
+                            "Name": "running"
+                        },
+                        "StateTransitionReason": "",
+                        "SubnetId": "subnet-0897a33a30b9945ed",
+                        "VpcId": "vpc-08bbc74c36b8a08dd",
+                        "Architecture": "x86_64",
+                        "BlockDeviceMappings": [
+                            {
+                                "DeviceName": "/dev/xvda",
+                                "Ebs": {
+                                    "AttachTime": {
+                                        "__class__": "datetime",
+                                        "year": 2023,
+                                        "month": 10,
+                                        "day": 24,
+                                        "hour": 16,
+                                        "minute": 4,
+                                        "second": 52,
+                                        "microsecond": 0
+                                    },
+                                    "DeleteOnTermination": true,
+                                    "Status": "attached",
+                                    "VolumeId": "vol-0d686d2c1576e82f6"
+                                }
+                            }
+                        ],
+                        "ClientToken": "a5197a4c-dac6-40c8-a535-917bbf4171b3",
+                        "EbsOptimized": false,
+                        "EnaSupport": true,
+                        "Hypervisor": "xen",
+                        "NetworkInterfaces": [
+                            {
+                                "Attachment": {
+                                    "AttachTime": {
+                                        "__class__": "datetime",
+                                        "year": 2023,
+                                        "month": 10,
+                                        "day": 24,
+                                        "hour": 16,
+                                        "minute": 4,
+                                        "second": 51,
+                                        "microsecond": 0
+                                    },
+                                    "AttachmentId": "eni-attach-0555cd80d78a1d586",
+                                    "DeleteOnTermination": true,
+                                    "DeviceIndex": 0,
+                                    "Status": "attached",
+                                    "NetworkCardIndex": 0
+                                },
+                                "Description": "",
+                                "Groups": [
+                                    {
+                                        "GroupName": "launch-wizard-7",
+                                        "GroupId": "sg-0ad159022dbc679a4"
+                                    }
+                                ],
+                                "Ipv6Addresses": [],
+                                "MacAddress": "12:14:b1:31:e7:63",
+                                "NetworkInterfaceId": "eni-0b182d4a32125e042",
+                                "OwnerId": "644160558196",
+                                "PrivateDnsName": "ip-10-146-96-44.ec2.internal",
+                                "PrivateIpAddress": "10.146.96.44",
+                                "PrivateIpAddresses": [
+                                    {
+                                        "Primary": true,
+                                        "PrivateDnsName": "ip-10-146-96-44.ec2.internal",
+                                        "PrivateIpAddress": "10.146.96.44"
+                                    }
+                                ],
+                                "SourceDestCheck": true,
+                                "Status": "in-use",
+                                "SubnetId": "subnet-0897a33a30b9945ed",
+                                "VpcId": "vpc-08bbc74c36b8a08dd",
+                                "InterfaceType": "interface"
+                            }
+                        ],
+                        "RootDeviceName": "/dev/xvda",
+                        "RootDeviceType": "ebs",
+                        "SecurityGroups": [
+                            {
+                                "GroupName": "launch-wizard-7",
+                                "GroupId": "sg-0ad159022dbc679a4"
+                            }
+                        ],
+                        "SourceDestCheck": true,
+                        "Tags": [
+                            {
+                                "Key": "cso_custodian_marked_for_op_verify_ssm_agent",
+                                "Value": "Resource does not meet policy: stop@2023/10/24 1704 UTC"
+                            },
+                            {
+                                "Key": "Name",
+                                "Value": "sas-cc-test"
+                            }
+                        ],
+                        "VirtualizationType": "hvm",
+                        "CpuOptions": {
+                            "CoreCount": 1,
+                            "ThreadsPerCore": 1
+                        },
+                        "CapacityReservationSpecification": {
+                            "CapacityReservationPreference": "open"
+                        },
+                        "HibernationOptions": {
+                            "Configured": false
+                        },
+                        "MetadataOptions": {
+                            "State": "applied",
+                            "HttpTokens": "required",
+                            "HttpPutResponseHopLimit": 2,
+                            "HttpEndpoint": "enabled",
+                            "HttpProtocolIpv6": "disabled",
+                            "InstanceMetadataTags": "disabled"
+                        },
+                        "EnclaveOptions": {
+                            "Enabled": false
+                        },
+                        "BootMode": "uefi-preferred",
+                        "PlatformDetails": "Linux/UNIX",
+                        "UsageOperation": "RunInstances",
+                        "UsageOperationUpdateTime": {
+                            "__class__": "datetime",
+                            "year": 2023,
+                            "month": 10,
+                            "day": 24,
+                            "hour": 16,
+                            "minute": 4,
+                            "second": 51,
+                            "microsecond": 0
+                        },
+                        "PrivateDnsNameOptions": {
+                            "HostnameType": "ip-name",
+                            "EnableResourceNameDnsARecord": false,
+                            "EnableResourceNameDnsAAAARecord": false
+                        },
+                        "MaintenanceOptions": {
+                            "AutoRecovery": "default"
+                        },
+                        "CurrentInstanceBootMode": "legacy-bios"
+                    }
+                ],
+                "OwnerId": "644160558196",
+                "ReservationId": "r-036177da60781d476"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

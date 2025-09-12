@@ -1,0 +1,34 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Name": "c7n-ap-no-policy-rapid-serval",
+        "Bucket": "c7n-ap-rapid-serval",
+        "NetworkOrigin": "Internet",
+        "PublicAccessBlockConfiguration": {
+            "BlockPublicAcls": true,
+            "IgnorePublicAcls": true,
+            "BlockPublicPolicy": false,
+            "RestrictPublicBuckets": false
+        },
+        "CreationDate": {
+            "__class__": "datetime",
+            "year": 2025,
+            "month": 9,
+            "day": 2,
+            "hour": 18,
+            "minute": 12,
+            "second": 37,
+            "microsecond": 0
+        },
+        "Alias": "c7n-ap-no-policy-rap-mp3ynbo4gbxh79tokx9t5jx46izbhuse1b-s3alias",
+        "AccessPointArn": "arn:aws:s3:us-east-1:644160558196:accesspoint/c7n-ap-no-policy-rapid-serval",
+        "Endpoints": {
+            "ipv4": "s3-accesspoint.us-east-1.amazonaws.com",
+            "fips": "s3-accesspoint-fips.us-east-1.amazonaws.com",
+            "fips_dualstack": "s3-accesspoint-fips.dualstack.us-east-1.amazonaws.com",
+            "dualstack": "s3-accesspoint.dualstack.us-east-1.amazonaws.com"
+        },
+        "BucketAccountId": "644160558196"
+    }
+}

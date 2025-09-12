@@ -1,0 +1,4902 @@
+interactions:
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "", "MaxResults":
+      5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '75'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432842'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"JaB7NCLC507xSTRyNMSkS6q6lldJ2WceuVK4eY-17zSPxCet5xBymC03B-DI59-B","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"chrisren"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"irisqqcheng"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"caesarzhli"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"lichlli"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"lipingwwang"}],"RequestId":"81e8b93f-9389-4ba2-9e07-bbcc0c47afe8"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '436'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:02 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "JaB7NCLC507xSTRyNMSkS6q6lldJ2WceuVK4eY-17zSPxCet5xBymC03B-DI59-B",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432842'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"m7vaIQTEHtbmxWy2Yg6-QZwuahl-nqtrQARUT_pIdFmdtcTbpZTXr1z-99wAfQHM","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"paulswang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"sekiroliang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"mlma"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"cupidmiao"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"shanksychen"}],"RequestId":"cd618d13-e467-4b2f-84bb-a50345b67a03"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '433'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:02 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "m7vaIQTEHtbmxWy2Yg6-QZwuahl-nqtrQARUT_pIdFmdtcTbpZTXr1z-99wAfQHM",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432842'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"qecTRP1qHcOjxZd1w5wfvXEQlyXbJ2w2MCdQcbvpMZv4ixh9ZQzYAhKIXjPxAeMB","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"hungtauli"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"fangfzhang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"jackygong"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"peterkhe"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"yusheng"}],"RequestId":"ed06348d-5f54-4522-977e-685ada677117"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '432'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:02 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "qecTRP1qHcOjxZd1w5wfvXEQlyXbJ2w2MCdQcbvpMZv4ixh9ZQzYAhKIXjPxAeMB",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432842'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"f5UPZx8G5ynl1FYFDZnyrbd2_lrofZbrDzCnHRWvYPIdZ8YApNEw-eM1i-ARS6_f","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"ghibli"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"vinzhou"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"stevelliu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"hongbohe"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"matrixshi(\u77f3\u633a\u5e38)"}],"RequestId":"8625ad40-e0df-43fc-ae2c-604d93b7200b"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '448'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:02 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "f5UPZx8G5ynl1FYFDZnyrbd2_lrofZbrDzCnHRWvYPIdZ8YApNEw-eM1i-ARS6_f",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432842'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"ryOCdcXlZ9g4eyUzsSIVl9Uxt3AKQ3mdSvxilfnfgbd_KKeP9mVJcbFxA_g1O-qT","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"sarielliu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"huarongyin"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"jorma"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"drovliu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"amberyypan"}],"RequestId":"30fe7d71-525b-45cc-8bed-6f8575df6c3e"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '430'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:02 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "ryOCdcXlZ9g4eyUzsSIVl9Uxt3AKQ3mdSvxilfnfgbd_KKeP9mVJcbFxA_g1O-qT",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432842'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"KuB5auemfGTs7EL1sQs0wmsjuDRKja24ro_2mfSNa8L7HZr5FUv6hRSoCursCLeS","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"rainxywang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"seekxu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"yahuifeng"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"zhiqiangguo"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"lilyyayang"}],"RequestId":"53db08e7-9258-449c-af58-ebf8e8ffb0ff"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '435'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:03 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "KuB5auemfGTs7EL1sQs0wmsjuDRKja24ro_2mfSNa8L7HZr5FUv6hRSoCursCLeS",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432843'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"unLAXy_uGsGzLgMiiBFUsJUE4P-Zuq97nU5BzTj_qGXaAMNzjFmiNj7Vr4434xMc","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"zexiazhou"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"hardyqhe"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"roywhhuang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"chicogong"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"calebji"}],"RequestId":"df4ca4aa-36c9-40e4-9958-389fb7fb5362"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '432'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:03 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "unLAXy_uGsGzLgMiiBFUsJUE4P-Zuq97nU5BzTj_qGXaAMNzjFmiNj7Vr4434xMc",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432843'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"xBI-2HWWYCoxZkq19EaPUHSkpNfba_1RQ9-ROhsimDqKUAgXCyKOSEoDqs3xZcpE","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"v_bingvzhao"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"jinlinliu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"ivyrxie"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"shawbozhang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"harlylei"}],"RequestId":"03ff0a5c-d8bd-42bd-8684-42c4450856e6"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '435'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:03 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "xBI-2HWWYCoxZkq19EaPUHSkpNfba_1RQ9-ROhsimDqKUAgXCyKOSEoDqs3xZcpE",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432843'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"C8hOVIjpQ_wVRY5AVZXVHk0lqdVohmVElOGqAjwLu7OK84X1qoXd1Kv4hAhKGHb9","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"codyyu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"v_huiliguo"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"kekesong"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"eadinchen"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"siweilu"}],"RequestId":"3bc1fe88-7c0c-4272-a239-fb27d6c7595e"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '429'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:03 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "C8hOVIjpQ_wVRY5AVZXVHk0lqdVohmVElOGqAjwLu7OK84X1qoXd1Kv4hAhKGHb9",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432843'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"VzXypW80Z2kcogmREccwD1oogR8wWl7V-YSzKgmQEcGndhgJMosjmGziziTlP6NT","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"hankluo"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"hysenhohe"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"elvinsyang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"walkerzzeng"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"p_pptaoli"}],"RequestId":"61a124e0-7560-47d9-9077-031352ed3401"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '435'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:03 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "VzXypW80Z2kcogmREccwD1oogR8wWl7V-YSzKgmQEcGndhgJMosjmGziziTlP6NT",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432843'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"a3rGLwWWri9xheJArpJBFRO9906NbOukNdA_ZamLP1yjYdzgWC_0S00YGgFkD9Wn","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"syuanzzhang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"himawali"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"evieli"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"neganhuang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"andyryhu"}],"RequestId":"8e12ac78-5c9f-41f3-8a80-15108b5724c7"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '432'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:03 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "a3rGLwWWri9xheJArpJBFRO9906NbOukNdA_ZamLP1yjYdzgWC_0S00YGgFkD9Wn",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432843'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"CP-Gp864h-uL4GmdMW9u6d_TwQGLMJcZIhHsirnTvsy-jiSG5Tl0yiPOX6nZBiXK","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"mickyzhang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"enazheng"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"nilchen"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"fenniedu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"yihongluo"}],"RequestId":"4cd7d3f9-aa97-4332-a598-8c7ee31fc328"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '431'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:03 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "CP-Gp864h-uL4GmdMW9u6d_TwQGLMJcZIhHsirnTvsy-jiSG5Tl0yiPOX6nZBiXK",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432843'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"hPMBpY3zql9Z3qWW5i2AJl4GST1Y61sSZbtoEUHwsykDmMiZkT_lohP_vBOuMLo2","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"yuannfu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"kempliu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"qingfenwang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"jianzou"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"bravozhang"}],"RequestId":"8e5a3557-dce4-4132-bdc4-ec3e310bb93c"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '431'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:03 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "hPMBpY3zql9Z3qWW5i2AJl4GST1Y61sSZbtoEUHwsykDmMiZkT_lohP_vBOuMLo2",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432843'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"ZWtZwjmcAVn7_aIH3HbEAPm0dmzuekfD883KZSZPYOzYUEawLrgeqgPg5MexVl4i","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"changlinli"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"bardqi"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"gangouyang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"zixingdeng"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"yizhouyang"}],"RequestId":"7e84ce98-a61d-479a-8570-ef564aebd3a4"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '435'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:03 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "ZWtZwjmcAVn7_aIH3HbEAPm0dmzuekfD883KZSZPYOzYUEawLrgeqgPg5MexVl4i",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432843'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"afBN0TMOTUMUuqcZHTjjEXEp3mfNtul2nt0nJIIxKJy-QPMsUIBZmGdDmiWAty1Y","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"tomtomyang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"maisieluo"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"apowliu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"ivanlfli"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"larryljwang"}],"RequestId":"949b9f5c-ac96-48c1-86de-f6aa50554384"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '434'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:03 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "afBN0TMOTUMUuqcZHTjjEXEp3mfNtul2nt0nJIIxKJy-QPMsUIBZmGdDmiWAty1Y",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432843'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"zdgieVt5IjijLdB0bCsrLXhSedx1_Ku_wYcfUFJ7j5qMInhanwYCM5u1j5hv-hVw","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"elandluo"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"jeffreezhao"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"shuzhonxiao"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"berttli"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"jacobjjli"}],"RequestId":"d703be7f-b5ef-4983-96c5-39341d148451"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '435'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:03 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "zdgieVt5IjijLdB0bCsrLXhSedx1_Ku_wYcfUFJ7j5qMInhanwYCM5u1j5hv-hVw",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432843'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"vgcYbJwXrui3RnYVOhiGv8UwkxnQrIDBTmUSZNEGg1SBbGCJPtwbfzfnLPdTVePB","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"weileli"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"billccheng"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"bingxinleng"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"dylonyu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"ericfuqu"}],"RequestId":"4857b2da-9803-48f5-b3df-09fa05ec81e0"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '432'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:03 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "vgcYbJwXrui3RnYVOhiGv8UwkxnQrIDBTmUSZNEGg1SBbGCJPtwbfzfnLPdTVePB",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432843'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"F9u4oTSG4XrJPfaNJ1RFn4TghOq6MmwNrkqNkvMviVKh81oRiOxJB8rrAvACm8P7","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"marvinnchen"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"alexlongguo"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"harrpoli"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"jiayingmeng"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"boblliu"}],"RequestId":"510ec69f-ce3c-4bd7-ba7b-6bdce505b545"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '437'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:04 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "F9u4oTSG4XrJPfaNJ1RFn4TghOq6MmwNrkqNkvMviVKh81oRiOxJB8rrAvACm8P7",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432844'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"7Mr5EQlCf8aSmXLq27JhkXw7FNEIhwNqDa4QtUQyCN2XEBk1L5YFDJlSDO7jazlv","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"iambowang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"cassenchen"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"raylhuang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"aandrewliu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"xuezhangliu"}],"RequestId":"4a0e1697-df2a-47ab-ac90-c072dcb301b8"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '438'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:04 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "7Mr5EQlCf8aSmXLq27JhkXw7FNEIhwNqDa4QtUQyCN2XEBk1L5YFDJlSDO7jazlv",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432844'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"2Aah_9r1GpH5C0cs6RzJSD8WwkBsJtF3fM-E0Gc52fBTu1FbojxP8QzQ8hrhPjNi","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"jonejywu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"allenxfwang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"brucemtian"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"binaryzhang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"v_vrqmren"}],"RequestId":"3f1e0935-7f7d-4ce2-b56c-6a3cce3164bd"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '438'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:04 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "2Aah_9r1GpH5C0cs6RzJSD8WwkBsJtF3fM-E0Gc52fBTu1FbojxP8QzQ8hrhPjNi",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432844'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"0ONZWcTXMZSpIH0CaOxqBXDw_p0kvpHGkSZIHXycjAJDZiiYexTyZrswFblDribZ","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"aemonzheng"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"sinbadli"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"bobbyzhao"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"lucillechen"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"yanbozzhang"}],"RequestId":"59227723-d609-43f1-9b0f-b96e826c9a23"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '438'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:04 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "0ONZWcTXMZSpIH0CaOxqBXDw_p0kvpHGkSZIHXycjAJDZiiYexTyZrswFblDribZ",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432844'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"3UrnZvZzH-VDM6ym7JM0s7N5t8ZSQwB6nf3TsYkRsgrjthVn4VW7VecfHyt7HrDb","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"jacktaoyang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"jordgedu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"fengxxxu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"pinhenzhang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"lindseyhe"}],"RequestId":"9628471e-cf0b-4d02-9c24-eb32bcc10d8f"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '436'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:04 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "3UrnZvZzH-VDM6ym7JM0s7N5t8ZSQwB6nf3TsYkRsgrjthVn4VW7VecfHyt7HrDb",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432844'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"OPuq_iJgD_p9ZrFuvDlUNa_klSaXA0wNQgoFgBnXKaVNy1y58_efFk7ab9Oz_9CH","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"v_aichu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"wchenghuang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"ziwanghuang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"linzli"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"zilongliu"}],"RequestId":"38c4fd02-c024-419d-b2eb-d6129ba48ba2"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '433'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:04 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "OPuq_iJgD_p9ZrFuvDlUNa_klSaXA0wNQgoFgBnXKaVNy1y58_efFk7ab9Oz_9CH",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432844'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"SIy7e3zPHNzPsCPc1Pgq0gAIdiOKJ-cYjF63iP2CzTreN-ZIXJbF7xkBkbW6qmNX","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"jessicasshi"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"joeyzyshi"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"kaiyuangeng"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"leolxliu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"cjunjiang"}],"RequestId":"c18aac30-3cf8-4dbe-8eed-a8ad9f07d82a"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '437'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:04 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "SIy7e3zPHNzPsCPc1Pgq0gAIdiOKJ-cYjF63iP2CzTreN-ZIXJbF7xkBkbW6qmNX",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432844'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"J7cU6PJWkILrhli1WkgMYA1NzX1juClNeRIWrvYxozf_QLvS0gd6Ko0CVh-pXmTW","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"v_kpaqli"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"lonecheng"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"jeasonzhou"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"demaxiyaliu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"nullxu"}],"RequestId":"02cb26cf-0ec0-4e12-8d25-333c854b360d"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '433'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:04 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "J7cU6PJWkILrhli1WkgMYA1NzX1juClNeRIWrvYxozf_QLvS0gd6Ko0CVh-pXmTW",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432844'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"mqgcq2VCKXf1t1CHc_K_4taW95UN2JrYGCBISi756M7L9amo--THUobA2klwal86","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"zyangdu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"steveyliu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"limye"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"herminexu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"seandxu"}],"RequestId":"eb795c32-2432-458e-bbbc-b6671675fc8a"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '426'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:04 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "mqgcq2VCKXf1t1CHc_K_4taW95UN2JrYGCBISi756M7L9amo--THUobA2klwal86",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432844'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"01qfX5tO_y9V83RM5R6bdzliWUeoJ42BBotCJD5hEJEDjnm5BPIMWVSY45iqaFEw","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"yongxzhuang(\u5e84\u955b\u946b)"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"francisdu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"zomiluo"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"phoenixyang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"ivesding"}],"RequestId":"574c8855-d98e-4179-a5a5-8e463f060dbc"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '455'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:04 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "01qfX5tO_y9V83RM5R6bdzliWUeoJ42BBotCJD5hEJEDjnm5BPIMWVSY45iqaFEw",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432844'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"evUeOZtVKWa15L4sKd4Xc3BxfM4Q7gjZZ9M_Fmu-dpp7V1DsS0JcGU-N6_QmU-Xo","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"yihaolan"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"yvanyfliu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"jennyxu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"jamcai"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"sjjwwang"}],"RequestId":"7c2277ab-5aab-4077-b550-613db2b3c330"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '427'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:04 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "evUeOZtVKWa15L4sKd4Xc3BxfM4Q7gjZZ9M_Fmu-dpp7V1DsS0JcGU-N6_QmU-Xo",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432844'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"tUJ-Ds5KXHOpIsGFxEiXxOdrALRhXk6H3O5tJevbLZTdb9olO-m03UvZaE9rIawO","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"daisysjdai"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"lucashli"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"v_vzhjliu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"nikzhang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"burlingwang"}],"RequestId":"86fcfa6e-adfa-4bbb-9c9c-98321aa1ba7c"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '435'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:04 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "tUJ-Ds5KXHOpIsGFxEiXxOdrALRhXk6H3O5tJevbLZTdb9olO-m03UvZaE9rIawO",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432844'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"doFqi3zEx4lvu8udmzCStJPF5XezdnQGop6HHcpwRtibekjTp74djOgm_4ng4ARr","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"zhenhaonong"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"ogawahuang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"kainanwang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"bethxu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"zilongzhang"}],"RequestId":"08db45c3-60cc-424e-92a6-0994fdcc1c7e"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '437'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:04 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "doFqi3zEx4lvu8udmzCStJPF5XezdnQGop6HHcpwRtibekjTp74djOgm_4ng4ARr",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432844'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"FycBG8cqQ12BSnPKzqiuNNOZ7tqpcuGIWW_iJew5it23LlWPjE1sfo5UhQQ3iMPf","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"mecexia"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"osborncheng"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"zhengxinliu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"charleslan"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"echoycai"}],"RequestId":"e974cf72-9466-46c1-a4bf-de664e542796"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '436'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:05 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "FycBG8cqQ12BSnPKzqiuNNOZ7tqpcuGIWW_iJew5it23LlWPjE1sfo5UhQQ3iMPf",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432845'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"SjRaM6vDq0PPBEyNtZMN4tG50_7q__KQPA5iiZMsIMYg8UeZ2QL5Etrty3WissjA","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"miaxie"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"gmzhai"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"wenhaotang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"hillgorwang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"junnanguo"}],"RequestId":"1a769c0f-3154-45b8-a093-c825490c599b"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '431'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:05 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "SjRaM6vDq0PPBEyNtZMN4tG50_7q__KQPA5iiZMsIMYg8UeZ2QL5Etrty3WissjA",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432845'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"Dl5IquSluCMAP07TDBUY764hN2pkYG-rpycqMCgxbc9VYCKrhQvvqgAgxeyV2UGo","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"guiyuetian"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"ninggyang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"nferzhuang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"kevenchen"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"cliffwchen"}],"RequestId":"a523b475-dce2-48cb-89d1-091d9b1ec824"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '437'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:05 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "Dl5IquSluCMAP07TDBUY764hN2pkYG-rpycqMCgxbc9VYCKrhQvvqgAgxeyV2UGo",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432845'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"Armiqtvc0M-24jAHKcDKuh8S8pC8iVBkhv3cUP415uOo6XTGP90uah2PIM7xHuFr","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"jamiemxu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"dylanjswang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"junwezhuang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"willcychen"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"azheliu"}],"RequestId":"db8eb32d-d366-4abc-8e51-4ab6b30d230b"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '436'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:05 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "Armiqtvc0M-24jAHKcDKuh8S8pC8iVBkhv3cUP415uOo6XTGP90uah2PIM7xHuFr",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432845'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"ZdVN3eHyxdrFmL1YcUynOTJb32mEs1TCQ2x1ksQDBj0-9gi4OcgWuBsVK092tNjN","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"bakercai"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"sugenejiang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"cathyzhu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"doromolv"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"ethangguo"}],"RequestId":"9001485b-2524-476c-8aba-e2f22791d5ec"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '433'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:05 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "ZdVN3eHyxdrFmL1YcUynOTJb32mEs1TCQ2x1ksQDBj0-9gi4OcgWuBsVK092tNjN",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432845'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"Cv3LzOO_KZy0nwh07NoICcEJy1Q9pgCd1qPKOA30w8Myd59_67soyrItHV5EfRn5","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"betaincao"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"xiaozhenni"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"riseyang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"jaydahu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"shalompeng"}],"RequestId":"bb9b7c0d-846b-4591-9f99-e7e1fd2e8405"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '433'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:05 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "Cv3LzOO_KZy0nwh07NoICcEJy1Q9pgCd1qPKOA30w8Myd59_67soyrItHV5EfRn5",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432845'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"IaLomnmmRPXXUyNRyrF5eUvYczYGZkFVjLp55kyjL864smPN2uQRc-uqApeip_IS","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"zuoyzhang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"xiancondeng"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"cxhui"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"dacizhang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"wenxinhu"}],"RequestId":"23138e1f-7ab1-4a23-b367-cb6dfb0dfbbd"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '431'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:05 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "IaLomnmmRPXXUyNRyrF5eUvYczYGZkFVjLp55kyjL864smPN2uQRc-uqApeip_IS",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432845'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"LUF1XP6FAuZstCDjwq5xKCfSs1VDyn0jdF3YLUOaW85RldMDJhllW24YrGMcONFB","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"diffjin"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"sekiroguo"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"tigeryhliu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"keatskang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"neopi"}],"RequestId":"d1ab6f44-b4a6-41c3-ba10-38fbf1640a76"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '429'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:05 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "LUF1XP6FAuZstCDjwq5xKCfSs1VDyn0jdF3YLUOaW85RldMDJhllW24YrGMcONFB",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432845'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"o2mhrQNU67XodcoL10_B6e7bcAW5B_w_H_avpuAvimOBqM6EeXsu2HVDEHyE6tWO","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"jasonawang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"autumnzeng"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"dannykang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"tommyhuo"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"devinshdu"}],"RequestId":"acccf33d-c2cd-4adf-b892-0f87581cc9d6"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '435'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:05 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "o2mhrQNU67XodcoL10_B6e7bcAW5B_w_H_avpuAvimOBqM6EeXsu2HVDEHyE6tWO",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432845'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"ouFkGfAhawItJt3khgJRcbu1blJEsWbKw7ILEk4C5SgDeA9L3JxJBc34YNJkcqpp","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"zanehzhang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"kaychen"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"glenzhou"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"martinxiao"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"rosschen"}],"RequestId":"fc0f2c5f-a4ea-49a7-bb16-1113638ab384"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '432'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:05 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "ouFkGfAhawItJt3khgJRcbu1blJEsWbKw7ILEk4C5SgDeA9L3JxJBc34YNJkcqpp",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432845'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"CffBv89Hh-3s9hyTEWxEc3KtVXUOS1ghHnq2fyBfhwfHw9xSU76CxBJRD6VMsyym","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"leonayzheng"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"krmnliu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"xfgong"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"tacodu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"phonpeng"}],"RequestId":"b699d759-c93b-483f-8d7b-51a2c19160da"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '427'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:05 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "CffBv89Hh-3s9hyTEWxEc3KtVXUOS1ghHnq2fyBfhwfHw9xSU76CxBJRD6VMsyym",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432845'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"5PLHnuHCPUqRqcKe-ERPpAcKbThbq2KXkohJKortcEBZ9mh56mGp1lLBgn75VHyv","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"cailynyu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"pennjiang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"yingjieyjhe"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"ashley"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"ireneshi"}],"RequestId":"f6be4c8a-0648-4ae3-a099-8412ff6d3962"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '431'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:05 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "5PLHnuHCPUqRqcKe-ERPpAcKbThbq2KXkohJKortcEBZ9mh56mGp1lLBgn75VHyv",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432845'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"giPOBq1T6xu-39G3PxdPzb2NOA-1Afb7vsZDrtrFZmGnTAIlcjlwzW4gmDTj8qR9","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"wensenxu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"derenmiao"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"anathantu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"joylyu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"guangzhanli"}],"RequestId":"fcde82da-312f-44aa-90bb-67563c926667"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '432'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:05 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "giPOBq1T6xu-39G3PxdPzb2NOA-1Afb7vsZDrtrFZmGnTAIlcjlwzW4gmDTj8qR9",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432845'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"EgzRQUHXodq7Th6dWgJDvUlQdkJOOy6ShQkvGSo4Px3dI2agYPZINCpnbbQ55aG_","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"aeriomao"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"lucanzwei"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"leonzgshao"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"danahan"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"gcmgzhang"}],"RequestId":"3477caca-1393-4601-acb9-c215311231af"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '432'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:06 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "EgzRQUHXodq7Th6dWgJDvUlQdkJOOy6ShQkvGSo4Px3dI2agYPZINCpnbbQ55aG_",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432846'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"NIyLm5CntRkAXPvnm2GlGLz8dul3q9Iq-FFXluvFyb1YlmC_riJ7je2ss-3885o6","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"gavindyrao"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"songqye"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"rocluo"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"canhuichen"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"xiaolinchi"}],"RequestId":"ff8856da-2396-41b9-8582-fc2b7c9e1524"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '432'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:06 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "NIyLm5CntRkAXPvnm2GlGLz8dul3q9Iq-FFXluvFyb1YlmC_riJ7je2ss-3885o6",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432846'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"azJwcizul2I2xRwU_-vAu1I_TC-Athn9tWHzUCdV15FfzMniRUPXGKMsRJCnSATA","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"yanniegao"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"llinwlwang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"edenlluo"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"ericjsheng"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"sauerwang"}],"RequestId":"4ce00af3-e432-4f2e-b0ec-17e2a0159efb"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '435'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:06 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "azJwcizul2I2xRwU_-vAu1I_TC-Athn9tWHzUCdV15FfzMniRUPXGKMsRJCnSATA",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432846'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"dMBE3UbjGelxoXXme3ICHZPYK538rMIUZ15LhxmaUvWMZcJbqsu1Is8B-GWJQSWy","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"venusqu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"hamliao"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"vernonlu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"zehualuo"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"gardennchen"}],"RequestId":"a3df5306-abd2-41cb-9bb8-961b42e77206"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '430'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:06 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "dMBE3UbjGelxoXXme3ICHZPYK538rMIUZ15LhxmaUvWMZcJbqsu1Is8B-GWJQSWy",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432846'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"DMeJu558u5z5WsDuRbHQWyRf5RxOXfPAbjuhAwHM8yfkrjr3wEn6GV8ywoPlUp3L","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"alexandecai"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"yeeechen"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"sulu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"leonlmxiong"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"seansi"}],"RequestId":"93a107f2-988b-4e58-abae-9e381db3293f"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '429'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:06 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "DMeJu558u5z5WsDuRbHQWyRf5RxOXfPAbjuhAwHM8yfkrjr3wEn6GV8ywoPlUp3L",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432846'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"6mC996QvWM57sAs4if_277Mk4Ms6Gztlq9FoOxtEzIIJwOgFo5nd3xq6uANKQqWA","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"starfishyu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"greengao"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"conncheng"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"bonussheng"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"allenyfyang"}],"RequestId":"e911eb55-6e7d-4f2b-8331-4b2952d63f72"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '437'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:06 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "6mC996QvWM57sAs4if_277Mk4Ms6Gztlq9FoOxtEzIIJwOgFo5nd3xq6uANKQqWA",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432846'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"Db_t4UE4h_IJmFOJkIZD14KdEPyX-3ojVlGQDuPTBdMxFEY50dxXZ2yJfa3u8lQF","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"verayqwang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"jasonlcchen"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"erichmao"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"allanzhli"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"gavinlhchen"}],"RequestId":"c9284a5c-306b-42f7-8486-8f4db4319be5"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '438'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:06 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "Db_t4UE4h_IJmFOJkIZD14KdEPyX-3ojVlGQDuPTBdMxFEY50dxXZ2yJfa3u8lQF",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432846'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"lZ53BlSfMX5pM1S7WwYGLkYC6i6ZJfmjyr1hREusKosVb4xSxQMdDijKIX3ZZqZr","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"johnezhou"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"rooniejiang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"healerli"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"cherryxiao"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"diluczhang"}],"RequestId":"4cb5db67-e4bf-4a7f-8393-8302359422b2"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '437'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:06 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "lZ53BlSfMX5pM1S7WwYGLkYC6i6ZJfmjyr1hREusKosVb4xSxQMdDijKIX3ZZqZr",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432846'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"u7-C8pGZ71e-WUMD51zQvY_VC44tOPtxqt2FG16mkR7AYwpFqxpEeXLqaI6u-Mop","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"robercheng"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"v_qilin"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"ienyu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"crispchen"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"hertzzhang"}],"RequestId":"3d40e371-3021-4ef9-83b2-ae180e0283dc"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '430'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:06 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "u7-C8pGZ71e-WUMD51zQvY_VC44tOPtxqt2FG16mkR7AYwpFqxpEeXLqaI6u-Mop",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432846'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"sUh-VxmDehQGfaaWxfLRPjWg2IYF5i28HDr5R6Htt2ayntx1PA5p4jZwqrpWLXI7","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"zcanzhu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"jennyju"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"devinyzeng"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"kirbyhu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"v_izhengliu"}],"RequestId":"5ab29287-fbc4-4813-b4e4-2e9e55e058d8"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '431'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:06 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "sUh-VxmDehQGfaaWxfLRPjWg2IYF5i28HDr5R6Htt2ayntx1PA5p4jZwqrpWLXI7",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432846'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"TKQPEjj2wR1A89weJiY3Il5c65tUB5RY1t_nulIz-f7NGJIwXf-4kuN7sg3hiz3B","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"matttian"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"haiyangxing"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"taloslai"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"beihan"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"hoseafeng"}],"RequestId":"3c854ff0-8092-4421-ab71-32235dec80c2"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '431'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:06 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "TKQPEjj2wR1A89weJiY3Il5c65tUB5RY1t_nulIz-f7NGJIwXf-4kuN7sg3hiz3B",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432846'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"mgoMsPo25XWGnrViFfQTkw4zxBlydz-f9nH4ERZklAlHgaDshbwW8YTwvMe2pC04","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"kaiqidong"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"cooperwhxu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"shuotaoxie"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"steveywwu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"runyangwu"}],"RequestId":"9e84262d-449f-4433-88d6-2daf8e7752a4"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '436'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:06 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "mgoMsPo25XWGnrViFfQTkw4zxBlydz-f9nH4ERZklAlHgaDshbwW8YTwvMe2pC04",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432846'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"GiXwFSBXbl4fni-NsOmZojP2lO15UiRWKfZ4k24S_tHrH2twLhwPCb5F9diXFxsm","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"v_guluzhang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"kevinlkkong"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"costasyan"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"raeyue"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"chunduan"}],"RequestId":"b6a08776-038f-4f25-a856-061830ac8566"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '434'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:07 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "GiXwFSBXbl4fni-NsOmZojP2lO15UiRWKfZ4k24S_tHrH2twLhwPCb5F9diXFxsm",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432847'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"d2FAj9_SY1eH5wqL69K_xM8fPJGpOW2X4TFmqC76DAujJ2I25CMmGe7rXHXOgoBO","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"willzgli"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"v_sfanglu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"lucaslliu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"fxinchen"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"fengqqian"}],"RequestId":"aa8c0c68-c566-4b3c-a351-4b08596d7609"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '432'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:07 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "d2FAj9_SY1eH5wqL69K_xM8fPJGpOW2X4TFmqC76DAujJ2I25CMmGe7rXHXOgoBO",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432847'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"O3z4o0qqI-5NUB2wo-igKENAA5xtunpGgbKj3udPA7ScMjZa8f6Ob0JsQLhi0X4S","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"flyxmxu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"kali"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"willyu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"artzhang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"bswang"}],"RequestId":"262b5569-62ea-46b6-af13-73d0fa50f7d9"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '420'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:07 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "O3z4o0qqI-5NUB2wo-igKENAA5xtunpGgbKj3udPA7ScMjZa8f6Ob0JsQLhi0X4S",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432847'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"ksoXsYAK-J2NY_yCAl70K1KTO-PblSpSBMKvmam5Yd5suRerbr40oVxdHrhctCX_","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"qingzzhang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"tonnylu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"laneyli"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"davidtluo"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"cochen"}],"RequestId":"c389bb94-ed40-4d3a-ad6e-ad3e64cd479f"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '428'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:07 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "ksoXsYAK-J2NY_yCAl70K1KTO-PblSpSBMKvmam5Yd5suRerbr40oVxdHrhctCX_",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432847'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"dMkkgLTTySh_7_pQFrkCSM5FaYKFXkM6vkU8hckypkNV362X5kZ55XMyzRtI0_w8","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"zhanyisu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"tobiszhang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"bufferwu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"lionezhang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"sheashxie"}],"RequestId":"be7e812e-4fd0-4b33-8748-8a70d9c654cd"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '434'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:07 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "dMkkgLTTySh_7_pQFrkCSM5FaYKFXkM6vkU8hckypkNV362X5kZ55XMyzRtI0_w8",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432847'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"K-rK1ZzCnFb23UeiMp8VkYlwgeRu9MPORKDGg1MtqqUNIOnlHryGN5Hfa_cn9TZc","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"leblancbi"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"v_vczycao"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"jiayiiyang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"leoxfjiang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"xiangyuzeng"}],"RequestId":"4dedbce1-02fb-468e-9e5e-629070e6a3f5"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '438'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:07 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "K-rK1ZzCnFb23UeiMp8VkYlwgeRu9MPORKDGg1MtqqUNIOnlHryGN5Hfa_cn9TZc",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432847'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"mZmIxQvbQYTLNlRowbpBiHNN_db27vlAAhVEGrNiO-OvmknHcotv5J-Kyd00-YAR","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"jemuelmiao"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"lackyli"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"kangwuzhu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"buzzwang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"v_szesun"}],"RequestId":"fd8727e1-9b81-4130-a11e-bf45dc190c8e"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '431'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:07 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "mZmIxQvbQYTLNlRowbpBiHNN_db27vlAAhVEGrNiO-OvmknHcotv5J-Kyd00-YAR",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432847'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"b7cJjZfBDhRhLtEm0hrw7Zqn48nGRcmlTXtM3Gytmit7O9VKxR2ewHzmAChdM5gm","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"furongdeng"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"haovchen"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"xiangyushi"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"juanjualong"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"haipengji"}],"RequestId":"b37bf212-644c-43d2-b361-1fc12aecdfb0"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '437'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:07 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "b7cJjZfBDhRhLtEm0hrw7Zqn48nGRcmlTXtM3Gytmit7O9VKxR2ewHzmAChdM5gm",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432847'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"JeNiEWu5x3hdocu9syTCZUdZrL_ZG6c8y9FQzPoUGVA2j6wxXUKAv6ybXEBvkGTj","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"neoleeli"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"xiaofanchen"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"cjjiejcchen"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"teddyzhu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"simonelong"}],"RequestId":"4b685ea9-4c14-4eda-99fd-845a1be00df4"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '437'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:07 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "JeNiEWu5x3hdocu9syTCZUdZrL_ZG6c8y9FQzPoUGVA2j6wxXUKAv6ybXEBvkGTj",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432847'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"cEx4DaL38sj4k9C1ZG-7uhlK_T0UkDp3LMKS_QDugpSOmslHk4GBJIj0EU6YVLAG","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"jingboyou"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"erioezhang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"vijaysun"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"terazhu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"junjungwang"}],"RequestId":"b5213cb5-2645-4337-8b40-0083c751da61"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '434'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:07 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "cEx4DaL38sj4k9C1ZG-7uhlK_T0UkDp3LMKS_QDugpSOmslHk4GBJIj0EU6YVLAG",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432847'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"syzkJaIy89RtlVC1NiB_SqPQkpXYO0arPeyDBPDkzmKHJYcdzUSA9E-unQEscmc2","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"p_pbobogao"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"danllliu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"amexu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"devenshi"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"codyktang"}],"RequestId":"afbd304d-0985-47dc-8a8d-1c1186dfe6fc"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '429'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:08 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "syzkJaIy89RtlVC1NiB_SqPQkpXYO0arPeyDBPDkzmKHJYcdzUSA9E-unQEscmc2",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432848'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"N0oDQAptkFxIE_oWHOKLWHqEUQdK9G6is4DAttFl4-RojEh9wtSIvH5TW2tUWTWB","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"ramirowang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"laryshi"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"p_wxinyang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"p_pmhan"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"wealdqin"}],"RequestId":"c7a04147-eea7-447f-b2d2-59a5db45e86c"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '431'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:08 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "N0oDQAptkFxIE_oWHOKLWHqEUQdK9G6is4DAttFl4-RojEh9wtSIvH5TW2tUWTWB",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432848'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"4z_0Q5kzGvZNql6LZZ15t6kF-tg4R2odi2fhbUqFaicqHDu9RXZERXS_OneQsY0e","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"webbershi"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"jettdeng"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"1258344699"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"ruhongxu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"geekyang"}],"RequestId":"77d69b5c-4e41-4f76-9d26-8816c3882b0a"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '432'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:08 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "4z_0Q5kzGvZNql6LZZ15t6kF-tg4R2odi2fhbUqFaicqHDu9RXZERXS_OneQsY0e",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432848'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"DOPbpy3dF83BRFMH5rCSrdW0h6fn2bh4hPW7Ctzv0uzztCgOfmkpr4t0cSPYXb8E","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"blueguo"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"brainlli"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"jellylxu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"alansthuang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"xiaoyawwang"}],"RequestId":"d5d17ab3-da28-495a-a034-e0be84fdd914"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '434'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:08 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "DOPbpy3dF83BRFMH5rCSrdW0h6fn2bh4hPW7Ctzv0uzztCgOfmkpr4t0cSPYXb8E",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432848'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"_H1TvTCfcqw5a3PzFNXPDqiAxx1dw-LEU0uNpl9bmOL4fB7eotJ4qd_A3ytCuI8b","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"shanksfydu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"zainzhao"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"galejzhang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"aslinwang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"amyleali"}],"RequestId":"6a65509f-55df-4ffe-9bf9-59b463f2945c"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '434'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:08 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "_H1TvTCfcqw5a3PzFNXPDqiAxx1dw-LEU0uNpl9bmOL4fB7eotJ4qd_A3ytCuI8b",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432848'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"ie7pkqqi3DIjhSfWRcs23pRIAG02c6E5wpHe6Diz8dR6HfDHcCRr3s9K9iw4VTaK","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"jiahuazhu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"santos"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"timothychao"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"v_shijucui"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"enderyang"}],"RequestId":"f468122d-2c95-4bc7-aa5c-bcaea98436ab"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '434'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:08 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "ie7pkqqi3DIjhSfWRcs23pRIAG02c6E5wpHe6Diz8dR6HfDHcCRr3s9K9iw4VTaK",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432848'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"egrumgOpsGe_HLqt48QkjDq4C7wdSKE2qoVW_m4SjUPNEw1mGmPtNgzJp1yp2fe1","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"ducanjie"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"chacomo"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"albertyyan"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"billddu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"junxiaolli"}],"RequestId":"fa53be6f-68e6-4e02-85af-d201c0217341"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '431'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:08 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "egrumgOpsGe_HLqt48QkjDq4C7wdSKE2qoVW_m4SjUPNEw1mGmPtNgzJp1yp2fe1",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432848'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"H6vgeTN6nRjcj6dKkTnLO2IrohZDRmNbxphd93rIbXfDlmhmsUN8snt5kCur2iQg","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"winterrli"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"zitinghuang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"charlielluo"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"ericwhzhao"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"hobwei"}],"RequestId":"82cc72a6-bcd8-4bf3-9dec-a7bc27e3e967"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '436'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:08 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "H6vgeTN6nRjcj6dKkTnLO2IrohZDRmNbxphd93rIbXfDlmhmsUN8snt5kCur2iQg",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432848'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"NUf2-1d3tPUHm77t1nWVMraURP5S4lvKRO8gerZYpWYalQNqtXZbHErBaqUuaa9M","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"shoma"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"fordzxfu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"noahlu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"zhouppeng"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"jianwjwang"}],"RequestId":"84e147a7-d7cc-4774-b7cf-6537ddf3a695"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '427'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:08 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "NUf2-1d3tPUHm77t1nWVMraURP5S4lvKRO8gerZYpWYalQNqtXZbHErBaqUuaa9M",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432848'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"lbFkEEJVRrBhWGevxaiM8o3fJWBpvannT9bx3TidQ_yPaFz5TaguiaEIkS9ymm3q","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"middlexie"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"zhenjunyao"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"marcdai"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"petezeng"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"xshengwang"}],"RequestId":"1e00ffe1-b760-4d04-a022-77cb610e2cd4"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '433'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:08 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "lbFkEEJVRrBhWGevxaiM8o3fJWBpvannT9bx3TidQ_yPaFz5TaguiaEIkS9ymm3q",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432848'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"Z_SMaU1ZMCNjZERdEkdh0cPYDEWvewxQrkElJnQatu_19iyNJhLcEVPTZ8YrAJ_S","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"kekeding"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"xinyiweng"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"yaduomosun"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"vernonxu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"wellsli"}],"RequestId":"c5d91d52-4162-4463-aa66-801b336fc40c"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '431'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:08 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "Z_SMaU1ZMCNjZERdEkdh0cPYDEWvewxQrkElJnQatu_19iyNJhLcEVPTZ8YrAJ_S",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432848'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"HQaTrUPTqoq_424s7lCFM6yTBhoFpZNuw2H_OeD8-7vZGbWBNT7QEtkb5bFqfR1M","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"chengjhuang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"devinzyang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"cherylwang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"fredtian"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"p_ppgqwang"}],"RequestId":"4e5174b4-95fc-4bf8-a253-dbd2f1219358"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '438'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:09 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "HQaTrUPTqoq_424s7lCFM6yTBhoFpZNuw2H_OeD8-7vZGbWBNT7QEtkb5bFqfR1M",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432849'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"oddtIV5DD_tr5mggz457L6SKQWYSXQobjH0T1V5vO0wDWmOpIrjNJRSEZ7AAp1B9","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"javali"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"stefanlliu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"fayelliao"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"elijzhang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"zhaojli"}],"RequestId":"c94e4b2e-f210-4108-8643-c446e9134fbf"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '430'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:09 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "oddtIV5DD_tr5mggz457L6SKQWYSXQobjH0T1V5vO0wDWmOpIrjNJRSEZ7AAp1B9",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432849'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"2hvnTWTpiH_y1cjrIS8FtXdHBoEmiaegrsFYXBAZKU-CIWzQ--S1Kvdgre4kE9QV","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"yiqianzhou"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"p_phexianli"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"gardenqiu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"superywang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"origamiying"}],"RequestId":"64878d9c-21f1-4710-8d7c-189d8c96dd05"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '440'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:09 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "2hvnTWTpiH_y1cjrIS8FtXdHBoEmiaegrsFYXBAZKU-CIWzQ--S1Kvdgre4kE9QV",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432849'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"kDBmQ8blqSUNa6CMDsf54Kg3GiYYXXRPD8Ki5RvK3d7Xw0ikIimbFMhV8b7jzOy7","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"bellyliu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"v_pzhilli"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"v_pzbbzhang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"p_pjhdong"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"carolmhuang"}],"RequestId":"36edab16-e763-4c4c-a4cc-5bd3a99f507f"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '437'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:09 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "kDBmQ8blqSUNa6CMDsf54Kg3GiYYXXRPD8Ki5RvK3d7Xw0ikIimbFMhV8b7jzOy7",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432849'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"dP6PRuXizKPmbTimk5rli4VWQpnnPBts_D6iGU_JG-KL9eNb8vq6Tn3p7dKyYrEH","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"kevinyyao"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"ruixian"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"duchendong"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"legendlu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"yyyupengli"}],"RequestId":"b9e1f42d-c853-4a52-b284-b64ac0b27689"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '433'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:09 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "dP6PRuXizKPmbTimk5rli4VWQpnnPBts_D6iGU_JG-KL9eNb8vq6Tn3p7dKyYrEH",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432849'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"yPzYEhbNmrNVunsSHsgiEQ4SbfaYsExBMl-O5lYs3yRXmTKV_JpVLO21RnsYlx_d","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"neoshengsun"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"qiaomingliu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"evancai"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"jarvisyqliu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"stefzhou"}],"RequestId":"58b6f84c-a4bf-4659-9065-f1f415595048"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '437'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:09 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "yPzYEhbNmrNVunsSHsgiEQ4SbfaYsExBMl-O5lYs3yRXmTKV_JpVLO21RnsYlx_d",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432849'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"amncjAalhRel8W_xbEqSDsHJkE3cSbbEU7L-FGcntVTdt4oHjp1EpPuLEV6LriKs","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"weitongma"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"ashleylang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"charlestu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"pandaxxiong"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"yolopyang"}],"RequestId":"bc324587-abff-40ad-80e9-6cab1988c6e6"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '437'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:09 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "amncjAalhRel8W_xbEqSDsHJkE3cSbbEU7L-FGcntVTdt4oHjp1EpPuLEV6LriKs",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432849'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"Eb_n4wMP1PJY_6Mvl6qZub5zshVpUwe88_hHY0wGeDr3aMkOyKLARMo8O_gO8qS9","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"cutlerliu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"renardren"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"camdyzeng"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"linkshang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"rivenfang"}],"RequestId":"34772014-78c0-4ea0-8478-f17621c32b67"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '434'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:09 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "Eb_n4wMP1PJY_6Mvl6qZub5zshVpUwe88_hHY0wGeDr3aMkOyKLARMo8O_gO8qS9",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432849'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"CmxDFfyVLA6Ho_AwAuBL-_gPNplCq64HaQCnTRGMSps374WxAxa3anBUcryysOUF","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"joesonpan"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"luweikang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"emxinma"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"kevinrzheng"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"marcojywu"}],"RequestId":"e5658767-5052-4eb8-b615-2d8cb6ef18da"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '434'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:09 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "CmxDFfyVLA6Ho_AwAuBL-_gPNplCq64HaQCnTRGMSps374WxAxa3anBUcryysOUF",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432849'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"ShFV54jSTpnVbYhzfbxL3-n8da4Y6tfBkwgPIIVmQxUCXmHCEbs9Do9QJa9jKNI-","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"oliverzyang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"lifumao"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"miyoliu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"lucasdixie"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"v_kpanxiong"}],"RequestId":"0b670253-c2a4-4207-9623-2855f3a64bec"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '435'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:09 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "ShFV54jSTpnVbYhzfbxL3-n8da4Y6tfBkwgPIIVmQxUCXmHCEbs9Do9QJa9jKNI-",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432849'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"Et0VRwt5UeIAEIA99V6Qz9isscgjQKd-KjCpD6SJhaCGQ1ZUk0Riv-f_m9Q_18JI","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"sanshizhao"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"georgeqli"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"daxuewwang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"tillyyang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"nerolv"}],"RequestId":"0b159207-a37c-4adc-b8f9-08b79def7190"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '433'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:09 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "Et0VRwt5UeIAEIA99V6Qz9isscgjQKd-KjCpD6SJhaCGQ1ZUk0Riv-f_m9Q_18JI",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432849'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"iDoL_lMFLQyT9NJ7r-K73LzK7upEcyefmq9YwwfFUVfBRRtWPyttgWbYxYuAMkDv","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"alexxxia"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"jokiccui"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"nichzhang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"darrickxiao"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"grorgehu"}],"RequestId":"6722c174-0c14-4b26-a51e-fd381c0b6ac9"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '433'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:09 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "iDoL_lMFLQyT9NJ7r-K73LzK7upEcyefmq9YwwfFUVfBRRtWPyttgWbYxYuAMkDv",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432849'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"_x9256sYAX7CPSuN-iWQoJmakSrOHj--1iorHlcXzyNRbkqVUegFOEcVb270ciF4","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"yudongwu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"v_lingvliu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"spikeyuan"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"sharmaxia"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"qipengluan"}],"RequestId":"23f9a0b4-6ce4-4819-bb11-193847539fa0"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '435'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:09 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "_x9256sYAX7CPSuN-iWQoJmakSrOHj--1iorHlcXzyNRbkqVUegFOEcVb270ciF4",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432849'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"ISvdv7y_vcjreGFytKBghRnOx3L05_zCsxuOMUe28IWD657tl8d3JFn0fcpZTjOg","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"venlerwei"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"josgu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"emilyshu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"shijiechen"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"garyyang"}],"RequestId":"9e280a2d-54b8-4f77-ba62-055211eb8be4"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '429'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:10 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "ISvdv7y_vcjreGFytKBghRnOx3L05_zCsxuOMUe28IWD657tl8d3JFn0fcpZTjOg",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432850'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"2FR2VJGD7oErNmjLgSmKq0xkhZRA-TAup-Kcp8328OMoQBoIHBu_Wo6yNbUg1xWy","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"v_wacwang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"richardczhu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"sevenqjiang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"georgetu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"yunianliu"}],"RequestId":"57f3b487-fc45-42c6-8165-a3a2a87ee8e4"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '437'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:10 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "2FR2VJGD7oErNmjLgSmKq0xkhZRA-TAup-Kcp8328OMoQBoIHBu_Wo6yNbUg1xWy",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432850'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"wbX9LsA2wP0zLlyB4aVyE3jjki6acYMFYyZLCX7ZE79-wbD6jyAIXg---yrp9VVn","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"kingsleyye"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"nanansun"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"p_pyhgong"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"p_pshunyao"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"p_xixianghe"}],"RequestId":"3755d6e4-de78-4596-8d60-4927fe239473"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '437'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:10 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "wbX9LsA2wP0zLlyB4aVyE3jjki6acYMFYyZLCX7ZE79-wbD6jyAIXg---yrp9VVn",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432850'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"O5aIyILVql1KrUt_cMEPqYZhJXQ9yBOB8JucnTV3YgxENzlqv5iVCYHB8DbY9gIO","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"hanydai"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"p_yaooli"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"cyrilhzhang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"peidongji"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"josephpu"}],"RequestId":"36594ad9-1775-40b4-b8ad-d7bea709627b"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '432'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:10 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "O5aIyILVql1KrUt_cMEPqYZhJXQ9yBOB8JucnTV3YgxENzlqv5iVCYHB8DbY9gIO",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432850'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"xVS3VMH2j5EXNIcoPMUb5SbhO783uDf0km5wbTgQti4BL4VlPWSYo-KUGDMrP-w1","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"planckzhang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"elvinlin"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"candydsu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"jiabosun"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"jiduma"}],"RequestId":"37a4c8c0-7bd2-4ecc-8eb5-c06e13f2b21f"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '430'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:10 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "xVS3VMH2j5EXNIcoPMUb5SbhO783uDf0km5wbTgQti4BL4VlPWSYo-KUGDMrP-w1",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432850'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"s4kPMB44g8iqia6-iAJMC0HCdgFAs8J1YgHFxh1_LvjrJy6eND5X9pd5jQqnsXaI","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"ambroselee"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"ramosli"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"haodianwei"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"libertyzhu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"joeyizhao"}],"RequestId":"5a125d65-0077-444e-b182-fbecacab63c9"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '435'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:10 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "s4kPMB44g8iqia6-iAJMC0HCdgFAs8J1YgHFxh1_LvjrJy6eND5X9pd5jQqnsXaI",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432850'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"vbb6RdKFNcXO8moRfmKFEvOV0F5pldhDYwkLkHKNmqtlPrqOqTmpmOQd-nYagG8Q","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"erichchen"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"xuleilxxu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"luochengluo"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"v_ichzhou"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"treyzhang"}],"RequestId":"a19913b5-f5db-43e4-9660-6d2b953634b7"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '436'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:10 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "vbb6RdKFNcXO8moRfmKFEvOV0F5pldhDYwkLkHKNmqtlPrqOqTmpmOQd-nYagG8Q",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432850'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"NnRkADMzHwvpGsEhIvyH8N17KH5HQrnE48zgQqKsfDIwvbm-6e2yfz354fyE38bs","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"louisjliu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"xuetingliu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"v_gzlgao"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"felixhzhu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"charlyhuang"}],"RequestId":"1cf99dfc-34ca-42c3-9b79-8cac91a94dab"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '436'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:10 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "NnRkADMzHwvpGsEhIvyH8N17KH5HQrnE48zgQqKsfDIwvbm-6e2yfz354fyE38bs",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432850'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"eQTvsjljE0SgObMOZtvZfsFIzCyRCDO-JKCYPgXyHYyDQn098jrUm4do5Mezk3ix","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"walterzhao"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"kingjayli"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"darbywang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"lorenzoyu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"heihuliliu"}],"RequestId":"36ac6f8f-0eff-4dd6-af7a-b451157d7f6c"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '436'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:10 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "eQTvsjljE0SgObMOZtvZfsFIzCyRCDO-JKCYPgXyHYyDQn098jrUm4do5Mezk3ix",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432850'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"-FkGg-3vHg6pk6YQDJSGqOcvtk8VMkOYfG07n814v56nCgHjSLWvmPDD1jI33KGe","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"xxhapecheng"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"applecxyang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"rexxarsyang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"grandzhong"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"jerryazhang"}],"RequestId":"47fa4dbc-abb7-42fd-ae71-817c0731e38a"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '443'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:10 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"TagKeys": ["\u8d1f\u8d23\u4eba"], "PaginationToken": "-FkGg-3vHg6pk6YQDJSGqOcvtk8VMkOYfG07n814v56nCgHjSLWvmPDD1jI33KGe",
+      "MaxResults": 5}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '139'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetTagValues
+      X-TC-Language:
+      - zh-CN
+      X-TC-Region:
+      - ap-singapore
+      X-TC-RequestClient:
+      - SDK_PYTHON_3.0.715
+      X-TC-Timestamp:
+      - '1662432850'
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"ZzUO_raIL7b34br2dBHgP9RtJf8BnP-0NmfazoTbuTwj5SSyjpkBjaYJbijhoPCw","Tags":[{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"igorguo"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"kellyhyyang"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"hoseani"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"yongmingliu"},{"TagKey":"\u8d1f\u8d23\u4eba","TagValue":"fionncchen"}],"RequestId":"e7228456-e781-4a9c-a294-8f15bc56b8b9"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '435'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 06 Sep 2022 02:54:10 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+version: 1

@@ -1,0 +1,202 @@
+{
+    "status_code": 200,
+    "data": {
+        "services": [
+            {
+                "serviceArn": "arn:aws:ecs:us-east-1:644160558196:service/timmy-test-cluster/test-task-set-delete",
+                "serviceName": "test-task-set-delete",
+                "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/timmy-test-cluster",
+                "loadBalancers": [
+                    {
+                        "targetGroupArn": "arn:aws:elasticloadbalancing:us-east-1:644160558196:targetgroup/test-task-set-tg/47a3a7a81ab3db0e",
+                        "containerName": "sample-app",
+                        "containerPort": 80
+                    }
+                ],
+                "serviceRegistries": [],
+                "status": "DRAINING",
+                "desiredCount": 0,
+                "runningCount": 1,
+                "pendingCount": 0,
+                "launchType": "FARGATE",
+                "platformVersion": "1.4.0",
+                "platformFamily": "Linux",
+                "taskDefinition": "arn:aws:ecs:us-east-1:644160558196:task-definition/c7n-test-task-def:2",
+                "deploymentConfiguration": {
+                    "maximumPercent": 200,
+                    "minimumHealthyPercent": 100
+                },
+                "taskSets": [
+                    {
+                        "id": "ecs-svc/4201323268728819917",
+                        "taskSetArn": "arn:aws:ecs:us-east-1:644160558196:task-set/timmy-test-cluster/test-task-set-delete/ecs-svc/4201323268728819917",
+                        "serviceArn": "arn:aws:ecs:us-east-1:644160558196:service/timmy-test-cluster/test-task-set-delete",
+                        "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/timmy-test-cluster",
+                        "status": "PRIMARY",
+                        "taskDefinition": "arn:aws:ecs:us-east-1:644160558196:task-definition/c7n-test-task-def:2",
+                        "computedDesiredCount": 1,
+                        "pendingCount": 0,
+                        "runningCount": 1,
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2024,
+                            "month": 3,
+                            "day": 12,
+                            "hour": 19,
+                            "minute": 49,
+                            "second": 24,
+                            "microsecond": 781000
+                        },
+                        "updatedAt": {
+                            "__class__": "datetime",
+                            "year": 2024,
+                            "month": 3,
+                            "day": 12,
+                            "hour": 19,
+                            "minute": 51,
+                            "second": 16,
+                            "microsecond": 548000
+                        },
+                        "launchType": "FARGATE",
+                        "platformVersion": "1.4.0",
+                        "platformFamily": "Linux",
+                        "networkConfiguration": {
+                            "awsvpcConfiguration": {
+                                "subnets": [
+                                    "subnet-efbcccb7",
+                                    "subnet-e3b194de",
+                                    "subnet-044d9e3b66dccd75a",
+                                    "subnet-914763e7"
+                                ],
+                                "securityGroups": [
+                                    "sg-6c7fa917"
+                                ],
+                                "assignPublicIp": "ENABLED"
+                            }
+                        },
+                        "loadBalancers": [
+                            {
+                                "targetGroupArn": "arn:aws:elasticloadbalancing:us-east-1:644160558196:targetgroup/test-task-set-tg/47a3a7a81ab3db0e",
+                                "containerName": "sample-app",
+                                "containerPort": 80
+                            }
+                        ],
+                        "serviceRegistries": [],
+                        "scale": {
+                            "value": 0.0,
+                            "unit": "PERCENT"
+                        },
+                        "stabilityStatus": "STABILIZING",
+                        "stabilityStatusAt": {
+                            "__class__": "datetime",
+                            "year": 2024,
+                            "month": 3,
+                            "day": 12,
+                            "hour": 19,
+                            "minute": 51,
+                            "second": 16,
+                            "microsecond": 548000
+                        },
+                        "tags": []
+                    }
+                ],
+                "roleArn": "arn:aws:iam::644160558196:role/aws-service-role/ecs.amazonaws.com/AWSServiceRoleForECS",
+                "events": [
+                    {
+                        "id": "789c4a15-caed-41c0-be6b-e4f7f90e34f8",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2024,
+                            "month": 3,
+                            "day": 12,
+                            "hour": 19,
+                            "minute": 50,
+                            "second": 19,
+                            "microsecond": 885000
+                        },
+                        "message": "(service test-task-set-delete) has reached a steady state."
+                    },
+                    {
+                        "id": "018517ec-af11-4f62-95b6-d05a991b0735",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2024,
+                            "month": 3,
+                            "day": 12,
+                            "hour": 19,
+                            "minute": 50,
+                            "second": 19,
+                            "microsecond": 884000
+                        },
+                        "message": "(service test-task-set-delete, taskSet ecs-svc/4201323268728819917) updated state to STEADY_STATE."
+                    },
+                    {
+                        "id": "07f1b4f5-53a7-46d1-ae0d-43ebe7bb92a5",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2024,
+                            "month": 3,
+                            "day": 12,
+                            "hour": 19,
+                            "minute": 50,
+                            "second": 0,
+                            "microsecond": 471000
+                        },
+                        "message": "(service test-task-set-delete, taskSet ecs-svc/4201323268728819917) registered 1 targets in (target-group arn:aws:elasticloadbalancing:us-east-1:644160558196:targetgroup/test-task-set-tg/47a3a7a81ab3db0e)"
+                    },
+                    {
+                        "id": "b50f4e8a-dfd4-4a4a-b634-4146c4c221f8",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2024,
+                            "month": 3,
+                            "day": 12,
+                            "hour": 19,
+                            "minute": 49,
+                            "second": 32,
+                            "microsecond": 412000
+                        },
+                        "message": "(service test-task-set-delete, taskSet ecs-svc/4201323268728819917) has started 1 tasks: (task 601dade4334d4864a4fb6da44a0ea8ff)."
+                    }
+                ],
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 3,
+                    "day": 12,
+                    "hour": 19,
+                    "minute": 49,
+                    "second": 24,
+                    "microsecond": 781000
+                },
+                "placementConstraints": [],
+                "placementStrategy": [],
+                "networkConfiguration": {
+                    "awsvpcConfiguration": {
+                        "subnets": [
+                            "subnet-efbcccb7",
+                            "subnet-e3b194de",
+                            "subnet-044d9e3b66dccd75a",
+                            "subnet-914763e7"
+                        ],
+                        "securityGroups": [
+                            "sg-6c7fa917"
+                        ],
+                        "assignPublicIp": "ENABLED"
+                    }
+                },
+                "healthCheckGracePeriodSeconds": 0,
+                "schedulingStrategy": "REPLICA",
+                "deploymentController": {
+                    "type": "CODE_DEPLOY"
+                },
+                "createdBy": "arn:aws:iam::644160558196:user/timmy",
+                "enableECSManagedTags": true,
+                "propagateTags": "NONE",
+                "enableExecuteCommand": false
+            }
+        ],
+        "failures": [],
+        "ResponseMetadata": {}
+    }
+}

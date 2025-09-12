@@ -1,12 +1,16 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-from unittest import TestCase
-from c7n import cache, config
 from argparse import Namespace
-import pickle
-import tempfile
-import mock
+from datetime import datetime, timedelta
 import os
+import pickle
+import sqlite3
+import sys
+from unittest import TestCase
+
+import pytest
+
+from c7n import cache, config
 
 
 class TestCache(TestCase):
@@ -14,7 +18,7 @@ class TestCache(TestCase):
     def test_factory(self):
         self.assertIsInstance(cache.factory(None), cache.NullCache)
         test_config = Namespace(cache_period=60, cache="test-cloud-custodian.cache")
-        self.assertIsInstance(cache.factory(test_config), cache.FileCacheManager)
+        self.assertIsInstance(cache.factory(test_config), cache.SqlKvCache)
         test_config.cache = None
         self.assertIsInstance(cache.factory(test_config), cache.NullCache)
 
@@ -27,126 +31,71 @@ class MemCacheTest(TestCase):
             cache.InMemoryCache)
 
     def test_get_set(self):
-        mem_cache = cache.InMemoryCache()
+        mem_cache = cache.InMemoryCache({})
         mem_cache.save({'region': 'us-east-1'}, {'hello': 'world'})
         self.assertEqual(mem_cache.size(), 1)
         self.assertEqual(mem_cache.load(), True)
 
-        mem_cache = cache.InMemoryCache()
+        mem_cache = cache.InMemoryCache({})
         self.assertEqual(
             mem_cache.get({'region': 'us-east-1'}),
             {'hello': 'world'})
+        mem_cache.close()
 
 
-class FileCacheManagerTest(TestCase):
+def test_sqlkv(tmp_path):
+    kv = cache.SqlKvCache(config.Bag(cache=tmp_path / "cache.db", cache_period=60))
+    kv.load()
+    k1 = {"account": "12345678901234", "region": "us-west-2", "resource": "ec2"}
+    v1 = [{'id': 'a'}, {'id': 'b'}]
 
-    def setUp(self):
-        self.test_config = Namespace(
-            cache_period=60, cache="test-cloud-custodian.cache"
-        )
-        self.test_cache = cache.FileCacheManager(self.test_config)
-        self.test_key = "test"
-        self.bad_key = "bad"
-        self.test_value = [1, 2, 3]
+    assert kv.get(k1) is None
+    kv.save(k1, v1)
+    assert kv.get(k1) == v1
+    kv.close()
 
-    def test_get_set(self):
-        t = self.temporary_file_with_cleanup()
-        c = cache.FileCacheManager(Namespace(cache_period=60, cache=t.name))
-        self.assertFalse(c.load())
-        k1 = {"account": "12345678901234", "region": "us-west-2", "resource": "ec2"}
-        c.save(k1, range(5))
-        self.assertEqual(c.get(k1), range(5))
-        k2 = {"account": "98765432101234", "region": "eu-west-1", "resource": "asg"}
-        c.save(k2, range(2))
-        self.assertEqual(c.get(k1), range(5))
-        self.assertEqual(c.get(k2), range(2))
 
-        c2 = cache.FileCacheManager(Namespace(cache_period=60, cache=t.name))
-        self.assertTrue(c2.load())
-        self.assertEqual(c2.get(k1), range(5))
-        self.assertEqual(c2.get(k2), range(2))
+def test_sqlkv_get_expired(tmp_path):
+    kv = cache.SqlKvCache(config.Bag(cache=tmp_path / "cache.db", cache_period=60))
+    kv.load()
+    kv1 = {'a': 'b', 'c': 'd'}
+    kv.save(kv1, kv1, datetime.utcnow() - timedelta(days=10))
+    assert kv.get(kv1) is None
 
-    def test_get(self):
-        # mock the pick and set it to the data variable
-        test_pickle = pickle.dumps(
-            {pickle.dumps(self.test_key): self.test_value}, protocol=2
-        )
-        self.test_cache.data = pickle.loads(test_pickle)
 
-        # assert
-        self.assertEqual(self.test_cache.get(self.test_key), self.test_value)
-        self.assertEqual(self.test_cache.get(self.bad_key), None)
+def test_sqlkv_load_gc(tmp_path):
+    kv = cache.SqlKvCache(config.Bag(cache=tmp_path / "cache.db", cache_period=60))
 
-    def test_load(self):
-        t = self.temporary_file_with_cleanup(suffix=".cache")
+    # seed old values with manual connection
+    kv.conn = sqlite3.connect(kv.cache_path)
+    kv.conn.execute(kv.create_table)
+    kv1 = {'a': 'b', 'c': 'd'}
+    kv2 = {'b': 'a', 'd': 'c'}
+    kv.save(kv1, kv1, datetime.utcnow() - timedelta(days=10))
+    kv.save(kv2, kv2, datetime.utcnow() - timedelta(minutes=5))
 
-        load_config = Namespace(cache_period=0, cache=t.name)
-        load_cache = cache.FileCacheManager(load_config)
-        self.assertFalse(load_cache.load())
-        load_cache.data = {"key": "value"}
-        self.assertTrue(load_cache.load())
+    kv.load()
+    assert kv.get(kv1) is None
+    assert kv.get(kv2) == kv2
 
-    @mock.patch.object(cache.os, "makedirs")
-    @mock.patch.object(cache.os.path, "exists")
-    @mock.patch.object(cache.pickle, "dump")
-    @mock.patch.object(cache.pickle, "dumps")
-    def test_save_exists(self, mock_dumps, mock_dump, mock_exists, mock_mkdir):
-        # path exists then we dont need to create the folder
-        mock_exists.return_value = True
-        # tempfile to hold the pickle
-        temp_cache_file = self.temporary_file_with_cleanup()
 
-        self.test_cache.cache_path = temp_cache_file.name
-        # make the call
-        self.test_cache.save(self.test_key, self.test_value)
+def test_sqlkv_parent_dir_create(tmp_path):
+    cache_path = tmp_path / ".cache" / "cache.db"
+    kv = cache.SqlKvCache(config.Bag(cache=cache_path, cache_period=60))
+    kv.load()
+    assert os.path.exists(os.path.dirname(cache_path))
 
-        # assert if file already exists
-        self.assertFalse(mock_mkdir.called)
-        self.assertTrue(mock_dumps.called)
-        self.assertTrue(mock_dump.called)
 
-        # mkdir should NOT be called, but pickles should
-        self.assertEqual(mock_mkdir.call_count, 0)
-        self.assertEqual(mock_dump.call_count, 1)
-        self.assertEqual(mock_dumps.call_count, 1)
-
-    @mock.patch.object(cache.os, "makedirs")
-    @mock.patch.object(cache.os.path, "exists")
-    @mock.patch.object(cache.pickle, "dump")
-    @mock.patch.object(cache.pickle, "dumps")
-    def test_save_doesnt_exists(self, mock_dumps, mock_dump, mock_exists, mock_mkdir):
-        temp_cache_file = self.temporary_file_with_cleanup()
-
-        self.test_cache.cache_path = temp_cache_file.name
-
-        # path doesnt exists then we will create the folder
-        # raise some sort of exception in the try
-        mock_exists.return_value = False
-        mock_dump.side_effect = Exception("Error")
-        mock_mkdir.side_effect = Exception("Error")
-
-        # make the call
-        self.test_cache.save(self.test_key, self.test_value)
-
-        # assert if file doesnt exists
-        self.assertTrue(mock_mkdir.called)
-        self.assertTrue(mock_dumps.called)
-        self.assertTrue(mock_dump.called)
-
-        # all 3 should be called once
-        self.assertEqual(mock_mkdir.call_count, 1)
-        self.assertEqual(mock_dump.call_count, 1)
-        self.assertEqual(mock_dumps.call_count, 1)
-
-    def temporary_file_with_cleanup(self, **kwargs):
-        """
-        NamedTemporaryFile with delete=True has
-        significantly different behavior on Windows
-        so we utilize delete=False to simplify maintaining
-        compatibility.
-        """
-        t = tempfile.NamedTemporaryFile(delete=False, **kwargs)
-
-        self.addCleanup(os.unlink, t.name)
-        self.addCleanup(t.close)
-        return t
+@pytest.mark.skipif(
+    sys.platform == 'win32',
+    reason="windows can't remove a recently created but closed file")
+def test_sqlkv_convert(tmp_path):
+    cache_path = tmp_path / "cache2.db"
+    with open(cache_path, 'wb') as fh:
+        pickle.dump({'kv': 'abc'}, fh)
+        fh.close()
+    kv = cache.SqlKvCache(config.Bag(cache=cache_path, cache_period=60))
+    kv.load()
+    kv.close()
+    with open(cache_path, 'rb') as fh:
+        assert fh.read(15) == b"SQLite format 3"

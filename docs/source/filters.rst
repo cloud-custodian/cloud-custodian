@@ -53,8 +53,51 @@ There are several ways to get a list of possible keys for each resource.
     you're interested in. The available fields will be listed under the results of that api call.
 
 
+Special Values
+~~~~~~~~~~~~~~
 
-- Comparison operators:
+    These meta-values can be used to test whether or not a resource contains a specific value, and if
+    the value is empty.
+
+    - ``absent``: matches when a key *does not* exist
+    - ``present``: matches when a key *does* exist
+    - ``empty``: matches when a value is false, empty, or missing
+    - ``not-null``: matches when a value exists, and is not false or empty
+
+    Consider an S3 bucket with this abbreviated set of attributes:
+
+    .. code-block:: json
+
+      {
+        "Name": "my_bucket",
+        "Versioning": {},
+        "Tags": [{
+          "Environment": "dev",
+          "Owner": ""
+        }]
+      }
+
+    All of the following filters would match this resource:
+
+    .. code-block::
+
+      filters:
+        - "tag:Environment": "dev"
+        - "tag:Environment": "not-null"
+        - "tag:Environment": "present"
+        - "tag:Owner": "empty"
+        - "tag:Owner": "present"
+        - "tag:Team": "empty"
+        - "tag:Team": "absent"
+        - "Versioning": "empty"
+        - "Versioning": "present"
+        - "Versioning.Status": "empty"
+        - "Versioning.Status": "absent"
+
+
+Comparison Operators
+~~~~~~~~~~~~~~~~~~~~
+
     The generic value filter allows for comparison operators to be used
 
     - ``equal`` or ``eq``
@@ -63,6 +106,9 @@ There are several ways to get a list of possible keys for each resource.
     - ``gte`` or ``ge``
     - ``less-than`` or ``lt``
     - ``lte`` or ``le``
+    - ``in``
+    - ``not-in`` or ``ni``
+    - ``contains``
 
   .. code-block:: yaml
 
@@ -72,22 +118,10 @@ There are several ways to get a list of possible keys for each resource.
            value: 36                      ─▶ Value that is being compared
            op: greater-than               ─▶ Comparison Operator
 
-- Other operators:
-    - ``absent``
-    - ``present``
-    - ``not-null``
-    - ``empty``
-    - ``contains``
 
-  .. code-block:: yaml
+Logical Operators
+~~~~~~~~~~~~~~~~~
 
-      filters:
-         - type: value
-           key: CpuOptions.CoreCount      ─▶ The value from the describe call
-           value: present                 ─▶ Checks if key is present
-
-
-- Logical Operators:
     - ``or`` or ``Or``
     - ``and`` or ``And``
     - ``not``
@@ -103,7 +137,9 @@ There are several ways to get a list of possible keys for each resource.
              key: CpuOptions.CoreCount      ─▶ The value from the describe call
              value: 42                      ─▶ Value that is being compared
 
-- List Operators:
+List Operators
+~~~~~~~~~~~~~~
+
     There is a collection of operators that can be used with user supplied lists. The operators
     are evaluated as ``value from key`` in (the operator) ``given value``. If you would like it
     evaluated in the opposite way  ``given value`` in (the operator) ``value from key`` then you
@@ -111,8 +147,11 @@ There are several ways to get a list of possible keys for each resource.
 
     - ``in``
     - ``not-in`` or ``ni``
-    - ``intersect`` - Provides comparison between 2 lists
+    - ``contains``
+    - ``intersect`` - Match if two lists share any elements
+    - ``difference`` - Match if the first list has any values not in the second list
 
+  This filter only matches resources whose ``ImageId`` property appears in a predefined list:
 
   .. code-block:: yaml
 
@@ -122,18 +161,60 @@ There are several ways to get a list of possible keys for each resource.
            op: in                         ─▶ List operator
            value: [ID-123, ID-321]        ─▶ List of Values to be compared against
 
+  Some resource properties are lists themselves. For example, EC2 instances can have
+  multiple security groups. For the next few examples, assume the filters are evaluating
+  three instances:
+
+  =========  ===============================================
+  Instance   Security Group Names
+  =========  ===============================================
+  instance1  default, common, custom
+  instance2  common, custom, extra
+  instance3  common
+  =========  ===============================================
+
+  This filter matches ``instance1``, whose security group list contains the ``default`` group:
+
   .. code-block:: yaml
 
       filters:
          - type: value
-           key: ImageId.List              ─▶ The value from the describe call
-           op: in                         ─▶ List operator
-           value: ID-321                  ─▶ Values to be compared against
-           value_type: swap               ─▶ Switches list comparison order
+           key: SecurityGroups[].GroupName
+           op: contains
+           value: default
 
+  The ``difference`` operator can find instances with security groups that don't appear in
+  a predefined list. This filter matches ``instance1`` and ``instance2``, because ``default``
+  and ``extra`` aren't in the list of expected security groups:
 
+  .. code-block:: yaml
 
-- Special operators:
+      filters:
+         - type: value
+           key: SecurityGroups[].GroupName
+           op: difference
+           value:
+             - common
+             - custom
+
+  ``value_type: swap`` can invert that logic, checking to see if the predefined list has
+  any values that don't appear on an instance. This filter matches ``instance3``, because
+  it is missing the ``custom`` security group:
+
+  .. code-block:: yaml
+
+      filters:
+         - type: value
+           key: SecurityGroups[].GroupName
+           op: difference
+           value:
+             - common
+             - custom
+           value_type: swap
+
+Pattern Matching Operators
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     - ``glob`` - Provides Glob matching support
     - ``regex`` - Provides Regex matching support but ignores case (1)
     - ``regex-case`` - Provides case sensitive Regex matching support (1)
@@ -161,7 +242,9 @@ There are several ways to get a list of possible keys for each resource.
 
   __ https://docs.python.org/3/library/re.html#search-vs-match
 
-- Transformations:
+Value Type Transformations
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
   Transformations on the value can be done using the ``value_type`` keyword.  The
   following value types are supported:
 
@@ -261,7 +344,38 @@ There are several ways to get a list of possible keys for each resource.
                  - subnet-1b8474522
                  - subnet-2d2736444
 
-- Value Regex:
+Additional JMESPath Functions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Cloud Custodian supports additional custom JMESPath functions, including:
+
+- ``split(seperator, input_string) -> list[str]``: takes 2 arguments, the seperator token
+  as well as the input string. Returns a list of strings.
+
+  .. code-block:: yaml
+
+    policies:
+      - name: copy-related-tag-with-split
+        resource: aws.log-group
+        filters:
+          - type: value
+            key: logGroupName
+            value: "/aws/lambda/"
+            op: in
+            value_type: swap
+        actions:
+          - type: copy-related-tag
+            resource: aws.lambda
+            # split the log group's name to get the lambda function's name
+            key: "split(`/`, logGroupName)[-1]"
+            tags: "*"
+
+- ``from_json(json_encoded_string) -> obj``: takes 1 argument, a json encoded string.
+  Returns an json decoded value.
+
+
+Value Regex
+~~~~~~~~~~~
 
   When using a Value Filter, a ``value_regex`` can be
   specified. This will mean that the value used for comparison is the output
@@ -289,11 +403,98 @@ There are several ways to get a list of possible keys for each resource.
       op: less-than
       value: 0
 
-- Value From:
+Value From
+~~~~~~~~~~
 
   ``value_from`` allows the use of external values in the Value Filter
 
   .. autodoconly:: c7n.resolver.ValuesFrom
+
+Value Path
+~~~~~~~~~~
+
+  Retrieve values using JMESPath.
+
+  The filter expects that a properly formatted 'string' is passed
+  containing a valid JMESPath. (Tutorial here on `JMESPath <http://jmespath.org/tutorial.html>`_ syntax)
+
+  When using a Value Filter, a ``value_path`` can be specified.
+  This means the value(s) the filter will compare against are
+  calculated during the initialization of the filter.
+
+  Note that this option only pulls properties of the resource
+  currently being filtered.
+
+  .. code-block:: yaml
+
+     policies:
+      - name: find-admins-with-user-roles
+        resource: gcp.project
+        filters:
+          - type: iam-policy
+            doc:
+              key: bindings[?(role=='roles/admin')].members[]
+              op: intersect
+              value_path: bindings[?(role=='roles/user_access')].members[]
+
+  The iam-policy uses the generic Value Filter implementation.
+  This implementation allows for the comparison of two separate lists of values
+  within the same resource.
+
+List Item Filter
+----------------
+
+The ``list-item`` filter makes it easier to evaluate resource properties that contain
+a list of values.
+
+Example 1: AWS ECS Task Definitions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+AWS ECS task definitions include a list of container definitions. This policy matches
+a task definition if any of its container images reference an image from outside a given
+account and region:
+
+  .. code-block:: yaml
+
+   policies:
+    - name: find-task-def-not-using-registry
+      resource: aws.ecs-task-definition
+      filters:
+        - not:
+          - type: list-item
+            key: containerDefinitions
+            attrs:
+              - not:
+                - type: value
+                  key: image
+                  value: "${account_id}.dkr.ecr.us-east-2.amazonaws.com.*"
+                  op: regex
+
+That check is not possible with the ``value`` filter alone, because the ``regex``
+operator cannot operate directly against a list.
+
+Example 2: S3 Lifecycle Rules
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+S3 buckets can have lifecycle policies that include multiple rules.
+This policy matches buckets that are missing a rule for cleaning up
+incomplete multipart uploads.
+
+  .. code-block:: yaml
+
+   policies:
+    - name: s3-mpu-cleanup-not-configured
+      resource: aws.s3
+      filters:
+        - not:
+          - type: list-item
+            key: Lifecycle.Rules[]
+            attrs:
+              - Status: Enabled
+              - AbortIncompleteMultipartUpload.DaysAfterInitiation: not-null
+
+Here the ``list-item`` filter ensures that we check a combination of multiple
+properties for each individual lifecycle rule.
 
 Event Filter
 -------------
@@ -304,16 +505,21 @@ describe resource call as is the case in the ValueFilter
 
   .. code-block:: yaml
 
+    policies:
      - name: no-ec2-public-ips
        resource: aws.ec2
-       mode:
-         type: cloudtrail
-         events:
+       mode: make
+         - type: cloudtrail
+           events:
              - RunInstances
        filters:
-         - type: event                                                                           ─┐ The key is a JMESPath Query of
-           key: "detail.requestParameters.networkInterfaceSet.items[].associatePublicIpAddress"   ├▶the event JSON from CloudWatch
-           value: true                                                                           ─┘
+         - type: event
+           # The key is a JMESPath Query of the event JSON from CloudWatch.
+           key: "detail.requestParameters.networkInterfaceSet.items[].associatePublicIpAddress"
+           # The key expression returns a list. Combining "op: contains" with "value: true"
+           # allows this filter to match if any network interface has a public IP address.
+           op: contains
+           value: true
        actions:
          - type: terminate
            force: true
@@ -462,6 +668,7 @@ instances total, then terminate them.
 
   .. code-block:: yaml
 
+   policies:
     - name: chaos-engineering
       resource: aws.ec2
       filters:

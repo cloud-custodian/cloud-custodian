@@ -1,0 +1,89 @@
+interactions:
+- request:
+    body: '{"Offset": 0, "Limit": 20}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '26'
+      Content-Type:
+      - application/json
+      Host:
+      - es.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.27.1
+      X-TC-Action:
+      - DescribeInstances
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2018-04-16'
+    method: POST
+    uri: https://es.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"TotalCount":1,"InstanceList":[{"InstanceId":"es-2j1xw4ab","InstanceName":"custodian_test","InstanceType":2,"Region":"ap-singapore","Zone":"ap-singapore-1","AppId":1253831162,"Uin":"100000750436","VpcUid":"vpc-dsdar6u5","SubnetUid":"subnet-jocwmrgq","Status":1,"ChargeType":"POSTPAID_BY_HOUR","ChargePeriod":0,"RenewFlag":"","NodeInfoList":[{"Type":"hotData","NodeNum":3,"NodeType":"ES.S1.MEDIUM4","CpuNum":2,"MemSize":4,"DiskType":"CLOUD_SSD","DiskSize":20,"DiskEncrypt":0,"DiskCount":1,"LocalDiskInfo":null}],"NodeType":"ES.S1.MEDIUM4","NodeNum":3,"CpuNum":2,"MemSize":4,"DiskType":"CLOUD_SSD","DiskSize":20,"EnableHotWarmMode":false,"WarmNodeType":"","WarmNodeNum":0,"WarmCpuNum":0,"WarmMemSize":0,"WarmDiskType":"","WarmDiskSize":0,"ColdNodeType":"","ColdNodeNum":0,"ColdCpuNum":0,"ColdMemSize":0,"ColdDiskType":"","ColdDiskSize":0,"FrozenNodeType":"","FrozenNodeNum":0,"FrozenCpuNum":0,"FrozenMemSize":0,"FrozenDiskType":"","FrozenDiskSize":0,"MasterNodeInfo":{"EnableDedicatedMaster":false,"MasterNodeType":"","MasterNodeNum":0,"MasterNodeCpuNum":0,"MasterNodeMemSize":0,"MasterNodeDiskType":"","MasterNodeDiskSize":0},"KibanaNodeInfo":{"KibanaNodeType":"ES.S1.SMALL2","KibanaNodeNum":1,"KibanaNodeCpuNum":1,"KibanaNodeMemSize":2,"KibanaNodeDiskType":"CLOUD_PREMIUM","KibanaNodeDiskSize":50},"EsDomain":"es-2j1xw4ab.tencentelasticsearch.com","EsPrivateDomain":"es-2j1xw4ab-internal.private.tencentelasticsearch.com","EsVip":"192.168.0.9","EsPort":9200,"KibanaUrl":"https://es-2j1xw4ab.kibana.tencentelasticsearch.com:5601","KibanaPrivateUrl":"","PublicAccess":"CLOSE","KibanaPublicAccess":"OPEN","KibanaPrivateAccess":"CLOSE","KibanaAlteringPublicAccess":"CLOSE","Protocol":"","NewPrivateLink":0,"SecurityGroups":[],"EsPublicUrl":"","EsPrivateUrl":"https://es-2j1xw4ab-internal.private.tencentelasticsearch.com:9200","EsVersion":"7.14.2","EsConfig":"{\"cluster.name\":\"custodian_test\"}","EsConfigSets":[],"KibanaConfig":"","EsAcl":{"WhiteIpList":["127.0.0.1"],"BlackIpList":[]},"EsPublicAcl":{"WhiteIpList":[],"BlackIpList":[]},"IkConfig":{"UpdateType":"","MainDict":[],"Stopwords":[],"Synonym":[],"QQDict":[]},"AllowCosBackup":true,"CosBackup":{"IsAutoBackup":false,"BackupTime":""},"DeployMode":0,"MultiZoneInfo":[{"Zone":"ap-singapore-1","SubnetId":"subnet-jocwmrgq"}],"TagList":[{"TagKey":"test_pro_24","TagValue":"test_pro_24"},{"TagKey":"test_pro_00001","TagValue":"this
+        is test"}],"HealthStatus":0,"SecurityType":2,"LicenseType":"basic","SceneType":1,"Jdk":"kona","WebNodeTypeInfo":{"NodeNum":1,"NodeType":"ES.S1.SMALL2"},"AutoIndexEnabled":true,"EnableHybridStorage":false,"CreateTime":"2022-10-17
+        17:17:17","UpdateTime":"2022-10-17 17:29:15","Deadline":"2017-12-04 00:00:00","OptionalWebServiceInfos":[],"OperationDuration":{"Periods":null,"TimeStart":"","TimeEnd":"","TimeZone":""},"EnableAdvancedFeature":1}],"RequestId":"266eee8e-9c2c-4134-9b60-37279cf6b679"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '2893'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 18 Oct 2022 08:16:02 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"ResourceList": ["qcs::es:ap-singapore:uin/100000750436:instance/es-2j1xw4ab"]}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '80'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.27.1
+      X-TC-Action:
+      - GetResources
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"","ResourceTagMappingList":[{"Resource":"qcs::es:ap-singapore:uin\/100000750436:instance\/es-2j1xw4ab","Tags":[{"TagKey":"test_pro_24","TagValue":"test_pro_24"},{"TagKey":"test_pro_00001","TagValue":"this
+        is test"}]}],"RequestId":"17230335-f967-4d6e-a920-4cebb5748569"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '302'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 18 Oct 2022 08:16:02 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+version: 1

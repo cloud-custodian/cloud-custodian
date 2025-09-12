@@ -1,0 +1,11 @@
+{
+    "status_code": 404,
+    "data": {
+        "Error": {
+            "Message": "Unable to get the cache as it doesn't exist, please create the cache first.",
+            "Code": "NotFoundException"
+        },
+        "ResponseMetadata": {},
+        "message": "Unable to get the cache as it doesn't exist, please create the cache first."
+    }
+}

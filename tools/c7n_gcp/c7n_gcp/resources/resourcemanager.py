@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import itertools
+from c7n_gcp.filters.iampolicy import IamPolicyFilter
 
 from c7n_gcp.actions import SetIamPolicy, MethodAction
 from c7n_gcp.provider import resources
@@ -9,6 +10,10 @@ from c7n_gcp.query import QueryResourceManager, TypeInfo
 
 from c7n.resolver import ValuesFrom
 from c7n.utils import type_schema, local_session
+from c7n.filters.core import ValueFilter, ListItemFilter
+from c7n.filters.missing import Missing
+
+from googleapiclient.errors import HttpError
 
 
 @resources.register('organization')
@@ -26,8 +31,18 @@ class Organization(QueryResourceManager):
         default_report_fields = [
             "name", "displayName", "creationTime", "lifecycleState"]
         asset_type = "cloudresourcemanager.googleapis.com/Organization"
+        scc_type = "google.cloud.resourcemanager.Organization"
         perm_service = 'resourcemanager'
         permissions = ('resourcemanager.organizations.get',)
+        urn_component = "organization"
+        urn_id_segments = (-1,)  # Just use the last segment of the id in the URN
+        urn_has_project = False
+
+        @staticmethod
+        def get(client, resource_info):
+            org = resource_info['resourceName'].rsplit('/', 1)[-1]
+            return client.execute_query(
+                'get', {'name': "organizations/" + org})
 
 
 @Organization.action_registry.register('set-iam-policy')
@@ -56,6 +71,9 @@ class Folder(QueryResourceManager):
             "name", "displayName", "lifecycleState", "createTime", "parent"]
         asset_type = "cloudresourcemanager.googleapis.com/Folder"
         perm_service = 'resourcemanager'
+        urn_component = "folder"
+        urn_id_segments = (-1,)  # Just use the last segment of the id in the URN
+        urn_has_project = False
 
     def get_resources(self, resource_ids):
         client = self.get_client()
@@ -85,11 +103,14 @@ class Project(QueryResourceManager):
         enum_spec = ('list', 'projects', None)
         name = id = 'projectId'
         default_report_fields = [
-            "name", "displayName", "lifecycleState", "createTime", "parent"]
+            "name", "lifecycleState", "createTime", "parent.id"]
         asset_type = "cloudresourcemanager.googleapis.com/Project"
+        scc_type = "google.cloud.resourcemanager.Project"
         perm_service = 'resourcemanager'
         labels = True
         labels_op = 'update'
+        urn_component = "project"
+        urn_has_project = False
 
         @staticmethod
         def get_label_params(resource, labels):
@@ -99,12 +120,73 @@ class Project(QueryResourceManager):
                         'parent': resource['parent'],
                         'labels': labels}}
 
+        @staticmethod
+        def get(client, resource_info):
+            return client.execute_query(
+                'get', {'projectId': resource_info['resourceName'].rsplit('/', 1)[-1]})
+
     def get_resource_query(self):
         # https://cloud.google.com/resource-manager/reference/rest/v1/projects/list
         if 'query' in self.data:
             for child in self.data.get('query'):
                 if 'filter' in child:
                     return {'filter': child['filter']}
+
+
+Project.filter_registry.register('missing', Missing)
+
+
+@Project.filter_registry.register('iam-policy')
+class ProjectIamPolicyFilter(IamPolicyFilter):
+    """
+    Overrides the base implementation to process Project resources correctly.
+    """
+    permissions = ('resourcemanager.projects.getIamPolicy',)
+
+    def _verb_arguments(self, resource):
+        verb_arguments = SetIamPolicy._verb_arguments(self, resource)
+        verb_arguments['body'] = {}
+        return verb_arguments
+
+
+@Project.filter_registry.register('compute-meta')
+class ProjectComputeMetaFilter(ValueFilter):
+    """
+    Allows filtering on project-level compute metadata including common instance metadata
+    and quotas.
+
+    :example:
+
+    Find Projects that have not enabled OS Login for compute instances
+
+    .. code-block:: yaml
+
+        policies:
+          - name: project-compute-os-login-not-enabled
+            resource: gcp.project
+            filters:
+              - type: compute-meta
+                key: "commonInstanceMetadata.items[?key==`enable-oslogin`].value | [0]"
+                op: ne
+                value_type: normalize
+                value: true
+
+    """
+
+    key = 'c7n:projectComputeMeta'
+    permissions = ('compute.projects.get',)
+    schema = type_schema('compute-meta', rinherit=ValueFilter.schema)
+
+    def __call__(self, resource):
+        if self.key in resource:
+            return resource[self.key]
+
+        session = local_session(self.manager.session_factory)
+        self.client = session.client('compute', 'v1', 'projects')
+
+        resource[self.key] = self.client.execute_command('get', {"project": resource['projectId']})
+
+        return super().__call__(resource[self.key])
 
 
 @Project.action_registry.register('delete')
@@ -289,3 +371,144 @@ class ProjectPropagateLabels(HierarchyAction):
 
             if delta:
                 yield ('update', model.get_label_params(r, rlabels))
+
+
+@Organization.filter_registry.register('essential-contacts')
+class OrgContactsFilter(ListItemFilter):
+    """Filter Resources based on essential contacts configuration
+
+    .. code-block:: yaml
+
+      - name: org-essential-contacts
+        resource: gcp.organization
+        filters:
+        - type: essential-contacts
+          count: 2
+          count_op: gte
+          attrs:
+            - validationState: VALID
+            - type: value
+              key: notificationCategorySubscriptions
+              value: TECHNICAL
+              op: contains
+    """
+    schema = type_schema(
+        'essential-contacts',
+        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'},
+        count={'type': 'number'},
+        count_op={'$ref': '#/definitions/filters_common/comparison_operators'}
+    )
+
+    annotate_items = True
+    permissions = ("essentialcontacts.contacts.list",)
+
+    def get_item_values(self, resource):
+        session = local_session(self.manager.session_factory)
+        client = session.client("essentialcontacts", "v1", "organizations.contacts")
+        pages = client.execute_paged_query('list', {'parent': resource['name'], 'pageSize': 100})
+        contacts = []
+        for page in pages:
+            contacts.extend(page.get('contacts', []))
+        return contacts
+
+
+@Organization.filter_registry.register('org-policy')
+class OrgPoliciesFilter(ListItemFilter):
+    """Filter Resources based on orgpolicy configuration
+
+    .. code-block:: yaml
+
+      - name: org-policy
+        resource: gcp.organization
+        filters:
+        - type: org-policy
+          attrs:
+            - type: value
+              key: constraint
+              value: constraints/iam.allowedPolicyMemberDomains
+              op: contains
+    """
+    schema = type_schema(
+        'org-policy',
+        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'}
+    )
+
+    annotate_items = True
+    permissions = ("orgpolicy.policy.get",)
+
+    def get_item_values(self, resource):
+        session = local_session(self.manager.session_factory)
+        client = session.client("cloudresourcemanager", "v1", "organizations")
+        pages = client.execute_paged_query('listOrgPolicies', {'resource': resource['name']})
+        policies = []
+        for page in pages:
+            policies.extend(page.get('policies', []))
+        return policies
+
+
+@Project.filter_registry.register('access-approval')
+class AccessApprovalFilter(ValueFilter):
+    """Filter Resources based on access approval configuration
+
+    .. code-block:: yaml
+
+      - name: project-access-approval
+        resource: gcp.project
+        filters:
+        - type: access-approval
+          key: enrolledServices.cloudProduct
+          value: "all"
+    """
+    schema = type_schema('access-approval', rinherit=ValueFilter.schema)
+    permissions = ('accessapproval.settings.get',)
+
+    def process(self, resources, event=None):
+        return [r for r in resources
+                if self.match(self.get_access_approval(r))]
+
+    def get_access_approval(self, resource):
+        session = local_session(self.manager.session_factory)
+        client = session.client("accessapproval", "v1", "projects")
+        project = resource['projectId']
+
+        try:
+            access_approval = client.execute_command(
+                'getAccessApprovalSettings',
+                {'name': f"projects/{project}/accessApprovalSettings"},)
+        except HttpError as ex:
+            if (ex.status_code == 400
+                and ex.reason == "Precondition check failed.") \
+                    or (ex.status_code == 404):
+                # For above exceptions, it implies that access approval is
+                # not enabled, so we return an empty setting.
+                access_approval = {}
+            else:
+                raise ex
+
+        return access_approval
+
+
+@Organization.filter_registry.register('iam-policy')
+class OrganizationIamPolicyFilter(IamPolicyFilter):
+    """
+    Overrides the base implementation to process Organization resources correctly.
+    """
+    permissions = ('resourcemanager.organizations.getIamPolicy',)
+
+    def _verb_arguments(self, resource):
+        verb_arguments = SetIamPolicy._verb_arguments(self, resource)
+        verb_arguments['body'] = {}
+        return verb_arguments
+
+
+@Folder.filter_registry.register('iam-policy')
+class FolderIamPolicyFilter(IamPolicyFilter):
+    """
+    Overrides the base implementation to process Folder resources correctly.
+    """
+    permissions = ('resourcemanager.folders.getIamPolicy',)
+
+    def _verb_arguments(self, resource):
+        verb_arguments = SetIamPolicy._verb_arguments(self, resource)
+        verb_arguments['body'] = {}
+        return verb_arguments

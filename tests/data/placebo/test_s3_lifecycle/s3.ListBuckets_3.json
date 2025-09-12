@@ -1,38 +1,25 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
-        "Owner": {
-            "DisplayName": "mandeep.bal", 
-            "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
-        }, 
+        "ResponseMetadata": {},
         "Buckets": [
             {
+                "Name": "c7n-lifecycle-test-again3",
                 "CreationDate": {
-                    "hour": 19, 
-                    "__class__": "datetime", 
-                    "month": 10, 
-                    "second": 49, 
-                    "microsecond": 0, 
-                    "year": 2017, 
-                    "day": 27, 
-                    "minute": 53
-                }, 
-                "Name": "custodian-lifecycle-test"
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 6,
+                    "day": 15,
+                    "hour": 2,
+                    "minute": 55,
+                    "second": 59,
+                    "microsecond": 0
+                }
             }
-        ], 
-        "ResponseMetadata": {
-            "HTTPStatusCode": 200, 
-            "RetryAttempts": 0, 
-            "HostId": "MoPHpR59FgLZuJlnanktP3jgUsQOqat1wLdGwqXP5Q6020pQ6EpNLOYUpbs4gTt2fInnPXVZwoQ=", 
-            "RequestId": "B17BEEC428D28092", 
-            "HTTPHeaders": {
-                "x-amz-id-2": "MoPHpR59FgLZuJlnanktP3jgUsQOqat1wLdGwqXP5Q6020pQ6EpNLOYUpbs4gTt2fInnPXVZwoQ=", 
-                "server": "AmazonS3", 
-                "transfer-encoding": "chunked", 
-                "x-amz-request-id": "B17BEEC428D28092", 
-                "date": "Fri, 27 Oct 2017 19:53:59 GMT", 
-                "content-type": "application/xml"
-            }
+        ],
+        "Owner": {
+            "DisplayName": "mandeep.bal",
+            "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
         }
     }
 }

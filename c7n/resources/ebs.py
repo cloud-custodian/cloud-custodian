@@ -14,7 +14,7 @@ from c7n.actions import BaseAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
     CrossAccountAccessFilter, Filter, AgeFilter, ValueFilter,
-    ANNOTATION_KEY)
+    ANNOTATION_KEY, ListItemFilter)
 from c7n.filters.health import HealthEventFilter
 from c7n.filters.related import RelatedResourceFilter
 
@@ -32,6 +32,8 @@ from c7n.utils import (
     set_annotation,
     type_schema,
     QueryParser,
+    get_support_region,
+    group_by
 )
 from c7n.resources.ami import AMI
 
@@ -69,6 +71,8 @@ class Snapshot(QueryResourceManager):
             query['Filters'] = qfilters
         if query.get('OwnerIds') is None:
             query['OwnerIds'] = ['self']
+        if 'MaxResults' not in query:
+            query['MaxResults'] = 1000
         return super(Snapshot, self).resources(query=query)
 
     def get_resources(self, ids, cache=True, augment=True):
@@ -235,12 +239,19 @@ class SnapshotCrossAccountAccess(CrossAccountAccessFilter):
 
     def process_resource_set(self, client, resource_set):
         results = []
+        everyone_only = self.data.get('everyone_only', False)
         for r in resource_set:
             attrs = self.manager.retry(
                 client.describe_snapshot_attribute,
                 SnapshotId=r['SnapshotId'],
                 Attribute='createVolumePermission')['CreateVolumePermissions']
-            shared_accounts = {
+            shared_accounts = set()
+            if everyone_only:
+                for g in attrs:
+                    if g.get('Group') == 'all':
+                        shared_accounts = {g.get('Group')}
+            else:
+                shared_accounts = {
                 g.get('Group') or g.get('UserId') for g in attrs}
             delta_accounts = shared_accounts.difference(self.accounts)
             if delta_accounts:
@@ -428,19 +439,20 @@ class SnapshotDelete(BaseAction):
                  post, pre - post)
 
         client = local_session(self.manager.session_factory).client('ec2')
+        deleted_snapshots = []
         with self.executor_factory(max_workers=2) as w:
             futures = []
             for snapshot_set in chunks(reversed(snapshots), size=50):
                 futures.append(
-                    w.submit(self.process_snapshot_set, client, snapshot_set))
+                    w.submit(self.process_snapshot_set, client, snapshot_set, deleted_snapshots))
             for f in as_completed(futures):
                 if f.exception():
                     self.log.error(
                         "Exception deleting snapshot set \n %s" % (
                             f.exception()))
-        return snapshots
+        return deleted_snapshots
 
-    def process_snapshot_set(self, client, snapshots_set):
+    def process_snapshot_set(self, client, snapshots_set, deleted_snapshots):
         retry = get_retry((
             'RequestLimitExceeded', 'Client.RequestLimitExceeded'))
 
@@ -451,6 +463,7 @@ class SnapshotDelete(BaseAction):
                 retry(client.delete_snapshot,
                       SnapshotId=s['SnapshotId'],
                       DryRun=self.manager.config.dryrun)
+                deleted_snapshots.append(s)
             except ClientError as e:
                 if e.response['Error']['Code'] == "InvalidSnapshot.NotFound":
                     continue
@@ -500,11 +513,6 @@ class CopySnapshot(BaseAction):
         return self
 
     def process(self, resources):
-        if self.data['target_region'] == self.manager.config.region:
-            self.log.info(
-                "Source and destination region are the same, skipping")
-            return
-
         with self.executor_factory(max_workers=2) as w:
             list(w.map(self.process_resource_set, chunks(resources, 20)))
 
@@ -512,8 +520,7 @@ class CopySnapshot(BaseAction):
         client = self.manager.session_factory(
             region=self.data['target_region']).client('ec2')
 
-        if self.data['target_region'] != self.manager.config.region:
-            cross_region = True
+        cross_region = self.data['target_region'] != self.manager.config.region
 
         params = {}
         params['Encrypted'] = self.data.get('encrypted', True)
@@ -675,6 +682,72 @@ class EBS(QueryResourceManager):
         return []
 
 
+@EBS.filter_registry.register('snapshots')
+class EBSSnapshotsFilter(ListItemFilter):
+    """
+    Filter volumes by all their snapshots.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: ebs-volumes
+            resource: aws.ebs
+            filters:
+              - not:
+                - type: snapshots
+                  attrs:
+                    - type: value
+                      key: StartTime
+                      value_type: age
+                      value: 2
+                      op: less-than
+    """
+    schema = type_schema(
+        'snapshots',
+        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'},
+        count={'type': 'number'},
+        count_op={'$ref': '#/definitions/filters_common/comparison_operators'}
+    )
+    permissions = ('ec2:DescribeSnapshots', )
+    item_annotation_key = 'c7n:Snapshots'
+    annotate_items = True
+
+    def _process_resources_set(self, client, resources):
+        snapshots = client.describe_snapshots(
+            Filters=[{
+                'Name': 'volume-id',
+                'Values': [r['VolumeId'] for r in resources]
+            }]
+        ).get('Snapshots') or []
+        grouped = group_by(snapshots, 'VolumeId')
+        for res in resources:
+            res[self.item_annotation_key] = grouped.get(res['VolumeId']) or []
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('ec2')
+        with self.manager.executor_factory(max_workers=3) as w:
+            futures = []
+            # 200 max value for a single call
+            for resources_set in chunks(resources, 30):
+                futures.append(w.submit(self._process_resources_set, client,
+                                        resources_set))
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Exception getting snapshots by volume ids \n %s" % (
+                            f.exception())
+                    )
+                    continue
+        return super().process(resources, event)
+
+    def get_item_values(self, resource):
+        if self.annotate_items:
+            return resource[self.item_annotation_key]
+        return resource.pop(self.item_annotation_key)
+
+
 @EBS.action_registry.register('post-finding')
 class EBSPostFinding(PostFinding):
 
@@ -811,7 +884,9 @@ class FaultTolerantSnapshots(Filter):
 
     def pull_check_results(self):
         result = set()
-        client = local_session(self.manager.session_factory).client('support')
+        support_region = get_support_region(self.manager)
+        client = local_session(self.manager.session_factory).client(
+            'support', region_name=support_region)
         client.refresh_trusted_advisor_check(checkId=self.check_id)
         results = client.describe_trusted_advisor_check_result(
             checkId=self.check_id, language='en')['result']
@@ -997,7 +1072,7 @@ class CopyInstanceTags(BaseAction):
             (t['Key'], t['Value']) for t in volume.get('Tags', [])])
 
         for t in instance.get('Tags', ()):
-            if only_tags and not t['Key'] in only_tags:
+            if only_tags and t['Key'] not in only_tags:
                 continue
             if t['Key'] in extant_tags and t['Value'] == extant_tags[t['Key']]:
                 continue
@@ -1198,6 +1273,7 @@ class EncryptInstanceVolumes(BaseAction):
         return False
 
     def create_encrypted_volume(self, ec2, v, key_id, instance_id):
+        unencrypted_volume_tags = v.get('Tags', [])
         # Create a current snapshot
         results = ec2.create_snapshot(
             VolumeId=v['VolumeId'],
@@ -1237,7 +1313,7 @@ class EncryptInstanceVolumes(BaseAction):
                 {'Key': 'maid-crypt-remediation', 'Value': instance_id},
                 {'Key': 'maid-origin-volume', 'Value': v['VolumeId']},
                 {'Key': 'maid-instance-device',
-                 'Value': v['Attachments'][0]['Device']}])
+                 'Value': v['Attachments'][0]['Device']}] + unencrypted_volume_tags)
 
         # Wait on encrypted volume creation
         self.wait_on_resource(ec2, volume_id=results['VolumeId'])
@@ -1336,7 +1412,8 @@ class CreateSnapshot(BaseAction):
         'snapshot',
         **{'copy-tags': {'type': 'array', 'items': {'type': 'string'}},
            'copy-volume-tags': {'type': 'boolean'},
-           'tags': {'type': 'object'}})
+           'tags': {'type': 'object'},
+           'description': {'type': 'string'}})
     permissions = ('ec2:CreateSnapshot', 'ec2:CreateTags',)
 
     def validate(self):
@@ -1356,8 +1433,16 @@ class CreateSnapshot(BaseAction):
             retry(self.process_volume, client=client, volume=vol_id, tags=tags)
 
     def process_volume(self, client, volume, tags):
+        description = self.data.get('description')
+        if not description:
+            description = "Automated snapshot by c7n - %s" % (self.manager.ctx.policy.name)
+
         try:
-            client.create_snapshot(VolumeId=volume, TagSpecifications=tags)
+            client.create_snapshot(
+                VolumeId=volume,
+                Description=description,
+                TagSpecifications=tags
+            )
         except ClientError as e:
             if e.response['Error']['Code'] == 'InvalidVolume.NotFound':
                 return
@@ -1549,7 +1634,7 @@ class ModifyVolume(BaseAction):
               resource: ebs
               filters:
                - type: value
-                 key: CreateDate
+                 key: CreateTime
                  value_type: age
                  value: 7
                  op: greater-than
@@ -1566,9 +1651,9 @@ class ModifyVolume(BaseAction):
                  volume-type: gp2
 
     `iops-percent` and `size-percent` can be used to modify
-    respectively iops on io1 volumes and volume size.
+    respectively iops on io1/io2 volumes and volume size.
 
-    When converting to io1, `iops-percent` is used to set the iops
+    When converting to io1/io2, `iops-percent` is used to set the iops
     allocation for the new volume against the extant value for the old
     volume.
 
@@ -1598,7 +1683,7 @@ class ModifyVolume(BaseAction):
 
     schema = type_schema(
         'modify',
-        **{'volume-type': {'enum': ['io1', 'gp2', 'st1', 'sc1']},
+        **{'volume-type': {'enum': ['io1', 'io2', 'gp2', 'gp3', 'st1', 'sc1']},
            'shrink': False,
            'size-percent': {'type': 'number'},
            'iops-percent': {'type': 'number'}})
@@ -1628,7 +1713,8 @@ class ModifyVolume(BaseAction):
 
         for r in resource_set:
             params = {'VolumeId': r['VolumeId']}
-            if piops and ('io1' in (vtype, r['VolumeType'])):
+            if piops and ('io1' in (vtype, r['VolumeType']) or
+                          'io2' in (vtype, r['VolumeType'])):
                 # default here if we're changing to io1
                 params['Iops'] = max(int(r.get('Iops', 10) * piops / 100.0), 100)
             if psize:

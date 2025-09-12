@@ -4,13 +4,131 @@
 module to test some universal tagging infrastructure not directly exposed.
 """
 import time
-from mock import MagicMock, call
+from freezegun import freeze_time
+from unittest.mock import MagicMock, call
 
 from c7n.tags import universal_retry, coalesce_copy_user_tags
 from c7n.exceptions import PolicyExecutionError, PolicyValidationError
 from c7n.utils import yaml_load
 
 from .common import BaseTest
+
+import pytest
+from pytest_terraform import terraform
+
+
+@pytest.mark.audited
+@terraform('tag_action_filter_call')
+def test_tag_action_filter_call(test, tag_action_filter_call):
+    aws_region = 'us-east-1'
+    session_factory = test.replay_flight_data('test_action_filter_call', region=aws_region)
+
+    p = test.load_policy(
+        {
+            'name': 'delete_marked_for_op_tag',
+            'resource': 'ec2',
+            'filters': [
+                {
+                    'State.Name': 'running'
+                },
+                {
+                    'type': 'marked-for-op',
+                    'tag': 'action_tag',
+                    'op': 'stop'
+                }
+            ],
+            'actions': ['stop'],
+        },
+        session_factory=session_factory,
+        config={'region': aws_region},
+    )
+
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+
+    stopped_ec2_instance_id = tag_action_filter_call['aws_instance.past_stop.id']
+    if test.recording:
+        time.sleep(0.25)
+    ec2 = session_factory().resource('ec2')
+    instance = ec2.Instance(stopped_ec2_instance_id)
+    test.assertEqual(instance.state['Name'], 'stopping')
+
+
+class TagInterpolationTest(BaseTest):
+    def __tag_interpolation_helper(self, resource_name, resources):
+
+        mock_factory = MagicMock()
+        mock_factory.region = 'us-east-1'
+
+        create_tags = mock_factory().client(resource_name).create_tags
+
+        tag_resources = mock_factory().client('resourcegroupstaggingapi').tag_resources
+        tag_resources.return_value = {}
+
+        policy = self.load_policy(
+            {
+                "name": "test-tag-interpolation",
+                "resource": resource_name,
+                "actions": [
+                    {
+                        "type": "tag",
+                        "tags": {
+                            "tag_account_id": "{account_id}",
+                            "tag_now": "{now}",
+                            "tag_region": "{region}",
+                        },
+                    }
+                ],
+            },
+            session_factory=mock_factory,
+        )
+        policy.expand_variables(policy.get_variables())
+        policy.resource_manager.actions[0].process(resources)
+
+        return (create_tags, tag_resources)
+
+    @freeze_time("2022-06-27 12:34:56")
+    def test_ec2_tag_interpolation(self):
+        (create_tags, _) = self.__tag_interpolation_helper(
+            'ec2', [{'InstanceId': 'i-12345'}]
+        )
+        create_tags.assert_called_once_with(
+            Resources=['i-12345'],
+            Tags=[
+                {'Key': 'tag_account_id', 'Value': self.account_id},
+                {'Key': 'tag_now', 'Value': '2022-06-27 12:34:56'},
+                {'Key': 'tag_region', 'Value': 'us-east-1'},
+            ],
+            DryRun=False,
+        )
+
+    @freeze_time("2022-06-27 12:34:56")
+    def test_rds_tag_interpolation(self):
+        (_, tag_resources) = self.__tag_interpolation_helper(
+            'rds', [{'DBInstanceIdentifier': 'xxx', 'DBInstanceArn': 'arn:xxx'}]
+        )
+        tag_resources.assert_called_once_with(
+            ResourceARNList=['arn:xxx'],
+            Tags={
+                'tag_account_id': self.account_id,
+                'tag_now': '2022-06-27 12:34:56',
+                'tag_region': 'us-east-1',
+            },
+        )
+
+    @freeze_time("2022-06-27 12:34:56")
+    def test_kms_key_tag_interpolation(self):
+        (_, tag_resources) = self.__tag_interpolation_helper(
+            'kms-key', [{'KeyId': 'xxx', 'Arn': 'arn:xxx'}]
+        )
+        tag_resources.assert_called_once_with(
+            ResourceARNList=['arn:xxx'],
+            Tags={
+                'tag_account_id': self.account_id,
+                'tag_now': '2022-06-27 12:34:56',
+                'tag_region': 'us-east-1',
+            },
+        )
 
 
 class UniversalTagTest(BaseTest):
@@ -76,6 +194,31 @@ class UniversalTagTest(BaseTest):
             {"FailedResourcesMap": {"arn:abc": {"ErrorCode": "PermissionDenied"}}}
         ]
         self.assertRaises(Exception, universal_retry, method, ["arn:abc"])
+
+    def test_mark_for_op_deprecations(self):
+        policy = self.load_policy({
+            'name': 'dep-test',
+            'resource': 'ec2',
+            'actions': [{'type': 'mark-for-op', 'op': 'stop'}]})
+
+        self.assertDeprecation(policy, """
+            policy 'dep-test'
+              actions:
+                mark-for-op: optional fields deprecated (one of 'hours' or 'days' must be specified)
+            """)
+
+    def test_unmark_deprecations(self):
+        policy = self.load_policy({
+            'name': 'dep-test',
+            'resource': 'ec2',
+            'filters': [{'tag:foo': 'exists'}],
+            'actions': [{'type': 'unmark', 'tags': ['foo']}]})
+
+        self.assertDeprecation(policy, """
+            policy 'dep-test'
+              actions:
+                remove-tag: alias 'unmark' has been deprecated
+            """)
 
 
 class CoalesceCopyUserTags(BaseTest):
@@ -390,3 +533,73 @@ class CopyRelatedResourceTag(BaseTest):
 
         self.assertEqual(len(untagged_snaps), 1)
         self.assertTrue('Tags' not in untagged_snaps[0].keys())
+
+    def test_copy_related_tag_resourcegroupstaggingapi(self):
+        session_factory = self.replay_flight_data("test_copy_related_tag_resourcegroupstaggingapi")
+        ec2_client = session_factory().client("ec2")
+        policy = {
+            "name": "copy-tags-from-tags",
+            "resource": "aws.ec2",
+            "filters": [
+                {
+                    "type": "value",
+                    "key": "tag:test-tag",
+                    "value": "absent"
+                },
+            ],
+            "actions": [
+                {
+                    "type": "copy-related-tag",
+                    "resource": "resourcegroupstaggingapi",
+                    "key": "tag:Foo",
+                    "tags": "*"
+                }
+            ]
+        }
+        policy = self.load_policy(policy, session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        tags = ec2_client.describe_tags(
+            Filters=[
+                {
+                    "Name": "resource-id",
+                    "Values": [resources[0]['InstanceId']]
+                }
+            ]
+        )
+        found = False
+        for t in tags["Tags"]:
+            if t['Key'] == 'test-tag':
+                found = True
+        self.assertTrue(found)
+
+    def test_copy_related_tag_validate_aws_prefix(self):
+        policy = {
+            'name': 'copy-related-tag-aws-prefix',
+            'resource': 'ami',
+            'actions': [
+                {
+                    'type': 'copy-related-tag',
+                    'resource': 'aws.ebs-snapshot',
+                    'key': '',
+                    'tags': '*',
+                }
+            ]
+        }
+        # policy will validate on load
+        policy = self.load_policy(policy)
+
+    def test_copy_related_tag_validate_aws_prefix_fake_resource(self):
+        policy = {
+            'name': 'copy-related-tag-aws-prefix',
+            'resource': 'ami',
+            'actions': [
+                {
+                    'type': 'copy-related-tag',
+                    'resource': 'aws.not-real',
+                    'key': '',
+                    'tags': '*',
+                }
+            ]
+        }
+        self.assertRaises(PolicyValidationError, self.load_policy, policy)

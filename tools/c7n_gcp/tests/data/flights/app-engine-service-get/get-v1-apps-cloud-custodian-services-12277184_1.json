@@ -1,0 +1,28 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 24 Apr 2019 17:48:40 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "4091",
+    "-content-encoding": "gzip",
+    "content-location": "https://appengine.googleapis.com/v1/apps/cloud-custodian/authorizedCertificates?alt=json"
+  },
+  "body": {
+        "name": "apps/cloud-custodian/services/12277184",
+        "id": "12277184",
+        "labels": {
+          "name": "test-service"
+        },
+        "networkSettings": {
+          "ingressTrafficAllowed": "INGRESS_TRAFFIC_ALLOWED_UNSPECIFIED"
+        }
+  }
+}

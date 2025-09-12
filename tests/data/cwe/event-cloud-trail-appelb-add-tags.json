@@ -1,0 +1,62 @@
+{
+    "version": "0",
+    "id": "5471314a-e675-32d7-2742-690d2d978102",
+    "detail-type": "AWS API Call via CloudTrail",
+    "source": "aws.elasticloadbalancing",
+    "account": "123456789123",
+    "time": "2022-07-13T20:07:38Z",
+    "region": "us-east-1",
+    "resources": [],
+    "detail": {
+        "eventVersion": "1.08",
+        "userIdentity": {
+            "type": "AssumedRole",
+            "principalId": "AROAVD4IK2M7GWZXER5DZ:HarishAchappa",
+            "arn": "arn:aws:sts::123456789123:assumed-role/c7nbot/HarishAchappa",
+            "accountId": "123456789123",
+            "accessKeyId": "ASIAVD4IK2M7LCL6FD6T",
+            "sessionContext": {
+                "sessionIssuer": {
+                    "type": "Role",
+                    "principalId": "AROAVD4IK2M7GWZXER5DZ",
+                    "arn": "arn:aws:iam::123456789123:role/c7nbot",
+                    "accountId": "123456789123",
+                    "userName": "c7nbot"
+                },
+                "webIdFederationData": {},
+                "attributes": {
+                    "creationDate": "2022-07-13T19:09:22Z",
+                    "mfaAuthenticated": "false"
+                }
+            }
+        },
+        "eventTime": "2022-07-13T20:07:38Z",
+        "eventSource": "elasticloadbalancing.amazonaws.com",
+        "eventName": "AddTags",
+        "awsRegion": "us-east-1",
+        "sourceIPAddress": "AWS Internal",
+        "userAgent": "AWS Internal",
+        "requestParameters": {
+            "tags": [
+                {
+                    "value": "Internal",
+                    "key": "WAF"
+                }
+            ],
+            "resourceArns": [
+                "arn:aws:elasticloadbalancing:us-east-1:123456789123:loadbalancer/app/test/433ae0ba96204181"
+            ]
+        },
+        "responseElements": null,
+        "requestID": "fe506154-00a9-4a09-84f7-d63cae6ebd1f",
+        "eventID": "e9f72371-5fc5-48fc-999d-462e13fdc6bd",
+        "readOnly": false,
+        "eventType": "AwsApiCall",
+        "apiVersion": "2015-12-01",
+        "managementEvent": true,
+        "recipientAccountId": "123456789123",
+        "eventCategory": "Management",
+        "sessionCredentialFromConsole": "true"
+    },
+    "debug": true
+}

@@ -1,8 +1,13 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
-from .common import BaseTest
 import time
+from dateutil.parser import parse as date_parse
+
+import c7n.resources.fsx
+from c7n.testing import mock_datetime_now
+from .common import BaseTest
+import c7n.filters.backup
 
 
 class TestFSx(BaseTest):
@@ -309,11 +314,11 @@ class TestFSx(BaseTest):
             session_factory=session_factory
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         client = session_factory().client('fsx')
         fs = client.describe_file_systems(
             FileSystemIds=[resources[0]['FileSystemId']])['FileSystems']
-        self.assertTrue(len(fs), 1)
+        self.assertEqual(len(fs), 1)
         self.assertEqual(fs[0]['Lifecycle'], 'DELETING')
         backups = client.describe_backups(
             Filters=[
@@ -355,11 +360,11 @@ class TestFSx(BaseTest):
             session_factory=session_factory
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         client = session_factory().client('fsx')
         fs = client.describe_file_systems(
             FileSystemIds=[resources[0]['FileSystemId']])['FileSystems']
-        self.assertTrue(len(fs), 1)
+        self.assertEqual(len(fs), 1)
         self.assertEqual(fs[0]['Lifecycle'], 'DELETING')
         backups = client.describe_backups(
             Filters=[
@@ -395,12 +400,141 @@ class TestFSx(BaseTest):
             session_factory=session_factory
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         client = session_factory().client('fsx')
         fs = client.describe_file_systems(
             FileSystemIds=[resources[0]['FileSystemId']])['FileSystems']
-        self.assertTrue(len(fs), 1)
+        self.assertEqual(len(fs), 1)
         self.assertNotEqual(fs[0]['Lifecycle'], 'DELETING')
+
+    def test_fsx_arn_in_event(self):
+        session_factory = self.replay_flight_data('test_fsx_resource')
+        p = self.load_policy({'name': 'test-fsx', 'resource': 'fsx'},
+            session_factory=session_factory)
+        resources = p.resource_manager.get_resources(
+            ["arn:aws:fsx:us-east-1:644160558196:file-system/fs-0bc98cbfb6b356896"])
+        self.assertEqual(len(resources), 1)
+
+    def test_fsx_backup_count_filter(self):
+        session_factory = self.replay_flight_data("test_fsx_backup_count_filter")
+        p = self.load_policy(
+            {
+                "name": "fsx-backup-count-filter",
+                "resource": "fsx",
+                "filters": [{"type": "consecutive-backups", "days": 2}],
+            },
+            config={'region': 'us-west-2'},
+            session_factory=session_factory,
+        )
+        with mock_datetime_now(date_parse("2022-07-04"), c7n.resources.fsx):
+            resources = p.run()
+        self.assertEqual(len(resources), 3)
+
+    def test_fsx_igw_subnet(self):
+        factory = self.replay_flight_data('test_fsx_public_subnet')
+        p = self.load_policy({
+            'name': 'fsx-public',
+            'resource': 'fsx',
+            'filters': [
+                {'type': 'subnet',
+                 'key': 'SubnetId',
+                 'value': 'present',
+                 'igw': True}
+            ]}, config={'region': 'us-west-2'}, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_fsx_consecutive_aws_backups_count_filter(self):
+        session_factory = self.replay_flight_data("test_fsx_consecutive_aws_backups_count_filter")
+        p = self.load_policy(
+            {
+                "name": "fsx_consecutive_aws_backups_count_filter",
+                "resource": "fsx",
+                "filters": [
+                    {
+                        "type": "consecutive-aws-backups",
+                        "count": 2,
+                        "period": "days",
+                        "status": "COMPLETED"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        with mock_datetime_now(date_parse("2022-09-09T00:00:00+00:00"), c7n.filters.backup):
+            resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_fsx_volumes_filter(self):
+        session_factory = self.replay_flight_data("test_fsx_volumes_filter")
+        p = self.load_policy({
+            "name": "fsx_volumes_filter",
+            "resource": "aws.fsx",
+            "filters": [{
+                "type": "volume",
+                "attrs": []
+            }]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources[0]['c7n:Volumes']), 2)
+
+    def test_fsx_vpc_filter(self):
+        session_factory = self.replay_flight_data("test_fsx_vpc_filter")
+        p = self.load_policy({
+            "name": "fsx_vpc_filter",
+            "resource": "aws.fsx",
+            "filters": [{
+                "type": "vpc",
+                "key": "IsDefault",
+                "value": True
+            }]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources[0]['c7n:matched-vpcs']), 1)
+
+    def test_fsx_metrics_filter(self):
+        session_factory = self.replay_flight_data('test_fsx_metrics_filter')
+        p = self.load_policy(
+            {
+                'name': 'test-fsx-metrics',
+                'resource': 'fsx',
+                'filters': [
+                    {
+                        'type': 'metrics',
+                        'name': 'CPUUtilization',
+                        'value': 0,
+                        'op': 'gt',
+                        'days': 7,
+                        'statistics': 'Average'
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+
+
+class TestFSxVolume(BaseTest):
+    def test_fsx_volume_query(self):
+        session_factory = self.replay_flight_data('test_fsx_volume_query')
+        p = self.load_policy(
+            {
+                "name": "fsx_volume_query",
+                "resource": "aws.fsx-volume",
+                "filters": [{
+                    "type": "value",
+                    "key": "Lifecycle",
+                    "value": "AVAILABLE"
+                }]
+            },
+            session_factory=session_factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
 
 
 class TestFSxBackup(BaseTest):
@@ -452,7 +586,7 @@ class TestFSxBackup(BaseTest):
             session_factory=session_factory
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         client = session_factory().client('fsx')
         backups = client.describe_backups(
             Filters=[
@@ -465,7 +599,7 @@ class TestFSxBackup(BaseTest):
         tags = None
         for b in backups:
             if b['BackupId'] == backup_id:
-                self.assertTrue(len(b['Tags']), 1)
+                self.assertEqual(len(b['Tags']), 1)
                 tags = b['Tags']
         self.assertTrue(tags)
         self.assertEqual(tags[0]['Key'], 'tag-test')
@@ -489,7 +623,7 @@ class TestFSxBackup(BaseTest):
             session_factory=session_factory
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
 
         client = session_factory().client('fsx')
         backups = client.describe_backups(
@@ -503,7 +637,7 @@ class TestFSxBackup(BaseTest):
         tags = None
         for b in backups:
             if b['BackupId'] == backup_id:
-                self.assertTrue(len(b['Tags']), 1)
+                self.assertEqual(len(b['Tags']), 1)
                 tags = [t for t in b['Tags'] if t['Key'] == 'maid_status']
         self.assertTrue(tags)
 
@@ -525,7 +659,7 @@ class TestFSxBackup(BaseTest):
             session_factory=session_factory
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
 
         client = session_factory().client('fsx')
         backups = client.describe_backups(

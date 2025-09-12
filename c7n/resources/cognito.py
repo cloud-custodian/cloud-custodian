@@ -3,9 +3,23 @@
 from botocore.exceptions import ClientError
 
 from c7n.actions import BaseAction
+from c7n.filters import WafV2FilterBase
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, TypeInfo
+from c7n.query import QueryResourceManager, TypeInfo, DescribeSource
+from c7n.tags import universal_augment
 from c7n.utils import local_session, type_schema
+
+
+class DescribeIdentityPool(DescribeSource):
+    def augment(self, resources):
+        resources = super().augment(resources)
+        return universal_augment(self.manager, resources)
+
+
+class DescribeUserPool(DescribeSource):
+    def augment(self, resources):
+        resources = super().augment(resources)
+        return universal_augment(self.manager, resources)
 
 
 @resources.register('identity-pool')
@@ -19,7 +33,13 @@ class CognitoIdentityPool(QueryResourceManager):
         id = 'IdentityPoolId'
         name = 'IdentityPoolName'
         arn_type = "identitypool"
-        cfn_type = 'AWS::Cognito::IdentityPool'
+        config_type = cfn_type = 'AWS::Cognito::IdentityPool'
+        universal_taggable = object()
+        permissions_augment = ("cognito-identity:ListTagsForResource",)
+
+    source_mapping = {
+        'describe': DescribeIdentityPool,
+    }
 
 
 @CognitoIdentityPool.action_registry.register('delete')
@@ -66,8 +86,46 @@ class CognitoUserPool(QueryResourceManager):
             'describe_user_pool', 'UserPoolId', 'Id', 'UserPool')
         id = 'Id'
         name = 'Name'
+        arn = 'Arn'
         arn_type = "userpool"
-        cfn_type = 'AWS::Cognito::UserPool'
+        config_type = cfn_type = 'AWS::Cognito::UserPool'
+        universal_taggable = object()
+        permissions_augment = ("cognito-idp:ListTagsForResource",)
+
+    source_mapping = {
+        'describe': DescribeUserPool,
+    }
+
+
+@CognitoUserPool.filter_registry.register('wafv2-enabled')
+class WafV2Filter(WafV2FilterBase):
+    """Filter Cognito UserPool by wafv2 web-acl
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: filter-userpool-wafv2
+                resource: user-pool
+                filters:
+                  - type: wafv2-enabled
+                    state: false
+              - name: filter-userpool-wafv2-regex
+                resource: user-pool
+                filters:
+                  - type: wafv2-enabled
+                    state: false
+                    web-acl: .*FMManagedWebACLV2-?FMS-.*
+    """
+
+    # cognito user pools don't hold a reference to the associated web acl
+    # so we have to look them up via the associations on the web acl directly
+    def get_associated_web_acl(self, resource):
+        return self.get_web_acl_from_associations(
+            'COGNITO_USER_POOL',
+            resource['Arn']
+        )
 
 
 @CognitoUserPool.action_registry.register('delete')

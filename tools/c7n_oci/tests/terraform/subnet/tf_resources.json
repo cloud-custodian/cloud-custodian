@@ -1,0 +1,122 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "oci_identity_availability_domain": {
+            "ad": {
+                "ad_number": 1,
+                "compartment_id": "ocid1.compartment.oc1..<unique_ID>",
+                "id": "ocid1.availabilitydomain.oc1..<unique_ID>",
+                "name": "NQNU:US-ASHBURN-AD-1"
+            }
+        },
+        "oci_core_default_route_table": {
+            "default_route_table": {
+                "compartment_id": "ocid1.compartment.oc1..<unique_ID>",
+                "defined_tags": {
+                    "Oracle-Tags.CreatedBy": "user@example.com",
+                    "Oracle-Tags.CreatedOn": "2023-06-09T12:35:25.001Z"
+                },
+                "display_name": "DefaultRouteTable",
+                "freeform_tags": {},
+                "id": "ocid1.routetable.oc1..<unique_ID>",
+                "manage_default_resource_id": "ocid1.routetable.oc1..<unique_ID>",
+                "route_rules": [
+                    {
+                        "cidr_block": "",
+                        "description": "",
+                        "destination": "0.0.0.0/0",
+                        "destination_type": "CIDR_BLOCK",
+                        "network_entity_id": "ocid1.internetgateway.oc1..<unique_ID>",
+                        "route_type": ""
+                    }
+                ],
+                "state": "AVAILABLE",
+                "time_created": "2023-06-09 12:35:25.166 +0000 UTC",
+                "timeouts": null
+            }
+        },
+        "oci_core_internet_gateway": {
+            "test_internet_gateway": {
+                "compartment_id": "ocid1.compartment.oc1..<unique_ID>",
+                "defined_tags": {
+                    "Oracle-Tags.CreatedBy": "user@example.com",
+                    "Oracle-Tags.CreatedOn": "2023-06-09T12:35:26.570Z"
+                },
+                "display_name": "TestInternetGateway",
+                "enabled": true,
+                "freeform_tags": {},
+                "id": "ocid1.internetgateway.oc1..<unique_ID>",
+                "route_table_id": null,
+                "state": "AVAILABLE",
+                "time_created": "2023-06-09 12:35:26.837 +0000 UTC",
+                "timeouts": null,
+                "vcn_id": "ocid1.vcn.oc1..<unique_ID>"
+            }
+        },
+        "oci_core_subnet": {
+            "test_subnet": {
+                "availability_domain": "NQNU:US-ASHBURN-AD-1",
+                "cidr_block": "10.1.20.0/24",
+                "compartment_id": "ocid1.compartment.oc1..<unique_ID>",
+                "defined_tags": {
+                    "Oracle-Tags.CreatedBy": "user@example.com",
+                    "Oracle-Tags.CreatedOn": "2023-06-09T12:35:27.686Z"
+                },
+                "dhcp_options_id": "ocid1.dhcpoptions.oc1..<unique_ID>",
+                "display_name": "TestSubnet",
+                "dns_label": "testsubnet",
+                "freeform_tags": {
+                    "Project": "CNCF"
+                },
+                "id": "ocid1.subnet.oc1..<unique_ID>",
+                "ipv6cidr_block": null,
+                "ipv6cidr_blocks": [],
+                "ipv6virtual_router_ip": null,
+                "prohibit_internet_ingress": false,
+                "prohibit_public_ip_on_vnic": false,
+                "route_table_id": "ocid1.routetable.oc1..<unique_ID>",
+                "security_list_ids": [
+                    "ocid1.securitylist.oc1..<unique_ID>"
+                ],
+                "state": "AVAILABLE",
+                "subnet_domain_name": "testsubnet.testvcn.oraclevcn.com",
+                "time_created": "2023-06-09 12:35:28.774 +0000 UTC",
+                "timeouts": null,
+                "vcn_id": "ocid1.vcn.oc1..<unique_ID>",
+                "virtual_router_ip": "10.1.20.1",
+                "virtual_router_mac": "00:00:17:74:81:F8"
+            }
+        },
+        "oci_core_vcn": {
+            "test_vcn": {
+                "byoipv6cidr_blocks": [],
+                "byoipv6cidr_details": null,
+                "cidr_block": "10.1.0.0/16",
+                "cidr_blocks": [
+                    "10.1.0.0/16"
+                ],
+                "compartment_id": "ocid1.compartment.oc1..<unique_ID>",
+                "default_dhcp_options_id": "ocid1.dhcpoptions.oc1..<unique_ID>",
+                "default_route_table_id": "ocid1.routetable.oc1..<unique_ID>",
+                "default_security_list_id": "ocid1.securitylist.oc1..<unique_ID>",
+                "defined_tags": {
+                    "Oracle-Tags.CreatedBy": "user@example.com",
+                    "Oracle-Tags.CreatedOn": "2023-06-09T12:35:25.001Z"
+                },
+                "display_name": "TestVcn",
+                "dns_label": "testvcn",
+                "freeform_tags": {},
+                "id": "ocid1.vcn.oc1..<unique_ID>",
+                "ipv6cidr_blocks": [],
+                "ipv6private_cidr_blocks": [],
+                "is_ipv6enabled": false,
+                "is_oracle_gua_allocation_enabled": null,
+                "state": "AVAILABLE",
+                "time_created": "2023-06-09 12:35:25.166 +0000 UTC",
+                "timeouts": null,
+                "vcn_domain_name": "testvcn.oraclevcn.com"
+            }
+        }
+    }
+}

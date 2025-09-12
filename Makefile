@@ -1,109 +1,165 @@
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
+oSHELL := /bin/bash
 SELF_MAKE := $(lastword $(MAKEFILE_LIST))
+
 PKG_REPO = testpypi
-PKG_SET = tools/c7n_gcp tools/c7n_azure tools/c7n_kube tools/c7n_openstack tools/c7n_mailer tools/c7n_logexporter tools/c7n_policystream tools/c7n_trailcreator tools/c7n_org tools/c7n_sphinxext tools/c7n_terraform
+PKG_INCREMENT := patch
+PKG_SET := tools/c7n_gcp tools/c7n_kube tools/c7n_openstack tools/c7n_mailer tools/c7n_policystream tools/c7n_org tools/c7n_sphinxext tools/c7n_awscc tools/c7n_tencentcloud tools/c7n_azure tools/c7n_oci tools/c7n_left
+
+PKG_SET_OLD := tools/c7n_logexporter tools/c7n_trailcreator tools/c7n_terraform
+
+FMT_SET := tools/c7n_left tools/c7n_mailer tools/c7n_oci tools/c7n_kube tools/c7n_awscc
+
+COVERAGE_TYPE := html
+ARGS :=
+IMAGE := c7n
+IMAGE_TAG := latest
+
+###
+# Common developer targets
 
 install:
-	python3 -m venv .
-	. bin/activate && pip install -r requirements-dev.txt
+# extras are for c7n_mailer, separate lint from dev for ci
+	uv sync --all-packages --locked \
+	    --group dev \
+	    --group addons \
+	    --group lint \
+            --extra gcp --extra azure
 
-install-poetry:
-	poetry install
-	for pkg in $(PKG_SET); do cd $$pkg && poetry install && cd ../..; done
+.PHONY: test
 
-pkg-rebase:
-	rm -f poetry.lock
-	for pkg in $(PKG_SET); do cd $$pkg && echo $$pkg && rm -f poetry.lock && cd ../..; done
+test:
+	. $(PWD)/test.env && uv run pytest -n auto $(ARGS) tests tools
 
-	rm -f setup.py
-	for pkg in $(PKG_SET); do cd $$pkg && echo $$pkg && rm -f setup.py && cd ../..; done
+test-coverage:
+	. $(PWD)/test.env && uv run pytest -n auto \
+            --cov-config .coveragerc \
+            --cov-report $(COVERAGE_TYPE) \
+            --cov c7n \
+            --cov tools/c7n_azure/c7n_azure \
+            --cov tools/c7n_gcp/c7n_gcp \
+            --cov tools/c7n_kube/c7n_kube \
+            --cov tools/c7n_left/c7n_left \
+            --cov tools/c7n_mailer/c7n_mailer \
+            --cov tools/c7n_policystream/c7n_policystream \
+            --cov tools/c7n_tencentcloud/c7n_tencentcloud \
+            --cov tools/c7n_oci/c7n_oci \
+            tests tools $(ARGS)
 
-	rm -f requirements.txt
-	for pkg in $(PKG_SET); do cd $$pkg && echo $$pkg && rm -f requirements.txt && cd ../..; done
+test-functional:
+# note this will provision real resources in a cloud environment
+	C7N_FUNCTIONAL=yes AWS_DEFAULT_REGION=us-east-2 pytest tests -m functional $(ARGS)
 
-	@$(MAKE) -f $(SELF_MAKE) pkg-update
-	git add poetry.lock
-	for pkg in $(PKG_SET); do cd $$pkg && echo $$pkg && git add poetry.lock && cd ../..; done
+sphinx:
+	make -f docs/Makefile.sphinx html
 
-	@$(MAKE) -f $(SELF_MAKE) pkg-gen-setup
-	git add setup.py
-	for pkg in $(PKG_SET); do cd $$pkg && echo $$pkg && git add setup.py && cd ../..; done
+lint:
+	uv run --no-project ruff check c7n tests tools
+	uv run --no-project black --check $(FMT_SET)
+	terraform fmt -check -recursive .
 
-	@$(MAKE) -f $(SELF_MAKE) pkg-gen-requirements
-	git add requirements.txt
-	for pkg in $(PKG_SET); do cd $$pkg && echo $$pkg && git add requirements.txt && cd ../..; done
+format:
+	uv run black $(FMT_SET)
+	uv run ruff check --fix c7n tests tools
+	terraform fmt -recursive .
+
+clean:
+	make -f docs/Makefile.sphinx clean
+	rm -rf .tox .Python bin include lib pip-selfcheck.json
+	@$(MAKE) -f $(SELF_MAKE) pkg-clean
+
+image:
+	docker build -f docker/$(IMAGE) -t $(IMAGE):$(IMAGE_TAG) .
+
+gen-docker:
+	uv run tools/dev/dockerpkg.py generate
+###
+# Package Management Targets
+# - primarily used to help drive frozen releases and dependency upgrades
+
+pkg-clean:
+	rm -f release.md
+	rm -f wheels-manifest.txt
+	rm -f dist/*
+	for pkg in $(PKG_SET); do cd $$pkg && rm -f dist/* && cd ../..; done
+
+	rm -Rf build/*
+	for pkg in $(PKG_SET); do cd $$pkg && rm -Rf build/* && cd ../..; done
+
 
 pkg-update:
-	poetry update
-	for pkg in $(PKG_SET); do cd $$pkg && echo $$pkg && poetry update && cd ../..; done
+	uv sync --all-packages \
+	    --group dev \
+	    --group addons \
+	    --group lint \
+            --extra gcp --extra azure \
+            --upgrade
 
 pkg-show-update:
-	poetry show -o
-	for pkg in $(PKG_SET); do cd $$pkg && poetry show -o && cd ../..; done
-
-pkg-freeze-setup:
-	python3 tools/dev/poetrypkg.py gen-frozensetup -p .
-	for pkg in $(PKG_SET); do python3 tools/dev/poetrypkg.py gen-frozensetup -p $$pkg; done
-
-pkg-gen-setup:
-	python3 tools/dev/poetrypkg.py gen-setup -p .
-	for pkg in $(PKG_SET); do python3 tools/dev/poetrypkg.py gen-setup -p $$pkg; done
-
-pkg-gen-requirements:
-# we have todo without hashes due to https://github.com/pypa/pip/issues/4995
-	poetry export --dev --without-hashes -f requirements.txt > requirements.txt
-	for pkg in $(PKG_SET); do cd $$pkg && poetry export --without-hashes -f requirements.txt > requirements.txt && cd ../..; done
+	uv tree --outdated --no-default-groups
 
 pkg-increment:
 # increment versions
-	poetry version patch
-	for pkg in $(PKG_SET); do cd $$pkg && poetry version patch && cd ../..; done
-# generate setup
-	@$(MAKE) pkg-gen-setup
-	python3 tools/dev/poetrypkg.py gen-version-file -p . -f c7n/version.py
+	uv version --bump $(PKG_INCREMENT)
+	for pkg in $(PKG_SET); do cd $$pkg && uv version --bump $(PKG_INCREMENT) && cd ../..; done
+	uv run tools/dev/devpkg.py gen-version-file -p . -f c7n/version.py
+
+pkg-build-wheel:
+	@$(MAKE) -f $(SELF_MAKE) pkg-clean
+	uv build --all-packages --wheel
+	uv run tools/dev/freezeuvwheel.py dist uv.lock
+	uv run twine check --strict dist/*.whl
 
 pkg-publish-wheel:
-# azure pin uses ancient wheel version, upgrade first
-	pip install -U wheel
-# clean up any artifacts first
-	rm -f dist/*
-	for pkg in $(PKG_SET); do cd $$pkg && rm -f dist/* && cd ../..; done
-# generate sdist
-	python setup.py bdist_wheel
-	for pkg in $(PKG_SET); do cd $$pkg && python setup.py bdist_wheel && cd ../..; done
-# check wheel
-	twine check dist/*
-	for pkg in $(PKG_SET); do cd $$pkg && twine check dist/* && cd ../..; done
-# upload to test pypi
-	twine upload -r $(PKG_REPO) dist/*
-	for pkg in $(PKG_SET); do cd $$pkg && twine upload -r $(PKG_REPO) dist/* && cd ../..; done
+# upload to named package index / pypi
+	uv run twine upload -r $(PKG_REPO) dist/*
 
-test-poetry:
-	. $(PWD)/test.env && poetry run pytest -n auto tests tools
+release-get-artifacts:
+# download release artifacts from github release action
+	@$(MAKE) -f $(SELF_MAKE) pkg-clean
+	uv run tools/dev/get_release_artifacts.py
 
-test:
-	./bin/tox -e py38
+data-update:
+# terraform data sets
+	cd tools/c7n_left/scripts && python uv run get_taggable.py \
+		--module-path taggable_providers/latest \
+		--module-path taggable_providers/azurerm-previous \
+		--output ../c7n_left/data/taggable.json
+# aws data sets
+	uv run tools/dev/data_cfntypedb.py -f tests/data/cfn-types.json
+	uv run tools/dev/data_updatearnref.py > tests/data/arn-types.json
+	uv run tools/dev/data_iamdb.py -f tests/data/iam-actions.json
+# gcp data sets
+	uv run tools/dev/data_gcpiamdb.py -f tools/c7n_gcp/tests/data/iam-permissions.json
+	uv run tools/dev/data_gcpregion.py -f tools/c7n_gcp/c7n_gcp/regions.json
 
-ftest:
-	C7N_FUNCTIONAL=yes AWS_DEFAULT_REGION=us-east-2 pytest tests -m functional
+###
+# Static analyzers
 
-ttest:
-	C7N_FUNCTIONAL=yes AWS_DEFAULT_REGION=us-east-2 pytest tests -m terraform
+analyzer-bandit:
+	uvx bandit -i -s B101,B311 \
+	-r tools/c7n_azure/c7n_azure \
+	 tools/c7n_gcp/c7n_gcp \
+	 tools/c7n_oci/c7n_oci \
+	 tools/c7n_left/c7n_left \
+	 tools/c7n_guardian/c7n_guardian \
+	 tools/c7n_org/c7n_org \
+	 tools/c7n_mailer/c7n_mailer \
+	 tools/c7n_policystream/policystream.py \
+	 tools/c7n_trailcreator/c7n_trailcreator \
+	 c7n
 
-sphinx:
-# if this errors either tox -e docs or cd tools/c7n_sphinext && poetry install
-	make -f docs/Makefile.sphinx html
 
-ghpages:
-	-git checkout gh-pages && \
-	mv docs/build/html new-docs && \
-	rm -rf docs && \
-	mv new-docs docs && \
-	git add -u && \
-	git add -A && \
-	git commit -m "Updated generated Sphinx documentation"
-
-lint:
-	flake8 c7n tests tools
-
-clean:
-	rm -rf .tox .Python bin include lib pip-selfcheck.json
+analyzer-semgrep:
+	uvx semgrep --error --verbose --config p/security-audit \
+	 tools/c7n_azure/c7n_azure \
+	 tools/c7n_gcp/c7n_gcp \
+	 tools/c7n_oci/c7n_oci \
+	 tools/c7n_left/c7n_left \
+	 tools/c7n_guardian/c7n_guardian \
+	 tools/c7n_org/c7n_org \
+	 tools/c7n_mailer/c7n_mailer \
+	 tools/c7n_policystream/policystream.py \
+	 tools/c7n_trailcreator/c7n_trailcreator \
+	 c7n

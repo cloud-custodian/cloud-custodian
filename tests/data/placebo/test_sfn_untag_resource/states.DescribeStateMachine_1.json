@@ -1,30 +1,33 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
-        "status": "ACTIVE", 
-        "definition": "{\n  \"StartAt\": \"HelloWorld\",\n  \"States\": {\n    \"HelloWorld\": {\n      \"Type\": \"Pass\",\n      \"Result\": \"Hello World!\",\n      \"End\": true\n    }\n  }\n}", 
-        "name": "test", 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "d3f7da1c-33ba-11e9-89b8-c11dfa96afad", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "d3f7da1c-33ba-11e9-89b8-c11dfa96afad", 
-                "content-length": "406", 
-                "content-type": "application/x-amz-json-1.0"
-            }
-        }, 
-        "roleArn": "arn:aws:iam::101010101111:role/service-role/StatesExecutionRole",
-        "stateMachineArn": "arn:aws:states:us-east-1:101010101111:stateMachine:test",
+        "stateMachineArn": "arn:aws:states:us-east-1:644160558196:stateMachine:Helloworld",
+        "name": "Helloworld",
+        "status": "ACTIVE",
+        "definition": "{\"Comment\":\"A Hello World example of the Amazon States Language using a Pass state\",\"StartAt\":\"HelloWorld\",\"States\":{\"HelloWorld\":{\"Type\":\"Pass\",\"Result\":\"Hello World!\",\"Next\":\"Step Functions Run Activity\"},\"Step Functions Run Activity\":{\"Type\":\"Task\",\"Resource\":\"arn:aws:states:us-east-1:644160558196:activity:test-c7n\",\"End\":true}}}",
+        "roleArn": "arn:aws:iam::644160558196:role/service-role/SfnDev",
+        "type": "STANDARD",
         "creationDate": {
-            "hour": 21, 
-            "__class__": "datetime", 
-            "month": 2, 
-            "second": 53, 
-            "microsecond": 482000, 
-            "year": 2019, 
-            "day": 17, 
-            "minute": 5
-        }
+            "__class__": "datetime",
+            "year": 2019,
+            "month": 6,
+            "day": 24,
+            "hour": 11,
+            "minute": 33,
+            "second": 30,
+            "microsecond": 570000
+        },
+        "loggingConfiguration": {
+            "level": "OFF",
+            "includeExecutionData": false
+        },
+        "tracingConfiguration": {
+            "enabled": false
+        },
+        "revisionId": "4ed2f4b3-f24d-4553-8b71-d34849619828",
+        "encryptionConfiguration": {
+            "type": "AWS_OWNED_KEY"
+        },
+        "ResponseMetadata": {}
     }
 }

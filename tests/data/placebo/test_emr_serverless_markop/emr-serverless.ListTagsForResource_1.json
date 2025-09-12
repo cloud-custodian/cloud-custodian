@@ -1,0 +1,9 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "tags": {
+            "foo": "Resource does not meet policy: notify@2023/01/26"
+        }
+    }
+}

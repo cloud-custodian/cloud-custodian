@@ -17,13 +17,15 @@ import tempfile
 import time
 import uuid
 
+from abc import ABC, abstractmethod
 
 from c7n.exceptions import InvalidOutputConfig
 from c7n.registry import PluginRegistry
-from c7n.utils import parse_url_config
+from c7n.utils import parse_url_config, join_output_path
 
 try:
     import psutil
+
     HAVE_PSUTIL = True
 except ImportError:
     HAVE_PSUTIL = False
@@ -157,7 +159,7 @@ class NullStats:
         """Take a snapshot of the system stats and append to the stack."""
 
     def pop_snapshot(self):
-        """Remove a snapshot from the snack and return a delta of the current stats to it.
+        """Remove a snapshot from the stack and return a delta of the current stats to it.
         """
         return {}
 
@@ -330,9 +332,9 @@ class LogOutput:
         return self
 
     def __exit__(self, exc_type=None, exc_value=None, exc_traceback=None):
-        self.leave_log()
         if exc_type is not None:
             log.exception("Error while executing policy")
+        self.leave_log()
 
     def join_log(self):
         self.handler = self.get_handler()
@@ -382,8 +384,33 @@ class NullLog(LogOutput):
         return None
 
 
+class OutputFileHandler(ABC):
+    """Base class for types registered with the blob_outputs registry.
+
+    Provides explicit interface definition for the types.
+
+    The file handlers are treated as context managers.
+    """
+
+    type: str  # Injected by the register method, matches the string type passed.
+    root_dir: str  # The base directory that will hold the output files.
+
+    @abstractmethod
+    def __enter__(self):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def __exit__(self, exc_type=None, exc_value=None, exc_traceback=None):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def write_file(self, rel_path, value):
+        "Write a file at the relative path specified with the value as the content."
+        raise NotImplementedError()
+
+
 @blob_outputs.register('null')
-class NullBlobOutput:
+class NullBlobOutput(OutputFileHandler):
     # default - for unit tests
 
     def __init__(self, ctx, config):
@@ -395,15 +422,18 @@ class NullBlobOutput:
         return "<null blob output>"
 
     def __enter__(self):
-        return
+        "A no-op for the null handler."
 
     def __exit__(self, exc_type=None, exc_value=None, exc_traceback=None):
-        return
+        "A no-op for the null handler."
+
+    def write_file(self, rel_path, value):
+        "A no-op for the null handler."
 
 
 @blob_outputs.register('file')
 @blob_outputs.register('default')
-class DirectoryOutput:
+class DirectoryOutput(OutputFileHandler):
 
     permissions = ()
 
@@ -428,6 +458,10 @@ class DirectoryOutput:
     def __repr__(self):
         return "<%s to dir:%s>" % (self.__class__.__name__, self.root_dir)
 
+    def write_file(self, rel_path, value):
+        with open(os.path.join(self.root_dir, rel_path), 'w') as fh:
+            fh.write(value)
+
     def compress(self):
         # Compress files individually so thats easy to walk them, without
         # downloading tar and extracting.
@@ -450,7 +484,8 @@ class DirectoryOutput:
             'region': self.ctx.options.region,
             'policy_name': self.ctx.policy.name,
             'now': datetime.datetime.utcnow(),
-            'uuid': str(uuid.uuid4())}
+            'uuid': str(uuid.uuid4()),
+        }
         return data
 
 
@@ -471,13 +506,16 @@ class BlobOutput(DirectoryOutput):
         return "<output:%s to bucket:%s prefix:%s>" % (
             self.type,
             self.bucket,
-            self.key_prefix)
+            self.key_prefix,
+        )
 
     def get_output_path(self, output_url):
         if '{' not in output_url:
-            date_path = datetime.datetime.utcnow().strftime('%Y/%m/%d/%H')
-            return "/".join([s.strip('/') for s in [
-                output_url, self.ctx.policy.name, date_path]])
+            return join_output_path(
+                output_url.strip('/'),
+                self.ctx.policy.name,
+                datetime.datetime.utcnow().strftime('%Y/%m/%d/%H')
+            )
         return output_url.format(**self.get_output_vars()).rstrip('/')
 
     def __exit__(self, exc_type=None, exc_value=None, exc_traceback=None):
@@ -489,8 +527,10 @@ class BlobOutput(DirectoryOutput):
 
     def upload(self):
         for root, dirs, files in os.walk(self.root_dir):
+            len_root_dir = len(self.root_dir)
             for f in files:
-                key = "/".join(filter(None, [self.key_prefix, root[len(self.root_dir):], f]))
+                rel_path = root[len_root_dir:]
+                key = "/".join(filter(None, [self.key_prefix, rel_path, f]))
                 self.upload_file(os.path.join(root, f), key)
 
     def upload_file(self, path, key):

@@ -29,20 +29,24 @@ import threading
 import os
 import socket
 import ssl
+from contextlib import nullcontext as no_rate_limiter
 from urllib.error import URLError
 
 from googleapiclient import discovery, errors  # NOQA
 from googleapiclient.http import set_user_agent
 from google.auth.credentials import with_scopes_if_required
+import google.auth.impersonated_credentials
 import google.oauth2.credentials
 import google_auth_httplib2
 
 import httplib2
-from ratelimiter import RateLimiter
+from pyrate_limiter import Limiter, RequestRate
+
 from retrying import retry
 
 
 HTTPLIB_CA_BUNDLE = os.environ.get('HTTPLIB_CA_BUNDLE')
+GOOGLE_IMPERSONATE_SERVICE_ACCOUNT = os.environ.get('GOOGLE_IMPERSONATE_SERVICE_ACCOUNT')
 
 CLOUD_SCOPES = frozenset(['https://www.googleapis.com/auth/cloud-platform'])
 
@@ -68,7 +72,7 @@ RETRYABLE_EXCEPTIONS = (
 
 
 def get_default_project():
-    for k in ('GOOGLE_PROJECT', 'GCLOUD_PROJECT',
+    for k in ('GCP_PROJECT', 'GOOGLE_PROJECT', 'GCLOUD_PROJECT',
               'GOOGLE_CLOUD_PROJECT', 'CLOUDSDK_CORE_PROJECT'):
         if k in os.environ:
             return os.environ[k]
@@ -156,6 +160,7 @@ class Session:
                  use_rate_limiter=False,
                  http=None,
                  project_id=None,
+                 impersonate_service=None,
                  **kwargs):
         """Constructor.
 
@@ -166,7 +171,7 @@ class Session:
             credentials (object): GoogleCredentials.
             quota_max_calls (int): Allowed requests per <quota_period> for the
                 API.
-            quota_period (float): The time period to track requests over.
+            quota_period (float): The time period (in seconds) to track requests over.
             use_rate_limiter (bool): Set to false to disable the use of a rate
                 limiter for this service.
             **kwargs (dict): Additional args such as version.
@@ -175,14 +180,31 @@ class Session:
         if not credentials:
             # Only share the http object when using the default credentials.
             self._use_cached_http = True
-            credentials, _ = google.auth.default(quota_project_id=project_id or
-            get_default_project())
-        self._credentials = with_scopes_if_required(credentials, list(CLOUD_SCOPES))
-        if use_rate_limiter:
-            self._rate_limiter = RateLimiter(max_calls=quota_max_calls,
-                                             period=quota_period)
+            # This causes error: https://github.com/cloud-custodian/cloud-custodian/issues/7155
+            # default_credentials, _ = google.auth.default(
+            #    quota_project_id=project_id or get_default_project()
+            # )
+            default_credentials, _ = google.auth.default()
+        impersonated_credentials = None
+        if impersonate_service or GOOGLE_IMPERSONATE_SERVICE_ACCOUNT:
+            impersonate_target = impersonate_service or GOOGLE_IMPERSONATE_SERVICE_ACCOUNT
+            log.info('using impersonated service account %s', impersonate_target)
+            impersonated_credentials = google.auth.impersonated_credentials.Credentials(
+                source_credentials=credentials or default_credentials,
+                target_principal=impersonate_target,
+                target_scopes=list(CLOUD_SCOPES))
+        target_credentials = impersonated_credentials or credentials or default_credentials
+        if not impersonated_credentials:
+            # get token with scopes if necessary
+            self._credentials = with_scopes_if_required(target_credentials, list(CLOUD_SCOPES))
         else:
-            self._rate_limiter = None
+            # impersonated_credentials already have scope
+            self._credentials = target_credentials
+        if use_rate_limiter:
+            limiter = Limiter(RequestRate(quota_max_calls, quota_period))
+            self._rate_limiter = limiter.ratelimit('gcp_session', delay=True)
+        else:
+            self._rate_limiter = no_rate_limiter()
         self._http = http
 
         self.project_id = project_id
@@ -479,12 +501,5 @@ class ServiceClient:
         Returns:
             dict: The response from the API.
         """
-        if self._rate_limiter:
-            # Since the ratelimiter library only exposes a context manager
-            # interface the code has to be duplicated to handle the case where
-            # no rate limiter is defined.
-            with self._rate_limiter:
-                return request.execute(http=self.http,
-                                       num_retries=self._num_retries)
-        return request.execute(http=self.http,
-                               num_retries=self._num_retries)
+        with self._rate_limiter:
+            return request.execute(http=self.http, num_retries=self._num_retries)

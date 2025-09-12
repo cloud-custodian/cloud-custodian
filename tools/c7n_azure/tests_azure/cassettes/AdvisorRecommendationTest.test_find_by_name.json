@@ -1,0 +1,65 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Advisor/recommendations?api-version=2020-01-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Thu, 12 Aug 2021 19:40:14 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "876"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                                  {
+                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Advisor/recommendations/6d569faf2-9fad-832d-70eb-df82c03e032d",
+                                    "name": "6d569faf2-9fad-832d-70eb-df82c03e032d",
+                                    "type": "Microsoft.Advisor/recommendations",
+                                    "properties": {
+                                      "category": "Security",
+                                      "impact": "High",
+                                      "impactedField": "Microsoft.Subscriptions/subscriptions",
+                                      "impactedValue": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                                      "lastUpdated": "2021-08-11T18:19:49.674765Z",
+                                      "recommendationTypeId": "4569faf2-6853-e252-a11e-dffc675689c2",
+                                      "shortDescription": {
+                                        "problem": "Deprecated accounts with owner permissions should be removed from your subscription",
+                                        "solution": "Deprecated accounts with owner permissions should be removed from your subscription"
+                                      },
+                                      "extendedProperties": {
+                                        "assessmentKey": "4569faf2-6853-e252-a11e-dffc675689c2",
+                                        "score": "0"
+                                      },
+                                      "resourceMetadata": {
+                                        "resourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47",
+                                        "source": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/assessments/4569faf2-6853-e252-a11e-dffc675689c2"
+                                      }
+                                    },
+                                    "resourceGroup": "Microsoft.Advisor"
+                                  }
+                            ]
+                        }
+                    }
+                }
+           }
+        ]
+}

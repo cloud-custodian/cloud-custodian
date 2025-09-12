@@ -18,6 +18,10 @@ class FirewallTest(BaseTest):
             'firewall_rule_id': '4746899906201084445',
             'project_id': 'cloud-custodian'})
         self.assertEqual(fw['name'], 'allow-inbound-xyz')
+        self.assertEqual(
+            p.resource_manager.get_urns([fw]),
+            ["gcp:compute::cloud-custodian:firewall/allow-inbound-xyz"],
+        )
 
     def test_firewall_modify(self):
         project_id = 'cloud-custodian'
@@ -61,6 +65,27 @@ class FirewallTest(BaseTest):
             self.assertTrue("was not found" in str(e))
 
 
+class NetworkTest(BaseTest):
+
+    def test_network_get(self):
+        factory = self.replay_flight_data(
+            'network-get-resource', project_id='cloud-custodian')
+        p = self.load_policy({'name': 'network', 'resource': 'gcp.vpc'},
+                             session_factory=factory)
+        network = p.resource_manager.get_resource({
+            "resourceName":
+                "//compute.googleapis.com/projects/cloud-custodian/"
+                "global/networks/default"})
+        self.assertEqual(network['name'], 'default')
+        self.assertEqual(network['autoCreateSubnetworks'], True)
+        self.assertEqual(
+            p.resource_manager.get_urns([network]),
+            [
+                'gcp:compute::cloud-custodian:vpc/default',
+            ],
+        )
+
+
 class SubnetTest(BaseTest):
 
     def test_subnet_get(self):
@@ -69,12 +94,18 @@ class SubnetTest(BaseTest):
         p = self.load_policy({'name': 'subnet', 'resource': 'gcp.subnet'},
                              session_factory=factory)
         subnet = p.resource_manager.get_resource({
-            "location": "us-central1",
+            "resourceName":
+                "//compute.googleapis.com/projects/cloud-custodian/"
+                "regions/us-central1/subnetworks/default",
             "project_id": "cloud-custodian",
-            "subnetwork_id": "4686700484947109325",
             "subnetwork_name": "default"})
         self.assertEqual(subnet['name'], 'default')
         self.assertEqual(subnet['privateIpGoogleAccess'], True)
+
+        self.assertEqual(
+            p.resource_manager.get_urns([subnet]),
+            ["gcp:compute:us-central1:cloud-custodian:subnet/default"],
+        )
 
     def test_subnet_set_flow(self):
         project_id = 'cloud-custodian'
@@ -139,6 +170,10 @@ class RouterTest(BaseTest):
 
         resources = policy.run()
         self.assertEqual(resources[0]['name'], 'test-router')
+        self.assertEqual(
+            policy.resource_manager.get_urns(resources),
+            ["gcp:compute:us-central1:cloud-custodian:router/test-router"],
+        )
 
     def test_router_get(self):
         project_id = 'cloud-custodian'
@@ -158,6 +193,10 @@ class RouterTest(BaseTest):
 
         self.assertEqual(len(routers), 1)
         self.assertEqual(routers[0]['bgp']['asn'], 65001)
+        self.assertEqual(
+            p.resource_manager.get_urns(routers),
+            ["gcp:compute:us-central1:cloud-custodian:router/test-router-2"],
+        )
 
     def test_router_delete(self):
         project_id = 'cloud-custodian'
@@ -201,6 +240,10 @@ class RouteTest(BaseTest):
 
         resources = policy.run()
         self.assertEqual(resources[0]['destRange'], '10.160.0.0/20')
+        self.assertEqual(
+            policy.resource_manager.get_urns(resources),
+            ["gcp:compute::cloud-custodian:route/default-route-f414047c633f96ab"],
+        )
 
     def test_route_get(self):
         project_id = 'cloud-custodian'
@@ -220,3 +263,32 @@ class RouteTest(BaseTest):
 
         self.assertEqual(len(routes), 1)
         self.assertEqual(routes[0]['destRange'], '10.0.0.0/24')
+        self.assertEqual(
+            p.resource_manager.get_urns(routes),
+            ["gcp:compute::cloud-custodian:route/test-route-2"],
+        )
+
+
+class TestVPCFirewallFilter(BaseTest):
+
+    def test_vpc_firewall_filter_query(self):
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data(
+            'test_vpc_firewall_filter_query', project_id=project_id)
+        p = self.load_policy(
+            {'name': 'vpc-firewall',
+             'resource': 'gcp.vpc',
+             'filters': [{
+                 'type': 'firewall',
+                 'attrs': [{
+                     'type': 'value',
+                     'key': 'id',
+                     'op': 'eq',
+                     'value': '2383043984399442858'
+                 }]
+             }]}, validate=True, session_factory=factory)
+
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['kind'], 'compute#network')

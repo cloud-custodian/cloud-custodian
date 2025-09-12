@@ -1,5 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import logging
+
 from ..azure_common import BaseTest, arm_template, cassette_name
 from c7n_azure.resources.key_vault import (KeyVaultUpdateAccessPolicyAction, WhiteListFilter,
                                            KeyVaultFirewallRulesFilter,
@@ -317,6 +319,50 @@ class KeyVaultTest(BaseTest):
         })
         resources = p.run()
         self.assertEqual(1, len(resources))
+
+    @arm_template('keyvault.json')
+    def test_update_access_policy(self):
+        tenant_id = '00000000-0000-0000-0000-000000000000'
+        object_id = '11111111-1111-1111-1111-111111111111'
+        p = self.load_policy({
+            'name': 'test-azure-keyvault',
+            'resource': 'azure.keyvault',
+            'filters': [
+                {'type': 'value',
+                    'key': 'name',
+                    'op': 'glob',
+                    'value_type': 'normalize',
+                    'value': 'cckeyvault1*'}],
+            'actions': [
+                {'type': 'update-access-policy',
+                    'operation': 'add',
+                    'access-policies': [{
+                        'tenant-id': tenant_id,
+                        'object-id': object_id,
+                        'permissions': {'keys': ['Get']}}]}]
+        })
+        warnings = self.capture_logging('custodian.azure.keyvault', level=logging.WARNING)
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+        self.assertEqual(warnings.getvalue(), '')
+        vault_before = resources[0]
+
+        client = self.session.client('azure.mgmt.keyvault.KeyVaultManagementClient')
+        vault_after = client.vaults.get(
+            vault_before['resourceGroup'], vault_before['name']
+        ).serialize(True)
+
+        access_policy_expr = f"length(properties.accessPolicies[?objectId == '{object_id}'])"
+        self.assertJmes(
+            access_policy_expr,
+            vault_before,
+            0
+        )
+        self.assertJmes(
+            access_policy_expr,
+            vault_after,
+            1
+        )
 
 
 class KeyVaultFirewallFilterTest(BaseTest):

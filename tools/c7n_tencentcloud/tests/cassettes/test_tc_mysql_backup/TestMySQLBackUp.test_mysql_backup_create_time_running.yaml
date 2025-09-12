@@ -1,0 +1,201 @@
+interactions:
+- request:
+    body: '{"Offset": 0, "Limit": 20}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '26'
+      Content-Type:
+      - application/json
+      Host:
+      - cdb.na-ashburn.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.27.1
+      X-TC-Action:
+      - DescribeDBInstances
+      X-TC-Region:
+      - na-ashburn
+      X-TC-Version:
+      - '2017-03-20'
+    method: POST
+    uri: https://cdb.na-ashburn.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response": {"Items": [{"AutoRenew": 0, "CageId": "", "CdbError":
+        0, "Cpu": 4, "CreateTime": "2022-11-01 02:28:31", "DeadlineTime": "0000-00-00
+        00:00:00", "DeployGroupId": "", "DeployMode": 0, "DeviceClass": "", "DeviceType":
+        "UNIVERSAL", "DiskType": "", "DrInfo": [], "EngineType": "InnoDB", "EngineVersion":
+        "8.0", "ExClusterId": "", "ExClusterName": "", "HourFeeStatus": 1, "InitFlag":
+        1, "InstanceId": "cdb-54yx9xqu", "InstanceName": "cdb116579", "InstanceNodes":
+        2, "InstanceType": 1, "IsolateTime": "0000-00-00 00:00:00", "MasterInfo":
+        null, "MaxDelayTime": 0, "Memory": 8000, "OfflineTime": "", "ParamVersionFlow":
+        800010001, "PayType": 1, "PhysicalId": "", "ProjectId": 0, "ProtectMode":
+        0, "Qps": 7200, "Region": "na-ashburn", "RegionId": 22, "ResourceId": "",
+        "RoGroups": [], "RoInstType": "", "RoVipInfo": null, "SecurityGroupIds": [],
+        "SlaveInfo": {"First": {"Region": "na-ashburn", "Vip": "", "VpcId": 0, "Vport":
+        0, "Zone": "na-ashburn-1"}, "Second": null}, "Status": 1, "SubnetId": 277976,
+        "TagList": null, "TaskStatus": 0, "UniqSubnetId": "subnet-7in3why6", "UniqVpcId":
+        "vpc-0rawvsw3", "Vip": "10.200.0.6", "Volume": 200, "VpcId": 10920694, "Vport":
+        3306, "WanDomain": "", "WanPort": 0, "WanStatus": 0, "Zone": "na-ashburn-1",
+        "ZoneId": 220001, "ZoneName": ""}], "RequestId": "036e8ddd-9e5f-4720-b8e4-99d3670c3838",
+        "TotalCount": 1}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1220'
+      Content-Type:
+      - application/json
+      Date:
+      - Mon, 09 Jan 2023 18:04:37 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"ResourceList": ["qcs::cdb:na-ashburn::instanceId/cdb-54yx9xqu"]}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '66'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.na-ashburn.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.27.1
+      X-TC-Action:
+      - GetResources
+      X-TC-Region:
+      - na-ashburn
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.na-ashburn.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"","ResourceTagMappingList":[],"RequestId":"65b1c4a3-95c8-4e7e-a160-8fae9e324668"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '114'
+      Content-Type:
+      - application/json
+      Date:
+      - Mon, 09 Jan 2023 18:04:38 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"InstanceId": "cdb-54yx9xqu"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '30'
+      Content-Type:
+      - application/json
+      Host:
+      - cdb.na-ashburn.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.27.1
+      X-TC-Action:
+      - DescribeBackups
+      X-TC-Region:
+      - na-ashburn
+      X-TC-Version:
+      - '2017-03-20'
+    method: POST
+    uri: https://cdb.na-ashburn.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response": {"Items": [{"BackupId": 103538698, "CosStorageType": 0,
+        "Creator": "SYSTEM", "Date": "2023-01-09 08:07:14", "Deleted": 0, "EncryptionFlag":
+        "off", "FinishTime": "2023-01-09 08:07:18", "InstanceId": "cdb-54yx9xqu",
+        "InternetUrl": "", "IntranetUrl": "", "ManualBackupName": "", "Method": "full",
+        "Name": "cdb116579_backup_20230109000514.xb", "Progress": 0, "Region": "na-ashburn",
+        "RemoteInfo": [], "SaveMode": "save_mode_regular", "Size": 3140794, "StartTime":
+        "2023-01-09 08:07:08", "Status": "SUCCESS", "Type": "physical", "Url": "",
+        "Way": "automatic"}, {"BackupId": 103537837, "CosStorageType": 0, "Creator":
+        "SYSTEM", "Date": "2023-01-08 08:03:40", "Deleted": 0, "EncryptionFlag": "off",
+        "FinishTime": "2023-01-08 08:03:43", "InstanceId": "cdb-54yx9xqu", "InternetUrl":
+        "", "IntranetUrl": "", "ManualBackupName": "", "Method": "full", "Name": "cdb116579_backup_20230108000514.xb",
+        "Progress": 0, "Region": "na-ashburn", "RemoteInfo": [], "SaveMode": "save_mode_regular",
+        "Size": 3140795, "StartTime": "2023-01-08 08:03:38", "Status": "SUCCESS",
+        "Type": "physical", "Url": "", "Way": "automatic"}, {"BackupId": 103536976,
+        "CosStorageType": 0, "Creator": "SYSTEM", "Date": "2023-01-07 08:08:17", "Deleted":
+        0, "EncryptionFlag": "off", "FinishTime": "2023-01-07 08:08:22", "InstanceId":
+        "cdb-54yx9xqu", "InternetUrl": "", "IntranetUrl": "", "ManualBackupName":
+        "", "Method": "full", "Name": "cdb116579_backup_20230107000514.xb", "Progress":
+        0, "Region": "na-ashburn", "RemoteInfo": [], "SaveMode": "save_mode_regular",
+        "Size": 3140786, "StartTime": "2023-01-07 08:08:11", "Status": "SUCCESS",
+        "Type": "physical", "Url": "", "Way": "automatic"}, {"BackupId": 103536057,
+        "CosStorageType": 0, "Creator": "SYSTEM", "Date": "2023-01-06 07:58:20", "Deleted":
+        0, "EncryptionFlag": "off", "FinishTime": "2023-01-06 07:58:22", "InstanceId":
+        "cdb-54yx9xqu", "InternetUrl": "", "IntranetUrl": "", "ManualBackupName":
+        "", "Method": "full", "Name": "cdb116579_backup_20230106000217.xb", "Progress":
+        0, "Region": "na-ashburn", "RemoteInfo": [], "SaveMode": "save_mode_regular",
+        "Size": 3140782, "StartTime": "2023-01-06 07:58:17", "Status": "SUCCESS",
+        "Type": "physical", "Url": "", "Way": "automatic"}, {"BackupId": 103534802,
+        "CosStorageType": 0, "Creator": "SYSTEM", "Date": "2023-01-05 08:05:39", "Deleted":
+        0, "EncryptionFlag": "off", "FinishTime": "2023-01-05 08:05:43", "InstanceId":
+        "cdb-54yx9xqu", "InternetUrl": "", "IntranetUrl": "", "ManualBackupName":
+        "", "Method": "full", "Name": "cdb116579_backup_20230105000210.xb", "Progress":
+        0, "Region": "na-ashburn", "RemoteInfo": [], "SaveMode": "save_mode_regular",
+        "Size": 3140770, "StartTime": "2023-01-05 08:05:33", "Status": "SUCCESS",
+        "Type": "physical", "Url": "", "Way": "automatic"}, {"BackupId": 103533941,
+        "CosStorageType": 0, "Creator": "SYSTEM", "Date": "2023-01-04 07:54:51", "Deleted":
+        0, "EncryptionFlag": "off", "FinishTime": "2023-01-04 07:54:55", "InstanceId":
+        "cdb-54yx9xqu", "InternetUrl": "", "IntranetUrl": "", "ManualBackupName":
+        "", "Method": "full", "Name": "cdb116579_backup_20230104000209.xb", "Progress":
+        0, "Region": "na-ashburn", "RemoteInfo": [], "SaveMode": "save_mode_regular",
+        "Size": 3140765, "StartTime": "2023-01-04 07:54:45", "Status": "SUCCESS",
+        "Type": "physical", "Url": "", "Way": "automatic"}, {"BackupId": 103533077,
+        "CosStorageType": 0, "Creator": "SYSTEM", "Date": "2023-01-03 07:54:52", "Deleted":
+        0, "EncryptionFlag": "off", "FinishTime": "2023-01-03 07:54:55", "InstanceId":
+        "cdb-54yx9xqu", "InternetUrl": "", "IntranetUrl": "", "ManualBackupName":
+        "", "Method": "full", "Name": "cdb116579_backup_20230103000722.xb", "Progress":
+        0, "Region": "na-ashburn", "RemoteInfo": [], "SaveMode": "save_mode_regular",
+        "Size": 3140763, "StartTime": "2023-01-03 07:54:49", "Status": "SUCCESS",
+        "Type": "physical", "Url": "", "Way": "automatic"}, {"BackupId": 103539588,
+        "CosStorageType": 0, "Creator": "SYSTEM", "Date": "0000-00-00 00:00:00", "Deleted":
+        0, "EncryptionFlag": "off", "FinishTime": "0000-00-00 00:00:00", "InstanceId":
+        "cdb-54yx9xqu", "InternetUrl": "", "IntranetUrl": "", "ManualBackupName":
+        "", "Method": "full", "Name": "cdb116579_backup_20230110000514.xb", "Progress":
+        0, "Region": "na-ashburn", "RemoteInfo": [], "SaveMode": "save_mode_regular",
+        "Size": 0, "StartTime": "0000-00-00 00:00:00", "Status": "RUNNING", "Type":
+        "physical", "Url": "", "Way": "automatic"}], "RequestId": "39b04091-a800-484d-9ad7-3c6a5df8e241",
+        "TotalCount": 8}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '17558'
+      Content-Type:
+      - application/json
+      Date:
+      - Mon, 09 Jan 2023 18:04:40 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+version: 1

@@ -1,0 +1,62 @@
+{
+    "version": "0",
+    "id": "0516aa12-81ce-e31b-9590-a8fd639e4e35",
+    "detail-type": "AWS API Call via CloudTrail",
+    "source": "aws.cloudfront",
+    "account": "351936369470",
+    "time": "2022-07-13T18:40:00Z",
+    "region": "us-east-1",
+    "resources": [],
+    "detail": {
+        "eventVersion": "1.08",
+        "userIdentity": {
+            "type": "AssumedRole",
+            "principalId": "AROAVD4IK2M7GWZXER5DZ:HarishAchappa",
+            "arn": "arn:aws:sts::123456789123:assumed-role/c7nbot/HarishAchappa",
+            "accountId": "351936369470",
+            "accessKeyId": "ASIAVD4IK2M7C6RULHH3",
+            "sessionContext": {
+                "sessionIssuer": {
+                    "type": "Role",
+                    "principalId": "AROAVD4IK2M7GWZXER5DZ",
+                    "arn": "arn:aws:iam::351936369470:role/c7nbot",
+                    "accountId": "351936369470",
+                    "userName": "c7nbot"
+                },
+                "webIdFederationData": {},
+                "attributes": {
+                    "creationDate": "2022-07-13T17:55:21Z",
+                    "mfaAuthenticated": "false"
+                }
+            }
+        },
+        "eventTime": "2022-07-13T18:40:00Z",
+        "eventSource": "cloudfront.amazonaws.com",
+        "eventName": "TagResource",
+        "awsRegion": "us-east-1",
+        "sourceIPAddress": "AWS Internal",
+        "userAgent": "AWS Internal",
+        "requestParameters": {
+            "resource": "arn:aws:cloudfront::351936369470:distribution/E53370FUHBNLK",
+            "tags": {
+                "items": [
+                    {
+                        "key": "WAF",
+                        "value": "Internal"
+                    }
+                ]
+            }
+        },
+        "responseElements": null,
+        "requestID": "12ccc851-136c-43b2-9e0d-7df3b9c26afb",
+        "eventID": "0981508a-ec98-4ed8-a9ae-6e2656576961",
+        "readOnly": false,
+        "eventType": "AwsApiCall",
+        "apiVersion": "2020_05_31",
+        "managementEvent": true,
+        "recipientAccountId": "351936369470",
+        "eventCategory": "Management",
+        "sessionCredentialFromConsole": "true"
+    },
+    "debug": true
+}

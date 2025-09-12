@@ -6,12 +6,13 @@ import docker
 import json
 
 from collections import defaultdict
+from c7n.vendored.distutils import version
 from datetime import datetime, timedelta
 from dateutil.tz import tzoffset, tzutc
 from dateutil.parser import parse as parse_date
 from functools import reduce
 import operator
-
+import re
 
 from c7n.resources import load_available
 from c7n.schema import resource_outline
@@ -26,6 +27,11 @@ aliases = {
     'c7n': 'core',
     'cli': 'core',
     'c7n_mailer': 'tools',
+    'c7n_tencentcloud': 'tencentcloud',
+    'c7n_kube': 'kubernetes',
+    'tools/c7n_kube': 'kubernetes',
+    'tools/c7n-left': 'shift-left',
+    'c7n-left': 'shift-left',
     'mailer': 'tools',
     'utils': 'core',
     'cask': 'tools',
@@ -62,10 +68,22 @@ def resolve_dateref(since, repo):
 
 def schema_outline_from_docker(tag):
     client = docker.from_env()
-    result = client.containers.run(
-        f"cloudcustodian/c7n:{tag}",
-        "schema --outline --json"
-    )
+    result = None
+    while True:
+        try:
+            result = client.containers.run(
+                f"cloudcustodian/c7n:{tag}",
+                "schema --outline --json"
+            )
+        except docker.errors.NotFound:
+            print("missing docker hub image tagged %s" % tag)
+            vtag = version.LooseVersion(tag).version
+
+            tag = f"{vtag[0]}.{vtag[1]}.{vtag[2] - 1}.0"
+            print("trying docker hub image tagged %s" % tag)
+        if result:
+            break
+
     return json.loads(result)
 
 
@@ -99,7 +117,7 @@ def link(provider='aws', resource=None, category=None, element=None):
         raise ValueError()
 
 
-def schema_diff(schema_old, schema_new):
+def schema_diff(schema_old, schema_new, skip_provider=()):
     def listify(items, bt=True):
         if bt:
             return ", ".join([f'`{i}`' for i in items])
@@ -109,6 +127,8 @@ def schema_diff(schema_old, schema_new):
     out = []
     resources_map = defaultdict(dict)
     for provider in schema_new:
+        if provider in skip_provider:
+            continue
         resources_old = schema_old.get(provider, [])
         resources_new = schema_new[provider]
         for resource in sorted(set(list(resources_old) + list(resources_new))):
@@ -172,14 +192,28 @@ def schema_diff(schema_old, schema_new):
     return "\n".join(out) + "\n"
 
 
+def get_last_release(repo):
+    regex = re.compile(r'^refs/tags/[\d\.]+')
+    versions = [
+        version.LooseVersion(t.rsplit('/', 1)[-1])
+        for t in repo.references
+        if regex.match(t)
+    ]
+    versions = sorted(versions)
+    return versions[-1].vstring
+
+
 @click.command()
 @click.option('--path', required=True)
 @click.option('--output', required=True)
 @click.option('--since')
 @click.option('--end')
+@click.option('--skip-provider', multiple=True)
 @click.option('--user', multiple=True)
-def main(path, output, since, end, user):
+def main(path, output, since, end, user, skip_provider):
     repo = pygit2.Repository(path)
+    if since in ('latest', 'current', 'last'):
+        since = get_last_release(repo)
     if since:
         since_dateref = resolve_dateref(since, repo)
     if end:
@@ -197,13 +231,15 @@ def main(path, output, since, end, user):
         if user and commit.author.name not in user:
             continue
 
-        parts = commit.message.strip().split('-', 1)
+        parts = commit.message.strip().split(' ', 1)
         if not len(parts) > 1:
             print("bad commit %s %s" % (cdate, commit.message))
             category = 'other'
         else:
             category = parts[0]
         category = category.strip().lower()
+        # try to aliases before we match on prefix (like tools)
+        category = aliases.get(category, category)
         if '.' in category:
             category = category.split('.', 1)[0]
         if '/' in category:
@@ -236,7 +272,7 @@ def main(path, output, since, end, user):
         schema_old = schema_outline_from_docker(since)
         load_available()
         schema_new = resource_outline()
-        diff_md = schema_diff(schema_old, schema_new)
+        diff_md = schema_diff(schema_old, schema_new, skip_provider)
 
     with open(output, 'w') as fh:
         for k in sorted(groups):

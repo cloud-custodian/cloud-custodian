@@ -2,9 +2,9 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
-import jmespath
-
+from c7n import deprecated
 from c7n.executor import ThreadPoolExecutor
+from c7n.utils import jmespath_search
 
 
 class Element:
@@ -44,11 +44,15 @@ class Element:
         if not search_expr.startswith('[].'):
             search_expr = '[].' + key_expr
         results = [r for value, r in zip(
-            jmespath.search(search_expr, resources), resources)
+            jmespath_search(search_expr, resources), resources)
             if value in allowed_values]
         if resource_count != len(results):
             self.log.warning(
                 "%s implicitly filtered %d of %d resources key:%s on %s",
                 self.type, len(results), resource_count, key_expr,
-                (', '.join(allowed_values)))
+                (', '.join(map(str, allowed_values))))
         return results
+
+    def get_deprecations(self):
+        """Return any matching deprecations for the policy fields itself."""
+        return deprecated.check_deprecations(self, self.type + ":")

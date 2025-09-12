@@ -1,0 +1,66 @@
+{
+    "status_code": 200,
+    "data": {
+        "NatGateways": [        {
+            "CreateTime": "2022-05-30T07:06:33+00:00",
+            "NatGatewayAddresses": [
+                {
+                    "AllocationId": "eipalloc-09782b698bb6a4eb0",
+                    "NetworkInterfaceId": "eni-0425b1ee658bbb889",
+                    "PrivateIp": "10.0.1.169",
+                    "PublicIp": "1.1.1.1"
+                }
+            ],
+            "NatGatewayId": "nat-0df07e596f7513ead",
+            "State": "available",
+            "SubnetId": "subnet-0845061a295aef2b6",
+            "VpcId": "vpc-012347c909f1f1896",
+            "Tags": [
+                {
+                    "Key": "Name",
+                    "Value": "us-west-2b"
+                }
+            ],
+            "ConnectivityType": "public"
+        },
+        {
+            "CreateTime": "2022-05-30T05:13:26+00:00",
+            "NatGatewayAddresses": [
+                {
+                    "AllocationId": "eipalloc-0df50535f542c19be",
+                    "NetworkInterfaceId": "eni-0fd0121afefcca42e",
+                    "PrivateIp": "10.0.1.145",
+                    "PublicIp": "2.2.2.2"
+                }
+            ],
+            "NatGatewayId": "nat-06e9acaa9c0ab8799",
+            "State": "available",
+            "SubnetId": "subnet-059f1e047a5ca7c1f",
+            "VpcId": "vpc-012347c909f1f1896",
+            "Tags": [
+                {
+                    "Key": "aws:cloudformation:stack-name",
+                    "Value": "xyz-vpc-1-RouteTable-1AFSXQCNQF4LN"
+                },
+                {
+                    "Key": "aws:cloudformation:logical-id",
+                    "Value": "NatGateway1"
+                },
+                {
+                    "Key": "aws:cloudformation:stack-id",
+                    "Value": "arn:aws:cloudformation:us-west-2:644160558196:stack/xyz-vpc-1-RouteTable-1AFSXQCNQF4LN/2e051350-dfd7-11ec-bbab-02b759b22f01"
+                },
+                {
+                    "Key": "xyz:cfn:version",
+                    "Value": "1.0.0"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "us-west-2a"
+                }
+            ],
+            "ConnectivityType": "public"
+        }],
+        "ResponseMetadata": {}
+    }
+}

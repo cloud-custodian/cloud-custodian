@@ -1,0 +1,97 @@
+{
+    "status_code": 200,
+    "data": {
+        "keyspaceName": "c7n_test",
+        "tableName": "c7n_test_table",
+        "resourceArn": "arn:aws:cassandra:us-east-1:644160558196:/keyspace/c7n_test/table/c7n_test_table",
+        "creationTimestamp": {
+            "__class__": "datetime",
+            "year": 2025,
+            "month": 5,
+            "day": 12,
+            "hour": 14,
+            "minute": 54,
+            "second": 42,
+            "microsecond": 398000
+        },
+        "status": "ACTIVE",
+        "schemaDefinition": {
+            "allColumns": [
+                {
+                    "name": "NewColumn",
+                    "type": "ascii"
+                }
+            ],
+            "partitionKeys": [
+                {
+                    "name": "NewColumn"
+                }
+            ],
+            "clusteringKeys": [],
+            "staticColumns": []
+        },
+        "capacitySpecification": {
+            "throughputMode": "PAY_PER_REQUEST",
+            "lastUpdateToPayPerRequestTimestamp": {
+                "__class__": "datetime",
+                "year": 2025,
+                "month": 5,
+                "day": 12,
+                "hour": 14,
+                "minute": 54,
+                "second": 42,
+                "microsecond": 398000
+            }
+        },
+        "encryptionSpecification": {
+            "type": "AWS_OWNED_KMS_KEY"
+        },
+        "pointInTimeRecovery": {
+            "status": "DISABLED"
+        },
+        "defaultTimeToLive": 0,
+        "comment": {
+            "message": ""
+        },
+        "clientSideTimestamps": {
+            "status": "ENABLED"
+        },
+        "replicaSpecifications": [
+            {
+                "region": "us-east-1",
+                "status": "ACTIVE",
+                "capacitySpecification": {
+                    "throughputMode": "PAY_PER_REQUEST",
+                    "lastUpdateToPayPerRequestTimestamp": {
+                        "__class__": "datetime",
+                        "year": 2025,
+                        "month": 5,
+                        "day": 12,
+                        "hour": 14,
+                        "minute": 54,
+                        "second": 42,
+                        "microsecond": 398000
+                    }
+                }
+            },
+            {
+                "region": "us-west-2",
+                "status": "ACTIVE",
+                "capacitySpecification": {
+                    "throughputMode": "PAY_PER_REQUEST",
+                    "lastUpdateToPayPerRequestTimestamp": {
+                        "__class__": "datetime",
+                        "year": 2025,
+                        "month": 5,
+                        "day": 12,
+                        "hour": 14,
+                        "minute": 54,
+                        "second": 42,
+                        "microsecond": 398000
+                    }
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

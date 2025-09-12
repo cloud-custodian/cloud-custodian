@@ -5,22 +5,26 @@ from c7n_kube.query import QueryResourceManager, TypeInfo
 from c7n_kube.provider import resources
 
 
-@resources.register('volume')
+@resources.register("volume")
 class PersistentVolume(QueryResourceManager):
     class resource_type(TypeInfo):
-        group = 'Core'
-        version = 'V1'
+        group = "Core"
+        canonical_group = ""
+        version = "V1"
         namespaced = False
-        patch = 'patch_persistent_volume'
-        delete = 'delete_persistent_volume'
-        enum_spec = ('list_persistent_volume', 'items', None)
+        patch = "patch_persistent_volume"
+        delete = "delete_persistent_volume"
+        enum_spec = ("list_persistent_volume", "items", None)
+        plural = "persistentvolumeclaims"
 
 
-@resources.register('volume-claim')
+@resources.register("volume-claim")
 class PersistentVolumeClaim(QueryResourceManager):
     class resource_type(TypeInfo):
-        group = 'Core'
-        version = 'V1'
-        patch = 'patch_namespaced_persistent_volume_claim'
-        delete = 'delete_namespaced_persistent_volume_claim'
-        enum_spec = ('list_persistent_volume_claim_for_all_namespaces', 'items', None)
+        group = "Core"
+        canonical_group = ""
+        version = "V1"
+        patch = "patch_namespaced_persistent_volume_claim"
+        delete = "delete_namespaced_persistent_volume_claim"
+        enum_spec = ("list_persistent_volume_claim_for_all_namespaces", "items", None)
+        plural = "persistentvolumeclaims"

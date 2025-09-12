@@ -1,0 +1,45 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:config:us-east-2:644160558196:config-rule/config-rule-y67kde",
+                "Tags": [
+                    {
+                        "Key": "Environment",
+                        "Value": "sandbox"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:config:us-east-2:644160558196:config-rule/config-rule-emfxvp",
+                "Tags": [
+                    {
+                        "Key": "Environment",
+                        "Value": "sandbox"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:config:us-east-2:644160558196:config-rule/config-rule-whifsj",
+                "Tags": [
+                    {
+                        "Key": "Environment",
+                        "Value": "sandbox"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:config:us-east-2:644160558196:config-rule/config-rule-zxcvbn",
+                "Tags": [
+                    {
+                        "Key": "Environment",
+                        "Value": "production"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

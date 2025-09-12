@@ -4,18 +4,22 @@
 from collections import Counter
 from datetime import datetime
 from dateutil.tz import tzutc
-import jmespath
 import json
 import hashlib
 import logging
+import sys
 
+from c7n import deprecated, query
 from c7n.actions import Action
 from c7n.filters import Filter
+from c7n.manager import resources
+from c7n.query import DescribeSource
 from c7n.exceptions import PolicyValidationError, PolicyExecutionError
 from c7n.policy import LambdaMode, execution
 from c7n.utils import (
-    local_session, type_schema,
-    chunks, dumps, filter_empty, get_partition
+    local_session, type_schema, get_retry,
+    chunks, dumps, filter_empty, get_partition, jmespath_search,
+    merge_dict_list
 )
 from c7n.version import version
 
@@ -26,7 +30,51 @@ log = logging.getLogger('c7n.securityhub')
 
 class SecurityHubFindingFilter(Filter):
     """Check if there are Security Hub Findings related to the resources
-    """
+
+    :example:
+
+    By default, this filter checks to see if *any* findings exist for a given
+    resource.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: iam-roles-with-findings
+            resource: aws.iam-role
+            filters:
+              - finding
+
+    :example:
+
+    The ``query`` parameter can look for specific findings. Consult this
+    `reference <https://docs.aws.amazon.com/securityhub/1.0/APIReference/API_AwsSecurityFindingFilters.html>`_
+    for more information about available filters and their structure. Note that when matching
+    by finding Id, it can be helpful to combine ``PREFIX`` comparisons with parameterized
+    account and region information.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: iam-roles-with-global-kms-decrypt
+            resource: aws.iam-role
+            filters:
+              - type: finding
+                query:
+                  Id:
+                    - Comparison: PREFIX
+                      Value: 'arn:aws:securityhub:{region}:{account_id}:subscription/aws-foundational-security-best-practices/v/1.0.0/KMS.2'
+                  Title:
+                    - Comparison: EQUALS
+                      Value: >-
+                        KMS.2 IAM principals should not have IAM inline policies
+                        that allow decryption actions on all KMS keys
+                  ComplianceStatus:
+                    - Comparison: EQUALS
+                      Value: 'FAILED'
+                  RecordState:
+                    - Comparison: EQUALS
+                      Value: 'ACTIVE'
+    """  # noqa: E501
     schema = type_schema(
         'finding',
         # Many folks do an aggregator region, allow them to use that
@@ -50,10 +98,13 @@ class SecurityHubFindingFilter(Filter):
                 'securityhub', region_name=self.data.get('region'))
         found = []
         params = dict(self.data.get('query', {}))
-
         for r_arn, resource in zip(self.manager.get_arns(resources), resources):
             params['ResourceId'] = [{"Value": r_arn, "Comparison": "EQUALS"}]
-            findings = client.get_findings(Filters=params).get("Findings")
+            if resource.get("InstanceId"):
+                params['ResourceId'].append(
+                    {"Value": resource["InstanceId"], "Comparison": "EQUALS"})
+            retry = get_retry(('TooManyRequestsException'))
+            findings = retry(client.get_findings, Filters=params).get("Findings")
             if len(findings) > 0:
                 resource[self.annotation_key] = findings
                 found.append(resource)
@@ -128,11 +179,18 @@ class SecurityHub(LambdaMode):
                 # Security hub invented some new arn format for a few resources...
                 # detect that and normalize to something sane.
                 if r['Id'].startswith('AWS') and r['Type'] == 'AwsIamAccessKey':
-                    rids.add('arn:aws:iam::%s:user/%s' % (
-                        f['AwsAccountId'],
-                        r['Details']['AwsIamAccessKey']['UserName']))
+                    if 'PrincipalName' in r['Details']['AwsIamAccessKey']:
+                        label = r['Details']['AwsIamAccessKey']['PrincipalName']
+                    else:
+                        label = r['Details']['AwsIamAccessKey']['UserName']
+                    rids.add('arn:{}:iam::{}:user/{}'.format(get_partition(r['Region']),
+                        f['AwsAccountId'], label))
                 elif not r['Id'].startswith('arn'):
-                    log.warning("security hub unknown id:%s rtype:%s",
+                    if r['Type'] == 'AwsEc2Instance':
+                        rids.add('arn:{}:ec2:{}:{}:instance/{}'.format(get_partition(r['Region']),
+                            r['Region'], f['AwsAccountId'], r['Id']))
+                    else:
+                        log.warning("security hub unknown id:%s rtype:%s",
                                 r['Id'], r['Type'])
                 else:
                     rids.add(r['Id'])
@@ -273,7 +331,9 @@ class PostFinding(Action):
     https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-findings-format.html
 
     For resources that are taggable, we will tag the resource with an identifier
-    such that further findings generate updates.
+    such that further findings generate updates. The name of the tag comes from the ``title``
+    parameter of the ``post-finding`` action, or the policy name if ``title`` is empty. This
+    allows different policies to update the same finding if they specify the same ``title``.
 
     Example generate a finding for accounts that don't have shield enabled.
 
@@ -294,15 +354,20 @@ class PostFinding(Action):
            - type: post-finding
              description: |
                 Shield should be enabled on account to allow for DDOS protection (1 time 3k USD Charge).
-             severity_normalized: 6
+             severity_label: LOW
              types:
                - "Software and Configuration Checks/Industry and Regulatory Standards/NIST CSF Controls (USA)"
              recommendation: "Enable shield"
              recommendation_url: "https://www.example.com/policies/AntiDDoS.html"
+             title: "shield-enabled"
              confidence: 100
              compliance_status: FAILED
 
     """ # NOQA
+
+    deprecations = (
+        deprecated.field('severity_normalized', 'severity_label'),
+    )
 
     FindingVersion = "2018-10-08"
 
@@ -330,7 +395,7 @@ class PostFinding(Action):
         recommendation={"type": "string"},
         recommendation_url={"type": "string"},
         fields={"type": "object"},
-        batch_size={'type': 'integer', 'minimum': 1, 'maximum': 10, 'default': 1},
+        batch_size={'type': 'integer', 'minimum': 1, 'maximum': 100, 'default': 1},
         types={
             "type": "array",
             "minItems": 1,
@@ -393,43 +458,46 @@ class PostFinding(Action):
         # which only shows a single resource in a finding.
         batch_size = self.data.get('batch_size', 1)
         stats = Counter()
-        for key, grouped_resources in self.group_resources(resources).items():
-            for resource_set in chunks(grouped_resources, batch_size):
-                stats['Finding'] += 1
-                if key == self.NEW_FINDING:
-                    finding_id = None
-                    created_at = now
-                    updated_at = now
-                else:
-                    finding_id, created_at = self.get_finding_tag(
-                        resource_set[0]).split(':', 1)
-                    updated_at = now
+        for resource_set in chunks(resources, batch_size):
+            findings = []
+            for key, grouped_resources in self.group_resources(resource_set).items():
+                for resource in grouped_resources:
+                    stats['Finding'] += 1
+                    if key == self.NEW_FINDING:
+                        finding_id = None
+                        created_at = now
+                        updated_at = now
+                    else:
+                        finding_id, created_at = self.get_finding_tag(
+                            resource).split(':', 1)
+                        updated_at = now
 
-                finding = self.get_finding(
-                    resource_set, finding_id, created_at, updated_at)
-                import_response = client.batch_import_findings(
-                    Findings=[finding])
-                if import_response['FailedCount'] > 0:
-                    stats['Failed'] += import_response['FailedCount']
-                    self.log.error(
-                        "import_response=%s" % (import_response))
-                if key == self.NEW_FINDING:
-                    stats['New'] += len(resource_set)
-                    # Tag resources with new finding ids
-                    tag_action = self.manager.action_registry.get('tag')
-                    if tag_action is None:
-                        continue
-                    tag_action({
-                        'key': '{}:{}'.format(
-                            'c7n:FindingId',
-                            self.data.get(
-                                'title', self.manager.ctx.policy.name)),
-                        'value': '{}:{}'.format(
-                            finding['Id'], created_at)},
-                        self.manager).process(resource_set)
-                else:
-                    stats['Update'] += len(resource_set)
-
+                    finding = self.get_finding(
+                        [resource], finding_id, created_at, updated_at)
+                    findings.append(finding)
+                    if key == self.NEW_FINDING:
+                        stats['New'] += 1
+                        # Tag resources with new finding ids
+                        tag_action = self.manager.action_registry.get('tag')
+                        if tag_action is None:
+                            continue
+                        tag_action({
+                            'key': '{}:{}'.format(
+                                'c7n:FindingId',
+                                self.data.get(
+                                    'title', self.manager.ctx.policy.name)),
+                            'value': '{}:{}'.format(
+                                finding['Id'], created_at)},
+                            self.manager).process([resource])
+                    else:
+                        stats['Update'] += 1
+            import_response = self.manager.retry(
+                client.batch_import_findings, Findings=findings
+            )
+            if import_response['FailedCount'] > 0:
+                stats['Failed'] += import_response['FailedCount']
+                self.log.error(
+                    "import_response=%s" % (import_response))
         self.log.debug(
             "policy:%s securityhub %d findings resources %d new %d updated %d failed",
             self.manager.ctx.policy.name,
@@ -446,14 +514,21 @@ class PostFinding(Action):
         if existing_finding_id:
             finding_id = existing_finding_id
         else:
+            # for fips compliance we need to explicit pass the usage param but it doesn't
+            # exist on python 3.8, directly pass when we drop 3.8 support.
+            params = (sys.version_info.major > 3 and sys.version_info.minor > 8) and {
+                'usedforsecurity': False} or {}
             finding_id = '{}/{}/{}/{}'.format(
                 self.manager.config.region,
                 self.manager.config.account_id,
-                hashlib.md5(json.dumps(
-                    policy.data).encode('utf8')).hexdigest(),
-                hashlib.md5(json.dumps(list(sorted(
-                    [r[model.id] for r in resources]))).encode(
-                        'utf8')).hexdigest())
+                # we use md5 for id, equiv to using crc32
+                hashlib.md5(  # nosec nosemgrep
+                    json.dumps(policy.data).encode('utf8'),
+                    **params).hexdigest(),
+                hashlib.md5(  # nosec nosemgrep
+                    json.dumps(list(sorted([r[model.id] for r in resources]))).encode('utf8'),
+                    **params).hexdigest()
+            )
         finding = {
             "SchemaVersion": self.FindingVersion,
             "ProductArn": "arn:{}:securityhub:{}::product/cloud-custodian/cloud-custodian".format(
@@ -564,7 +639,7 @@ class OtherResourcePostFinding(PostFinding):
             details[k] = r[k]
 
         for f in self.fields:
-            value = jmespath.search(f['expr'], r)
+            value = jmespath_search(f['expr'], r)
             if not value:
                 continue
             details[f['key']] = value
@@ -601,3 +676,93 @@ class OtherResourcePostFinding(PostFinding):
 
 AWS.resources.subscribe(OtherResourcePostFinding.register_resource)
 AWS.resources.subscribe(SecurityHubFindingFilter.register_resources)
+
+
+class DescribeSecurityhubFinding(DescribeSource):
+    def resources(self, query):
+        """Only show active compliance failures by default
+
+        Unless overridden by policy, use these default filters:
+
+        - Workflow status: anything but RESOLVED
+        - Record state: ACTIVE
+        - Compliance status: FAILED
+        """
+
+        query = merge_dict_list(
+            [
+                {
+                    "Filters": {
+                        "WorkflowStatus": [
+                            {
+                                "Comparison": "NOT_EQUALS",
+                                "Value": "RESOLVED",
+                            },
+                        ],
+                        "RecordState": [
+                            {
+                                "Comparison": "EQUALS",
+                                "Value": "ACTIVE",
+                            },
+                        ],
+                        "ComplianceStatus": [
+                            {
+                                "Comparison": "EQUALS",
+                                "Value": "FAILED",
+                            }
+                        ],
+                    }
+                },
+                *self.manager.data.get("query", []),
+                query,
+            ]
+        )
+
+        return super().resources(query=query)
+
+
+@resources.register("securityhub-finding")
+class SecurityhubFinding(query.QueryResourceManager):
+    """AWS SecurityHub Findings
+
+    :example:
+
+    Use the default filter set, which includes active unresolved findings
+    that have failed compliance checks
+
+    .. code-block:: yaml
+
+        policies:
+          - name: aws-security-hub-findings
+            resource: aws.securityhub-finding
+
+    :example:
+
+    Show findings for a specific control ID, overriding default filters
+
+    .. code-block:: yaml
+
+        policies:
+          - name: aws-security-hub-findings
+            resource: aws.securityhub-finding
+            query:
+              - Filters:
+                  ComplianceSecurityControlId:
+                    - Comparison: EQUALS
+                      Value: RDS.23
+
+    Reference for available filters:
+
+    https://docs.aws.amazon.com/securityhub/1.0/APIReference/API_GetFindings.html#API_GetFindings_RequestSyntax
+    """  # noqa: E501
+
+    class resource_type(query.TypeInfo):
+        service = "securityhub"
+        enum_spec = ('get_findings', 'Findings', None)
+        arn = False
+        id = "Id"
+        name = "ProductName"
+
+    source_mapping = {
+        "describe": DescribeSecurityhubFinding,
+    }

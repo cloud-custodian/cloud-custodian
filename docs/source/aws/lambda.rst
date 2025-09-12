@@ -29,11 +29,14 @@ resources never became available.
 Cloud Custodian Integration
 ===========================
 
-Custodian provides for policy level execution against any CWE event stream.
-Each Custodian policy can be deployed as an independent Lambda function. The
-only difference between a Custodian policy that runs in Lambda and one that
-runs directly from the CLI in poll mode is the specification of the
-subscription of the events in the mode config block of the policy.
+Custodian provides for policy level execution against any `Amazon CloudWatch
+Event
+<https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/WhatIsCloudWatchEvents.html>`_
+stream. Henceforth "CloudWatch Events" will be abbreviated as CWE. Each
+Custodian policy can be deployed as an independent Lambda function. The only
+difference between a Custodian policy that runs in Lambda and one that runs
+directly from the CLI in poll mode is the specification of the subscription of
+the events in the mode config block of the policy.
 
 Internally Custodian will reconstitute current state for all the resources
 in the event, execute the policy against them, match against the
@@ -43,7 +46,7 @@ policy filters, and apply the policy actions to matching resources.
 CloudTrail API Calls
 ++++++++++++++++++++
 
-Lambdas can receive CWE over CloudTrail API calls with delay of 90s at P99.
+Lambdas can receive CWE over CloudTrail API calls within seconds of delay at P99.
 
 .. code-block:: yaml
 
@@ -57,16 +60,17 @@ Lambdas can receive CWE over CloudTrail API calls with delay of 90s at P99.
        actions:
          - type: mark
            tag: foo
-           msg: bar
+           value: bar
 
 Because the total AWS API surface area is so large most CloudTrail API
 event subscriptions need two additional fields:
 
-#. For CloudTrail events we need to reference the source API call.
+#. For CloudTrail events we need to reference the source API call. In the code
+   block example below this is the ``source:`` key.
 
 #. To work transparently with existing resource policies, we also need to
    specify how to extract the resource IDs from the event via JMESPath so that
-   the resources can be queried.
+   the resources can be queried. In the code block example below this is the ``ids:`` key. 
 
 For very common API calls for policies, some `shortcuts
 <https://github.com/cloud-custodian/cloud-custodian/blob/master/c7n/cwe.py#L28-L69>`_
@@ -80,11 +84,15 @@ have been defined to allow for easier policy writing as for the
         event: RunInstances
         ids: "responseElements.instancesSet.items[].instanceId"
 
+Refer to the `AWS execution modes documention
+<https://cloudcustodian.io/docs/aws/resources/aws-modes.html#cloudtrail>`_ for a
+list of other configurable options. 
+
 
 EC2 Instance State Events
 +++++++++++++++++++++++++
 
-Lambdas can receive EC2 instance state events in real time (seconds delay).
+Policies can react to EC2 instance state events in real time. 
 
 .. code-block:: yaml
 
@@ -103,6 +111,9 @@ Lambdas can receive EC2 instance state events in real time (seconds delay).
          - mark
          - terminate
 
+Refer to `AWS execution modes documentation
+<https://cloudcustodian.io/docs/aws/resources/aws-modes.html#ec2-instance-state>`_
+for a list of configurable options. 
 
 Periodic Function
 +++++++++++++++++
@@ -127,6 +138,53 @@ substituted so a policy can be used across accounts.
          type: periodic
          schedule: "rate(1 day)"
          role: arn:aws:iam::{account_id}:role/some-role
+
+EventBridge Scheduler Function
+++++++++++++++++++++++++++++++
+
+We also support rate based, cron based and one time schedules, per `Schedule types on
+EventBridge Scheduler
+<https://docs.aws.amazon.com/scheduler/latest/UserGuide/schedule-types.html>`_.
+This includes support for `start-date`, `end-date` which should be ISO 8601 formatted
+strings compatible with Python's `datetime.datetime.fromisoformat
+<https://docs.python.org/3/library/datetime.html#datetime.datetime.fromisoformat>`_
+method, and `timezone` which should be a string from the `IANA Timezone Database <https://www.iana.org/time-zones>`_
+(defaults to `Etc/UTC`).
+
+EventBridge Scheduler requires an execution role to invoke the policy Lambda function per
+`Set up the execution role <https://docs.aws.amazon.com/scheduler/latest/UserGuide/setting-up.html#setting-up-execution-role>`_.
+The role ARN must be included in the mode block using the `scheduler-role` property.
+
+Schedules can also be placed into a schedule group with the `group-name` property.
+The group must already exist in EventBridge Scheduler. EventBridge Scheduler schedules do
+not support tagging, but groups do.
+
+.. code-block:: yaml
+
+   policies:
+     - name: s3-bucket-check
+       resource: s3
+       mode:
+         type: schedule
+         role: arn:aws:iam::{account_id}:role/some-role
+         schedule: "rate(1 day)"
+         scheduler-role: arn:aws:iam::{account_id}:role/some-scheduler-role
+         timezone: Asia/Seoul
+         group-name: MySchedGroup
+         start-date: "2024-04-04T00:05:23"
+
+Note:
+
+When switching from `periodic` mode to `schedule` mode for a policy that is already deployed,
+the `custodian run` command will not remove the old EventBridge Rule. The same is true when
+switching from `schedule` to `periodic`. The `custodian run` command cannot know what used to
+be in a policy file, only what is there now.
+
+Instead of deleting rules and schedules manually, `tools/ops/mugc.py` deletes any function in
+an AWS account that doesn't exist in a set of policy files, including rules and schedules.
+Comment out the policy in your policy file and run `mugc.py`. This will delete the existing policy
+Lambda function as well as any rules or schedules. Then remove the comments and redeploy with
+`custodian run` as normal.
 
 Event Pattern Filtering
 +++++++++++++++++++++++

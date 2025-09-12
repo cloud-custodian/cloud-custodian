@@ -1,16 +1,27 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from botocore.exceptions import ClientError
-import jmespath
 
 from c7n.actions import BaseAction
 from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter, VpcFilter
+from c7n.filters import ValueFilter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, DescribeSource, ConfigSource, TypeInfo
+from c7n.query import (
+    QueryResourceManager, DescribeSource, ConfigSource, TypeInfo, ChildResourceManager)
 from c7n.tags import universal_augment
-from c7n.utils import local_session, type_schema
+from c7n.utils import local_session, type_schema, jmespath_search
+from c7n import query
 
 from .securityhub import OtherResourcePostFinding
+
+
+class DescribeRepo(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(
+            self.manager,
+            super().augment(resources)
+        )
 
 
 @resources.register('codecommit')
@@ -27,8 +38,14 @@ class CodeRepository(QueryResourceManager):
         date = 'creationDate'
         cfn_type = 'AWS::CodeCommit::Repository'
         universal_taggable = object()
+        permissions_augment = ("codecommit:ListTagsForResource",)
 
-    def get_resources(self, ids, cache=True):
+    source_mapping = {
+        'describe': DescribeRepo,
+        'config': ConfigSource
+    }
+
+    def get_resources(self, ids, cache=True, augment=True):
         return universal_augment(self, self.augment([{'repositoryName': i} for i in ids]))
 
 
@@ -126,6 +143,16 @@ class CodeBuildProject(QueryResourceManager):
     }
 
 
+@resources.register('codebuild-credential')
+class CodeBuildSourceCredentials(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = 'codebuild'
+        enum_spec = ('list_source_credentials', 'sourceCredentialsInfos', None)
+        name = id = 'arn'
+        arn = 'arn'
+        cfn_type = 'AWS::CodeBuild::SourceCredential'
+
+
 @CodeBuildProject.filter_registry.register('subnet')
 class BuildSubnetFilter(SubnetFilter):
 
@@ -158,9 +185,9 @@ class BuildPostFinding(OtherResourcePostFinding):
                 'Type': r['environment']['type'],
                 'Certificate': r['environment'].get('certificate'),
                 'RegistryCredential': self.filter_empty({
-                    'Credential': jmespath.search(
+                    'Credential': jmespath_search(
                         'environment.registryCredential.credential', r),
-                    'CredentialProvider': jmespath.search(
+                    'CredentialProvider': jmespath_search(
                         'environment.registryCredential.credentialProvider', r)
                 }),
                 'ImagePullCredentialsType': r['environment'].get(
@@ -168,14 +195,14 @@ class BuildPostFinding(OtherResourcePostFinding):
             }),
             'ServiceRole': r['serviceRole'],
             'VpcConfig': self.filter_empty({
-                'VpcId': jmespath.search('vpcConfig.vpcId', r),
-                'Subnets': jmespath.search('vpcConfig.subnets', r),
-                'SecurityGroupIds': jmespath.search('vpcConfig.securityGroupIds', r)
+                'VpcId': jmespath_search('vpcConfig.vpcId', r),
+                'Subnets': jmespath_search('vpcConfig.subnets', r),
+                'SecurityGroupIds': jmespath_search('vpcConfig.securityGroupIds', r)
             }),
             'Source': self.filter_empty({
-                'Type': jmespath.search('source.type', r),
-                'Location': jmespath.search('source.location', r),
-                'GitCloneDepth': jmespath.search('source.gitCloneDepth', r)
+                'Type': jmespath_search('source.type', r),
+                'Location': jmespath_search('source.location', r),
+                'GitCloneDepth': jmespath_search('source.gitCloneDepth', r)
             }),
         }))
         return envelope
@@ -264,4 +291,196 @@ class DeletePipeline(BaseAction):
             try:
                 self.manager.retry(client.delete_pipeline, name=r['name'])
             except client.exceptions.PipelineNotFoundException:
+                continue
+
+
+class DescribeApplication(DescribeSource):
+
+    def augment(self, resources):
+        resources = super().augment(resources)
+        client = local_session(self.manager.session_factory).client('codedeploy')
+        for r, arn in zip(resources, self.manager.get_arns(resources)):
+            r['Tags'] = client.list_tags_for_resource(
+                ResourceArn=arn).get('Tags', [])
+        return resources
+
+
+@resources.register('codedeploy-app')
+class CodeDeployApplication(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'codedeploy'
+        enum_spec = ('list_applications', 'applications', None)
+        batch_detail_spec = (
+            'batch_get_applications', 'applicationNames',
+            None, 'applicationsInfo', None)
+        id = name = 'applicationName'
+        date = 'createTime'
+        arn_type = "application"
+        arn_separator = ":"
+        config_type = cfn_type = "AWS::CodeDeploy::Application"
+        universal_taggable = True
+
+    source_mapping = {
+        'describe': DescribeApplication,
+        'config': ConfigSource
+    }
+
+    def get_arns(self, resources):
+        return [self.generate_arn(r['applicationName']) for r in resources]
+
+
+@CodeDeployApplication.action_registry.register('delete')
+class DeleteApplication(BaseAction):
+
+    schema = type_schema('delete')
+    permissions = ('codedeploy:DeleteApplication',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('codedeploy')
+        for r in resources:
+            try:
+                self.manager.retry(client.delete_application, applicationName=r['applicationName'])
+            except (client.exceptions.InvalidApplicationNameException,
+            client.exceptions.ApplicationDoesNotExistException):
+                continue
+
+
+@resources.register('codedeploy-deployment')
+class CodeDeployDeployment(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'codedeploy'
+        enum_spec = ('list_deployments', 'deployments', {'includeOnlyStatuses': [
+            'Created', 'Queued', 'InProgress', 'Baking', 'Ready']})
+        batch_detail_spec = (
+            'batch_get_deployments', 'deploymentIds',
+            None, 'deploymentsInfo', None)
+        name = id = 'deploymentId'
+        # couldn't find a real cloudformation type
+        cfn_type = None
+        arn_type = "deploymentgroup"
+        date = 'createTime'
+        permissions_augment = ("codedeploy:ListTagsForResource",)
+
+
+class DescribeDeploymentGroup(query.ChildDescribeSource):
+
+    def get_query(self):
+        return super().get_query(capture_parent_id=True)
+
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('codedeploy')
+        results = []
+        for parent_id, group_name in resources:
+            dg = self.manager.retry(
+                client.get_deployment_group, applicationName=parent_id,
+                deploymentGroupName=group_name).get('deploymentGroupInfo')
+            results.append(dg)
+        for r in results:
+            rarn = self.manager.generate_arn(r['applicationName'] + '/' + r['deploymentGroupName'])
+            r['Tags'] = self.manager.retry(
+                client.list_tags_for_resource, ResourceArn=rarn).get('Tags')
+        return results
+
+
+@resources.register('codedeploy-group')
+class CodeDeployDeploymentGroup(ChildResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'codedeploy'
+        parent_spec = ('codedeploy-app', 'applicationName', None)
+        enum_spec = ('list_deployment_groups', 'deploymentGroups', None)
+        id = 'deploymentGroupId'
+        name = 'deploymentGroupName'
+        arn_type = "deploymentgroup"
+        config_type = cfn_type = 'AWS::CodeDeploy::DeploymentGroup'
+        arn_separator = ':'
+        permission_prefix = 'codedeploy'
+        universal_taggable = True
+
+    source_mapping = {
+        'describe-child': DescribeDeploymentGroup
+    }
+
+    def get_arns(self, resources):
+        arns = []
+        for r in resources:
+            arns.append(self.generate_arn(r['applicationName'] + '/' + r['deploymentGroupName']))
+        return arns
+
+
+@resources.register('codedeploy-config')
+class CodeDeployConfig(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'codedeploy'
+        enum_spec = ('list_deployment_configs', 'deploymentConfigsList', None)
+        detail_spec = ('get_deployment_config', 'deploymentConfigName', None,
+                       'deploymentConfigInfo')
+        id = 'deploymentConfigId'
+        name = 'deploymentConfigName'
+        arn = False
+        cfn_type = config_type = "AWS::CodeDeploy::DeploymentConfig"
+        date = 'createTime'
+        permissions_augment = ("codedeploy:GetDeploymentConfig",)
+
+
+@CodeDeployDeploymentGroup.filter_registry.register('config')
+class CodeDeployDeploymentGroupConfigFilter(ValueFilter):
+    """
+    Filter Code Deploy Groups by their Config
+
+    :example:
+
+    Get all groups where config type is Lambda
+
+        .. code-block:: yaml
+
+                policies:
+                  - name: deploy-groups-where-config-type-lambda
+                    resource: aws.codedeploy-group
+                    filters:
+                      - type: config
+                        key: computePlatform
+                        value: Lambda
+
+    """
+    schema = type_schema('config', rinherit=ValueFilter.schema)
+    permissions = ("codedeploy:GetDeploymentConfig",)
+    annotation_key = 'c7n:DeploymentConfig'
+    FetchThreshold = 10
+
+    def process(self, resources, event=None):
+        cfg = self.manager.get_resource_manager('aws.codedeploy-config')
+        if len(resources) < self.FetchThreshold:
+            configs = cfg.get_resources([r['deploymentConfigName'] for r in resources])
+        else:
+            configs = cfg.resources()
+        model = cfg.get_model()
+        by_name = {c[model.name]: c for c in configs}
+        for res in resources:
+            res[self.annotation_key] = by_name.get(res['deploymentConfigName'])
+        return super().process(resources, event)
+
+    def __call__(self, r):
+        return super().__call__(r.setdefault(self.annotation_key, None))
+
+
+@CodeDeployDeploymentGroup.action_registry.register('delete')
+class DeleteDeploymentGroup(BaseAction):
+    """Delete a deployment group tied to an application.
+    """
+
+    schema = type_schema('delete')
+    permissions = ('codedeploy:DeleteDeploymentGroup',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('codedeploy')
+        for r in resources:
+            try:
+                self.manager.retry(client.delete_deployment_group,
+                      applicationName=r['applicationName'],
+                      deploymentGroupName=r['deploymentGroupName'])
+            except client.exceptions.InvalidDeploymentGroupNameException:
                 continue

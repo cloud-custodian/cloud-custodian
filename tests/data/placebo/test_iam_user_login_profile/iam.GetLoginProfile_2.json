@@ -1,0 +1,11 @@
+{
+    "status_code": 404,
+    "data": {
+        "Error": {
+            "Type": "Sender",
+            "Code": "NoSuchEntity",
+            "Message": "Login Profile for User test-user-no-console-access cannot be found."
+        },
+        "ResponseMetadata": {}
+    }
+}

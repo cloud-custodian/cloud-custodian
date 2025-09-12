@@ -1,0 +1,241 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "oci_identity_availability_domain": {
+            "ad": {
+                "ad_number": 1,
+                "compartment_id": "ocid1.compartment.oc1..<unique_ID>",
+                "id": "ocid1.availabilitydomain.oc1..<unique_ID>",
+                "name": "NQNU:US-ASHBURN-AD-1"
+            }
+        },
+        "oci_core_default_route_table": {
+            "default_route_table": {
+                "compartment_id": "ocid1.compartment.oc1..<unique_ID>",
+                "defined_tags": {
+                    "Oracle-Tags.CreatedBy": "user@example.com",
+                    "Oracle-Tags.CreatedOn": "2023-06-15T12:30:45.179Z"
+                },
+                "display_name": "DefaultRouteTable",
+                "freeform_tags": {},
+                "id": "ocid1.routetable.oc1..<unique_ID>",
+                "manage_default_resource_id": "ocid1.routetable.oc1..<unique_ID>",
+                "route_rules": [
+                    {
+                        "cidr_block": "",
+                        "description": "",
+                        "destination": "0.0.0.0/0",
+                        "destination_type": "CIDR_BLOCK",
+                        "network_entity_id": "ocid1.internetgateway.oc1..<unique_ID>",
+                        "route_type": ""
+                    }
+                ],
+                "state": "AVAILABLE",
+                "time_created": "2023-06-15 12:30:45.39 +0000 UTC",
+                "timeouts": null
+            }
+        },
+        "oci_core_instance": {
+            "test_instance": {
+                "agent_config": [
+                    {
+                        "are_all_plugins_disabled": false,
+                        "is_management_disabled": false,
+                        "is_monitoring_disabled": false,
+                        "plugins_config": []
+                    }
+                ],
+                "async": null,
+                "availability_config": [
+                    {
+                        "is_live_migration_preferred": false,
+                        "recovery_action": "RESTORE_INSTANCE"
+                    }
+                ],
+                "availability_domain": "NQNU:US-ASHBURN-AD-1",
+                "boot_volume_id": "ocid1.bootvolume.oc1..<unique_ID>",
+                "capacity_reservation_id": null,
+                "compartment_id": "ocid1.compartment.oc1..<unique_ID>",
+                "compute_cluster_id": null,
+                "create_vnic_details": [
+                    {
+                        "assign_private_dns_record": true,
+                        "assign_public_ip": "true",
+                        "defined_tags": {
+                            "Oracle-Tags.CreatedBy": "user@example.com",
+                            "Oracle-Tags.CreatedOn": "2023-06-15T12:30:51.701Z"
+                        },
+                        "display_name": "Primaryvnic",
+                        "freeform_tags": {
+                            "Project": "CNCF"
+                        },
+                        "hostname_label": "exampleinstance0",
+                        "nsg_ids": null,
+                        "private_ip": "10.1.20.60",
+                        "skip_source_dest_check": false,
+                        "subnet_id": "ocid1.subnet.oc1..<unique_ID>",
+                        "vlan_id": ""
+                    }
+                ],
+                "dedicated_vm_host_id": null,
+                "defined_tags": {
+                    "Oracle-Tags.CreatedBy": "user@example.com",
+                    "Oracle-Tags.CreatedOn": "2023-06-15T12:30:51.532Z"
+                },
+                "display_name": "instance20230615123052",
+                "extended_metadata": null,
+                "fault_domain": "FAULT-DOMAIN-1",
+                "freeform_tags": {
+                    "Project": "CNCF"
+                },
+                "hostname_label": "exampleinstance0",
+                "id": "ocid1.instance.oc1..<unique_ID>",
+                "image": "ocid1.image.oc1..<unique_ID>",
+                "instance_options": [
+                    {
+                        "are_legacy_imds_endpoints_disabled": false
+                    }
+                ],
+                "ipxe_script": null,
+                "is_cross_numa_node": false,
+                "is_pv_encryption_in_transit_enabled": null,
+                "launch_mode": "PARAVIRTUALIZED",
+                "launch_options": [
+                    {
+                        "boot_volume_type": "PARAVIRTUALIZED",
+                        "firmware": "UEFI_64",
+                        "is_consistent_volume_naming_enabled": true,
+                        "is_pv_encryption_in_transit_enabled": false,
+                        "network_type": "PARAVIRTUALIZED",
+                        "remote_data_volume_type": "PARAVIRTUALIZED"
+                    }
+                ],
+                "metadata": null,
+                "platform_config": [],
+                "preemptible_instance_config": [],
+                "preserve_boot_volume": null,
+                "private_ip": "10.1.20.60",
+                "public_ip": "144.25.38.240",
+                "region": "iad",
+                "shape": "VM.Standard.E3.Flex",
+                "shape_config": [
+                    {
+                        "baseline_ocpu_utilization": "",
+                        "gpu_description": "",
+                        "gpus": 0,
+                        "local_disk_description": "",
+                        "local_disks": 0,
+                        "local_disks_total_size_in_gbs": 0,
+                        "max_vnic_attachments": 2,
+                        "memory_in_gbs": 1,
+                        "networking_bandwidth_in_gbps": 1,
+                        "nvmes": 0,
+                        "ocpus": 1,
+                        "processor_description": "2.25 GHz AMD EPYC\u2122 7742 (Rome)"
+                    }
+                ],
+                "source_details": [
+                    {
+                        "boot_volume_size_in_gbs": "47",
+                        "boot_volume_vpus_per_gb": "10",
+                        "kms_key_id": "",
+                        "source_id": "ocid1.image.oc1..<unique_ID>",
+                        "source_type": "image"
+                    }
+                ],
+                "state": "RUNNING",
+                "subnet_id": "ocid1.subnet.oc1..<unique_ID>",
+                "system_tags": {},
+                "time_created": "2023-06-15 12:30:52.09 +0000 UTC",
+                "time_maintenance_reboot_due": "",
+                "timeouts": {
+                    "create": "2m",
+                    "delete": null,
+                    "update": null
+                },
+                "update_operation_constraint": null
+            }
+        },
+        "oci_core_internet_gateway": {
+            "test_internet_gateway": {
+                "compartment_id": "ocid1.compartment.oc1..<unique_ID>",
+                "defined_tags": {
+                    "Oracle-Tags.CreatedBy": "user@example.com",
+                    "Oracle-Tags.CreatedOn": "2023-06-15T12:30:47.059Z"
+                },
+                "display_name": "TestInternetGateway",
+                "enabled": true,
+                "freeform_tags": {},
+                "id": "ocid1.internetgateway.oc1..<unique_ID>",
+                "route_table_id": null,
+                "state": "AVAILABLE",
+                "time_created": "2023-06-15 12:30:47.096 +0000 UTC",
+                "timeouts": null,
+                "vcn_id": "ocid1.vcn.oc1..<unique_ID>"
+            }
+        },
+        "oci_core_subnet": {
+            "test_subnet": {
+                "availability_domain": "NQNU:US-ASHBURN-AD-1",
+                "cidr_block": "10.1.20.0/24",
+                "compartment_id": "ocid1.compartment.oc1..<unique_ID>",
+                "defined_tags": {
+                    "Oracle-Tags.CreatedBy": "user@example.com",
+                    "Oracle-Tags.CreatedOn": "2023-06-15T12:30:48.399Z"
+                },
+                "dhcp_options_id": "ocid1.dhcpoptions.oc1..<unique_ID>",
+                "display_name": "TestSubnet",
+                "dns_label": "testsubnet",
+                "freeform_tags": {},
+                "id": "ocid1.subnet.oc1..<unique_ID>",
+                "ipv6cidr_block": null,
+                "ipv6cidr_blocks": [],
+                "ipv6virtual_router_ip": null,
+                "prohibit_internet_ingress": false,
+                "prohibit_public_ip_on_vnic": false,
+                "route_table_id": "ocid1.routetable.oc1..<unique_ID>",
+                "security_list_ids": [
+                    "ocid1.securitylist.oc1..<unique_ID>"
+                ],
+                "state": "AVAILABLE",
+                "subnet_domain_name": "testsubnet.testvcn.oraclevcn.com",
+                "time_created": "2023-06-15 12:30:48.48 +0000 UTC",
+                "timeouts": null,
+                "vcn_id": "ocid1.vcn.oc1..<unique_ID>",
+                "virtual_router_ip": "10.1.20.1",
+                "virtual_router_mac": "00:00:17:07:C6:A3"
+            }
+        },
+        "oci_core_vcn": {
+            "test_vcn": {
+                "byoipv6cidr_blocks": [],
+                "byoipv6cidr_details": null,
+                "cidr_block": "10.1.0.0/16",
+                "cidr_blocks": [
+                    "10.1.0.0/16"
+                ],
+                "compartment_id": "ocid1.compartment.oc1..<unique_ID>",
+                "default_dhcp_options_id": "ocid1.dhcpoptions.oc1..<unique_ID>",
+                "default_route_table_id": "ocid1.routetable.oc1..<unique_ID>",
+                "default_security_list_id": "ocid1.securitylist.oc1..<unique_ID>",
+                "defined_tags": {
+                    "Oracle-Tags.CreatedBy": "user@example.com",
+                    "Oracle-Tags.CreatedOn": "2023-06-15T12:30:45.179Z"
+                },
+                "display_name": "TestVcn",
+                "dns_label": "testvcn",
+                "freeform_tags": {},
+                "id": "ocid1.vcn.oc1..<unique_ID>",
+                "ipv6cidr_blocks": [],
+                "ipv6private_cidr_blocks": [],
+                "is_ipv6enabled": false,
+                "is_oracle_gua_allocation_enabled": null,
+                "state": "AVAILABLE",
+                "time_created": "2023-06-15 12:30:45.39 +0000 UTC",
+                "timeouts": null,
+                "vcn_domain_name": "testvcn.oraclevcn.com"
+            }
+        }
+    }
+}

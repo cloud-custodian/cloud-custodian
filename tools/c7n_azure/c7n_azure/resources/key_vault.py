@@ -95,7 +95,7 @@ class KeyVault(ArmResourceManager):
 
         service = 'azure.mgmt.keyvault'
         client = 'KeyVaultManagementClient'
-        enum_spec = ('vaults', 'list', None)
+        enum_spec = ('vaults', 'list_by_subscription', None)
         resource_type = 'Microsoft.KeyVault/vaults'
 
 
@@ -318,7 +318,7 @@ class KeyVaultUpdateAccessPolicyAction(AzureBaseAction):
                 resource_group_name=resource['resourceGroup'],
                 vault_name=resource['name'],
                 operation_kind=operation,
-                properties=access_policies
+                parameters=dict(properties=access_policies),
             )
         except Exception as error:
             log.warning(error)

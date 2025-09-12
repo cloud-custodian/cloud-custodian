@@ -11,7 +11,7 @@ class CdnTest(BaseTest):
         with self.sign_out_patch():
             p = self.load_policy({
                 'name': 'test-azure-cdn',
-                'resource': 'azure.cdnprofile'
+                'resource': 'azure.cdnprofile',
             }, validate=True)
             self.assertTrue(p)
 
@@ -29,3 +29,15 @@ class CdnTest(BaseTest):
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_cdn_waf(self):
+        p = self.load_policy({
+            'name': 'test-waf-not-enabled',
+            'resource': 'azure.cdnprofile',
+            'filters': [
+                {'type': 'waf',
+                 'state': 'Disabled'}
+            ]
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 2)

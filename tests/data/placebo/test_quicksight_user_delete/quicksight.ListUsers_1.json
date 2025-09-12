@@ -1,0 +1,19 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Status": 200,
+        "UserList": [
+            {
+                "Arn": "arn:aws:quicksight:us-east-1:644160558196:user/default/Jerry",
+                "UserName": "Jerry",
+                "Email": "policyfoundry@capitalone.com",
+                "Role": "READER",
+                "IdentityType": "IAM",
+                "Active": true,
+                "PrincipalId": "federated/iam/AIDAZL6XWCR2GMVVY4IYC"
+            }
+        ],
+        "RequestId": "952dbb33-a2f0-434f-a552-0dcb87fe51b9"
+    }
+}

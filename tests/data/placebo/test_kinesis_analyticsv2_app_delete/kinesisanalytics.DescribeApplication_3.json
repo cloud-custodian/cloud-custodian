@@ -1,0 +1,82 @@
+{
+    "status_code": 200,
+    "data": {
+        "ApplicationDetail": {
+            "ApplicationARN": "arn:aws:kinesisanalytics:us-east-1:644160558196:application/test2",
+            "ApplicationName": "test2",
+            "RuntimeEnvironment": "FLINK-1_8",
+            "ServiceExecutionRole": "arn:aws:iam::644160558196:role/service-role/kinesis-analytics-test2-us-east-1",
+            "ApplicationStatus": "DELETING",
+            "ApplicationVersionId": 3,
+            "CreateTimestamp": {
+                "__class__": "datetime",
+                "year": 2020,
+                "month": 8,
+                "day": 18,
+                "hour": 12,
+                "minute": 58,
+                "second": 47,
+                "microsecond": 0
+            },
+            "LastUpdateTimestamp": {
+                "__class__": "datetime",
+                "year": 2021,
+                "month": 5,
+                "day": 18,
+                "hour": 0,
+                "minute": 55,
+                "second": 30,
+                "microsecond": 0
+            },
+            "ApplicationConfigurationDescription": {
+                "ApplicationCodeConfigurationDescription": {
+                    "CodeContentType": "ZIPFILE",
+                    "CodeContentDescription": {
+                        "CodeMD5": "c4031c4997af1d0a77ac5623c3c0ee4e",
+                        "CodeSize": 22218709,
+                        "S3ApplicationCodeLocationDescription": {
+                            "BucketARN": "arn:aws:s3:::repela",
+                            "FileKey": "kd.jar"
+                        }
+                    }
+                },
+                "FlinkApplicationConfigurationDescription": {
+                    "CheckpointConfigurationDescription": {
+                        "ConfigurationType": "DEFAULT",
+                        "CheckpointingEnabled": true,
+                        "CheckpointInterval": 60000,
+                        "MinPauseBetweenCheckpoints": 5000
+                    },
+                    "MonitoringConfigurationDescription": {
+                        "ConfigurationType": "DEFAULT",
+                        "MetricsLevel": "APPLICATION",
+                        "LogLevel": "INFO"
+                    },
+                    "ParallelismConfigurationDescription": {
+                        "ConfigurationType": "DEFAULT",
+                        "Parallelism": 1,
+                        "ParallelismPerKPU": 1,
+                        "CurrentParallelism": 1,
+                        "AutoScalingEnabled": true
+                    }
+                },
+                "ApplicationSnapshotConfigurationDescription": {
+                    "SnapshotsEnabled": true
+                },
+                "VpcConfigurationDescriptions": [
+                    {
+                        "VpcConfigurationId": "3.1",
+                        "VpcId": "vpc-0a59f94e3fca9fbc0",
+                        "SubnetIds": [
+                            "subnet-05b58b4afe5124322"
+                        ],
+                        "SecurityGroupIds": [
+                            "sg-05b111f88a2aefa2c"
+                        ]
+                    }
+                ]
+            }
+        },
+        "ResponseMetadata": {}
+    }
+}

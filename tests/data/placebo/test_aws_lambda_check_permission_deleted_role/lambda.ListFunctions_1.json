@@ -1,0 +1,27 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Functions": [
+            {
+                "FunctionName": "c7n_test_check_permissions",
+                "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:c7n_test_check_permissions",
+                "Runtime": "python3.8",
+                "Role": "arn:aws:iam::644160558196:role/c7n_test_check_permissions",
+                "Handler": "handler.lambda_handler",
+                "CodeSize": 206,
+                "Description": "",
+                "Timeout": 3,
+                "MemorySize": 128,
+                "LastModified": "2021-11-08T04:25:52.895+0000",
+                "CodeSha256": "lD/UayWBQclNCPtLONanF0NsCwgfVii9QazqWgmwtIE=",
+                "Version": "$LATEST",
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                },
+                "RevisionId": "3c2e0fdd-07af-41c1-bd10-df309dadd446",
+                "PackageType": "Zip"
+            }
+        ]
+    }
+}

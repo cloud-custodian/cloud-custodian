@@ -1,0 +1,17 @@
+{
+    "status_code": 200,
+    "data": {
+        "OptionGroupsList": [
+            {
+                "OptionGroupName": "default:mysql-8-0",
+                "OptionGroupDescription": "Default option group for mysql 8.0",
+                "EngineName": "mysql",
+                "MajorEngineVersion": "8.0",
+                "Options": [],
+                "AllowsVpcAndNonVpcInstanceMemberships": true,
+                "OptionGroupArn": "arn:aws:rds:us-west-2:644160558196:og:default:mysql-8-0"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

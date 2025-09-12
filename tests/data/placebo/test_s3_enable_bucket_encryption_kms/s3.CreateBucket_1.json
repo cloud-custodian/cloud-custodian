@@ -1,20 +1,7 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
-        "Location": "/custodian-enable-bucket-encryption-kms", 
-        "ResponseMetadata": {
-            "HTTPStatusCode": 200, 
-            "RetryAttempts": 0, 
-            "HostId": "mHcXQFRxgdZUqZiOYtB6IhSUcYq21V/YbEikO6fLfZSwh9EzBQPn2x05xJmUCt/Bc5WcJ8hqkFE=", 
-            "RequestId": "3BB3A03E123B547C", 
-            "HTTPHeaders": {
-                "content-length": "0", 
-                "x-amz-id-2": "mHcXQFRxgdZUqZiOYtB6IhSUcYq21V/YbEikO6fLfZSwh9EzBQPn2x05xJmUCt/Bc5WcJ8hqkFE=", 
-                "server": "AmazonS3", 
-                "x-amz-request-id": "3BB3A03E123B547C", 
-                "location": "/custodian-enable-bucket-encryption-kms", 
-                "date": "Wed, 15 Nov 2017 16:15:51 GMT"
-            }
-        }
+        "ResponseMetadata": {},
+        "Location": "/custodian-enable-bucket-encryption-kms"
     }
 }

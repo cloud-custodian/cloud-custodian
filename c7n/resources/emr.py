@@ -3,15 +3,15 @@
 import logging
 import time
 import json
-import jmespath
 
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.exceptions import PolicyValidationError
-from c7n.filters import FilterRegistry, MetricsFilter
+from c7n.filters import FilterRegistry, MetricsFilter, ValueFilter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, TypeInfo
+from c7n.query import QueryResourceManager, TypeInfo, ConfigSource, DescribeSource
+from c7n.tags import universal_augment
 from c7n.utils import (
-    local_session, type_schema, get_retry)
+    local_session, type_schema, get_retry, jmespath_search)
 from c7n.tags import (
     TagDelayedAction, RemoveTag, TagActionFilter, Tag)
 import c7n.filters.vpc as net_filters
@@ -32,8 +32,8 @@ class EMRCluster(QueryResourceManager):
         service = 'emr'
         arn_type = 'emr'
         permission_prefix = 'elasticmapreduce'
-        cluster_states = ['WAITING', 'BOOTSTRAPPING', 'RUNNING', 'STARTING']
-        enum_spec = ('list_clusters', 'Clusters', {'ClusterStates': cluster_states})
+        default_cluster_states = ['WAITING', 'BOOTSTRAPPING', 'RUNNING', 'STARTING']
+        enum_spec = ('list_clusters', 'Clusters', None)
         name = 'Name'
         id = 'Id'
         date = "Status.Timeline.CreationDateTime"
@@ -46,9 +46,7 @@ class EMRCluster(QueryResourceManager):
     def __init__(self, ctx, data):
         super(EMRCluster, self).__init__(ctx, data)
         self.queries = QueryFilter.parse(
-            self.data.get('query', [
-                {'ClusterStates': [
-                    'running', 'bootstrapping', 'waiting']}]))
+            self.data.get('query', []))
 
     @classmethod
     def get_permissions(cls):
@@ -91,7 +89,7 @@ class EMRCluster(QueryResourceManager):
             result.append(
                 {
                     'Name': 'ClusterStates',
-                    'Values': ['WAITING', 'RUNNING', 'BOOTSTRAPPING'],
+                    'Values': self.resource_type.default_cluster_states
                 }
             )
         return result
@@ -297,7 +295,7 @@ class SecurityGroupFilter(net_filters.SecurityGroupFilter):
         sg_ids = set()
         for r in resources:
             for exp in self.expressions:
-                ids = jmespath.search(exp, r)
+                ids = jmespath_search(exp, r)
                 if isinstance(ids, list):
                     sg_ids.update(tuple(ids))
                 elif isinstance(ids, str):
@@ -306,6 +304,45 @@ class SecurityGroupFilter(net_filters.SecurityGroupFilter):
 
 
 filters.register('network-location', net_filters.NetworkLocation)
+
+
+@filters.register('security-configuration')
+class EMRSecurityConfigurationFilter(ValueFilter):
+    """Filter for annotate security configuration and
+       filter based on its attributes.
+
+    :example:
+
+    .. code-block:: yaml
+
+      policies:
+        - name: emr-security-configuration
+          resource: emr
+          filters:
+            - type: security-configuration
+              key: EnableAtRestEncryption
+              value: true
+
+    """
+    annotation_key = 'c7n:SecurityConfiguration'
+    permissions = ("elasticmapreduce:ListSecurityConfigurations",
+                   "elasticmapreduce:DescribeSecurityConfiguration",)
+    schema = type_schema('security-configuration', rinherit=ValueFilter.schema)
+    schema_alias = False
+
+    def process(self, resources, event=None):
+        results = []
+        emr_sec_cfgs = {
+            cfg['Name']: cfg for cfg in self.manager.get_resource_manager(
+                'emr-security-configuration').resources()}
+        for r in resources:
+            if 'SecurityConfiguration' not in r:
+                continue
+            cfg = emr_sec_cfgs.get(r['SecurityConfiguration'], {}).get('SecurityConfiguration', {})
+            if self.match(cfg):
+                r[self.annotation_key] = cfg
+                results.append(r)
+        return results
 
 
 @resources.register('emr-security-configuration')
@@ -344,4 +381,115 @@ class DeleteEMRSecurityConfiguration(BaseAction):
             try:
                 client.delete_security_configuration(Name=r['Name'])
             except client.exceptions.EntityNotFoundException:
+                continue
+
+
+class DescribeEMRServerlessApp(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(
+            self.manager,
+            super().augment(resources))
+
+
+@resources.register('emr-serverless-app')
+class EMRServerless(QueryResourceManager):
+    """Resource manager for Elastic MapReduce Serverless Application
+    """
+
+    class resource_type(TypeInfo):
+        service = 'emr-serverless'
+        enum_spec = ('list_applications', 'applications', None)
+        arn = 'arn'
+        arn_type = '/applications'
+        name = 'name'
+        id = 'id'
+        date = "createdAt"
+        cfn_type = 'AWS::EMRServerless::Application'
+
+    source_mapping = {
+        'describe': DescribeEMRServerlessApp,
+        'config': ConfigSource
+    }
+
+
+EMRServerless.action_registry.register('mark-for-op', TagDelayedAction)
+EMRServerless.filter_registry.register('marked-for-op', TagActionFilter)
+
+
+@EMRServerless.action_registry.register('tag')
+class EMRServerlessTag(Tag):
+    """Action to create tag(s) on EMR-Serverless
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: tag-emr-serverless
+                resource: emr-serverless-app
+                filters:
+                  - "tag:target-tag": absent
+                actions:
+                  - type: tag
+                    key: target-tag
+                    value: target-tag-value
+    """
+
+    permissions = ('emr-serverless:TagResource',)
+
+    def process_resource_set(self, client, resource_set, tags):
+        Tags = {r['Key']: r['Value'] for r in tags}
+        for r in resource_set:
+            client.tag_resource(resourceArn=r['arn'], tags=Tags)
+
+
+@EMRServerless.action_registry.register("remove-tag")
+class EMRServerlessRemoveTag(RemoveTag):
+    """Action to create tag(s) on EMR-Serverless
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: untag-emr-serverless
+                resource: emr-serverless-app
+                filters:
+                  - "tag:target-tag": present
+                actions:
+                  - type: remove-tag
+                    tags: ["target-tag"]
+    """
+    permissions = ('emr-serverless:UntagResource',)
+
+    def process_resource_set(self, client, resource_set, tags):
+        for r in resource_set:
+            client.untag_resource(resourceArn=r['arn'], tagKeys=tags)
+
+
+@EMRServerless.action_registry.register("delete")
+class EMRServerlessDelete(BaseAction):
+    """Deletes an EMRServerless application
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: delete-emr-serverless-app
+                resource: emr-serverless-app
+                actions:
+                  - type: delete
+    """
+    schema = type_schema('delete')
+    permissions = ('emr-serverless:DeleteApplication',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('emr-serverless')
+        for r in resources:
+            try:
+                client.delete_application(
+                    applicationId=r['id']
+                )
+            except client.exceptions.ResourceNotFoundException:
                 continue

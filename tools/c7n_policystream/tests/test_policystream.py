@@ -26,6 +26,9 @@ email = "policyauthor@example.com"
 name = "WatchFolk"
 """
 
+if os.name == 'nt':
+    pytest.skip('policystream not supported on windows', allow_module_level=True)
+
 
 class GitRepo:
 
@@ -33,8 +36,11 @@ class GitRepo:
         self.repo_path = repo_path
         self.git_config = git_config or DEFAULT_CONFIG
 
+    def _run(self, cmd, **kw):
+        return subprocess.check_call(cmd, cwd=self.repo_path, **kw)
+
     def init(self):
-        subprocess.check_output(['git', 'init'], cwd=self.repo_path)
+        self._run(['git', 'init', '--initial-branch', 'main'])
         with open(os.path.join(self.repo_path, '.git', 'config'), 'w') as fh:
             fh.write(self.git_config)
 
@@ -53,16 +59,16 @@ class GitRepo:
                 fh.write(content)
 
         if not exists:
-            subprocess.check_output(['git', 'add', path], cwd=self.repo_path)
+            self._run(['git', 'add', path])
 
     def rm(self, path):
-        os.remove(os.path.join(self.repo_path, path))
+        self._run(['git', 'rm', path])
 
     def repo(self):
         return pygit2.Repository(os.path.join(self.repo_path, '.git'))
 
     def move(self, src, tgt):
-        subprocess.check_output(['git', 'mv', src, tgt], cwd=self.repo_path)
+        self._run(['git', 'mv', src, tgt])
 
     def commit(self, msg, author=None, email=None):
         env = {}
@@ -70,17 +76,14 @@ class GitRepo:
             env['GIT_AUTHOR_NAME'] = author
         if email:
             env['GIT_AUTHOR_EMAIL'] = email
-
-        subprocess.check_output(
-            ['git', 'commit', '-am', msg],
-            cwd=self.repo_path, env=env)
+        self._run(['git', 'commit', '-am', msg], env=env)
 
     def checkout(self, branch, create=True):
         args = ['git', 'checkout']
         if create:
             args.append('-b')
         args.append(branch)
-        subprocess.check_output(args, cwd=self.repo_path)
+        self._run(args)
 
 
 @pytest.mark.skipif(pygit2 is None, reason="pygit2 not installed")
@@ -107,12 +110,12 @@ class StreamTest(TestUtils):
         git.commit('switch')
         return git
 
-    def test_cli_diff_master(self):
+    def test_cli_diff_main(self):
         git = self.setup_basic_repo()
         runner = CliRunner()
         result = runner.invoke(
             policystream.cli,
-            ['diff', '-r', git.repo_path])
+            ['diff', '-r', git.repo_path, '--source', 'HEAD^', '--target', 'main'])
         self.assertEqual(result.exit_code, 0)
         self.assertEqual(
             yaml.safe_load(result.stdout),
@@ -132,7 +135,7 @@ class StreamTest(TestUtils):
         runner = CliRunner()
         result = runner.invoke(
             policystream.cli,
-            ['diff', '-r', git.repo_path])
+            ['diff', '-r', git.repo_path, '--source', 'main'])
         self.assertEqual(result.exit_code, 0)
         self.assertEqual(
             yaml.safe_load(result.stdout),
@@ -280,3 +283,18 @@ class StreamTest(TestUtils):
              ('add', 'lambda-check', 'switch'),
              ('add', 'ec2-check', 'new file'),
              ('moved', 'lambda-check', 'move policy')])
+
+
+@pytest.mark.skipif(pygit2 is None, reason="pygit2 not installed")
+def test_path_matcher():
+    for p, result in (
+            ('foo/bar.yml', True),
+            ('foo/bar.json', False),
+            ('zoo/rabbit.yaml', True),
+    ):
+        assert policystream.policy_path_matcher(p) is result
+
+    for p, patterns, result in (
+            ('foo/bar.yml', ('dir/*.yaml',), False),
+            ('foo/bar.json', ('foo/*.json',), True)):
+        assert policystream.policy_path_matcher(p, patterns) is result

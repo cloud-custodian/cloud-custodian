@@ -1,0 +1,41 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Functions": [
+            {
+                "FunctionName": "cloud-custodian-memory-resize-test",
+                "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:cloud-custodian-memory-resize-test",
+                "Runtime": "nodejs22.x",
+                "Role": "arn:aws:iam::644160558196:role/service-role/cloud-custodian-memory-resize-test-role-fmaa8afs",
+                "Handler": "index.handler",
+                "CodeSize": 295,
+                "Description": "",
+                "Timeout": 3,
+                "MemorySize": 256,
+                "LastModified": "2025-04-13T11:00:35.000+0000",
+                "CodeSha256": "q8E7Nexf5xxhKT9/d4bGpAYOXJYFAUjJ0UDj8OivK8E=",
+                "Version": "$LATEST",
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                },
+                "RevisionId": "60baef52-5cfb-43e4-9b80-39096d1ed184",
+                "PackageType": "Zip",
+                "Architectures": [
+                    "x86_64"
+                ],
+                "EphemeralStorage": {
+                    "Size": 512
+                },
+                "SnapStart": {
+                    "ApplyOn": "None",
+                    "OptimizationStatus": "Off"
+                },
+                "LoggingConfig": {
+                    "LogFormat": "Text",
+                    "LogGroup": "/aws/lambda/cloud-custodian-memory-resize-test"
+                }
+            }
+        ]
+    }
+}

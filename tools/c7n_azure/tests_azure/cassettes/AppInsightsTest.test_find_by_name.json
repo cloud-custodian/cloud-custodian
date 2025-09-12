@@ -1,0 +1,80 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Insights/components?api-version=2015-05-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "request-context": [
+                        "appId=cid-v1:60b64f55-e716-48c8-8b96-83eb9c6a7a9b"
+                    ],
+                    "access-control-expose-headers": [
+                        "Request-Context"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Wed, 16 Aug 2023 21:42:53 GMT"
+                    ],
+                    "content-length": [
+                        "1629"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-gwmwtlsh/providers/microsoft.insights/components/cfb-gwmwtlsh-appinsights",
+                                "name": "cfb-gwmwtlsh-appinsights",
+                                "type": "microsoft.insights/components",
+                                "location": "centralus",
+                                "tags": {
+                                    "product_id": "13742"
+                                },
+                                "kind": "web",
+                                "etag": "\"3b0021f4-0000-0300-0000-64dd3f770000\"",
+                                "properties": {
+                                    "ApplicationId": "cfb-gwmwtlsh-appinsights",
+                                    "AppId": "5247c401-8825-44ef-9454-d1e1155cafc9",
+                                    "Application_Type": "web",
+                                    "Flow_Type": null,
+                                    "Request_Source": null,
+                                    "InstrumentationKey": "00000000-0000-0000-0000-000000000004",
+                                    "ConnectionString": "InstrumentationKey=2ce5bd10-b3d0-4956-ac7f-a86a5864ee64;IngestionEndpoint=https://centralus-0.in.applicationinsights.azure.com/;LiveEndpoint=https://centralus.livediagnostics.monitor.azure.com/",
+                                    "Name": "cfb-gwmwtlsh-appinsights",
+                                    "CreationDate": "2023-08-16T21:28:09.9676139+00:00",
+                                    "TenantId": "00000000-0000-0000-0000-000000000003",
+                                    "provisioningState": "Succeeded",
+                                    "SamplingPercentage": 100.0,
+                                    "RetentionInDays": 90,
+                                    "Retention": "P90D",
+                                    "DisableIpMasking": false,
+                                    "IngestionMode": "ApplicationInsights",
+                                    "publicNetworkAccessForIngestion": "Enabled",
+                                    "publicNetworkAccessForQuery": "Enabled",
+                                    "DisableLocalAuth": false,
+                                    "ForceCustomerStorageForProfiler": false,
+                                    "Ver": "v2"
+                                }
+                            }
+                        ],
+                        "nextLink": null
+                    }
+                }
+            }
+        }
+    ]
+}

@@ -1,0 +1,107 @@
+interactions:
+- request:
+    body: '{"LoadBalancerIds": ["lb-n6g4mc26"], "Offset": 0, "Limit": 20}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '62'
+      Content-Type:
+      - application/json
+      Host:
+      - clb.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - DescribeLoadBalancers
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2018-03-17'
+    method: POST
+    uri: https://clb.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response": {"TotalCount": 1, "LoadBalancerSet": [{"LoadBalancerId":
+        "lb-n6g4mc26", "LoadBalancerName": "cls-57vn5lu8_grafana-00004abbf1fa-grafana-4gohjl7g",
+        "Forward": 1, "Domain": "", "LoadBalancerVips": ["172.22.32.16"], "AddressIPv6":
+        null, "AddressIPVersion": "ipv4", "IPv6Mode": null, "LoadBalancerType": "INTERNAL",
+        "Status": 1, "CreateTime": "2022-01-20 10:34:23", "StatusTime": "2022-01-20
+        10:34:38", "ProjectId": 0, "OpenBgp": 0, "Snat": false, "Isolation": 0, "Log":
+        "", "AnycastZone": "", "VpcId": "vpc-3aajxqgr", "NumericalVpcId": 830620,
+        "TargetRegionInfo": {"Region": "ap-singapore", "VpcId": "vpc-3aajxqgr"}, "SubnetId":
+        "subnet-1miim8ks", "SecureGroups": [], "Tags": [{"TagKey": "tke-name", "TagValue":
+        "grafana-00004abbf1fa-grafana-4gohjl7g/grafana-4gohjl7g-grafana"}, {"TagKey":
+        "tke-clusterId", "TagValue": "cls-57vn5lu8"}, {"TagKey": "tke-created", "TagValue":
+        "yes"}, {"TagKey": "tke-kind", "TagValue": "service"}], "MasterZone": null,
+        "BackupZoneSet": null, "IsolatedTime": null, "ExpireTime": "2022-02-20 10:34:23",
+        "ChargeType": "POSTPAID_BY_HOUR", "NetworkAttributes": {"InternetChargeType":
+        "TRAFFIC_POSTPAID_BY_HOUR", "InternetMaxBandwidthOut": 0, "BandwidthpkgSubType":
+        null}, "PrepaidAttributes": null, "ExtraInfo": null, "LogSetId": "", "LogTopicId":
+        "", "LoadBalancerPassToTarget": false, "IsDDos": false, "ConfigId": "", "ExclusiveCluster":
+        {}, "SnatPro": false, "SnatIps": [], "IsBlock": false, "IsBlockTime": "",
+        "SlaType": "", "ClusterTag": null, "LocalBgp": false, "MixIpTarget": false,
+        "Zones": null, "NfvInfo": "", "HealthLogSetId": "", "HealthLogTopicId": "",
+        "ClusterIds": null, "AttributeFlags": [], "VipIsp": "INTERNAL"}], "RequestId":
+        "d87fb8e4-76b8-4ed1-9126-ad35c3740dba"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1720'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 29 Sep 2022 12:51:37 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"ResourceList": ["qcs::clb:ap-singapore:uin/100000750436:clb/lb-n6g4mc26"]}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '76'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetResources
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"","ResourceTagMappingList":[{"Resource":"qcs::clb:ap-singapore:uin\/100000750436:clb\/lb-n6g4mc26","Tags":[{"TagKey":"tke-created","TagValue":"yes"},{"TagKey":"tke-name","TagValue":"grafana-00004abbf1fa-grafana-4gohjl7g\/grafana-4gohjl7g-grafana"},{"TagKey":"tke-kind","TagValue":"service"},{"TagKey":"tke-clusterId","TagValue":"cls-57vn5lu8"}]}],"RequestId":"8ff43754-adfd-4e0e-9a64-8e8ae92c425d"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '431'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 29 Sep 2022 12:51:41 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+version: 1

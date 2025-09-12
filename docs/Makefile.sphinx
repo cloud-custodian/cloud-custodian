@@ -10,10 +10,9 @@ SPHINXBINS    ?= .tox/$(VIRTUALENV)/bin
 SRCDIR        ?= docs/source
 SPHINXOPTS    ?=
 #SPHINXBUILD   ?= $(SPHINXBINS)/sphinx-build
-# use for poetry environments
 SPHINXBUILD   ?= sphinx-build
 PAPER         ?=
-BUILDDIR      ?= $(SRCDIR)/../build
+BUILDDIR      ?= docs/build
 
 # User-friendly check for sphinx-build
 ifeq ($(shell which $(SPHINXBUILD) >/dev/null 2>&1; echo $$?), 1)
@@ -59,6 +58,12 @@ help:
 clean:
 	rm -rf $(BUILDDIR)/*
 	rm -rf $(SRCDIR)/generated
+	rm -f $(SRCDIR)/aws/resources/*
+	rm -f $(SRCDIR)/gcp/resources/*
+	rm -f $(SRCDIR)/azure/resources/*
+	rm -f $(SRCDIR)/oci/resources/*
+#	rm -f $(SRCDIR)/awscc/resources/*
+	rm -f $(SRCDIR)/tools/*.md
 
 html:
 #	$(SPHINXBINS)/sphinx-apidoc -H "AWS" -o $(SRCDIR)/generated/aws $(SRCDIR)/../../c7n $(SRCDIR)/../../tests $(SRCDIR)/../../c7n/ipaddress.py
@@ -75,35 +80,23 @@ html:
 	cp -p tools/c7n_mailer/README.md $(SRCDIR)/tools/c7n-mailer.md
 	cp -p tools/c7n_trailcreator/readme.md $(SRCDIR)/tools/c7n-trailcreator.md
 	cp -p tools/c7n_guardian/readme.md $(SRCDIR)/tools/c7n-guardian.md
-	cp -p tools/omnissm/README.md $(SRCDIR)/tools/omnissm.md
-	cp -p tools/omnissm/assets/omnissm.svg $(SRCDIR)/tools/assets/omnissm.svg
 	cp -p tools/c7n_salactus/README.md $(SRCDIR)/tools/c7n-salactus.md
 	cp -p tools/c7n_logexporter/README.md $(SRCDIR)/tools/c7n-logexporter.md
-
+	cp -p tools/c7n_left/README.md $(SRCDIR)/tools/c7n-left.md
+	cp -p tools/c7n_kube/readme.md $(SRCDIR)/tools/c7n-kube.md
 	mkdir -p $(SRCDIR)/aws/resources
 	c7n-sphinxext --provider aws --output-dir $(SRCDIR)/aws/resources --group-by=resource_type.service
 	mkdir -p $(SRCDIR)/gcp/resources
 	c7n-sphinxext --provider gcp --output-dir $(SRCDIR)/gcp/resources --group-by=resource_type.service
 	mkdir -p $(SRCDIR)/azure/resources
 	c7n-sphinxext --provider azure --output-dir $(SRCDIR)/azure/resources --group-by=resource_type.doc_groups
-	$(SPHINXBUILD) -W -j auto -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
+	mkdir -p $(SRCDIR)/tencentcloud/resources
+	cp -p tools/c7n_tencentcloud/readme.md $(SRCDIR)/tencentcloud/gettingstarted.md
+	c7n-sphinxext --provider tencentcloud --output-dir $(SRCDIR)/tencentcloud/resources --group-by=resource_type.service
+	mkdir -p $(SRCDIR)/oci/resources
+	c7n-sphinxext --provider oci --output-dir $(SRCDIR)/oci/resources --group-by=resource_type.doc_groups
 
-#
-# Remove the copies so folks dont accidentally edit the copy
-#	rm $(SRCDIR)/tools/c7n-org.md
-#	rm $(SRCDIR)/tools/c7n-policystream.md
-#	rm $(SRCDIR)/tools/c7n-mailer.md
-#	rm $(SRCDIR)/tools/c7n-trailcreator.md
-#	rm $(SRCDIR)/tools/omnissm.md
-#	rm $(SRCDIR)/tools/c7n-salactus.md
-#	rm $(SRCDIR)/tools/c7n-logexporter.md
-#	rm $(SRCDIR)/tools/c7n-guardian.md
-#	rm $(SRCDIR)/tools/cask.md
-#	rm -R $(SRCDIR)/tools/assets
-#	rm $(SRCDIR)/aws/resources/*rst
-#	rm $(SRCDIR)/azure/resources/*rst
-#	rm $(SRCDIR)/gcp/resources/*rst
-
+	$(SPHINXBUILD) -W --keep-going -v -j auto -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."

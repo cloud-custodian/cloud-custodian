@@ -1,0 +1,46 @@
+{
+    "status_code": 200,
+    "data": {
+        "PiiEntitiesDetectionJobPropertiesList": [
+            {
+                "JobId": "9768d723bc784fd1edec725335cdcb4a",
+                "JobArn": "arn:aws:comprehend:us-east-1:644160558196:pii-entities-detection-job/9768d723bc784fd1edec725335cdcb4a",
+                "JobName": "PIIJob",
+                "JobStatus": "FAILED",
+                "Message": "NO_WRITE_ACCESS_TO_OUTPUT: The provided data access role does not have write access to the output S3 URI or it does not have access to the output S3 KMS Key.",
+                "SubmitTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 7,
+                    "day": 8,
+                    "hour": 14,
+                    "minute": 53,
+                    "second": 24,
+                    "microsecond": 871000
+                },
+                "EndTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 7,
+                    "day": 8,
+                    "hour": 14,
+                    "minute": 53,
+                    "second": 39,
+                    "microsecond": 375000
+                },
+                "InputDataConfig": {
+                    "S3Uri": "s3://c7n-test-s3-bucket/PII.txt",
+                    "InputFormat": "ONE_DOC_PER_LINE"
+                },
+                "OutputDataConfig": {
+                    "S3Uri": "s3://c7n-test-s3-bucket/644160558196-PII-9768d723bc784fd1edec725335cdcb4a/output/",
+                    "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/20a0c3ed-99ff-4b38-92e6-e489628e0bfb"
+                },
+                "LanguageCode": "en",
+                "DataAccessRoleArn": "arn:aws:iam::644160558196:role/ComprehendVpcAccessRole",
+                "Mode": "ONLY_OFFSETS"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,50 @@
+{
+    "status_code": 200,
+    "data": {
+        "DocumentIdentifiers": [
+            {
+                "Name": "Test-Document-1",
+                "Owner": "xxxxxxxxxxxx",
+                "PlatformTypes": [
+                    "Windows",
+                    "Linux",
+                    "MacOS"
+                ],
+                "DocumentVersion": "1",
+                "DocumentType": "Command",
+                "SchemaVersion": "2.2",
+                "DocumentFormat": "JSON",
+                "Tags": []
+            },
+            {
+                "Name": "Test-Document-2",
+                "Owner": "xxxxxxxxxxxx",
+                "PlatformTypes": [
+                    "Windows",
+                    "Linux",
+                    "MacOS"
+                ],
+                "DocumentVersion": "1",
+                "DocumentType": "Command",
+                "SchemaVersion": "2.2",
+                "DocumentFormat": "JSON",
+                "Tags": []
+            },
+            {
+                "Name": "Test-AWS-Document",
+                "Owner": "Amazon",
+                "PlatformTypes": [
+                    "Windows",
+                    "Linux",
+                    "MacOS"
+                ],
+                "DocumentVersion": "1",
+                "DocumentType": "Command",
+                "SchemaVersion": "2.2",
+                "DocumentFormat": "JSON",
+                "Tags": []
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

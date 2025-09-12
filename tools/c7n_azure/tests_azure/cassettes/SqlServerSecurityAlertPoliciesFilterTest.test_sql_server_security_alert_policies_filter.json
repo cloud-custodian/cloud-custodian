@@ -1,0 +1,182 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Sql/servers?api-version=2019-06-01-preview",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-length": [
+                        "960"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Fri, 09 Jul 2021 08:33:40 GMT"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "6a060960-8eb0-4002-8260-4b6fbcf39886",
+                        "f2f6a195-5f39-4d81-aded-10e429233f8b"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "kind": "v12.0",
+                                "properties": {
+                                    "administratorLogin": "user016cisads",
+                                    "version": "12.0",
+                                    "state": "Ready",
+                                    "fullyQualifiedDomainName": "server-016cisads.database.windows.net",
+                                    "privateEndpointConnections": [],
+                                    "publicNetworkAccess": "Enabled"
+                                },
+                                "location": "eastus",
+                                "tags": {
+                                    "test": "Red"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/RG-016cisads/providers/Microsoft.Sql/servers/server-016cisads",
+                                "name": "server-016cisads",
+                                "type": "Microsoft.Sql/servers"
+                            },
+                            {
+                                "kind": "v12.0",
+                                "properties": {
+                                    "administratorLogin": "custodian",
+                                    "version": "12.0",
+                                    "state": "Ready",
+                                    "fullyQualifiedDomainName": "cctestsqlserverp2fkgne6rt5vw.database.windows.net",
+                                    "privateEndpointConnections": [],
+                                    "publicNetworkAccess": "Enabled"
+                                },
+                                "location": "eastus2",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverp2fkgne6rt5vw",
+                                "name": "cctestsqlserverp2fkgne6rt5vw",
+                                "type": "Microsoft.Sql/servers"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/RG-016cisads/providers/Microsoft.Sql/servers/server-016cisads/securityAlertPolicies?api-version=2017-03-01-preview",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Fri, 09 Jul 2021 08:33:41 GMT"
+                    ],
+                    "content-length": [
+                        "464"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "properties": {
+                                    "state": "Disabled",
+                                    "disabledAlerts": [
+                                        ""
+                                    ],
+                                    "emailAddresses": [
+                                        ""
+                                    ],
+                                    "emailAccountAdmins": false,
+                                    "storageEndpoint": "",
+                                    "storageAccountAccessKey": "",
+                                    "retentionDays": 0,
+                                    "creationTime": "2021-07-09T08:17:19.253Z"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/RG-016cisads/providers/Microsoft.Sql/servers/server-016cisads/securityAlertPolicies/Default",
+                                "name": "Default",
+                                "type": "Microsoft.Sql/servers/securityAlertPolicies"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverp2fkgne6rt5vw/securityAlertPolicies?api-version=2017-03-01-preview",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Fri, 09 Jul 2021 08:33:41 GMT"
+                    ],
+                    "content-length": [
+                        "474"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "properties": {
+                                    "state": "Disabled",
+                                    "disabledAlerts": [
+                                        ""
+                                    ],
+                                    "emailAddresses": [
+                                        ""
+                                    ],
+                                    "emailAccountAdmins": false,
+                                    "storageEndpoint": "",
+                                    "storageAccountAccessKey": "",
+                                    "retentionDays": 0,
+                                    "creationTime": "0001-01-01T00:00:00Z"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverp2fkgne6rt5vw/securityAlertPolicies/Default",
+                                "name": "Default",
+                                "type": "Microsoft.Sql/servers/securityAlertPolicies"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

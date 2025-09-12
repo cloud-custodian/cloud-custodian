@@ -14,7 +14,9 @@ class DirectConnect(QueryResourceManager):
         id = 'connectionId'
         name = 'connectionName'
         filter_name = 'connectionId'
+        filter_type = 'scalar'
         arn_type = "dxcon"
         universal_taggable = object()
+        permissions_augment = ("directconnect:DescribeTags",)
 
     augment = universal_augment

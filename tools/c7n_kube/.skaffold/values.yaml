@@ -1,0 +1,46 @@
+certManager:
+  enabled: true
+
+policies:
+  source: configMap
+  configMap:
+    policies:
+      - name: missing-recommended-labels
+        mode:
+          type: k8s-admission
+          on-match: deny
+          operations:
+            - CREATE
+            - UPDATE
+        description: |
+          Kubernetes recommmended the following labels from its docs:
+          app.kubernetes.io/name
+          app.kubernetes.io/instance
+          app.kubernetes.io/version
+          app.kubernetes.io/component
+          app.kubernetes.io/part-of
+          app.kubernetes.io/managed-by
+          https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/
+        resource: k8s.pod
+        filters:
+          - or:
+              - metadata.labels."app.kubernetes.io/name": absent
+              - metadata.labels."app.kubernetes.io/instance": absent
+              - metadata.labels."app.kubernetes.io/version": absent
+              - metadata.labels."app.kubernetes.io/component": absent
+              - metadata.labels."app.kubernetes.io/part-of": absent
+              - metadata.labels."app.kubernetes.io/managed-by": absent
+
+webhook:
+  namespaceSelector:
+    matchExpressions:
+      - key: c7n-monitor
+        operator: NotIn
+        values: [ "false" ]
+
+  rules:
+    - apiGroups: [""]
+      apiVersions: ["v1"]
+      operations: ["CREATE"]
+      resources: ["pods"]
+      scope: Namespaced

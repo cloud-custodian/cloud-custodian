@@ -469,7 +469,7 @@ class AzurePolicyModeTest(BaseTest):
             event_mode.target_subscription_ids = [DEFAULT_SUBSCRIPTION_ID]
             event_mode._create_event_subscription(storage_account, 'some_queue', None)
 
-            name, args, kwargs = mock_create.mock_calls[0]
+            _, args, _ = mock_create.mock_calls[0]
 
             # verify the advanced filter created
             event_filter = args[4].advanced_filters[0]
@@ -497,7 +497,7 @@ class AzurePolicyModeTest(BaseTest):
             event_mode.target_subscription_ids = [DEFAULT_SUBSCRIPTION_ID]
             event_mode._create_event_subscription(storage_account, 'some_queue', None)
 
-            name, args, kwargs = mock_create.mock_calls[0]
+            _, args, _ = mock_create.mock_calls[0]
 
             # verify the advanced filter created
             event_filter = args[4].advanced_filters[0]
@@ -587,6 +587,26 @@ class AzurePolicyModeTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['name'], 'test_emptyrg')
         self.assertTrue(mock_delete.called)
+
+    @arm_template('emptyrg.json')
+    @cassette_name('resourcegroup')
+    def test_empty_group_container_event_no_resources(self):
+        p = self.load_policy({
+            'name': 'test-azure-resource-group',
+            'mode':
+                {'type': CONTAINER_EVENT_TRIGGER_MODE,
+                 'events': ['ResourceGroupWrite']},
+            'resource': 'azure.resourcegroup',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value': 'not-there'}]})
+
+        event = AzurePolicyModeTest.get_sample_event()
+
+        resources = p.push(event, None)
+        assert resources is None
 
     @arm_template('emptyrg.json')
     def test_empty_group_container_scheduled(self):

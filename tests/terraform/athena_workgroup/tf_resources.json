@@ -1,0 +1,152 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_athena_workgroup": {
+            "working": {
+                "arn": "arn:aws:athena:us-east-1:644160558196:workgroup/tf_testm_adapting_dane",
+                "configuration": [
+                    {
+                        "bytes_scanned_cutoff_per_query": 0,
+                        "enforce_workgroup_configuration": true,
+                        "engine_version": [
+                            {
+                                "effective_engine_version": "Athena engine version 3",
+                                "selected_engine_version": "AUTO"
+                            }
+                        ],
+                        "execution_role": "",
+                        "publish_cloudwatch_metrics_enabled": true,
+                        "requester_pays_enabled": false,
+                        "result_configuration": [
+                            {
+                                "acl_configuration": [],
+                                "encryption_configuration": [
+                                    {
+                                        "encryption_option": "SSE_KMS",
+                                        "kms_key_arn": "arn:aws:kms:us-east-1:644160558196:key/7ce1a747-8c10-48c0-b19e-ec7984023d2f"
+                                    }
+                                ],
+                                "expected_bucket_owner": "",
+                                "output_location": "s3://tf-test-perfect-beetle/output/"
+                            }
+                        ]
+                    }
+                ],
+                "description": "",
+                "force_destroy": false,
+                "id": "tf_testm_adapting_dane",
+                "name": "tf_testm_adapting_dane",
+                "state": "ENABLED",
+                "tags": {
+                    "App": "c7n-test",
+                    "Env": "Dev",
+                    "Name": "something"
+                },
+                "tags_all": {
+                    "App": "c7n-test",
+                    "Env": "Dev",
+                    "Name": "something"
+                }
+            }
+        },
+        "aws_kms_key": {
+            "encrypt": {
+                "arn": "arn:aws:kms:us-east-1:644160558196:key/7ce1a747-8c10-48c0-b19e-ec7984023d2f",
+                "bypass_policy_lockout_safety_check": false,
+                "custom_key_store_id": "",
+                "customer_master_key_spec": "SYMMETRIC_DEFAULT",
+                "deletion_window_in_days": 7,
+                "description": "Athena Workgroup KMS Key",
+                "enable_key_rotation": false,
+                "id": "7ce1a747-8c10-48c0-b19e-ec7984023d2f",
+                "is_enabled": true,
+                "key_id": "7ce1a747-8c10-48c0-b19e-ec7984023d2f",
+                "key_usage": "ENCRYPT_DECRYPT",
+                "multi_region": false,
+                "policy": "{\"Id\":\"key-default-1\",\"Statement\":[{\"Action\":\"kms:*\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::644160558196:root\"},\"Resource\":\"*\",\"Sid\":\"Enable IAM User Permissions\"}],\"Version\":\"2012-10-17\"}",
+                "rotation_period_in_days": 0,
+                "tags": null,
+                "tags_all": {},
+                "timeouts": null,
+                "xks_key_id": ""
+            }
+        },
+        "aws_s3_bucket": {
+            "results": {
+                "acceleration_status": "",
+                "acl": null,
+                "arn": "arn:aws:s3:::tf-test-perfect-beetle",
+                "bucket": "tf-test-perfect-beetle",
+                "bucket_domain_name": "tf-test-perfect-beetle.s3.amazonaws.com",
+                "bucket_prefix": "",
+                "bucket_regional_domain_name": "tf-test-perfect-beetle.s3.us-east-1.amazonaws.com",
+                "cors_rule": [],
+                "force_destroy": true,
+                "grant": [
+                    {
+                        "id": "3c0057ac95bd3056dbf6c96929a82adf24fe68ddfb75c57499ab6016e693bc65",
+                        "permissions": [
+                            "FULL_CONTROL"
+                        ],
+                        "type": "CanonicalUser",
+                        "uri": ""
+                    }
+                ],
+                "hosted_zone_id": "Z3AQBSTGFYJSTF",
+                "id": "tf-test-perfect-beetle",
+                "lifecycle_rule": [],
+                "logging": [],
+                "object_lock_configuration": [],
+                "object_lock_enabled": false,
+                "policy": "",
+                "region": "us-east-1",
+                "replication_configuration": [],
+                "request_payer": "BucketOwner",
+                "server_side_encryption_configuration": [
+                    {
+                        "rule": [
+                            {
+                                "apply_server_side_encryption_by_default": [
+                                    {
+                                        "kms_master_key_id": "",
+                                        "sse_algorithm": "AES256"
+                                    }
+                                ],
+                                "bucket_key_enabled": false
+                            }
+                        ]
+                    }
+                ],
+                "tags": null,
+                "tags_all": {},
+                "timeouts": null,
+                "versioning": [
+                    {
+                        "enabled": false,
+                        "mfa_delete": false
+                    }
+                ],
+                "website": [],
+                "website_domain": null,
+                "website_endpoint": null
+            }
+        },
+        "random_pet": {
+            "bucket": {
+                "id": "tf-test-perfect-beetle",
+                "keepers": null,
+                "length": 2,
+                "prefix": "tf-test",
+                "separator": "-"
+            },
+            "group": {
+                "id": "tf_testm_adapting_dane",
+                "keepers": null,
+                "length": 2,
+                "prefix": "tf_testm",
+                "separator": "_"
+            }
+        }
+    }
+}

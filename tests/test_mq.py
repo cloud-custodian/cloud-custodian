@@ -64,7 +64,7 @@ class MessageQueue(BaseTest):
             session_factory=session_factory
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         aliases = kms.list_aliases(KeyId=resources[0]['EncryptionOptions']['KmsKeyId'])
         self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/aws/mq')
 
@@ -105,7 +105,7 @@ class MessageQueue(BaseTest):
             session_factory=factory,
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         client = factory().client("mq")
         if self.recording:
             time.sleep(1)
@@ -134,7 +134,7 @@ class MessageQueue(BaseTest):
             session_factory=factory,
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         client = factory().client("mq")
         if self.recording:
             time.sleep(1)

@@ -1,0 +1,49 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-customization-job/cohere.command-text-v14:7:4k/eys9455tunxa",
+        "jobName": "c7n-test-14",
+        "outputModelName": "c7n-test-14",
+        "clientRequestToken": "41a58c54-0b21-4ecc-91b2-4b80376b2c62",
+        "roleArn": "arn:aws:iam::644160558196:role/AmazonBedrockExecutionRoleForAgents_c7n_test",
+        "status": "InProgress",
+        "creationTime": {
+            "__class__": "datetime",
+            "year": 2024,
+            "month": 2,
+            "day": 14,
+            "hour": 16,
+            "minute": 27,
+            "second": 33,
+            "microsecond": 963000
+        },
+        "lastModifiedTime": {
+            "__class__": "datetime",
+            "year": 2024,
+            "month": 2,
+            "day": 14,
+            "hour": 16,
+            "minute": 34,
+            "second": 50,
+            "microsecond": 108000
+        },
+        "baseModelArn": "arn:aws:bedrock:us-east-1::foundation-model/cohere.command-text-v14:7:4k",
+        "hyperParameters": {
+            "batchSize": "8",
+            "earlyStoppingPatience": "6",
+            "earlyStoppingThreshold": "0.01",
+            "epochCount": "1",
+            "evalPercentage": "20.0",
+            "learningRate": "0.005"
+        },
+        "trainingDataConfig": {
+            "s3Uri": "s3://test-bedrock-1/training/training.json"
+        },
+        "outputDataConfig": {
+            "s3Uri": "s3://test-bedrock-1"
+        },
+        "customizationType": "FINE_TUNING",
+        "validationMetrics": []
+    }
+}

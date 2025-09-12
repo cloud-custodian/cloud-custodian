@@ -1,11 +1,29 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-from .common import BaseTest
 import json
+from unittest.mock import patch
+
 from c7n.exceptions import PolicyValidationError
 from c7n.resources.aws import shape_validate
+import pytest
+from pytest_terraform import terraform
+
+from .common import BaseTest
 
 
+@pytest.fixture(scope='class')
+@terraform('elasticsearch_cross_cluster_search_connections', scope='class')
+def terraform_cross_cluster(elasticsearch_cross_cluster_search_connections, request):
+    """Wrap a pytest-terraform fixture for use with unittest
+
+    Due to the way pytest-terraform creates fixtures, it doesn't play well with unittest
+    directly. One workaround for that is to not use unittest and pytest-terraform
+    together. Another option is wrapping the fixture and using it to set a class attribute.
+    """
+    request.cls.terraform_cross_cluster = elasticsearch_cross_cluster_search_connections
+
+
+@pytest.mark.usefixtures('terraform_cross_cluster')
 class ElasticSearch(BaseTest):
 
     def test_get_resources(self):
@@ -38,6 +56,20 @@ class ElasticSearch(BaseTest):
                 "search-c7n-test-ug4l2nqtnwwrktaeagxsqso"
             )
         )
+
+    def test_elasticsearch_with_prequery_filter(self):
+        factory = self.replay_flight_data("test_elasticsearch_with_prequery_filter")
+        p = self.load_policy(
+            {
+                "name": "es-query-2",
+                "resource": "elasticsearch",
+                "query": [{"EngineType": "OpenSearch"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["DomainName"], "c7n-test-opensearch")
 
     def test_metrics_domain(self):
         factory = self.replay_flight_data("test_elasticsearch_delete")
@@ -163,6 +195,31 @@ class ElasticSearch(BaseTest):
         tags = client.list_tags(ARN=resources[0]["ARN"])["TagList"]
         self.assertEqual(len(tags), 0)
 
+    def test_deleted_domain_tag_operations(self):
+        """Expect an uninterrupted policy run, though there's nothing to do."""
+
+        session_factory = self.replay_flight_data("test_elasticsearch_deleted_domain_tag_ops")
+        p = self.load_policy(
+            {
+                "name": "manage-tags-for-deleted-es-domain",
+                "resource": "aws.elasticsearch",
+                "actions": [
+                    {"type": "tag", "key": "environment", "value": "test"},
+                    {"type": "remove-tag", "tags": ["owner"]}
+                ],
+            },
+            session_factory=session_factory,
+        )
+
+        with patch("c7n.resources.elasticsearch.ElasticSearchDomain.resources", return_value=[
+            {
+                "DomainName": "non-existent-domain",
+                "ARN": "arn:aws:es:us-east-1:644160558196:domain/non-existent-domain",
+                "Tags": {"owner": "me"}
+            },
+        ]):
+            p.run()
+
     def test_domain_mark_for_op(self):
         session_factory = self.replay_flight_data("test_elasticsearch_markforop")
         client = session_factory(region="us-east-1").client("es")
@@ -277,9 +334,145 @@ class ElasticSearch(BaseTest):
             session_factory=session_factory
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         aliases = kms.list_aliases(KeyId=resources[0]['EncryptionAtRestOptions']['KmsKeyId'])
         self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/aws/es')
+
+    def test_elasticsearch_cross_cluster_search_connections(self):
+        session_factory = self.replay_flight_data(
+            'test_elasticsearch_cross_cluster_search_connections')
+        p = self.load_policy(
+            {
+                'name': 'test-elasticsearch-cross-cluster-search-connections',
+                'resource': 'aws.elasticsearch',
+                'filters': [
+                    {
+                        'type': 'cross-cluster',
+                        'inbound':
+                        {
+                            'key': 'SourceDomainInfo.OwnerId',
+                            'value': '644160558196',
+                            'op': 'eq'
+                        },
+                        'outbound':
+                        {
+                            'key': 'SourceDomainInfo.OwnerId',
+                            'value': '644160558196',
+                            'op': 'eq'
+                        }
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        es = session_factory().client('es')
+        search_inbound_connections = es.describe_inbound_cross_cluster_search_connections()
+        self.assertEqual(search_inbound_connections['CrossClusterSearchConnections'][0]
+        ['SourceDomainInfo']['OwnerId'], '644160558196')
+        search_outbound_connections = es.describe_outbound_cross_cluster_search_connections()
+        self.assertEqual(search_outbound_connections['CrossClusterSearchConnections'][0]
+        ['SourceDomainInfo']['OwnerId'], '644160558196')
+
+    def test_elasticsearch_cross_cluster_search_connections_inbound(self):
+        session_factory = self.replay_flight_data(
+            'test_elasticsearch_cross_cluster_search_connections')
+        p = self.load_policy(
+            {
+                'name': 'test-elasticsearch-cross-cluster-search-connections',
+                'resource': 'aws.elasticsearch',
+                'filters': [
+                    {
+                        'type': 'cross-cluster',
+                        'inbound':
+                        {
+                            'key': 'SourceDomainInfo.OwnerId',
+                            'value': '644160558196',
+                            'op': 'eq'
+                        },
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['DomainName'],
+            self.terraform_cross_cluster['aws_elasticsearch_domain.inbound_connection.domain_name']
+        )
+        es = session_factory().client('es')
+        search_inbound_connections = es.describe_inbound_cross_cluster_search_connections()
+        self.assertEqual(search_inbound_connections['CrossClusterSearchConnections'][0]
+        ['SourceDomainInfo']['OwnerId'], '644160558196')
+
+    def test_elasticsearch_cross_cluster_search_connections_outbound(self):
+        session_factory = self.replay_flight_data(
+            'test_elasticsearch_cross_cluster_search_connections')
+        p = self.load_policy(
+            {
+                'name': 'test-elasticsearch-cross-cluster-search-connections',
+                'resource': 'aws.elasticsearch',
+                'filters': [
+                    {
+                        'type': 'cross-cluster',
+                        'outbound':
+                        {
+                            'key': 'SourceDomainInfo.OwnerId',
+                            'value': '644160558196',
+                            'op': 'eq'
+                        }
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['DomainName'],
+            self.terraform_cross_cluster['aws_elasticsearch_domain.outbound_connection.domain_name']
+        )
+        es = session_factory().client('es')
+        search_outbound_connections = es.describe_outbound_cross_cluster_search_connections()
+        self.assertEqual(search_outbound_connections['CrossClusterSearchConnections'][0]
+        ['SourceDomainInfo']['OwnerId'], '644160558196')
+
+    def test_elasticsearch_cross_cluster_search_connections_not_found(self):
+        session_factory = self.replay_flight_data(
+            'test_elasticsearch_cross_cluster_search_connections_not_found')
+        p = self.load_policy(
+            {
+                'name': 'test-elasticsearch-cross-cluster-search-connections',
+                'resource': 'aws.elasticsearch',
+                'filters': [
+                    {
+                        'type': 'cross-cluster',
+                        'outbound':
+                        {
+                            'key': 'DestinationDomainInfo.DomainName',
+                            'value': 'test',
+                            'op': 'eq'
+                        }
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+        es = session_factory().client('es')
+        search_outbound_connections = es.describe_outbound_cross_cluster_search_connections(
+            Filters=[
+                {
+                    'Name': 'destination-domain-info.domain-name',
+                    'Values': [
+                        'test',
+                    ]
+                },
+            ],)
+        self.assertEqual(len(search_outbound_connections["CrossClusterSearchConnections"]), 0)
 
     def test_elasticsearch_cross_account(self):
         session_factory = self.replay_flight_data("test_elasticsearch_cross_account")
@@ -353,6 +546,131 @@ class ElasticSearch(BaseTest):
                 "actions": [{"type": "remove-statements", "statement_ids": "matched"}],
             }
         )
+
+    def test_elasticsearch_has_statement(self):
+        factory = self.replay_flight_data("test_elasticsearch_has_statement")
+        p = self.load_policy(
+            {
+                "name": "elasticsearch-has-statement-deny",
+                "resource": "elasticsearch",
+                "filters": [
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Deny",
+                                "Action": "es:*",
+                                "Principal": {"AWS": "*"},
+                                "Resource": "{domain_arn}/*"
+                            }
+                        ]
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        access_policy = json.loads(resources[0]['AccessPolicies'])
+        self.assertEqual(access_policy['Statement'][0]['Effect'], 'Deny')
+        self.assertEqual(access_policy['Statement'][0]['Action'], 'es:*')
+        self.assertEqual(access_policy['Statement'][0]['Principal'], {"AWS": "*"})
+        self.assertEqual(access_policy['Statement'][0]['Resource'],
+        'arn:aws:es:us-east-1:644160558196:domain/my-test-cluster/*')
+
+    def test_elasticsearch_not_has_statement(self):
+        factory = self.replay_flight_data("test_elasticsearch_has_statement")
+        p = self.load_policy(
+            {
+                "name": "elasticsearch-has-statement-allow",
+                "resource": "elasticsearch",
+                "filters": [
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Allow",
+                                "Action": "es:*",
+                                "Principal": {"AWS": "*"},
+                                "Resource": "{domain_arn}/*"
+                            }
+                        ]
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    def test_source_ip(self):
+        factory = self.replay_flight_data("test_elasticsearch_source_ip")
+        client = factory().client("es")
+        p = self.load_policy(
+            {
+                "name": "elasticsearch-source-ip",
+                "resource": "elasticsearch",
+                "filters": [
+                    {
+                        "type": "source-ip",
+                        "op": "not-in",
+                        "value_type": "cidr",
+                        "value": ["103.15.250.0/24", "73.240.160.0/21", "106.108.40.0/21"]
+                    }
+                ],
+                "actions": [
+                    "remove-matched-source-ips"
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['c7n:MatchedSourceIps'], [{'SourceIp': '10.0.0.0/24'}])
+
+        resp = client.describe_elasticsearch_domain(DomainName=resources[0]['DomainName'])
+        self.assertNotIn('10.0.0.0/24', resp['DomainStatus']['AccessPolicies'])
+
+    def test_elasticsearch_update_tls_config(self):
+        factory = self.replay_flight_data("test_elasticsearch_update_tls_config")
+        p = self.load_policy(
+            {
+                "name": "test_elasticsearch_update_tls_config",
+                "resource": "elasticsearch",
+                "filters": [{"DomainName": "test-es"}],
+                "actions": [{"type": "update-tls-config", "value": "Policy-Min-TLS-1-2-2019-07"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["DomainName"], "test-es")
+        client = factory().client("es")
+        state = client.describe_elasticsearch_domain(DomainName="test-es")['DomainStatus'][
+            'DomainEndpointOptions']
+        self.assertEqual(state['EnforceHTTPS'], True)
+        self.assertEqual(state['TLSSecurityPolicy'], "Policy-Min-TLS-1-2-2019-07")
+
+    def test_elasticsearch_enable_auditlog(self):
+        factory = self.replay_flight_data("test_elasticsearch_enable_auditlog")
+        p = self.load_policy(
+            {
+                "name": "test_elasticsearch_enable_auditlog",
+                "resource": "elasticsearch",
+                "filters": [{"DomainName": "test-es-dom"}],
+                "actions": [{"type": "enable-auditlog", "state": True, "delay": 1}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["DomainName"], "test-es-dom")
+        client = factory().client("es")
+        state = client.describe_elasticsearch_domain(DomainName="test-es-dom")['DomainStatus'][
+            'LogPublishingOptions']
+        self.assertEqual(state['AUDIT_LOGS']['Enabled'], True)
+        self.assertEqual(state['AUDIT_LOGS']['CloudWatchLogsLogGroupArn'],
+            "arn:aws:logs:us-east-1:123456789012:log-group:/aws/domains/test-es-dom/audit-logs:*")
 
 
 class TestReservedInstances(BaseTest):

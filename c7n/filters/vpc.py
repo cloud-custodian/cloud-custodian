@@ -28,15 +28,140 @@ class SecurityGroupFilter(MatchResourceValidator, RelatedResourceFilter):
 
 
 class SubnetFilter(MatchResourceValidator, RelatedResourceFilter):
-    """Filter a resource by its associated subnets."""
+    """Filter a resource by its associated subnets attributes.
+
+    This filter is generally available for network attached resources.
+
+    ie. to find lambda functions that are vpc attached to subnets with
+    a tag key Location and value Database.
+
+    :example:
+
+    .. code-block:: yaml
+
+      policies:
+        - name: lambda
+          resource: aws.lambda
+          filters:
+            - type: subnet
+              key: tag:Location
+              value: Database
+
+    It also supports finding resources on public or private subnets
+    via route table introspection to determine if the subnet is
+    associated to an internet gateway or a nat gateway.
+
+    :example:
+
+    .. code-block:: yaml
+
+      policies:
+         - name: public-ec2
+           resource: aws.ec2
+           filters:
+             - type: subnet
+               operator: or
+               igw: True
+               nat: True
+
+    """
+
     schema = type_schema(
         'subnet', rinherit=ValueFilter.schema,
         **{'match-resource': {'type': 'boolean'},
-           'operator': {'enum': ['and', 'or']}})
-    schema_alias = True
+           'operator': {'enum': ['and', 'or']},
+           'igw': {'enum': [True, False]},
+           'nat': {'enum': [True, False]},
+           })
 
+    schema_alias = True
     RelatedResource = "c7n.resources.vpc.Subnet"
     AnnotationKey = "matched-subnets"
+    required_keys = set()
+
+    def get_permissions(self):
+        perms = super().get_permissions()
+        if self.data.get('igw') in (True, False) or self.data.get('nat') in (True, False):
+            perms += self.manager.get_resource_manager(
+                'aws.route-table').get_permissions()
+        return perms
+
+    def validate(self):
+        super().validate()
+        self.check_igw = self.data.get('igw')
+        self.check_nat = self.data.get('nat')
+
+    def match(self, related):
+        op = all if self.data.get('operator', 'and') == 'and' else any
+
+        # If the policy doesn't define value filter keys, implicitly
+        # pass and skip the value filter match.
+        value_match = {'key', 'value'}.difference(self.data) or super().match(related)
+
+        return op(
+            (
+                self.match_igw(related),
+                self.match_nat(related),
+                value_match,
+            )
+        )
+
+    def process(self, resources, event=None):
+        related = self.get_related(resources)
+        if self.check_igw in [True, False] or self.check_nat in [True, False]:
+            self.route_tables = self.get_route_tables()
+        return [r for r in resources if self.process_resource(r, related)]
+
+    def get_route_tables(self):
+        rmanager = self.manager.get_resource_manager('aws.route-table')
+        route_tables = {}
+        for r in rmanager.resources():
+            for a in r['Associations']:
+                if a['Main']:
+                    route_tables[r['VpcId']] = r
+                elif 'SubnetId' in a:
+                    route_tables[a['SubnetId']] = r
+        return route_tables
+
+    def match_igw(self, subnet):
+        if self.check_igw is None:
+            return True
+        rtable = self.route_tables.get(
+            subnet['SubnetId'],
+            self.route_tables.get(subnet['VpcId']))
+        if rtable is None:
+            self.log.debug('route table for %s not found', subnet['SubnetId'])
+            return
+        found_igw = False
+        for route in rtable['Routes']:
+            if route.get('GatewayId') and route['GatewayId'].startswith('igw-'):
+                found_igw = True
+                break
+        if self.check_igw and found_igw:
+            return True
+        elif not self.check_igw and not found_igw:
+            return True
+        return False
+
+    def match_nat(self, subnet):
+        if self.check_nat is None:
+            return True
+        rtable = self.route_tables.get(
+            subnet['SubnetId'],
+            self.route_tables.get(subnet['VpcId']))
+        if rtable is None:
+            self.log.debug('route table for %s not found', subnet['SubnetId'])
+            return
+        found_nat = False
+        for route in rtable['Routes']:
+            if route.get('NatGatewayId'):
+                found_nat = True
+                break
+        if self.check_nat and found_nat:
+            return True
+        elif not self.check_nat and not found_nat:
+            return True
+        return False
 
 
 class VpcFilter(MatchResourceValidator, RelatedResourceFilter):
@@ -105,7 +230,7 @@ class NetworkLocation(Filter):
             'description': (
                 "How to handle missing keys on elements, by default this causes"
                 "resources to be considered not-equal")},
-           'match': {'type': 'string', 'enum': ['equal', 'not-equal'],
+           'match': {'type': 'string', 'enum': ['equal', 'not-equal', 'in'],
                      'default': 'non-equal'},
            'compare': {
             'type': 'array',
@@ -123,7 +248,7 @@ class NetworkLocation(Filter):
                'title': ''},
            'ignore': {'type': 'array', 'items': {'type': 'object'}},
            'required': ['key'],
-
+           'value': {'type': 'array', 'items': {'type': 'string'}}
            })
     schema_alias = True
     permissions = ('ec2:DescribeSecurityGroups', 'ec2:DescribeSubnets')
@@ -193,6 +318,9 @@ class NetworkLocation(Filter):
         evaluation = []
         sg_space = set()
         subnet_space = set()
+
+        if self.match == 'in':
+            return self.process_match_in(r, resource_sgs, resource_subnets, key)
 
         if 'subnet' in self.compare:
             subnet_values = {
@@ -265,3 +393,40 @@ class NetworkLocation(Filter):
             return r
         elif not evaluation and self.match == 'equal':
             return r
+
+    def process_match_in(self, r, resource_sgs, resource_subnets, key):
+        network_location_vals = set(self.data.get('value', []))
+
+        if 'subnet' in self.compare:
+            subnet_values = {
+                rsub[self.subnet_model.id]: self.subnet.get_resource_value(key, rsub)
+                for rsub in resource_subnets}
+            # import pdb; pdb.set_trace()
+            if not self.missing_ok and None in subnet_values.values():
+                return
+
+            subnet_space = set(filter(None, subnet_values.values()))
+            if not subnet_space.issubset(network_location_vals):
+                return
+
+        if 'security-group' in self.compare:
+            sg_values = {
+                rsg[self.sg_model.id]: self.sg.get_resource_value(key, rsg)
+                for rsg in resource_sgs}
+            if not self.missing_ok and None in sg_values.values():
+                return
+
+            sg_space = set(filter(None, sg_values.values()))
+
+            if not sg_space.issubset(network_location_vals):
+                return
+
+        if 'resource' in self.compare:
+            r_value = self.vf.get_resource_value(key, r)
+            if not self.missing_ok and r_value is None:
+                return
+
+            if r_value not in network_location_vals:
+                return
+
+        return r

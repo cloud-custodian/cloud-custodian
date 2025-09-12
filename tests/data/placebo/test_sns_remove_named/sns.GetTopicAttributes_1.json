@@ -1,27 +1,16 @@
-
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
         "Attributes": {
-            "SubscriptionsConfirmed": "0", 
-            "DisplayName": "", 
-            "SubscriptionsDeleted": "0", 
-            "EffectiveDeliveryPolicy": "{\"http\":{\"defaultHealthyRetryPolicy\":{\"minDelayTarget\":20,\"maxDelayTarget\":20,\"numRetries\":3,\"numMaxDelayRetries\":0,\"numNoDelayRetries\":0,\"numMinDelayRetries\":0,\"backoffFunction\":\"linear\"},\"disableSubscriptionOverrides\":false}}", 
-            "Owner": "644160558196", 
-            "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"SpecificAllow\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"SNS:Subscribe\",\"Resource\":\"arn:aws:sns:us-east-1:123456789012:test-sns-remove-named\"},{\"Sid\":\"RemoveMe\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"SNS:GetTopicAttributes\",\"Resource\":\"arn:aws:sns:us-east-1:123456789012:test-sns-remove-named\"}]}", 
-            "TopicArn": "arn:aws:sns:us-east-1:123456789012:test-sns-remove-named", 
-            "SubscriptionsPending": "0"
-        }, 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "79e6324e-7612-53d3-b998-607449c2a2a7", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "79e6324e-7612-53d3-b998-607449c2a2a7", 
-                "date": "Mon, 18 Sep 2017 21:41:36 GMT", 
-                "content-length": "1985", 
-                "content-type": "text/xml"
-            }
-        }
+            "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"SpecificAllow\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"SNS:Subscribe\",\"Resource\":\"arn:aws:sns:ap-northeast-2:644160558196:test-sns-remove-named\"},{\"Sid\":\"RemoveMe\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"SNS:GetTopicAttributes\",\"Resource\":\"arn:aws:sns:ap-northeast-2:644160558196:test-sns-remove-named\"}]}",
+            "Owner": "644160558196",
+            "SubscriptionsPending": "0",
+            "TopicArn": "arn:aws:sns:ap-northeast-2:644160558196:test-sns-remove-named",
+            "EffectiveDeliveryPolicy": "{\"http\":{\"defaultHealthyRetryPolicy\":{\"minDelayTarget\":20,\"maxDelayTarget\":20,\"numRetries\":3,\"numMaxDelayRetries\":0,\"numNoDelayRetries\":0,\"numMinDelayRetries\":0,\"backoffFunction\":\"linear\"},\"disableSubscriptionOverrides\":false}}",
+            "SubscriptionsConfirmed": "0",
+            "DisplayName": "",
+            "SubscriptionsDeleted": "0"
+        },
+        "ResponseMetadata": {}
     }
 }

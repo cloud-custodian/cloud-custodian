@@ -1,0 +1,10 @@
+{
+    "status_code": 200,
+    "data": {
+        "applications": [
+            "c7n-abc",
+            "test"
+        ],
+        "ResponseMetadata": {}
+    }
+}

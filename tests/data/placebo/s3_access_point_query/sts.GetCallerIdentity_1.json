@@ -1,0 +1,9 @@
+{
+    "status_code": 200,
+    "data": {
+        "UserId": "AIDAZL6XWCR2MLDRO6EIG",
+        "Account": "644160558196",
+        "Arn": "arn:aws:iam::644160558196:user/matt@capitalone.com",
+        "ResponseMetadata": {}
+    }
+}

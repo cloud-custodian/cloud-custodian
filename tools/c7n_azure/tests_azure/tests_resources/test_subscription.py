@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 from mock import patch
 
-from ..azure_common import BaseTest
+from ..azure_common import BaseTest, cassette_name
 
 
 class SubscriptionTest(BaseTest):
@@ -72,3 +72,35 @@ class SubscriptionTest(BaseTest):
         policy = client.policy_assignments.get(scope, 'cctestpolicy_sub')
 
         self.assertEqual('cctestpolicy_sub', policy.name)
+
+
+class SubscriptionDiagnosticSettingsFilterTest(BaseTest):
+    @cassette_name('diag')
+    def test_filter_match(self):
+        p = self.load_policy({
+            'name': 'test-sub-diag-filter-match',
+            'resource': 'azure.subscription',
+            'filters': [{
+                'type': 'diagnostic-settings',
+                'key': "properties.logs[?category == 'Security'].enabled",
+                'op': 'contains',
+                'value': True
+            }]
+        }, validate=True)
+
+        self.assertEqual(1, len(p.run()))
+
+    @cassette_name('diag')
+    def test_filter_no_match(self):
+        p = self.load_policy({
+            'name': 'test-sub-diag-filter-match',
+            'resource': 'azure.subscription',
+            'filters': [{
+                'type': 'diagnostic-settings',
+                'key': "properties.logs[?category == 'Alert'].enabled",
+                'op': 'contains',
+                'value': True
+            }]
+        }, validate=True)
+
+        self.assertEqual(0, len(p.run()))

@@ -1,0 +1,11 @@
+{
+    "status_code": 200,
+    "data": {
+        "Entries": [
+            {
+                "Cidr": "172.31.0.0/16"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,159 @@
+{
+    "status_code": 200,
+    "data": {
+        "Aliases": [
+            {
+                "AliasName": "alias/skunk/trails",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/skunk/trails",
+                "TargetKeyId": "36812ccf-daaf-49b1-a24b-0eef254ffe41",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2016,
+                    "month": 7,
+                    "day": 24,
+                    "hour": 4,
+                    "minute": 51,
+                    "second": 26,
+                    "microsecond": 482000
+                },
+                "LastUpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2016,
+                    "month": 7,
+                    "day": 24,
+                    "hour": 4,
+                    "minute": 51,
+                    "second": 26,
+                    "microsecond": 482000
+                }
+            },
+            {
+                "AliasName": "alias/tes/pratyush",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/tes/pratyush",
+                "TargetKeyId": "082cd05f-96d1-49f6-a5ac-32093d2cfe38",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 5,
+                    "day": 13,
+                    "hour": 13,
+                    "minute": 2,
+                    "second": 58,
+                    "microsecond": 537000
+                },
+                "LastUpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 5,
+                    "day": 13,
+                    "hour": 13,
+                    "minute": 2,
+                    "second": 58,
+                    "microsecond": 537000
+                }
+            },
+            {
+                "AliasName": "alias/test-log-group",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/test-log-group",
+                "TargetKeyId": "326e2489-013e-4766-ba51-babc51f68dd4",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 12,
+                    "day": 4,
+                    "hour": 14,
+                    "minute": 20,
+                    "second": 37,
+                    "microsecond": 815000
+                },
+                "LastUpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 12,
+                    "day": 4,
+                    "hour": 14,
+                    "minute": 20,
+                    "second": 37,
+                    "microsecond": 815000
+                }
+            },
+            {
+                "AliasName": "alias/test/cwe",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/test/cwe",
+                "TargetKeyId": "3bd15351-ad10-4cf4-b230-280746ad3dbb",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 10,
+                    "day": 28,
+                    "hour": 13,
+                    "minute": 56,
+                    "second": 25,
+                    "microsecond": 965000
+                },
+                "LastUpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 10,
+                    "day": 28,
+                    "hour": 13,
+                    "minute": 56,
+                    "second": 25,
+                    "microsecond": 965000
+                }
+            },
+            {
+                "AliasName": "alias/test/sfn/encrypted",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/test/sfn/encrypted",
+                "TargetKeyId": "44d264df-da6f-45f9-9c18-1fc1beca6db0",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 8,
+                    "day": 29,
+                    "hour": 10,
+                    "minute": 56,
+                    "second": 31,
+                    "microsecond": 505000
+                },
+                "LastUpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 8,
+                    "day": 29,
+                    "hour": 10,
+                    "minute": 56,
+                    "second": 31,
+                    "microsecond": 505000
+                }
+            },
+            {
+                "AliasName": "alias/test/timestream",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/test/timestream",
+                "TargetKeyId": "a75f7e18-1f8f-44df-8b38-8853ef42555d",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 5,
+                    "day": 6,
+                    "hour": 15,
+                    "minute": 14,
+                    "second": 47,
+                    "microsecond": 838000
+                },
+                "LastUpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 5,
+                    "day": 6,
+                    "hour": 15,
+                    "minute": 14,
+                    "second": 47,
+                    "microsecond": 838000
+                }
+            }
+        ],
+        "Truncated": false,
+        "ResponseMetadata": {}
+    }
+}

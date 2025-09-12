@@ -1,6 +1,5 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-import jmespath
 import json
 from urllib.parse import urlparse, parse_qs
 
@@ -10,15 +9,26 @@ from concurrent.futures import as_completed
 from datetime import timedelta, datetime
 
 from c7n.actions import Action, RemovePolicyBase, ModifyVpcSecurityGroupsAction
-from c7n.filters import CrossAccountAccessFilter, ValueFilter
+from c7n.filters import CrossAccountAccessFilter, ValueFilter, Filter
+from c7n.filters.costhub import CostHubRecommendation
 from c7n.filters.kms import KmsRelatedFilter
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
-from c7n import query
-from c7n.resources.iam import CheckPermissions
+from c7n import query, utils
+from c7n.resources.aws import shape_validate
+from c7n.resources.iam import CheckPermissions, SpecificIamRoleManagedPolicy
 from c7n.tags import universal_augment
-from c7n.utils import local_session, type_schema, select_keys, get_human_size, parse_date
-
+from c7n.utils import (
+    local_session,
+    type_schema,
+    select_keys,
+    get_human_size,
+    parse_date,
+    get_retry,
+    jmespath_search,
+    jmespath_compile
+)
+from botocore.config import Config
 from .securityhub import PostFinding
 
 ErrAccessDenied = "AccessDeniedException"
@@ -71,6 +81,7 @@ class AWSLambda(query.QueryResourceManager):
         config_type = 'AWS::Lambda::Function'
         cfn_type = 'AWS::Lambda::Function'
         universal_taggable = object()
+        permissions_augment = ("lambda:ListTags",)
 
     source_mapping = {
         'describe': DescribeLambda,
@@ -109,6 +120,35 @@ class LambdaPermissions(CheckPermissions):
         return [r['Role'] for r in resources]
 
 
+@AWSLambda.filter_registry.register('url-config')
+class URLConfig(ValueFilter):
+
+    annotation_key = "c7n:UrlConfig"
+    schema = type_schema('url-config', rinherit=ValueFilter.schema)
+    schema_alias = False
+    permissions = ('lambda:GetFunctionUrlConfig',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('lambda')
+
+        def _augment(r):
+            try:
+                r[self.annotation_key] = self.manager.retry(
+                    client.get_function_url_config, FunctionName=r['FunctionArn'])
+                r[self.annotation_key].pop('ResponseMetadata')
+            except client.exceptions.ResourceNotFoundException:
+                r[self.annotation_key] = {}
+            return r
+
+        with self.executor_factory(max_workers=2) as w:
+            resources = list(filter(None, w.map(_augment, resources)))
+
+        return super().process(resources, event)
+
+    def __call__(self, i):
+        return super().__call__(i[self.annotation_key])
+
+
 @AWSLambda.filter_registry.register('reserved-concurrency')
 class ReservedConcurrency(ValueFilter):
 
@@ -141,7 +181,7 @@ class ReservedConcurrency(ValueFilter):
 
         with self.executor_factory(max_workers=3) as w:
             resources = list(filter(None, w.map(_augment, resources)))
-            return super(ReservedConcurrency, self).process(resources, event)
+        return super(ReservedConcurrency, self).process(resources, event)
 
 
 def get_lambda_policies(client, executor_factory, resources, log):
@@ -251,24 +291,167 @@ class LambdaCrossAccountAccessFilter(CrossAccountAccessFilter):
 
 @AWSLambda.filter_registry.register('kms-key')
 class KmsFilter(KmsRelatedFilter):
-    """
-    Filter a resource by its associcated kms key and optionally the aliasname
-    of the kms key by using 'c7n:AliasName'
+
+    RelatedIdsExpression = 'KMSKeyArn'
+
+
+@AWSLambda.filter_registry.register('has-specific-managed-policy')
+class HasSpecificManagedPolicy(SpecificIamRoleManagedPolicy):
+    """Filter an lambda function that has an IAM execution role that has a
+    specific managed IAM policy.
 
     :example:
 
-        .. code-block:: yaml
+    .. code-block:: yaml
 
-            policies:
-                - name: lambda-kms-key-filters
-                  resource: aws.lambda
-                  filters:
-                    - type: kms-key
-                      key: c7n:AliasName
-                      value: "^(alias/aws/lambda)"
-                      op: regex
+        policies:
+          - name: lambda-has-admin-policy
+            resource: aws.lambda
+            filters:
+              - type: has-specific-managed-policy
+                value: admin-policy
+
     """
-    RelatedIdsExpression = 'KMSKeyArn'
+
+    permissions = ('iam:ListAttachedRolePolicies',)
+
+    def process(self, resources, event=None):
+        client = utils.local_session(self.manager.session_factory).client('iam')
+
+        results = []
+        roles = {
+            r['Role']: {
+                'RoleName': r['Role'].split('/')[-1]
+            }
+            for r in resources
+        }
+
+        for role in roles.values():
+            self.get_managed_policies(client, [role])
+        for r in resources:
+            role_arn = r['Role']
+            matched_keys = [k for k in roles[role_arn][self.annotation_key] if self.match(k)]
+            self.merge_annotation(role, self.matched_annotation_key, matched_keys)
+            if matched_keys:
+                results.append(r)
+
+        return results
+
+
+@AWSLambda.action_registry.register('update')
+class UpdateLambda(Action):
+    """Update a lambda's configuration.
+
+    This action also has specific support for enacting recommendations
+    from the AWS Cost Optimization Hub for resizing.
+
+    :example:
+
+      .. code-block:: yaml
+
+         policies:
+           - name: lambda-rightsize
+             resource: aws.lambda
+             filters:
+               - type: cost-optimization
+                 attrs:
+                   - actionType: Rightsize
+             actions:
+               - update
+
+    """
+    schema = type_schema('update', properties={'type': 'object'})
+    permissions = ("lambda:UpdateFunctionConfiguration",)
+
+    def validate(self):
+        props = self.data.get('properties', {})
+        props['FunctionName'] = 'validation'
+        shape_validate(props, 'UpdateFunctionConfigurationRequest', 'lambda')
+
+    def process(self, resources):
+        client = utils.local_session(self.manager.session_factory).client('lambda')
+        retry = get_retry(('TooManyRequestsException', 'ResourceConflictException'))
+
+        for r in resources:
+            params = self.get_parameters(r)
+            params.pop('FunctionName', None)
+            try:
+                retry(
+                    client.update_function_configuration,
+                    FunctionName=r['FunctionName'],
+                    **params
+                )
+            except client.exceptions.ResourceNotFoundException:
+                continue
+
+    def get_parameters(self, r):
+        params = self.data.get('properties', {})
+        hub_recommendation = r.get(CostHubRecommendation.annotation_key)
+        if hub_recommendation and hub_recommendation['actionType'] == 'Rightsize':
+            size = int(hub_recommendation['recommendedResourceSummary'].split(' ')[0])
+            params['MemorySize'] = size
+        return params
+
+
+@AWSLambda.action_registry.register('set-xray-tracing')
+class LambdaEnableXrayTracing(Action):
+    """
+    This action allows for enable Xray tracing to Active
+
+    :example:
+
+    .. code-block:: yaml
+
+      actions:
+        - type: enable-xray-tracing
+    """
+
+    schema = type_schema(
+        'set-xray-tracing',
+        **{'state': {'default': True, 'type': 'boolean'}}
+    )
+    permissions = ("lambda:UpdateFunctionConfiguration",)
+
+    def get_mode_val(self, state):
+        if state:
+            return "Active"
+        return "PassThrough"
+
+    def process(self, resources):
+        """
+            Enables the Xray Tracing for the function.
+
+            Args:
+                resources: AWS lamdba resources
+            Returns:
+                None
+        """
+        config = Config(
+            retries={
+                'max_attempts': 8,
+                'mode': 'standard'
+            }
+        )
+        client = local_session(self.manager.session_factory).client('lambda', config=config)
+        updateState = self.data.get('state', True)
+        retry = get_retry(('TooManyRequestsException', 'ResourceConflictException'))
+
+        mode = self.get_mode_val(updateState)
+        for resource in resources:
+            state = bool(resource["TracingConfig"]["Mode"] == "Active")
+            if updateState != state:
+                function_name = resource["FunctionName"]
+                self.log.info(f"Set Xray tracing to {mode} for lambda {function_name}")
+                try:
+                    retry(
+                        client.update_function_configuration,
+                        FunctionName=function_name,
+                        TracingConfig={
+                            'Mode': mode
+                        }
+                    )
+                except client.exceptions.ResourceNotFoundException:
+                    continue
 
 
 @AWSLambda.action_registry.register('post-finding')
@@ -284,7 +467,6 @@ class LambdaPostFinding(PostFinding):
              'DeadLetterConfig',
              'Environment',
              'Handler',
-             'KMSKeyArn',
              'LastModified',
              'MemorySize',
              'MasterArn',
@@ -295,6 +477,10 @@ class LambdaPostFinding(PostFinding):
              'Timeout',
              'Version',
              'VpcConfig']))
+        # check and set the correct formatting value for kms key arn if it exists
+        kms_value = r.get('KMSKeyArn')
+        if kms_value is not None:
+            details['KmsKeyArn'] = kms_value
         # do the brain dead parts Layers, Code, TracingConfig
         if 'Layers' in r:
             r['Layers'] = {
@@ -470,7 +656,7 @@ class RemovePolicyStatement(RemovePolicyBase):
 
         p = json.loads(resource['c7n:Policy'])
 
-        statements, found = self.process_policy(
+        _, found = self.process_policy(
             p, resource, CrossAccountAccessFilter.annotation_key)
         if not found:
             return
@@ -512,7 +698,7 @@ class SetConcurrency(Action):
         is_expr = self.data.get('expr', False)
         value = self.data['value']
         if is_expr:
-            value = jmespath.compile(value)
+            value = jmespath_compile(value)
 
         none_type = type(None)
 
@@ -660,10 +846,16 @@ class LayerCrossAccount(CrossAccountAccessFilter):
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('lambda')
         for r in resources:
-            r['c7n:Policy'] = self.manager.retry(
-                client.get_layer_version_policy,
-                LayerName=r['LayerName'],
-                VersionNumber=r['Version']).get('Policy')
+            if 'c7n:Policy' in r:
+                continue
+            try:
+                rpolicy = self.manager.retry(
+                    client.get_layer_version_policy,
+                    LayerName=r['LayerName'],
+                    VersionNumber=r['Version']).get('Policy')
+            except client.exceptions.ResourceNotFoundException:
+                rpolicy = {}
+            r['c7n:Policy'] = rpolicy
         return super(LayerCrossAccount, self).process(resources)
 
     def get_resource_policy(self, r):
@@ -701,7 +893,7 @@ class LayerRemovePermissions(RemovePolicyBase):
 
         p = json.loads(r['c7n:Policy'])
 
-        statements, found = self.process_policy(
+        _, found = self.process_policy(
             p, r, CrossAccountAccessFilter.annotation_key)
 
         if not found:
@@ -745,3 +937,54 @@ class LayerPostFinding(PostFinding):
         payload.update(self.filter_empty(
             select_keys(r, ['Version', 'CreatedDate', 'CompatibleRuntimes'])))
         return envelope
+
+
+@AWSLambda.filter_registry.register('lambda-edge')
+class LambdaEdgeFilter(Filter):
+    """
+    Filter for lambda@edge functions. Lambda@edge only exists in us-east-1
+
+    :example:
+
+        .. code-block:: yaml
+
+            policies:
+                - name: lambda-edge-filter
+                  resource: lambda
+                  region: us-east-1
+                  filters:
+                    - type: lambda-edge
+                      state: True
+    """
+    permissions = ('cloudfront:ListDistributions',)
+
+    schema = type_schema('lambda-edge',
+        **{'state': {'type': 'boolean'}})
+
+    def get_lambda_cf_map(self):
+        cfs = self.manager.get_resource_manager('distribution').resources()
+        func_expressions = ('DefaultCacheBehavior.LambdaFunctionAssociations.Items',
+          'CacheBehaviors.Items[].LambdaFunctionAssociations.Items[]')
+        lambda_dist_map = {}
+        for d in cfs:
+            for exp in func_expressions:
+                if jmespath_search(exp, d):
+                    for function in jmespath_search(exp, d):
+                        # Geting rid of the version number in the arn
+                        lambda_edge_arn = ':'.join(function['LambdaFunctionARN'].split(':')[:-1])
+                        lambda_dist_map.setdefault(lambda_edge_arn, set()).add(d['Id'])
+        return lambda_dist_map
+
+    def process(self, resources, event=None):
+        results = []
+        if self.manager.config.region != 'us-east-1' and self.data.get('state'):
+            return []
+        annotation_key = 'c7n:DistributionIds'
+        lambda_edge_cf_map = self.get_lambda_cf_map()
+        for r in resources:
+            if (r['FunctionArn'] in lambda_edge_cf_map and self.data.get('state')):
+                r[annotation_key] = list(lambda_edge_cf_map.get(r['FunctionArn']))
+                results.append(r)
+            elif (r['FunctionArn'] not in lambda_edge_cf_map and not self.data.get('state')):
+                results.append(r)
+        return results

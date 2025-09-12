@@ -1,0 +1,32 @@
+{
+    "status_code": 200,
+    "data": {
+        "TrailARN": "arn:aws:cloudtrail:us-east-1:644160558196:trail/test-cloudtrail",
+        "AdvancedEventSelectors": [
+            {
+                "FieldSelectors": [
+                    {
+                        "Field": "eventCategory",
+                        "Equals": [
+                            "Management"
+                        ]
+                    },
+                    {
+                        "Field": "eventSource",
+                        "NotEquals": [
+                            "kms.amazonaws.com",
+                            "rdsdata.amazonaws.com"
+                        ]
+                    },
+                    {
+                        "Field": "readOnly",
+                        "Equals": [
+                            "false"
+                        ]
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

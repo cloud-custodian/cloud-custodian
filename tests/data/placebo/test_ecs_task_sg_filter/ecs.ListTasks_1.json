@@ -1,0 +1,9 @@
+{
+    "status_code": 200,
+    "data": {
+        "taskArns": [
+            "arn:aws:ecs:us-east-1:644160558196:task/c7n-test-cluster/2e04f4f94d1149b3b4a0515e4a71d933"
+        ],
+        "ResponseMetadata": {}
+    }
+}

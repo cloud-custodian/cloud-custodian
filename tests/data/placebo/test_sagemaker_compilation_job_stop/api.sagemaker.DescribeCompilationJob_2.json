@@ -1,0 +1,53 @@
+{
+    "status_code": 200,
+    "data": {
+        "CompilationJobName": "c7n-test-2",
+        "CompilationJobArn": "arn:aws:sagemaker:us-east-1:644160558196:compilation-job/c7n-test-2",
+        "CompilationJobStatus": "STOPPING",
+        "CompilationStartTime": {
+            "__class__": "datetime",
+            "year": 2024,
+            "month": 4,
+            "day": 16,
+            "hour": 13,
+            "minute": 42,
+            "second": 29,
+            "microsecond": 0
+        },
+        "StoppingCondition": {
+            "MaxRuntimeInSeconds": 900
+        },
+        "InferenceImage": "644160558196.dkr.ecr.us-east-1.amazonaws.com/xgboost-neo:latest",
+        "CreationTime": {
+            "__class__": "datetime",
+            "year": 2024,
+            "month": 4,
+            "day": 16,
+            "hour": 13,
+            "minute": 40,
+            "second": 35,
+            "microsecond": 546000
+        },
+        "LastModifiedTime": {
+            "__class__": "datetime",
+            "year": 2024,
+            "month": 4,
+            "day": 16,
+            "hour": 13,
+            "minute": 42,
+            "second": 35,
+            "microsecond": 0
+        },
+        "RoleArn": "arn:aws:iam::644160558196:role/service-role/AmazonSageMaker-ExecutionRole-20240319T150889",
+        "InputConfig": {
+            "S3Uri": "s3://c7n-test-s3-bucket/DEMO-automatic-model-tuning-xgboost-dm/train/train.csv",
+            "DataInputConfig": "{\"data\": [1, 2, 3, 4]}",
+            "Framework": "XGBOOST"
+        },
+        "OutputConfig": {
+            "S3OutputLocation": "s3://c7n-test-s3-bucket/DEMO-automatic-model-tuning-xgboost-dm/",
+            "TargetDevice": "ml_c4"
+        },
+        "ResponseMetadata": {}
+    }
+}

@@ -2,13 +2,28 @@
 # SPDX-License-Identifier: Apache-2.0
 import json
 
-from c7n.actions import RemovePolicyBase, Action
+from c7n.actions import RemovePolicyBase, Action, ModifyPolicyBase
 from c7n.exceptions import PolicyValidationError
-from c7n.filters import CrossAccountAccessFilter, Filter, ValueFilter
+from c7n.filters import CrossAccountAccessFilter, Filter, ValueFilter, MetricsFilter
 from c7n.manager import resources
-from c7n.query import ConfigSource, DescribeSource, QueryResourceManager, TypeInfo
+from c7n.query import (
+    ConfigSource, DescribeSource, QueryResourceManager, TypeInfo,
+    ChildResourceManager, ChildDescribeSource, ChildResourceQuery, sources)
 from c7n import tags
-from c7n.utils import local_session, type_schema
+from c7n.utils import generate_arn, local_session, type_schema
+
+
+class ConfigECR(ConfigSource):
+
+    def load_resource(self, item):
+        resource = super().load_resource(item)
+        for configk, servicek in {
+                'RepositoryName': 'repositoryName',
+                'Arn': 'repositoryArn',
+                'RepositoryUri': 'repositoryUri',
+                'RepositoryPolicyText': 'Policy'}.items():
+            resource[servicek] = resource.pop(configk, None)
+        return resource
 
 
 class DescribeECR(DescribeSource):
@@ -37,12 +52,198 @@ class ECR(QueryResourceManager):
         arn_type = 'repository'
         filter_name = 'repositoryNames'
         filter_type = 'list'
-        cfn_type = 'AWS::ECR::Repository'
+        config_type = cfn_type = 'AWS::ECR::Repository'
+        dimension = 'RepositoryName'
+        permissions_augment = ("ecr:ListTagsForResource",)
 
     source_mapping = {
         'describe': DescribeECR,
-        'config': ConfigSource
+        'config': ConfigECR
     }
+
+
+@ECR.filter_registry.register('metrics')
+class ECRMetricsFilter(MetricsFilter):
+    def get_dimensions(self, resource):
+        return [{"Name": "RepositoryName", "Value": resource['repositoryName']}]
+
+
+class ECRImageQuery(ChildResourceQuery):
+
+    def get(self, resource_manager, identities):
+        m = self.resolve(resource_manager.resource_type)
+        params = {'ImageIds': [identities]}
+        resources = self.filter(resource_manager, **params)
+        resources = [r for r in resources if "{}/{}".format(r[0], r[1][m.id]) in identities]
+        return resources
+
+
+@sources.register('describe-ecr-image')
+class RepositoryImageDescribeSource(ChildDescribeSource):
+
+    resource_query_factory = ECRImageQuery
+
+    def get_query(self):
+        return super().get_query(capture_parent_id=True)
+
+    def get_query_params(self, query):
+        query = query or {}
+        if 'query' not in self.manager.data:
+            return query
+        for q in self.manager.data['query']:
+            query.update(q)
+        return query
+
+    def augment(self, resources):
+        # construct an image arn
+        ecr_manager = self.manager.get_resource_manager(self.manager.resource_type.parent_spec[0])
+        rtype = ecr_manager.resource_type
+
+        repo_arn_map = {}
+        for repo_name in list({repo_name for repo_name, image in resources}):
+            repo_arn_map[repo_name] = generate_arn(
+                rtype.service,
+                region=self.manager.config.region,
+                account_id=self.manager.account_id,
+                resource_type=ecr_manager.resource_type.arn_type,
+                separator="/",
+                resource=repo_name
+            )
+
+        results = []
+        for repo_name, image in resources:
+            image['imageArn'] = "{}/{}".format(repo_arn_map[repo_name], image['imageDigest'])
+            results.append(image)
+        return results
+
+
+@resources.register('ecr-image')
+class RepositoryImage(ChildResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'ecr'
+        parent_spec = ('ecr', 'repositoryName', None)
+        enum_spec = ('describe_images', 'imageDetails', None)
+        id = 'imageDigest'
+        name = 'repositoryName'
+        arn = "imageArn"
+        arn_type = 'repository'
+
+    source_mapping = {
+        'describe-child': RepositoryImageDescribeSource,
+        'describe': RepositoryImageDescribeSource,
+    }
+
+
+ECR_POLICY_SCHEMA = {
+    'type': 'object',
+    'properties': {
+        'Sid': {'type': 'string'},
+        'Effect': {'type': 'string', 'enum': ['Allow', 'Deny']},
+        'Principal': {'anyOf': [
+            {'type': 'string'},
+            {'type': 'object'}, {'type': 'array'}]},
+        'NotPrincipal': {'anyOf': [{'type': 'object'}, {'type': 'array'}]},
+        'Action': {'anyOf': [{'type': 'string', 'pattern': '^ecr:([a-zA-Z]*|[*])$'},
+            {'type': 'array', 'items': {'type': 'string', 'pattern': '^ecr:([a-zA-Z]*|[*])$'}}]},
+        'NotAction': {'anyOf': [{'type': 'string', 'pattern': '^ecr:([a-zA-Z]*|[*])$'},
+            {'type': 'array', 'items': {'type': 'string', 'pattern': '^ecr:([a-zA-Z]*|[*])$'}}]},
+        'Resource': {'anyOf': [{'type': 'string'}, {'type': 'array'}]},
+        'NotResource': {'anyOf': [{'type': 'string'}, {'type': 'array'}]},
+        'Condition': {'type': 'object'}
+    },
+    'required': ['Sid', 'Effect'],
+    'oneOf': [
+        {'required': ['Principal', 'Action']},
+        {'required': ['NotPrincipal', 'Action']},
+        {'required': ['Principal', 'NotAction']},
+        {'required': ['NotPrincipal', 'NotAction']}
+    ]
+}
+
+
+@RepositoryImage.action_registry.register('modify-ecr-policy')
+@ECR.action_registry.register('modify-ecr-policy')
+class ModifyPolicyStatement(ModifyPolicyBase):
+    """Action to modify ECR policy statements.
+
+    :example:
+
+    .. code-block:: yaml
+
+           policies:
+              - name: ecr-image-prevent-pull
+                resource: ecr-image
+                filters:
+                  - type: finding
+                actions:
+                  - type: modify-ecr-policy
+                    add-statements: [{
+                        "Sid": "ReplaceWithMe",
+                        "Effect": "Deny",
+                        "Principal": "*",
+                        "Action": ["ecr:BatchGetImage"]
+                            }]
+                    remove-statements: "*"
+    """
+    permissions = ('ecr:GetRepositoryPolicy', 'ecr:SetRepositoryPolicy')
+    schema = type_schema(
+        'modify-ecr-policy', schema_alias=False,
+        **{
+            'add-statements': {
+                'type': 'array',
+                'items': ECR_POLICY_SCHEMA,
+            },
+            'remove-statements': {
+                'type': ['array', 'string'],
+                'oneOf': [
+                    {'enum': ['matched', '*']},
+                    {'type': 'array', 'items': {'type': 'string'}}
+                ],
+            }
+        })
+
+    def process(self, resources):
+        results = []
+        client = local_session(self.manager.session_factory).client('ecr')
+        for r in resources:
+            try:
+                policy = json.loads(
+                    client.get_repository_policy(
+                        repositoryName=r["repositoryName"])["policyText"])
+            except client.exceptions.RepositoryPolicyNotFoundException:
+                policy = {}
+            policy_statements = policy.setdefault('Statement', [])
+            new_policy, removed = self.remove_statements(
+                policy_statements, r, CrossAccountAccessFilter.annotation_key)
+            if new_policy is None:
+                new_policy = policy_statements
+            new_policy, added = self.add_statements(new_policy)
+
+            if not removed and not added:
+                continue
+            elif not new_policy:
+                client.delete_repository_policy(
+                    repositoryName=r['repositoryName'])
+            else:
+                cleaned = []
+                for statement in new_policy:
+                    if "Resource" in statement:
+                        del statement["Resource"]
+                        cleaned.append(statement)
+                    else:
+                        cleaned.append(statement)
+                policy['Statement'] = cleaned
+                client.set_repository_policy(
+                    repositoryName=r['repositoryName'],
+                    policyText=json.dumps(policy))
+            results += {
+                'Name': r['repositoryName'],
+                'State': 'PolicyModified',
+                'Statements': new_policy
+            }
+
+        return results
 
 
 @ECR.action_registry.register('tag')
@@ -142,6 +343,8 @@ class ECRCrossAccountAccessFilter(CrossAccountAccessFilter):
         client = local_session(self.manager.session_factory).client('ecr')
 
         def _augment(r):
+            if r.get('Policy') is not None:
+                return r
             try:
                 r['Policy'] = client.get_repository_policy(
                     repositoryName=r['repositoryName'])['policyText']
@@ -174,6 +377,7 @@ LIFECYCLE_RULE_SCHEMA = {
             'required': ['countType', 'countNumber', 'tagStatus'],
             'properties': {
                 'tagStatus': {'enum': ['tagged', 'untagged', 'any']},
+                'tagPatternList': {'type': 'array', 'items': {'type': 'string'}},
                 'tagPrefixList': {'type': 'array', 'items': {'type': 'string'}},
                 'countNumber': {'type': 'integer'},
                 'countUnit': {'enum': ['hours', 'days']},
@@ -191,12 +395,13 @@ def lifecycle_rule_validate(policy, rule):
     #
     # https://docs.aws.amazon.com/AmazonECR/latest/userguide/LifecyclePolicies.html#lp_evaluation_rules
 
-    if (rule['selection']['tagStatus'] == 'tagged' and
-            'tagPrefixList' not in rule['selection']):
-        raise PolicyValidationError(
-            ("{} has invalid lifecycle rule {} tagPrefixList "
-             "required for tagStatus: tagged").format(
-                 policy.name, rule))
+    if rule['selection']['tagStatus'] == 'tagged':
+        if ('tagPrefixList' not in rule['selection'] and
+        'tagPatternList' not in rule['selection']):
+            raise PolicyValidationError(
+                ("{} has invalid lifecycle rule {} tagPrefixList or tagPatternList "
+                "required for tagStatus: tagged").format(
+                    policy.name, rule))
     if (rule['selection']['countType'] == 'sinceImagePushed' and
             'countUnit' not in rule['selection']):
         raise PolicyValidationError(

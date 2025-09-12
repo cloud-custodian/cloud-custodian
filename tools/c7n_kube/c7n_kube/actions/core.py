@@ -9,11 +9,21 @@ from c7n.exceptions import PolicyValidationError
 
 from kubernetes.client import V1DeleteOptions
 
-log = logging.getLogger('custodian.k8s.actions')
+log = logging.getLogger("custodian.k8s.actions")
 
 
 class Action(BaseAction):
     pass
+
+
+class EventAction(BaseAction):
+    def validate(self):
+        modes = ("k8s-admission",)
+        policy = self.manager.data
+        if policy.get("mode", {}).get("type") not in modes:
+            raise PolicyValidationError(
+                "Event Actions are only supported for k8s-admission mode policies"
+            )
 
 
 class MethodAction(Action):
@@ -33,10 +43,10 @@ class MethodAction(Action):
             self.process_resource_set(client, resource_set)
 
     def process_resource_set(self, client, resources):
-        op_name = self.method_spec['op']
+        op_name = self.method_spec["op"]
         op = getattr(client, op_name)
         for r in resources:
-            op(name=r['metadata']['name'])
+            op(name=r["metadata"]["name"])
 
 
 class PatchAction(MethodAction):
@@ -45,22 +55,23 @@ class PatchAction(MethodAction):
 
     Requires patch and namespaced attributes on the resource definition
     """
+
     def validate(self):
         if not self.manager.get_model().patch:
-            raise PolicyValidationError('patch attribute not defined for resource')
+            raise PolicyValidationError("patch attribute not defined for resource")
         return self
 
     def get_permissions(self):
         patch = self.manager.get_model().patch
-        return ''.join([a.capitalize() for a in patch.split('_')])
+        return "".join([a.capitalize() for a in patch.split("_")])
 
     def patch_resources(self, client, resources, **patch_args):
         op = getattr(client, self.manager.get_model().patch)
         namespaced = self.manager.get_model().namespaced
         for r in resources:
-            patch_args['name'] = r['metadata']['name']
+            patch_args["name"] = r["metadata"]["name"]
             if namespaced:
-                patch_args['namespace'] = r['metadata']['namespace']
+                patch_args["namespace"] = r["metadata"]["namespace"]
             op(**patch_args)
 
 
@@ -81,20 +92,18 @@ class PatchResource(PatchAction):
                 spec:
                   replicas: 0
     """
-    schema = type_schema(
-        'patch',
-        **{'options': {'type': 'object'}}
-    )
+
+    schema = type_schema("patch", **{"options": {"type": "object"}})
 
     def process_resource_set(self, client, resources):
-        patch_args = {'body': self.data.get('options', {})}
+        patch_args = {"body": self.data.get("options", {})}
         self.patch_resources(client, resources, **patch_args)
 
     @classmethod
     def register_resources(klass, registry, resource_class):
         model = resource_class.resource_type
-        if hasattr(model, 'patch') and hasattr(model, 'namespaced'):
-            resource_class.action_registry.register('patch', klass)
+        if hasattr(model, "patch") and hasattr(model, "namespaced"):
+            resource_class.action_registry.register("patch", klass)
 
 
 class DeleteAction(MethodAction):
@@ -103,22 +112,23 @@ class DeleteAction(MethodAction):
 
     Requires delete and namespaced attributes on the resource definition
     """
+
     def validate(self):
         if not self.manager.get_model().delete:
-            raise PolicyValidationError('delete attribute not defined for resource')
+            raise PolicyValidationError("delete attribute not defined for resource")
         return self
 
     def get_permissions(self):
         delete = self.manager.get_model().delete
-        return ''.join([a.capitalize() for a in delete.split('_')])
+        return "".join([a.capitalize() for a in delete.split("_")])
 
     def delete_resources(self, client, resources, **delete_args):
         op = getattr(client, self.manager.get_model().delete)
         namespaced = self.manager.get_model().namespaced
         for r in resources:
-            delete_args['name'] = r['metadata']['name']
+            delete_args["name"] = r["metadata"]["name"]
             if namespaced:
-                delete_args['namespace'] = r['metadata']['namespace']
+                delete_args["namespace"] = r["metadata"]["namespace"]
             op(**delete_args)
 
 
@@ -135,22 +145,25 @@ class DeleteResource(DeleteAction):
           actions:
             - delete
     """
+
     schema = type_schema(
-        'delete',
-        grace_period_seconds={'type': 'integer'},
+        "delete",
+        grace_period_seconds={"type": "integer"},
     )
 
     def process_resource_set(self, client, resources):
-        grace = self.data.get('grace_period_seconds', 30)
+        grace = self.data.get("grace_period_seconds", 30)
         body = V1DeleteOptions()
         body.grace_period_seconds = grace
-        delete_args = {'body': body}
+        delete_args = {"body": body}
         self.delete_resources(client, resources, **delete_args)
 
     @classmethod
     def register_resources(klass, registry, resource_class):
         model = resource_class.resource_type
-        if ('delete' not in resource_class.action_registry and
-            hasattr(model, 'delete') and
-                hasattr(model, 'namespaced')):
-            resource_class.action_registry.register('delete', klass)
+        if (
+            "delete" not in resource_class.action_registry
+            and hasattr(model, "delete")
+            and hasattr(model, "namespaced")
+        ):
+            resource_class.action_registry.register("delete", klass)

@@ -1,0 +1,182 @@
+{
+    "status_code": 200,
+    "data": {
+        "Reservations": [
+            {
+                "Groups": [],
+                "Instances": [
+                    {
+                        "AmiLaunchIndex": 0,
+                        "ImageId": "ami-0022f774911c1d690",
+                        "InstanceId": "i-0186d79a60beee17f",
+                        "InstanceType": "t2.micro",
+                        "LaunchTime": {
+                            "__class__": "datetime",
+                            "year": 2022,
+                            "month": 5,
+                            "day": 5,
+                            "hour": 18,
+                            "minute": 1,
+                            "second": 33,
+                            "microsecond": 0
+                        },
+                        "Monitoring": {
+                            "State": "disabled"
+                        },
+                        "Placement": {
+                            "AvailabilityZone": "us-east-1b",
+                            "GroupName": "",
+                            "Tenancy": "default"
+                        },
+                        "PrivateDnsName": "ip-172-31-18-28.ec2.internal",
+                        "PrivateIpAddress": "172.31.18.28",
+                        "ProductCodes": [],
+                        "PublicDnsName": "",
+                        "State": {
+                            "Code": 16,
+                            "Name": "running"
+                        },
+                        "StateTransitionReason": "",
+                        "SubnetId": "subnet-06a51b8914723a441",
+                        "VpcId": "vpc-0b36ebef5c318fbae",
+                        "Architecture": "x86_64",
+                        "BlockDeviceMappings": [
+                            {
+                                "DeviceName": "/dev/xvda",
+                                "Ebs": {
+                                    "AttachTime": {
+                                        "__class__": "datetime",
+                                        "year": 2022,
+                                        "month": 5,
+                                        "day": 5,
+                                        "hour": 18,
+                                        "minute": 1,
+                                        "second": 34,
+                                        "microsecond": 0
+                                    },
+                                    "DeleteOnTermination": true,
+                                    "Status": "attached",
+                                    "VolumeId": "vol-0835b54773b3ee198"
+                                }
+                            }
+                        ],
+                        "ClientToken": "",
+                        "EbsOptimized": false,
+                        "EnaSupport": true,
+                        "Hypervisor": "xen",
+                        "NetworkInterfaces": [
+                            {
+                                "Attachment": {
+                                    "AttachTime": {
+                                        "__class__": "datetime",
+                                        "year": 2022,
+                                        "month": 5,
+                                        "day": 5,
+                                        "hour": 18,
+                                        "minute": 1,
+                                        "second": 33,
+                                        "microsecond": 0
+                                    },
+                                    "AttachmentId": "eni-attach-080cdd92170de33bc",
+                                    "DeleteOnTermination": true,
+                                    "DeviceIndex": 0,
+                                    "Status": "attached",
+                                    "NetworkCardIndex": 0
+                                },
+                                "Description": "",
+                                "Groups": [
+                                    {
+                                        "GroupName": "default",
+                                        "GroupId": "sg-02df69073faec3e4e"
+                                    }
+                                ],
+                                "Ipv6Addresses": [],
+                                "MacAddress": "12:a1:00:4b:a6:bf",
+                                "NetworkInterfaceId": "eni-06a738536ff471c56",
+                                "OwnerId": "644160558196",
+                                "PrivateDnsName": "ip-172-31-18-28.ec2.internal",
+                                "PrivateIpAddress": "172.31.18.28",
+                                "PrivateIpAddresses": [
+                                    {
+                                        "Primary": true,
+                                        "PrivateDnsName": "ip-172-31-18-28.ec2.internal",
+                                        "PrivateIpAddress": "172.31.18.28"
+                                    }
+                                ],
+                                "SourceDestCheck": true,
+                                "Status": "in-use",
+                                "SubnetId": "subnet-06a51b8914723a441",
+                                "VpcId": "vpc-0b36ebef5c318fbae",
+                                "InterfaceType": "interface"
+                            }
+                        ],
+                        "RootDeviceName": "/dev/xvda",
+                        "RootDeviceType": "ebs",
+                        "SecurityGroups": [
+                            {
+                                "GroupName": "default",
+                                "GroupId": "sg-02df69073faec3e4e"
+                            }
+                        ],
+                        "SourceDestCheck": true,
+                        "Tags": [
+                            {
+                                "Key": "Foo",
+                                "Value": "arn:aws:ec2:us-east-1:644160558196:security-group/sg-02df69073faec3e4e"
+                            },
+                            {
+                                "Key": "Name",
+                                "Value": "foo"
+                            }
+                        ],
+                        "VirtualizationType": "hvm",
+                        "CpuOptions": {
+                            "CoreCount": 1,
+                            "ThreadsPerCore": 1
+                        },
+                        "CapacityReservationSpecification": {
+                            "CapacityReservationPreference": "open"
+                        },
+                        "HibernationOptions": {
+                            "Configured": false
+                        },
+                        "MetadataOptions": {
+                            "State": "applied",
+                            "HttpTokens": "optional",
+                            "HttpPutResponseHopLimit": 1,
+                            "HttpEndpoint": "enabled",
+                            "HttpProtocolIpv6": "disabled",
+                            "InstanceMetadataTags": "disabled"
+                        },
+                        "EnclaveOptions": {
+                            "Enabled": false
+                        },
+                        "PlatformDetails": "Linux/UNIX",
+                        "UsageOperation": "RunInstances",
+                        "UsageOperationUpdateTime": {
+                            "__class__": "datetime",
+                            "year": 2022,
+                            "month": 5,
+                            "day": 5,
+                            "hour": 18,
+                            "minute": 1,
+                            "second": 33,
+                            "microsecond": 0
+                        },
+                        "PrivateDnsNameOptions": {
+                            "HostnameType": "ip-name",
+                            "EnableResourceNameDnsARecord": true,
+                            "EnableResourceNameDnsAAAARecord": false
+                        },
+                        "MaintenanceOptions": {
+                            "AutoRecovery": "default"
+                        }
+                    }
+                ],
+                "OwnerId": "644160558196",
+                "ReservationId": "r-0e88978c707610b30"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

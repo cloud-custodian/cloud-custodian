@@ -1,0 +1,10 @@
+{
+    "status_code": 200,
+    "data": {
+        "InstanceId": "i-017e55c722d539f90",
+        "DisableApiStop": {
+            "Value": false
+        },
+        "ResponseMetadata": {}
+    }
+}

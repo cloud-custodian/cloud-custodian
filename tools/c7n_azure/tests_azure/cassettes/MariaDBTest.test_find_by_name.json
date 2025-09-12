@@ -1,0 +1,75 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.DBForMariaDB/servers?api-version=2018-06-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Tue, 18 Apr 2023 15:37:02 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "971"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "sku": {
+                                    "name": "GP_Gen5_2",
+                                    "tier": "GeneralPurpose",
+                                    "family": "Gen5",
+                                    "capacity": 2
+                                },
+                                "properties": {
+                                    "administratorLogin": "custodian",
+                                    "storageProfile": {
+                                        "storageMB": 51200,
+                                        "backupRetentionDays": 7,
+                                        "geoRedundantBackup": "Disabled",
+                                        "storageAutogrow": "Disabled"
+                                    },
+                                    "version": "10.3",
+                                    "sslEnforcement": "Enabled",
+                                    "minimalTlsVersion": "TLS1_2",
+                                    "userVisibleState": "Ready",
+                                    "fullyQualifiedDomainName": "cctestmariadbserver76cp5dtr7sta4.mariadb.database.azure.com",
+                                    "earliestRestoreDate": "2023-04-18T15:33:05.367+00:00",
+                                    "replicationRole": "",
+                                    "masterServerId": "",
+                                    "byokEnforcement": "Disabled",
+                                    "infrastructureEncryption": "Disabled",
+                                    "privateEndpointConnections": [],
+                                    "publicNetworkAccess": "Enabled"
+                                },
+                                "location": "eastus",
+                                "tags": {
+                                    "product_id": "13742"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_mariadb/providers/Microsoft.DBforMariaDB/servers/cctestmariadbserver76cp5dtr7sta4",
+                                "name": "cctestmariadbserver76cp5dtr7sta4",
+                                "type": "Microsoft.DBforMariaDB/servers"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

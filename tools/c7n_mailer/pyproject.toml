@@ -1,40 +1,64 @@
-[tool.poetry]
-name = "c7n_mailer"
-version = "0.6.11"
-description = "Cloud Custodian - Reference Mailer"
-authors = ["Cloud Custodian Project"]
+[project]
+authors = [
+    {name = "Cloud Custodian Project"},
+]
 license = "Apache-2.0"
+requires-python = "<4.0.0,>=3.9.2"
+dependencies = [
+    "Jinja2<4.0,>=3.0",
+    "boto3>=1.11.12",
+    "datadog<1.0.0,>=0.34.0",
+    "importlib-metadata<9.0,>=8.0",
+    "jsonpatch<2.0,>=1.25",
+    "jsonpointer>=2.0",
+    "jsonschema>=4.18",
+    "ldap3<3.0.0,>=2.6.1",
+    "python-dateutil<3.0.0,>=2.8.1",
+    "pyyaml>=5.4.0",
+    "redis<6.0,>=5.0",
+    "sendgrid<7.0.0,>=6.1.1",
+    "types-six<2.0.0,>=1.16.10",
+]
+name = "c7n_mailer"
+version = "0.6.46"
+description = "Cloud Custodian - Reference Mailer"
 readme = "README.md"
+classifiers = [
+    "License :: OSI Approved :: Apache Software License",
+    "Topic :: System :: Systems Administration",
+    "Topic :: System :: Distributed Computing",
+]
+
+[project.urls]
 homepage = "https://cloudcustodian.io"
 repository = "https://github.com/cloud-custodian/cloud-custodian"
 documentation = "https://cloudcustodian.io/docs/"
-classifiers = [
-   "Topic :: System :: Systems Administration",
-   "Topic :: System :: Distributed Computing"
+
+[project.optional-dependencies]
+gcp = [
+    "c7n_gcp",
+    "google-cloud-secret-manager<3.0.0,>=2.8.0",
+]
+azure = [
+    "c7n_azure",
 ]
 
-[tool.poetry.scripts]
-c7n-mailer = 'c7n_mailer.cli:main'
-c7n-mailer-replay = 'c7n_mailer.replay:main'
+[tool.uv.sources]
+c7n_azure = { workspace = true }
+c7n_gcp = { workspace = true }
 
-[tool.poetry.dependencies]
-python = "^3.6"
-Jinja2 = "^2.11"
-boto3 = "^1.11.12"
-jsonschema = "^3.2.0"
-python-dateutil = "^2.8.1"
-pyyaml="^5.3"
-sendgrid = "^6.1.1"
-datadog = "^0.34.0"
-ldap3 = "^2.6.1"
-redis = "^3.4.1"
-jsonpointer = "^2.0"
-jsonpatch = "^1.25"
+[project.scripts]
+c7n-mailer = "c7n_mailer.cli:main"
+c7n-mailer-replay = "c7n_mailer.replay:main"
 
-[tool.poetry.dev-dependencies]
-fakeredis = "^1.2.0"
-pytest = "~6.0.0"
+[dependency-groups]
+dev = [
+    "black<25.0,>=23.1",
+    "fakeredis<3.0,>=2.0",
+    "mypy<1.0,>=0.931",
+    "pytest<8.0",
+]
 
 [build-system]
-requires = ["poetry>=0.12", "setuptools"]
-build-backend = "poetry.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
