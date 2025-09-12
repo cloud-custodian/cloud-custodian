@@ -1,5 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import functools
 import itertools
 import re
 from collections import defaultdict
@@ -18,7 +19,7 @@ from c7n.query import (
     TypeInfo, DescribeSource, ConfigSource, DescribeWithResourceTags)
 from c7n.resolver import ValuesFrom
 from c7n.tags import universal_augment
-from c7n.utils import type_schema, local_session, chunks, get_retry, jmespath_search
+from c7n.utils import generate_arn, type_schema, local_session, chunks, get_retry, jmespath_search
 
 
 class DescribeAlarm(DescribeSource):
@@ -832,3 +833,92 @@ class DeliveryDestinationDelete(BaseAction):
                 ignore_err_codes=('ResourceNotFoundException',),
                 name=r['name'],
             )
+
+
+@resources.register('cloudwatch-synthetics')
+class SyntheticsCanary(QueryResourceManager):
+    """AWS CloudWatch Synthetics Canary
+
+    Example:
+        .. code-block:: yaml
+
+            policies:
+              - name: stop-failed-canaries
+                resource: aws.cloudwatch-synthetics
+                filters:
+                  - State.CurrentStatus.State: FAILED
+                actions:
+                  - type: delete
+    """
+
+    class resource_type(TypeInfo):
+        service = 'synthetics'
+        id = 'Id'
+        name = 'Name'
+        date = 'LastModified'
+        arn_type = 'canary'
+        dimension = 'CanaryName'
+        cfn_type = 'AWS::Synthetics::Canary'
+        enum_spec = ('describe_canaries', 'Canaries', None)
+        universal_taggable = object()
+
+    @property
+    def generate_arn(self):
+        """
+         Sample arn: arn:aws:synthetics:us-east-1::canary:test-canary
+         This method overrides c7n.utils.generate_arn and drops
+         account id from the generic arn.
+        """
+        if self._generate_arn is None:
+            self._generate_arn = functools.partial(
+                generate_arn,
+                self.resource_type.service,
+                region=self.config.region,
+                resource_type=self.resource_type.arn_type)
+        return self._generate_arn
+
+    def augment(self, resources):
+        for r in resources:
+            # AWS returns tags as a dict { "Key": "Value" }
+            # Custodian expects [{"Key": k, "Value": v}, ...]
+            r["Tags"] = [{"Key": k, "Value": v} for k, v in r["Tags"].items()]
+
+        return resources
+
+
+@SyntheticsCanary.action_registry.register('start')
+class StartCanary(BaseAction):
+    schema = type_schema('start')
+
+    permissions = ('synthetics:StartCanary',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('synthetics')
+        for r in resources:
+            client.start_canary(Name=r['Name'])
+
+
+@SyntheticsCanary.action_registry.register('stop')
+class StopCanary(BaseAction):
+    schema = type_schema('stop')
+
+    permissions = ('synthetics:StopCanary',)
+
+    def process(self, resources):
+        """Stop all running resources"""
+        client = local_session(self.manager.session_factory).client('synthetics')
+        for r in resources:
+            client.stop_canary(Name=r['Name'])
+
+
+@SyntheticsCanary.action_registry.register('delete')
+class DeleteCanary(BaseAction):
+    schema = type_schema('delete')
+
+    permissions = ('synthetics:DeleteCanary',)
+
+    def process(self, resources):
+        """Delete resources"""
+        client = local_session(self.manager.session_factory).client('synthetics')
+        for r in resources:
+            client.delete_canary(Name=r['Name'])
