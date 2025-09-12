@@ -1,0 +1,10 @@
+{
+    "status_code": 400,
+    "data": {
+        "Error": {
+            "Code": "InvalidVpcEndpointId.NotFound",
+            "Message": "The vpc endpoint ID 'vpce-12345test' does not exist"
+        },
+        "ResponseMetadata": {}
+    }
+}

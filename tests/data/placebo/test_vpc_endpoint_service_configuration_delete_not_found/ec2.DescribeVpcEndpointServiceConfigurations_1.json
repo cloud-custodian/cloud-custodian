@@ -1,0 +1,35 @@
+{
+    "status_code": 200,
+    "data": {
+        "ServiceConfigurations": [
+            {
+                "ServiceId": "vpce-svc-nonexistent",
+                "ServiceName": "com.amazonaws.vpce.us-east-1.vpce-svc-nonexistent",
+                "ServiceState": "Available",
+                "ServiceType": [
+                    {
+                        "ServiceType": "Interface"
+                    }
+                ],
+                "AcceptanceRequired": false,
+                "ManagesVpcEndpoints": false,
+                "NetworkLoadBalancerArns": [
+                    "arn:aws:elasticloadbalancing:us-east-1:644160558196:loadbalancer/net/test-nlb/1234567890abcdef"
+                ],
+                "GatewayLoadBalancerArns": [],
+                "SupportedIpAddressTypes": [
+                    "ipv4"
+                ],
+                "BaseEndpointDnsNames": [
+                    "vpce-svc-nonexistent.us-east-1.vpce.amazonaws.com"
+                ],
+                "PrivateDnsName": "",
+                "PrivateDnsNames": [],
+                "PrivateDnsNameConfiguration": {},
+                "PayerResponsibility": "ServiceOwner",
+                "Tags": []
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

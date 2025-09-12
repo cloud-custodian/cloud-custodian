@@ -1,0 +1,50 @@
+{
+    "status_code": 200,
+    "data": {
+        "VpcEndpoints": [
+            {
+                "VpcEndpointId": "vpce-12345test",
+                "VpcEndpointType": "Interface",
+                "VpcId": "vpc-d2d616b5",
+                "ServiceName": "com.amazonaws.us-east-1.s3",
+                "State": "available",
+                "PolicyDocument": "{\n  \"Statement\": [\n    {\n      \"Action\": \"*\", \n      \"Effect\": \"Allow\", \n      \"Principal\": \"*\", \n      \"Resource\": \"*\"\n    }\n  ]\n}",
+                "RouteTableIds": [],
+                "SubnetIds": [
+                    "subnet-3a334610",
+                    "subnet-efbcccb7"
+                ],
+                "Groups": [
+                    {
+                        "GroupId": "sg-6c7fa917",
+                        "GroupName": "default"
+                    }
+                ],
+                "PrivateDnsEnabled": false,
+                "RequesterManaged": false,
+                "NetworkInterfaceIds": [
+                    "eni-009c64280f9096586"
+                ],
+                "DnsEntries": [],
+                "CreationTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 10,
+                    "day": 20,
+                    "hour": 10,
+                    "minute": 53,
+                    "second": 39,
+                    "microsecond": 0
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "c7n-test-endpoint"
+                    }
+                ],
+                "OwnerId": "644160558196"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

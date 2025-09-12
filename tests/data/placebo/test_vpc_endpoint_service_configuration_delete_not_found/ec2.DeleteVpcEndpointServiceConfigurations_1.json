@@ -1,0 +1,10 @@
+{
+    "status_code": 400,
+    "data": {
+        "Error": {
+            "Code": "InvalidVpcEndpointServiceId.NotFound",
+            "Message": "The vpc endpoint service ID 'vpce-svc-nonexistent' does not exist"
+        },
+        "ResponseMetadata": {}
+    }
+}
