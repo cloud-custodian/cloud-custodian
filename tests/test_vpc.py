@@ -3544,6 +3544,26 @@ class SecurityGroupTest(BaseTest):
 
 class EndpointTest(BaseTest):
 
+    def test_vpc_endpoint_unused_filter(self):
+        factory = self.replay_flight_data("test_vpc_endpoint_unused_filter")
+        p = self.load_policy(
+            {
+                "name": "unused-vpc-endpoints",
+                "resource": "vpc-endpoint",
+                "filters": [
+                    {"type": "unused"}
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+
+        # Check that we found the expected unused endpoints
+        endpoint_ids = {r['VpcEndpointId'] for r in resources}
+        self.assertIn('vpce-unused-gateway', endpoint_ids)
+        self.assertIn('vpce-unused-interface', endpoint_ids)
+
     def test_vpc_endpoint_delete(self):
         factory = self.replay_flight_data("test_vpc_endpoint_delete")
         p = self.load_policy(

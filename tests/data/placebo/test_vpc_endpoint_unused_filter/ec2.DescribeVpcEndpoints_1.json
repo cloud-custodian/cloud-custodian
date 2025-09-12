@@ -1,0 +1,52 @@
+{
+    "status_code": 200,
+    "data": {
+        "VpcEndpoints": [
+            {
+                "VpcEndpointId": "vpce-unused-gateway",
+                "VpcEndpointType": "Gateway",
+                "VpcId": "vpc-12345678",
+                "ServiceName": "com.amazonaws.us-east-1.s3",
+                "State": "Available",
+                "RouteTableIds": [],
+                "CreationTimestamp": "2023-01-01T12:00:00.000Z"
+            },
+            {
+                "VpcEndpointId": "vpce-unused-interface", 
+                "VpcEndpointType": "Interface",
+                "VpcId": "vpc-12345678",
+                "ServiceName": "com.amazonaws.us-east-1.ec2",
+                "State": "Available",
+                "SubnetIds": [],
+                "CreationTimestamp": "2023-01-01T12:00:00.000Z"
+            },
+            {
+                "VpcEndpointId": "vpce-used-gateway",
+                "VpcEndpointType": "Gateway", 
+                "VpcId": "vpc-12345678",
+                "ServiceName": "com.amazonaws.us-east-1.s3",
+                "State": "Available",
+                "RouteTableIds": ["rtb-12345678"],
+                "CreationTimestamp": "2023-01-01T12:00:00.000Z"
+            },
+            {
+                "VpcEndpointId": "vpce-used-interface",
+                "VpcEndpointType": "Interface",
+                "VpcId": "vpc-12345678", 
+                "ServiceName": "com.amazonaws.us-east-1.ec2",
+                "State": "Available",
+                "SubnetIds": ["subnet-12345678"],
+                "CreationTimestamp": "2023-01-01T12:00:00.000Z"
+            },
+            {
+                "VpcEndpointId": "vpce-pending-interface",
+                "VpcEndpointType": "Interface",
+                "VpcId": "vpc-12345678",
+                "ServiceName": "com.amazonaws.us-east-1.ec2", 
+                "State": "Pending",
+                "SubnetIds": [],
+                "CreationTimestamp": "2023-01-01T12:00:00.000Z"
+            }
+        ]
+    }
+}
