@@ -101,11 +101,15 @@ class MetricsFilter(Filter):
     def get_batch_size(self):
         """get_batch_size
         refer doc: https://www.tencentcloud.com/document/product/248/33881
-        one request only support 1440 data points
-        so it need to calc the batch size
+        A single request can get the data of up to 10 instances
+        for up to 1,440 data points total across instances.
+        So batch size must satisfy both constraints.
         """
         data_points_per_resource = math.ceil(self.days * 86400 / self.period)
-        return math.floor(1440 / data_points_per_resource)
+        # limit by total data points across instances
+        max_instances_by_points = math.floor(1440 / data_points_per_resource)
+        # limit by max instances per request (10)
+        return min(10, max_instances_by_points)
 
     def _get_request_params(self, resources):
         namespace, instances = self.manager.get_metrics_req_params(resources)
