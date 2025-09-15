@@ -3660,21 +3660,21 @@ class EndpointTest(BaseTest):
         self.assertEqual(len(results), 0)
 
     def test_vpc_endpoint_unused_filter_resource_manager_error(self):
-        """Test that resource manager handles API errors gracefully"""
+        """Test that resource manager raises ClientError for invalid endpoints"""
         factory = self.replay_flight_data("test_vpc_endpoint_unused_filter_error")
 
-        # This should test that the resource manager handles ClientError properly
-        # The unused filter itself doesn't make API calls, but the resource manager does
+        # This tests that the resource manager properly propagates ClientError
+        # when trying to describe non-existent VPC endpoints
         p = self.load_policy({
             "name": "unused-vpc-endpoints-error",
             "resource": "vpc-endpoint",
             "filters": [{"type": "unused"}]
         }, session_factory=factory)
 
-        # This should handle the API error gracefully and return no results
-        # since the resource manager can't retrieve the endpoints
-        resources = p.run()
-        self.assertEqual(len(resources), 0)
+        # The resource manager should raise ClientError for invalid endpoint IDs
+        with self.assertRaises(BotoClientError) as e:
+            p.run()
+        self.assertEqual(e.exception.response['Error']['Code'], 'InvalidVpcEndpointId.NotFound')
 
     def test_vpc_endpoint_delete(self):
         factory = self.replay_flight_data("test_vpc_endpoint_delete")
