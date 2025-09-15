@@ -3564,6 +3564,118 @@ class EndpointTest(BaseTest):
         self.assertIn('vpce-unused-gateway', endpoint_ids)
         self.assertIn('vpce-unused-interface', endpoint_ids)
 
+    def test_vpc_endpoint_unused_filter_edge_cases(self):
+        """Test UnusedVpcEndpoint filter with malformed/edge case data"""
+        p = self.load_policy({
+            "name": "unused-vpc-endpoints-edge-cases",
+            "resource": "vpc-endpoint",
+            "filters": [{"type": "unused"}]
+        })
+
+        unused_filter = p.resource_manager.filters[0]
+
+        # Test with malformed resources missing properties
+        malformed_resources = [
+            # Missing State - should be skipped
+            {
+                "VpcEndpointId": "vpce-missing-state",
+                "VpcEndpointType": "Gateway",
+                "VpcId": "vpc-12345678"
+                # Missing State, RouteTableIds
+            },
+            # Missing VpcEndpointType - should be skipped
+            {
+                "VpcEndpointId": "vpce-missing-type",
+                "State": "Available",
+                "VpcId": "vpc-12345678"
+                # Missing VpcEndpointType
+            },
+            # Gateway with None RouteTableIds - should be flagged as unused
+            {
+                "VpcEndpointId": "vpce-gateway-none-routes",
+                "VpcEndpointType": "Gateway",
+                "State": "Available",
+                "VpcId": "vpc-12345678",
+                "RouteTableIds": None
+            },
+            # Interface with None SubnetIds - should be flagged as unused
+            {
+                "VpcEndpointId": "vpce-interface-none-subnets",
+                "VpcEndpointType": "Interface",
+                "State": "Available",
+                "VpcId": "vpc-12345678",
+                "SubnetIds": None
+            },
+            # Unknown endpoint type - should be skipped
+            {
+                "VpcEndpointId": "vpce-unknown-type",
+                "VpcEndpointType": "Unknown",
+                "State": "Available",
+                "VpcId": "vpc-12345678"
+            }
+        ]
+
+        results = unused_filter.process(malformed_resources)
+
+        # Should find 2 unused endpoints (the ones with None values for associations)
+        self.assertEqual(len(results), 2)
+        endpoint_ids = {r['VpcEndpointId'] for r in results}
+        self.assertIn('vpce-gateway-none-routes', endpoint_ids)
+        self.assertIn('vpce-interface-none-subnets', endpoint_ids)
+
+    def test_vpc_endpoint_unused_filter_empty_data(self):
+        """Test UnusedVpcEndpoint filter with empty data scenarios"""
+        p = self.load_policy({
+            "name": "unused-vpc-endpoints-empty",
+            "resource": "vpc-endpoint",
+            "filters": [{"type": "unused"}]
+        })
+
+        unused_filter = p.resource_manager.filters[0]
+
+        # Test with empty resource list
+        results = unused_filter.process([])
+        self.assertEqual(len(results), 0)
+
+        # Test with resources that have all expected properties but are not Available
+        non_available_resources = [
+            {
+                "VpcEndpointId": "vpce-pending",
+                "VpcEndpointType": "Gateway",
+                "State": "Pending",
+                "VpcId": "vpc-12345678",
+                "RouteTableIds": []
+            },
+            {
+                "VpcEndpointId": "vpce-failed",
+                "VpcEndpointType": "Interface",
+                "State": "Failed",
+                "VpcId": "vpc-12345678",
+                "SubnetIds": []
+            }
+        ]
+
+        results = unused_filter.process(non_available_resources)
+        # Should return empty since only Available endpoints are considered
+        self.assertEqual(len(results), 0)
+
+    def test_vpc_endpoint_unused_filter_resource_manager_error(self):
+        """Test that resource manager handles API errors gracefully"""
+        factory = self.replay_flight_data("test_vpc_endpoint_unused_filter_error")
+
+        # This should test that the resource manager handles ClientError properly
+        # The unused filter itself doesn't make API calls, but the resource manager does
+        p = self.load_policy({
+            "name": "unused-vpc-endpoints-error",
+            "resource": "vpc-endpoint",
+            "filters": [{"type": "unused"}]
+        }, session_factory=factory)
+
+        # This should handle the API error gracefully and return no results
+        # since the resource manager can't retrieve the endpoints
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
     def test_vpc_endpoint_delete(self):
         factory = self.replay_flight_data("test_vpc_endpoint_delete")
         p = self.load_policy(
