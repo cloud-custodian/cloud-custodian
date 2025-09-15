@@ -112,6 +112,7 @@ COPY --from=build-env /output /output
 
 
 RUN adduser --disabled-login --gecos "" custodian
+{pre_entry}
 USER custodian
 WORKDIR /home/custodian
 ENV LC_ALL="C.UTF-8" LANG="C.UTF-8"
@@ -184,6 +185,7 @@ class Image:
         uv_version="0.7.6",
         packages="",
         providers=" ".join(default_providers),
+        pre_entry="",
         PHASE_1_PKG_INSTALL_DEP=PHASE_1_PKG_INSTALL_DEP,
         PHASE_2_PKG_INSTALL_ROOT=PHASE_2_PKG_INSTALL_ROOT,
     )
@@ -221,7 +223,8 @@ ImageMap = {
             name="cli",
             repo="c7n",
             description="Cloud Management Rules Engine",
-            entrypoint="/src/.venv/bin/custodian",
+            pre_entry="RUN ln -s /src/.venv/bin/custodian /usr/local/bin/custodian",
+            entrypoint="/usr/local/bin/custodian",
         ),
         build=[BUILD_STAGE],
         target=[TARGET_UBUNTU_STAGE, TARGET_CLI],
@@ -231,7 +234,8 @@ ImageMap = {
             name="kube",
             repo="c7n",
             description="Cloud Custodian Kubernetes Hooks",
-            entrypoint="/src/.venv/bin/c7n-kates",
+            pre_entry="RUN ln -s /src/.venv/bin/c7n-kates /usr/local/bin/c7n-kates",
+            entrypoint="/usr/local/bin/c7n-kates",
         ),
         build=[BUILD_STAGE, BUILD_KUBE],
         target=[TARGET_UBUNTU_STAGE, TARGET_KUBE],
@@ -241,7 +245,8 @@ ImageMap = {
             name="org",
             repo="c7n-org",
             description="Cloud Custodian Organization Runner",
-            entrypoint="/src/.venv/bin/c7n-org",
+            pre_entry="RUN ln -s /src/.venv/bin/c7n-org /usr/local/bin/c7n-org",
+            entrypoint="/usr/local/bin/c7n-org",
         ),
         build=[BUILD_STAGE, BUILD_ORG],
         target=[TARGET_UBUNTU_STAGE, TARGET_ORG],
@@ -250,7 +255,8 @@ ImageMap = {
         dict(
             name="mailer",
             description="Cloud Custodian Notification Delivery",
-            entrypoint="/src/.venv/bin/c7n-mailer",
+            pre_entry="RUN ln -s /src/.venv/bin/c7n-mailer /usr/local/bin/c7n-mailer",
+            entrypoint="/usr/local/bin/c7n-mailer",
         ),
         build=[BUILD_STAGE, BUILD_MAILER],
         target=[TARGET_UBUNTU_STAGE, TARGET_MAILER],
@@ -259,7 +265,8 @@ ImageMap = {
         dict(
             name="policystream",
             description="Custodian policy changes streamed from Git",
-            entrypoint="/src/.venv/bin/c7n-policystream",
+            pre_entry="RUN ln -s /src/.venv/bin/c7n-policystream /usr/local/bin/c7n-policystream",
+            entrypoint="/usr/local/bin/c7n-policystream",
         ),
         build=[BUILD_STAGE, BUILD_POLICYSTREAM],
         target=[TARGET_UBUNTU_STAGE, TARGET_POLICYSTREAM],
