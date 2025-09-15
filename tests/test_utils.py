@@ -300,7 +300,7 @@ class UtilTest(BaseTest):
     def test_merge_dict_tuple(self):
 
         a = {
-            "a": ("bcd","efg")
+            "a": ("bcd", "efg")
         }
         b = {
             "a": {"abc", "def"}
