@@ -139,7 +139,7 @@ class MetricsFilter(Filter):
     def get_client(self):
         """get_client"""
         return local_session(self.manager.session_factory).client("monitor.tencentcloudapi.com",
-                                                                  "service",
+                                                                  "monitor",
                                                                   "2018-07-24",
                                                                   self.manager.config.region)
 
