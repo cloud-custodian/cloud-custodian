@@ -303,9 +303,9 @@ class UtilTest(BaseTest):
             "a": ("bcd", "efg")
         }
         b = {
-            "a": {"abc", "def"}
+            "a": ("abc", "def")
         }
-        assert utils.merge_dict(a, b) == {"a": {"abc", "def"}}
+        assert utils.merge_dict(a, b) == {"a": ("abc", "def")}
 
     def test_compare_dicts_using_sets(self):
         a = {
