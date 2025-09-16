@@ -147,11 +147,46 @@ class MetricsFilter(Filter):
         """process"""
         log.debug("[metrics filter]start_time=%s, end_time=%s", self.start_time, self.end_time)
 
+        # Create a map from resource_id to resource for quick lookup
+        resource_map = {res[self.resource_metadata.id]: res for res in resources}
+        
         matched_resource_ids = []
         for data_point in self.get_metrics_data_point(resources):
             resource_id = self.manager.get_resource_id_from_dimensions(data_point["Dimensions"])
             if resource_id is None:
                 raise PolicyExecutionError("get resource id from metrics response data error")
+            
+            # Attach metrics data to the resource (similar to AWS implementation)
+            if resource_id in resource_map:
+                resource = resource_map[resource_id]
+                collected_metrics = resource.setdefault('c7n.metrics', {})
+                # Create cache key similar to AWS pattern
+                key = f"{self.resource_metadata.metrics_namespace}.{self.metric_name}.{self.statistics}.{self.days}"
+                
+                # Store the raw data point and computed metric value
+                collected_metrics[key] = {
+                    'Timestamps': data_point.get('Timestamps', []),
+                    'Values': data_point.get('Values', []),
+                    'Dimensions': data_point.get('Dimensions', []),
+                    'Statistic': self.statistics,
+                    'MetricName': self.metric_name,
+                    'Namespace': self.resource_metadata.metrics_namespace,
+                    'Period': self.period,
+                    'Days': self.days
+                }
+                
+                # Compute aggregated value for filtering
+                values = data_point.get("Values", [])
+                if not values and self.missing_value is None:
+                    raise PolicyExecutionError("there is no metrics, but not set missing-value")
+                if not values:
+                    metric_value = self.missing_value
+                else:
+                    metric_value = self.statistics_op(values)
+                
+                # Store the computed metric value for easy access
+                collected_metrics[key]['AggregatedValue'] = metric_value
+            
             if self.match(data_point):
                 matched_resource_ids.append(resource_id)
             else:
