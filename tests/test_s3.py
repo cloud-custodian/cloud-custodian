@@ -60,7 +60,8 @@ def test_s3_assembly_validate(test):
 
 
 def test_s3_assembly_none(test):
-    # noting even with none we will still get location and tags to ensure other s3 filters/actions work
+    # noting even with none we will still get location and tags to
+    # ensure other s3 filters/actions work.
     policy = test.load_policy(
         {'name': 's3-attrs',
          'resource': 's3',
@@ -75,7 +76,6 @@ def test_s3_assembly_none(test):
 
 
 def test_s3_assembly_website(test):
-    # noting even with none we will still get location and tags to ensure other s3 filters/actions work
     policy = test.load_policy(
         {'name': 's3-attrs',
          'resource': 's3',
