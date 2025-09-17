@@ -373,8 +373,9 @@ class S3(query.QueryResourceManager):
     particular sub document is not needed for a policy, by setting the
     `augment-keys` parameter in a query block of the policy.
 
-    ie if we only care about bucket website and replication configuration, we can
-    minimize the api calls needed to fetch a bucket by setting up augment-keys as follows.
+    ie if we only care about bucket website and replication
+    configuration, we can minimize the api calls needed to fetch a
+    bucket by setting up augment-keys as follows.
 
     :example:
 
@@ -405,10 +406,13 @@ class S3(query.QueryResourceManager):
              - Website.ErrorDocument: not-null
              - Replication.ReplicationConfiguration.Rules: not-null
 
-    The default value for augment-keys is `all` to preserve historical compatiblity. It also supports
-    the value of 'none' to disable all subdocument fetching except Location and Tags.
+    The default value for augment-keys is `all` to preserve historical
+    compatiblity. `augment-keys` also supports the value of 'none' to disable all
+    subdocument fetching except Location and Tags.
 
-    Note certain actions may implicitly depend on the corresponding subdocument being present.
+    Note certain actions may implicitly depend on the corresponding
+    subdocument being present.
+
     """
 
     class resource_type(query.TypeInfo):
