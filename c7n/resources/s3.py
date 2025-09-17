@@ -561,7 +561,7 @@ class BucketAssembly:
             # k: v dict
             elif len(f) == 1:
                 fkey = list(f.keys())[0]
-            if fkey is None:
+            if fkey is None: # pragma: no cover
                 continue
 
             # remove any jmespath expressions
@@ -620,15 +620,15 @@ class BucketAssembly:
                     value = value[select]
             except (ssl.SSLError, SSLError) as e:
                 # Proxy issue most likely
-                log.warning("Bucket ssl error %s: %s %s",
-                            bucket['Name'], bucket.get('Location', 'unknown'),
-                            e)
+                log.warning(
+                    "Bucket ssl error %s: %s %s",
+                    bucket['Name'], bucket.get('Location', 'unknown'), e)
                 continue
             except ClientError as e:
                 code = e.response['Error']['Code']
                 if code.startswith("NoSuch") or "NotFound" in code:
                     value = default
-                elif code == 'PermanentRedirect':
+                elif code == 'PermanentRedirect':  # pragma: no cover
                     # (09/2025)- its not clear how we get here given a client region switch post
                     # location detection.
                     #

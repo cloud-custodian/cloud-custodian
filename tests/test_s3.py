@@ -47,7 +47,7 @@ def test_s3_assembly_validate(test):
         )
         policy.validate()
 
-    for tcase in ('random', ['Garbage']):
+    for tcase in ('random', ['Garbage'], {}):
         with pytest.raises(PolicyValidationError):
             policy = test.load_policy(
                 {'name': 's3-attrs',
@@ -97,6 +97,7 @@ def test_s3_assembly_detect(test):
          'query': [{'augment-keys': 'detect'}],
          'filters': [
              {'tag:Owner': 'xyz'},
+             {'type': 'cross-account'},
              {'SomethingRandom': 'xyz'},
              {'Replication.ReplicationConfiguation.Rules[].Destination.StorageClass': 'Standard'},
              {'type': 'value',
@@ -263,6 +264,7 @@ class BucketMetrics(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertIn('c7n.metrics', resources[0])
+        assert p.resource_manager.get_arns(resources) == ['arn:aws:s3:::c7n-ssm-build']
 
     def test_metrics(self):
         self.patch(s3.S3, "executor_factory", MainThreadExecutor)
