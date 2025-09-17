@@ -561,7 +561,7 @@ class BucketAssembly:
             # k: v dict
             elif len(f) == 1:
                 fkey = list(f.keys())[0]
-            if fkey is None: # pragma: no cover
+            if fkey is None:  # pragma: no cover
                 continue
 
             # remove any jmespath expressions
