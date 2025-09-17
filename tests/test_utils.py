@@ -181,20 +181,44 @@ class UtilTest(BaseTest):
                 'a': 1, 'b': 2, 'c': 3, 'x': 1}
 
     def test_merge_dict(self):
-        a = {'detail': {'eventName': ['CreateSubnet'],
-                        'eventSource': ['ec2.amazonaws.com']},
-             'detail-type': ['AWS API Call via CloudTrail']}
-        b = {'detail': {'userIdentity': {
-            'userName': [{'anything-but': 'deputy'}]}}}
+        a = {
+                'detail': {
+                    'eventName': 'CreateSubnet',
+                    'eventSource': ['ec2.amazonaws.com'],
+                    'resources': [{'id': 1}],
+                    'statusCode': 'Pending'
+                },
+                'detail-type': ['AWS API Call via CloudTrail']
+            }
+        b = {
+                'awsregion': 'us-east-1',
+                'detail': {
+                    'eventName': 'UpdateSubnet',
+                    'resources': [{'id': 2}],
+                    'eventSource': 's3.amazonaws.com',
+                    'statusCode': ['Success', 'Failure'],
+                    'userIdentity': {
+                        'userName': [{'anything-but': 'deputy'}]
+                    }
+                }
+            }
+
         self.assertEqual(
             utils.merge_dict(a, b),
-            {'detail-type': ['AWS API Call via CloudTrail'],
-             'detail': {
-                 'eventName': ['CreateSubnet'],
-                 'eventSource': ['ec2.amazonaws.com'],
-                 'userIdentity': {
-                     'userName': [
-                         {'anything-but': 'deputy'}]}}})
+            {
+                'awsregion': 'us-east-1',
+                'detail-type': ['AWS API Call via CloudTrail'],
+                'detail': {
+                    'eventName': 'UpdateSubnet',
+                    'eventSource': ['ec2.amazonaws.com', 's3.amazonaws.com'],
+                    'resources': [{'id': 1}, {'id': 2}],
+                    'statusCode': ['Pending', 'Success', 'Failure'],
+                    'userIdentity': {
+                        'userName': [{'anything-but': 'deputy'}]
+                    }
+                }
+            }
+        )
 
     def test_merge_dict_iam_condition(self):
         a = {
@@ -241,11 +265,11 @@ class UtilTest(BaseTest):
             utils.merge_dict(a, b),
             {
                 "Bool": {
-                    "aws:SecureTransport": "true",
+                    "aws:SecureTransport": "false",
                     "elasticfilesystem:AccessedViaMountTarget": "true",
                 },
                 "StringNotLike": {
-                    "aws": "abc"
+                    "aws": "def"
                 },
                 "StringEquals": {
                     "aws:PrincipalType": [

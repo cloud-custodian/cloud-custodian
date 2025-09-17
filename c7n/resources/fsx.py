@@ -11,7 +11,7 @@ from c7n.query import (
 from c7n.actions import BaseAction
 from c7n.tags import Tag, TagDelayedAction, RemoveTag, coalesce_copy_user_tags, TagActionFilter
 from c7n.utils import type_schema, local_session, chunks, group_by
-from c7n.filters import Filter, ListItemFilter
+from c7n.filters import Filter, ListItemFilter, MetricsFilter
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters.vpc import SubnetFilter, VpcFilter
 from c7n.filters.backup import ConsecutiveAwsBackupsFilter
@@ -40,6 +40,7 @@ class FSx(QueryResourceManager):
         date = 'CreationTime'
         cfn_type = 'AWS::FSx::FileSystem'
         id_prefix = 'fs-'
+        dimension = 'FileSystemId'
 
     source_mapping = {
         'describe': DescribeFSx
@@ -157,6 +158,7 @@ class DeleteBackup(BaseAction):
 FSxBackup.filter_registry.register('marked-for-op', TagActionFilter)
 
 FSx.filter_registry.register('marked-for-op', TagActionFilter)
+FSx.filter_registry.register('metrics', MetricsFilter)
 
 
 @FSxBackup.action_registry.register('mark-for-op')

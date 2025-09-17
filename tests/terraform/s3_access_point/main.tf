@@ -30,6 +30,14 @@ resource "aws_s3_access_point" "example" {
     block_public_policy     = false
     restrict_public_buckets = false
   }
-  policy = templatefile("policy.json", { unique_suffix = random_pet.bucket.id, account_id = data.aws_caller_identity.current.account_id, region = data.aws_region.current.name })
+  policy = templatefile("policy.json", { unique_suffix = random_pet.bucket.id, account_id = data.aws_caller_identity.current.account_id, region = data.aws_region.current.region })
 }
 
+resource "aws_s3_access_point" "no_policy" {
+  bucket = aws_s3_bucket.example.id
+  name   = "c7n-ap-no-policy-${random_pet.bucket.id}"
+  public_access_block_configuration {
+    block_public_policy     = false
+    restrict_public_buckets = false
+  }
+}
