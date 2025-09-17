@@ -360,6 +360,56 @@ class ConfigS3(query.ConfigSource):
 
 @resources.register('s3')
 class S3(query.QueryResourceManager):
+    """Amazon's Simple Storage Service Buckets.
+
+
+    By default and due to historical compatiblity cloud custodian will
+    fetch a number of subdocuments (Acl, Policy, Tagging, Versioning,
+    Website, Notification, Lifecycle, and Replication) for each bucket
+    to allow policies authors's to target common bucket
+    configurations.
+
+    This behavior can be customized to avoid extraneous api calls if a
+    particular sub document is not needed for a policy, by setting the
+    `augment-keys` parameter in a query block of the policy.
+
+    ie if we only care about bucket website and replication configuration, we can
+    minimize the api calls needed to fetch a bucket by setting up augment-keys as follows.
+
+    :example:
+
+    .. code-block:: yaml
+
+       policies:
+         - name: check-website-replication
+           resource: s3
+           query:
+             - augment-keys: ['Website', 'Replication']
+           filters:
+             - Website.ErrorDocument: not-null
+             - Replication.ReplicationConfiguration.Rules: not-null
+
+    It also supports an automatic detection mode where the use of a subdocument
+    in a filter is automically with the augment-keys value of 'detect'.
+
+    :example:
+
+    .. code-block:: yaml
+
+       policies:
+         - name: check-website-replication
+           resource: s3
+           query:
+             - augment-keys: 'detect'
+           filters:
+             - Website.ErrorDocument: not-null
+             - Replication.ReplicationConfiguration.Rules: not-null
+
+    The default value for augment-keys is `all` to preserve historical compatiblity. It also supports
+    the value of 'none' to disable all subdocument fetching except Location and Tags.
+
+    Note certain actions may implicitly depend on the corresponding subdocument being present.
+    """
 
     class resource_type(query.TypeInfo):
         service = 's3'
