@@ -29,11 +29,11 @@ Actions:
 import copy
 import functools
 import json
-import itertools
 import logging
 import math
 import os
 import time
+import threading
 import ssl
 
 from botocore.client import Config
@@ -80,11 +80,12 @@ MAX_COPY_SIZE = 1024 * 1024 * 1024 * 2
 class DescribeS3(query.DescribeSource):
 
     def augment(self, buckets):
+        assembler = BucketAssembly(self.manager)
+        assembler.initialize()
+
         with self.manager.executor_factory(
                 max_workers=min((10, len(buckets) + 1))) as w:
-            results = w.map(
-                assemble_bucket,
-                zip(itertools.repeat(self.manager.session_factory), buckets))
+            results = w.map(assembler.assemble, buckets)
             results = list(filter(None, results))
             return results
 
@@ -431,75 +432,172 @@ S3_AUGMENT_TABLE = (
 )
 
 
-def assemble_bucket(item):
-    """Assemble a document representing all the config state around a bucket.
+class BucketAssembly:
 
-    TODO: Refactor this, the logic here feels quite muddled.
-    """
-    factory, b = item
-    s = factory()
-    c = s.client('s3')
-    # Bucket Location, Current Client Location, Default Location
-    b_location = c_location = location = "us-east-1"
-    methods = list(S3_AUGMENT_TABLE)
-    for minfo in methods:
-        m, k, default, select = minfo[:4]
-        try:
-            method = getattr(c, m)
-            v = method(Bucket=b['Name'])
-            v.pop('ResponseMetadata')
-            if select is not None and select in v:
-                v = v[select]
-        except (ssl.SSLError, SSLError) as e:
-            # Proxy issues? i assume
-            log.warning("Bucket ssl error %s: %s %s",
-                        b['Name'], b.get('Location', 'unknown'),
-                        e)
-            continue
-        except ClientError as e:
-            code = e.response['Error']['Code']
-            if code.startswith("NoSuch") or "NotFound" in code:
-                v = default
-            elif code == 'PermanentRedirect':
-                s = factory()
-                c = bucket_client(s, b)
-                # Requeue with the correct region given location constraint
-                methods.append((m, k, default, select))
+    def __init__(self, manager):
+        self.manager = manager
+        self.default_region = None
+        self.region_clients = {}
+        self.session = None
+        self.session_lock = None
+        self.augment_fields = []
+
+    def initialize(self):
+        # construct a default boto3 client, using the current session region.
+        self.session = local_session(self.manager.session_factory)
+        self.session_lock = threading.Lock()
+        self.default_region = self.manager.config.region
+        self.region_clients[self.default_region] = self.session.client('s3')
+        self.augment_fields = set(self.detect_augment_fields())
+        # location is required for client construction
+        self.augment_fields.add('Location')
+        # custodian always returns tags
+        self.augment_fields.add('Tags')
+
+    def validate(self):
+        config = self.get_augment_config()
+        if isinstance(config, str) and config not in ('all', 'detect', 'none'):
+            raise PolicyValidationError(
+                "augment-keys supports 'all', 'detect', 'none' or list of keys found: %s" % config)
+        elif isinstance(config, list):
+            delta = set(config).delta([row[1] for row in S3_AUGMENT_TABLE])
+            if delta:
+                raise PolicyValidationError("augment-keys - found invalid keys: %s" % (list(delta)))
+        if not isinstance(config, (list, str)):
+            raise PolicyValidationError(
+                "augment-keys supports 'all', 'detect', 'none' or list of keys found: %s" % config)
+
+    def get_augment_config(self):
+        augment_config = None
+        for option in self.manager.data.get('query', []):
+            if option and option.get('augment-keys') is not None:
+                augment_config = option['augment-keys']
+        if augment_config is None:
+            augment_config = 'all'
+        return augment_config
+
+    def detect_augment_fields(self):
+        # try to detect augment fields required for the policy execution
+        # we want to avoid extraneous api calls unless they are being used by the policy.
+
+        detected_keys = []
+        augment_keys = [row[1] for row in S3_AUGMENT_TABLE]
+        augment_config = self.get_augment_config()
+
+        if augment_config == 'all':
+            return augment_keys
+        elif augment_config == 'none':
+            return []
+        elif isinstance(augment_config, list):
+            return augment_config
+
+        for f in self.manager.iter_filters():
+            fkey = None
+            if not isinstance(f, ValueFilter):
                 continue
-            else:
-                log.warning(
-                    "Bucket:%s unable to invoke method:%s error:%s ",
-                    b['Name'], m, e.response['Error']['Message'])
-                # For auth failures, we don't bail out, continue processing if we can.
-                # Note this can lead to missing data, but in general is cleaner than
-                # failing hard, due to the common use of locked down s3 bucket policies
-                # that may cause issues fetching information across a fleet of buckets.
 
-                # This does mean s3 policies depending on augments should check denied
-                # methods annotation, generally though lacking get access to an augment means
-                # they won't have write access either.
+            f = f.data
+            # type: value
+            if f.get('type', '') == 'value':
+                fkey = f.get('key')
+            # k: v dict
+            elif len(f) == 1:
+                fkey = list(f.keys())[0]
+            if fkey is None:
+                continue
 
-                # For other error types we raise and bail policy execution.
-                if e.response['Error']['Code'] == 'AccessDenied':
-                    b.setdefault('c7n:DeniedMethods', []).append(m)
+            # remove any jmespath expressions
+            fkey = fkey.split('.', 1)[0]
+
+            # tags have explicit handling in value filters.
+            if fkey.startswith('tag:'):
+                fkey = 'Tags'
+
+            # denied methods checks get all keys
+            if fkey.startswith('c7n:DeniedMethods'):
+                return augment_keys
+
+            if fkey in augment_keys:
+                detected_keys.append(fkey)
+
+        return detected_keys
+
+    def get_client(self, region):
+        if region in self.region_clients:
+            return self.region_clients[region]
+        with self.session_lock:
+            self.region_clients[region] = self.session.client('s3', region=region)
+            return self.region_clients[region]
+
+    def normalize_region(self, location):
+        # for historical reason we normalize EU to eu-west-1
+        b_location = location.get('LocationConstraint')
+        # Location == region for all cases but EU
+        # https://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketGETlocation.html
+        if b_location is None:
+            b_location = "us-east-1"
+        elif b_location == 'EU':
+            b_location = "eu-west-1"
+            location['LocationConstraint'] = 'eu-west-1'
+
+    def assemble(self, bucket):
+
+        client = self.get_client(self.default_region)
+        augments = list(S3_AUGMENT_TABLE)
+
+        for info in augments:
+            # we use the offset, as tests manipulate the augments table
+            method_name, key, default, select = info[:4]
+            if key not in self.augment_fields:
+                continue
+
+            method = getattr(client, method_name)
+
+            try:
+                response = method(Bucket=bucket['Name'])
+                # This is here as exception handling will change to defaults if not present
+                response.pop('ResponseMetadata', None)
+                value = response
+                if select and select in value:
+                    value = value[select]
+            except (ssl.SSLError, SSLError) as e:
+                # Proxy issue most likely
+                log.warning("Bucket ssl error %s: %s %s",
+                            bucket['Name'], bucket.get('Location', 'unknown'),
+                            e)
+                continue
+            except ClientError as e:
+                code = e.response['Error']['Code']
+                if code.startswith("NoSuch") or "NotFound" in code:
+                    value = default
+                elif code == 'PermanentRedirect':
+                    # (09/2025)- its not clear how we get here given a client region switch post
+                    # location detection.
+                    #
+                    # change client region
+                    client = self.get_client(get_region(bucket))
+                    # requeue now that we have correct region
+                    augments.append((method_name, key, default, select))
                     continue
-                raise
-        # As soon as we learn location (which generally works)
-        if k == 'Location' and v is not None:
-            b_location = v.get('LocationConstraint')
-            # Location == region for all cases but EU
-            # https://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketGETlocation.html
-            if b_location is None:
-                b_location = "us-east-1"
-            elif b_location == 'EU':
-                b_location = "eu-west-1"
-                v['LocationConstraint'] = 'eu-west-1'
-            if v and v != c_location:
-                c = s.client('s3', region_name=b_location)
-            elif c_location != location:
-                c = s.client('s3', region_name=location)
-        b[k] = v
-    return b
+                else:
+                    # for auth errors record as attribute and move on
+                    if e.response['Error']['Code'] == 'AccessDenied':
+                        bucket.setdefault('c7n:DeniedMethods', []).append(method_name)
+                        continue
+                    # else log and raise
+                    log.warning(
+                        "Bucket:%s unable to invoke method:%s error:%s ",
+                        bucket['Name'], method_name, e.response['Error']['Message'])
+                    raise
+            if key == 'Location' and value:
+                self.normalize_region(value)
+
+            bucket[key] = value
+
+            if key == 'Location':
+                if get_region(bucket) != client.meta.region_name:
+                    client = self.get_client(get_region(bucket))
+        return bucket
 
 
 def bucket_client(session, b, kms=False):
