@@ -503,7 +503,7 @@ class BucketAssembly:
     def initialize(self):
         # construct a default boto3 client, using the current session region.
         self.session = local_session(self.manager.session_factory)
-        self.session_lock = threading.Lock()
+        self.session_lock = threading.RLock()
         self.default_region = self.manager.config.region
         self.region_clients[self.default_region] = self.session.client('s3')
         self.augment_fields = set(self.detect_augment_fields())
@@ -584,7 +584,7 @@ class BucketAssembly:
         if region in self.region_clients:
             return self.region_clients[region]
         with self.session_lock:
-            self.region_clients[region] = self.session.client('s3', region=region)
+            self.region_clients[region] = self.session.client('s3', region_name=region)
             return self.region_clients[region]
 
     def normalize_region(self, location):
