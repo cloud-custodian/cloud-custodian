@@ -391,6 +391,10 @@ class S3(query.QueryResourceManager):
         'config': ConfigS3
     }
 
+    def validate(self):
+        super().validate()
+        BucketAssembly(self).validate()
+
     def get_arns(self, resources):
         return ["arn:aws:s3:::{}".format(r["Name"]) for r in resources]
 
@@ -460,7 +464,7 @@ class BucketAssembly:
             raise PolicyValidationError(
                 "augment-keys supports 'all', 'detect', 'none' or list of keys found: %s" % config)
         elif isinstance(config, list):
-            delta = set(config).delta([row[1] for row in S3_AUGMENT_TABLE])
+            delta = set(config).difference([row[1] for row in S3_AUGMENT_TABLE])
             if delta:
                 raise PolicyValidationError("augment-keys - found invalid keys: %s" % (list(delta)))
         if not isinstance(config, (list, str)):

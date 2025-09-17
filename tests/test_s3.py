@@ -36,6 +36,93 @@ from .common import (
 )
 
 
+def test_s3_assembly_validate(test):
+
+    for tcase in ('all', 'none', 'detect', ['Website', 'Replication']):
+        policy = test.load_policy(
+            {'name': 's3-attrs',
+             'resource': 's3',
+             'query': [{'augment-keys': tcase}]
+             }
+        )
+        policy.validate()
+
+    for tcase in ('random', ['Garbage']):
+        with pytest.raises(PolicyValidationError):
+            policy = test.load_policy(
+                {'name': 's3-attrs',
+                 'resource': 's3',
+                 'query': [{'augment-keys': tcase}],
+                 'filters': [{'tag:Owner': 'xyz'}],
+                 },
+                validate=True
+            )
+
+
+def test_s3_assembly_none(test):
+    # noting even with none we will still get location and tags to ensure other s3 filters/actions work
+    policy = test.load_policy(
+        {'name': 's3-attrs',
+         'resource': 's3',
+         'query': [{'augment-keys': 'none'}],
+         'filters': [
+             {'tag:Owner': 'xyz'},
+         ]
+         }
+    )
+    assembly = s3.BucketAssembly(policy.resource_manager)
+    assert assembly.detect_augment_fields() == []
+
+
+def test_s3_assembly_website(test):
+    # noting even with none we will still get location and tags to ensure other s3 filters/actions work
+    policy = test.load_policy(
+        {'name': 's3-attrs',
+         'resource': 's3',
+         'query': [{'augment-keys': ['Website', 'Replication']}],
+         'filters': [
+             {'tag:Owner': 'xyz'},
+         ]
+         }
+    )
+    assembly = s3.BucketAssembly(policy.resource_manager)
+    assert assembly.detect_augment_fields() == ['Website', 'Replication']
+
+
+def test_s3_assembly_detect(test):
+
+    policy = test.load_policy(
+        {'name': 's3-attrs',
+         'resource': 's3',
+         'query': [{'augment-keys': 'detect'}],
+         'filters': [
+             {'tag:Owner': 'xyz'},
+             {'SomethingRandom': 'xyz'},
+             {'Replication.ReplicationConfiguation.Rules[].Destination.StorageClass': ['Standard']},
+             {'type': 'value',
+              'value': 'not-null',
+              'key': 'Website.ErrorDocument'}]
+         }
+    )
+    assembly = s3.BucketAssembly(policy.resource_manager)
+    assert assembly.detect_augment_fields() == ['Tags', 'Replication', 'Website']
+
+
+def test_s3_assembly_detect_denied(test):
+    policy = test.load_policy(
+        {'name': 's3-attrs',
+         'resource': 's3',
+         'query': [{'augment-keys': 'detect'}],
+         'filters': [
+             {'c7n:DeniedMethods': ['get_bucket_acl']},
+         ]}
+    )
+    assembly = s3.BucketAssembly(policy.resource_manager)
+    assert assembly.detect_augment_fields() == [
+        'Location', 'Tags', 'Policy', 'Acl', 'Replication', 'Versioning', 'Website',
+        'Logging', 'Notification', 'Lifecycle']
+
+
 def test_s3_express(test):
     session_factory = test.replay_flight_data('test_s3_express')
     p = test.load_policy(
