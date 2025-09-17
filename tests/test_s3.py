@@ -114,7 +114,7 @@ def test_s3_assembly_detect_denied(test):
          'resource': 's3',
          'query': [{'augment-keys': 'detect'}],
          'filters': [
-             {'c7n:DeniedMethods': ['get_bucket_acl']},
+             {'c7n:DeniedMethods': 'not-null'},
          ]}
     )
     assembly = s3.BucketAssembly(policy.resource_manager)
