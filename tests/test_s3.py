@@ -98,7 +98,7 @@ def test_s3_assembly_detect(test):
          'filters': [
              {'tag:Owner': 'xyz'},
              {'SomethingRandom': 'xyz'},
-             {'Replication.ReplicationConfiguation.Rules[].Destination.StorageClass': ['Standard']},
+             {'Replication.ReplicationConfiguation.Rules[].Destination.StorageClass': 'Standard'},
              {'type': 'value',
               'value': 'not-null',
               'key': 'Website.ErrorDocument'}]

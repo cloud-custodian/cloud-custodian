@@ -407,8 +407,8 @@ class S3(query.QueryResourceManager):
              - Replication.ReplicationConfiguration.Rules: not-null
 
     The default value for augment-keys is `all` to preserve historical
-    compatiblity. `augment-keys` also supports the value of 'none' to disable all
-    subdocument fetching except Location and Tags.
+    compatiblity. `augment-keys` also supports the value of 'none' to
+    disable all subdocument fetching except Location and Tags.
 
     Note certain actions may implicitly depend on the corresponding
     subdocument being present.
