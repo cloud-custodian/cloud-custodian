@@ -6,10 +6,6 @@ from collections import defaultdict
 from concurrent.futures import as_completed
 from datetime import datetime, timedelta
 
-import botocore.exceptions
-from botocore.config import Config
-
-from c7n import query
 from c7n.actions import BaseAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import Filter, MetricsFilter
