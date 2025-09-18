@@ -587,17 +587,6 @@ class BucketAssembly:
             self.region_clients[region] = self.session.client('s3', region_name=region)
             return self.region_clients[region]
 
-    def normalize_region(self, location):
-        # for historical reason we normalize EU to eu-west-1
-        b_location = location.get('LocationConstraint')
-        # Location == region for all cases but EU
-        # https://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketGETlocation.html
-        if b_location is None:
-            b_location = "us-east-1"
-        elif b_location == 'EU':
-            b_location = "eu-west-1"
-            location['LocationConstraint'] = 'eu-west-1'
-
     def assemble(self, bucket):
 
         client = self.get_client(self.default_region)
@@ -647,14 +636,18 @@ class BucketAssembly:
                         "Bucket:%s unable to invoke method:%s error:%s ",
                         bucket['Name'], method_name, e.response['Error']['Message'])
                     raise
-            if key == 'Location' and value:
-                self.normalize_region(value)
+
+            # for historical reasons we normalize EU to eu-west-1 on the bucket
+            # https://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketGETlocation.html
+            if key == 'Location' and value and value.get('LocationConstraint', '') == 'EU':
+                value['LocationConstraint'] = 'eu-west-1'
 
             bucket[key] = value
 
-            if key == 'Location':
-                if get_region(bucket) != client.meta.region_name:
-                    client = self.get_client(get_region(bucket))
+            # For all subsequent attributes after location, use a client that is targeted to
+            # the bucket's regional s3 endpoint.
+            if key == 'Location' and get_region(bucket) != client.meta.region_name:
+                client = self.get_client(get_region(bucket))
         return bucket
 
 
