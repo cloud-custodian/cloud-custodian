@@ -3,7 +3,7 @@
 from .common import BaseTest, event_data
 from c7n.resources.aws import shape_validate
 from c7n.utils import local_session, jmespath_compile
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 
 class CloudFrontWaf(BaseTest):
@@ -714,6 +714,67 @@ class CloudFront(BaseTest):
         self.assertEqual(
             resp['DistributionConfig']['Logging']['Enabled'], True
         )
+
+    def test_cloudfront_update_distribution_called(self):
+        # Ensures the update_definition method gets called as expected
+        # to make sure this step does not get skipped based on the conditions
+        # in cloudfront.py.
+        factory = self.replay_flight_data("test_distribution_update_distribution")
+
+        with patch("c7n.resources.cloudfront.local_session", autospec=True) as mock_local_session:
+            mock_client = MagicMock()
+            mock_local_session.return_value.client.return_value = mock_client
+
+            # Mock the get_distribution_config response
+            mock_client.get_distribution_config.return_value = {
+                "DistributionConfig": {
+                    "Enabled": True,
+                    "Comment": "",
+                    "Logging": {
+                        "Enabled": False,
+                        "IncludeCookies": False,
+                        "Bucket": "",
+                        "Prefix": ""
+                    }
+                },
+                "ETag": "test-etag"
+            }
+
+            mock_client.update_distribution.return_value = {}
+
+            p = self.load_policy(
+                {
+                    "name": "cloudfront-update-distribution",
+                    "resource": "distribution",
+                    "filters": [
+                        {
+                            "type": "distribution-config",
+                            "key": "Logging.Enabled",
+                            "value": False,
+                        }
+                    ],
+                    "actions": [
+                        {
+                            "type": "set-attributes",
+                            "attributes": {
+                                "Comment": "",
+                                "Enabled": True,
+                                "Logging": {
+                                    "Enabled": True,
+                                    "IncludeCookies": False,
+                                    "Bucket": 'test-logging.s3.amazonaws.com',
+                                    "Prefix": '',
+                                }
+                            }
+                        }
+                    ],
+                },
+                session_factory=factory,
+            )
+
+            resources = p.run()
+            self.assertEqual(len(resources), 1)
+            mock_client.update_distribution.assert_called_once()
 
     def test_cloudfront_update_streaming_distribution(self):
         factory = self.replay_flight_data("test_distribution_update_streaming_distribution")
