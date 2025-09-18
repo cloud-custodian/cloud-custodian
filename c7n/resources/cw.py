@@ -1,12 +1,10 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-import functools
 import itertools
 import re
 from collections import defaultdict
 from concurrent.futures import as_completed
 from datetime import datetime, timedelta
-
 import botocore.exceptions
 from botocore.config import Config
 
@@ -26,7 +24,7 @@ from c7n.resolver import ValuesFrom
 from c7n.resources import load_resources
 from c7n.resources.aws import ArnResolver
 from c7n.tags import universal_augment
-from c7n.utils import generate_arn, type_schema, local_session, chunks, get_retry, jmespath_search
+from c7n.utils import type_schema, local_session, chunks, get_retry, jmespath_search
 
 
 class DescribeAlarm(DescribeSource):
@@ -1325,21 +1323,6 @@ class SyntheticsCanary(QueryResourceManager):
         cfn_type = 'AWS::Synthetics::Canary'
         enum_spec = ('describe_canaries', 'Canaries', None)
         universal_taggable = object()
-
-    @property
-    def generate_arn(self):
-        """
-         Sample arn: arn:aws:synthetics:us-east-1::canary:test-canary
-         This method overrides c7n.utils.generate_arn and drops
-         account id from the generic arn.
-        """
-        if self._generate_arn is None:
-            self._generate_arn = functools.partial(
-                generate_arn,
-                self.resource_type.service,
-                region=self.config.region,
-                resource_type=self.resource_type.arn_type)
-        return self._generate_arn
 
     def augment(self, resources):
         for r in resources:
