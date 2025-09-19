@@ -29,8 +29,8 @@ class CertificateManagerCertificate(QueryResourceManager):
         labels = False  # Disable automatic label registration
         labels_op = 'patch'
         default_report_fields = [
-            'name', 'description', 'createTime', 'updateTime',
-            'labels', 'scope', 'sanDnsnames'
+            'name', 'description', 'createTime', 'expireTime',
+            'updateTime', 'labels', 'sanDnsnames', 'usedBy'
         ]
         asset_type = 'certificatemanager.googleapis.com/Certificate'
         urn_component = 'certificate'
