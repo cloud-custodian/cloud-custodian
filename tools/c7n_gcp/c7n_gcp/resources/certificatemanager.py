@@ -9,7 +9,7 @@ from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
 
 
-@resources.register('certificate-manager-certificate')
+@resources.register('certmanager-certificate')
 class CertificateManagerCertificate(QueryResourceManager):
     """GCP Certificate Manager Certificate
 
@@ -71,7 +71,7 @@ class DeleteCertificate(MethodAction):
 
         policies:
           - name: delete-unused-certificates
-            resource: gcp.certificate-manager-certificate
+            resource: gcp.certmanager-certificate
             filters:
               - type: value
                 key: labels.environment
@@ -98,7 +98,7 @@ class CertificateSetLabelsAction(SetLabelsAction):
 
         policies:
           - name: label-certificates
-            resource: gcp.certificate-manager-certificate
+            resource: gcp.certmanager-certificate
             actions:
               - type: set-labels
                 labels:
@@ -121,7 +121,7 @@ class CertificateMarkForOpAction(LabelDelayedAction):
 
         policies:
           - name: mark-certificates-for-deletion
-            resource: gcp.certificate-manager-certificate
+            resource: gcp.certmanager-certificate
             actions:
               - type: mark-for-op
                 op: delete

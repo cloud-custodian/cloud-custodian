@@ -9,11 +9,11 @@ class CertificateManagerTest(BaseTest):
 
     def test_certificate_query(self):
         """Test certificate manager resource query functionality"""
-        session_factory = self.replay_flight_data('certificate-manager-certificate-query')
+        session_factory = self.replay_flight_data('certmanager-certificate-query')
 
         policy = self.load_policy(
             {'name': 'all-certificates',
-             'resource': 'gcp.certificate-manager-certificate'},
+             'resource': 'gcp.certmanager-certificate'},
             session_factory=session_factory)
         resources = policy.run()
 
