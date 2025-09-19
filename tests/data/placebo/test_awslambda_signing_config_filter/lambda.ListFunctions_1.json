@@ -1,0 +1,74 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Functions": [
+            {
+                "FunctionName": "678_lambda_red",
+                "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:678_lambda_red",
+                "Runtime": "python3.8",
+                "Role": "arn:aws:iam::644160558196:role/678_role_red",
+                "Handler": "func.py",
+                "CodeSize": 299,
+                "Description": "",
+                "Timeout": 3,
+                "MemorySize": 128,
+                "LastModified": "2022-07-06T08:14:28.220+0000",
+                "CodeSha256": "wVKxCuS3+QGJFX662+Zi8SIwlKE7zm6222zpZo7SFHI=",
+                "Version": "$LATEST",
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                },
+                "RevisionId": "1fb55a73-4c67-4ff7-9e0a-7c8f9e2de526",
+                "PackageType": "Zip",
+                "Architectures": [
+                    "x86_64"
+                ]
+            },
+            {
+                "FunctionName": "cloudfrontAuth",
+                "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:cloudfrontAuth",
+                "Runtime": "nodejs16.x",
+                "Role": "arn:aws:iam::644160558196:role/service-role/cloudfrontAuth-role-8gpvgnre",
+                "Handler": "index.handler",
+                "CodeSize": 499,
+                "Description": "",
+                "Timeout": 3,
+                "MemorySize": 128,
+                "LastModified": "2022-06-12T17:11:20.000+0000",
+                "CodeSha256": "DQ0G8itj3w9WmD29lDlq8uLp4i7Mx8w5o2TNf40SPgA=",
+                "Version": "$LATEST",
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                },
+                "RevisionId": "10a58c53-eab5-4941-bed2-91cb5dc10cbe",
+                "PackageType": "Zip",
+                "Architectures": [
+                    "x86_64"
+                ]
+            },
+            {
+                "FunctionName": "678_lambda_green",
+                "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:678_lambda_green",
+                "Runtime": "python3.8",
+                "Role": "arn:aws:iam::644160558196:role/678_role_green",
+                "Handler": "func.py",
+                "CodeSize": 299,
+                "Description": "",
+                "Timeout": 3,
+                "MemorySize": 128,
+                "LastModified": "2022-07-06T08:14:02.404+0000",
+                "CodeSha256": "wVKxCuS3+QGJFX662+Zi8SIwlKE7zm6222zpZo7SFHI=",
+                "Version": "$LATEST",
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                },
+                "RevisionId": "34c31349-c1fa-45bc-81fa-7bbea1b6ac37",
+                "PackageType": "Zip",
+                "Architectures": [
+                    "x86_64"
+                ]
+            }
+        ]
+    }
+}

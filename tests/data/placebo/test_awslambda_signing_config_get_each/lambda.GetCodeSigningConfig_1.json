@@ -1,0 +1,20 @@
+{
+  "status_code": 200,
+  "data": {
+    "ResponseMetadata": {},
+    "CodeSigningConfig": {
+      "CodeSigningConfigId": "csc-0ae823415010ccc4x",
+      "CodeSigningConfigArn": "arn:aws:lambda:eu-west-1:644160558196:code-signing-config:csc-0ae823415010ccc4x",
+      "Description": "example-signin configuration",
+      "AllowedPublishers": {
+        "SigningProfileVersionArns": [
+          "arn:aws:signer:eu-west-1:644160558196:/signing-profiles/TEST_PROFILE/sESmwQmcr1"
+        ]
+      },
+      "CodeSigningPolicies": {
+        "UntrustedArtifactOnDeployment": "Enforce"
+      },
+      "LastModified": "2025-06-13T09:29:16.129035162Z"
+    }
+  }
+}

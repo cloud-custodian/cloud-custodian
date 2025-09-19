@@ -1,0 +1,39 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:lambda:us-east-1:644160558196:function:678_lambda_red",
+                "Tags": [
+                    {
+                        "Key": "CustodianRule",
+                        "Value": "epam-aws-678-lambda_code_signing_enabled"
+                    },
+                    {
+                        "Key": "ComplianceStatus",
+                        "Value": "Red"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:lambda:us-east-1:644160558196:function:cloudfrontAuth",
+                "Tags": []
+            },
+            {
+                "ResourceARN": "arn:aws:lambda:us-east-1:644160558196:function:678_lambda_green",
+                "Tags": [
+                    {
+                        "Key": "CustodianRule",
+                        "Value": "epam-aws-678-lambda_code_signing_enabled"
+                    },
+                    {
+                        "Key": "ComplianceStatus",
+                        "Value": "Green"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
