@@ -1,0 +1,14 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Status": 200,
+        "Tags": [
+            {
+                "Key": "Env",
+                "Value": "dev"
+            }
+        ],
+        "RequestId": "e5763a06-0662-49bf-b9fc-3d7194d7c6c8"
+    }
+}

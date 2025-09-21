@@ -1,0 +1,7 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Policy": "{\"Version\":\"2012-10-17\",\"Id\":\"COMPLIANTPOLICY\",\"Statement\":[{\"Sid\":\"AllowAccessPoint\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Action\":[\"s3:GetObject\",\"s3:ListBucket\"],\"Resource\":[\"arn:aws:s3:::sbx-mqrbuh-bucket-compliant\",\"arn:aws:s3:::sbx-mqrbuh-bucket-compliant/*\"],\"Condition\":{\"StringEquals\":{\"s3:DataAccessPointAccount\":\"644160558196\"}}}]}"
+    }
+}
