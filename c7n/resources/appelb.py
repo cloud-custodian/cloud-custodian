@@ -1452,9 +1452,7 @@ class AppELBDeleteListenerAction(BaseAction):
         """Validate the delete-listener action configuration.
 
         The listener filter is only required when the action is scoped to
-        the *matched* listeners. If the caller specifies ``scope: all`` we
-        will operate on every listener attached to the load-balancer and no
-        prior listener filter is required.
+        the *matched* listeners.
         """
         scope = self.data.get('scope', 'matched')
         if scope == 'matched':
