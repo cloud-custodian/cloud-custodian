@@ -990,44 +990,43 @@ class LambdaEdgeFilter(Filter):
         return results
 
 
-class DescribeEventSourceMappings(query.ChildDescribeSource):
+class DescribeEventSourceMappings(query.DescribeSource):
 
     def augment(self, resources):
-        client = local_session(self.manager.session_factory).client(
-            self.manager.resource_type.service)
+        # client = local_session(self.manager.session_factory).client(
+        #     self.manager.resource_type.service)
 
-        resources = universal_augment(self.manager, super().augment(resources))
+        # # Fetch all event source mappings in one shot
+        # all_mappings = []
+        # paginator = client.get_paginator('list_event_source_mappings')
+        # paginator.PAGE_ITERATOR_CLS = query.RetryPageIterator
+        # for page in paginator.paginate():
+        #     all_mappings.extend(page.get('EventSourceMappings', []))
 
-        # Part 1: Add tags from parent resources to child resources
-        # This is used to identify the child resources from the parent lambda function
-        parent_resources = self.manager.get_parent_manager().resources()
-        parent_tag_map = {
-            p['FunctionArn']: [
-                {'Key': tag['Key'], 'Value': tag['Value']} for tag in p.get('Tags', [])
-            ]
-            for p in parent_resources
-        }
-        for r in resources:
-            parent_tags = parent_tag_map.get(r['FunctionArn'], [])
-            child_tags = r.get('Tags', [])
-            r['Tags'] = parent_tags + child_tags
+        # # Always fetch all lambda functions using the resource manager registry
+        # lambda_manager = self.manager.get_resource_manager('lambda')
+        # parent_resources = lambda_manager.resources()
+        # parent_tag_map = {
+        #     p['FunctionArn']: [
+        #         {'Key': tag['Key'], 'Value': tag['Value']} for tag in p.get('Tags', [])
+        #     ]
+        #     for p in parent_resources
+        # }
 
-        # Part 2: Get all event source mappings and add orphaned ones to resources
-        # This is used to ensure that all event source mappings are included because
-        # some may have parent lambda function deleted.
-        existing_uuids = {r['UUID'] for r in resources}
-        paginator = client.get_paginator('list_event_source_mappings')
-        paginator.PAGE_ITERATOR_CLS = query.RetryPageIterator
-        for page in paginator.paginate():
-            for mapping in page.get('EventSourceMappings', []):
-                if mapping['UUID'] not in existing_uuids:
-                    resources.append(mapping)
+        # # Annotate mappings with parent tags if available
+        # for mapping in all_mappings:
+        #     parent_tags = parent_tag_map.get(mapping.get('FunctionArn'), [])
+        #     child_tags = mapping.get('Tags', [])
+        #     mapping['Tags'] = parent_tags + child_tags
 
-        return resources
+        # Universal augment (if needed)
+        return universal_augment(
+            self.manager,
+            super(DescribeEventSourceMappings, self).augment(resources))
 
 
 @resources.register('lambda-event-source-mapping')
-class LambdaEventSourceMapping(query.ChildResourceManager):
+class LambdaEventSourceMapping(query.QueryResourceManager):
 
     class resource_type(query.TypeInfo):
         service = 'lambda'
@@ -1038,11 +1037,10 @@ class LambdaEventSourceMapping(query.ChildResourceManager):
         cfn_type = 'AWS::Lambda::EventSourceMapping'
         permissions_augment = ("lambda:ListEventSourceMappings", "lambda:GetEventSourceMapping",
                                  "lambda:ListTags")
-        parent_spec = ('lambda', 'FunctionName', True)
         universal_taggable = object
 
     source_mapping = {
-        'describe-child': DescribeEventSourceMappings,
+        'describe': DescribeEventSourceMappings,
     }
 
 

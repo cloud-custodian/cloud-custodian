@@ -432,7 +432,7 @@ class LambdaTest(BaseTest):
                 "resource": "lambda-event-source-mapping",
                 "filters": [
                      {
-                        "tag:team": "policy"
+                        "tag:test": "policyfoundry"
                      }
                  ],
             },

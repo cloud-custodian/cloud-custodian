@@ -2,24 +2,23 @@
     "status_code": 200,
     "data": {
         "ResponseMetadata": {},
-        "UUID": "662dc6cf-fabc-4c3f-9c68-e77904628601",
+        "UUID": "bb57fe00-6653-4ea8-a32e-13b4fc98a4f0",
         "BatchSize": 10,
         "MaximumBatchingWindowInSeconds": 0,
-        "EventSourceArn": "arn:aws:sqs:us-east-1:644160558196:CloudActionModulePoc3Stack-InputSQSQueue23D0B3DB-Gs6s08pu1ze3",
-        "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:CloudActionModulePoc3Stack-IngestionLambdaEF25F265-mRpHWGSq9jhn",
+        "EventSourceArn": "arn:aws:sqs:us-east-1:644160558196:test-queue",
+        "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:test-sqs",
         "LastModified": {
             "__class__": "datetime",
-            "year": 2022,
-            "month": 4,
-            "day": 8,
-            "hour": 10,
-            "minute": 49,
-            "second": 51,
-            "microsecond": 825000
+            "year": 2019,
+            "month": 3,
+            "day": 13,
+            "hour": 14,
+            "minute": 48,
+            "second": 15,
+            "microsecond": 873000
         },
-        "State": "Enabled",
+        "State": "Disabled",
         "StateTransitionReason": "USER_INITIATED",
-        "FunctionResponseTypes": [],
-        "EventSourceMappingArn": "arn:aws:lambda:us-east-1:644160558196:event-source-mapping:662dc6cf-fabc-4c3f-9c68-e77904628601"
+        "EventSourceMappingArn": "arn:aws:lambda:us-east-1:644160558196:event-source-mapping:bb57fe00-6653-4ea8-a32e-13b4fc98a4f0"
     }
 }
