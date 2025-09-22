@@ -416,12 +416,13 @@ class TypeInfo(metaclass=TypeMeta):
     allow_metrics_filters = True
 
     @classmethod
-    def get_metric_resource_name(cls, resource):
+    def get_metric_resource_name(cls, resource, metric_key=None):
+        key = metric_key or cls.metric_key
+        if key == 'metric.labels.instance_name':
+            return resource.get(cls.name)
+        elif key == 'resource.labels.instance_id':
+            return resource['id']
         return resource.get(cls.name)
-
-    @classmethod
-    def get_metric_resource_id(cls, resource):
-        return resource['id']
 
     @classmethod
     def get_urns(cls, resources, project_id):
