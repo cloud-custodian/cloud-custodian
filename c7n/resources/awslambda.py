@@ -993,33 +993,6 @@ class LambdaEdgeFilter(Filter):
 class DescribeEventSourceMappings(query.DescribeSource):
 
     def augment(self, resources):
-        # client = local_session(self.manager.session_factory).client(
-        #     self.manager.resource_type.service)
-
-        # # Fetch all event source mappings in one shot
-        # all_mappings = []
-        # paginator = client.get_paginator('list_event_source_mappings')
-        # paginator.PAGE_ITERATOR_CLS = query.RetryPageIterator
-        # for page in paginator.paginate():
-        #     all_mappings.extend(page.get('EventSourceMappings', []))
-
-        # # Always fetch all lambda functions using the resource manager registry
-        # lambda_manager = self.manager.get_resource_manager('lambda')
-        # parent_resources = lambda_manager.resources()
-        # parent_tag_map = {
-        #     p['FunctionArn']: [
-        #         {'Key': tag['Key'], 'Value': tag['Value']} for tag in p.get('Tags', [])
-        #     ]
-        #     for p in parent_resources
-        # }
-
-        # # Annotate mappings with parent tags if available
-        # for mapping in all_mappings:
-        #     parent_tags = parent_tag_map.get(mapping.get('FunctionArn'), [])
-        #     child_tags = mapping.get('Tags', [])
-        #     mapping['Tags'] = parent_tags + child_tags
-
-        # Universal augment (if needed)
         return universal_augment(
             self.manager,
             super(DescribeEventSourceMappings, self).augment(resources))
