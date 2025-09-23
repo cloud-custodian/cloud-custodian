@@ -416,12 +416,7 @@ class TypeInfo(metaclass=TypeMeta):
     allow_metrics_filters = True
 
     @classmethod
-    def get_metric_resource_name(cls, resource, metric_key=None):
-        key = metric_key or cls.metric_key
-        if key == 'metric.labels.instance_name':
-            return resource.get(cls.name)
-        elif key == 'resource.labels.instance_id':
-            return resource['id']
+    def get_metric_resource_name(cls, resource):
         return resource.get(cls.name)
 
     @classmethod
