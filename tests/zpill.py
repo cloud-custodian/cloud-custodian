@@ -282,14 +282,11 @@ class PillTest(CustodianTestCore):
     _client_stats = None
 
     def pillCleanUp(self):
-        print('cleanup invoked')
         self.pill = None
-
         if self._session_count and self._session_count > 2:
             raise RuntimeError("test created too many sessions %d" % self._session_count)
         if self._client_stats and sum(self._client_stats.values()) > 2:
             raise RuntimeError("test created too many clients %s" % self._client_stats)
-        print(self._client_stats)
 
     def record_flight_data(self, test_case, zdata=False, augment=False, region=None):
         self.recording = True
@@ -380,8 +377,6 @@ class PillTest(CustodianTestCore):
 
         if not strtobool(os.environ.get('C7N_TRACK_CLIENT', 'no')):
             return lambda region=None, assume=None: session
-
-        import traceback
 
         class TrackingFactory:
 
