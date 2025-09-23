@@ -70,6 +70,15 @@ class Instance(QueryResourceManager):
                 }
             )
 
+        @classmethod
+        def get_metric_resource_name(cls, resource, metric_key=None):
+            key = metric_key or cls.metric_key
+            if key == 'metric.labels.instance_name':
+                return resource.get(cls.name)
+            elif key == 'resource.labels.instance_id':
+                return resource['id']
+            return resource.get(cls.name)
+
 
 Instance.filter_registry.register('offhour', OffHour)
 Instance.filter_registry.register('onhour', OnHour)
