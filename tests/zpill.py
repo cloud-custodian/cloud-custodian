@@ -6,6 +6,7 @@ import fnmatch
 from io import BytesIO
 import json
 import os
+import traceback
 import shutil
 import zipfile
 import re
@@ -396,9 +397,6 @@ class PillTest(CustodianTestCore):
         return TrackingFactory()
 
 
-import traceback
-import psutil
-
 class TrackingSession(boto3.Session):
 
     def client(self, *args, **kw):
@@ -406,9 +404,4 @@ class TrackingSession(boto3.Session):
         if strtobool(os.environ.get('C7N_STACK_CLIENT', 'no')):
             traceback.print_stack()
             print('--')
-        p = psutil.Process()
-        smem = p.memory_info()
-        client =  super().client(*args, **kw)
-        emem = p.memory_info()
-        import pdb; pdb.set_trace()
-        return client
+        return super().client(*args, **kw)
