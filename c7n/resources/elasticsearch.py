@@ -392,8 +392,16 @@ class UpgradeAvailable(Filter):
                             # Check major version upgrade filter
                             if not check_major:
                                 # Only allow minor version upgrades
-                                source_major = source_version_parsed.split('.')[0] if source_version_parsed else ''
-                                target_major = target_version.split('.')[0] if target_version else ''
+                                source_major = (
+                                    source_version_parsed.split('.')[0]
+                                    if source_version_parsed
+                                    else ''
+                                )
+                                target_major = (
+                                    target_version.split('.')[0]
+                                    if target_version
+                                    else ''
+                                )
 
                                 # Skip major version upgrades if major=False
                                 if source_major != target_major and source_engine == target_engine:
