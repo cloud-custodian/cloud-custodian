@@ -18,6 +18,27 @@ import c7n.filters.policystatement as polstmt_filter
 from .securityhub import PostFinding
 
 
+def parse_es_version(version):
+    """Parse ElasticSearch/OpenSearch version string into (engine_name, major_minor_version) tuple
+
+    Examples:
+    - "Elasticsearch_7.4" -> ("Elasticsearch", "7.4")
+    - "OpenSearch_1.3" -> ("OpenSearch", "1.3")
+    """
+    if '_' not in version:
+        return None, None
+
+    engine_name, version_str = version.split('_', 1)
+
+    # Extract major.minor version (ignore patch versions)
+    version_parts = version_str.split('.')
+    if len(version_parts) >= 2:
+        major_minor = f"{version_parts[0]}.{version_parts[1]}"
+        return engine_name, major_minor
+
+    return engine_name, version_str
+
+
 class DescribeDomain(DescribeSource):
 
     def get_resources(self, resource_ids):
@@ -301,6 +322,103 @@ class SourceIP(Filter):
                 else:
                     source_ips.append(ips)
         return source_ips
+
+
+@ElasticSearchDomain.filter_registry.register('upgrade-available')
+class UpgradeAvailable(Filter):
+    """Scans for available upgrade-compatible ES versions
+
+    This will check all the ElasticSearch domains on the resources, and return
+    a list of viable upgrade options.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: elasticsearch-upgrade-available
+                resource: elasticsearch
+                filters:
+                  - type: upgrade-available
+                    major: False
+
+    """
+
+    schema = type_schema(
+        'upgrade-available',
+        major={'type': 'boolean'},
+        value={'type': 'boolean'},
+    )
+    permissions = ('es:GetCompatibleVersions',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('es')
+        check_major = self.data.get('major', False)
+        check_upgrade_extant = self.data.get('value', True)
+        results = []
+
+        for r in resources:
+            domain_name = r["DomainName"]
+            current_version = r.get('ElasticsearchVersion', '')
+
+            # Get compatible versions for this domain
+            try:
+                response = self.manager.retry(
+                    client.get_compatible_elasticsearch_versions,
+                    DomainName=domain_name,
+                    ignore_err_codes=('ResourceNotFoundException',)
+                )
+
+                if not response:
+                    continue
+
+                compatible_versions = response.get('CompatibleElasticsearchVersions', [])
+
+                # Find upgrades for the current domain version
+                available_upgrades = []
+                for version_map in compatible_versions:
+                    source_version = version_map.get('SourceVersion')
+                    target_versions = version_map.get('TargetVersions', [])
+
+                    # Check if this matches our current domain version
+                    if source_version == current_version:
+                        for target in target_versions:
+                            target_engine, target_version = parse_es_version(target)
+                            source_engine, source_version_parsed = parse_es_version(source_version)
+
+                            if not target_engine or not source_engine:
+                                continue
+
+                            # Check major version upgrade filter
+                            if not check_major:
+                                # Only allow minor version upgrades
+                                source_major = source_version_parsed.split('.')[0] if source_version_parsed else ''
+                                target_major = target_version.split('.')[0] if target_version else ''
+
+                                # Skip major version upgrades if major=False
+                                if source_major != target_major and source_engine == target_engine:
+                                    continue
+                                # Skip engine changes (considered major)
+                                if source_engine != target_engine:
+                                    continue
+
+                            available_upgrades.append(target)
+
+                # Annotate the resource with available upgrades
+                r['c7n:AvailableUpgrades'] = available_upgrades
+
+                # Decide whether to include this resource based on value filter
+                has_upgrades = len(available_upgrades) > 0
+                if check_upgrade_extant == has_upgrades:
+                    results.append(r)
+
+            except Exception as e:
+                self.manager.log.warning(
+                    f"Error getting compatible versions for domain {domain_name}: {e}"
+                )
+                continue
+
+        return results
 
 
 @ElasticSearchDomain.action_registry.register('remove-statements')
