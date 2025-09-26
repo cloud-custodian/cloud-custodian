@@ -519,6 +519,43 @@ class VpcTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    @functional
+    def test_subnet_delete(self):
+        factory = self.replay_flight_data("test_subnet_delete")
+        client = factory().client("ec2")
+        vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")["Vpc"]["VpcId"]
+        self.addCleanup(client.delete_vpc, VpcId=vpc_id)
+        subnet_id = client.create_subnet(
+            VpcId=vpc_id, CidrBlock="10.4.1.0/24"
+        )["Subnet"]["SubnetId"]
+    
+        def delete_subnet():
+            try:
+                client.delete_subnet(SubnetId=subnet_id)
+            except Exception:
+                pass
+    
+        self.addCleanup(delete_subnet)
+    
+        p = self.load_policy(
+            {
+                "name": "subnet-delete",
+                "resource": "aws.subnet",
+                "filters": [{"SubnetId": subnet_id}],
+                "actions": ["delete"],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["SubnetId"], subnet_id)
+        try:
+            client.describe_subnets(SubnetIds=[subnet_id])
+        except Exception:
+            pass
+        else:
+            self.fail("subnet not deleted")
+    
     def test_endpoint_policy_filter(self):
         factory = self.replay_flight_data("test_endpoint_policy_filter")
         p = self.load_policy(
