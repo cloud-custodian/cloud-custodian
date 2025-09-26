@@ -821,10 +821,11 @@ def merge_dict(a, b):
     """Perform a merge of dictionaries A and B
 
     Any subdictionaries will be recursively merged.
-    Any leaf elements in the form of scalar will use the value from A.
-    If there is a scalar and list for the same key, the scalar will be appended to the list.
-    If there are two lists for the same key, the list from B will be treated like a set
-    and be appended to the list from A.
+    Any leaf elements in the form of scalar will use the value from B.
+    If A is a str and B is a list, A will be inserted into the front of the list.
+    If A is a list and B is a str, B will be appended to the list.
+    If there are two lists for the same key, the lists will be merged
+    deduplicated with values in A first, followed by any additional values from B.
     """
     d = copy.deepcopy(a)
     for k, v in b.items():
@@ -836,15 +837,19 @@ def merge_dict(a, b):
             for val in v:
                 if val not in d[k]:
                     d[k].append(val)
-        elif isinstance(v, str) and isinstance(d[k], list) and v not in d[k]:
-            d[k].append(v)
-        elif isinstance(v, list) and isinstance(d[k], str) and d[k] in v:
-            d[k] = v
-        elif isinstance(v, list) and isinstance(d[k], str) and d[k] not in v:
-            v.insert(0, d[k])
-            d[k] = v
+        elif isinstance(v, str) and isinstance(d[k], list):
+            if v in d[k]:
+                continue
+            else:
+                d[k].append(v)
+        elif isinstance(v, list) and isinstance(d[k], str):
+            if d[k] in v:
+                d[k] = v
+            else:
+                d[k] = [d[k]]
+                d[k].extend(v)
         elif k in d and isinstance(v, (int, str, float, bool)):
-            continue
+            d[k] = v
         else:
             raise Exception(f"k={k}, {type(v)} and {type(d[k])} not conformable.")
     return d

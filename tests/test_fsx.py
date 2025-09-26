@@ -494,6 +494,28 @@ class TestFSx(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(len(resources[0]['c7n:matched-vpcs']), 1)
 
+    def test_fsx_metrics_filter(self):
+        session_factory = self.replay_flight_data('test_fsx_metrics_filter')
+        p = self.load_policy(
+            {
+                'name': 'test-fsx-metrics',
+                'resource': 'fsx',
+                'filters': [
+                    {
+                        'type': 'metrics',
+                        'name': 'CPUUtilization',
+                        'value': 0,
+                        'op': 'gt',
+                        'days': 7,
+                        'statistics': 'Average'
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+
 
 class TestFSxVolume(BaseTest):
     def test_fsx_volume_query(self):

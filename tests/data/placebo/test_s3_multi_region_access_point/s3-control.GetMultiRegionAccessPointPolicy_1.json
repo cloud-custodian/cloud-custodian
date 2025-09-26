@@ -1,0 +1,14 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Policy": {
+            "Established": {
+                "Policy": "{\n\t\"Version\": \"2012-10-17\",\n\t\"Statement\": [\n\t\t{\n\t\t\t\"Sid\": \"AllowIntraAcct\",\n\t\t\t\"Principal\": {\n\t\t\t\t\"AWS\": \"644160558196\"\n\t\t\t},\n\t\t\t\"Effect\": \"Allow\",\n\t\t\t\"Action\": [\n\t\t\t\t\"s3:*\"\n\t\t\t],\n\t\t\t\"Resource\": [\n\t\t\t\t\"arn:aws:s3::644160558196:accesspoint/mokkwp4hcdned.mrap\"\n\t\t\t]\n\t\t},\n\t\t{\n\t\t\t\"Sid\": \"AllowExternal\",\n\t\t\t\"Principal\": {\n\t\t\t\t\"AWS\": \"111111111111\"\n\t\t\t},\n\t\t\t\"Effect\": \"Allow\",\n\t\t\t\"Action\": [\n\t\t\t\t\"s3:*\"\n\t\t\t],\n\t\t\t\"Resource\": [\n\t\t\t\t\"arn:aws:s3::644160558196:accesspoint/mokkwp4hcdned.mrap\"\n\t\t\t]\n\t\t}\n\t]\n}"
+            },
+            "Proposed": {
+                "Policy": "{\n\t\"Version\": \"2012-10-17\",\n\t\"Statement\": [\n\t\t{\n\t\t\t\"Sid\": \"AllowIntraAcct\",\n\t\t\t\"Principal\": {\n\t\t\t\t\"AWS\": \"644160558196\"\n\t\t\t},\n\t\t\t\"Effect\": \"Allow\",\n\t\t\t\"Action\": [\n\t\t\t\t\"s3:*\"\n\t\t\t],\n\t\t\t\"Resource\": [\n\t\t\t\t\"arn:aws:s3::644160558196:accesspoint/mokkwp4hcdned.mrap\"\n\t\t\t]\n\t\t},\n\t\t{\n\t\t\t\"Sid\": \"AllowExternal\",\n\t\t\t\"Principal\": {\n\t\t\t\t\"AWS\": \"111111111111\"\n\t\t\t},\n\t\t\t\"Effect\": \"Allow\",\n\t\t\t\"Action\": [\n\t\t\t\t\"s3:*\"\n\t\t\t],\n\t\t\t\"Resource\": [\n\t\t\t\t\"arn:aws:s3::644160558196:accesspoint/mokkwp4hcdned.mrap\"\n\t\t\t]\n\t\t}\n\t]\n}"
+            }
+        }
+    }
+}

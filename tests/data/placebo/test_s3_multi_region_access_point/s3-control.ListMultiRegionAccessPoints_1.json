@@ -1,0 +1,41 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "AccessPoints": [
+            {
+                "Name": "c7n-test",
+                "Alias": "mokkwp4hcdned.mrap",
+                "CreatedAt": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 8,
+                    "day": 11,
+                    "hour": 18,
+                    "minute": 9,
+                    "second": 58,
+                    "microsecond": 503000
+                },
+                "PublicAccessBlock": {
+                    "BlockPublicAcls": true,
+                    "IgnorePublicAcls": true,
+                    "BlockPublicPolicy": true,
+                    "RestrictPublicBuckets": true
+                },
+                "Status": "READY",
+                "Regions": [
+                    {
+                        "Bucket": "c1-replication",
+                        "Region": "us-east-1",
+                        "BucketAccountId": "644160558196"
+                    },
+                    {
+                        "Bucket": "c7n-ssm-build",
+                        "Region": "us-east-2",
+                        "BucketAccountId": "644160558196"
+                    }
+                ]
+            }
+        ]
+    }
+}
