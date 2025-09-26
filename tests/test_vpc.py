@@ -528,15 +528,14 @@ class VpcTest(BaseTest):
         subnet_id = client.create_subnet(
             VpcId=vpc_id, CidrBlock="10.4.1.0/24"
         )["Subnet"]["SubnetId"]
-    
+
         def delete_subnet():
             try:
                 client.delete_subnet(SubnetId=subnet_id)
             except Exception:
                 pass
-    
+
         self.addCleanup(delete_subnet)
-    
         p = self.load_policy(
             {
                 "name": "subnet-delete",
@@ -555,7 +554,7 @@ class VpcTest(BaseTest):
             pass
         else:
             self.fail("subnet not deleted")
-    
+
     def test_endpoint_policy_filter(self):
         factory = self.replay_flight_data("test_endpoint_policy_filter")
         p = self.load_policy(
