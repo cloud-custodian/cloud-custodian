@@ -36,6 +36,33 @@ class DescribeSecret(DescribeSource):
             )
             secret.setdefault('c7n:DeniedMethods', []).append(detail_op)
 
+        # Add replica details if ReplicationStatus exists
+        if 'ReplicationStatus' in secret and secret['ReplicationStatus']:
+            replicas = []
+            for replica in secret['ReplicationStatus']:
+                region = replica.get('Region')
+                if not region:
+                    continue
+                # Use the same secret name/ARN in the replica region
+                try:
+                    replica_client = local_session(self.manager.session_factory).client(
+                        self.manager.resource_type.service, region_name=region)
+                    # Use the same detail_spec as for the primary secret
+                    detail_op, param_name, param_key, _ = self.manager.resource_type.detail_spec
+                    op = getattr(replica_client, detail_op)
+                    kw = {param_name: secret[param_key]}
+                    replica_detail = self.manager.retry(op, **kw)
+                    # Optionally, add region info to the replica detail
+                    replica_detail['Region'] = region
+                    replicas.append(replica_detail)
+                except ClientError as e:
+                    self.manager.log.warning(
+                        "Replica Secret:%s in region:%s unable to invoke method:%s error:%s ",
+                        secret[param_key], region, detail_op, e.response['Error']['Message']
+                    )
+            if replicas:
+                secret['c7n:Replicas'] = replicas
+
     def augment(self, secrets):
         client = local_session(self.manager.session_factory).client(
             self.manager.resource_type.service

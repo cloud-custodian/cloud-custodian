@@ -130,7 +130,7 @@ class TestSecretsManager(BaseTest):
                     {
                         'type': 'value',
                         'key': 'Name',
-                        'value': 'test'
+                        'value': 'test_2'
                     }
                 ],
                 'actions': [
@@ -144,8 +144,12 @@ class TestSecretsManager(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['Name'], 'test')
-        self.assertEqual(len(resources[0].get('ReplicationStatus')), 2)
+        self.assertEqual(resources[0]['Name'], 'test_2')
+        self.assertEqual(len(resources[0].get('ReplicationStatus')), 1)
+        self.assertIn('c7n:Replicas', resources[0])
+        self.assertTrue(isinstance(resources[0]['c7n:Replicas'], list))
+        self.assertEqual(len(resources[0]['c7n:Replicas']), 1)
+        self.assertEqual(resources[0]['c7n:Replicas'][0]['Name'], 'test_2')
         secret_for_del = client.describe_secret(SecretId=resources[0]['ARN'])
         self.assertTrue('DeletedDate' in secret_for_del)
 
