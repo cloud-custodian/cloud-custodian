@@ -5,6 +5,8 @@ from .common import BaseTest
 from c7n.exceptions import PolicyValidationError
 from c7n.executor import MainThreadExecutor
 from c7n.resources.secretsmanager import SecretsManager
+from unittest.mock import patch, MagicMock
+from botocore.exceptions import ClientError
 
 
 class TestSecretsManager(BaseTest):
@@ -273,3 +275,57 @@ class TestSecretsManager(BaseTest):
         self.assertIsInstance(resources[0].get('VersionIdsToStages'), dict)
         self.assertEqual(resources[1].get('VersionIdsToStages'), None)
         self.assertEqual(resources[1]['c7n:DeniedMethods'], ['describe_secret'])
+
+    def test_secrets_manager_replica_access_denied(self):
+        self.patch(SecretsManager, 'executor_factory', MainThreadExecutor)
+        session_factory = self.replay_flight_data('test_secrets_manager_replica_access_denied')
+
+        # Use MagicMock to simulate region-specific behavior and exception
+        mock_factory = MagicMock()
+        mock_factory.region = 'us-east-1'
+        # Setup the client for the primary region
+        real_client = session_factory(region="us-east-1").client("secretsmanager")
+        # Setup the client for the replica region
+        replica_client = MagicMock()
+        # Simulate AccessDeniedException for describe_secret in replica region
+        replica_client.describe_secret.side_effect = ClientError(
+            {
+                "Error": {
+                    "Code": "AccessDeniedException",
+                    "Message": "User is not authorized"
+                }
+            },
+            "DescribeSecret"
+        )
+        # When .client('secretsmanager', region_name='us-west-2') is called, return replica_client
+
+        def client_side_effect(service_name, region_name=None):
+            if region_name == "eu-west-1":
+                return replica_client
+            return real_client
+        mock_factory().client.side_effect = client_side_effect
+
+        p = self.load_policy(
+            {
+                'name': 'secrets-manager-replica-access-denied',
+                'resource': 'secrets-manager',
+                'filters': [
+                    {
+                        'type': 'value',
+                        'key': 'Name',
+                        'value': 'c7n'
+                    }
+                ]
+            },
+            session_factory=mock_factory
+        )
+
+        with patch.object(
+            p.resource_manager.source.manager, 'log'
+        ) as mock_log:
+            resources = p.run()
+            # Assert that the warning log was called for the replica ClientError
+            mock_log.warning.assert_any_call(
+                "Replica Secret:%s in region:%s unable to invoke method:%s error:%s ",
+                resources[0]['Name'], "eu-west-1", "describe_secret", "User is not authorized"
+            )
