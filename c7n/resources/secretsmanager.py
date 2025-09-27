@@ -41,8 +41,6 @@ class DescribeSecret(DescribeSource):
             replicas = []
             for replica in secret['ReplicationStatus']:
                 region = replica.get('Region')
-                if not region:
-                    continue
                 # Use the same secret name/ARN in the replica region
                 try:
                     replica_client = local_session(self.manager.session_factory).client(
