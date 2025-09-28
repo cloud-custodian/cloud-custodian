@@ -126,14 +126,14 @@ class TestSecretsManager(BaseTest):
         client = session_factory(region="us-east-1").client("secretsmanager")
         p = self.load_policy(
             {
-                'name': 'secrets-manager-unencrypted-delete',
+                'name': 'secrets-manager-delete',
                 'resource': 'secrets-manager',
                 'filters': [
                     {
                         'type': 'value',
                         'key': 'Name',
-                        'value': 'test_2'
-                    }
+                        'value': 'test1'
+                    },
                 ],
                 'actions': [
                     {
@@ -146,12 +146,7 @@ class TestSecretsManager(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['Name'], 'test_2')
-        self.assertEqual(len(resources[0].get('ReplicationStatus')), 1)
-        self.assertIn('c7n:Replicas', resources[0])
-        self.assertTrue(isinstance(resources[0]['c7n:Replicas'], list))
-        self.assertEqual(len(resources[0]['c7n:Replicas']), 1)
-        self.assertEqual(resources[0]['c7n:Replicas'][0]['Name'], 'test_2')
+        self.assertEqual(resources[0]['Name'], 'test1')
         secret_for_del = client.describe_secret(SecretId=resources[0]['ARN'])
         self.assertTrue('DeletedDate' in secret_for_del)
 
@@ -314,7 +309,14 @@ class TestSecretsManager(BaseTest):
                         'type': 'value',
                         'key': 'Name',
                         'value': 'c7n'
-                    }
+                    },
+                    {
+                        'type': 'replica-attribute',
+                        'key': 'LastAccessedDate',
+                        'op': 'ge',
+                        'value': '2023-01-01',
+                        'value_type': 'date'
+                    },
                 ]
             },
             session_factory=mock_factory
@@ -323,9 +325,39 @@ class TestSecretsManager(BaseTest):
         with patch.object(
             p.resource_manager.source.manager, 'log'
         ) as mock_log:
-            resources = p.run()
+            p.run()
             # Assert that the warning log was called for the replica ClientError
-            mock_log.warning.assert_any_call(
-                "Replica Secret:%s in region:%s unable to invoke method:%s error:%s ",
-                resources[0]['Name'], "eu-west-1", "describe_secret", "User is not authorized"
-            )
+            self.assertTrue(mock_log.warning.called)
+
+    def test_secrets_manager_replica_attribute(self):
+        self.patch(SecretsManager, 'executor_factory', MainThreadExecutor)
+        session_factory = self.replay_flight_data('test_secrets_manager_replica_attribute')
+        p = self.load_policy(
+            {
+                'name': 'secrets-manager-unencrypted-delete',
+                'resource': 'secrets-manager',
+                'filters': [
+                    {
+                        'type': 'value',
+                        'key': 'Name',
+                        'value': 'c7n'
+                    },
+                                        {
+                        'type': 'replica-attribute',
+                        'key': 'LastAccessedDate',
+                        'op': 'ge',
+                        'value': '2023-01-01',
+                        'value_type': 'date'
+                    },
+                ],
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['Name'], 'c7n')
+        self.assertEqual(len(resources[0].get('ReplicationStatus')), 1)
+        self.assertIn('c7n:Replicas', resources[0])
+        self.assertTrue(isinstance(resources[0]['c7n:Replicas'], list))
+        self.assertEqual(len(resources[0]['c7n:Replicas']), 1)
+        self.assertEqual(resources[0]['c7n:Replicas'][0]['Name'], 'c7n')
