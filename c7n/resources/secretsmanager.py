@@ -141,6 +141,7 @@ class ReplicaAttributeFilter(ValueFilter):
         'replica-attribute',
         rinherit=ValueFilter.schema
     )
+    permissions = ('secretsmanager:DescribeSecret',)
 
     def process(self, resources, event=None):
         session_factory = self.manager.session_factory
