@@ -63,7 +63,7 @@ dependencies = [
     "azure-mgmt-resource<24.0.0,>=23.0.0",
     "azure-mgmt-resourcegraph<8.0.0,>=7.0.0",
     "azure-mgmt-search<9.0.0,>=8.0.0",
-    "azure-mgmt-security<8.0.0,>=7.0.0",
+    "azure-mgmt-security==8.0.0b1",
     "azure-mgmt-servicebus<9.0.0,>=8.2.0",
     "azure-mgmt-servicefabric<2.0.0,>=1.0.0",
     "azure-mgmt-signalr==0.4.0",
