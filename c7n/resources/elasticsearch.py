@@ -19,7 +19,9 @@ from .securityhub import PostFinding
 
 
 def parse_es_version(version):
-    """Parse ElasticSearch/OpenSearch version string into (engine_name, major_minor_version) tuple
+    """
+    Parses a ElasticSearch/OpenSearch version string into a
+    `(engine_name, major_minor_version)` tuple.
 
     Examples:
     - "Elasticsearch_7.4" -> ("Elasticsearch", "7.4")
