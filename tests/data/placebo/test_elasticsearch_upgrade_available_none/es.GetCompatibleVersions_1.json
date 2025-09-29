@@ -1,0 +1,8 @@
+{
+  "CompatibleVersions": [
+    {
+      "SourceVersion": "ElasticSeach_7.7",
+      "TargetVersions": []
+    }
+  ]
+}
