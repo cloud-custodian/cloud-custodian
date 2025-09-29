@@ -12,11 +12,10 @@
         "content-type": "application/json"
       }
     },
-    "CompatibleVersions": [
-        {
-        "SourceVersion": "ElasticSeach_7.7",
-        "TargetVersions": []
-        }
+    "DomainNames": [
+      {
+        "DomainName": "test-es"
+      }
     ]
   }
 }
