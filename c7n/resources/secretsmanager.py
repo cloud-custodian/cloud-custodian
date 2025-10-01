@@ -147,15 +147,21 @@ class ReplicaAttributeFilter(ValueFilter):
         session_factory = self.manager.session_factory
         service = self.manager.resource_type.service
 
+        # Cache clients by region to avoid creating multiple clients for the same region
+        client_cache = {}
+
         for r in resources:
             # Always fetch and annotate replica details when this filter is invoked
             fetched_replicas = []
             for replica in r.get('ReplicationStatus', []):
                 region = replica.get('Region')
-                try:
-                    replica_client = local_session(session_factory).client(
+                # Use cached client if available
+                if region not in client_cache:
+                    client_cache[region] = local_session(session_factory).client(
                         service, region_name=region
                     )
+                replica_client = client_cache[region]
+                try:
                     detail_op, param_name, param_key, _ = self.manager.resource_type.detail_spec
                     op_func = getattr(replica_client, detail_op)
                     kw = {param_name: r[param_key]}
