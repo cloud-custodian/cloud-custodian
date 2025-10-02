@@ -708,16 +708,17 @@ wheels = [
 
 [[package]]
 name = "azure-mgmt-keyvault"
-version = "8.0.0"
+version = "11.0.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "azure-common" },
     { name = "azure-mgmt-core" },
-    { name = "msrest" },
+    { name = "isodate" },
+    { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/69/56/678b158efbd4b4d70151a0d688e11a529a42eac3ff426813878f253f76c4/azure-mgmt-keyvault-8.0.0.zip", hash = "sha256:2c974c6114d8d27152642c82a975812790a5e86ccf609bf370a476d9ea0d2e7d", size = 597535, upload-time = "2020-10-10T06:26:06.446Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/9f/d3/9e8d31aaedfb37efd20c8a9ac420b07cdb5c3d2f19c3452c9cdcb082dad6/azure_mgmt_keyvault-11.0.0.tar.gz", hash = "sha256:fcfb1366852926f2a311e1bc6e6a786eb8a8a1fd46e6025d4c114ede2cb4642e", size = 187547, upload-time = "2025-03-13T04:17:20.632Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a4/1f/7147646213b4cba47b05e1a55059509f3d7941c50f75c78f4a803776320e/azure_mgmt_keyvault-8.0.0-py2.py3-none-any.whl", hash = "sha256:99da24e9455f195d1e45a605af04d663e15cb5d5eb005b0ef60638474bbb2b3f", size = 197391, upload-time = "2020-10-10T06:26:04.335Z" },
+    { url = "https://files.pythonhosted.org/packages/9b/24/87c592517bbf97daf1897a271c8713ad1afd888b05db1fb48d7428cc8ee7/azure_mgmt_keyvault-11.0.0-py3-none-any.whl", hash = "sha256:abff0023a1c1b8033f3d4800cac996bf2b5470bd9c5ab71470c3184d7e8f0654", size = 308775, upload-time = "2025-03-13T04:17:22.345Z" },
 ]
 
 [[package]]
@@ -1306,6 +1307,7 @@ dev = [
     { name = "docker", extra = ["websockets"] },
     { name = "freezegun" },
     { name = "moto" },
+    { name = "multidict" },
     { name = "openapi-spec-validator" },
     { name = "placebo" },
     { name = "pytest" },
@@ -1348,6 +1350,7 @@ dev = [
     { name = "docker", extras = ["websockets"], specifier = ">=7.1.0,<8.0.0" },
     { name = "freezegun", specifier = ">=1.2.2,<2.0.0" },
     { name = "moto", specifier = ">=5.0,<6.0" },
+    { name = "multidict", specifier = ">=6.6.2,<7.0" },
     { name = "openapi-spec-validator", specifier = ">=0.7.1,<1.0.0" },
     { name = "placebo", specifier = ">=0,<1" },
     { name = "pytest", specifier = "<8" },
@@ -1525,7 +1528,7 @@ requires-dist = [
     { name = "azure-mgmt-frontdoor", specifier = ">=1.0.0,<2.0.0" },
     { name = "azure-mgmt-hdinsight", specifier = ">=7.0.0,<8.0.0" },
     { name = "azure-mgmt-iothub", specifier = ">=1.0.0,<2.0.0" },
-    { name = "azure-mgmt-keyvault", specifier = ">=8.0.0,<9.0.0" },
+    { name = "azure-mgmt-keyvault", specifier = ">=11.0.0,<12.0.0" },
     { name = "azure-mgmt-kusto", specifier = ">=2.2.0,<3.0.0" },
     { name = "azure-mgmt-logic", specifier = ">=9.0.0,<10.0.0" },
     { name = "azure-mgmt-machinelearningservices", specifier = "==2.0.0b2" },

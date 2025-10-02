@@ -46,6 +46,7 @@ dev = [
     "pytest<8",
     "pytest-cov<6,>=3",
     "pytest-recording<0.14.0,>=0.12.1",
+    "multidict<7.0,>=6.6.2",
     "pytest-sugar<1.1.0,>=0.9.2",
     "pytest-terraform<0.8,>=0.6",
     "pytest-xdist<4.0,>=3.0",
