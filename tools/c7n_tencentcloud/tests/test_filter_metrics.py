@@ -142,3 +142,63 @@ class TestFilterMetrics(BaseTest):
                 }
             )
             policy.run()
+
+    def test_validate_unknown_statistics(self, ctx):
+        """Test validation error for unknown statistics"""
+        manager = self.load_policy({
+            "name": "test-policy",
+            "resource": "tencentcloud.cvm",
+        }).resource_manager
+        
+        metrics_filter = MetricsFilter({
+            "type": "metrics",
+            "name": "CPUUsage",
+            "statistics": "Median",  # Invalid statistic
+            "days": 1,
+            "op": "less-than",
+            "value": 10,
+            "period": 300
+        }, manager)
+        
+        with pytest.raises(PolicyValidationError, match="unknown statistics"):
+            metrics_filter.validate()
+
+    def test_validate_unknown_operator(self, ctx):
+        """Test validation error for unknown operator"""
+        manager = self.load_policy({
+            "name": "test-policy",
+            "resource": "tencentcloud.cvm",
+        }).resource_manager
+        
+        metrics_filter = MetricsFilter({
+            "type": "metrics",
+            "name": "CPUUsage",
+            "statistics": "Average",
+            "days": 1,
+            "op": "invalid-op",  # Invalid operator
+            "value": 10,
+            "period": 300
+        }, manager)
+        
+        with pytest.raises(PolicyValidationError, match="unknown op"):
+            metrics_filter.validate()
+
+    def test_validate_zero_days(self, ctx):
+        """Test validation error for zero days"""
+        manager = self.load_policy({
+            "name": "test-policy",
+            "resource": "tencentcloud.cvm",
+        }).resource_manager
+        
+        metrics_filter = MetricsFilter({
+            "type": "metrics",
+            "name": "CPUUsage",
+            "statistics": "Average",
+            "days": 0,  # Invalid: zero days
+            "op": "less-than",
+            "value": 10,
+            "period": 300
+        }, manager)
+        
+        with pytest.raises(PolicyValidationError, match="days value cannot be 0"):
+            metrics_filter.validate()

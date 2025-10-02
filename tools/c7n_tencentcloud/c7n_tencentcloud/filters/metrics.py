@@ -105,6 +105,8 @@ class MetricsFilter(Filter):
         for up to 1,440 data points total across instances.
         So batch size must satisfy both constraints.
         """
+        if self.days <= 0 or self.period <= 0:
+            return 0
         data_points_per_resource = math.ceil(self.days * 86400 / self.period)
         # limit by total data points across instances
         max_instances_by_points = math.floor(1440 / data_points_per_resource)
