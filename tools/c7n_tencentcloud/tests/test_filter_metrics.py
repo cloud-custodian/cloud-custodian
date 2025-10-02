@@ -149,7 +149,7 @@ class TestFilterMetrics(BaseTest):
             "name": "test-policy",
             "resource": "tencentcloud.cvm",
         }).resource_manager
-        
+
         metrics_filter = MetricsFilter({
             "type": "metrics",
             "name": "CPUUsage",
@@ -159,7 +159,7 @@ class TestFilterMetrics(BaseTest):
             "value": 10,
             "period": 300
         }, manager)
-        
+
         with pytest.raises(PolicyValidationError, match="unknown statistics"):
             metrics_filter.validate()
 
@@ -169,7 +169,7 @@ class TestFilterMetrics(BaseTest):
             "name": "test-policy",
             "resource": "tencentcloud.cvm",
         }).resource_manager
-        
+
         metrics_filter = MetricsFilter({
             "type": "metrics",
             "name": "CPUUsage",
@@ -179,7 +179,7 @@ class TestFilterMetrics(BaseTest):
             "value": 10,
             "period": 300
         }, manager)
-        
+
         with pytest.raises(PolicyValidationError, match="unknown op"):
             metrics_filter.validate()
 
@@ -189,7 +189,7 @@ class TestFilterMetrics(BaseTest):
             "name": "test-policy",
             "resource": "tencentcloud.cvm",
         }).resource_manager
-        
+
         metrics_filter = MetricsFilter({
             "type": "metrics",
             "name": "CPUUsage",
@@ -199,6 +199,6 @@ class TestFilterMetrics(BaseTest):
             "value": 10,
             "period": 300
         }, manager)
-        
+
         with pytest.raises(PolicyValidationError, match="days value cannot be 0"):
             metrics_filter.validate()
