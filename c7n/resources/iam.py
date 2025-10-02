@@ -3219,3 +3219,52 @@ class SpecificIamProfileManagedPolicy(ValueFilter):
             if matched_keys:
                 matched.append(r)
         return matched
+
+
+#########################
+#    IAM Access Keys    #
+#########################
+
+
+class ListAccessKeys(DescribeSource):
+    """List all Access Keys since list_access_keys requires UserName parameter."""
+
+    def resources(self, query=None):
+        """Enumerate all access keys for all IAM users."""
+        client = local_session(self.manager.session_factory).client('iam')
+        resources = []
+
+        # Get all users first
+        users_paginator = client.get_paginator('list_users')
+        for users_page in users_paginator.paginate():
+            for user in users_page['Users']:
+                # For each user, get their access keys
+                keys_paginator = client.get_paginator('list_access_keys')
+                for keys_page in keys_paginator.paginate(UserName=user['UserName']):
+                    resources.extend(keys_page['AccessKeyMetadata'])
+
+        return resources
+
+
+@resources.register('iam-access-key')
+class AccessKey(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'iam'
+        # Access keys don't have ARNs - they use AccessKeyId as identifier
+        # Using 'access-key' as arn_type for consistency but ARN construction will not be used
+        arn_type = 'access-key'
+        id = name = 'AccessKeyId'
+        date = 'CreateDate'
+        # Denotes this resource type exists across regions
+        global_resource = True
+        # Use custom enum source since list_access_keys doesn't work without UserName
+        enum_spec = None
+        # No detail spec needed as list_access_keys returns full metadata
+        cfn_type = config_type = "AWS::IAM::AccessKey"
+        # config_id = 'AccessKeyId'
+
+    source_mapping = {
+        'describe': ListAccessKeys,
+        'config': ConfigSource
+    }
