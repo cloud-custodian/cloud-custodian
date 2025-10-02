@@ -3258,8 +3258,7 @@ class AccessKey(QueryResourceManager):
         date = 'CreateDate'
         # Denotes this resource type exists across regions
         global_resource = True
-        # Use custom enum source since list_access_keys doesn't work without UserName
-        enum_spec = None
+        enum_spec = ('list_access_keys', 'AccessKeys', None)
         # No detail spec needed as list_access_keys returns full metadata
         cfn_type = config_type = "AWS::IAM::AccessKey"
         # config_id = 'AccessKeyId'
