@@ -121,7 +121,9 @@ class AthenaQueryExecution(query.QueryResourceManager):
             "QueryExecutions",
             None,
         )
-        arn = False
+        arn = False,
+        cfn_type    = None,
+        config_type = None
         id = "QueryExecutionId"
         name = "QueryExecutionId"
 
@@ -145,7 +147,11 @@ class RuntimeStatisticsFilter(ValueFilter):
                 stats = resp.get("QueryRuntimeStatistics")
                 if stats is not None:
                     r["QueryRuntimeStatistics"] = stats
-            except ClientError:
-                # If API is not available/authorized, leave as-is and let matching fail
-                pass
+            except ClientError as e:
+                error = e.response.get("Error", {})
+                code = error.get("Code")
+                if code == "InvalidRequestException":
+                    # Query is gone or never existed (stale execution ids). Skip silently.
+                    continue
+                raise
         return super(RuntimeStatisticsFilter, self).process(resources, event)
