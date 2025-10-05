@@ -121,8 +121,8 @@ class AthenaQueryExecution(query.QueryResourceManager):
             "QueryExecutions",
             None,
         )
-        arn = False,
-        cfn_type    = None,
+        arn = False
+        cfn_type = None
         config_type = None
         id = "QueryExecutionId"
         name = "QueryExecutionId"
