@@ -889,11 +889,17 @@ class UsedIamRole(IamRoleUsage):
             filters:
               - type: used
                 state: true
+
+          - name: iam-role-not-in-use
+            resource: iam-role
+            filters:
+              - type: used
+                state: false
     """
 
     schema = type_schema(
         'used',
-        state={'type': 'boolean'})
+        state={'type': 'boolean', 'default': True})
 
     def process(self, resources, event=None):
         roles = self.service_role_usage()
