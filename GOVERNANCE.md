@@ -76,8 +76,3 @@ Cloud Custodian follows the CNCF Code of Conduct, which is published in `CODE_OF
 - `GOVERNANCE.md` (this document)  
 - `OWNERS.md` (area and core maintainers list)  
 - `CODE_OF_CONDUCT.md` (CNCF Code of Conduct link)
-
-
-
-
-
