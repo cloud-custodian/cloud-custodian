@@ -97,7 +97,7 @@ class KeyVaultKeyTest(BaseTest):
                         }
                     },
                     {
-                        'attributes.enabled': False
+                        'attributes.data.enabled': False
                     }
                 ],
                 "actions": [
