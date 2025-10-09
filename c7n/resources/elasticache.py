@@ -719,3 +719,36 @@ class ModifyUser(BaseAction):
         for r in resources:
             retry(client.modify_user, UserId=r['UserId'], **self.data["attributes"],
                 ignore_err_codes=('UserNotFoundFault',))
+
+
+@resources.register('elasticache-reserved')
+class ReservedCacheNodes(QueryResourceManager):
+    """Lists all the reserved cache nodes
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: reserved-cache-nodes-expiring
+            resource: aws.elasticache-reserved
+            filters:
+              - type: value
+                key: State
+                value: active
+
+    """
+
+    class resource_type(TypeInfo):
+        service = 'elasticache'
+        name = id = 'ReservedCacheNodeId'
+        date = 'StartTime'
+        enum_spec = (
+            'describe_reserved_cache_nodes',
+            'ReservedCacheNodes',
+            None,
+        )
+        filter_name = 'ReservedCacheNodeId'
+        filter_type = 'scalar'
+        arn_type = "reserved-instance"
+        permissions_enum = ('elasticache:DescribeReservedCacheNodes',)
