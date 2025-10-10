@@ -548,12 +548,12 @@ class VpcTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["SubnetId"], subnet_id)
-        try:
-            client.describe_subnets(SubnetIds=[subnet_id])
-        except Exception:
-            pass
-        else:
-            self.fail("subnet not deleted")
+        self.assertRaisesRegex(
+            BotoClientError,
+            'InvalidSubnetID.NotFound',
+            client.describe_subnets,
+            SubnetIds=[subnet_id],
+        )
 
     def test_endpoint_policy_filter(self):
         factory = self.replay_flight_data("test_endpoint_policy_filter")
