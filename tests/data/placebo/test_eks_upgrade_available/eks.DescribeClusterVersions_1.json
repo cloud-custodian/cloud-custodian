@@ -1,0 +1,19 @@
+{
+  "status_code": 200,
+  "data": {
+    "ResponseMetadata": {},
+    "clusterVersions": [
+      {
+        "clusterVersion": "1.31",
+        "clusterType": "eks",
+        "defaultPlatformVersion": "eks.21",
+        "defaultVersion": true,
+        "releaseDate": "2024-09-25T17:00:00-07:00",
+        "endOfStandardSupportDate": "2025-11-25T16:00:00-08:00",
+        "endOfExtendedSupportDate": "2026-11-25T16:00:00-08:00",
+        "status": "STANDARD_SUPPORT",
+        "kubernetesPatchVersion": "1.31.3"
+      }
+    ]
+  }
+}
