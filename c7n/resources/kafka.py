@@ -8,6 +8,8 @@ from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, ConfigSour
 from c7n.utils import local_session, type_schema
 
 from .aws import shape_validate
+from c7n.filters import CrossAccountAccessFilter
+import json
 
 
 class DescribeKafka(DescribeSource):
@@ -194,3 +196,28 @@ class DeleteClusterConfiguration(Action):
                 client.delete_configuration(Arn=r['Arn'])
             except client.exceptions.NotFoundException:
                 continue
+
+
+@Kafka.filter_registry.register('cross-account')
+class KafkaCrossAccountAccessFilter(CrossAccountAccessFilter):
+    """Filters Kafka clusters with cross-account permissions.
+
+    Only applies to provisioned clusters, as serverless clusters do not support resource policies.
+    """
+
+    policy_annotation = "c7n:Policy"
+    permissions = ("kafka:GetClusterPolicy", )
+
+    def process(self, resources, event=None):
+        # Only process provisioned clusters; serverless clusters do not support resource policies.
+        provisioned = [r for r in resources if r.get('ClusterType') == 'PROVISIONED']
+        return super(KafkaCrossAccountAccessFilter, self).process(provisioned, event)
+
+    def get_resource_policy(self, r):
+        client = local_session(self.manager.session_factory).client('kafka')
+        resp = client.get_cluster_policy(ClusterArn=r['ClusterArn'])
+        policy = json.loads(resp.get('Policy'))
+
+        # Annotate for reference/debugging
+        r[self.policy_annotation] = policy
+        return policy

@@ -165,6 +165,27 @@ class KafkaTest(BaseTest):
         self.assertEqual(resources[0]['ClusterType'], 'PROVISIONED')
         self.assertEqual(resources[1]['ClusterType'], 'SERVERLESS')
 
+    def test_kafka_cluster_cross_account_filter(self):
+        session_factory = self.replay_flight_data('test_kafka_cluster_cross_account_filter')
+        p = self.load_policy(
+            {
+                'name': 'kafka-cross-account-filter',
+                'resource': 'kafka',
+                'filters': [
+                    {
+                        'type': 'cross-account'
+                    }
+                ]
+            },
+            session_factory=session_factory,
+            config={'region': 'us-east-1'}
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['CrossAccountViolations'][0]['Resource'],
+            'arn:aws:kafka:us-east-1:644160558196:cluster/demo-cluster-1/51c9ae02-92f4-4fce-97a2-e890dcedfa91-21')
+
 
 class TestKafkaClusterConfiguration(BaseTest):
 
