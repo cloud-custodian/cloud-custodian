@@ -9,6 +9,7 @@ from c7n.utils import local_session, type_schema
 
 from .aws import shape_validate
 from c7n.filters import CrossAccountAccessFilter
+import json
 
 
 class DescribeKafka(DescribeSource):
@@ -204,20 +205,19 @@ class KafkaCrossAccountAccessFilter(CrossAccountAccessFilter):
     Only applies to provisioned clusters, as serverless clusters do not support resource policies.
     """
 
-    policy_annotation = "c7n:AccessPolicy"
-    permissions = ("kafka:DescribeCluster", "kafka:DescribeClusterV2",)
+    policy_annotation = "c7n:Policy"
+    permissions = ("kafka:GetClusterPolicy", )
 
     def process(self, resources, event=None):
-        filtered = []
-        for r in resources:
-            # Only provisioned clusters have a resource policy
-            policy = r.get('Provisioned', {}).get('ClusterPolicy')
-            if policy:
-                r[self.policy_annotation] = policy
-                filtered.append(r)
-        # Only process provisioned clusters for cross-account
-        return super(KafkaCrossAccountAccessFilter, self).process(filtered, event)
+        # Only process provisioned clusters; serverless clusters do not support resource policies.
+        provisioned = [r for r in resources if r.get('ClusterType') == 'PROVISIONED']
+        return super(KafkaCrossAccountAccessFilter, self).process(provisioned, event)
 
     def get_resource_policy(self, r):
-        return r.get(self.policy_annotation)
+        client = local_session(self.manager.session_factory).client('kafka')
+        resp = client.get_cluster_policy(ClusterArn=r['ClusterArn'])
+        policy = json.loads(resp.get('Policy'))
 
+        # Annotate for reference/debugging
+        r[self.policy_annotation] = policy
+        return policy

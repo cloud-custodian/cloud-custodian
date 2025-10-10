@@ -1,0 +1,115 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "ClusterInfoList": [
+            {
+                "ClusterType": "PROVISIONED",
+                "ClusterArn": "arn:aws:kafka:us-east-1:644160558196:cluster/demo-cluster-1/51c9ae02-92f4-4fce-97a2-e890dcedfa91-21",
+                "ClusterName": "demo-cluster-1",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 10,
+                    "day": 10,
+                    "hour": 17,
+                    "minute": 26,
+                    "second": 4,
+                    "microsecond": 343000
+                },
+                "CurrentVersion": "K3JWKAKR8XB7XF",
+                "State": "ACTIVE",
+                "Tags": {},
+                "Provisioned": {
+                    "BrokerNodeGroupInfo": {
+                        "BrokerAZDistribution": "DEFAULT",
+                        "ClientSubnets": [
+                            "subnet-efbcccb7",
+                            "subnet-044d9e3b66dccd75a",
+                            "subnet-914763e7"
+                        ],
+                        "InstanceType": "kafka.m7g.large",
+                        "SecurityGroups": [
+                            "sg-6c7fa917"
+                        ],
+                        "StorageInfo": {
+                            "EbsStorageInfo": {
+                                "VolumeSize": 100
+                            }
+                        },
+                        "ConnectivityInfo": {
+                            "PublicAccess": {
+                                "Type": "DISABLED"
+                            },
+                            "VpcConnectivity": {
+                                "ClientAuthentication": {
+                                    "Sasl": {
+                                        "Scram": {
+                                            "Enabled": false
+                                        },
+                                        "Iam": {
+                                            "Enabled": false
+                                        }
+                                    },
+                                    "Tls": {
+                                        "Enabled": false
+                                    }
+                                }
+                            }
+                        },
+                        "ZoneIds": [
+                            "use1-az6",
+                            "use1-az2",
+                            "use1-az4"
+                        ]
+                    },
+                    "CurrentBrokerSoftwareInfo": {
+                        "KafkaVersion": "3.8.x"
+                    },
+                    "ClientAuthentication": {
+                        "Sasl": {
+                            "Scram": {
+                                "Enabled": false
+                            },
+                            "Iam": {
+                                "Enabled": true
+                            }
+                        },
+                        "Tls": {
+                            "CertificateAuthorityArnList": [],
+                            "Enabled": false
+                        },
+                        "Unauthenticated": {
+                            "Enabled": false
+                        }
+                    },
+                    "EncryptionInfo": {
+                        "EncryptionAtRest": {
+                            "DataVolumeKMSKeyId": "arn:aws:kms:us-east-1:644160558196:key/133b4e81-8447-4c40-83cd-1db75d52b106"
+                        },
+                        "EncryptionInTransit": {
+                            "ClientBroker": "TLS",
+                            "InCluster": true
+                        }
+                    },
+                    "EnhancedMonitoring": "DEFAULT",
+                    "OpenMonitoring": {
+                        "Prometheus": {
+                            "JmxExporter": {
+                                "EnabledInBroker": false
+                            },
+                            "NodeExporter": {
+                                "EnabledInBroker": false
+                            }
+                        }
+                    },
+                    "NumberOfBrokerNodes": 3,
+                    "ZookeeperConnectString": "z-1.democluster1.45kuwb.c21.kafka.us-east-1.amazonaws.com:2181,z-3.democluster1.45kuwb.c21.kafka.us-east-1.amazonaws.com:2181,z-2.democluster1.45kuwb.c21.kafka.us-east-1.amazonaws.com:2181",
+                    "ZookeeperConnectStringTls": "z-1.democluster1.45kuwb.c21.kafka.us-east-1.amazonaws.com:2182,z-3.democluster1.45kuwb.c21.kafka.us-east-1.amazonaws.com:2182,z-2.democluster1.45kuwb.c21.kafka.us-east-1.amazonaws.com:2182",
+                    "StorageMode": "LOCAL",
+                    "CustomerActionStatus": "NONE"
+                }
+            }
+        ]
+    }
+}
