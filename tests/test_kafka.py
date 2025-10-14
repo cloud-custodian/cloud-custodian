@@ -184,7 +184,7 @@ class KafkaTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(
             resources[0]['CrossAccountViolations'][0]['Resource'],
-            'arn:aws:kafka:us-east-1:644160558196:cluster/demo-cluster-1/51c9ae02-92f4-4fce-97a2-e890dcedfa91-21')
+            'arn:aws:kafka:us-east-1:644160558196:cluster/demo-cluster-1/b12690b6-7337-464f-b334-628d5575a4b0-21')
 
 
 class TestKafkaClusterConfiguration(BaseTest):

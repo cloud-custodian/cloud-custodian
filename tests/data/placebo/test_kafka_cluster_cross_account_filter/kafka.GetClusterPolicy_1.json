@@ -2,7 +2,7 @@
     "status_code": 200,
     "data": {
         "ResponseMetadata": {},
-        "CurrentVersion": "K1PA6795UKMFR9",
-        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Action\":[\"kafka:CreateVpcConnection\",\"kafka:GetBootstrapBrokers\",\"kafka:DescribeCluster\",\"kafka:DescribeClusterV2\"],\"Resource\":\"arn:aws:kafka:us-east-1:644160558196:cluster/demo-cluster-1/51c9ae02-92f4-4fce-97a2-e890dcedfa91-21\"}]}"
+        "CurrentVersion": "KTVPDKIKX0DER",
+        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Action\":[\"kafka:CreateVpcConnection\",\"kafka:GetBootstrapBrokers\",\"kafka:DescribeCluster\",\"kafka:DescribeClusterV2\"],\"Resource\":\"arn:aws:kafka:us-east-1:644160558196:cluster/demo-cluster-1/b12690b6-7337-464f-b334-628d5575a4b0-21\"}]}"
     }
 }

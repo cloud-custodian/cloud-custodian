@@ -5,17 +5,17 @@
         "ClusterInfoList": [
             {
                 "ClusterType": "PROVISIONED",
-                "ClusterArn": "arn:aws:kafka:us-east-1:644160558196:cluster/demo-cluster-1/51c9ae02-92f4-4fce-97a2-e890dcedfa91-21",
+                "ClusterArn": "arn:aws:kafka:us-east-1:644160558196:cluster/demo-cluster-1/b12690b6-7337-464f-b334-628d5575a4b0-21",
                 "ClusterName": "demo-cluster-1",
                 "CreationTime": {
                     "__class__": "datetime",
                     "year": 2025,
                     "month": 10,
-                    "day": 10,
-                    "hour": 17,
-                    "minute": 26,
-                    "second": 4,
-                    "microsecond": 343000
+                    "day": 14,
+                    "hour": 18,
+                    "minute": 49,
+                    "second": 30,
+                    "microsecond": 30000
                 },
                 "CurrentVersion": "K3JWKAKR8XB7XF",
                 "State": "ACTIVE",
@@ -28,15 +28,10 @@
                             "subnet-044d9e3b66dccd75a",
                             "subnet-914763e7"
                         ],
-                        "InstanceType": "kafka.m7g.large",
+                        "InstanceType": "express.m7g.large",
                         "SecurityGroups": [
                             "sg-6c7fa917"
                         ],
-                        "StorageInfo": {
-                            "EbsStorageInfo": {
-                                "VolumeSize": 100
-                            }
-                        },
                         "ConnectivityInfo": {
                             "PublicAccess": {
                                 "Type": "DISABLED"
@@ -104,9 +99,6 @@
                         }
                     },
                     "NumberOfBrokerNodes": 3,
-                    "ZookeeperConnectString": "z-1.democluster1.45kuwb.c21.kafka.us-east-1.amazonaws.com:2181,z-3.democluster1.45kuwb.c21.kafka.us-east-1.amazonaws.com:2181,z-2.democluster1.45kuwb.c21.kafka.us-east-1.amazonaws.com:2181",
-                    "ZookeeperConnectStringTls": "z-1.democluster1.45kuwb.c21.kafka.us-east-1.amazonaws.com:2182,z-3.democluster1.45kuwb.c21.kafka.us-east-1.amazonaws.com:2182,z-2.democluster1.45kuwb.c21.kafka.us-east-1.amazonaws.com:2182",
-                    "StorageMode": "LOCAL",
                     "CustomerActionStatus": "NONE"
                 }
             }
