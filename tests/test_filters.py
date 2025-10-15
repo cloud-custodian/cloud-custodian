@@ -929,6 +929,19 @@ class TestInstanceValue(BaseFilterTest):
             True,
         )
 
+    def test_normalized_keys_filter(self):
+        i = instance(Tags=[{"Key": " foo", "Value": "abcd"}])
+        self.assertFilter({"tag:foo": "abcd"}, i, False)
+        self.assertFilter({"normalized_keys_tag:foo": "abcd"}, i, True)
+        self.assertEqual(annotation(i, base_filters.ANNOTATION_KEY), ["normalized_keys_tag:foo"])
+
+        i = instance(Tags=[{"Key": " foo_bar", "Value": "abcd"}])
+        self.assertFilter({"tag:FooBar": "abcd"}, i, False)
+        self.assertFilter({"normalized_keys_title_nounderscores_tag:FooBar": "abcd"}, i, True)
+        self.assertEqual(
+            annotation(i, base_filters.ANNOTATION_KEY),
+            ["normalized_keys_title_nounderscores_tag:FooBar"],
+        )
 
 class TestEqualValue(unittest.TestCase):
 
