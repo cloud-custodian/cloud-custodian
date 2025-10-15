@@ -532,7 +532,7 @@ class VpcTest(BaseTest):
         def delete_subnet():
             try:
                 client.delete_subnet(SubnetId=subnet_id)
-            except Exception:
+            except BotoClientError:
                 pass
 
         self.addCleanup(delete_subnet)
@@ -578,14 +578,14 @@ class VpcTest(BaseTest):
         def delete_subnet():
             try:
                 client.delete_subnet(SubnetId=subnet_id)
-            except Exception:
+            except BotoClientError:
                 pass
         self.addCleanup(delete_subnet)
 
         def delete_network_interface():
             try:
                 client.delete_network_interface(NetworkInterfaceId=eni_id)
-            except Exception:
+            except BotoClientError:
                 pass
         self.addCleanup(delete_network_interface)
 
