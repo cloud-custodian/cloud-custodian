@@ -728,6 +728,8 @@ class DeleteSubnet(BaseAction):
 
     :example:
 
+    Delete empty development subnets
+
     .. code-block:: yaml
 
         policies:
@@ -735,6 +737,9 @@ class DeleteSubnet(BaseAction):
             resource: aws.subnet
             filters:
               - tag:Environment: dev
+              - type: ip-address-usage
+                key: NumberUsed
+                value: 0
             actions:
               - type: delete
     """

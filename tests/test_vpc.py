@@ -540,7 +540,14 @@ class VpcTest(BaseTest):
             {
                 "name": "subnet-delete",
                 "resource": "aws.subnet",
-                "filters": [{"SubnetId": subnet_id}],
+                "filters": [
+                    {
+                        "type": "ip-address-usage",
+                        "key": "NumberUsed",
+                        "value": 0,
+                    },
+                    {"SubnetId": subnet_id}
+                ],
                 "actions": ["delete"],
             },
             session_factory=factory,
