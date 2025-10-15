@@ -862,11 +862,44 @@ class SyntheticsCanary(QueryResourceManager):
         universal_taggable = object()
 
     def augment(self, resources):
+        client = local_session(self.session_factory).client('synthetics')
+        s3 = local_session(self.session_factory).client('s3')
+
         for r in resources:
             # AWS returns tags as a dict { "Key": "Value" }
             # Custodian expects [{"Key": k, "Value": v}, ...]
             r["Tags"] = [{"Key": k, "Value": v} for k, v in r["Tags"].items()]
 
+            # Grab the runs to extract the log S3 bucket
+            runs = client.get_canary_runs(Name=r['Name'], MaxResults=1).get("CanaryRuns", [])
+            if not runs:
+                r["DestinationUrl"] = None
+                continue
+
+            artifact = runs[0].get("ArtifactS3Location")
+            if not artifact:
+                r["DestinationUrl"] = None
+                continue
+
+            bucket, key_prefix = artifact.split("/", 1)
+            report_key = f"{key_prefix}/SyntheticsReport-PASSED.json"
+
+            try:
+                obj = s3.get_object(Bucket=bucket, Key=report_key)
+                body = obj["Body"].read().decode("utf-8")
+                import json
+                report = json.loads(body)
+
+                # Extract destinationUrls
+                steps = report.get("customerScript", {}).get("steps", [])
+                dest_urls = [s.get("destinationUrl") for s in steps if "destinationUrl" in s]
+
+                r["DestinationUrl"] = dest_urls[0] if dest_urls else None
+                r["AllDestinationUrls"] = dest_urls
+
+            except Exception:
+                r["DestinationUrl"] = None
+                r["AllDestinationUrls"] = []
         return resources
 
 
@@ -879,7 +912,13 @@ class StartCanary(BaseAction):
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('synthetics')
         for r in resources:
-            client.start_canary(Name=r['Name'])
+            try:
+                desc = client.get_canary(Name=r['Name'])
+                if desc['Canary']['Status']['State'] == 'STOPPED':
+                    client.start_canary(Name=r['Name'])
+            except Exception as e:
+                self.log.warning("Error starting canary %s: %s", r['Name'], e)
+                continue
 
 
 @SyntheticsCanary.action_registry.register('stop')
@@ -892,7 +931,13 @@ class StopCanary(BaseAction):
         """Stop all running resources"""
         client = local_session(self.manager.session_factory).client('synthetics')
         for r in resources:
-            client.stop_canary(Name=r['Name'])
+            try:
+                desc = client.get_canary(Name=r['Name'])
+                if desc['Canary']['Status']['State'] == 'RUNNING':
+                    client.stop_canary(Name=r['Name'])
+            except Exception as e:
+                self.log.warning("Error stopping canary %s: %s", r['Name'], e)
+                continue
 
 
 @SyntheticsCanary.action_registry.register('delete')
@@ -905,4 +950,10 @@ class DeleteCanary(BaseAction):
         """Delete resources"""
         client = local_session(self.manager.session_factory).client('synthetics')
         for r in resources:
-            client.delete_canary(Name=r['Name'])
+            try:
+                desc = client.get_canary(Name=r['Name'])
+                if desc['Canary']['Status']['State'] == 'STOPPED':
+                    client.delete_canary(Name=r['Name'])
+            except Exception as e:
+                self.log.warning("Error deleting canary %s: %s", r['Name'], e)
+                continue

@@ -5,7 +5,7 @@ class SyntheticsCanaryTest(BaseTest):
 
     def test_canary_filter_by_tag(self):
         factory = self.replay_flight_data("test_cw_synthetics_tag_filter")
-        canary_name = "c7n-test-canary-tag"
+        canary_name = "test_canary_tag"
 
         p = self.load_policy(
             {
@@ -27,7 +27,7 @@ class SyntheticsCanaryTest(BaseTest):
         factory = self.replay_flight_data("test_cw_synthetics_delete")
         client = factory().client("synthetics")
 
-        canary_name = "c7n-test-canary-delete"
+        canary_name = "test_canary_delete"
 
         p = self.load_policy(
             {
@@ -43,13 +43,17 @@ class SyntheticsCanaryTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
         canaries = client.describe_canaries()["Canaries"]
-        self.assertFalse(any(c["Name"] == canary_name for c in canaries))
+        # After deletion, canary should either be gone or in DELETING state
+        target_canary = next((c for c in canaries if c["Name"] == canary_name), None)
+        if target_canary is not None:
+            self.assertEqual(target_canary["Status"]["State"], "DELETING")
+        # If target_canary is None, that's also acceptable (fully deleted)
 
     def test_stop_canary(self):
         factory = self.replay_flight_data("test_cw_synthetics_stop")
         client = factory().client("synthetics")
 
-        canary_name = "c7n-test-canary-stop"
+        canary_name = "test_canary_stop"
 
         p = self.load_policy(
             {
@@ -70,7 +74,7 @@ class SyntheticsCanaryTest(BaseTest):
         factory = self.replay_flight_data("test_cw_synthetics_start")
         client = factory().client("synthetics")
 
-        canary_name = "c7n-test-canary-start"
+        canary_name = "test_canary_start"
 
         p = self.load_policy(
             {
