@@ -143,3 +143,26 @@ class DiagnosticSettingsFilterTest(BaseTest):
         }
         self.assertRaises(
             PolicyValidationError, self.load_policy, policy, validate=True)
+
+
+class EntraIDDiagnosticSettingsFilterTest(BaseTest):
+    """Test diagnostic settings filter for EntraID resources."""
+
+    def test_entraid_diagnostic_settings_schema_validate(self):
+        """Test that EntraID resources support diagnostic-settings filter schema validation."""
+
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'test-entraid-diagnostic-settings',
+                'resource': 'azure.entraid-user',
+                'filters': [
+                    {
+                        'type': 'diagnostic-settings',
+                        'key': "logs[?category == 'AuditLogs'][].enabled",
+                        'op': 'in',
+                        'value_type': 'swap',
+                        'value': True
+                    }
+                ]
+            }, validate=False)
+            self.assertTrue(p)
