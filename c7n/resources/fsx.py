@@ -383,11 +383,66 @@ class DeleteFileSystem(BaseAction):
             config = {'SkipFinalBackup': skip_snapshot}
             if tags and not skip_snapshot:
                 config['FinalBackupTags'] = tags
+
+            delete_args = {
+                'FileSystemId': r['FileSystemId'],
+            }
+            # Determine the correct configuration key based on FileSystemType
+            # fs_type == 'ONTAP' does not support config in boto3 (Oct 2025)
+            fs_type = r.get('FileSystemType')
+            config_key = None
+            if fs_type == 'WINDOWS':
+                config_key = 'WindowsConfiguration'
+            elif fs_type == 'LUSTRE':
+                config_key = 'LustreConfiguration'
+            elif fs_type == 'OPENZFS':
+                config_key = 'OpenZFSConfiguration'
+                # OpenZFS requires this option to delete all child volumes and snapshots
+                delete_args['Options'] = ['DELETE_CHILD_VOLUMES_AND_SNAPSHOTS']
+            elif fs_type == 'ONTAP':
+                # Before deleting an ONTAP file system, all volumes must be deleted
+                # Loop through and delete all volumes associated with the file system
+                volumes = client.describe_volumes(Filters=[
+                    {
+                        'Name': 'file-system-id',
+                        'Values': [r['FileSystemId']],
+                    }]).get('Volumes', [])
+                for volume in volumes:
+                    try:
+                        client.delete_volume(VolumeId=volume['VolumeId'])
+                    except client.exceptions.VolumeNotFound:
+                        # Volume already deleted, continue
+                        continue
+                    except client.exceptions.VolumeInUse as e:
+                        self.log.warning(
+                            'Unable to delete volume for: %s - %s - %s' % (
+                                r['FileSystemId'], volume['VolumeId'], e))
+                # After attempting to delete all volumes, check if any remain
+                remaining_volumes = client.describe_volumes(Filters=[
+                    {
+                        'Name': 'file-system-id',
+                        'Values': [r['FileSystemId']],
+                    }]).get('Volumes', [])
+                if remaining_volumes:
+                    # Wait a short period to ensure volumes are fully deleted
+                    import time
+                    time.sleep(10)
+                    # After attempting to delete all volumes, check if any remain
+                    remaining_volumes = client.describe_volumes(Filters=[
+                        {
+                            'Name': 'file-system-id',
+                            'Values': [r['FileSystemId']],
+                        }]).get('Volumes', [])
+                    self.log.warning(
+                        'Skipping deletion of ONTAP file system %s, volumes still exist. Try again' % r['FileSystemId'])
+                    continue
+
+            if config_key:
+                delete_args[config_key] = config
+
             try:
-                client.delete_file_system(
-                    FileSystemId=r['FileSystemId'],
-                    WindowsConfiguration=config
-                )
+                client.delete_file_system(**delete_args)
+
             except client.exceptions.BadRequest as e:
                 self.log.warning('Unable to delete: %s - %s' % (r['FileSystemId'], e))
 
