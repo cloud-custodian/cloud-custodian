@@ -943,6 +943,7 @@ class TestInstanceValue(BaseFilterTest):
             ["normalized_keys_title_nounderscores_tag:FooBar"],
         )
 
+
 class TestEqualValue(unittest.TestCase):
 
     def test_eq(self):

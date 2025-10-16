@@ -311,9 +311,10 @@ class NormalizeFilterTagKeys(Enum):
 
     @classmethod
     def transform_func_if_needed(cls, tag_filter):
-        """ Return a callable func to do the transformation of tag keys as specified in the tag strategy.
-        For example: this example would normalize all the tag keys to do the following commands in order:
-          strip(), title(), replace("_", "") and look for a normalized key of FooBar to match spam
+        """ Return a callable func to do the transformation of tag keys as specified in the tag
+         strategy. For example: this example would normalize all the tag keys to do the following
+         commands in order: strip(), title(), replace("_", "") and look for a normalized key of
+         FooBar to match spam
         filters:
           - type: value
             key: normalized_keys_title_nounderscores_tag:FooBar
