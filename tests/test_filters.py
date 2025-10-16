@@ -943,6 +943,14 @@ class TestInstanceValue(BaseFilterTest):
             ["normalized_keys_title_nounderscores_tag:FooBar"],
         )
 
+        # make instance tags GCP-like by removing "Tags" and adding "labels"
+        i = instance()
+        del i["Tags"]
+        i["labels"] = {" foo": "abcd"}
+        self.assertFilter({"tag:foo": "abcd"}, i, False)
+        self.assertFilter({"normalized_keys_tag:foo": "abcd"}, i, True)
+        self.assertEqual(annotation(i, base_filters.ANNOTATION_KEY), ["normalized_keys_tag:foo"])
+
 
 class TestEqualValue(unittest.TestCase):
 
