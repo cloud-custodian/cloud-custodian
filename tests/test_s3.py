@@ -36,6 +36,94 @@ from .common import (
 )
 
 
+def test_s3_assembly_validate(test):
+
+    for tcase in ('all', 'none', 'detect', ['Website', 'Replication']):
+        policy = test.load_policy(
+            {'name': 's3-attrs',
+             'resource': 's3',
+             'query': [{'augment-keys': tcase}]
+             }
+        )
+        policy.validate()
+
+    for tcase in ('random', ['Garbage'], {}):
+        with pytest.raises(PolicyValidationError):
+            policy = test.load_policy(
+                {'name': 's3-attrs',
+                 'resource': 's3',
+                 'query': [{'augment-keys': tcase}],
+                 'filters': [{'tag:Owner': 'xyz'}],
+                 },
+                validate=True
+            )
+
+
+def test_s3_assembly_none(test):
+    # noting even with none we will still get location and tags to
+    # ensure other s3 filters/actions work.
+    policy = test.load_policy(
+        {'name': 's3-attrs',
+         'resource': 's3',
+         'query': [{'augment-keys': 'none'}],
+         'filters': [
+             {'tag:Owner': 'xyz'},
+         ]
+         }
+    )
+    assembly = s3.BucketAssembly(policy.resource_manager)
+    assert assembly.detect_augment_fields() == []
+
+
+def test_s3_assembly_website(test):
+    policy = test.load_policy(
+        {'name': 's3-attrs',
+         'resource': 's3',
+         'query': [{'augment-keys': ['Website', 'Replication']}],
+         'filters': [
+             {'tag:Owner': 'xyz'},
+         ]
+         }
+    )
+    assembly = s3.BucketAssembly(policy.resource_manager)
+    assert assembly.detect_augment_fields() == ['Website', 'Replication']
+
+
+def test_s3_assembly_detect(test):
+
+    policy = test.load_policy(
+        {'name': 's3-attrs',
+         'resource': 's3',
+         'query': [{'augment-keys': 'detect'}],
+         'filters': [
+             {'tag:Owner': 'xyz'},
+             {'type': 'cross-account'},
+             {'SomethingRandom': 'xyz'},
+             {'Replication.ReplicationConfiguation.Rules[].Destination.StorageClass': 'Standard'},
+             {'type': 'value',
+              'value': 'not-null',
+              'key': 'Website.ErrorDocument'}]
+         }
+    )
+    assembly = s3.BucketAssembly(policy.resource_manager)
+    assert assembly.detect_augment_fields() == ['Tags', 'Replication', 'Website']
+
+
+def test_s3_assembly_detect_denied(test):
+    policy = test.load_policy(
+        {'name': 's3-attrs',
+         'resource': 's3',
+         'query': [{'augment-keys': 'detect'}],
+         'filters': [
+             {'c7n:DeniedMethods': 'not-null'},
+         ]}
+    )
+    assembly = s3.BucketAssembly(policy.resource_manager)
+    assert assembly.detect_augment_fields() == [
+        'Location', 'Tags', 'Policy', 'Acl', 'Replication', 'Versioning', 'Website',
+        'Logging', 'Notification', 'Lifecycle']
+
+
 def test_s3_express(test):
     session_factory = test.replay_flight_data('test_s3_express')
     p = test.load_policy(
@@ -176,6 +264,7 @@ class BucketMetrics(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertIn('c7n.metrics', resources[0])
+        assert p.resource_manager.get_arns(resources) == ['arn:aws:s3:::c7n-ssm-build']
 
     def test_metrics(self):
         self.patch(s3.S3, "executor_factory", MainThreadExecutor)
@@ -3804,6 +3893,7 @@ class S3Test(BaseTest):
         assert {bucket["Name"] for bucket in resources} == {"bucket-with-data-events"}
 
     def test_s3_dataaccesspointaccount_cross_account(self):
+        self.patch(s3.S3, "executor_factory", MainThreadExecutor)
         session_factory = self.replay_flight_data("test_s3_dataaccesspointaccount_cross_account")
 
         p = self.load_policy(

@@ -46,7 +46,7 @@ def _default_options(p, exclude=[]):
             help="AWS Region to target.  Can be used multiple times")
     provider.add_argument(
         "--profile",
-        help="AWS Account Config File Profile to utilize")
+        help="Account Config File Profile to utilize (AWS/TencentCloud)")
     provider.add_argument("--assume", default=None, dest="assume_role",
                           help="Role or Service Account to assume")
     provider.add_argument("--external-id", default=None, dest="external_id",

@@ -100,6 +100,7 @@ COPY --from=build-env /output /output
 
 
 RUN adduser --disabled-login --gecos "" custodian
+RUN ln -s /src/.venv/bin/c7n-mailer /usr/local/bin/c7n-mailer
 USER custodian
 WORKDIR /home/custodian
 ENV LC_ALL="C.UTF-8" LANG="C.UTF-8"
