@@ -6,13 +6,14 @@ Resource Filtering Logic
 import copy
 import datetime
 from datetime import timedelta
-from enum import Enum
+import enum
 from functools import partial, reduce
 import fnmatch
 import ipaddress
 import logging
 import operator
 import re
+import sys
 
 from dateutil.tz import tzutc
 from dateutil.parser import parse
@@ -297,17 +298,23 @@ class BaseValueFilter(Filter):
         return self
 
 
-class NormalizeFilterTagKeys(Enum):
-    # use partial since setting a callable value overrides enum methods
-    noop = partial(lambda v: v)
-    capitalize = partial(lambda v: v.capitalize())
-    lower = partial(lambda v: v.lower())
-    strip = partial(lambda v: v.strip())
-    title = partial(lambda v: v.title())
-    upper = partial(lambda v: v.upper())
-    nospaces = partial(lambda v: v.replace(" ", ""))
-    nounderscores = partial(lambda v: v.replace("_", ""))
-    nodashes = partial(lambda v: v.replace("-", ""))
+# Setting a callable Enum value overrides Enum methods so we need to wrap in either:
+# functools.partial (3.10) or enum.member (3.11+).
+# functools.partial has changed behavior in 3.13 so we can't use it for all python versions
+# Once 3.10 is no longer supported, just use enum.member
+_member = enum.member if sys.version_info[0] >= 3 and sys.version_info[1] >= 10 else partial
+
+
+class NormalizeFilterTagKeys(enum.Enum):
+    noop = _member(lambda v: v)
+    capitalize = _member(lambda v: v.capitalize())
+    lower = _member(lambda v: v.lower())
+    strip = _member(lambda v: v.strip())
+    title = _member(lambda v: v.title())
+    upper = _member(lambda v: v.upper())
+    nospaces = _member(lambda v: v.replace(" ", ""))
+    nounderscores = _member(lambda v: v.replace("_", ""))
+    nodashes = _member(lambda v: v.replace("-", ""))
 
     @classmethod
     def transform_func_if_needed(cls, tag_filter):
