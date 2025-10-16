@@ -302,7 +302,7 @@ class BaseValueFilter(Filter):
 # functools.partial (3.10) or enum.member (3.11+).
 # functools.partial has changed behavior in 3.13 so we can't use it for all python versions
 # Once 3.10 is no longer supported, just use enum.member
-_member = enum.member if sys.version_info[0] >= 3 and sys.version_info[1] >= 10 else partial
+_member = enum.member if sys.version_info[0] >= 3 and sys.version_info[1] >= 11 else partial
 
 
 class NormalizeFilterTagKeys(enum.Enum):
