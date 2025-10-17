@@ -9,7 +9,7 @@ from dateutil.parser import parse
 
 from c7n.actions import (
     ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction)
-from c7n.filters import FilterRegistry, AgeFilter
+from c7n.filters import FilterRegistry, AgeFilter, Filter
 import c7n.filters.vpc as net_filters
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.manager import resources
@@ -170,6 +170,88 @@ class VpcFilter(net_filters.VpcFilter):
 
 
 filters.register('network-location', net_filters.NetworkLocation)
+
+
+@filters.register('upgrade-available')
+class UpgradeAvailable(Filter):
+    """Scans for ElastiCache clusters available upgrade versions
+
+    This will check all the ElastiCache clusters on the resources, and return
+    a list of viable upgrade options.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: elasticache-upgrade-available
+                resource: cache-cluster
+                filters:
+                  - type: upgrade-available
+                    major: False
+
+    """
+
+    schema = type_schema(
+        'upgrade-available',
+        major={'type': 'boolean'},
+        value={'type': 'boolean'},
+    )
+    permissions = ('elasticache:DescribeServiceUpdates',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('elasticache')
+        check_major = self.data.get('major', False)
+        check_upgrade_extant = self.data.get('value', True)
+        results = []
+
+        # Get all available service updates
+        paginator = client.get_paginator('describe_service_updates')
+        page_iterator = paginator.paginate(
+            ServiceUpdateStatus=['available']
+        )
+
+        # Build a set of available upgrades: (engine, version) tuples
+        available_upgrades = set()
+        for page in page_iterator:
+            for service_update in page['ServiceUpdates']:
+                engine = service_update.get('Engine', '').lower()
+                engine_version = service_update.get('EngineVersion', '')
+                engine_name, version = _parse_engine_version(engine_version)
+
+                if engine_name and version:
+                    available_upgrades.add((engine_name, version))
+
+        for resource in resources:
+            resource_engine = resource.get('Engine', '').lower()
+            resource_version = resource.get('EngineVersion', '')
+            resource_major_version, _ = resource_version.split('.', 1)
+            has_upgrade_available = False
+
+            # Check if any available upgrades match this resource's engine
+            for engine, version in available_upgrades:
+                if engine == resource_engine:
+                    # Only in the case of the same engine can we use
+                    # `check_major` here.
+                    if check_major:
+                        has_upgrade_available = True
+                        break
+
+                    # If we're here, we're only looking for minor upgrades.
+                    # Ensure the major versions match.
+                    major, _ = version.split('.', 1)
+
+                    if resource_major_version == major:
+                        has_upgrade_available = True
+                        break
+
+            # Apply filter logic based on 'value' parameter
+            if check_upgrade_extant:
+                results.append(resource)
+            elif has_upgrade_available:
+                results.append(resource)
+
+        return results
 
 
 @actions.register('delete')
@@ -542,6 +624,26 @@ class CopyClusterTags(BaseAction):
                 client.add_tags_to_resource,
                 ResourceName=arn,
                 Tags=[{'Key': k, 'Value': v} for k, v in copy_tags.items()])
+
+
+def _parse_engine_version(engine_version):
+    """Parse EngineVersion string into (engine_name, version) tuple
+
+    Example inputs:
+    - "redis-7.0" -> ("redis", "7.0")
+    - "memcached-1.6.12" -> ("memcached", "1.6.12")
+    - "valkey-7.2" -> ("valkey", "7.2")
+    """
+    if not engine_version or '-' not in engine_version:
+        return None, None
+
+    # Handle the strange `and onwards` verbiage.
+    engine_version = engine_version.replace('and onwards', '').strip()
+
+    parts = engine_version.split('-', 1)
+    if len(parts) == 2:
+        return parts[0].lower(), parts[1]
+    return None, None
 
 
 def _cluster_eligible_for_snapshot(cluster):
