@@ -381,6 +381,23 @@ class SpannerDatabaseInstanceTest(BaseTest):
 
         self.assertEqual(test_method(existing_bindings, bindings_to_remove), expected_bindings)
 
+    def test_no_metrics(self):
+        # The replay shouldn't matter. We just want to make sure the exception is thrown.
+        session_factory = self.replay_flight_data('spanner-database-instance-query')
+        policy = self.load_policy(
+            {
+                'name': 'all-spanner-database-instances',
+                'resource': 'gcp.spanner-database-instance'
+            },
+            session_factory=session_factory,
+        )
+        resource_type = policy.resource_manager.resource_type
+
+        with self.assertRaises(NotImplementedError):
+            resource_type.get_metric_resource_name({
+                "whatever": "doesn't matter",
+            })
+
 
 class TestSpannerInstanceBackup(BaseTest):
 
@@ -421,6 +438,27 @@ class TestSpannerInstanceBackup(BaseTest):
         resources = p.run()
 
         self.assertEqual(1, len(resources))
+
+    def test_no_metrics(self):
+        # The replay shouldn't matter. We just want to make sure the exception is thrown.
+        project_id = 'cloud-custodian'
+        session_factory = self.replay_flight_data(
+            'test-spanner-instance-backup',
+            project_id=project_id,
+        )
+        policy = self.load_policy(
+            {
+                'name': 'spanner-instance-backup',
+                'resource': 'gcp.spanner-backup',
+            },
+            session_factory=session_factory,
+        )
+        resource_type = policy.resource_manager.resource_type
+
+        with self.assertRaises(NotImplementedError):
+            resource_type.get_metric_resource_name({
+                "whatever": "doesn't matter",
+            })
 
 
 @terraform('spanner_backup')
