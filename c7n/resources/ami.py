@@ -670,6 +670,50 @@ class AmiCrossAccountFilter(CrossAccountAccessFilter):
         return results
 
 
+@AMI.filter_registry.register('block-public-access')
+class BlockPublicAccess(Filter):
+    """Scans for AWS accounts that have/do not have Block Public Access set for
+    their AMIs.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: ami-block-public-access
+                resource: ami
+                filters:
+                  - type: block-public-access
+                    value: false
+
+    """
+
+    schema = type_schema('block-public-access', value={'type': 'boolean'})
+    permissions = ('ec2:GetImageBlockPublicAccessState',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('ec2')
+        is_blocked = self.data.get('value', False)
+        results = []
+
+        # Get account-wide block public access state (one API call for all resources)
+        try:
+            response = client.get_image_block_public_access_state()
+            account_state = response.get('ImageBlockPublicAccessState', 'unblocked')
+            account_blocked = account_state == 'block-new-sharing'
+        except ClientError as e:
+            self.log.error("Failed to get image block public access state: %s", e)
+            return []
+
+        # Filter resources based on whether the account state matches the desired value
+        if account_blocked == is_blocked:
+            results = resources
+        else:
+            results = []
+
+        return results
+
+
 @AMI.filter_registry.register('image-attribute')
 class ImageAttribute(ValueFilter):
     """AMI Image Value Filter on a given image attribute.

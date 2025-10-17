@@ -1,0 +1,40 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Images": [
+            {
+                "VirtualizationType": "hvm", 
+                "Name": "TestAMI2", 
+                "Hypervisor": "xen", 
+                "SriovNetSupport": "simple", 
+                "ImageId": "ami-87654321", 
+                "State": "available", 
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda", 
+                        "Ebs": {
+                            "DeleteOnTermination": true, 
+                            "SnapshotId": "snap-87654321", 
+                            "VolumeSize": 8, 
+                            "VolumeType": "gp2", 
+                            "Encrypted": false
+                        }
+                    }
+                ], 
+                "Architecture": "x86_64", 
+                "ImageLocation": "123456789012/TestAMI2", 
+                "RootDeviceType": "ebs", 
+                "OwnerId": "123456789012", 
+                "RootDeviceName": "/dev/xvda", 
+                "CreationDate": "2023-01-01T12:00:00.000Z", 
+                "Public": false, 
+                "ImageType": "machine", 
+                "Description": "Test AMI for block public access filter disabled"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "87654321-4321-7654-1098-876543210987"
+        }
+    }
+}
