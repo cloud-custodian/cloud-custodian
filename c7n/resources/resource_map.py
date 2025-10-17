@@ -172,6 +172,7 @@ ResourceMap = {
   "aws.hsm": "c7n.resources.hsm.CloudHSM",
   "aws.hsm-client": "c7n.resources.hsm.HSMClient",
   "aws.hsm-hapg": "c7n.resources.hsm.PartitionGroup",
+  "aws.iam-access-key": "c7n.resources.iam.AccessKey",
   "aws.iam-certificate": "c7n.resources.iam.ServerCertificate",
   "aws.iam-group": "c7n.resources.iam.Group",
   "aws.iam-oidc-provider": "c7n.resources.iam.OpenIdProvider",
