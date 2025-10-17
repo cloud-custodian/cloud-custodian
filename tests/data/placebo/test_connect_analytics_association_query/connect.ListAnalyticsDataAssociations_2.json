@@ -1,0 +1,14 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Results": [
+            {
+                "DataSetId": "contact_record",
+                "TargetAccountId": "644160558196",
+                "ResourceShareId": "0cf94d60-a166-47fb-b367-1b79ca9f27f9",
+                "ResourceShareArn": "arn:aws:ram:us-east-1:644160558196:resource-share/0cf94d60-a166-47fb-b367-1b79ca9f27f9"
+            }
+        ]
+    }
+}
