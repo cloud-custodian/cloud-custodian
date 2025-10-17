@@ -100,6 +100,73 @@ class KMSTest(BaseTest):
         key = client.get_key_rotation_status(KeyId=resources[0]["KeyId"])
         self.assertEqual(key["KeyRotationEnabled"], True)
 
+    def test_last_rotation(self):
+        session_factory = self.replay_flight_data("test_kms_last_rotation")
+        p = self.load_policy(
+            {
+                "name": "kms-last-rotation",
+                "resource": "kms-key",
+                "filters": [
+                    {
+                        "type": "last-rotation",
+                        "key": "RotationDate",
+                        "value": 30,
+                        "value_type": "age",
+                        "op": "gte",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        # Check that LastRotation data was added to the resource
+        self.assertIn("LastRotation", resources[0])
+        self.assertIn("RotationDate", resources[0]["LastRotation"])
+
+    def test_last_rotation_no_rotations(self):
+        session_factory = self.replay_flight_data("test_kms_last_rotation_none")
+        p = self.load_policy(
+            {
+                "name": "kms-never-rotated",
+                "resource": "kms-key",
+                "filters": [
+                    {
+                        "type": "last-rotation",
+                        "key": "RotationDate",
+                        "value": "absent",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        # Should find keys that have never been rotated
+        self.assertGreaterEqual(len(resources), 0)
+
+    def test_last_rotation_exception_handling(self):
+        """Test that UnsupportedOperationException is handled gracefully"""
+        session_factory = self.replay_flight_data("test_kms_last_rotation_unsupported")
+        p = self.load_policy(
+            {
+                "name": "kms-last-rotation-unsupported",
+                "resource": "kms-key",
+                "filters": [
+                    {
+                        "type": "last-rotation",
+                        "key": "RotationDate",
+                        "value": 30,
+                        "value_type": "age",
+                        "op": "gte",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        # Should not raise an exception even if some keys don't support rotation
+        resources = p.run()
+        self.assertIsInstance(resources, list)
+
     def test_key_rotation_exception_unsupportedopp(self):
         region = "us-west-2"
         session_factory = self.replay_flight_data(

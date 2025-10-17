@@ -440,6 +440,78 @@ class KmsPostFinding(PostFinding):
         return envelope
 
 
+@Key.filter_registry.register('last-rotation')
+class LastRotation(ValueFilter):
+    """Queries KMS keys by the last time they were rotated.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: kms-not-rotated-in-last-30
+                resource: kms-key
+                filters:
+                  - type: last-rotation
+                    key: RotationDate
+                    value: 30
+                    value_type: age
+                    op: gte
+
+    """
+
+    schema = type_schema('last-rotation', rinherit=ValueFilter.schema)
+    schema_alias = False
+    permissions = ('kms:ListKeyRotations',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('kms')
+        results = []
+
+        for r in resources:
+            try:
+                # Get the paginator for list_key_rotations
+                paginator = client.get_paginator('list_key_rotations')
+                page_iterator = paginator.paginate(KeyId=r['KeyId'])
+
+                # Collect all rotations for this key
+                rotations = []
+                for page in page_iterator:
+                    rotations.extend(page.get('Rotations', []))
+
+                # Find the most recent rotation date
+                if rotations:
+                    # Sort by RotationDate descending to get the most recent
+                    most_recent_rotation = max(rotations, key=lambda x: x.get('RotationDate', 0))
+                    r['LastRotation'] = most_recent_rotation
+
+                    # Apply the filter based on the configured key
+                    if self.match(most_recent_rotation):
+                        results.append(r)
+                else:
+                    # No rotations found - key may never have been rotated
+                    # Only include if we're filtering for keys without rotations
+                    if self.match(None):
+                        results.append(r)
+
+            except client.exceptions.NotFoundException:
+                # Key not found - skip it
+                continue
+            except client.exceptions.UnsupportedOperationException:
+                # Key doesn't support rotation (e.g., AWS managed keys)
+                self.log.warning(
+                    "UnsupportedOperationException when listing rotations for key:%s",
+                    r.get('KeyId'))
+                continue
+            except Exception as e:
+                self.log.warning(
+                    "Error listing rotations for key %s: %s",
+                    r.get('KeyId'), str(e))
+                continue
+
+        return results
+
+
 @Key.action_registry.register("schedule-deletion")
 class KmsKeyScheduleDeletion(BaseAction):
     """Schedule KMS key deletion
