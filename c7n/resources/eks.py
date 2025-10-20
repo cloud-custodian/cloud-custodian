@@ -13,6 +13,7 @@ from botocore.waiter import WaiterModel, create_waiter_with_client
 from .aws import shape_validate
 from .ecs import ContainerConfigSource
 from c7n.filters.kms import KmsRelatedFilter
+from c7n.filters import Filter
 
 
 @query.sources.register('describe-eks-nodegroup')
@@ -132,6 +133,152 @@ class EKSVpcFilter(VpcFilter):
 @EKS.filter_registry.register('kms-key')
 class KmsFilter(KmsRelatedFilter):
     RelatedIdsExpression = 'encryptionConfig[].provider.keyArn'
+
+
+@EKS.filter_registry.register('upgrade-available')
+class UpgradeAvailable(Filter):
+    """Scans for available upgrade-compatible EKS versions
+
+    This will check all the EKS clusters on the resources, and return
+    a list of viable upgrade options.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: eks-upgrade-available
+                resource: aws.eks
+                filters:
+                  - type: upgrade-available
+                    major: False
+
+    """
+
+    schema = type_schema(
+        'upgrade-available',
+        major={'type': 'boolean'},
+        value={'type': 'boolean'},
+    )
+    permissions = ('eks:DescribeClusterVersions',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('eks')
+        check_major = self.data.get('major', False)
+        check_upgrade_extant = self.data.get('value', True)
+        results = []
+
+        for r in resources:
+            current_version = r.get('version')
+
+            if not current_version:
+                continue
+
+            # Get paginator for DescribeClusterVersions
+            paginator = client.get_paginator('describe_cluster_versions')
+
+            # Request all available versions with STANDARD_SUPPORT
+            page_iterator = paginator.paginate(
+                versionStatus='STANDARD_SUPPORT'
+            )
+
+            available_versions = []
+            for page in page_iterator:
+                for version_info in page.get('clusterVersions', []):
+                    available_versions.append(version_info)
+
+            # Check if upgrades are available
+            has_upgrades = self._has_upgrade_options(
+                current_version,
+                available_versions,
+                check_major,
+            )
+
+            if check_upgrade_extant == has_upgrades:
+                # Add available upgrade information to the resource
+                upgrade_versions = self._get_upgrade_versions(
+                    current_version,
+                    available_versions,
+                    check_major,
+                )
+                r['c7n:AvailableVersions'] = available_versions
+                r['c7n:UpgradeVersions'] = upgrade_versions
+                r['c7n:HasUpgrades'] = has_upgrades
+                results.append(r)
+
+        return results
+
+    def _has_upgrade_options(self, current_version, available_versions, check_major):
+        """Check if there are upgrade options available"""
+        current_parts = self._parse_version(current_version)
+        if not current_parts:
+            return False
+
+        for version_info in available_versions:
+            available_version = version_info.get('clusterVersion')
+            if not available_version or available_version == current_version:
+                continue
+
+            available_parts = self._parse_version(available_version)
+            if not available_parts:
+                continue
+
+            # Compare versions
+            if self._is_upgrade(current_parts, available_parts, check_major):
+                return True
+
+        return False
+
+    def _parse_version(self, version):
+        """Parse version string into major.minor format"""
+        try:
+            # EKS versions are typically like "1.28" or "1.29"
+            parts = version.split('.')
+            if len(parts) >= 2:
+                return {'major': int(parts[0]), 'minor': int(parts[1])}
+        except (ValueError, AttributeError):
+            pass
+        return None
+
+    def _is_upgrade(self, current, available, check_major):
+        """Determine if available version is an upgrade from current"""
+        if check_major:
+            # Allow major version upgrades
+            return (
+                available['major'] > current['major'] or
+                (
+                    available['major'] == current['major'] and
+                    available['minor'] > current['minor']
+                )
+            )
+        else:
+            # Only minor version upgrades within same major version
+            return (
+                available['major'] == current['major'] and
+                available['minor'] > current['minor']
+            )
+
+    def _get_upgrade_versions(self, current_version, available_versions, check_major):
+        """Get list of upgrade versions available"""
+        current_parts = self._parse_version(current_version)
+        if not current_parts:
+            return []
+
+        upgrade_versions = []
+        for version_info in available_versions:
+            available_version = version_info.get('clusterVersion')
+            if not available_version or available_version == current_version:
+                continue
+
+            available_parts = self._parse_version(available_version)
+            if not available_parts:
+                continue
+
+            # Check if this is an upgrade version
+            if self._is_upgrade(current_parts, available_parts, check_major):
+                upgrade_versions.append(version_info)
+
+        return upgrade_versions
 
 
 @EKS.action_registry.register('tag')
