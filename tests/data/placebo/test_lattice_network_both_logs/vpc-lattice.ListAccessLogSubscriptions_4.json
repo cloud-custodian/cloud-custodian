@@ -1,0 +1,64 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "items": [
+            {
+                "arn": "arn:aws:vpc-lattice:us-east-1:644160558196:accesslogsubscription/als-00ae635bb2d1e2c6d",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 9,
+                    "day": 16,
+                    "hour": 20,
+                    "minute": 21,
+                    "second": 14,
+                    "microsecond": 222000
+                },
+                "destinationArn": "arn:aws:s3:::c7n-lattice-test-logs",
+                "id": "als-00ae635bb2d1e2c6d",
+                "lastUpdatedAt": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 9,
+                    "day": 16,
+                    "hour": 20,
+                    "minute": 21,
+                    "second": 14,
+                    "microsecond": 222000
+                },
+                "resourceArn": "arn:aws:vpc-lattice:us-east-1:644160558196:servicenetwork/sn-08911a980b03fb795",
+                "resourceId": "sn-08911a980b03fb795",
+                "serviceNetworkLogType": "RESOURCE"
+            },
+            {
+                "arn": "arn:aws:vpc-lattice:us-east-1:644160558196:accesslogsubscription/als-04a86ab774a4e0cdc",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 9,
+                    "day": 16,
+                    "hour": 20,
+                    "minute": 16,
+                    "second": 22,
+                    "microsecond": 803000
+                },
+                "destinationArn": "arn:aws:s3:::c7n-lattice-test-logs",
+                "id": "als-04a86ab774a4e0cdc",
+                "lastUpdatedAt": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 9,
+                    "day": 16,
+                    "hour": 20,
+                    "minute": 16,
+                    "second": 22,
+                    "microsecond": 803000
+                },
+                "resourceArn": "arn:aws:vpc-lattice:us-east-1:644160558196:servicenetwork/sn-08911a980b03fb795",
+                "resourceId": "sn-08911a980b03fb795",
+                "serviceNetworkLogType": "SERVICE"
+            }
+        ]
+    }
+}
