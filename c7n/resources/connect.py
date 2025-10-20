@@ -62,53 +62,99 @@ class ConnectInstanceAttributeFilter(ValueFilter):
 
         return results
 
-    @Connect.action_registry.register("set-attributes")
-    class SetAttributes(Action):
-        """Set the attributes for the connect resources
 
-        :example:
+@Connect.filter_registry.register('analytics-association')
+class ConnectAnalyticsAssociationFilter(ValueFilter):
+    """
+    Filter Connect instances based on analytics data associations
+    :example:
 
-        .. code-block:: yaml
+    .. code-block:: yaml
 
-            policies:
-              - name: connect-set-contact-lens
-                resource: connect-instance
-                filters:
-                  - type: instance-attribute
-                    key: Attribute.Value
-                    value: false
-                    attribute_type: CONTACT_LENS
-                actions:
-                  - type: set-attributes
-                    attribute_type: CONTACT_LENS
-                    value: true
-              - name: connect-disable-contact-lens
-                resource: connect-instance
-                filters:
-                  - type: instance-attribute
-                    key: Attribute.Value
-                    value: true
-                    attribute_type: CONTACT_LENS
-                actions:
-                  - type: set-attributes
-                    attribute_type: CONTACT_LENS
-                    value: false
-        """
-        attributes = ["INBOUND_CALLS", "OUTBOUND_CALLS",
-                      "CONTACTFLOW_LOGS", "CONTACT_LENS",
-                      "AUTO_RESOLVE_BEST_VOICES", "USE_CUSTOM_TTS_VOICES",
-                      "EARLY_MEDIA", "MULTI_PARTY_CONFERENCE",
-                      "HIGH_VOLUME_OUTBOUND", "ENHANCED_CONTACT_MONITORING"]
-        schema = type_schema("set-attributes", attribute_type={'anyOf': [{'enum': attributes},
-                  {'type': 'string'}]}, value={}, required=["value", "attribute_type"])
-        permissions = ("connect:UpdateInstanceAttribute",)
+        policies:
+          - name: connect-analytics-sharing
+            resource: connect-instance
+            filters:
+              - type: analytics-association
+                key: TargetAccountId
+                op: ne
+                value: "123456789012"
+          - name: check-association
+            resource: connect-instance
+            filters:
+              - type: analytics-association
+                key: DataSetId
+                value: present
 
-        def process(self, resources):
-            client = local_session(self.manager.session_factory).client('connect')
+    """
 
-            for r in resources:
-                client.update_instance_attribute(InstanceId=r["Id"],
-                    AttributeType=self.data.get("attribute_type"), Value=self.data.get("value"))
+    schema = type_schema('analytics-association', rinherit=ValueFilter.schema)
+    permissions = ('connect:ListAnalyticsDataAssociations',)
+    annotation_key = 'c7n:AnalyticsAssociations'
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('connect')
+        results = []
+
+        for r in resources:
+            if self.annotation_key not in r:
+                r[self.annotation_key] = client.list_analytics_data_associations(
+                    InstanceId=r['Id']
+                ).get('Results', [])
+
+            if any(self.match(assoc) for assoc in r[self.annotation_key]):
+                results.append(r)
+
+        return results
+
+
+@Connect.action_registry.register("set-attributes")
+class SetAttributes(Action):
+    """Set the attributes for the connect resources
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: connect-set-contact-lens
+            resource: connect-instance
+            filters:
+              - type: instance-attribute
+                key: Attribute.Value
+                value: false
+                attribute_type: CONTACT_LENS
+            actions:
+              - type: set-attributes
+                attribute_type: CONTACT_LENS
+                value: true
+          - name: connect-disable-contact-lens
+            resource: connect-instance
+            filters:
+              - type: instance-attribute
+                key: Attribute.Value
+                value: true
+                attribute_type: CONTACT_LENS
+            actions:
+              - type: set-attributes
+                attribute_type: CONTACT_LENS
+                value: false
+    """
+    attributes = ["INBOUND_CALLS", "OUTBOUND_CALLS",
+                  "CONTACTFLOW_LOGS", "CONTACT_LENS",
+                  "AUTO_RESOLVE_BEST_VOICES", "USE_CUSTOM_TTS_VOICES",
+                  "EARLY_MEDIA", "MULTI_PARTY_CONFERENCE",
+                  "HIGH_VOLUME_OUTBOUND", "ENHANCED_CONTACT_MONITORING"]
+    schema = type_schema("set-attributes", attribute_type={'anyOf': [{'enum': attributes},
+              {'type': 'string'}]}, value={}, required=["value", "attribute_type"])
+    permissions = ("connect:UpdateInstanceAttribute",)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('connect')
+
+        for r in resources:
+            client.update_instance_attribute(InstanceId=r["Id"],
+                AttributeType=self.data.get("attribute_type"), Value=self.data.get("value"))
 
 
 @resources.register('connect-campaign')
