@@ -1,0 +1,59 @@
+{
+    "status_code": 200,
+    "data": {
+      "Vpcs": [
+        {
+          "CidrBlock": "10.0.0.0/16",
+          "DhcpOptionsId": "dopt-24ff1940",
+          "State": "available",
+          "VpcId": "vpc-0503a8b9ddbb3a5c5",
+          "OwnerId": "644160558196",
+          "InstanceTenancy": "default",
+          "CidrBlockAssociationSet": [
+            {
+              "AssociationId": "vpc-cidr-assoc-00f6ac427cf5981b3",
+              "CidrBlock": "10.0.0.0/16",
+              "CidrBlockState": {
+                "State": "associated"
+              }
+            }
+          ],
+          "IsDefault": false,
+          "Tags": [
+            {
+              "Key": "Description",
+              "Value": "Created for ECS cluster c7n-test-cluster"
+            },
+            {
+              "Key": "Name",
+              "Value": "ECS c7n-test-cluster - VPC"
+            }
+          ]
+        },
+        {
+          "CidrBlock": "10.0.0.0/24",
+          "DhcpOptionsId": "dopt-24ff1940",
+          "State": "available",
+          "VpcId": "vpc-029d7b65096a4717d",
+          "OwnerId": "644160558196",
+          "InstanceTenancy": "default",
+          "CidrBlockAssociationSet": [
+            {
+              "AssociationId": "vpc-cidr-assoc-03505ef1c125b5edf",
+              "CidrBlock": "10.0.0.0/24",
+              "CidrBlockState": {
+                "State": "associated"
+              }
+            }
+          ],
+          "IsDefault": false,
+          "Tags": [
+            {
+              "Key": "Name",
+              "Value": "policy-test-vpc"
+            }
+          ]
+        }
+      ]
+    }
+  }
