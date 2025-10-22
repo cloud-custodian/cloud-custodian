@@ -210,11 +210,10 @@ class FirehoseDelete(Action):
                 "These delivery streams can't be deleted (wrong state): %s" % (
                     ", ".join(creating)))
         for r in resources:
-            if not r['DeliveryStreamStatus'] == 'ACTIVE':
+            if r['DeliveryStreamStatus'] not in ('ACTIVE', 'SUSPENDED'):
                 continue
             client.delete_delivery_stream(
                 DeliveryStreamName=r['DeliveryStreamName'])
-
 
 @DeliveryStream.action_registry.register('encrypt-s3-destination')
 class FirehoseEncryptS3Destination(Action):
