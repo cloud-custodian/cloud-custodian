@@ -2864,3 +2864,328 @@ class AccessKeyTest(BaseTest):
         # Just check that we can run this without error
         # The actual age filter logic is handled by C7N core
         self.assertTrue(len(resources) >= 0)
+
+    @functional
+    def test_access_key_functional_good_policy(self):
+        """
+        Functional test for iam-access-key resource with a 'good policy'.
+        Tests various filtering scenarios against real AWS resources.
+
+        This test creates real IAM users and access keys, then validates
+        that the iam-access-key resource correctly identifies and filters
+        access keys based on various criteria.
+        """
+        factory = self.replay_flight_data("test_iam_access_key_functional_good")
+        client = factory().client("iam")
+
+        # Create test users with access keys
+        test_user_1 = "c7n-test-user-1"
+        test_user_2 = "c7n-test-user-2"
+
+        # Create users
+        try:
+            client.create_user(UserName=test_user_1, Path="/c7n-test/")
+            self.addCleanup(self._cleanup_user, client, test_user_1)
+        except ClientError as e:
+            if e.response['Error']['Code'] != 'EntityAlreadyExists':
+                raise
+
+        try:
+            client.create_user(UserName=test_user_2, Path="/c7n-test/")
+            self.addCleanup(self._cleanup_user, client, test_user_2)
+        except ClientError as e:
+            if e.response['Error']['Code'] != 'EntityAlreadyExists':
+                raise
+
+        # Create access keys for the users
+        key_1_response = client.create_access_key(UserName=test_user_1)
+        key_1_id = key_1_response['AccessKey']['AccessKeyId']
+
+        key_2_response = client.create_access_key(UserName=test_user_2)
+        key_2_id = key_2_response['AccessKey']['AccessKeyId']
+
+        # Add cleanup for access keys
+        self.addCleanup(self._cleanup_access_key, client, test_user_1, key_1_id)
+        self.addCleanup(self._cleanup_access_key, client, test_user_2, key_2_id)
+
+        # Create a second key for user 1 and deactivate it for testing
+        key_3_response = client.create_access_key(UserName=test_user_1)
+        key_3_id = key_3_response['AccessKey']['AccessKeyId']
+        self.addCleanup(self._cleanup_access_key, client, test_user_1, key_3_id)
+
+        # Deactivate the third key
+        client.update_access_key(
+            UserName=test_user_1,
+            AccessKeyId=key_3_id,
+            Status='Inactive'
+        )
+
+        # Test 1: Basic enumeration - should find our test keys
+        p = self.load_policy(
+            {
+                "name": "iam-access-key-enumerate",
+                "resource": "iam-access-key",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "UserName",
+                        "value": [test_user_1, test_user_2],
+                        "op": "in"
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+
+        # Should find all 3 keys we created
+        self.assertEqual(len(resources), 3)
+        found_key_ids = {r['AccessKeyId'] for r in resources}
+        expected_key_ids = {key_1_id, key_2_id, key_3_id}
+        self.assertEqual(found_key_ids, expected_key_ids)
+
+        # Verify required fields are present
+        for resource in resources:
+            self.assertIn('AccessKeyId', resource)
+            self.assertIn('UserName', resource)
+            self.assertIn('Status', resource)
+            self.assertIn('CreateDate', resource)
+
+        # Test 2: Filter by status - Active keys only
+        p = self.load_policy(
+            {
+                "name": "iam-access-key-active-only",
+                "resource": "iam-access-key",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "UserName",
+                        "value": [test_user_1, test_user_2],
+                        "op": "in"
+                    },
+                    {
+                        "type": "value",
+                        "key": "Status",
+                        "value": "Active"
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+
+        # Should find only the 2 active keys
+        self.assertEqual(len(resources), 2)
+        for resource in resources:
+            self.assertEqual(resource['Status'], 'Active')
+            self.assertIn(resource['AccessKeyId'], {key_1_id, key_2_id})
+
+        # Test 3: Filter by specific user
+        p = self.load_policy(
+            {
+                "name": "iam-access-key-user-specific",
+                "resource": "iam-access-key",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "UserName",
+                        "value": test_user_1
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+
+        # Should find 2 keys for test_user_1
+        self.assertEqual(len(resources), 2)
+        for resource in resources:
+            self.assertEqual(resource['UserName'], test_user_1)
+            self.assertIn(resource['AccessKeyId'], {key_1_id, key_3_id})
+
+        # Test 4: Filter by age (recent keys - should find our test keys)
+        p = self.load_policy(
+            {
+                "name": "iam-access-key-recent",
+                "resource": "iam-access-key",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "UserName",
+                        "value": [test_user_1, test_user_2],
+                        "op": "in"
+                    },
+                    {
+                        "type": "value",
+                        "key": "CreateDate",
+                        "value_type": "age",
+                        "value": 1,
+                        "op": "less-than"
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+
+        # Should find our recently created keys
+        self.assertEqual(len(resources), 3)
+        for resource in resources:
+            self.assertIn(resource['UserName'], [test_user_1, test_user_2])
+
+    @functional
+    def test_access_key_functional_bad_policy(self):
+        """
+        Functional test for iam-access-key resource with a 'bad policy'.
+        Tests edge cases and error handling scenarios.
+
+        This test verifies that the resource handles various edge cases
+        gracefully, including non-existent users, invalid filters, and
+        boundary conditions.
+        """
+        factory = self.replay_flight_data("test_iam_access_key_functional_bad")
+        client = factory().client("iam")
+
+        # Create a test user with no access keys
+        test_user_empty = "c7n-test-user-empty"
+
+        try:
+            client.create_user(UserName=test_user_empty, Path="/c7n-test/")
+            self.addCleanup(self._cleanup_user, client, test_user_empty)
+        except ClientError as e:
+            if e.response['Error']['Code'] != 'EntityAlreadyExists':
+                raise
+
+        # Test 1: Filter for non-existent user - should return empty
+        p = self.load_policy(
+            {
+                "name": "iam-access-key-nonexistent-user",
+                "resource": "iam-access-key",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "UserName",
+                        "value": "c7n-nonexistent-user-12345"
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+        # Test 2: Filter for user with no access keys - should return empty
+        p = self.load_policy(
+            {
+                "name": "iam-access-key-empty-user",
+                "resource": "iam-access-key",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "UserName",
+                        "value": test_user_empty
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+        # Test 3: Filter by very old age - should return empty for our test keys
+        p = self.load_policy(
+            {
+                "name": "iam-access-key-very-old",
+                "resource": "iam-access-key",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "UserName",
+                        "value": test_user_empty
+                    },
+                    {
+                        "type": "value",
+                        "key": "CreateDate",
+                        "value_type": "age",
+                        "value": 365,
+                        "op": "greater-than"
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+        # Test 4: Filter by invalid status - should return empty
+        p = self.load_policy(
+            {
+                "name": "iam-access-key-invalid-status",
+                "resource": "iam-access-key",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "Status",
+                        "value": "InvalidStatus"
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+        # Test 5: Multiple contradictory filters - should return empty
+        p = self.load_policy(
+            {
+                "name": "iam-access-key-contradictory",
+                "resource": "iam-access-key",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "Status",
+                        "value": "Active"
+                    },
+                    {
+                        "type": "value",
+                        "key": "Status",
+                        "value": "Inactive"
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    def _cleanup_user(self, client, username):
+        """Clean up IAM user and all associated resources."""
+        try:
+            # First, delete all access keys for the user
+            try:
+                keys = client.list_access_keys(UserName=username)
+                for key in keys.get('AccessKeyMetadata', []):
+                    try:
+                        client.delete_access_key(
+                            UserName=username,
+                            AccessKeyId=key['AccessKeyId']
+                        )
+                    except ClientError:
+                        pass  # Ignore errors during cleanup
+            except ClientError:
+                pass  # Ignore errors if user doesn't exist
+
+            # Delete the user
+            client.delete_user(UserName=username)
+        except ClientError:
+            pass  # Ignore errors during cleanup
+
+    def _cleanup_access_key(self, client, username, access_key_id):
+        """Clean up specific access key."""
+        try:
+            client.delete_access_key(
+                UserName=username,
+                AccessKeyId=access_key_id
+            )
+        except ClientError:
+            pass  # Ignore errors during cleanup
