@@ -236,7 +236,7 @@ def main():
     if templates:
         default_templates.append(path.abspath(path.expanduser(path.expandvars(templates))))
 
-    mailer_config["templates_folders"] = sorted(default_templates)
+    mailer_config["templates_folders"] = default_templates
 
     provider = get_provider(mailer_config)
     if args_dict.get("update_lambda"):

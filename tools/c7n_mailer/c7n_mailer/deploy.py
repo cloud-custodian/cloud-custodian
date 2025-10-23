@@ -62,9 +62,7 @@ def get_archive(config):
         if not os.path.exists(d):
             continue
 
-        template_files = sorted([f for f in os.listdir(d) if os.path.splitext(f)[1] == ".j2"])
-
-        for t in template_files:
+        for t in sorted(f for f in os.listdir(d) if os.path.splitext(f)[1] == ".j2"):
             with open(os.path.join(d, t)) as fh:
                 archive.add_contents("msg-templates/%s" % t, fh.read())
 
