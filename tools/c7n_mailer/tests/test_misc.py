@@ -84,7 +84,6 @@ class DeployTests(unittest.TestCase):
         assert len(archive.get_filenames()) > 50  # should be > 500
 
     def test_get_archive_with_templates(self):
-        # Test with multiple template folders and ensure archive checksum is the same on multiple attempts
         with (
             tempfile.TemporaryDirectory() as template_folder1,
             tempfile.TemporaryDirectory() as template_folder2,
@@ -97,9 +96,9 @@ class DeployTests(unittest.TestCase):
                 f.write("gamma")
             with open(os.path.join(template_folder3, "alpha.j2"), "w") as f:
                 f.write("alpha")
-
+            # Test with multiple template folders
             config = {"templates_folders": [template_folder1, template_folder2, template_folder3]}
-
+            # Ensure checksum is the same with multiple calls
             archive1 = deploy.get_archive(config)
             checksum1 = archive1.get_checksum()
             archive2 = deploy.get_archive(config)
