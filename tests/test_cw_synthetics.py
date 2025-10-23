@@ -90,3 +90,63 @@ class SyntheticsCanaryTest(BaseTest):
         self.assertEqual(len(resources), 1)
         desc = client.get_canary(Name=canary_name)
         self.assertIn(desc["Canary"]["Status"]["State"], ["RUNNING", "STARTING"])
+
+    def test_endpoint_url_error_paths(self):
+        """Test error handling paths in endpoint URL extraction"""
+        from unittest.mock import patch, MagicMock
+
+        factory = self.replay_flight_data("test_cw_synthetics_tag_filter")
+
+        p = self.load_policy(
+            {
+                "name": "test-endpoint-url-errors",
+                "resource": "cloudwatch-synthetics",
+            },
+            session_factory=factory,
+        )
+
+        # Test case 1: No runs available (covers lines 876-877)
+        with patch('c7n.resources.cw.local_session') as mock_session:
+            mock_synthetics = MagicMock()
+            mock_s3 = MagicMock()
+            mock_session.return_value.client.side_effect = (
+                lambda x: mock_synthetics if x == 'synthetics' else mock_s3
+            )
+
+            # Mock empty runs
+            mock_synthetics.get_canary_runs.return_value = {"CanaryRuns": []}
+
+            # Create a test resource
+            test_resource = {
+                "Name": "test-canary",
+                "Tags": {"TestKey": "TestValue"}
+            }
+
+            # Call augment directly
+            result = p.resource_manager.augment([test_resource])
+
+            # Verify DestinationUrl is None when no runs
+            self.assertIsNone(result[0]["DestinationUrl"])
+
+        # Test case 2: No artifact location (covers lines 881-882)
+        with patch('c7n.resources.cw.local_session') as mock_session:
+            mock_synthetics = MagicMock()
+            mock_s3 = MagicMock()
+            mock_session.return_value.client.side_effect = (
+                lambda x: mock_synthetics if x == 'synthetics' else mock_s3
+            )
+
+            # Mock runs without artifact location
+            mock_synthetics.get_canary_runs.return_value = {
+                "CanaryRuns": [{"Status": {"State": "PASSED"}}]  # Missing ArtifactS3Location
+            }
+
+            test_resource = {
+                "Name": "test-canary",
+                "Tags": {"TestKey": "TestValue"}
+            }
+
+            result = p.resource_manager.augment([test_resource])
+
+            # Verify DestinationUrl is None when no artifact
+            self.assertIsNone(result[0]["DestinationUrl"])
