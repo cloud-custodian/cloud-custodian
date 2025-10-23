@@ -84,9 +84,11 @@ class DeployTests(unittest.TestCase):
         assert len(archive.get_filenames()) > 50  # should be > 500
 
     def test_get_archive_with_templates(self):
-        with tempfile.TemporaryDirectory() as template_folder1, \
-             tempfile.TemporaryDirectory() as template_folder2, \
-             tempfile.TemporaryDirectory() as template_folder3:
+        with (
+            tempfile.TemporaryDirectory() as template_folder1,
+            tempfile.TemporaryDirectory() as template_folder2,
+            tempfile.TemporaryDirectory() as template_folder3,
+        ):
 
             with open(os.path.join(template_folder1, "beta.j2"), "w") as f:
                 f.write("beta")
