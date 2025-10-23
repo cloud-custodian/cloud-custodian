@@ -165,7 +165,7 @@ class KMSTest(BaseTest):
         )
         # Should not raise an exception even if some keys don't support rotation
         resources = p.run()
-        self.assertIsInstance(resources, list)
+        self.assertEqual(len(resources), 0)
 
     def test_key_rotation_exception_unsupportedopp(self):
         region = "us-west-2"
