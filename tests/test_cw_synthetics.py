@@ -239,3 +239,27 @@ class SyntheticsCanaryTest(BaseTest):
             # Verify exception handling - DestinationUrl should be None, AllDestinationUrls empty
             self.assertIsNone(result[0]["DestinationUrl"])
             self.assertEqual(result[0]["AllDestinationUrls"], [])
+
+    def test_endpoint_url_extraction_real_data(self):
+        """Test endpoint URL extraction using real placebo test data"""
+        factory = self.replay_flight_data("test_cw_synthetics_tag_filter")
+
+        p = self.load_policy(
+            {
+                "name": "test-endpoint-url-real-data",
+                "resource": "cloudwatch-synthetics",
+                "filters": [{"type": "value", "key": "tag:MyTagKey", "value": "MyTagValue"}],
+            },
+            session_factory=factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        # Verify that the endpoint URL fields were added during augmentation
+        resource = resources[0]
+        self.assertIn("DestinationUrl", resource)
+        self.assertIn("AllDestinationUrls", resource)
+
+        # The actual values will depend on what's in the placebo test data
+        # but we're testing that the augmentation logic runs without error
