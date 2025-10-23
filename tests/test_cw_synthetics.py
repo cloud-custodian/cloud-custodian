@@ -2,7 +2,6 @@ from .common import BaseTest
 
 
 class SyntheticsCanaryTest(BaseTest):
-
     def test_canary_filter_by_tag(self):
         factory = self.replay_flight_data("test_cw_synthetics_tag_filter")
         canary_name = "test_canary_tag"
@@ -11,9 +10,7 @@ class SyntheticsCanaryTest(BaseTest):
             {
                 "name": "filter-canary-by-tag",
                 "resource": "cloudwatch-synthetics",
-                "filters": [
-                    {"type": "value", "key": "tag:MyTagKey", "value": "MyTagValue"}
-                ],
+                "filters": [{"type": "value", "key": "tag:MyTagKey", "value": "MyTagValue"}],
             },
             session_factory=factory,
         )
@@ -109,18 +106,15 @@ class SyntheticsCanaryTest(BaseTest):
         with patch('c7n.resources.cw.local_session') as mock_session:
             mock_synthetics = MagicMock()
             mock_s3 = MagicMock()
-            mock_session.return_value.client.side_effect = (
-                lambda x: mock_synthetics if x == 'synthetics' else mock_s3
+            mock_session.return_value.client.side_effect = lambda x: (
+                mock_synthetics if x == 'synthetics' else mock_s3
             )
 
             # Mock empty runs
             mock_synthetics.get_canary_runs.return_value = {"CanaryRuns": []}
 
             # Create a test resource
-            test_resource = {
-                "Name": "test-canary",
-                "Tags": {"TestKey": "TestValue"}
-            }
+            test_resource = {"Name": "test-canary", "Tags": {"TestKey": "TestValue"}}
 
             # Call augment directly
             result = p.resource_manager.augment([test_resource])
@@ -132,8 +126,8 @@ class SyntheticsCanaryTest(BaseTest):
         with patch('c7n.resources.cw.local_session') as mock_session:
             mock_synthetics = MagicMock()
             mock_s3 = MagicMock()
-            mock_session.return_value.client.side_effect = (
-                lambda x: mock_synthetics if x == 'synthetics' else mock_s3
+            mock_session.return_value.client.side_effect = lambda x: (
+                mock_synthetics if x == 'synthetics' else mock_s3
             )
 
             # Mock runs without artifact location
@@ -141,10 +135,7 @@ class SyntheticsCanaryTest(BaseTest):
                 "CanaryRuns": [{"Status": {"State": "PASSED"}}]  # Missing ArtifactS3Location
             }
 
-            test_resource = {
-                "Name": "test-canary",
-                "Tags": {"TestKey": "TestValue"}
-            }
+            test_resource = {"Name": "test-canary", "Tags": {"TestKey": "TestValue"}}
 
             result = p.resource_manager.augment([test_resource])
 
