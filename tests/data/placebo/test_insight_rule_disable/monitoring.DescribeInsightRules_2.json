@@ -1,0 +1,14 @@
+{
+    "status_code": 200,
+    "data": {
+        "InsightRules": [
+            {
+                "Name": "test",
+                "State": "DISABLED",
+                "Schema": "{\"Rules\":[{\"RuleName\":\"test-rule\"}]}",
+                "Definition": "{\"aggregateOn\":\"count\"}",
+                "ManagedRule": false
+            }
+        ]
+    }
+}
