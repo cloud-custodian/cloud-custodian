@@ -141,3 +141,101 @@ class SyntheticsCanaryTest(BaseTest):
 
             # Verify DestinationUrl is None when no artifact
             self.assertIsNone(result[0]["DestinationUrl"])
+
+    def test_endpoint_url_extraction_success(self):
+        """Test successful endpoint URL extraction from SyntheticsReport files"""
+        from unittest.mock import patch, MagicMock
+        import json
+
+        factory = self.replay_flight_data("test_cw_synthetics_tag_filter")
+
+        p = self.load_policy(
+            {
+                "name": "test-endpoint-url-success",
+                "resource": "cloudwatch-synthetics",
+            },
+            session_factory=factory,
+        )
+
+        with patch('c7n.resources.cw.local_session') as mock_session:
+            mock_synthetics = MagicMock()
+            mock_s3 = MagicMock()
+            mock_session.return_value.client.side_effect = lambda x: (
+                mock_synthetics if x == 'synthetics' else mock_s3
+            )
+
+            # Mock runs with artifact location
+            mock_synthetics.get_canary_runs.return_value = {
+                "CanaryRuns": [
+                    {
+                        "Status": {"State": "PASSED"},
+                        "ArtifactS3Location": "test-bucket/canary-artifacts/test-canary/",
+                    }
+                ]
+            }
+
+            # Mock SyntheticsReport file content with endpoint URLs
+            report_content = {
+                "customerScript": {
+                    "steps": [
+                        {"destinationUrl": "https://example.com/api/health"},
+                        {"destinationUrl": "https://api.example.com/status"},
+                    ]
+                }
+            }
+
+            mock_s3.get_object.return_value = {
+                "Body": MagicMock(read=lambda: json.dumps(report_content).encode('utf-8'))
+            }
+
+            test_resource = {"Name": "test-canary", "Tags": {"TestKey": "TestValue"}}
+
+            result = p.resource_manager.augment([test_resource])
+
+            # Verify endpoint URLs were extracted successfully
+            self.assertEqual(result[0]["DestinationUrl"], "https://example.com/api/health")
+            self.assertEqual(len(result[0]["AllDestinationUrls"]), 2)
+            self.assertIn("https://example.com/api/health", result[0]["AllDestinationUrls"])
+            self.assertIn("https://api.example.com/status", result[0]["AllDestinationUrls"])
+
+    def test_endpoint_url_extraction_exception(self):
+        """Test exception handling in endpoint URL extraction"""
+        from unittest.mock import patch, MagicMock
+
+        factory = self.replay_flight_data("test_cw_synthetics_tag_filter")
+
+        p = self.load_policy(
+            {
+                "name": "test-endpoint-url-exception",
+                "resource": "cloudwatch-synthetics",
+            },
+            session_factory=factory,
+        )
+
+        with patch('c7n.resources.cw.local_session') as mock_session:
+            mock_synthetics = MagicMock()
+            mock_s3 = MagicMock()
+            mock_session.return_value.client.side_effect = lambda x: (
+                mock_synthetics if x == 'synthetics' else mock_s3
+            )
+
+            # Mock runs with artifact location
+            mock_synthetics.get_canary_runs.return_value = {
+                "CanaryRuns": [
+                    {
+                        "Status": {"State": "PASSED"},
+                        "ArtifactS3Location": "test-bucket/canary-artifacts/test-canary/",
+                    }
+                ]
+            }
+
+            # Mock S3 operations to raise an exception
+            mock_s3.get_object.side_effect = Exception("S3 access denied")
+
+            test_resource = {"Name": "test-canary", "Tags": {"TestKey": "TestValue"}}
+
+            result = p.resource_manager.augment([test_resource])
+
+            # Verify exception handling - DestinationUrl should be None, AllDestinationUrls empty
+            self.assertIsNone(result[0]["DestinationUrl"])
+            self.assertEqual(result[0]["AllDestinationUrls"], [])
