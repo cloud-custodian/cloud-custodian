@@ -58,10 +58,13 @@ def get_archive(config):
     deps = ["c7n_mailer"] + list(CORE_DEPS)
     archive = PythonPackageArchive(modules=deps)
 
-    for d in set(config["templates_folders"]):
+    for d in sorted(set(config.get("templates_folders", []))):
         if not os.path.exists(d):
             continue
-        for t in [f for f in os.listdir(d) if os.path.splitext(f)[1] == ".j2"]:
+
+        template_files = sorted([f for f in os.listdir(d) if os.path.splitext(f)[1] == ".j2"])
+
+        for t in template_files:
             with open(os.path.join(d, t)) as fh:
                 archive.add_contents("msg-templates/%s" % t, fh.read())
 

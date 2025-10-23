@@ -4,6 +4,8 @@
 import argparse
 import unittest
 import logging
+import os
+import tempfile
 import boto3
 from unittest.mock import patch
 
@@ -80,3 +82,26 @@ class DeployTests(unittest.TestCase):
         # basic sanity checks using random, low values
         assert archive.size > 10000  # this should really be about 1.5 MB
         assert len(archive.get_filenames()) > 50  # should be > 500
+
+    def test_get_archive_with_templates(self):
+        with tempfile.TemporaryDirectory() as template_folder1, \
+             tempfile.TemporaryDirectory() as template_folder2, \
+             tempfile.TemporaryDirectory() as template_folder3:
+
+            with open(os.path.join(template_folder1, "beta.j2"), "w") as f:
+                f.write("beta")
+            with open(os.path.join(template_folder2, "gamma.j2"), "w") as f:
+                f.write("gamma")
+            with open(os.path.join(template_folder3, "alpha.j2"), "w") as f:
+                f.write("alpha")
+
+            # Use multiple folders to test ordering
+            config = {"templates_folders": [template_folder1, template_folder2, template_folder3]}
+
+            archive1 = deploy.get_archive(config)
+            checksum1 = archive1.get_checksum()
+            archive2 = deploy.get_archive(config)
+            checksum2 = archive2.get_checksum()
+            assert checksum1 == checksum2, "Checksums should be equal"
+            archive1.remove()
+            archive2.remove()
