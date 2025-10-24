@@ -412,7 +412,7 @@ class TypeInfo(metaclass=TypeMeta):
     refresh = None
 
     @classmethod
-    def get_metric_resource_name(cls, resource):
+    def get_metric_resource_name(cls, resource, metric_key=None):
         return resource.get(cls.name)
 
     @classmethod
