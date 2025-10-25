@@ -12,7 +12,7 @@ dependencies = [
     "tfparse<1.0,>=0.6",
 ]
 name = "c7n_left"
-version = "0.3.33"
+version = "0.3.34"
 description = "Custodian policies for IAAC definitions"
 readme = "README.md"
 classifiers = [

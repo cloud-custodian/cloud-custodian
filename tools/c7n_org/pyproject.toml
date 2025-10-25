@@ -9,7 +9,7 @@ dependencies = [
     "click>=8.0",
 ]
 name = "c7n_org"
-version = "0.6.46"
+version = "0.6.47"
 description = "Cloud Custodian - Parallel Execution"
 readme = "README.md"
 classifiers = [
