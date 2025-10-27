@@ -697,13 +697,9 @@ class BlockPublicAccess(Filter):
         results = []
 
         # Get account-wide block public access state (one API call for all resources)
-        try:
-            response = client.get_image_block_public_access_state()
-            account_state = response.get('ImageBlockPublicAccessState', 'unblocked')
-            account_blocked = account_state == 'block-new-sharing'
-        except ClientError as e:
-            self.log.error("Failed to get image block public access state: %s", e)
-            return []
+        response = client.get_image_block_public_access_state()
+        account_state = response.get('ImageBlockPublicAccessState', 'unblocked')
+        account_blocked = account_state == 'block-new-sharing'
 
         # Filter resources based on whether the account state matches the desired value
         if account_blocked == is_blocked:
