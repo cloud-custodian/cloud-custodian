@@ -10,11 +10,12 @@ from c7n.query import (
     DescribeWithResourceTags)
 from c7n.actions import BaseAction
 from c7n.tags import Tag, TagDelayedAction, RemoveTag, coalesce_copy_user_tags, TagActionFilter
-from c7n.utils import type_schema, local_session, chunks, group_by
+from c7n.utils import type_schema, local_session, chunks, group_by, get_retry
 from c7n.filters import Filter, ListItemFilter, MetricsFilter
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters.vpc import SubnetFilter, VpcFilter
 from c7n.filters.backup import ConsecutiveAwsBackupsFilter
+import pytest
 
 
 class DescribeFSx(DescribeSource):
@@ -324,6 +325,16 @@ class DeleteFileSystem(BaseAction):
     :example:
 
     .. code-block:: yaml
+        If `skip-snapshot` is set to True, no final snapshot will be created.
+
+        If `force` is set to True, this action will attempt to delete all
+        dependencies necessary to delete the file system.
+
+        You can override the default retry settings for deletion by specifying
+        `retry-delay` (in seconds) and `retry-max-attempts`.
+
+        Note: FSx for OnTap resources do not create snapshot backups on deletion
+        even if skip-snapshot is set to True.
 
         policies:
             - name: delete-fsx-instance-with-snapshot
@@ -344,15 +355,19 @@ class DeleteFileSystem(BaseAction):
                 - FileSystemId: fs-1234567890123
               actions:
                 - type: delete
+                  force: True
+                  retry-delay: 60
+                  retry-max-attempts: 10
                   skip-snapshot: True
 
     """
 
-    permissions = ('fsx:DeleteFileSystem',)
+    permissions = ('fsx:DeleteFileSystem','fsx:DescribeVolumes')
 
     schema = type_schema(
         'delete',
         **{
+            'force': {'type': 'boolean'},
             'skip-snapshot': {'type': 'boolean'},
             'tags': {'type': 'object'},
             'copy-tags': {
@@ -377,6 +392,9 @@ class DeleteFileSystem(BaseAction):
         skip_snapshot = self.data.get('skip-snapshot', False)
         copy_tags = self.data.get('copy-tags', True)
         user_tags = self.data.get('tags', [])
+        retry_delay = self.data.get('retry-delay', 60)
+        retry_max_attempts = self.data.get('retry-max-attempts', 10)
+        retry = get_retry(retry_codes=('BadRequest'), min_delay=retry_delay, max_attempts=retry_max_attempts, log_retries=True)
 
         for r in resources:
             tags = coalesce_copy_user_tags(r, copy_tags, user_tags)
@@ -398,54 +416,77 @@ class DeleteFileSystem(BaseAction):
             elif fs_type == 'OPENZFS':
                 config_key = 'OpenZFSConfiguration'
                 # OpenZFS requires this option to delete all child volumes and snapshots
-                delete_args['Options'] = ['DELETE_CHILD_VOLUMES_AND_SNAPSHOTS']
-            elif fs_type == 'ONTAP':
-                # Before deleting an ONTAP file system, all volumes must be deleted
-                # Loop through and delete all volumes associated with the file system
-                volumes = client.describe_volumes(Filters=[
-                    {
-                        'Name': 'file-system-id',
-                        'Values': [r['FileSystemId']],
-                    }]).get('Volumes', [])
-                for volume in volumes:
-                    try:
-                        client.delete_volume(VolumeId=volume['VolumeId'])
-                    except client.exceptions.VolumeNotFound:
-                        # Volume already deleted, continue
-                        continue
-                    except client.exceptions.VolumeInUse as e:
-                        self.log.warning(
-                            'Unable to delete volume for: %s - %s - %s' % (
-                                r['FileSystemId'], volume['VolumeId'], e))
-                # After attempting to delete all volumes, check if any remain
-                remaining_volumes = client.describe_volumes(Filters=[
-                    {
-                        'Name': 'file-system-id',
-                        'Values': [r['FileSystemId']],
-                    }]).get('Volumes', [])
-                if remaining_volumes:
-                    # Wait a short period to ensure volumes are fully deleted
-                    import time
-                    time.sleep(10)
-                    # After attempting to delete all volumes, check if any remain
-                    remaining_volumes = client.describe_volumes(Filters=[
-                        {
-                            'Name': 'file-system-id',
-                            'Values': [r['FileSystemId']],
-                        }]).get('Volumes', [])
-                    self.log.warning(
-                        'Skipping deletion of ONTAP file system %s, volumes still exist. Try again' % r['FileSystemId'])
-                    continue
+                if self.data.get('force'):
+                    config['Options'] = ['DELETE_CHILD_VOLUMES_AND_SNAPSHOTS']
+
+            if self.data.get('force'):
+                self._delete_dependencies(client, r, fs_type, retry)
 
             if config_key:
                 delete_args[config_key] = config
 
+            # pytest.set_trace()
             try:
-                client.delete_file_system(**delete_args)
+                retry(
+                    client.delete_file_system,
+                    **delete_args,
+                )
+                # client.delete_file_system(**delete_args)
 
-            except client.exceptions.BadRequest as e:
+            except Exception as e:
                 self.log.warning('Unable to delete: %s - %s' % (r['FileSystemId'], e))
 
+# do we need to add permissions?
+    def _delete_dependencies(self, client, resource, fs_type, retry):
+        """
+        Delete dependent resources for a file system.
+        """
+        # pytest.set_trace()
+        if fs_type == 'ONTAP':
+            # delete storage virtual machines
+            svms = client.describe_storage_virtual_machines(Filters=[
+                {
+                    'Name': 'file-system-id',
+                    'Values': [resource['FileSystemId']],
+                }]).get('StorageVirtualMachines', [])
+            for svm in svms:
+                # pytest.set_trace()
+                if svm.get('Lifecycle') == 'DELETING':
+                    continue
+                try:
+                    retry(
+                        client.delete_storage_virtual_machine,
+                        StorageVirtualMachineId=svm['StorageVirtualMachineId']
+                    )
+                except client.exceptions.StorageVirtualMachineNotFound:
+                    continue
+                except Exception as e:
+                    self.log.warning(
+                        'Unable to delete SVM for: %s - %s - %s' % (
+                            resource['FileSystemId'], svm['StorageVirtualMachineId'], e))
+
+            volumes = client.describe_volumes(Filters=[
+                {
+                    'Name': 'file-system-id',
+                    'Values': [resource['FileSystemId']],
+                }]).get('Volumes', [])
+            for volume in volumes:
+                # pytest.set_trace()
+                if volume.get('Lifecycle') == 'DELETING':
+                    continue
+                try:
+                    retry(
+                        client.delete_volume,
+                        VolumeId=volume['VolumeId']
+                    )
+                    # client.delete_volume(VolumeId=volume['VolumeId'])
+                except client.exceptions.VolumeNotFound:
+                    # Volume already deleted, continue
+                    continue
+                except Exception as e:
+                    self.log.warning(
+                        'Unable to delete volume for: %s - %s - %s' % (
+                            resource['FileSystemId'], volume['VolumeId'], e))
 
 @FSx.filter_registry.register('kms-key')
 class KmsFilter(KmsRelatedFilter):
