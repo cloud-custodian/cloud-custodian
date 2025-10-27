@@ -15,7 +15,6 @@ from c7n.filters import Filter, ListItemFilter, MetricsFilter
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters.vpc import SubnetFilter, VpcFilter
 from c7n.filters.backup import ConsecutiveAwsBackupsFilter
-import pytest
 
 
 class DescribeFSx(DescribeSource):
@@ -329,8 +328,8 @@ class DeleteFileSystem(BaseAction):
         dependencies necessary to delete the file system.
 
         You can override the default retry settings for deletion by specifying
-        `retry-delay` (default: 45 seconds) and
-        `retry-max-attempts` (default: 10).
+        `retry-delay` (default: 1 seconds) and
+        `retry-max-attempts` (default: 2).
 
         Note:
         If `skip-snapshot` is set to True, no final snapshot will be created.
@@ -359,13 +358,13 @@ class DeleteFileSystem(BaseAction):
               actions:
                 - type: delete
                   force: True
-                  retry-delay: 45
+                  retry-delay: 30
                   retry-max-attempts: 10
                   skip-snapshot: True
 
     """
 
-    permissions = ('fsx:DeleteFileSystem','fsx:DescribeVolumes')
+    permissions = ('fsx:DeleteFileSystem', 'fsx:DescribeVolumes')
 
     schema = type_schema(
         'delete',
@@ -395,9 +394,10 @@ class DeleteFileSystem(BaseAction):
         skip_snapshot = self.data.get('skip-snapshot', False)
         copy_tags = self.data.get('copy-tags', True)
         user_tags = self.data.get('tags', [])
-        retry_delay = self.data.get('retry-delay', 45)
-        retry_max_attempts = self.data.get('retry-max-attempts', 10)
-        retry = get_retry(retry_codes=('BadRequest'), min_delay=retry_delay, max_attempts=retry_max_attempts, log_retries=True)
+        retry_delay = self.data.get('retry-delay', 1)
+        retry_max_attempts = self.data.get('retry-max-attempts', 2)
+        retry = get_retry(retry_codes=('BadRequest'), min_delay=retry_delay,
+                    max_attempts=retry_max_attempts, log_retries=True)
 
         for r in resources:
             tags = coalesce_copy_user_tags(r, copy_tags, user_tags)
@@ -420,7 +420,7 @@ class DeleteFileSystem(BaseAction):
                     deployment_type = r.get("LustreConfiguration", {}).get("DeploymentType")
                     if deployment_type == "SCRATCH_2" or deployment_type == "SCRATCH_1":
                         self.log.warning(
-                            'Force Deletion: Final backup not supported for ' \
+                            'Force Deletion: Final backup not supported for '
                             'SCRATCH deployment types: %s' % (r['FileSystemId'])
                         )
                         # No final backup support for SCRATCH deployment types
@@ -543,6 +543,7 @@ class DeleteFileSystem(BaseAction):
 
         if additional_permissions:
             self.permissions += tuple(additional_permissions)
+
 
 @FSx.filter_registry.register('kms-key')
 class KmsFilter(KmsRelatedFilter):
