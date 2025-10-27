@@ -372,6 +372,8 @@ class DeleteFileSystem(BaseAction):
         'delete',
         **{
             'force': {'type': 'boolean'},
+            'retry-delay': {'type': 'number', 'minimum': 1},
+            'retry-max-attempts': {'type': 'number', 'minimum': 1},
             'skip-snapshot': {'type': 'boolean'},
             'tags': {'type': 'object'},
             'copy-tags': {
