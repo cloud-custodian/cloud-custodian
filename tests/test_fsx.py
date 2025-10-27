@@ -345,6 +345,11 @@ class TestFSx(BaseTest):
                         'type': 'value',
                         'key': 'Lifecycle',
                         'value': 'AVAILABLE'
+                    },
+                    {
+                        'type': 'value',
+                        'key': 'FileSystemType',
+                        'value': 'WINDOWS'
                     }
                 ],
                 'actions': [
@@ -387,7 +392,7 @@ class TestFSx(BaseTest):
         session_factory = self.replay_flight_data(
             'test_fsx_delete_file_system_ontap', region="us-west-2")
         if self.recording:
-            retry_delay = 60
+            retry_delay = 30
             retry_max_attempts = 10
         else:
             retry_delay = 1
@@ -476,7 +481,7 @@ class TestFSx(BaseTest):
             'test_fsx_delete_file_system_openzfs_force',
             region="us-west-2")
         if self.recording:
-            retry_delay = 30
+            retry_delay = 10
             retry_max_attempts = 10
         else:
             retry_delay = 1
@@ -521,8 +526,9 @@ class TestFSx(BaseTest):
     def test_fsx_delete_file_system_lustre(self):
         session_factory = self.replay_flight_data(
             'test_fsx_delete_file_system_lustre', region="us-west-2")
+
         if self.recording:
-            retry_delay = 30
+            retry_delay = 5
             retry_max_attempts = 10
         else:
             retry_delay = 1

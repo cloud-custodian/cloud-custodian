@@ -443,7 +443,7 @@ class DeleteFileSystem(BaseAction):
             if self.data.get('force'):
                 self._delete_dependencies(client, r, fs_type, retry)
 
-            if config_key:
+            if config_key and config:
                 delete_args[config_key] = config
             try:
                 retry(
