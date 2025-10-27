@@ -474,8 +474,8 @@ class TestFSx(BaseTest):
     def test_fsx_delete_file_system_lustre(self):
 
         # Against a resource with child volumes and s3 access point.
-        # session_factory = self.record_flight_data('test_fsx_delete_file_system_skip_snapshot_openzfs_force', region="us-west-2")
-        session_factory = self.replay_flight_data('test_fsx_delete_file_system_skip_snapshot_openzfs_force', region="us-west-2")
+        # session_factory = self.record_flight_data('test_fsx_delete_file_system_lustre', region="us-west-2")
+        session_factory = self.replay_flight_data('test_fsx_delete_file_system_lustre', region="us-west-2")
         if self.recording:
             retry_delay = 30
             retry_max_attempts = 10
@@ -495,12 +495,13 @@ class TestFSx(BaseTest):
                     {
                         'type': 'value',
                         'key': 'FileSystemType',
-                        'value': 'OPENZFS'
+                        'value': 'LUSTRE'
                     }
                 ],
                 'actions': [
                     {
                         'type': 'delete',
+                        'force': True,
                         'retry-delay': retry_delay,
                         'retry-max-attempts': retry_max_attempts,
                         'skip-snapshot': False

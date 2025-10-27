@@ -325,8 +325,6 @@ class DeleteFileSystem(BaseAction):
     :example:
 
     .. code-block:: yaml
-        If `skip-snapshot` is set to True, no final snapshot will be created.
-
         If `force` is set to True, this action will attempt to delete all
         dependencies necessary to delete the file system.
 
@@ -334,8 +332,12 @@ class DeleteFileSystem(BaseAction):
         `retry-delay` (default: 45 seconds) and
         `retry-max-attempts` (default: 10).
 
-        Note: FSx for OnTap resources do not create snapshot backups on deletion
+        Note:
+        If `skip-snapshot` is set to True, no final snapshot will be created.
+        FSx for OnTap resources do not create snapshot backups on deletion
         even if skip-snapshot is set to True.
+        FSx for Lustre resources using the Scratch deployment type do not
+        support final backups on deletion.
 
         policies:
             - name: delete-fsx-instance-with-snapshot
@@ -414,6 +416,18 @@ class DeleteFileSystem(BaseAction):
                 config_key = 'WindowsConfiguration'
             elif fs_type == 'LUSTRE':
                 config_key = 'LustreConfiguration'
+                if self.data.get('force') and not skip_snapshot:
+                    deployment_type = r.get("LustreConfiguration", {}).get("DeploymentType")
+                    if deployment_type == "SCRATCH_2" or deployment_type == "SCRATCH_1":
+                        self.log.warning(
+                            'Force Deletion: Final backup not supported for ' \
+                            'SCRATCH deployment types: %s' % (r['FileSystemId'])
+                        )
+                        # No final backup support for SCRATCH deployment types
+                        # Override to skip final backup and final backup tags
+                        # when we are forcing deletion.
+                        config_key = None
+
             elif fs_type == 'OPENZFS':
                 config_key = 'OpenZFSConfiguration'
                 # OpenZFS requires this option to delete all child volumes and snapshots
