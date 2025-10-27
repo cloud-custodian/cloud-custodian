@@ -152,6 +152,33 @@ class SnapshotQueryParser(QueryParser):
     type_name = 'EBS'
 
 
+class VolumeQueryParser(QueryParser):
+
+    # Valid EBS Volume Query Filters
+    # https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeVolumes.html
+    # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2/client/describe_volumes.html   
+    QuerySchema = {
+        'attachment.attach-time': str,
+        'attachment.delete-on-termination': bool,
+        'attachment.device': str,
+        'attachment.instance-id': str,
+        'attachment.status': ('attaching', 'attached', 'detaching'),
+        'availability-zone': str,
+        'create-time': str,
+        'encrypted': bool,
+        'multi-attach-enabled': bool,
+        'size': int,
+        'snapshot-id': str,
+        'status': ('creating', 'available', 'in-use', 'deleting', 'deleted', 'error'),
+        'tag': str,
+        'tag-key': str,
+        'volume-id': str,
+        'volume-type': ('standard', 'io1', 'io2', 'gp2', 'gp3', 'sc1', 'st1'),
+    }
+
+    type_name = 'EBS Volume'
+
+
 @Snapshot.action_registry.register('tag')
 class SnapshotTag(Tag):
 
@@ -664,6 +691,14 @@ class EBS(QueryResourceManager):
             'VolumeType',
             'KmsKeyId'
         )
+
+    def resources(self, query=None):
+        qfilters = VolumeQueryParser.parse(self.data.get('query', []))
+        query = query or {}
+        if qfilters:
+            query['Filters'] = qfilters
+        query['MaxResults'] = 1000
+        return super(EBS, self).resources(query=query)
 
     def get_resources(self, ids, cache=True, augment=True):
         if cache:
