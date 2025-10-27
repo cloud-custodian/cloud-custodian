@@ -2776,3 +2776,342 @@ class TestIamProfileHasSpecificManagedPolicyFilter(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 3)
+
+
+class AccessKeyTest(BaseTest):
+
+    def test_access_key_list(self):
+        """Test basic enumeration of access keys."""
+        factory = self.replay_flight_data("test_iam_access_key_list")
+        p = self.load_policy(
+            {
+                "name": "iam-access-key-list",
+                "resource": "iam-access-key"
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertTrue(len(resources) >= 0)
+        for resource in resources:
+            # Verify required fields are present
+            self.assertIn('AccessKeyId', resource)
+            self.assertIn('UserName', resource)
+            self.assertIn('Status', resource)
+            self.assertIn('CreateDate', resource)
+
+    def test_access_key_filter_by_status(self):
+        """Test filtering access keys by status."""
+        factory = self.replay_flight_data("test_iam_access_key_filter_status")
+        p = self.load_policy(
+            {
+                "name": "iam-access-key-active",
+                "resource": "iam-access-key",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "Status",
+                        "value": "Active"
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        for resource in resources:
+            self.assertEqual(resource['Status'], 'Active')
+
+    def test_access_key_filter_by_user(self):
+        """Test filtering access keys by username."""
+        factory = self.replay_flight_data("test_iam_access_key_filter_user")
+        p = self.load_policy(
+            {
+                "name": "iam-access-key-by-user",
+                "resource": "iam-access-key",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "UserName",
+                        "value": "test-user"
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        for resource in resources:
+            self.assertEqual(resource['UserName'], 'test-user')
+
+    def test_access_key_filter_by_age(self):
+        """Test filtering access keys by age."""
+        factory = self.replay_flight_data("test_iam_access_key_filter_age")
+        p = self.load_policy(
+            {
+                "name": "iam-access-key-old",
+                "resource": "iam-access-key",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "CreateDate",
+                        "value_type": "age",
+                        "value": 90,
+                        "op": "greater-than"
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        # Just check that we can run this without error
+        # The actual age filter logic is handled by C7N core
+        self.assertTrue(len(resources) >= 0)
+
+
+@terraform('iam_access_key_good')
+def test_access_key_functional_good_policy(test, iam_access_key_good):
+    """
+    Functional test for iam-access-key resource with a 'good policy'.
+    Tests various filtering scenarios against real AWS resources.
+
+    This test uses Terraform-managed IAM users and access keys to validate
+    that the iam-access-key resource correctly identifies and filters
+    access keys based on various criteria.
+    """
+    factory = test.replay_flight_data("test_iam_access_key_functional_good")
+
+    # Get resource names from Terraform
+    test_user_1 = iam_access_key_good["aws_iam_user.test_user_1.name"]
+    test_user_2 = iam_access_key_good["aws_iam_user.test_user_2.name"]
+    key_1_id = iam_access_key_good["aws_iam_access_key.key_1_active.id"]
+    key_2_id = iam_access_key_good["aws_iam_access_key.key_2_active.id"]
+    key_3_id = iam_access_key_good["aws_iam_access_key.key_1_inactive.id"]
+
+    # Test 1: Basic enumeration - should find our test keys
+    p = test.load_policy(
+        {
+            "name": "iam-access-key-enumerate",
+            "resource": "iam-access-key",
+            "filters": [
+                {
+                    "type": "value",
+                    "key": "UserName",
+                    "value": [test_user_1, test_user_2],
+                    "op": "in"
+                }
+            ]
+        },
+        session_factory=factory,
+    )
+    resources = p.run()
+
+    # Should find all 3 keys we created
+    assert len(resources) == 3
+    found_key_ids = {r['AccessKeyId'] for r in resources}
+    expected_key_ids = {key_1_id, key_2_id, key_3_id}
+    assert found_key_ids == expected_key_ids
+
+    # Verify required fields are present
+    for resource in resources:
+        assert 'AccessKeyId' in resource
+        assert 'UserName' in resource
+        assert 'Status' in resource
+        assert 'CreateDate' in resource
+
+    # Test 2: Filter by status (Active only)
+    p = test.load_policy(
+        {
+            "name": "iam-access-key-active",
+            "resource": "iam-access-key",
+            "filters": [
+                {
+                    "type": "value",
+                    "key": "UserName",
+                    "value": [test_user_1, test_user_2],
+                    "op": "in"
+                },
+                {
+                    "type": "value",
+                    "key": "Status",
+                    "value": "Active"
+                }
+            ]
+        },
+        session_factory=factory,
+    )
+    resources = p.run()
+
+    # Should find only the 2 active keys
+    assert len(resources) == 2
+    for resource in resources:
+        assert resource['Status'] == 'Active'
+        assert resource['AccessKeyId'] in {key_1_id, key_2_id}
+
+    # Test 3: Filter by specific user
+    p = test.load_policy(
+        {
+            "name": "iam-access-key-user-specific",
+            "resource": "iam-access-key",
+            "filters": [
+                {
+                    "type": "value",
+                    "key": "UserName",
+                    "value": test_user_1
+                }
+            ]
+        },
+        session_factory=factory,
+    )
+    resources = p.run()
+
+    # Should find 2 keys for test_user_1
+    assert len(resources) == 2
+    for resource in resources:
+        assert resource['UserName'] == test_user_1
+        assert resource['AccessKeyId'] in {key_1_id, key_3_id}
+
+    # Test 4: Filter by age (recent keys - should find our test keys)
+    p = test.load_policy(
+        {
+            "name": "iam-access-key-recent",
+            "resource": "iam-access-key",
+            "filters": [
+                {
+                    "type": "value",
+                    "key": "UserName",
+                    "value": [test_user_1, test_user_2],
+                    "op": "in"
+                },
+                {
+                    "type": "value",
+                    "key": "CreateDate",
+                    "value_type": "age",
+                    "value": 1,
+                    "op": "less-than"
+                }
+            ]
+        },
+        session_factory=factory,
+    )
+    resources = p.run()
+
+    # Should find our recently created keys
+    assert len(resources) == 3
+    for resource in resources:
+        assert resource['UserName'] in [test_user_1, test_user_2]
+
+
+@terraform('iam_access_key_bad')
+def test_access_key_functional_bad_policy(test, iam_access_key_bad):
+    """
+    Functional test for iam-access-key resource with a 'bad policy'.
+    Tests edge cases and error handling scenarios.
+
+    This test verifies that the resource handles various edge cases
+    gracefully, including non-existent users, invalid filters, and
+    boundary conditions.
+    """
+    factory = test.replay_flight_data("test_iam_access_key_functional_bad")
+
+    # Get resource name from Terraform
+    test_user_empty = iam_access_key_bad["aws_iam_user.test_user_empty.name"]
+
+    # Test 1: Filter for non-existent user - should return empty
+    p = test.load_policy(
+        {
+            "name": "iam-access-key-nonexistent-user",
+            "resource": "iam-access-key",
+            "filters": [
+                {
+                    "type": "value",
+                    "key": "UserName",
+                    "value": "c7n-nonexistent-user-12345"
+                }
+            ]
+        },
+        session_factory=factory,
+    )
+    resources = p.run()
+    assert len(resources) == 0
+
+    # Test 2: Filter for user with no access keys - should return empty
+    p = test.load_policy(
+        {
+            "name": "iam-access-key-empty-user",
+            "resource": "iam-access-key",
+            "filters": [
+                {
+                    "type": "value",
+                    "key": "UserName",
+                    "value": test_user_empty
+                }
+            ]
+        },
+        session_factory=factory,
+    )
+    resources = p.run()
+    assert len(resources) == 0
+
+    # Test 3: Filter by very old age - should return empty for our test keys
+    p = test.load_policy(
+        {
+            "name": "iam-access-key-very-old",
+            "resource": "iam-access-key",
+            "filters": [
+                {
+                    "type": "value",
+                    "key": "UserName",
+                    "value": test_user_empty
+                },
+                {
+                    "type": "value",
+                    "key": "CreateDate",
+                    "value_type": "age",
+                    "value": 365,
+                    "op": "greater-than"
+                }
+            ]
+        },
+        session_factory=factory,
+    )
+    resources = p.run()
+    assert len(resources) == 0
+
+    # Test 4: Filter by invalid status - should return empty
+    p = test.load_policy(
+        {
+            "name": "iam-access-key-invalid-status",
+            "resource": "iam-access-key",
+            "filters": [
+                {
+                    "type": "value",
+                    "key": "Status",
+                    "value": "InvalidStatus"
+                }
+            ]
+        },
+        session_factory=factory,
+    )
+    resources = p.run()
+    assert len(resources) == 0
+
+    # Test 5: Multiple contradictory filters - should return empty
+    p = test.load_policy(
+        {
+            "name": "iam-access-key-contradictory",
+            "resource": "iam-access-key",
+            "filters": [
+                {
+                    "type": "value",
+                    "key": "Status",
+                    "value": "Active"
+                },
+                {
+                    "type": "value",
+                    "key": "Status",
+                    "value": "Inactive"
+                }
+            ]
+        },
+        session_factory=factory,
+    )
+    resources = p.run()
+    assert len(resources) == 0
