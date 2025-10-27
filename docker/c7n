@@ -97,7 +97,6 @@ COPY --from=build-env /output /output
 
 RUN adduser --disabled-login --gecos "" custodian
 RUN ln -s /src/.venv/bin/custodian /usr/local/bin/custodian
-RUN ln -s /src/.venv/bin/python3 /usr/local/bin/python3
 USER custodian
 WORKDIR /home/custodian
 ENV LC_ALL="C.UTF-8" LANG="C.UTF-8"
