@@ -334,9 +334,10 @@ class TestFSx(BaseTest):
         )['Backups']
         self.assertEqual(len(backups), 0)
 
-    def test_fsx_delete_file_system_skip_snapshot_ontap(self):
+    def test_fsx_delete_file_system_ontap(self):
         # Delete fsx resource with volumes and svms.
-        # ontap does not create snapshot backups on deletion even if skip-snapshot is set to True.
+        # Ontap does not create snapshot backups on deletion even if
+        # skip-snapshot is set to False.
         session_factory = self.replay_flight_data('test_fsx_delete_file_system_ontap', region="us-west-2")
         if self.recording:
             retry_delay = 60
@@ -422,44 +423,100 @@ class TestFSx(BaseTest):
         self.assertEqual(len(fs), 1)
         self.assertEqual(fs[0]['Lifecycle'], 'DELETING')
 
-    # def test_fsx_delete_file_system_skip_snapshot_openzfs_force(self):
-    #     # Against a resource with child volumes and s3 access point.
-    #     # session_factory = self.record_flight_data('test_fsx_delete_file_system_skip_snapshot_openzfs_force', region="us-west-2")
-    #     session_factory = self.replay_flight_data('test_fsx_delete_file_system_skip_snapshot_openzfs_force', region="us-west-2")
-    #     p = self.load_policy(
-    #         {
-    #             'name': 'fsx-delete-file-system',
-    #             'resource': 'fsx',
-    #             'filters': [
-    #                 {
-    #                     'type': 'value',
-    #                     'key': 'Lifecycle',
-    #                     'value': 'AVAILABLE'
-    #                 },
-    #                 {
-    #                     'type': 'value',
-    #                     'key': 'FileSystemType',
-    #                     'value': 'OPENZFS'
-    #                 }
-    #             ],
-    #             'actions': [
-    #                 {
-    #                     'type': 'delete',
-    #                     'force': True,
-    #                     'skip-snapshot': True
-    #                 }
-    #             ]
-    #         },
-    #         session_factory=session_factory,
-    #         config={'region': 'us-west-2'},
-    #     )
-    #     resources = p.run()
-    #     self.assertEqual(len(resources), 1)
-    #     client = session_factory().client('fsx')
-    #     fs = client.describe_file_systems(
-    #         FileSystemIds=[resources[0]['FileSystemId']])['FileSystems']
-    #     self.assertEqual(len(fs), 1)
-    #     self.assertEqual(fs[0]['Lifecycle'], 'DELETING')
+    def test_fsx_delete_file_system_skip_snapshot_openzfs_force(self):
+
+        # Against a resource with child volumes and s3 access point.
+        # session_factory = self.record_flight_data('test_fsx_delete_file_system_skip_snapshot_openzfs_force', region="us-west-2")
+        session_factory = self.replay_flight_data('test_fsx_delete_file_system_skip_snapshot_openzfs_force', region="us-west-2")
+        if self.recording:
+            retry_delay = 30
+            retry_max_attempts = 10
+        else:
+            retry_delay = 1
+            retry_max_attempts = 2
+        p = self.load_policy(
+            {
+                'name': 'fsx-delete-file-system',
+                'resource': 'fsx',
+                'filters': [
+                    {
+                        'type': 'value',
+                        'key': 'Lifecycle',
+                        'value': 'AVAILABLE'
+                    },
+                    {
+                        'type': 'value',
+                        'key': 'FileSystemType',
+                        'value': 'OPENZFS'
+                    }
+                ],
+                'actions': [
+                    {
+                        'type': 'delete',
+                        'force': True,
+                        'retry-delay': retry_delay,
+                        'retry-max-attempts': retry_max_attempts,
+                        'skip-snapshot': True
+                    }
+                ]
+            },
+            session_factory=session_factory,
+            config={'region': 'us-west-2'},
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client('fsx')
+        fs = client.describe_file_systems(
+            FileSystemIds=[resources[0]['FileSystemId']])['FileSystems']
+        self.assertEqual(len(fs), 1)
+        self.assertEqual(fs[0]['Lifecycle'], 'DELETING')
+
+    def test_fsx_delete_file_system_lustre(self):
+
+        # Against a resource with child volumes and s3 access point.
+        # session_factory = self.record_flight_data('test_fsx_delete_file_system_skip_snapshot_openzfs_force', region="us-west-2")
+        session_factory = self.replay_flight_data('test_fsx_delete_file_system_skip_snapshot_openzfs_force', region="us-west-2")
+        if self.recording:
+            retry_delay = 30
+            retry_max_attempts = 10
+        else:
+            retry_delay = 1
+            retry_max_attempts = 2
+        p = self.load_policy(
+            {
+                'name': 'fsx-delete-file-system',
+                'resource': 'fsx',
+                'filters': [
+                    {
+                        'type': 'value',
+                        'key': 'Lifecycle',
+                        'value': 'AVAILABLE'
+                    },
+                    {
+                        'type': 'value',
+                        'key': 'FileSystemType',
+                        'value': 'OPENZFS'
+                    }
+                ],
+                'actions': [
+                    {
+                        'type': 'delete',
+                        'retry-delay': retry_delay,
+                        'retry-max-attempts': retry_max_attempts,
+                        'skip-snapshot': False
+                    }
+                ]
+            },
+            session_factory=session_factory,
+            config={'region': 'us-west-2'},
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client('fsx')
+        fs = client.describe_file_systems(
+            FileSystemIds=[resources[0]['FileSystemId']])['FileSystems']
+        self.assertEqual(len(fs), 1)
+        self.assertEqual(fs[0]['Lifecycle'], 'DELETING')
 
     def test_fsx_delete_file_system(self):
         session_factory = self.replay_flight_data('test_fsx_delete_file_system')

@@ -331,7 +331,8 @@ class DeleteFileSystem(BaseAction):
         dependencies necessary to delete the file system.
 
         You can override the default retry settings for deletion by specifying
-        `retry-delay` (in seconds) and `retry-max-attempts`.
+        `retry-delay` (default: 45 seconds) and
+        `retry-max-attempts` (default: 10).
 
         Note: FSx for OnTap resources do not create snapshot backups on deletion
         even if skip-snapshot is set to True.
@@ -356,7 +357,7 @@ class DeleteFileSystem(BaseAction):
               actions:
                 - type: delete
                   force: True
-                  retry-delay: 60
+                  retry-delay: 45
                   retry-max-attempts: 10
                   skip-snapshot: True
 
@@ -392,7 +393,7 @@ class DeleteFileSystem(BaseAction):
         skip_snapshot = self.data.get('skip-snapshot', False)
         copy_tags = self.data.get('copy-tags', True)
         user_tags = self.data.get('tags', [])
-        retry_delay = self.data.get('retry-delay', 60)
+        retry_delay = self.data.get('retry-delay', 45)
         retry_max_attempts = self.data.get('retry-max-attempts', 10)
         retry = get_retry(retry_codes=('BadRequest'), min_delay=retry_delay, max_attempts=retry_max_attempts, log_retries=True)
 
@@ -441,14 +442,18 @@ class DeleteFileSystem(BaseAction):
         """
         Delete dependent resources for a file system.
         """
+        additional_permissions = []
         # pytest.set_trace()
         if fs_type == 'ONTAP':
             # delete storage virtual machines
+            additional_permissions.append('fsx:DescribeStorageVirtualMachines')
             svms = client.describe_storage_virtual_machines(Filters=[
                 {
                     'Name': 'file-system-id',
                     'Values': [resource['FileSystemId']],
                 }]).get('StorageVirtualMachines', [])
+            if svms:
+                additional_permissions.append('fsx:DeleteStorageVirtualMachine')
             for svm in svms:
                 # pytest.set_trace()
                 if svm.get('Lifecycle') == 'DELETING':
@@ -465,11 +470,14 @@ class DeleteFileSystem(BaseAction):
                         'Unable to delete SVM for: %s - %s - %s' % (
                             resource['FileSystemId'], svm['StorageVirtualMachineId'], e))
 
+            additional_permissions.append('fsx:DescribeVolumes')
             volumes = client.describe_volumes(Filters=[
                 {
                     'Name': 'file-system-id',
                     'Values': [resource['FileSystemId']],
                 }]).get('Volumes', [])
+            if volumes:
+                additional_permissions.append('fsx:DeleteVolume')
             for volume in volumes:
                 # pytest.set_trace()
                 if volume.get('Lifecycle') == 'DELETING':
@@ -487,6 +495,40 @@ class DeleteFileSystem(BaseAction):
                     self.log.warning(
                         'Unable to delete volume for: %s - %s - %s' % (
                             resource['FileSystemId'], volume['VolumeId'], e))
+        elif fs_type == 'OPENZFS':
+            additional_permissions.append('fsx:DescribeS3AccessPointAttachments')
+
+            s3_attachments = client.describe_s3_access_point_attachments(Filters=[
+                {
+                    'Name': 'file-system-id',
+                    'Values': [resource['FileSystemId']],
+                }]).get('S3AccessPointAttachments', [])
+
+            if s3_attachments:
+                additional_permissions.extend(['fsx:DetachAndDeleteS3AccessPoint',
+                                              's3:DeleteAccessPoint'])
+
+            for s3_attachment in s3_attachments:
+                if s3_attachment.get('Lifecycle') == 'DELETING':
+                    continue
+                try:
+                    retry(
+                        client.detach_and_delete_s3_access_point,
+                        Name=s3_attachment['Name']
+                    )
+                except client.exceptions.S3AccessPointNotFound:
+                    continue
+                except Exception as e:
+                    self.log.warning(
+                        'Unable to delete S3 Access Point for: %s - %s - %s -%s' % (
+                            resource['FileSystemId'],
+                            s3_attachment['Name'],
+                            s3_attachment['S3AccessPointArn'], e
+                        )
+                    )
+
+        if additional_permissions:
+            self.permissions += tuple(additional_permissions)
 
 @FSx.filter_registry.register('kms-key')
 class KmsFilter(KmsRelatedFilter):
