@@ -328,8 +328,10 @@ class DeleteFileSystem(BaseAction):
         dependencies necessary to delete the file system.
 
         You can override the default retry settings for deletion by specifying
-        `retry-delay` (default: 1 seconds) and
+        `retry-delay` (default: 5 seconds) and
         `retry-max-attempts` (default: 2).
+        FSx for Ontap may take longer to delete all volumes before it can delete
+        the file system.
 
         Note:
         If `skip-snapshot` is set to True, no final snapshot will be created.
@@ -394,7 +396,7 @@ class DeleteFileSystem(BaseAction):
         skip_snapshot = self.data.get('skip-snapshot', False)
         copy_tags = self.data.get('copy-tags', True)
         user_tags = self.data.get('tags', [])
-        retry_delay = self.data.get('retry-delay', 1)
+        retry_delay = self.data.get('retry-delay', 5)
         retry_max_attempts = self.data.get('retry-max-attempts', 2)
         retry = get_retry(retry_codes=('BadRequest'), min_delay=retry_delay,
                     max_attempts=retry_max_attempts, log_retries=True)
@@ -409,24 +411,28 @@ class DeleteFileSystem(BaseAction):
                 'FileSystemId': r['FileSystemId'],
             }
             # Determine the correct configuration key based on FileSystemType
-            # fs_type == 'ONTAP' does not support config in boto3 (Oct 2025)
+            # fs_type == 'ONTAP' does not have its own config in boto3
             fs_type = r.get('FileSystemType')
             config_key = None
             if fs_type == 'WINDOWS':
                 config_key = 'WindowsConfiguration'
+
             elif fs_type == 'LUSTRE':
                 config_key = 'LustreConfiguration'
+
                 if self.data.get('force') and not skip_snapshot:
                     deployment_type = r.get("LustreConfiguration", {}).get("DeploymentType")
+
+                    # There is no final backup support for SCRATCH deployment
+                    # types. Override to skip final backup and final backup tags
+                    # when we are forcing deletion.
                     if deployment_type == "SCRATCH_2" or deployment_type == "SCRATCH_1":
                         self.log.warning(
                             'Force Deletion: Final backup not supported for '
                             'SCRATCH deployment types: %s' % (r['FileSystemId'])
                         )
-                        # No final backup support for SCRATCH deployment types
-                        # Override to skip final backup and final backup tags
-                        # when we are forcing deletion.
-                        config_key = None
+                        del config['FinalBackupTags']
+                        del config['SkipFinalBackup']
 
             elif fs_type == 'OPENZFS':
                 config_key = 'OpenZFSConfiguration'
@@ -439,27 +445,21 @@ class DeleteFileSystem(BaseAction):
 
             if config_key:
                 delete_args[config_key] = config
-
-            # pytest.set_trace()
             try:
                 retry(
                     client.delete_file_system,
                     **delete_args,
                 )
-                # client.delete_file_system(**delete_args)
 
             except Exception as e:
                 self.log.warning('Unable to delete: %s - %s' % (r['FileSystemId'], e))
 
-# do we need to add permissions?
     def _delete_dependencies(self, client, resource, fs_type, retry):
         """
         Delete dependent resources for a file system.
         """
         additional_permissions = []
-        # pytest.set_trace()
         if fs_type == 'ONTAP':
-            # delete storage virtual machines
             additional_permissions.append('fsx:DescribeStorageVirtualMachines')
             svms = client.describe_storage_virtual_machines(Filters=[
                 {
@@ -469,7 +469,6 @@ class DeleteFileSystem(BaseAction):
             if svms:
                 additional_permissions.append('fsx:DeleteStorageVirtualMachine')
             for svm in svms:
-                # pytest.set_trace()
                 if svm.get('Lifecycle') == 'DELETING':
                     continue
                 try:
@@ -493,7 +492,6 @@ class DeleteFileSystem(BaseAction):
             if volumes:
                 additional_permissions.append('fsx:DeleteVolume')
             for volume in volumes:
-                # pytest.set_trace()
                 if volume.get('Lifecycle') == 'DELETING':
                     continue
                 try:
@@ -501,9 +499,7 @@ class DeleteFileSystem(BaseAction):
                         client.delete_volume,
                         VolumeId=volume['VolumeId']
                     )
-                    # client.delete_volume(VolumeId=volume['VolumeId'])
                 except client.exceptions.VolumeNotFound:
-                    # Volume already deleted, continue
                     continue
                 except Exception as e:
                     self.log.warning(
