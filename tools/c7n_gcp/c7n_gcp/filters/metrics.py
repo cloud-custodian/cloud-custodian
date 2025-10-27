@@ -211,7 +211,8 @@ class GCPMetricsFilter(Filter):
     @classmethod
     def register_resources(klass, registry, resource_class):
         if resource_class.filter_registry:
-            resource_class.filter_registry.register('metrics', klass)
+            if resource_class.resource_type.allow_metrics_filters:
+                resource_class.filter_registry.register('metrics', klass)
 
 
 gcp_resources.subscribe(GCPMetricsFilter.register_resources)
