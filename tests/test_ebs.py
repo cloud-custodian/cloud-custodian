@@ -1038,14 +1038,14 @@ class VolumeQueryFilterTest(BaseTest):
                 {"Name": "status", "Values": ["available"]}
             ]
         })
-        
+
         with mock.patch.object(
             policy.resource_manager.source,
             'resources',
             return_value=[]
         ) as mock_resources:
             policy.run()
-            
+
             mock_resources.assert_called_once()
 
     def test_volume_query_filter(self):

@@ -156,7 +156,7 @@ class VolumeQueryParser(QueryParser):
 
     # Valid EBS Volume Query Filters
     # https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeVolumes.html
-    # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2/client/describe_volumes.html   
+    # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2/client/describe_volumes.html
     QuerySchema = {
         'attachment.attach-time': str,
         'attachment.delete-on-termination': bool,
