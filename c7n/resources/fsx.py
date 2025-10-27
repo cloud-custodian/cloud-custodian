@@ -320,25 +320,25 @@ class BackupFileSystem(BaseAction):
 class DeleteFileSystem(BaseAction):
     """
     Delete Filesystems
+    If `force` is set to True, this action will attempt to delete all
+    dependencies necessary to delete the file system.
+
+    You can override the default retry settings for deletion by specifying
+    `retry-delay` (default: 5 seconds) and
+    `retry-max-attempts` (default: 2).
+    FSx for Ontap may take longer to delete all volumes before it can delete
+    the file system.
+
+    Note:
+    If `skip-snapshot` is set to True, no final snapshot will be created.
+    FSx for OnTap resources do not create snapshot backups on deletion
+    even if skip-snapshot is set to False.
+    FSx for Lustre resources using the Scratch deployment type do not
+    support final backups on deletion.
 
     :example:
 
     .. code-block:: yaml
-        If `force` is set to True, this action will attempt to delete all
-        dependencies necessary to delete the file system.
-
-        You can override the default retry settings for deletion by specifying
-        `retry-delay` (default: 5 seconds) and
-        `retry-max-attempts` (default: 2).
-        FSx for Ontap may take longer to delete all volumes before it can delete
-        the file system.
-
-        Note:
-        If `skip-snapshot` is set to True, no final snapshot will be created.
-        FSx for OnTap resources do not create snapshot backups on deletion
-        even if skip-snapshot is set to False.
-        FSx for Lustre resources using the Scratch deployment type do not
-        support final backups on deletion.
 
         policies:
             - name: delete-fsx-instance-with-snapshot
