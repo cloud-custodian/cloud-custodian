@@ -366,7 +366,7 @@ class DeleteFileSystem(BaseAction):
 
     """
 
-    permissions = ('fsx:DeleteFileSystem', 'fsx:DescribeVolumes')
+    permissions = ('fsx:DeleteFileSystem')
 
     schema = type_schema(
         'delete',
