@@ -800,7 +800,7 @@ class PolicyMetaLint(BaseTest):
             'rrset',
             'redshift-reserved',
             'elasticsearch-reserved',
-            'ses-receipt-rule-set'
+            'ses-receipt-rule-set',
         ))
 
         for k, v in manager.resources.items():
