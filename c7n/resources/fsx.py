@@ -478,8 +478,6 @@ class DeleteFileSystem(BaseAction):
                         client.delete_storage_virtual_machine,
                         StorageVirtualMachineId=svm['StorageVirtualMachineId']
                     )
-                except client.exceptions.StorageVirtualMachineNotFound:
-                    continue
                 except Exception as e:
                     self.log.error(
                         'Unable to delete SVM for: %s - %s - %s' % (
@@ -500,8 +498,6 @@ class DeleteFileSystem(BaseAction):
                         client.delete_volume,
                         VolumeId=volume['VolumeId']
                     )
-                except client.exceptions.VolumeNotFound:
-                    continue
                 except Exception as e:
                     self.log.error(
                         'Unable to delete volume for: %s - %s - %s' % (
@@ -527,8 +523,6 @@ class DeleteFileSystem(BaseAction):
                         client.detach_and_delete_s3_access_point,
                         Name=s3_attachment['Name']
                     )
-                except client.exceptions.S3AccessPointAttachmentNotFound:
-                    continue
                 except Exception as e:
                     self.log.error(
                         'Unable to delete S3 Access Point for: %s - %s - %s -%s' % (
