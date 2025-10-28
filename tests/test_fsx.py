@@ -498,8 +498,7 @@ class TestFSx(BaseTest):
                         }
                     ],
                 },
-                session_factory=factory,
-                config={"region": "us-west-2"},
+                session_factory=factory
             )
             resources = p.run()
             self.assertEqual(len(resources), 1)
@@ -569,8 +568,7 @@ class TestFSx(BaseTest):
                         }
                     ],
                 },
-                session_factory=factory,
-                config={"region": "us-west-2"},
+                session_factory=factory
             )
             resources = p.run()
             self.assertEqual(len(resources), 1)
@@ -658,8 +656,7 @@ class TestFSx(BaseTest):
                         }
                     ],
                 },
-                session_factory=factory,
-                config={"region": "us-west-2"},
+                session_factory=factory
             )
             resources = p.run()
             self.assertEqual(len(resources), 1)
@@ -724,8 +721,7 @@ class TestFSx(BaseTest):
                         }
                     ],
                 },
-                session_factory=factory,
-                config={"region": "us-west-2"},
+                session_factory=factory
             )
             resources = p.run()
             self.assertEqual(len(resources), 1)
@@ -825,8 +821,7 @@ class TestFSx(BaseTest):
                         }
                     ],
                 },
-                session_factory=factory,
-                config={"region": "us-west-2"},
+                session_factory=factory
             )
             resources = p.run()
             self.assertEqual(len(resources), 1)
@@ -886,8 +881,7 @@ class TestFSx(BaseTest):
                         }
                     ],
                 },
-                session_factory=factory,
-                config={"region": "us-west-2"},
+                session_factory=factory
             )
             resources = p.run()
             self.assertEqual(len(resources), 1)
