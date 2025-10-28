@@ -433,9 +433,6 @@ class TestFSx(BaseTest):
         fs = client.describe_file_systems(
             FileSystemIds=[resources[0]['FileSystemId']])['FileSystems']
         self.assertEqual(len(fs), 1)
-        # Add sleep here to allow for eventual consistency
-        if self.recording:
-            time.sleep(30)
         self.assertEqual(fs[0]['Lifecycle'], 'DELETING')
 
     def test_fsx_delete_file_system_ontap_mock_skip_dependencies(self):
