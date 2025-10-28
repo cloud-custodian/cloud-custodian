@@ -366,7 +366,7 @@ class DeleteFileSystem(BaseAction):
 
     """
 
-    permissions = ('fsx:DeleteFileSystem', 'fsx:DescribeVolumes')
+    permissions = ('fsx:DeleteFileSystem',)
 
     schema = type_schema(
         'delete',
@@ -460,16 +460,13 @@ class DeleteFileSystem(BaseAction):
         """
         Delete dependent resources for a file system.
         """
-        additional_permissions = []
         if fs_type == 'ONTAP':
-            additional_permissions.append('fsx:DescribeStorageVirtualMachines')
             svms = client.describe_storage_virtual_machines(Filters=[
                 {
                     'Name': 'file-system-id',
                     'Values': [resource['FileSystemId']],
                 }]).get('StorageVirtualMachines', [])
-            if svms:
-                additional_permissions.append('fsx:DeleteStorageVirtualMachine')
+
             for svm in svms:
                 if svm.get('Lifecycle') == 'DELETING':
                     continue
@@ -488,8 +485,7 @@ class DeleteFileSystem(BaseAction):
                     'Name': 'file-system-id',
                     'Values': [resource['FileSystemId']],
                 }]).get('Volumes', [])
-            if volumes:
-                additional_permissions.append('fsx:DeleteVolume')
+
             for volume in volumes:
                 if volume.get('Lifecycle') == 'DELETING':
                     continue
@@ -503,17 +499,12 @@ class DeleteFileSystem(BaseAction):
                         'Unable to delete volume for: %s - %s - %s' % (
                             resource['FileSystemId'], volume['VolumeId'], e))
         elif fs_type == 'OPENZFS':
-            additional_permissions.append('fsx:DescribeS3AccessPointAttachments')
 
             s3_attachments = client.describe_s3_access_point_attachments(Filters=[
                 {
                     'Name': 'file-system-id',
                     'Values': [resource['FileSystemId']],
                 }]).get('S3AccessPointAttachments', [])
-
-            if s3_attachments:
-                additional_permissions.extend(['fsx:DetachAndDeleteS3AccessPoint',
-                                              's3:DeleteAccessPoint'])
 
             for s3_attachment in s3_attachments:
                 if s3_attachment.get('Lifecycle') == 'DELETING':
@@ -531,9 +522,6 @@ class DeleteFileSystem(BaseAction):
                             s3_attachment['S3AccessPointArn'], e
                         )
                     )
-
-        if additional_permissions:
-            self.permissions += tuple(additional_permissions)
 
 
 @FSx.filter_registry.register('kms-key')
