@@ -454,7 +454,7 @@ class DeleteFileSystem(BaseAction):
                 )
 
             except Exception as e:
-                self.log.warning('Unable to delete: %s - %s' % (r['FileSystemId'], e))
+                self.log.error('Unable to delete: %s - %s' % (r['FileSystemId'], e))
 
     def _delete_dependencies(self, client, resource, fs_type, retry):
         """
@@ -481,7 +481,7 @@ class DeleteFileSystem(BaseAction):
                 except client.exceptions.StorageVirtualMachineNotFound:
                     continue
                 except Exception as e:
-                    self.log.warning(
+                    self.log.error(
                         'Unable to delete SVM for: %s - %s - %s' % (
                             resource['FileSystemId'], svm['StorageVirtualMachineId'], e))
 
@@ -504,7 +504,7 @@ class DeleteFileSystem(BaseAction):
                 except client.exceptions.VolumeNotFound:
                     continue
                 except Exception as e:
-                    self.log.warning(
+                    self.log.error(
                         'Unable to delete volume for: %s - %s - %s' % (
                             resource['FileSystemId'], volume['VolumeId'], e))
         elif fs_type == 'OPENZFS':
@@ -528,10 +528,10 @@ class DeleteFileSystem(BaseAction):
                         client.detach_and_delete_s3_access_point,
                         Name=s3_attachment['Name']
                     )
-                except client.exceptions.S3AccessPointNotFound:
+                except client.exceptions.S3AccessPointAttachmentNotFound:
                     continue
                 except Exception as e:
-                    self.log.warning(
+                    self.log.error(
                         'Unable to delete S3 Access Point for: %s - %s - %s -%s' % (
                             resource['FileSystemId'],
                             s3_attachment['Name'],
