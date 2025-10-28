@@ -1,0 +1,13 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:cassandra:us-east-1:644160558196:/keyspace/c7n_test/table/c7n_test_table",
+                "Tags": []
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

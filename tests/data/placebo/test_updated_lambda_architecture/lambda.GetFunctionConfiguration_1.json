@@ -4,7 +4,7 @@
         "ResponseMetadata": {},
         "FunctionName": "custodian-ec2-foo-bar",
         "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-ec2-foo-bar",
-        "Runtime": "python3.9",
+        "Runtime": "python3.12",
         "Role": "arn:aws:iam::644160558196:role/custodian-mu",
         "Handler": "custodian_policy.run",
         "CodeSize": 530080,

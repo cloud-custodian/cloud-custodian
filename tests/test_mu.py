@@ -152,7 +152,7 @@ class PolicyLambdaProvision(Publish):
                 'mode': {
                     'type': 'cloudtrail',
                     'role': 'arn:aws:iam::644160558196:role/custodian-mu',
-                    'runtime': 'python3.9',
+                    'runtime': 'python3.12',
                     'events': ['RunInstances']}})
             pl1 = PolicyLambda(p1)
             mgr = LambdaManager(session_factory)
@@ -490,7 +490,7 @@ class PolicyLambdaProvision(Publish):
             for i in mgr.list_functions()
             if i["FunctionName"] == "custodian-s3-bucket-policy"
         ]
-        self.assertTrue(len(functions), 1)
+        self.assertEqual(len(functions), 1)
 
     def test_cwe_trail(self):
         session_factory = self.replay_flight_data("test_cwe_trail", zdata=True)

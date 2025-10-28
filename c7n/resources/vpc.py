@@ -722,6 +722,49 @@ class SubnetIpAddressUsageFilter(ValueFilter):
         return results
 
 
+@Subnet.action_registry.register('delete')
+class DeleteSubnet(BaseAction):
+    """Action to delete a Subnet.
+
+    :example:
+
+    Delete empty development subnets
+
+    .. code-block:: yaml
+
+        policies:
+          - name: delete-subnet
+            resource: aws.subnet
+            filters:
+              - tag:Environment: dev
+              - type: ip-address-usage
+                key: NumberUsed
+                value: 0
+            actions:
+              - type: delete
+    """
+
+    schema = type_schema('delete')
+    permissions = ("ec2:DeleteSubnet",)
+
+    def process(self, subnets):
+        client = local_session(self.manager.session_factory).client('ec2')
+        for subnet in subnets:
+            self.process_subnet(client, subnet)
+
+    def process_subnet(self, client, subnet):
+        try:
+            self.manager.retry(
+                client.delete_subnet,
+                SubnetId=subnet['SubnetId']
+            )
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'DependencyViolation':
+                self.log.warning(f"Cannot delete subnet {subnet['SubnetId']} due to dependencies")
+                return
+            raise
+
+
 class ConfigSG(query.ConfigSource):
 
     def load_resource(self, item):
@@ -2649,6 +2692,22 @@ class VPNGateway(query.QueryResourceManager):
         id_prefix = "vgw-"
 
 
+@resources.register('client-vpn-endpoint')
+class ClientVpnEndpoint(query.QueryResourceManager):
+
+    class resource_type(query.TypeInfo):
+        service = 'ec2'
+        arn_type = 'client-vpn-endpoint'
+        enum_spec = ('describe_client_vpn_endpoints', 'ClientVpnEndpoints', None)
+        name = id = 'ClientVpnEndpointId'
+        filter_name = 'ClientVpnEndpointIds'
+        filter_type = 'list'
+        cfn_type = config_type = 'AWS::EC2::ClientVpnEndpoint'
+        id_prefix = 'cvpn-endpoint-'
+        metrics_namespace = 'AWS/ClientVPN'
+        dimension = 'ClientVpnEndpointId'
+
+
 @resources.register('vpc-endpoint')
 class VpcEndpoint(query.QueryResourceManager):
 
@@ -2782,6 +2841,39 @@ class SubnetEndpointFilter(RelatedResourceByIdFilter):
     schema = type_schema(
         'vpc-endpoint',
         rinherit=ValueFilter.schema)
+
+
+@resources.register('vpc-endpoint-service-configuration')
+class VPCEndpointServiceConfiguration(query.QueryResourceManager):
+    """
+    Resource manager for VPC Endpoint Service Configurations.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: acceptance-not-enabled
+            resource: aws.vpc-endpoint-service-configuration
+            filters:
+              - AcceptanceRequired: false
+
+    """
+    class resource_type(query.TypeInfo):
+        service = 'ec2'
+        enum_spec = ('describe_vpc_endpoint_service_configurations',
+                     'ServiceConfigurations', None)
+        name = id = 'ServiceId'  # ServiceName contains DNS
+        id_prefix = 'vpce-svc-'
+        filter_name = 'ServiceIds'
+        filter_type = 'list'
+        cfn_type = config_type = 'AWS::EC2::VPCEndpointService'
+        arn_type = 'vpc-endpoint-service'
+        arn_separator = '/'
+        default_report_fields = (
+            'ServiceId',
+            'ServiceState'
+        )
 
 
 @resources.register('key-pair')

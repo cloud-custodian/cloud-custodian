@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 import json
 import time
-from mock import patch
+from unittest.mock import patch
 
 from botocore.exceptions import ClientError
 from .common import BaseTest, functional
@@ -423,6 +423,24 @@ class LambdaTest(BaseTest):
         self.assertEqual(
             {r["c7n:EventSources"][0] for r in resources}, {"iot.amazonaws.com"}
         )
+
+    def test_event_source_mapping(self):
+        factory = self.replay_flight_data("test_aws_lambda_event_source_mapping")
+        p = self.load_policy(
+            {
+                "name": "lambda-event-source",
+                "resource": "lambda-event-source-mapping",
+                "filters": [
+                     {
+                        "tag:test": "policyfoundry"
+                     }
+                 ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertIn("my-c7n-test", resources[0]["EventSourceArn"])
 
     def test_sg_filter(self):
         factory = self.replay_flight_data("test_aws_lambda_sg")

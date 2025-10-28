@@ -1,7 +1,12 @@
 {
-    "status_code": 200,
+    "status_code": 404,
     "data": {
-        "ResponseMetadata": {},
-        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":[\"s3:GetObject\",\"s3:PutObject\"],\"Resource\":\"arn:aws:s3:us-east-2:644160558196:accesspoint/c7n-ap-liberal-anemone/object/*\"}]}"
+        "Error": {
+            "Message": "The specified accesspoint policy does not exist",
+            "Code": "NoSuchAccessPointPolicy",
+            "AccessPointName": "c7n-ap-no-policy-rapid-serval"
+        },
+        "HostId": "MtxDiWcZ2lX9WZXo106bwimgUD/4cPJCwA9gUehzstNjVmXEgz91xDh9wO5tOPIFa1gze6o/MSY=",
+        "ResponseMetadata": {}
     }
 }

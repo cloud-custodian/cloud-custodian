@@ -1,0 +1,42 @@
+[
+  {
+    "Id": "OrgID-Valid",
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "Stmt1510843305330",
+        "Action": [
+          "s3:PutObject"
+        ],
+        "Effect": "Allow",
+        "Resource": "arn:aws:s3:::cross-account-valid/*",
+        "Condition": {
+          "StringEquals": {
+            "aws:ResourceOrgID": "o-goodorg"
+          }
+        },
+        "Principal": "*"
+      }
+    ]
+  },
+  {
+    "Id": "OrgID-Valid",
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "Stmt1510843305330",
+        "Action": [
+          "s3:PutObject"
+        ],
+        "Effect": "Allow",
+        "Resource": "arn:aws:s3:::cross-account-valid/*",
+        "Condition": {
+          "StringEquals": {
+            "aws:ResourceOrgID": "o-badorg"
+          }
+        },
+        "Principal": "*"
+      }
+    ]
+  }
+]

@@ -169,6 +169,13 @@ class KeyRotationStatus(ValueFilter):
                     self.log.warning(
                         "Access denied when getting rotation status on key:%s",
                         resource.get('KeyArn'))
+                elif e.response['Error']['Code'] == 'UnsupportedOperationException':
+                    # This is expected for keys that do not support rotation
+                    # e.g. keys in custom keystores or when keys are in certain
+                    # states such as PendingImport.
+                    self.log.warning(
+                        "UnsupportedOperationException when getting rotation status on key:%s",
+                        resource.get('KeyArn'))
                 else:
                     raise
 
@@ -431,3 +438,39 @@ class KmsPostFinding(PostFinding):
             )
 
         return envelope
+
+
+@Key.action_registry.register("schedule-deletion")
+class KmsKeyScheduleDeletion(BaseAction):
+    """Schedule KMS key deletion
+
+    If the number of days is not specified, the default value of 30 days is used.
+    The number of days must be between 7 and 30.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: delete-tagged-keys
+            resource: kms-key
+            filters:
+              - type: value
+                key: tag:DeleteAfter
+                op: ge
+                value_type: age # age is a special value type that will be converted to a timestamp
+                value: 0
+            actions:
+              - type: schedule-deletion
+                days: 7
+    """
+
+    permissions = ("kms:ScheduleKeyDeletion",)
+    schema = type_schema("schedule-deletion", days={"type": "integer", "minimum": 7, "maximum": 30})
+
+    def process(self, keys):
+        client = local_session(self.manager.session_factory).client("kms")
+        for k in keys:
+            client.schedule_key_deletion(
+                KeyId=k["KeyId"], PendingWindowInDays=self.data.get("days", 30)
+            )

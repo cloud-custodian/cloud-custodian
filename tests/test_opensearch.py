@@ -162,6 +162,30 @@ class OpensearchIngestion(BaseTest):
         self.assertEqual(resources[0]['EncryptionAtRestOptions']['KmsKeyArn'],
             'arn:aws:kms:us-east-1:644160558196:key/082cd05f-96d1-49f6-a5ac-32093d2cfe38')
 
+    def test_opensearch_ingestion_pipeline_config_filter(self):
+        session_factory = self.replay_flight_data(
+            "test_opensearch_ingestion_pipeline_config_filter")
+        p = self.load_policy(
+            {
+                "name": "opensearch-ingestion-pipeline-config",
+                "resource": "opensearch-ingestion",
+                'filters': [
+                    {
+                        'type': 'pipeline-config',
+                        'key': 'pipeline.source.opensearch',
+                        'value': 'not-null',
+                    },
+                    {
+                        'type': 'pipeline-config',
+                        'key': 'pipeline.sink[].opensearch',
+                        'value': 'not-null',
+                    }
+                ]
+            }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['PipelineName'], 'c7n-test')
+
     def test_opensearch_ingestion_update(self):
         session_factory = self.replay_flight_data('test_opensearch_ingestion_update')
         policy = {

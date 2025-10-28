@@ -3,19 +3,21 @@ description: "Install Cloud Custodian"
 inputs:
   python-version:
     required: true
-  poetry-version:
-    default: "1.8.3"
+  uv-version:
+    required: true
 outputs:
-  poetry-version:
-    description: "poetry version"
-    value: ${{ steps.echo-poetry-version.outputs.poetry-version }}
+  uv-version:
+    description: "uv version"
+    value: ${{ steps.echo-uv-version.outputs.uv-version }}
 
 runs:
   using: "composite"
   steps:
-    - name: Install poetry
-      shell: bash
-      run: pipx install poetry==${{ inputs.poetry-version }}
+    - name: Install uv
+      uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # ratchet:astral-sh/setup-uv@v5
+      with:
+        version: ${{ inputs.uv-version }}
+        enable-cache: true
 
     - name: Set up Python ${{ inputs.python-version }}
       uses: actions/setup-python@8d9ed9ac5c53483de85588cdf95a591a75ab9f55 # ratchet:actions/setup-python@v5
@@ -27,7 +29,7 @@ runs:
       id: cache
       with:
         path: .venv
-        key: venv-${{ runner.os }}-${{ inputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
+        key: venv-${{ runner.os }}-${{ inputs.python-version }}-${{ hashFiles('uv.lock') }}
 
     - name: Update PATH
       shell: bash
@@ -46,7 +48,7 @@ runs:
       id: cache_check
       shell: bash
       run: |
-        if poetry run custodian version ; then
+        if uv run custodian version ; then
            echo "venv=success" >> $GITHUB_OUTPUT
            echo "Cache Green"
         else
@@ -67,15 +69,13 @@ runs:
         if [ -d ".venv" ]; then
           mv .venv .venv-old
         fi
-        python -m venv .venv
         make install
 
-    - name: Output Poetry Version
+    - name: Output UV Version
       shell: bash
-      id: echo-poetry-version
-      run: echo "poetry-version=${{ inputs.poetry-version }}" >> $GITHUB_OUTPUT
+      id: echo-uv-version
+      run: echo "uv-version=${{ inputs.uv-version }}" >> $GITHUB_OUTPUT
 
     - name: Build awscc data files
       shell: bash
       run: cd tools/c7n_awscc && python build.py
-

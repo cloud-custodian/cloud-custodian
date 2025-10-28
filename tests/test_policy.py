@@ -206,7 +206,7 @@ class PolicyMetaLint(BaseTest):
             {'account', 's3', 'hostedzone', 'log-group', 'rest-api', 'redshift-snapshot',
              'rest-stage', 'codedeploy-app', 'codedeploy-group', 'fis-template', 'dlm-policy',
              'apigwv2', 'apigwv2-stage', 'lexv2-bot-alias', 'apigw-domain-name', 'fis-experiment',
-             'launch-template-version', 'glue-table'})
+             'launch-template-version', 'glue-table', 'glue-catalog', 'cloudwatch-synthetics'})
         if overrides:
             raise ValueError("unknown arn overrides in %s" % (", ".join(overrides)))
 
@@ -265,6 +265,8 @@ class PolicyMetaLint(BaseTest):
 
         whitelist = set(('AwsS3Object', 'Container'))
         todo = set((
+            # q2 2025
+            'CodeRepository',
             # q4 2023,
             'AwsEc2ClientVpnEndpoint',
             'AwsS3AccessPoint',
@@ -377,6 +379,39 @@ class PolicyMetaLint(BaseTest):
         # of a resource.
 
         whitelist = {
+            # q2 2025
+            "AWS::AppConfig::ExtensionAssociation",
+            "AWS::AppIntegrations::Application",
+            "AWS::AppSync::ApiCache",
+            "AWS::Bedrock::Guardrail",
+            "AWS::Bedrock::KnowledgeBase",
+            "AWS::Connect::Rule",
+            "AWS::Connect::User",
+            "AWS::EC2::ClientVpnTargetNetworkAssociation",
+            "AWS::EC2::EIPAssociation",
+            "AWS::EC2::InstanceConnectEndpoint",
+            "AWS::EC2::IPAMResourceDiscovery",
+            "AWS::EC2::IPAMResourceDiscoveryAssociation",
+            "AWS::EC2::SnapshotBlockPublicAccess",
+            "AWS::EC2::VPCBlockPublicAccessExclusion",
+            "AWS::EC2::VPCBlockPublicAccessOptions",
+            "AWS::EC2::VPCEndpointConnectionNotification",
+            "AWS::EC2::VPNConnectionRoute",
+            "AWS::Evidently::Segment",
+            "AWS::InspectorV2::Activation",
+            "AWS::MediaConnect::Gateway",
+            "AWS::MSK::ClusterPolicy",
+            "AWS::MSK::VpcConnection",
+            "AWS::OpenSearchServerless::Collection",
+            "AWS::OpenSearchServerless::VpcEndpoint",
+            "AWS::Redshift::EndpointAuthorization",
+            "AWS::Route53Profiles::Profile",
+            "AWS::S3::StorageLensGroup",
+            "AWS::S3Express::BucketPolicy",
+            "AWS::S3Express::DirectoryBucket",
+            "AWS::SageMaker::InferenceExperiment",
+            "AWS::SecurityHub::Standard",
+            "AWS::Transfer::Profile",
             # q1 2024
             "AWS::Cognito::UserPoolClient",
             "AWS::Cognito::UserPoolGroup",
@@ -439,7 +474,6 @@ class PolicyMetaLint(BaseTest):
             "AWS::Athena::PreparedStatement",
             "AWS::CustomerProfiles::ObjectType",
             "AWS::EC2::CapacityReservation",
-            "AWS::EC2::ClientVpnEndpoint",
             "AWS::EC2::IPAMScope",
             "AWS::Evidently::Launch",
             "AWS::Forecast::DatasetGroup",
@@ -607,7 +641,6 @@ class PolicyMetaLint(BaseTest):
             'AWS::EC2::RegisteredHAInstance',
             'AWS::EC2::TransitGatewayAttachment',
             'AWS::EC2::TransitGatewayRouteTable',
-            'AWS::EC2::VPCEndpointService',
             'AWS::ECR::PublicRepository',
             'AWS::EFS::AccessPoint',
             'AWS::EMR::SecurityConfiguration',

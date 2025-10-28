@@ -1,0 +1,11 @@
+{
+    "status_code": 401,
+    "data": {
+        "Error": {
+            "Message": "Operation is being called from endpoint us-west-2, but your identity region is us-east-1. Please use the us-east-1 endpoint.",
+            "Code": "AccessDeniedException"
+        },
+        "ResponseMetadata": {},
+        "Message": "Operation is being called from endpoint us-west-2, but your identity region is us-east-1. Please use the us-east-1 endpoint."
+    }
+}

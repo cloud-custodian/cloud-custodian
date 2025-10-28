@@ -82,7 +82,7 @@ runs:
       with:
         context: .
         build-args: |
-          POETRY_VERSION=${{ steps.install-custodian.outputs.poetry-version }}
+          UV_VERSION=${{ steps.install-custodian.outputs.uv-version }}
         push: false
         pull: true
         tags: ${{ steps.meta.outputs.tags }}
@@ -102,7 +102,7 @@ runs:
         image_var=CUSTODIAN_${image_var//[-]/_}_IMAGE
         image_var=${image_var^^}
         export ${image_var}="$(echo $tags | cut -d ',' -f 1)"
-        TEST_DOCKER=yes poetry run pytest -s -v -p no:terraform -v tests/test_docker.py
+        TEST_DOCKER=yes uv run pytest -s -v -p no:terraform -v tests/test_docker.py
 
     # actually push the multi arch image
     - name: Push
@@ -112,7 +112,7 @@ runs:
       with:
         context: .
         build-args: |
-          POETRY_VERSION=${{ steps.install-custodian.outputs.poetry-version }}
+          UV_VERSION=${{ steps.install-custodian.outputs.uv-version }}
         push: true
         pull: true
         platforms: ${{ inputs.platforms }}

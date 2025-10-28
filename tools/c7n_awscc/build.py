@@ -9,12 +9,32 @@ https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/resource-type-sch
 import json
 from io import BytesIO
 from pathlib import Path
-from urllib.request import urlopen
 import zipfile
+import requests
 
 # we use this to fetch the available python sdk service names.
 # boto is listed as a build dependency.
 import boto3
+
+try:
+    from hatchling.plugin import hookimpl
+    from hatchling.builders.hooks.plugin.interface import BuildHookInterface
+
+    class CloudDataBuild(BuildHookInterface):
+
+        PLUGIN_NAME = "CloudServiceData"
+
+        def initialize(self, version, build_data):
+            build({})
+            build_data["artifacts"].append("data/*.json")
+
+    @hookimpl
+    def hatch_register_build_hook():
+        return CloudDataBuild
+
+except ImportError:
+    pass
+
 
 SCHEMA_URL = "https://schema.cloudformation.us-east-1.amazonaws.com/CloudformationSchema.zip"
 
@@ -118,11 +138,12 @@ def build(setup_kwargs):
     data_dir = Path("c7n_awscc") / "data"
     data_dir.mkdir(exist_ok=True)
 
-    with urlopen(SCHEMA_URL) as response:
-        zipf = zipfile.ZipFile(BytesIO(response.read()))
-        for f in zipf.namelist():
-            name = f.replace("-", "_")
-            (data_dir / name).write_text(zipf.read(f).decode("utf8"), encoding="utf8")
+    response = requests.get(SCHEMA_URL)
+
+    zipf = zipfile.ZipFile(BytesIO(response.content))
+    for f in zipf.namelist():
+        name = f.replace("-", "_")
+        (data_dir / name).write_text(zipf.read(f).decode("utf8"), encoding="utf8")
 
     print("awscc - downloaded %d resource types" % (len(zipf.namelist())))
     build_index(data_dir)

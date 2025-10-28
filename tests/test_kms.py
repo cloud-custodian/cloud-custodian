@@ -2,8 +2,13 @@
 # SPDX-License-Identifier: Apache-2.0
 import json
 import time
+from datetime import datetime, timedelta
 from unittest.mock import patch
 
+import boto3
+import moto
+import pytest
+from dateutil.tz import tzutc
 
 from c7n.resources.aws import shape_validate
 from .common import BaseTest, functional
@@ -94,6 +99,45 @@ class KMSTest(BaseTest):
         client = session_factory(region="us-east-1").client("kms")
         key = client.get_key_rotation_status(KeyId=resources[0]["KeyId"])
         self.assertEqual(key["KeyRotationEnabled"], True)
+
+    def test_key_rotation_exception_unsupportedopp(self):
+        region = "us-west-2"
+        session_factory = self.replay_flight_data(
+            "test_key_rotation_unsupportedopp", region=region
+        )
+
+        p = self.load_policy(
+            {
+                "name": "kms-key-rotation-unsupportedopp",
+                "resource": "kms-key",
+                "filters": [
+                    {
+                        "and": [
+                            {
+                                "type": "key-rotation-status",
+                                "key": "KeyRotationEnabled",
+                                "op": "ne",
+                                "value": True
+                            },
+                            {
+                                "type": "value",
+                                "key": "KeyState",
+                                "op": "eq",
+                                "value": "PendingImport"
+                            }
+                        ]
+                    }
+                ],
+            },
+            session_factory=session_factory,
+            config={"region": region}
+        )
+
+        # Trying to get the key rotation status of a key in PendingImport state
+        # will raise an UnsupportedOperationException, but it should be handled
+        # as a warning and not cause the policy to fail.
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
 
     def test_kms_config_source(self):
         session_factory = self.replay_flight_data("test_kms_config_source")
@@ -693,3 +737,65 @@ class KMSCrossAccount(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["KeyId"], key_info["KeyId"])
+
+
+class KMSMotoTests(BaseTest):
+    @pytest.fixture(autouse=True)
+    def use_utc_timezone(self, monkeypatch):
+        monkeypatch.setenv("TZ", "UTC")
+        try:
+            time.tzset()
+        except AttributeError:
+            # A windows system should honor the TZ environment variable
+            # when it next calls datetime.now() (so says AI)
+            pass
+
+    @moto.mock_aws
+    def test_schedule_deletion(self):
+        kms = boto3.client("kms", region_name="us-east-1")
+        kms.create_key(Description="test-key")
+
+        seven_days_away = datetime.now(tzutc()) + timedelta(days=7)
+
+        p = self.load_policy(
+            {
+                "name": "delete-keys",
+                "resource": "kms-key",
+                "actions": [{"type": "schedule-deletion", "days": 7}],
+            }
+        )
+        resources = p.run()
+        assert len(resources) == 1
+        key_id = resources[0]["KeyId"]
+
+        key_meta = kms.describe_key(KeyId=key_id)["KeyMetadata"]
+        assert key_meta["KeyState"] == "PendingDeletion"
+
+        deletion_date = key_meta["DeletionDate"].astimezone(tzutc())
+        assert deletion_date > seven_days_away
+        assert deletion_date < (seven_days_away + timedelta(days=1))
+
+    @moto.mock_aws
+    def test_schedule_deletion_default_days(self):
+        kms = boto3.client("kms", region_name="us-east-1")
+        kms.create_key(Description="test-key")
+
+        thirty_days_away = datetime.now(tzutc()) + timedelta(days=30)
+
+        p = self.load_policy(
+            {
+                "name": "delete-keys",
+                "resource": "kms-key",
+                "actions": [{"type": "schedule-deletion"}],
+            }
+        )
+        resources = p.run()
+        assert len(resources) == 1
+        key_id = resources[0]["KeyId"]
+
+        key_meta = kms.describe_key(KeyId=key_id)["KeyMetadata"]
+        assert key_meta["KeyState"] == "PendingDeletion"
+
+        deletion_date = key_meta["DeletionDate"].astimezone(tzutc())
+        assert deletion_date > thirty_days_away
+        assert deletion_date < (thirty_days_away + timedelta(days=1))

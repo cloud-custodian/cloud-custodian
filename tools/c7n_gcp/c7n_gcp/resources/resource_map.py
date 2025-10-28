@@ -23,6 +23,8 @@ ResourceMap = {
     "gcp.bq-table": "c7n_gcp.resources.bigquery.BigQueryTable",
     "gcp.bucket": "c7n_gcp.resources.storage.Bucket",
     "gcp.build": "c7n_gcp.resources.build.CloudBuild",
+    "gcp.certmanager-certificate": (
+        "c7n_gcp.resources.certificatemanager.CertificateManagerCertificate"),
     "gcp.cloudbilling-account": "c7n_gcp.resources.cloudbilling.CloudBillingAccount",
     "gcp.cloud-run-service": "c7n_gcp.resources.cloudrun.CloudRunService",
     "gcp.cloud-run-job": "c7n_gcp.resources.cloudrun.CloudRunJob",

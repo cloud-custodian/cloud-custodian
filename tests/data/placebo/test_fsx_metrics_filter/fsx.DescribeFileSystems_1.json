@@ -1,0 +1,141 @@
+{
+    "status_code": 200,
+    "data": {
+        "FileSystems": [
+            {
+                "OwnerId": "123456789012",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 12,
+                    "day": 19,
+                    "hour": 3,
+                    "minute": 1,
+                    "second": 5,
+                    "microsecond": 75000
+                },
+                "FileSystemId": "fs-01234567890abcdef",
+                "FileSystemType": "ONTAP",
+                "Lifecycle": "AVAILABLE",
+                "StorageCapacity": 1024,
+                "StorageType": "SSD",
+                "VpcId": "vpc-12345678",
+                "SubnetIds": [
+                    "subnet-12345678"
+                ],
+                "NetworkInterfaceIds": [
+                    "eni-1234567890abcdef",
+                    "eni-1234567890abcdef"
+                ],
+                "KmsKeyId": "arn:aws:kms:us-east-1:123456789012:key/12345678-1234-1234-1234-123456789012",
+                "ResourceARN": "arn:aws:fsx:us-east-1:123456789012:file-system/fs-01234567890abcdef",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "test-filesystem"
+                    },
+                    {
+                        "Key": "Environment",
+                        "Value": "test"
+                    }
+                ],
+                "OntapConfiguration": {
+                    "DeploymentType": "SINGLE_AZ_1",
+                    "Endpoints": {
+                        "Intercluster": {
+                            "DNSName": "intercluster.fs-01234567890abcdef.fsx.us-east-1.amazonaws.com",
+                            "IpAddresses": [
+                                "10.0.1.100",
+                                "10.0.1.101"
+                            ]
+                        },
+                        "Management": {
+                            "DNSName": "management.fs-01234567890abcdef.fsx.us-east-1.amazonaws.com",
+                            "IpAddresses": [
+                                "10.0.1.102"
+                            ]
+                        }
+                    },
+                    "DiskIopsConfiguration": {
+                        "Mode": "AUTOMATIC",
+                        "Iops": 3072
+                    },
+                    "PreferredSubnetId": "subnet-12345678",
+                    "ThroughputCapacity": 128,
+                    "WeeklyMaintenanceStartTime": "2:04:30",
+                    "HAPairs": 1,
+                    "ThroughputCapacityPerHAPair": 128
+                }
+            },
+            {
+                "OwnerId": "123456789012",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 4,
+                    "day": 14,
+                    "hour": 9,
+                    "minute": 14,
+                    "second": 51,
+                    "microsecond": 360000
+                },
+                "FileSystemId": "fs-0fedcba9876543210",
+                "FileSystemType": "WINDOWS",
+                "Lifecycle": "AVAILABLE",
+                "StorageCapacity": 32,
+                "StorageType": "SSD",
+                "VpcId": "vpc-87654321",
+                "SubnetIds": [
+                    "subnet-87654321",
+                    "subnet-87654322"
+                ],
+                "NetworkInterfaceIds": [
+                    "eni-1234567890abcdef",
+                    "eni-1234567890abcdef"
+                ],
+                "DNSName": "amznfsxtest.test.local",
+                "KmsKeyId": "arn:aws:kms:us-east-1:123456789012:key/12345678-1234-1234-1234-123456789012",
+                "ResourceARN": "arn:aws:fsx:us-east-1:123456789012:file-system/fs-0fedcba9876543210",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "test-windows-filesystem"
+                    },
+                    {
+                        "Key": "Environment",
+                        "Value": "test"
+                    }
+                ],
+                "WindowsConfiguration": {
+                    "SelfManagedActiveDirectoryConfiguration": {
+                        "DomainName": "test.local",
+                        "OrganizationalUnitDistinguishedName": "OU=test,DC=test,DC=local",
+                        "FileSystemAdministratorsGroup": "Domain Admins",
+                        "UserName": "testuser",
+                        "DnsIps": [
+                            "10.0.1.200",
+                            "10.0.1.201"
+                        ]
+                    },
+                    "DeploymentType": "MULTI_AZ_1",
+                    "RemoteAdministrationEndpoint": "amznfsxtest.test.local",                        "PreferredSubnetId": "subnet-87654321",
+                    "PreferredFileServerIp": "10.0.1.110",
+                    "ThroughputCapacity": 8,
+                    "WeeklyMaintenanceStartTime": "5:04:30",
+                    "DailyAutomaticBackupStartTime": "10:30",
+                    "AutomaticBackupRetentionDays": 7,
+                    "CopyTagsToBackups": false,
+                    "AuditLogConfiguration": {
+                        "FileAccessAuditLogLevel": "DISABLED",
+                        "FileShareAccessAuditLogLevel": "DISABLED"
+                    },
+                    "DiskIopsConfiguration": {
+                        "Mode": "AUTOMATIC",
+                        "Iops": 96
+                    }
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

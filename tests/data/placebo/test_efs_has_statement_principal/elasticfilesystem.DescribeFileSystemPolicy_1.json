@@ -1,0 +1,8 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "FileSystemId": "fs-050482c305683afb2",
+        "Policy": "{\n  \"Version\" : \"2012-10-17\",\n  \"Id\" : \"efs-policy-wizard-44d92bec-732a-4276-a31c-afb7407fdc70\",\n  \"Statement\" : [ {\n    \"Sid\" : \"efs-statement-b3103dd3-9aef-4d74-9502-f52b11cf1d89\",\n    \"Effect\" : \"Allow\",\n    \"Principal\" : {\n      \"AWS\" : [ \"arn:aws:iam::644160558196:user/test-policy\", \"arn:aws:iam::644160558196:root\" ]\n    },\n    \"Action\" : [ \"elasticfilesystem:ClientWrite\", \"elasticfilesystem:ClientMount\" ],\n    \"Resource\" : \"arn:aws:elasticfilesystem:us-west-2:644160558196:file-system/fs-050482c305683afb2\",\n    \"Condition\" : {\n      \"Bool\" : {\n        \"elasticfilesystem:AccessedViaMountTarget\" : \"true\"\n      }\n    }\n  } ]\n}"
+    }
+}

@@ -818,21 +818,101 @@ def merge_dict_list(dict_iter):
 
 
 def merge_dict(a, b):
-    """Perform a merge of dictionaries a and b
+    """Perform a merge of dictionaries A and B
 
     Any subdictionaries will be recursively merged.
-    Any leaf elements in the form of a list or scalar will use the value from a
+    Any leaf elements in the form of scalar will use the value from B.
+    If A is a str and B is a list, A will be inserted into the front of the list.
+    If A is a list and B is a str, B will be appended to the list.
+    If there are two lists for the same key, the lists will be merged
+    deduplicated with values in A first, followed by any additional values from B.
     """
-    d = {}
-    for k, v in a.items():
-        if k not in b:
-            d[k] = v
-        elif isinstance(v, dict) and isinstance(b[k], dict):
-            d[k] = merge_dict(v, b[k])
+    d = copy.deepcopy(a)
     for k, v in b.items():
         if k not in d:
             d[k] = v
+        elif isinstance(d[k], dict) and isinstance(v, dict):
+            d[k] = merge_dict(d[k], v)
+        elif isinstance(d[k], list) and isinstance(v, list):
+            for val in v:
+                if val not in d[k]:
+                    d[k].append(val)
+        elif isinstance(v, str) and isinstance(d[k], list):
+            if v in d[k]:
+                continue
+            else:
+                d[k].append(v)
+        elif isinstance(v, list) and isinstance(d[k], str):
+            if d[k] in v:
+                d[k] = v
+            else:
+                d[k] = [d[k]]
+                d[k].extend(v)
+        elif k in d and isinstance(v, (int, str, float, bool)):
+            d[k] = v
+        else:
+            raise Exception(f"k={k}, {type(v)} and {type(d[k])} not conformable.")
     return d
+
+
+def compare_dicts_using_sets(a, b) -> bool:
+    """Compares two dicts and replaces any lists or strings with sets
+
+    Compares any lists in the dict as sets.
+    """
+
+    if a.keys() != b.keys():
+        return False
+
+    for k, v in b.items():
+        if isinstance(v, list):
+            v = format_to_set(v)
+            if isinstance(a[k], str):
+                a[k] = format_to_set(a[k])
+        if isinstance(a[k], list):
+            a[k] = format_to_set(a[k])
+            if isinstance(v, str):
+                v = format_to_set(v)
+        if isinstance(a[k], dict) and isinstance(v, dict):
+            if compare_dicts_using_sets(a[k], v):
+                continue
+        if v != a[k]:
+            return False
+    return True
+
+
+def format_to_set(x) -> set:
+    """Formats lists and strings to sets.
+
+    Strings return as a set with one string.
+    Lists return as a set.
+    Variables of other datatypes will return as the original datatype.
+    """
+    if isinstance(x, str):
+        return set([x])
+    if isinstance(x, list):
+        return set(x)
+    else:
+        return x
+
+
+def format_dict_with_sets(x: dict) -> dict:
+    """Formats string and list values in a dict to sets.
+
+    Any string value returns as a set with one string.
+    Any list values return as a set.
+    Returns a formatted dict.
+    """
+    if isinstance(x, dict):
+        format_dict = {}
+        for key, value in x.items():
+            if isinstance(value, dict):
+                format_dict[key] = format_dict_with_sets(value)
+            else:
+                format_dict[key] = format_to_set(value)
+        return format_dict
+    else:
+        return x
 
 
 def select_keys(d, keys):

@@ -1,0 +1,24 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "UUID": "bb57fe00-6653-4ea8-a32e-13b4fc98a4f0",
+        "BatchSize": 10,
+        "MaximumBatchingWindowInSeconds": 0,
+        "EventSourceArn": "arn:aws:sqs:us-east-1:644160558196:test-queue",
+        "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:test-sqs",
+        "LastModified": {
+            "__class__": "datetime",
+            "year": 2019,
+            "month": 3,
+            "day": 13,
+            "hour": 14,
+            "minute": 48,
+            "second": 15,
+            "microsecond": 873000
+        },
+        "State": "Disabled",
+        "StateTransitionReason": "USER_INITIATED",
+        "EventSourceMappingArn": "arn:aws:lambda:us-east-1:644160558196:event-source-mapping:bb57fe00-6653-4ea8-a32e-13b4fc98a4f0"
+    }
+}

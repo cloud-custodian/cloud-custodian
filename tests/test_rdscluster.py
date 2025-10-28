@@ -1,10 +1,12 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import sys
+from unittest.mock import patch
 
 import c7n.resources.rdscluster
 import pytest
 from c7n.executor import MainThreadExecutor
+from c7n.exceptions import PolicyValidationError
 from c7n.resources.rdscluster import RDSCluster, _run_cluster_method
 from c7n.testing import mock_datetime_now
 from dateutil import parser
@@ -62,6 +64,22 @@ class RDSClusterTest(BaseTest):
             describe_resource.pop(kk, None)
 
         assert describe_resource == config_resource
+
+    def test_rdscluster_api_filter_limit(self):
+        self.remove_augments()
+        factory = self.replay_flight_data("test_rdscluster_api_filter_limit")
+        p = self.load_policy(
+            {"name": "foo", "resource": "aws.rds-cluster"},
+            session_factory=factory)
+        resource_ids = [f"db-instance{i}" for i in range(200)]
+        with patch.object(
+            p.resource_manager.source.query,
+            "filter",
+            wraps=p.resource_manager.source.query.filter
+        ) as wrapped_filter:
+            p.resource_manager.get_resources(resource_ids)
+            # 200 unique IDs, batched into chunks of 100
+            assert wrapped_filter.call_count == 2
 
     def test_rdscluster_security_group(self):
         self.remove_augments()
@@ -784,6 +802,85 @@ class RDSClusterSnapshotTest(BaseTest):
             resources[0]["DBClusterSnapshotIdentifier"]
         )
         self.assertEqual(len(restore_permissions_after), 0)
+
+    def test_rds_cluster_cross_region_copy_lambda(self):
+        self.assertRaises(
+            PolicyValidationError,
+            self.load_policy,
+            {
+                "name": "rds-copy-fail",
+                "resource": "rds-cluster-snapshot",
+                "mode": {"type": "config-rule"},
+                "actions": [{"type": "region-copy", "target_region": "us-east-2"}],
+            },
+        )
+
+    def test_rds_cluster_cross_region_copy_skip_same_region(self):
+        factory = self.replay_flight_data("test_rds_cluster_snapshot_latest")
+        output = self.capture_logging("custodian.actions")
+        p = self.load_policy(
+            {
+                "name": "rds-cluster-copy-skip",
+                "resource": "rds-cluster-snapshot",
+                "actions": [{"type": "region-copy", "target_region": "us-east-2"}],
+            },
+            config={'region': 'us-east-2'},
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertFalse([r for r in resources if "c7n:CopiedClusterSnapshot" in r])
+        self.assertIn("Source and destination region are the same", output.getvalue())
+
+    def test_rds_cluster_cross_region_copy(self):
+        # preconditions
+        # rds cluster snapshot, encrypted in region with kms, and tags
+        factory = self.replay_flight_data("test_rds_cluster_snapshot_region_copy")
+        client = factory().client("rds", region_name="us-east-2")
+        self.change_environment(AWS_DEFAULT_REGION="us-east-1")
+        p = self.load_policy(
+            {
+                "name": "rds-cluster-snapshot-region-copy",
+                "resource": "rds-cluster-snapshot",
+                "filters": [{"DBClusterSnapshotIdentifier": "test-cluster-final-snapshot"}],
+                "actions": [
+                    {
+                        "type": "region-copy",
+                        "target_region": "us-east-2",
+                        "tags": {"migrated_from": "us-east-1"},
+                        "target_key": "b10f842a-feb7-4318-92d5-0640a75b7688",
+                    }
+                ],
+            },
+            config=dict(region="us-east-1"),
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        snapshots = client.describe_db_cluster_snapshots(
+            DBClusterSnapshotIdentifier=resources[0]["c7n:CopiedClusterSnapshot"].rsplit(":", 1)[1]
+        )[
+            "DBClusterSnapshots"
+        ]
+        self.assertEqual(len(snapshots), 1)
+        self.assertEqual(snapshots[0]["DBClusterIdentifier"], "test-cluster")
+        tags = {
+            t["Key"]: t["Value"]
+            for t in client.list_tags_for_resource(
+                ResourceName=resources[0]["c7n:CopiedClusterSnapshot"]
+            )[
+                "TagList"
+            ]
+        }
+        self.assertEqual(
+            {
+                "migrated_from": "us-east-1",
+                "app": "mgmt-portal",
+                "env": "staging",
+                "workload-type": "other",
+            },
+            tags,
+        )
 
 
 class TestRDSClusterParameterGroupFilter(BaseTest):

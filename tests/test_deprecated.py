@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 from .common import BaseTest
 
-from mock import Mock
+from unittest.mock import Mock
 from textwrap import dedent
 
 from c7n import deprecated

@@ -1,0 +1,20 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Owner": {
+            "DisplayName": "aws-us-sbx+put-cloud-ctls",
+            "ID": "9bc5907c3dcc0edea88a21fc6ada6f5e9120a2e204134503bb78f1492b1d287e"
+        },
+        "Grants": [
+            {
+                "Grantee": {
+                    "DisplayName": "aws-us-sbx+put-cloud-ctls",
+                    "ID": "9bc5907c3dcc0edea88a21fc6ada6f5e9120a2e204134503bb78f1492b1d287e",
+                    "Type": "CanonicalUser"
+                },
+                "Permission": "FULL_CONTROL"
+            }
+        ]
+    }
+}

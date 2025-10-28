@@ -55,9 +55,12 @@ class AccessPointCrossAccount(CrossAccountAccessFilter):
             if self.policy_attribute in r:
                 continue
             arn = Arn.parse(r['AccessPointArn'])
-            r[self.policy_attribute] = client.get_access_point_policy(
-                AccountId=arn.account_id, Name=r['Name']
-            ).get('Policy')
+            resp = self.manager.retry(
+                client.get_access_point_policy,
+                AccountId=arn.account_id, Name=r['Name'],
+                ignore_err_codes=('NoSuchAccessPointPolicy',),
+            )
+            r[self.policy_attribute] = resp.get('Policy') if resp else None
 
         return super().process(resources, event)
 
@@ -79,6 +82,7 @@ class Delete(Action):
 
 
 class MultiRegionAccessPointDescribe(DescribeSource):
+
     def get_query_params(self, query_params):
         query_params = query_params or {}
         query_params['AccountId'] = self.manager.config.account_id
@@ -97,6 +101,26 @@ class MultiRegionAccessPoint(QueryResourceManager):
         permission_prefix = 's3'
 
     source_mapping = {'describe': MultiRegionAccessPointDescribe}
+
+
+@MultiRegionAccessPoint.filter_registry.register('cross-account')
+class MultiRegionAccessPointCrossAccount(CrossAccountAccessFilter):
+
+    policy_attribute = 'c7n:Policy'
+    permissions = ('s3:GetMultiRegionAccessPointPolicy',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('s3control')
+        for r in resources:
+            if self.policy_attribute in r:
+                continue
+            r[self.policy_attribute] = self.manager.retry(
+                client.get_multi_region_access_point_policy,
+                AccountId=self.manager.config.account_id,
+                Name=r['Name']
+            ).get('Policy').get('Established').get('Policy')
+
+        return super().process(resources, event)
 
 
 class StorageLensDescribe(DescribeSource):

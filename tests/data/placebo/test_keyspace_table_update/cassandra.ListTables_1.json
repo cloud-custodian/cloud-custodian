@@ -1,0 +1,13 @@
+{
+    "status_code": 200,
+    "data": {
+        "tables": [
+            {
+                "keyspaceName": "c7n_test",
+                "tableName": "c7n_test_table",
+                "resourceArn": "arn:aws:cassandra:us-east-1:644160558196:/keyspace/c7n_test/table/c7n_test_table"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

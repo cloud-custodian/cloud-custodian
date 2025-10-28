@@ -3,10 +3,10 @@
 from botocore.exceptions import ClientError
 
 from c7n import query
-from c7n.actions import ActionRegistry
+from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import FilterRegistry
 from c7n.manager import resources, ResourceManager
-from c7n.utils import local_session, get_retry
+from c7n.utils import local_session, get_retry, type_schema
 
 
 class DescribeQuicksight(query.DescribeSource):
@@ -32,6 +32,25 @@ class QuicksightUser(query.QueryResourceManager):
     source_mapping = {
         "describe": DescribeQuicksight,
     }
+
+
+@QuicksightUser.action_registry.register('delete')
+class DeleteUserAction(BaseAction):
+    schema = type_schema('delete',)
+    permissions = ('quicksight:DeleteUser',)
+
+    def process(self, resources):
+        session = local_session(self.manager.session_factory)
+        client = session.client(self.manager.resource_type.service)
+        account_id = self.manager.config.account_id
+        for r in resources:
+            self.manager.retry(
+                client.delete_user,
+                AwsAccountId=account_id,
+                Namespace='default',
+                UserName=r['UserName'],
+                ignore_err_codes=('ResourceNotFoundException',)
+            )
 
 
 @resources.register("quicksight-group")
@@ -88,7 +107,20 @@ class QuicksightAccount(ResourceManager):
                 AwsAccountId=self.config.account_id
             )["AccountSettings"]
         except ClientError as e:
-            if e.response['Error']['Code'] in ('ResourceNotFoundException',):
+            # Return no resources if no quicksight account has been created, the standard edition is
+            # being used, or if the policy is being run from a non-identity region. Otherwise, raise
+            # the exception. It's a bit brittle to depend on error messages, but unfortunately
+            # these all are lumped under AccessDenied, and we would like normal AccessDenied
+            # Exceptions caused by lack of IAM permissions to still be raised.
+            error_code = e.response['Error']['Code']
+            error_message = e.response['Error'].get('Message', '')
+
+            if error_code == 'ResourceNotFoundException' or (
+                error_code == 'AccessDeniedException' and (
+                    "disabled for STANDARD Edition" in error_message or
+                    "Operation is being called from endpoint" in error_message
+                )
+            ):
                 return []
             raise
 
@@ -101,3 +133,53 @@ class QuicksightAccount(ResourceManager):
 
     def get_resources(self, resource_ids):
         return self._get_account()
+
+
+class DescribeQuicksightWithAccountId(query.DescribeSource):
+
+    def resources(self, query):
+        required = {
+            "AwsAccountId": self.manager.config.account_id
+        }
+        return super().resources(required)
+
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('quicksight')
+        for r in resources:
+            tags = self.manager.retry(client.list_tags_for_resource,
+                                ResourceArn=r['Arn'],
+                                ignore_err_codes=("ResourceNotFoundException",))['Tags']
+            r['Tags'] = tags
+        return resources
+
+
+@resources.register("quicksight-dashboard")
+class QuicksightDashboard(query.QueryResourceManager):
+    class resource_type(query.TypeInfo):
+        service = "quicksight"
+        enum_spec = ('list_dashboards', 'DashboardSummaryList', None)
+        arn_type = "dashboard"
+        arn = "Arn"
+        id = "DashboardId"
+        name = "Name"
+        permissions_augment = ("quicksight:ListTagsForResource",)
+
+    source_mapping = {
+        "describe": DescribeQuicksightWithAccountId,
+    }
+
+
+@resources.register("quicksight-datasource")
+class QuicksightDataSource(query.QueryResourceManager):
+    class resource_type(query.TypeInfo):
+        service = "quicksight"
+        enum_spec = ('list_data_sources', 'DataSources', None)
+        arn_type = "datasource"
+        arn = "Arn"
+        id = "DataSourceId"
+        name = "Name"
+        permissions_augment = ("quicksight:ListTagsForResource",)
+
+    source_mapping = {
+        "describe": DescribeQuicksightWithAccountId,
+    }

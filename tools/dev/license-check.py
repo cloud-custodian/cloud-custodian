@@ -37,25 +37,13 @@ whitelist_packages = set(
         #
         # Deps with licenses that get flagged
         'pygit2',  # tools/c7n_policystream dep, GPL w/ Linking Exception
-        'astroid',  # ci for codelint, LGPL-2.1
-        'pylint',  # ci for codelint, GPL
-        'semgrep',  # ci, LGPLv2
         'ldap3',  # mailer dependency, LGPL
         'sphinx-markdown-tables',  # docgen - GPL
         'docutils',  # docgen - couple of different licenses but bulk is public domain
-        # 'chardet',  # requests dep - LPGL
-        'websocket-client',  # c7n_kube dep - LGPL-2.1
         #
         # packages with bad metadata
-        'applicationinsights',  # MIT
-        'msal-extensions',  # MIT
         'protobuf',  # BSD-3-Clause
-        'python-http-client',  # MIT
-        'sendgrid',  # MIT
-        'typed-ast',  # apache 2.0
-        'starkbank-ecdsa',  # MIT
-        'portalocker',  # PSF
-        'setuptools',  # Removed classifiers following PEP 639
+        'uritemplate'  # Dual license BSD 3-Clause OR Apache-2.0
     )
 )
 

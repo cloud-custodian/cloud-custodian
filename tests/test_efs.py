@@ -319,6 +319,9 @@ class ElasticFileSystem(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["Name"], "efs-has-statement")
 
+    def test_efs_has_statement_full_match_action(self):
+        factory = self.replay_flight_data("test_efs_has_statement", region='us-west-1')
+        region_config = {'region': 'us-west-1'}
         # No PartialMatch key, full match on Action.
         p = self.load_policy(
             {
@@ -344,6 +347,9 @@ class ElasticFileSystem(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_efs_has_statement_no_principal_match(self):
+        factory = self.replay_flight_data("test_efs_has_statement", region='us-west-1')
+        region_config = {'region': 'us-west-1'}
         # Check that Principal does not throw an error if the key does not exist
         # in the resource's policy statement
         p = self.load_policy(
@@ -368,6 +374,9 @@ class ElasticFileSystem(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 0)
 
+    def test_efs_has_statement_negative_full_match(self):
+        factory = self.replay_flight_data("test_efs_has_statement", region='us-west-1')
+        region_config = {'region': 'us-west-1'}
         p = self.load_policy(
             {
                 "name": "efs-has-statement",
@@ -398,6 +407,9 @@ class ElasticFileSystem(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["Name"], "efs-has-statement")
 
+    def test_efs_has_statement_notaction(self):
+        factory = self.replay_flight_data("test_efs_has_statement", region='us-west-1')
+        region_config = {'region': 'us-west-1'}
         # Check that NotAction does not throw an error if the key does not exist
         # in the resource's policy statement.
         p = self.load_policy(
@@ -423,7 +435,7 @@ class ElasticFileSystem(BaseTest):
         self.assertEqual(len(resources), 0)
 
     # Test a resource with no resource policy attached
-    def test_efs_has_statement_no_policy(self):
+    def test_efs_has_statement_no_policy_negative(self):
         factory = self.replay_flight_data("test_efs_has_statement_no_policy", region='us-west-1')
         region_config = {'region': 'us-west-1'}
         p = self.load_policy(
@@ -459,6 +471,9 @@ class ElasticFileSystem(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["Name"], "efs-has-statement-no-policy")
 
+    def test_efs_has_statement_no_policy(self):
+        factory = self.replay_flight_data("test_efs_has_statement_no_policy", region='us-west-1')
+        region_config = {'region': 'us-west-1'}
         # Check that we find zero resources as expected.
         p = self.load_policy(
             {
@@ -569,7 +584,7 @@ class ElasticFileSystem(BaseTest):
                                           region='us-west-1')
         region_config = {'region': 'us-west-1'}
 
-        # Test case insensitive and full-match with PartialMatch key
+        # Test case insensitive actions and full-match with PartialMatch key
         p = self.load_policy(
             {
                 "name": "efs-has-statement-partial",
@@ -580,9 +595,19 @@ class ElasticFileSystem(BaseTest):
                         "statements": [
                             {
                                 "Effect": "Allow",
-                                "Action": ["elasticFilesystem:clientRootAccess",
-                                            "elasticfilesystem:clientMount"],
-                                "PartialMatch": ["Action"]
+                                "Action": [
+                                    "elasticFilesystem:clientRootAccess",
+                                    "elasticfilesystem:clientMount",
+                                    "elasticfilesystem:*"
+                                    ],
+                                "Principal": {
+                                    "AWS": [
+                                        "arn:aws:iam::{account_id}:root",
+                                        "arn:aws:iam::{account_id}:user/test-policy"
+                                    ]
+                                },
+                                "Resource": "{fs_arn}",
+                                "PartialMatch": ["Action", "Principal", "Resource"]
                             }
                         ]
                     }
@@ -594,6 +619,10 @@ class ElasticFileSystem(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_efs_has_statement_partial_one(self):
+        factory = self.replay_flight_data("test_efs_has_statement_partial",
+                                          region='us-west-1')
+        region_config = {'region': 'us-west-1'}
         # Test for presence of just one partial match.
         p = self.load_policy(
             {
@@ -619,6 +648,10 @@ class ElasticFileSystem(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_efs_has_statement_partial_wildcard(self):
+        factory = self.replay_flight_data("test_efs_has_statement_partial",
+                                          region='us-west-1')
+        region_config = {'region': 'us-west-1'}
         # Test for case-insensitive partial match using wildcard
         p = self.load_policy(
             {
@@ -644,6 +677,10 @@ class ElasticFileSystem(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_efs_has_statement_partial_expected_fail(self):
+        factory = self.replay_flight_data("test_efs_has_statement_partial",
+                                          region='us-west-1')
+        region_config = {'region': 'us-west-1'}
         # Test for expected fail PartialMatch case
         p = self.load_policy(
             {
@@ -668,6 +705,226 @@ class ElasticFileSystem(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 0)
+
+    def test_efs_has_statement_partial_principal(self):
+        factory = self.replay_flight_data("test_efs_has_statement_partial",
+                                          region='us-west-1')
+        region_config = {'region': 'us-west-1'}
+
+        # Test for Principal match PartialMatch case
+        p = self.load_policy(
+            {
+                "name": "efs-has-statement-partial",
+                "resource": "efs",
+                "filters": [
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Allow",
+                                "Principal": {
+                                    "AWS": "arn:aws:iam::{account_id}:user/test-policy"
+                                },
+                                "PartialMatch": ["Principal"]
+                            }
+                        ]
+                    }
+                ],
+            },
+            config=region_config,
+            session_factory=factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_efs_has_statement_partial_principal_array(self):
+        factory = self.replay_flight_data("test_efs_has_statement_partial",
+                                          region='us-west-1')
+        region_config = {'region': 'us-west-1'}
+        # Test array partial match Principal
+        p = self.load_policy(
+            {
+                "name": "efs-has-statement-partial",
+                "resource": "efs",
+                "filters": [
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Allow",
+                                "Principal": {
+                                    "AWS": ["arn:aws:iam::{account_id}:user/test-policy"],
+                                },
+                                "PartialMatch": ["Principal"]
+                            }
+                        ]
+                    }
+                ],
+            },
+            config=region_config,
+            session_factory=factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_efs_has_statement_partial_principal_full_match(self):
+        factory = self.replay_flight_data("test_efs_has_statement_partial",
+                                          region='us-west-1')
+        region_config = {'region': 'us-west-1'}
+        # full match
+        p = self.load_policy(
+            {
+                "name": "efs-has-statement-partial",
+                "resource": "efs",
+                "filters": [
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Allow",
+                                "Principal": {
+                                    "AWS": [
+                                        "arn:aws:iam::{account_id}:user/test-policy",
+                                        "arn:aws:iam::{account_id}:root"
+                                    ]
+                                },
+                                "PartialMatch": ["Principal"]
+                            }
+                        ]
+                    }
+                ],
+            },
+            config=region_config,
+            session_factory=factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        # Test full match on Principal
+        p = self.load_policy(
+            {
+                "name": "efs-has-statement-partial",
+                "resource": "efs",
+                "filters": [
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Allow",
+                                "Principal": {
+                                    "AWS": [
+                                        "arn:aws:iam::{account_id}:user/test-policy",
+                                        "arn:aws:iam::{account_id}:root"
+                                    ]
+                                },
+                            }
+                        ]
+                    }
+                ],
+            },
+            config=region_config,
+            session_factory=factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_efs_has_statement_partial_principal_single_array(self):
+        factory = self.replay_flight_data("test_efs_has_statement_partial",
+                                          region='us-west-1')
+        region_config = {'region': 'us-west-1', 'account_id': ''}
+        p = self.load_policy(
+            {
+                "name": "efs-has-statement-partial",
+                "resource": "efs",
+                "filters": [
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Allow",
+                                "Principal": {
+                                    "AWS": [
+                                        "arn:aws:iam::{account_id}:user/test-policy"
+                                    ]
+                                },
+                            }
+                        ]
+                    }
+                ],
+            },
+            config=region_config,
+            session_factory=factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    def test_efs_has_statement_partial_condition(self):
+        factory = self.replay_flight_data("test_efs_has_statement_partial",
+                                          region='us-west-1')
+        region_config = {'region': 'us-west-1'}
+        p = self.load_policy(
+            {
+                "name": "efs-has-statement-partial",
+                "resource": "efs",
+                "filters": [
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Allow",
+                                "Condition": {
+                                    "Bool": {
+                                        "aws:SecureTransport": "true",
+                                        "elasticfilesystem:AccessedViaMountTarget": "true",
+                                    },
+                                    "StringNotLike": {
+                                        "aws": "abc"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                ],
+            },
+            config=region_config,
+            session_factory=factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        p = self.load_policy(
+            {
+                "name": "efs-has-statement-partial",
+                "resource": "efs",
+                "filters": [
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Allow",
+                                "Condition": {
+                                    "Bool": {
+                                        "elasticfilesystem:AccessedViaMountTarget": "true"
+                                    }
+                                },
+                                "PartialMatch": ["Condition"]
+                            }
+                        ]
+                    }
+                ],
+            },
+            config=region_config,
+            session_factory=factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
 
     def test_efs_consecutive_aws_backups_count_filter(self):
         session_factory = self.replay_flight_data("test_efs_consecutive_aws_backups_count_filter")
