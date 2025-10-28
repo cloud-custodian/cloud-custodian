@@ -422,7 +422,7 @@ class DeleteFileSystem(BaseAction):
             elif fs_type == 'LUSTRE':
                 config_key = 'LustreConfiguration'
 
-                if self.data.get('force') and not skip_snapshot:
+                if not skip_snapshot:
                     deployment_type = r.get("LustreConfiguration", {}).get("DeploymentType")
 
                     # There is no final backup support for SCRATCH deployment
@@ -430,11 +430,13 @@ class DeleteFileSystem(BaseAction):
                     # when we are forcing deletion.
                     if deployment_type == "SCRATCH_2" or deployment_type == "SCRATCH_1":
                         self.log.warning(
-                            'Force Deletion: Final backup not supported for '
-                            'SCRATCH deployment types: %s' % (r['FileSystemId'])
+                            'Final backup not supported for SCRATCH deployment '
+                            'types (set Force to True to delete): %s'
+                            % (r['FileSystemId'])
                         )
-                        del config['FinalBackupTags']
-                        del config['SkipFinalBackup']
+                        if self.data.get('force'):
+                            del config['FinalBackupTags']
+                            del config['SkipFinalBackup']
 
             elif fs_type == 'OPENZFS':
                 config_key = 'OpenZFSConfiguration'
