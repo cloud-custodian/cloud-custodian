@@ -215,7 +215,7 @@ class SessionTest(BaseTest):
         with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.jwt') as fp:
             fp.write('fake.jwt.token')
             token_file = fp.name
-        
+
         try:
             with patch.dict(os.environ,
                             {
@@ -225,7 +225,7 @@ class SessionTest(BaseTest):
                                 constants.ENV_FEDERATED_TOKEN_FILE: token_file
                             }, clear=True):
                 s = Session()
-                
+
                 self.assertIsInstance(s.get_credentials()._credential, WorkloadIdentityCredential)
                 self.assertEqual(s.get_subscription_id(), DEFAULT_SUBSCRIPTION_ID)
                 self.assertEqual(s.get_tenant_id(), DEFAULT_TENANT_ID)
