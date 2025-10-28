@@ -366,7 +366,7 @@ class DeleteFileSystem(BaseAction):
 
     """
 
-    permissions = ('fsx:DeleteFileSystem')
+    permissions = ('fsx:DeleteFileSystem', 'fsx:DescribeVolumes')
 
     schema = type_schema(
         'delete',
@@ -485,7 +485,6 @@ class DeleteFileSystem(BaseAction):
                         'Unable to delete SVM for: %s - %s - %s' % (
                             resource['FileSystemId'], svm['StorageVirtualMachineId'], e))
 
-            additional_permissions.append('fsx:DescribeVolumes')
             volumes = client.describe_volumes(Filters=[
                 {
                     'Name': 'file-system-id',
