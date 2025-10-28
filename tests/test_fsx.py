@@ -602,7 +602,7 @@ class TestFSx(BaseTest):
                 "Volumes": [
                     {
                         "VolumeId": "vol-12345678",
-                        "Lifecycle": "AVAILABLE",
+                        "Lifecycle": "FAILED",
                     }
                 ]
             }
@@ -612,7 +612,7 @@ class TestFSx(BaseTest):
                 "StorageVirtualMachines": [
                     {
                         "StorageVirtualMachineId": "svm-12345678",
-                        "Lifecycle": "AVAILABLE",
+                        "Lifecycle": "FAILED",
                     }
                 ]
             }
@@ -663,9 +663,11 @@ class TestFSx(BaseTest):
             mock_client.delete_storage_virtual_machine.assert_called_once()
             mock_client.delete_volume.assert_called_once()
             mock_client.delete_file_system.assert_called_once()
+            assert mock_client.delete_storage_virtual_machine.side_effect
+            assert mock_client.delete_volume.side_effect
 
-    def test_fsx_delete_file_system_ontap_mock_exception_error(self):
-        # InternalServerError exception handling example.
+    def test_fsx_delete_file_system_ontap_mock_exception_svm_error(self):
+        # Example of InternalServerError handling during dependency deletion.
         factory = self.replay_flight_data("test_fsx_delete_file_system_ontap")
         with patch("c7n.resources.fsx.local_session", autospec=True) as mock_local_session:
             mock_client = MagicMock()
@@ -682,6 +684,7 @@ class TestFSx(BaseTest):
                 ]
             }
 
+            # Mock describe_storage_virtual_machines to return in AVAILABLE state
             mock_client.describe_storage_virtual_machines.return_value = {
                 "StorageVirtualMachines": [
                     {
@@ -690,11 +693,12 @@ class TestFSx(BaseTest):
                     }
                 ]
             }
-            # Mock delete_storage_virtual_machine to raise exception
+
+            # Mock delete_storage_virtual_machine to raise InternalServerError
             mock_client.delete_storage_virtual_machine.side_effect = (
                 mock_client.exceptions.InternalServerError(
-                    {"Error": {"Code": "InternalServerError"}}, "DeleteStorageVirtualMachine"
-                )
+                    {"Error": {"Code": "InternalServerError"}},
+                    "DeleteStorageVirtualMachine")
             )
 
             p = self.load_policy(
@@ -726,7 +730,73 @@ class TestFSx(BaseTest):
             resources = p.run()
             self.assertEqual(len(resources), 1)
             mock_client.delete_storage_virtual_machine.assert_called_once()
-            mock_client.delete_volume.assert_not_called()
+            assert mock_client.delete_storage_virtual_machine.side_effect
+
+    def test_fsx_delete_file_system_ontap_mock_exception_volume_error(self):
+        # Example of InternalServerError handling during volume deletion.
+        factory = self.replay_flight_data("test_fsx_delete_file_system_ontap")
+        with patch("c7n.resources.fsx.local_session", autospec=True) as mock_local_session:
+            mock_client = MagicMock()
+            mock_local_session.return_value.client.return_value = mock_client
+
+            # Mock describe_file_systems to return AVAILABLE ONTAP fs
+            mock_client.describe_file_systems.return_value = {
+                "FileSystems": [
+                    {
+                        "FileSystemId": "fs-12345678",
+                        "Lifecycle": "AVAILABLE",
+                        "FileSystemType": "ONTAP",
+                    }
+                ]
+            }
+
+            # Mock describe_volumes to return volumes in AVAILABLE state
+            mock_client.describe_volumes.return_value = {
+                "Volumes": [
+                    {
+                        "VolumeId": "vol-12345678",
+                        "Lifecycle": "AVAILABLE",
+                    }
+                ]
+            }
+
+            # Mock delete_volume to raise InternalServerError
+            mock_client.delete_volume.side_effect = (
+                mock_client.exceptions.InternalServerError(
+                    {"Error": {"Code": "InternalServerError"}},
+                    "DeleteVolume")
+            )
+
+            p = self.load_policy(
+                {
+                    "name": "fsx-delete-file-system",
+                    "resource": "fsx",
+                    "filters": [
+                        {
+                            "type": "value",
+                            "key": "Lifecycle",
+                            "value": "AVAILABLE",
+                        },
+                        {
+                            "type": "value",
+                            "key": "FileSystemType",
+                            "value": "ONTAP",
+                        },
+                    ],
+                    "actions": [
+                        {
+                            "type": "delete",
+                            "force": True,
+                            "skip-snapshot": True,
+                        }
+                    ],
+                },
+                session_factory=factory
+            )
+            resources = p.run()
+            self.assertEqual(len(resources), 1)
+            mock_client.delete_volume.assert_called_once()
+            assert mock_client.delete_volume.side_effect
 
     def test_fsx_delete_file_system_openzfs(self):
         session_factory = self.replay_flight_data(
