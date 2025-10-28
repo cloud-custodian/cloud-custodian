@@ -247,8 +247,10 @@ class BaseValueFilter(Filter):
 
     def get_resource_value(self, k, i, regex=None):
         r = None
-        normalize_if_needed = NormalizeFilterTagKeys.transform_func_if_needed(k)
-        if k.startswith('tag:') or normalize_if_needed:
+        normalize_if_needed = NormalizeFilterTagKeys.transform_func_if_needed(
+            self.data.get("tag_key_transforms")
+        )
+        if k.startswith('tag:'):
             tk = k.split(':', 1)[1]
             if 'Tags' in i:
                 for t in _normalize_aws_tag_keys(i.get("Tags", []), normalize_if_needed):
@@ -317,27 +319,26 @@ class NormalizeFilterTagKeys(enum.Enum):
     nodashes = _member(lambda v: v.replace("-", ""))
 
     @classmethod
-    def transform_func_if_needed(cls, tag_filter):
-        """ Return a callable func to do the transformation of tag keys as specified in the tag
+    def transform_func_if_needed(cls, transforms: list[str]):
+        """Return a callable func to do the transformation of tag keys as specified in the tag
          strategy. For example: this example would normalize all the tag keys to do the following
          commands in order: strip(), title(), replace("_", "") and look for a normalized key of
          FooBar to match spam
         filters:
           - type: value
-            key: normalized_keys_title_nounderscores_tag:FooBar
+            key: tag:FooBar
+            tag_key_transforms:
+                - strip
+                - title
+                - nounderscores
             op: eq
             value: spam
         ."""
-        if not tag_filter.startswith("normalized_keys_") or not (
-            strategy := tag_filter.split(":")[0]
-        ).endswith("_tag"):
+        if not transforms:
             return None
-        list_of_transforms = strategy.split("_")[2:-1]
-        # do strip on all, use lower when no other transforms are specified`
-        if not list_of_transforms:
-            list_of_transforms = ["lower"]
-        funcs = ["strip"] + list_of_transforms
-        return _combine(cls[func].value for func in funcs if func in cls.__members__)
+        return _combine(
+            cls[transform].value for transform in transforms if transform in cls.__members__
+        )
 
 
 def _combine(callables_list):

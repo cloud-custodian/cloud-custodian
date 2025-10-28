@@ -932,15 +932,27 @@ class TestInstanceValue(BaseFilterTest):
     def test_normalized_keys_filter(self):
         i = instance(Tags=[{"Key": " foo", "Value": "abcd"}])
         self.assertFilter({"tag:foo": "abcd"}, i, False)
-        self.assertFilter({"normalized_keys_tag:foo": "abcd"}, i, True)
-        self.assertEqual(annotation(i, base_filters.ANNOTATION_KEY), ["normalized_keys_tag:foo"])
+        fdata = {
+            "type": "value",
+            "key": "tag:foo",
+            "tag_key_transforms": ["strip"],
+            "value": "abcd",
+        }
+        self.assertFilter(fdata, i, True)
+        self.assertEqual(annotation(i, base_filters.ANNOTATION_KEY), ["tag:foo"])
 
         i = instance(Tags=[{"Key": " foo_bar", "Value": "abcd"}])
         self.assertFilter({"tag:FooBar": "abcd"}, i, False)
-        self.assertFilter({"normalized_keys_title_nounderscores_tag:FooBar": "abcd"}, i, True)
+        fdata_big = {
+            "type": "value",
+            "key": "tag:FooBar",
+            "tag_key_transforms": ["strip", "title", "nounderscores"],
+            "value": "abcd",
+        }
+        self.assertFilter(fdata_big, i, True)
         self.assertEqual(
             annotation(i, base_filters.ANNOTATION_KEY),
-            ["normalized_keys_title_nounderscores_tag:FooBar"],
+            ["tag:FooBar"],
         )
 
         # make instance tags GCP-like by removing "Tags" and adding "labels"
@@ -948,8 +960,8 @@ class TestInstanceValue(BaseFilterTest):
         del i["Tags"]
         i["labels"] = {" foo": "abcd"}
         self.assertFilter({"tag:foo": "abcd"}, i, False)
-        self.assertFilter({"normalized_keys_tag:foo": "abcd"}, i, True)
-        self.assertEqual(annotation(i, base_filters.ANNOTATION_KEY), ["normalized_keys_tag:foo"])
+        self.assertFilter(fdata, i, True)
+        self.assertEqual(annotation(i, base_filters.ANNOTATION_KEY), ["tag:foo"])
 
 
 class TestEqualValue(unittest.TestCase):
