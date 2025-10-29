@@ -215,6 +215,7 @@ class FirehoseDelete(Action):
             client.delete_delivery_stream(
                 DeliveryStreamName=r['DeliveryStreamName'])
 
+
 @DeliveryStream.action_registry.register('encrypt-s3-destination')
 class FirehoseEncryptS3Destination(Action):
     """Action to set encryption key a Firehose S3 destination
