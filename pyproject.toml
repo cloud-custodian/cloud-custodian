@@ -114,3 +114,7 @@ filterwarnings = [
     "ignore::DeprecationWarning",
     "ignore::PendingDeprecationWarning"
 ]
+
+
+[tool.coverage.report]
+omit = ["c7n/resources/opsworks.py"]
