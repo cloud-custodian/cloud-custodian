@@ -330,12 +330,13 @@ class DeleteFileSystem(BaseAction):
     the file system.
 
     Note:
-    If `skip-snapshot` is set to True, no final snapshot will be created.
+    - If `skip-snapshot` is set to True, no final snapshot will be created.
     FSx for OnTap resources do not create snapshot backups on deletion
     even if skip-snapshot is set to False.
-    FSx for Lustre resources using the Scratch deployment type do not support
+    - FSx for Lustre resources using the Scratch deployment type do not support
     final backups on deletion. Set `force` to True to delete these when
     `skip-snapshot` is set to False.
+    - Not all permissions listed is necessary for every file system type.
 
     :example:
 
@@ -367,7 +368,14 @@ class DeleteFileSystem(BaseAction):
 
     """
 
-    permissions = ('fsx:DeleteFileSystem',)
+    permissions = ('fsx:DeleteFileSystem',
+                   "fsx:DescribeStorageVirtualMachines",
+                   "fsx:DeleteStorageVirtualMachine",
+                   "fsx:DescribeVolumes",
+                   "fsx:DeleteVolume",
+                   "fsx:DescribeS3AccessPointAttachments",
+                   "fsx:DetachAndDeleteS3AccessPoint",
+                   "s3:DeleteAccessPoint",)
 
     schema = type_schema(
         'delete',
@@ -458,6 +466,7 @@ class DeleteFileSystem(BaseAction):
 
             except Exception as e:
                 self.log.error('Unable to delete: %s - %s' % (r['FileSystemId'], e))
+                raise e
 
     def _delete_dependencies(self, client, resource, fs_type, retry):
         """

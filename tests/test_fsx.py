@@ -880,8 +880,8 @@ class TestFSx(BaseTest):
             retry_delay = 10
             retry_max_attempts = 10
         else:
-            retry_delay = 1
-            retry_max_attempts = 2
+            retry_delay = 5
+            retry_max_attempts = 10
         p = self.load_policy(
             {
                 'name': 'fsx-delete-file-system',
@@ -989,13 +989,82 @@ class TestFSx(BaseTest):
             },
             session_factory=session_factory
         )
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        client = session_factory().client('fsx')
-        fs = client.describe_file_systems(
-            FileSystemIds=[resources[0]['FileSystemId']])['FileSystems']
-        self.assertEqual(len(fs), 1)
-        self.assertNotEqual(fs[0]['Lifecycle'], 'DELETING')
+        # error because you cannot delete a creating fsx resource.
+        with self.assertRaises(Exception):
+            p.run()
+
+    def test_fsx_delete_file_system_ontap_error(self):
+        # Delete fsx resource with volumes and svms without force flag
+        session_factory = self.replay_flight_data(
+            'test_fsx_delete_file_system_ontap_error', region="us-west-2")
+        p = self.load_policy(
+            {
+                'name': 'fsx-delete-file-system',
+                'resource': 'fsx',
+                'filters': [
+                    {
+                        'type': 'value',
+                        'key': 'Lifecycle',
+                        'value': 'AVAILABLE'
+                    },
+                    {
+                        'type': 'value',
+                        'key': 'FileSystemType',
+                        'value': 'ONTAP'
+                    }
+                ],
+                'actions': [
+                    {
+                        'type': 'delete',
+                        'retry-delay': 1,
+                        'retry-max-attempts': 3,
+                        'skip-snapshot': True
+                    }
+                ]
+            },
+            session_factory=session_factory,
+            config={'region': 'us-west-2'},
+        )
+        with self.assertRaises(Exception):
+            p.run()
+
+    def test_fsx_delete_file_system_openzfs_error(self):
+        # Against a resource with child volumes and s3 access point.
+        # No force flag set should raise error.
+        session_factory = self.replay_flight_data(
+            'test_fsx_delete_file_system_openzfs_error',
+            region="us-west-2")
+        p = self.load_policy(
+            {
+                'name': 'fsx-delete-file-system',
+                'resource': 'fsx',
+                'filters': [
+                    {
+                        'type': 'value',
+                        'key': 'Lifecycle',
+                        'value': 'AVAILABLE'
+                    },
+                    {
+                        'type': 'value',
+                        'key': 'FileSystemType',
+                        'value': 'OPENZFS'
+                    }
+                ],
+                'actions': [
+                    {
+                        'type': 'delete',
+                        'force': True,
+                        'retry-delay': 1,
+                        'retry-max-attempts': 3,
+                        'skip-snapshot': True
+                    }
+                ]
+            },
+            session_factory=session_factory,
+            config={'region': 'us-west-2'},
+        )
+        with self.assertRaises(Exception):
+            p.run()
 
     def test_fsx_arn_in_event(self):
         session_factory = self.replay_flight_data('test_fsx_resource')
