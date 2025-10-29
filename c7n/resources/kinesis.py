@@ -210,6 +210,7 @@ class FirehoseDelete(Action):
                 "These delivery streams can't be deleted (wrong state): %s" % (
                     ", ".join(creating)))
         for r in resources:
+            # added suspended
             if r['DeliveryStreamStatus'] not in ('ACTIVE', 'SUSPENDED'):
                 continue
             client.delete_delivery_stream(
