@@ -44,7 +44,9 @@ whitelist_packages = set(
         #
         # packages with bad metadata
         'protobuf',  # BSD-3-Clause
-        'uritemplate'  # Dual license BSD 3-Clause OR Apache-2.0
+        'uritemplate',  # Dual license BSD 3-Clause OR Apache-2.0
+        # https://github.com/GrahamDumpleton/wrapt/issues/298
+        'wrapt',  # BSD-2-Clause .. packaging update is missing license spdx header
     )
 )
 
