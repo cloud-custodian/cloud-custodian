@@ -4,7 +4,6 @@ from .common import BaseTest
 
 
 class TestOpsworksCM(BaseTest):
-
     def test_query_CM(self):
         p = self.load_policy(
             {"name": "get-opswork-cm", "resource": "opswork-cm"},
@@ -13,9 +12,7 @@ class TestOpsworksCM(BaseTest):
         self.assertEqual(len(resources), 0)
 
 
-
 class TestOpsWorksStack(BaseTest):
-
     def test_query_opsworks_stacks(self):
         p = self.load_policy(
             {"name": "get-opswork-stack", "resource": "opswork-stack"},

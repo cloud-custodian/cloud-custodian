@@ -1,12 +1,9 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-from botocore.exceptions import ClientError
-
 from c7n.actions import BaseAction
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo, DescribeSource
-from c7n.utils import local_session, type_schema
-from c7n import utils
+from c7n.utils import type_schema
 
 
 class DescribeRemoved(DescribeSource):
@@ -32,21 +29,16 @@ class OpsworkStack(QueryResourceManager):
 
     source_mapping = {'describe': DescribeRemoved}
 
+    def get_permissions(self):
+        return []
+
 
 @OpsworkStack.action_registry.register('delete')
 class DeleteStack(BaseAction):
     """Deprecated action"""
 
     schema = type_schema('delete')
-    permissions = (
-        "opsworks:DescribeApps",
-        "opsworks:DescribeLayers",
-        "opsworks:DescribeInstances",
-        "opsworks:DeleteStack",
-        "opsworks:DeleteApp",
-        "opsworks:DeleteLayer",
-        "opsworks:DeleteInstance",
-    )
+    permissions = ()
 
     def process(self, stacks):
         return []
@@ -57,7 +49,7 @@ class StopStack(BaseAction):
     """Deprecated Action"""
 
     schema = type_schema('stop')
-    permissions = ("opsworks:StopStack",)
+    permissions = ()
 
     def process(self, stacks):
         return []
@@ -77,13 +69,16 @@ class OpsworksCM(QueryResourceManager):
 
     source_mapping = {'describe': DescribeRemoved}
 
+    def get_permissions(self):
+        return []
+
 
 @OpsworksCM.action_registry.register('delete')
 class CMDelete(BaseAction):
     """Deprecated action"""
 
     schema = type_schema('delete')
-    permissions = ("opsworks-cm:DeleteServer",)
+    permissions = ()
 
     def process(self, servers):
         return []
