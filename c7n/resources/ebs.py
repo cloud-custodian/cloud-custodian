@@ -178,6 +178,26 @@ class VolumeQueryParser(QueryParser):
 
     type_name = 'EBS Volume'
 
+    @classmethod
+    def parse(cls, data):
+        # First, validate using the parent class
+        filters = super().parse(data)
+        
+        # Convert boolean and integer values to strings for AWS API
+        for f in filters:
+            values = f.get('Values', [])
+            converted_values = []
+            for v in values:
+                if isinstance(v, bool):
+                    converted_values.append('true' if v else 'false')
+                elif isinstance(v, int):
+                    converted_values.append(str(v))
+                else:
+                    converted_values.append(v)
+            f['Values'] = converted_values
+        
+        return filters
+
 
 @Snapshot.action_registry.register('tag')
 class SnapshotTag(Tag):
