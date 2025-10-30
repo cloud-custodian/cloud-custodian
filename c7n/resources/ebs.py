@@ -180,10 +180,8 @@ class VolumeQueryParser(QueryParser):
 
     @classmethod
     def parse(cls, data):
-        # First, validate using the parent class
         filters = super().parse(data)
 
-        # Convert boolean and integer values to strings for AWS API
         for f in filters:
             values = f.get('Values', [])
             converted_values = []
