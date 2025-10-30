@@ -4,6 +4,7 @@ import json
 from unittest.mock import patch
 
 from c7n.exceptions import PolicyValidationError
+from c7n.filters.core import ComparableVersion
 from c7n.resources.aws import shape_validate
 import pytest
 from pytest_terraform import terraform
@@ -102,9 +103,9 @@ class ElasticSearch(BaseTest):
         from c7n.resources.elasticsearch import parse_es_version
 
         # Test the version parsing function
-        self.assertEqual(parse_es_version("Elasticsearch_7.4"), ("Elasticsearch", "7.4"))
-        self.assertEqual(parse_es_version("OpenSearch_1.3"), ("OpenSearch", "1.3"))
-        self.assertEqual(parse_es_version("invalid"), (None, None))
+        self.assertEqual(parse_es_version("Elasticsearch_7.4"), ("Elasticsearch", "7.4", ComparableVersion("7.4")))
+        self.assertEqual(parse_es_version("OpenSearch_1.3"), ("OpenSearch", "1.3", ComparableVersion("1.3")))
+        self.assertEqual(parse_es_version("invalid"), (None, None, None))
 
         factory = self.replay_flight_data("test_elasticsearch_upgrade_available")
         p = self.load_policy(
