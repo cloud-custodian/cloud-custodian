@@ -333,11 +333,11 @@ class DeleteFileSystem(BaseAction):
     Note:
 
     - If `skip-snapshot` is set to True, no final snapshot will be created.
-    - FSx for OnTap resources do not create snapshot backups on deletion
-    even if skip-snapshot is set to False.
-    - FSx for Lustre resources using the Scratch deployment type do not support
-    final backups on deletion. Set `force` to True to delete these when
-    `skip-snapshot` is set to False.
+    - FSx for OnTap resources do not create snapshot backups on deletion even \
+      if skip-snapshot is set to False.
+    - FSx for Lustre resources using the Scratch deployment type do not support \
+      final backups on deletion. Set `force` to True to delete these when \
+      `skip-snapshot` is set to False.
 
     Annotated Permissions:
 
