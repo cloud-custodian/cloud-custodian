@@ -418,7 +418,8 @@ class SessionTest(BaseTest):
                             constants.ENV_KEYVAULT_CLIENT_ID: 'kv_client',
                             constants.ENV_KEYVAULT_SECRET_ID: 'kv_secret',
                             constants.ENV_CLIENT_CERTIFICATE_PATH: '/certificate',
-                            constants.ENV_CLIENT_CERTIFICATE_PASSWORD: 'password'
+                            constants.ENV_CLIENT_CERTIFICATE_PASSWORD: 'password',
+                            constants.ENV_FEDERATED_TOKEN_FILE: '/token_file'
                         }, clear=True):
             env_params = Session().get_credentials().auth_params
 
