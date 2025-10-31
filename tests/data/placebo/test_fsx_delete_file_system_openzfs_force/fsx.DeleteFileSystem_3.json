@@ -1,0 +1,9 @@
+{
+    "status_code": 200,
+    "data": {
+        "FileSystemId": "fs-00ddfdcad3d408573",
+        "Lifecycle": "DELETING",
+        "OpenZFSResponse": {},
+        "ResponseMetadata": {}
+    }
+}

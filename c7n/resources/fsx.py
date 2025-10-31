@@ -10,7 +10,7 @@ from c7n.query import (
     DescribeWithResourceTags)
 from c7n.actions import BaseAction
 from c7n.tags import Tag, TagDelayedAction, RemoveTag, coalesce_copy_user_tags, TagActionFilter
-from c7n.utils import type_schema, local_session, chunks, group_by
+from c7n.utils import type_schema, local_session, chunks, group_by, get_retry
 from c7n.filters import Filter, ListItemFilter, MetricsFilter
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters.vpc import SubnetFilter, VpcFilter
@@ -321,6 +321,36 @@ class DeleteFileSystem(BaseAction):
     """
     Delete Filesystems
 
+    If `force` is set to True, this action will attempt to delete all
+    dependencies necessary to delete the file system.
+
+    You can override the default retry settings for deletion by specifying
+    `retry-delay` (default: 1 seconds) and `retry-max-attempts` (default: 1).
+    Adjust the retry settings, as necessary when using `force` set to `True`.
+    FSx for Ontap takes extra time to delete all volumes before it can delete
+    the file system. OpenZFS also takes extra time to delete S3 access points.
+
+    Note:
+
+    - If `skip-snapshot` is set to True, no final snapshot will be created.
+    - FSx for OnTap resources do not create snapshot backups on deletion even \
+      if skip-snapshot is set to False.
+    - FSx for Lustre resources using the Scratch deployment type do not support \
+      final backups on deletion. Set `force` to True to delete these when \
+      `skip-snapshot` is set to False.
+
+    Annotated Permissions:
+
+    - fsx:DeleteFileSystem (required)
+    - fsx:CreateBackup (if skip-snapshot is False or not set)
+    - fsx:DescribeStorageVirtualMachines (if force is True for ONTAP)
+    - fsx:DeleteStorageVirtualMachine (if force is True for ONTAP)
+    - fsx:DescribeVolumes (if force is True for ONTAP and OpenZFS)
+    - fsx:DeleteVolume (if force is True for ONTAP and OpenZFS)
+    - fsx:DescribeS3AccessPointAttachments (if force is True for OpenZFS)
+    - fsx:DetachAndDeleteS3AccessPoint (if force is True for OpenZFS)
+    - s3:DeleteAccessPoint (if force is True for OpenZFS)
+
     :example:
 
     .. code-block:: yaml
@@ -344,15 +374,29 @@ class DeleteFileSystem(BaseAction):
                 - FileSystemId: fs-1234567890123
               actions:
                 - type: delete
+                  force: True
+                  retry-delay: 30
+                  retry-max-attempts: 10
                   skip-snapshot: True
 
     """
 
-    permissions = ('fsx:DeleteFileSystem',)
+    permissions = ('fsx:DeleteFileSystem',
+                   'fsx:CreateBackup',
+                   'fsx:DescribeStorageVirtualMachines',
+                   'fsx:DeleteStorageVirtualMachine',
+                   'fsx:DescribeVolumes',
+                   'fsx:DeleteVolume',
+                   'fsx:DescribeS3AccessPointAttachments',
+                   'fsx:DetachAndDeleteS3AccessPoint',
+                   's3:DeleteAccessPoint',)
 
     schema = type_schema(
         'delete',
         **{
+            'force': {'type': 'boolean'},
+            'retry-delay': {'type': 'number', 'minimum': 1},
+            'retry-max-attempts': {'type': 'number', 'minimum': 1},
             'skip-snapshot': {'type': 'boolean'},
             'tags': {'type': 'object'},
             'copy-tags': {
@@ -377,19 +421,133 @@ class DeleteFileSystem(BaseAction):
         skip_snapshot = self.data.get('skip-snapshot', False)
         copy_tags = self.data.get('copy-tags', True)
         user_tags = self.data.get('tags', [])
+        retry_delay = self.data.get('retry-delay', 1)
+        retry_max_attempts = self.data.get('retry-max-attempts', 1)
+        retry = get_retry(retry_codes=('BadRequest'), min_delay=retry_delay,
+                    max_attempts=retry_max_attempts, log_retries=True)
 
         for r in resources:
             tags = coalesce_copy_user_tags(r, copy_tags, user_tags)
             config = {'SkipFinalBackup': skip_snapshot}
             if tags and not skip_snapshot:
                 config['FinalBackupTags'] = tags
+
+            delete_args = {
+                'FileSystemId': r['FileSystemId'],
+            }
+            # Determine the correct configuration key based on FileSystemType
+            # fs_type == 'ONTAP' does not have its own config in boto3
+            fs_type = r.get('FileSystemType')
+            config_key = None
+            if fs_type == 'WINDOWS':
+                config_key = 'WindowsConfiguration'
+
+            elif fs_type == 'LUSTRE':
+                config_key = 'LustreConfiguration'
+
+                if not skip_snapshot:
+                    deployment_type = r.get("LustreConfiguration", {}).get("DeploymentType")
+
+                    # There is no final backup support for SCRATCH deployment
+                    # types. Override to skip final backup and final backup tags
+                    # when we are forcing deletion.
+                    if deployment_type == "SCRATCH_2" or deployment_type == "SCRATCH_1":
+                        self.log.warning(
+                            'Final backup not supported for SCRATCH deployment '
+                            'types (set Force to True to delete): %s'
+                            % (r['FileSystemId'])
+                        )
+                        if self.data.get('force'):
+                            del config['FinalBackupTags']
+                            del config['SkipFinalBackup']
+
+            elif fs_type == 'OPENZFS':
+                config_key = 'OpenZFSConfiguration'
+                # OpenZFS requires this option to delete all child volumes and snapshots
+                if self.data.get('force'):
+                    config['Options'] = ['DELETE_CHILD_VOLUMES_AND_SNAPSHOTS']
+
+            if self.data.get('force'):
+                self._delete_dependencies(client, r, fs_type, retry)
+
+            if config_key and config:
+                delete_args[config_key] = config
             try:
-                client.delete_file_system(
-                    FileSystemId=r['FileSystemId'],
-                    WindowsConfiguration=config
+                retry(
+                    client.delete_file_system,
+                    **delete_args,
                 )
-            except client.exceptions.BadRequest as e:
-                self.log.warning('Unable to delete: %s - %s' % (r['FileSystemId'], e))
+
+            except Exception as e:
+                self.log.error('Unable to delete: %s - %s' % (r['FileSystemId'], e))
+                raise e
+
+    def _delete_dependencies(self, client, resource, fs_type, retry):
+        """
+        Delete dependent resources for a file system.
+        """
+        if fs_type == 'ONTAP':
+            svms = client.describe_storage_virtual_machines(Filters=[
+                {
+                    'Name': 'file-system-id',
+                    'Values': [resource['FileSystemId']],
+                }]).get('StorageVirtualMachines', [])
+
+            for svm in svms:
+                if svm.get('Lifecycle') == 'DELETING':
+                    continue
+                try:
+                    retry(
+                        client.delete_storage_virtual_machine,
+                        StorageVirtualMachineId=svm['StorageVirtualMachineId']
+                    )
+                except Exception as e:
+                    self.log.error(
+                        'Unable to delete SVM for: %s - %s - %s' % (
+                            resource['FileSystemId'], svm['StorageVirtualMachineId'], e))
+
+            volumes = client.describe_volumes(Filters=[
+                {
+                    'Name': 'file-system-id',
+                    'Values': [resource['FileSystemId']],
+                }]).get('Volumes', [])
+
+            for volume in volumes:
+                if volume.get('Lifecycle') == 'DELETING':
+                    continue
+                try:
+                    retry(
+                        client.delete_volume,
+                        VolumeId=volume['VolumeId']
+                    )
+                except Exception as e:
+                    self.log.error(
+                        'Unable to delete volume for: %s - %s - %s' % (
+                            resource['FileSystemId'], volume['VolumeId'], e))
+        elif fs_type == 'OPENZFS':
+
+            s3_attachments = client.describe_s3_access_point_attachments(Filters=[
+                {
+                    'Name': 'file-system-id',
+                    'Values': [resource['FileSystemId']],
+                }]).get('S3AccessPointAttachments', [])
+
+            for s3_attachment in s3_attachments:
+                if s3_attachment.get('Lifecycle') == 'DELETING':
+                    continue
+                try:
+                    retry(
+                        client.detach_and_delete_s3_access_point,
+                        Name=s3_attachment['Name']
+                    )
+                except Exception as e:
+                    self.log.error(
+                        'Unable to delete S3 Access Point for: %s - %s - %s -%s' % (
+                            resource['FileSystemId'],
+                            s3_attachment['Name'],
+                            s3_attachment['S3AccessPointArn'], e
+                        )
+                    )
 
 
 @FSx.filter_registry.register('kms-key')
