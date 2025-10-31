@@ -1,0 +1,10 @@
+{
+    "status_code": 400,
+    "data": {
+        "Error": {
+            "Code": "DependencyViolation",
+            "Message": "The subnet 'subnet-006ee56b4320c50ab' has dependencies and cannot be deleted."
+        },
+        "ResponseMetadata": {}
+    }
+}

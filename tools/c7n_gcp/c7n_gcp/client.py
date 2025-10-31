@@ -36,7 +36,7 @@ from googleapiclient import discovery, errors  # NOQA
 from googleapiclient.http import set_user_agent
 from google.auth.credentials import with_scopes_if_required
 import google.auth.impersonated_credentials
-import google.oauth2.credentials
+# import google.oauth2.credentials
 import google_auth_httplib2
 
 import httplib2

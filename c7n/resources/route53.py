@@ -153,6 +153,7 @@ class Route53Domain(QueryResourceManager):
         service = 'route53domains'
         arn_type = 'r53domain'
         enum_spec = ('list_domains', 'Domains', None)
+        detail_spec = ('get_domain_detail', 'DomainName', 'DomainName', None)
         name = id = 'DomainName'
         global_resource = False
 
@@ -164,7 +165,7 @@ class Route53Domain(QueryResourceManager):
             d['Tags'] = self.retry(
                 client.list_tags_for_domain,
                 DomainName=d['DomainName'])['TagList']
-        return domains
+        return super().augment(domains)
 
 
 @Route53Domain.action_registry.register('tag')

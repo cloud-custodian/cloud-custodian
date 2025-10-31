@@ -683,3 +683,34 @@ class TestElastiCacheUser(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+
+class TestReservedCacheNodes(BaseTest):
+
+    def test_reserved_cache_nodes(self):
+        session_factory = self.replay_flight_data("test_reserved_cache_nodes")
+        p = self.load_policy(
+            {
+                "name": "reserved-cache-nodes",
+                "resource": "aws.elasticache-reserved",
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['ReservedCacheNodeId'], 'test-reservation')
+        self.assertEqual(resources[0]['State'], 'active')
+
+    def test_reserved_cache_nodes_filter(self):
+        session_factory = self.replay_flight_data("test_reserved_cache_nodes_filtered")
+        p = self.load_policy(
+            {
+                "name": "reserved-cache-nodes-active",
+                "resource": "aws.elasticache-reserved",
+                "filters": [{"type": "value", "key": "State", "value": "active"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['State'], 'active')
