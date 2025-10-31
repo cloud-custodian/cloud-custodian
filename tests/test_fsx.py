@@ -880,7 +880,7 @@ class TestFSx(BaseTest):
             retry_delay = 10
             retry_max_attempts = 10
         else:
-            retry_delay = 5
+            retry_delay = 1
             retry_max_attempts = 10
         p = self.load_policy(
             {

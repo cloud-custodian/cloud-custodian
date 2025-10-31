@@ -325,9 +325,10 @@ class DeleteFileSystem(BaseAction):
     dependencies necessary to delete the file system.
 
     You can override the default retry settings for deletion by specifying
-    `retry-delay` (default: 5 seconds) and `retry-max-attempts` (default: 2).
-    FSx for Ontap may take longer to delete all volumes before it can delete
-    the file system.
+    `retry-delay` (default: 1 seconds) and `retry-max-attempts` (default: 1).
+    Adjust the retry settings, as necessary when using `force` set to `True`.
+    FSx for Ontap takes extra time to delete all volumes before it can delete
+    the file system. OpenZFS also takes extra time to delete S3 access points.
 
     Note:
     - If `skip-snapshot` is set to True, no final snapshot will be created.
@@ -417,8 +418,8 @@ class DeleteFileSystem(BaseAction):
         skip_snapshot = self.data.get('skip-snapshot', False)
         copy_tags = self.data.get('copy-tags', True)
         user_tags = self.data.get('tags', [])
-        retry_delay = self.data.get('retry-delay', 5)
-        retry_max_attempts = self.data.get('retry-max-attempts', 2)
+        retry_delay = self.data.get('retry-delay', 1)
+        retry_max_attempts = self.data.get('retry-max-attempts', 1)
         retry = get_retry(retry_codes=('BadRequest'), min_delay=retry_delay,
                     max_attempts=retry_max_attempts, log_retries=True)
 
