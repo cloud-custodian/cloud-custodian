@@ -13,6 +13,7 @@ from azure.common.credentials import BasicTokenAuthentication
 from azure.core.credentials import AccessToken
 from azure.identity import (AzureCliCredential, ClientSecretCredential,
                             ManagedIdentityCredential, CertificateCredential,
+                            WorkloadIdentityCredential,
                             __version__ as az_identity_version)
 from azure.identity._credentials.azure_cli import _run_command
 from msrestazure.azure_cloud import AZURE_PUBLIC_CLOUD
@@ -45,6 +46,7 @@ class AzureCredential:
                 'access_token': os.environ.get(constants.ENV_ACCESS_TOKEN),
                 'tenant_id': os.environ.get(constants.ENV_TENANT_ID),
                 'use_msi': bool(os.environ.get(constants.ENV_USE_MSI)),
+                'federated_token_file': os.environ.get(constants.ENV_FEDERATED_TOKEN_FILE),
                 'subscription_id': os.environ.get(constants.ENV_SUB_ID),
                 'keyvault_client_id': os.environ.get(constants.ENV_KEYVAULT_CLIENT_ID),
                 'keyvault_secret_id': os.environ.get(constants.ENV_KEYVAULT_SECRET_ID),
@@ -78,6 +80,13 @@ class AzureCredential:
         if self._auth_params.get('access_token') is not None:
             auth_name = 'Access Token'
             pass
+        elif self._auth_params.get('federated_token_file') is not None:
+            auth_name = 'Workload Identity'
+            self._credential = WorkloadIdentityCredential(
+                tenant_id=self._auth_params.get('tenant_id'),
+                client_id=self._auth_params.get('client_id'),
+                federated_token_file=self._auth_params.get('federated_token_file')
+            )
         elif (self._auth_params.get('client_id') and
               self._auth_params.get('client_secret') and
               self._auth_params.get('tenant_id')

@@ -10,7 +10,8 @@ from datetime import datetime, timedelta
 import pytest
 from adal import AdalError
 from azure.core.credentials import AccessToken
-from azure.identity import (ClientSecretCredential, ManagedIdentityCredential)
+from azure.identity import (ClientSecretCredential, ManagedIdentityCredential,
+                            WorkloadIdentityCredential)
 from azure.identity._credentials import azure_cli
 from c7n_azure import constants
 from c7n_azure.session import Session
@@ -19,7 +20,7 @@ from msrest.exceptions import AuthenticationError
 from msrestazure.azure_cloud import (AZURE_CHINA_CLOUD, AZURE_US_GOV_CLOUD)
 from requests import HTTPError
 
-from .azure_common import DEFAULT_SUBSCRIPTION_ID, DEFAULT_TENANT_ID, BaseTest
+from .azure_common import DEFAULT_CLIENT_ID, DEFAULT_SUBSCRIPTION_ID, DEFAULT_TENANT_ID, BaseTest
 
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
@@ -210,6 +211,27 @@ class SessionTest(BaseTest):
 #                'client')
             self.assertEqual(s.get_subscription_id(), DEFAULT_SUBSCRIPTION_ID)
 
+    def test_initialize_workload_identity(self):
+        with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.jwt') as fp:
+            fp.write('fake.jwt.token')
+            token_file = fp.name
+
+        try:
+            with patch.dict(os.environ,
+                            {
+                                constants.ENV_TENANT_ID: DEFAULT_TENANT_ID,
+                                constants.ENV_SUB_ID: DEFAULT_SUBSCRIPTION_ID,
+                                constants.ENV_CLIENT_ID: DEFAULT_CLIENT_ID,
+                                constants.ENV_FEDERATED_TOKEN_FILE: token_file
+                            }, clear=True):
+                s = Session()
+
+                self.assertIsInstance(s.get_credentials()._credential, WorkloadIdentityCredential)
+                self.assertEqual(s.get_subscription_id(), DEFAULT_SUBSCRIPTION_ID)
+                self.assertEqual(s.get_tenant_id(), DEFAULT_TENANT_ID)
+        finally:
+            os.unlink(token_file)
+
     @patch('msrestazure.azure_active_directory.MSIAuthentication.__init__')
     @patch('c7n_azure.session.log.error')
     def test_initialize_session_msi_authentication_error(self, mock_log, mock_cred):
@@ -396,7 +418,8 @@ class SessionTest(BaseTest):
                             constants.ENV_KEYVAULT_CLIENT_ID: 'kv_client',
                             constants.ENV_KEYVAULT_SECRET_ID: 'kv_secret',
                             constants.ENV_CLIENT_CERTIFICATE_PATH: '/certificate',
-                            constants.ENV_CLIENT_CERTIFICATE_PASSWORD: 'password'
+                            constants.ENV_CLIENT_CERTIFICATE_PASSWORD: 'password',
+                            constants.ENV_FEDERATED_TOKEN_FILE: '/token_file'
                         }, clear=True):
             env_params = Session().get_credentials().auth_params
 
