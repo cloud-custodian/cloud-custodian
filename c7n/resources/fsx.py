@@ -338,15 +338,15 @@ class DeleteFileSystem(BaseAction):
     final backups on deletion. Set `force` to True to delete these when
     `skip-snapshot` is set to False.
     - Annotated Permissions:
-        - fsx:DeleteFileSystem (required)
-        - fsx:CreateBackup (if skip-snapshot is False or not set)
-        - fsx:DescribeStorageVirtualMachines (if force is True for ONTAP)
-        - fsx:DeleteStorageVirtualMachine (if force is True for ONTAP)
-        - fsx:DescribeVolumes (if force is True for ONTAP AND OpenZFS)
-        - fsx:DeleteVolume (if force is True for ONTAP AND OpenZFS)
-        - fsx:DescribeS3AccessPointAttachments (if force is True for OpenZFS)
-        - fsx:DetachAndDeleteS3AccessPoint (if force is True for OpenZFS)
-        - s3:DeleteAccessPoint (if force is True for OpenZFS)
+      - fsx:DeleteFileSystem (required)
+      - fsx:CreateBackup (if skip-snapshot is False or not set)
+      - fsx:DescribeStorageVirtualMachines (if force is True for ONTAP)
+      - fsx:DeleteStorageVirtualMachine (if force is True for ONTAP)
+      - fsx:DescribeVolumes (if force is True for ONTAP AND OpenZFS)
+      - fsx:DeleteVolume (if force is True for ONTAP AND OpenZFS)
+      - fsx:DescribeS3AccessPointAttachments (if force is True for OpenZFS)
+      - fsx:DetachAndDeleteS3AccessPoint (if force is True for OpenZFS)
+      - s3:DeleteAccessPoint (if force is True for OpenZFS)
 
     :example:
 
