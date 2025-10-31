@@ -331,22 +331,25 @@ class DeleteFileSystem(BaseAction):
     the file system. OpenZFS also takes extra time to delete S3 access points.
 
     Note:
+
     - If `skip-snapshot` is set to True, no final snapshot will be created.
-    FSx for OnTap resources do not create snapshot backups on deletion
+    - FSx for OnTap resources do not create snapshot backups on deletion
     even if skip-snapshot is set to False.
     - FSx for Lustre resources using the Scratch deployment type do not support
     final backups on deletion. Set `force` to True to delete these when
     `skip-snapshot` is set to False.
-    - Annotated Permissions:
-      - fsx:DeleteFileSystem (required)
-      - fsx:CreateBackup (if skip-snapshot is False or not set)
-      - fsx:DescribeStorageVirtualMachines (if force is True for ONTAP)
-      - fsx:DeleteStorageVirtualMachine (if force is True for ONTAP)
-      - fsx:DescribeVolumes (if force is True for ONTAP AND OpenZFS)
-      - fsx:DeleteVolume (if force is True for ONTAP AND OpenZFS)
-      - fsx:DescribeS3AccessPointAttachments (if force is True for OpenZFS)
-      - fsx:DetachAndDeleteS3AccessPoint (if force is True for OpenZFS)
-      - s3:DeleteAccessPoint (if force is True for OpenZFS)
+
+    Annotated Permissions:
+
+    - fsx:DeleteFileSystem (required)
+    - fsx:CreateBackup (if skip-snapshot is False or not set)
+    - fsx:DescribeStorageVirtualMachines (if force is True for ONTAP)
+    - fsx:DeleteStorageVirtualMachine (if force is True for ONTAP)
+    - fsx:DescribeVolumes (if force is True for ONTAP and OpenZFS)
+    - fsx:DeleteVolume (if force is True for ONTAP and OpenZFS)
+    - fsx:DescribeS3AccessPointAttachments (if force is True for OpenZFS)
+    - fsx:DetachAndDeleteS3AccessPoint (if force is True for OpenZFS)
+    - s3:DeleteAccessPoint (if force is True for OpenZFS)
 
     :example:
 
