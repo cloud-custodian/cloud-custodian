@@ -33,6 +33,7 @@ class ElastiCacheQueryParser(QueryParser):
         'ShowCacheNodeInfo': bool,
         'ShowCacheClustersNotInReplicationGroups': bool,
     }
+    type_name = "ElastiCache"
     multi_value = False
     value_key = 'Value'
 
@@ -49,8 +50,7 @@ class DescribeElastiCache(DescribeSource):
           - name: cache-node-with-default-port
             resource: aws.cache-cluster
             query:
-              - Name: ShowCacheNodeInfo
-                Value: true
+              - ShowCacheNodeInfo: true
             filters:
               - type: list-item
                 key: CacheNodes
@@ -62,8 +62,9 @@ class DescribeElastiCache(DescribeSource):
 
     def get_query_params(self, query_params):
         query_params = query_params or {}
-        for q in ElastiCacheQueryParser.parse(self.manager.data.get('query', [])):
-            query_params[q['Name']] = q['Value']
+        queries = ElastiCacheQueryParser.parse(self.manager.data.get('query', []))
+        for q in queries:
+            query_params.update(q)
         return query_params
 
 
