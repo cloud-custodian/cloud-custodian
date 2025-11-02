@@ -1,0 +1,65 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0,
+            "HTTPStatusCode": 200,
+            "RequestId": "test-request-id-001",
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked",
+                "vary": "Accept-Encoding",
+                "server": "AmazonEC2",
+                "content-type": "text/xml;charset=UTF-8",
+                "date": "Mon, 27 Oct 2025 12:00:00 GMT"
+            }
+        },
+        "Volumes": [
+            {
+                "AvailabilityZone": "us-east-1a",
+                "Attachments": [],
+                "Encrypted": true,
+                "VolumeType": "gp3",
+                "VolumeId": "vol-encrypted-gp3-001",
+                "State": "available",
+                "Iops": 3000,
+                "SnapshotId": "",
+                "CreateTime": {
+                    "hour": 10,
+                    "__class__": "datetime",
+                    "month": 10,
+                    "second": 0,
+                    "microsecond": 0,
+                    "year": 2025,
+                    "day": 27,
+                    "minute": 0
+                },
+                "Size": 100,
+                "Throughput": 125
+            },
+            {
+                "AvailabilityZone": "us-east-1b",
+                "Attachments": [],
+                "Encrypted": true,
+                "VolumeType": "gp3",
+                "VolumeId": "vol-encrypted-gp3-002",
+                "State": "available",
+                "Iops": 3000,
+                "SnapshotId": "",
+                "CreateTime": {
+                    "hour": 11,
+                    "__class__": "datetime",
+                    "month": 10,
+                    "second": 0,
+                    "microsecond": 0,
+                    "year": 2025,
+                    "day": 27,
+                    "minute": 30
+                },
+                "Size": 200,
+                "Throughput": 125
+            }
+        ],
+        "NextToken": null
+    }
+}
+
