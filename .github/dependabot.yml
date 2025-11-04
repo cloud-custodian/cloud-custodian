@@ -2,7 +2,11 @@ version: 2
 updates:
 
 - package-ecosystem: "github-actions"
-  directory: "/"
+  directories:
+    - "/"
+    - ".github/composites/docker-build-push"
+    - ".github/composites/docs-publish"
+    - ".github/composites/install"
   schedule:
       interval: "monthly"
   commit-message:
@@ -11,4 +15,3 @@ updates:
     github-actions:
       patterns:
         - "*"
-
