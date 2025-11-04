@@ -15,12 +15,12 @@ jobs:
       contents: read
       checks: write
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: ${{ env.DEFAULT_PY_VERSION }}
 
-      - uses: aws-actions/configure-aws-credentials@v4
+      - uses: aws-actions/configure-aws-credentials@v5
         with:
           role-to-assume: ${{ secrets.AWS_FTEST_ROLE }}
           aws-region: us-east-1
