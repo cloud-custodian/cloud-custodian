@@ -1310,6 +1310,10 @@ class EventBridgeScheduleSource(AWSEventBase):
                 f'{", ".join(map(str, self.data.get("events", [])))}>')
 
     def add(self, func, existing):
+        func_arn = func.arn
+        if func_arn.count(':') > 6:
+            func_arn, _ = func_arn.rsplit(':', 1)
+
         params = dict(
             Name=func.event_name,
             Description=func.description,
@@ -1319,7 +1323,7 @@ class EventBridgeScheduleSource(AWSEventBase):
             ScheduleExpressionTimezone=self.data.get('timezone', 'Etc/UTC'),
             GroupName=self.data.get('group-name', 'default'),
             Target={
-                'Arn': func.arn,
+                'Arn': func_arn,
                 'RoleArn': self.data.get('scheduler-role')
             }
         )
