@@ -12,7 +12,7 @@ dependencies = [
     "tencentcloud-sdk-python<4.0.0,>=3.0.783",
 ]
 name = "c7n_tencentcloud"
-version = "0.1.28"
+version = "0.1.30"
 description = "Cloud Custodian - Tencent Cloud Provider"
 readme = "readme.md"
 

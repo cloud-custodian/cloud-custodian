@@ -162,6 +162,36 @@ def test_eni_igw_subnet(test):
     assert resources[0]['NetworkInterfaceId'] == 'eni-0d47bf614f6182182'
 
 
+def test_eni_nat_subnet(test):
+    factory = test.replay_flight_data('test_eni_private_subnet')
+
+    p = test.load_policy({
+        'name': 'private-eni',
+        'resource': 'aws.eni',
+        'filters': [
+            {'type': 'subnet',
+             'key': 'SubnetId',
+             'value': 'present',
+             'nat': True}
+        ]}, session_factory=factory)
+    resources = p.run()
+    assert len(resources) == 2
+    assert resources[0]['NetworkInterfaceId'] == 'eni-054de8d628e757d05'
+
+    p = test.load_policy({
+        'name': 'egress-eni',
+        'resource': 'aws.eni',
+        'filters': [
+            {'type': 'subnet',
+             'key': 'SubnetId',
+             'value': 'present',
+             'nat': False}
+        ]}, session_factory=factory)
+    resources = p.run()
+    assert len(resources) == 1
+    assert resources[0]['NetworkInterfaceId'] == 'eni-02f9c1d34f40af967'
+
+
 @terraform('aws_code_build_vpc')
 def test_codebuild_unused(test, aws_code_build_vpc):
     factory = test.replay_flight_data("test_security_group_codebuild_unused")
@@ -488,6 +518,92 @@ class VpcTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    @functional
+    def test_subnet_delete(self):
+        factory = self.replay_flight_data("test_subnet_delete")
+        client = factory().client("ec2")
+        vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")["Vpc"]["VpcId"]
+        self.addCleanup(client.delete_vpc, VpcId=vpc_id)
+        subnet_id = client.create_subnet(
+            VpcId=vpc_id, CidrBlock="10.4.1.0/24"
+        )["Subnet"]["SubnetId"]
+
+        def delete_subnet():
+            try:
+                client.delete_subnet(SubnetId=subnet_id)
+            except BotoClientError:
+                pass
+
+        self.addCleanup(delete_subnet)
+        p = self.load_policy(
+            {
+                "name": "subnet-delete",
+                "resource": "aws.subnet",
+                "filters": [
+                    {
+                        "type": "ip-address-usage",
+                        "key": "NumberUsed",
+                        "value": 0,
+                    },
+                    {"SubnetId": subnet_id}
+                ],
+                "actions": ["delete"],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["SubnetId"], subnet_id)
+        self.assertRaisesRegex(
+            BotoClientError,
+            'InvalidSubnetID.NotFound',
+            client.describe_subnets,
+            SubnetIds=[subnet_id],
+        )
+
+    @functional
+    def test_subnet_delete_with_dependencies(self):
+        factory = self.replay_flight_data("test_subnet_delete_with_dependencies")
+        client = factory().client("ec2")
+        vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")["Vpc"]["VpcId"]
+        self.addCleanup(client.delete_vpc, VpcId=vpc_id)
+        subnet_id = client.create_subnet(
+            VpcId=vpc_id, CidrBlock="10.4.2.0/24"
+        )["Subnet"]["SubnetId"]
+
+        eni_id = client.create_network_interface(
+            SubnetId=subnet_id)["NetworkInterface"]["NetworkInterfaceId"]
+
+        def delete_subnet():
+            try:
+                client.delete_subnet(SubnetId=subnet_id)
+            except BotoClientError:
+                pass
+        self.addCleanup(delete_subnet)
+
+        def delete_network_interface():
+            try:
+                client.delete_network_interface(NetworkInterfaceId=eni_id)
+            except BotoClientError:
+                pass
+        self.addCleanup(delete_network_interface)
+
+        p = self.load_policy(
+            {
+                "name": "subnet-delete-with-dependencies",
+                "resource": "aws.subnet",
+                "filters": [{"SubnetId": subnet_id}],
+                "actions": ["delete"],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["SubnetId"], subnet_id)
+
+        subnets = client.describe_subnets(SubnetIds=[subnet_id])["Subnets"]
+        self.assertEqual(len(subnets), 1)
 
     def test_endpoint_policy_filter(self):
         factory = self.replay_flight_data("test_endpoint_policy_filter")

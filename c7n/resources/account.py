@@ -407,8 +407,8 @@ class GuardDutyEnabled(MultiAttrFilter):
                 filters:
                   - type: guard-duty
                     Detector.Status: ENABLED
-                    Master.AccountId: "00011001"
-                    Master.RelationshipStatus: "Enabled"
+                    Administrator.AccountId: "00011001"
+                    Administrator.RelationshipStatus: "Enabled"
     """
 
     schema = {
@@ -419,7 +419,7 @@ class GuardDutyEnabled(MultiAttrFilter):
             'match-operator': {'enum': ['or', 'and']}},
         'patternProperties': {
             '^Detector': {'oneOf': [{'type': 'object'}, {'type': 'string'}]},
-            '^Master': {'oneOf': [{'type': 'object'}, {'type': 'string'}]}},
+            '^Administrator': {'oneOf': [{'type': 'object'}, {'type': 'string'}]}},
     }
 
     annotation = "c7n:guard-duty"
@@ -451,8 +451,8 @@ class GuardDutyEnabled(MultiAttrFilter):
 
         detector = client.get_detector(DetectorId=detector_id)
         detector.pop('ResponseMetadata', None)
-        master = client.get_administrator_account(DetectorId=detector_id).get('Master')
-        resource[self.annotation] = r = {'Detector': detector, 'Master': master}
+        admin = client.get_administrator_account(DetectorId=detector_id).get('Administrator')
+        resource[self.annotation] = r = {'Detector': detector, 'Administrator': admin}
         return r
 
 

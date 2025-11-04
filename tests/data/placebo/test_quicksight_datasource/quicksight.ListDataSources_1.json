@@ -1,0 +1,222 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Status": 200,
+        "DataSources": [
+            {
+                "Arn": "arn:aws:quicksight:us-east-1:644160558196:datasource/62132bb5-e3b1-47b7-aa61-7485df576afa",
+                "DataSourceId": "62132bb5-e3b1-47b7-aa61-7485df576afa",
+                "Name": "Sales Pipeline",
+                "Type": "S3",
+                "Status": "CREATION_SUCCESSFUL",
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 7,
+                    "day": 17,
+                    "hour": 12,
+                    "minute": 49,
+                    "second": 38,
+                    "microsecond": 37000
+                },
+                "LastUpdatedTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 7,
+                    "day": 17,
+                    "hour": 12,
+                    "minute": 49,
+                    "second": 38,
+                    "microsecond": 37000
+                },
+                "DataSourceParameters": {
+                    "S3Parameters": {
+                        "ManifestFileLocation": {
+                            "Bucket": "spaceneedle-samplefiles.prod.us-east-1",
+                            "Key": "sales/manifest.json"
+                        }
+                    }
+                }
+            },
+            {
+                "Arn": "arn:aws:quicksight:us-east-1:644160558196:datasource/b4ddecd6-396a-4be0-9f9b-504fb2ed69db",
+                "DataSourceId": "b4ddecd6-396a-4be0-9f9b-504fb2ed69db",
+                "Name": "Web and Social Media Analytics",
+                "Type": "S3",
+                "Status": "CREATION_SUCCESSFUL",
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 7,
+                    "day": 17,
+                    "hour": 12,
+                    "minute": 49,
+                    "second": 38,
+                    "microsecond": 94000
+                },
+                "LastUpdatedTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 7,
+                    "day": 17,
+                    "hour": 12,
+                    "minute": 49,
+                    "second": 38,
+                    "microsecond": 94000
+                },
+                "DataSourceParameters": {
+                    "S3Parameters": {
+                        "ManifestFileLocation": {
+                            "Bucket": "spaceneedle-samplefiles.prod.us-east-1",
+                            "Key": "marketing/manifest.json"
+                        }
+                    }
+                }
+            },
+            {
+                "Arn": "arn:aws:quicksight:us-east-1:644160558196:datasource/d0acb92e-38f2-43cb-99b2-1770588c0373",
+                "DataSourceId": "d0acb92e-38f2-43cb-99b2-1770588c0373",
+                "Name": "People Overview",
+                "Type": "S3",
+                "Status": "CREATION_SUCCESSFUL",
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 7,
+                    "day": 17,
+                    "hour": 12,
+                    "minute": 49,
+                    "second": 38,
+                    "microsecond": 32000
+                },
+                "LastUpdatedTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 7,
+                    "day": 17,
+                    "hour": 12,
+                    "minute": 49,
+                    "second": 38,
+                    "microsecond": 32000
+                },
+                "DataSourceParameters": {
+                    "S3Parameters": {
+                        "ManifestFileLocation": {
+                            "Bucket": "spaceneedle-samplefiles.prod.us-east-1",
+                            "Key": "hr/manifest.json"
+                        }
+                    }
+                }
+            },
+            {
+                "Arn": "arn:aws:quicksight:us-east-1:644160558196:datasource/eb34fad8-eac7-4a5f-a109-0da4166a927b",
+                "DataSourceId": "eb34fad8-eac7-4a5f-a109-0da4166a927b",
+                "Name": "Business Review",
+                "Type": "S3",
+                "Status": "CREATION_SUCCESSFUL",
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 7,
+                    "day": 17,
+                    "hour": 12,
+                    "minute": 49,
+                    "second": 38,
+                    "microsecond": 67000
+                },
+                "LastUpdatedTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 7,
+                    "day": 17,
+                    "hour": 12,
+                    "minute": 49,
+                    "second": 38,
+                    "microsecond": 67000
+                },
+                "DataSourceParameters": {
+                    "S3Parameters": {
+                        "ManifestFileLocation": {
+                            "Bucket": "spaceneedle-samplefiles.prod.us-east-1",
+                            "Key": "revenue/manifest.json"
+                        }
+                    }
+                }
+            },
+            {
+                "Arn": "arn:aws:quicksight:us-east-1:644160558196:datasource/tagged-example-source",
+                "DataSourceId": "tagged-example-source",
+                "Name": "tagged-example-source",
+                "Type": "S3",
+                "Status": "CREATION_SUCCESSFUL",
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 7,
+                    "day": 22,
+                    "hour": 11,
+                    "minute": 49,
+                    "second": 0,
+                    "microsecond": 150000
+                },
+                "LastUpdatedTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 7,
+                    "day": 22,
+                    "hour": 11,
+                    "minute": 49,
+                    "second": 0,
+                    "microsecond": 150000
+                },
+                "DataSourceParameters": {
+                    "S3Parameters": {
+                        "ManifestFileLocation": {
+                            "Bucket": "c7ntest-quicksight-test-bucket",
+                            "Key": "manifest.json"
+                        },
+                        "RoleArn": "arn:aws:iam::644160558196:role/QuickSightS3AccessRole"
+                    }
+                }
+            },
+            {
+                "Arn": "arn:aws:quicksight:us-east-1:644160558196:datasource/untagged-example-source",
+                "DataSourceId": "untagged-example-source",
+                "Name": "untagged-example-source",
+                "Type": "S3",
+                "Status": "CREATION_SUCCESSFUL",
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 7,
+                    "day": 22,
+                    "hour": 11,
+                    "minute": 49,
+                    "second": 0,
+                    "microsecond": 135000
+                },
+                "LastUpdatedTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 7,
+                    "day": 22,
+                    "hour": 11,
+                    "minute": 49,
+                    "second": 0,
+                    "microsecond": 135000
+                },
+                "DataSourceParameters": {
+                    "S3Parameters": {
+                        "ManifestFileLocation": {
+                            "Bucket": "c7ntest-quicksight-test-bucket",
+                            "Key": "manifest.json"
+                        },
+                        "RoleArn": "arn:aws:iam::644160558196:role/QuickSightS3AccessRole"
+                    }
+                }
+            }
+        ],
+        "RequestId": "5c02165e-b811-4be9-9030-3d06e6608afa"
+    }
+}

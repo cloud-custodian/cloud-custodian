@@ -1,0 +1,29 @@
+{
+  "status_code": 200,
+  "data": {
+    "ResponseMetadata": {},
+    "ReservedCacheNodes": [
+      {
+        "ReservedCacheNodeId": "test-reservation",
+        "ReservedCacheNodesOfferingId": "649fd0c8-cf6d-47a0-bfa6-060f8e75e95f",
+        "CacheNodeType": "cache.t2.small",
+        "StartTime": "2025-10-09T19:52:28Z",
+        "Duration": 2592000,
+        "FixedPrice": 27.5,
+        "UsagePrice": 0.005,
+        "CacheNodeCount": 1,
+        "ProductDescription": "Test description here",
+        "OfferingType": "Light Utilization",
+        "State": "active",
+        "RecurringCharges": [
+          {
+            "RecurringChargeAmount": 1.3,
+            "RecurringChargeFrequency": "weekly"
+          }
+        ],
+        "ReservationARN": "arn:aws:elasticache:us-east-1:123456789012:reserved-instance:ri-2017-03-27-08-33-25-582"
+      }
+    ],
+    "NextToken": ""
+  }
+}

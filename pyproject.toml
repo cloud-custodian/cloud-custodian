@@ -16,7 +16,7 @@ dependencies = [
     "urllib3>2"
 ]
 name = "c7n"
-version = "0.9.46"
+version = "0.9.48"
 description = "Cloud Custodian - Policy Rules Engine"
 readme = "README.md"
 classifiers = [
@@ -114,3 +114,7 @@ filterwarnings = [
     "ignore::DeprecationWarning",
     "ignore::PendingDeprecationWarning"
 ]
+
+
+[tool.coverage.report]
+omit = ["c7n/resources/opsworks.py"]

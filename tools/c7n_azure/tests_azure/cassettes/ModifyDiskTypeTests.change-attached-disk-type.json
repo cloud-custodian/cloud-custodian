@@ -4,7 +4,7 @@
         {
             "request": {
                 "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/disks?api-version=2020-09-30",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/disks?api-version=2024-03-02",
                 "body": null,
                 "headers": {}
             },
@@ -14,110 +14,36 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "x-cache": [
-                        "CONFIG_NOCACHE"
-                    ],
-                    "x-ms-original-request-ids": [
-                        "eefa68b2-c0e7-4b43-bfaa-27b9f8be0ec4",
-                        "4217d460-67c7-46bb-9c39-98ed4279bd90"
-                    ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
-                    ],
-                    "x-msedge-ref": [
-                        "Ref A: 868CD87D9C0942DAA6E86EDD59FA8AE6 Ref B: MRS211050313039 Ref C: 2025-02-10T16:31:06Z"
-                    ],
-                    "date": [
-                        "Mon, 10 Feb 2025 16:31:07 GMT"
-                    ],
                     "cache-control": [
                         "no-cache"
                     ],
                     "x-ms-ratelimit-remaining-subscription-global-reads": [
                         "3749"
                     ],
+                    "x-msedge-ref": [
+                        "Ref A: 767DF9FAED59496FA632C38CBD72DD93 Ref B: MNZ221060609017 Ref C: 2025-07-23T19:33:07Z"
+                    ],
+                    "date": [
+                        "Wed, 23 Jul 2025 19:33:07 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
                     "content-length": [
-                        "5491"
+                        "15589"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "44319996-e32e-4d2c-b4a5-041f871ac1e0",
+                        "163a1fb9-cb60-4835-9c81-5a5ce5dac40d",
+                        "c031863c-81d0-49a3-8ce5-60d5f879a16b"
                     ]
                 },
                 "body": {
                     "data": {
                         "value": [
-                            {
-                                "name": "kkkk",
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST-BEN/providers/Microsoft.Compute/disks/kkkk",
-                                "type": "Microsoft.Compute/disks",
-                                "location": "eastus",
-                                "tags": {
-                                    "CA_az_disktypeexc": "true"
-                                },
-                                "zones": [
-                                    "1"
-                                ],
-                                "managedBy": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test-ben/providers/Microsoft.Compute/virtualMachines/test-1",
-                                "sku": {
-                                    "name": "Premium_LRS",
-                                    "tier": "Premium"
-                                },
-                                "properties": {
-                                    "creationData": {
-                                        "createOption": "Empty"
-                                    },
-                                    "diskSizeGB": 4,
-                                    "diskIOPSReadWrite": 120,
-                                    "diskMBpsReadWrite": 25,
-                                    "encryption": {
-                                        "type": "EncryptionAtRestWithPlatformKey"
-                                    },
-                                    "networkAccessPolicy": "AllowAll",
-                                    "timeCreated": "2025-01-21T11:45:22.8082948+00:00",
-                                    "provisioningState": "Succeeded",
-                                    "diskState": "Reserved",
-                                    "diskSizeBytes": 4294967296,
-                                    "uniqueId": "162b31ce-fe87-4b90-a308-d34ecea7feec",
-                                    "tier": "P1"
-                                }
-                            },
-                            {
-                                "name": "test-1_OsDisk_1_96c5e99f83984601b028ff8bf13a1166",
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST-BEN/providers/Microsoft.Compute/disks/test-1_OsDisk_1_96c5e99f83984601b028ff8bf13a1166",
-                                "type": "Microsoft.Compute/disks",
-                                "location": "eastus",
-                                "tags": {
-                                    "CA_az_disktypeexc": "true"
-                                },
-                                "zones": [
-                                    "1"
-                                ],
-                                "managedBy": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test-ben/providers/Microsoft.Compute/virtualMachines/test-1",
-                                "sku": {
-                                    "name": "Premium_LRS",
-                                    "tier": "Premium"
-                                },
-                                "properties": {
-                                    "osType": "Linux",
-                                    "hyperVGeneration": "V2",
-                                    "creationData": {
-                                        "createOption": "FromImage",
-                                        "imageReference": {
-                                            "id": "/Subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/Providers/Microsoft.Compute/Locations/eastus/Publishers/canonical/ArtifactTypes/VMImage/Offers/ubuntu-24_04-lts/Skus/server/Versions/24.04.202408090"
-                                        }
-                                    },
-                                    "diskSizeGB": 30,
-                                    "diskIOPSReadWrite": 120,
-                                    "diskMBpsReadWrite": 25,
-                                    "encryption": {
-                                        "type": "EncryptionAtRestWithPlatformKey"
-                                    },
-                                    "networkAccessPolicy": "AllowAll",
-                                    "timeCreated": "2024-08-11T13:04:55.2330482+00:00",
-                                    "provisioningState": "Succeeded",
-                                    "diskState": "Reserved",
-                                    "diskSizeBytes": 32213303296,
-                                    "uniqueId": "96c5e99f-8398-4601-b028-ff8bf13a1166",
-                                    "tier": "P4"
-                                }
-                            },
                             {
                                 "name": "cctestvm_disk2_a9097edcfa664ff48c8e88e87d72003e",
                                 "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_DISK/providers/Microsoft.Compute/disks/cctestvm_disk2_a9097edcfa664ff48c8e88e87d72003e",
@@ -141,21 +67,64 @@
                                         "type": "EncryptionAtRestWithPlatformKey"
                                     },
                                     "networkAccessPolicy": "AllowAll",
-                                    "timeCreated": "2025-02-10T16:29:29.0065471+00:00",
+                                    "publicNetworkAccess": "Enabled",
+                                    "timeCreated": "2025-07-23T18:24:19.6649499+00:00",
                                     "provisioningState": "Succeeded",
                                     "diskState": "Unattached",
                                     "diskSizeBytes": 1098437885952,
-                                    "uniqueId": "f8067b99-6cd8-4324-8b77-c04947b4eccf"
+                                    "uniqueId": "5d89ad2b-d4c7-4a29-98d8-757a91488e22"
                                 }
                             },
                             {
-                                "name": "disk1",
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_DISK_TYPE_MODIFY/providers/Microsoft.Compute/disks/disk1",
+                                "name": "cctestvm_OsDisk_1_81338ced63fa4855b8a5f3e2bab5213c",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_DISK/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_81338ced63fa4855b8a5f3e2bab5213c",
+                                "type": "Microsoft.Compute/disks",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "testtag": "testvalue"
+                                },
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "properties": {
+                                    "osType": "Linux",
+                                    "hyperVGeneration": "V2",
+                                    "supportsHibernation": true,
+                                    "supportedCapabilities": {
+                                        "diskControllerTypes": "SCSI, NVMe",
+                                        "acceleratedNetwork": true,
+                                        "architecture": "x64"
+                                    },
+                                    "creationData": {
+                                        "createOption": "FromImage",
+                                        "imageReference": {
+                                            "id": "/Subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/Providers/Microsoft.Compute/Locations/westus/Publishers/Canonical/ArtifactTypes/VMImage/Offers/ubuntu-24_04-lts/Skus/server/Versions/24.04.202507080"
+                                        }
+                                    },
+                                    "diskSizeGB": 30,
+                                    "diskIOPSReadWrite": 500,
+                                    "diskMBpsReadWrite": 60,
+                                    "encryption": {
+                                        "type": "EncryptionAtRestWithPlatformKey"
+                                    },
+                                    "networkAccessPolicy": "AllowAll",
+                                    "publicNetworkAccess": "Enabled",
+                                    "timeCreated": "2025-07-23T18:24:19.7117879+00:00",
+                                    "provisioningState": "Succeeded",
+                                    "diskState": "Unattached",
+                                    "diskSizeBytes": 32213303296,
+                                    "uniqueId": "c2188f51-c47a-4523-a238-229584accfdb"
+                                }
+                            },
+                            {
+                                "name": "c7n-test-disk1",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_DISK_TYPE_MODIFY/providers/Microsoft.Compute/disks/c7n-test-disk1",
                                 "type": "Microsoft.Compute/disks",
                                 "location": "southcentralus",
                                 "sku": {
-                                    "name": "Premium_LRS",
-                                    "tier": "Premium"
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
                                 },
                                 "properties": {
                                     "creationData": {
@@ -163,25 +132,25 @@
                                     },
                                     "diskSizeGB": 128,
                                     "diskIOPSReadWrite": 500,
-                                    "diskMBpsReadWrite": 100,
+                                    "diskMBpsReadWrite": 60,
                                     "encryption": {
                                         "type": "EncryptionAtRestWithPlatformKey"
                                     },
                                     "networkAccessPolicy": "AllowAll",
-                                    "timeCreated": "2025-02-10T16:29:31.0847274+00:00",
+                                    "publicNetworkAccess": "Enabled",
+                                    "timeCreated": "2025-07-23T18:24:23.586772+00:00",
                                     "provisioningState": "Succeeded",
                                     "diskState": "Unattached",
                                     "diskSizeBytes": 137438953472,
-                                    "uniqueId": "5ad7e90b-fccc-4b3a-9dcc-709d99f20074",
-                                    "tier": "P10"
+                                    "uniqueId": "bdd9761e-fdf2-4384-97c6-b239192a0cc1"
                                 }
                             },
                             {
-                                "name": "disk2",
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_DISK_TYPE_MODIFY/providers/Microsoft.Compute/disks/disk2",
+                                "name": "c7n-test-disk2",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_DISK_TYPE_MODIFY/providers/Microsoft.Compute/disks/c7n-test-disk2",
                                 "type": "Microsoft.Compute/disks",
                                 "location": "southcentralus",
-                                "managedBy": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_disk_type_modify/providers/Microsoft.Compute/virtualMachines/vm-disk-test",
+                                "managedBy": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_disk_type_modify/providers/Microsoft.Compute/virtualMachines/c7n-test-vm",
                                 "sku": {
                                     "name": "Standard_LRS",
                                     "tier": "Standard"
@@ -197,45 +166,54 @@
                                         "type": "EncryptionAtRestWithPlatformKey"
                                     },
                                     "networkAccessPolicy": "AllowAll",
-                                    "timeCreated": "2025-02-10T16:29:31.0847274+00:00",
+                                    "publicNetworkAccess": "Enabled",
+                                    "timeCreated": "2025-07-23T18:24:23.6648947+00:00",
                                     "provisioningState": "Succeeded",
                                     "diskState": "Attached",
+                                    "LastOwnershipUpdateTime": "2025-07-23T18:44:26.0860766+00:00",
                                     "diskSizeBytes": 68719476736,
-                                    "uniqueId": "c94b2f6c-b6f2-4e01-b682-c1f3c12fb68e"
+                                    "uniqueId": "508c62ff-b41c-4a65-912f-6e7c2a2d3d26"
                                 }
                             },
                             {
-                                "name": "vm-disk-test_disk1_0785b5d7ea814594aa9f173026092513",
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_DISK_TYPE_MODIFY/providers/Microsoft.Compute/disks/vm-disk-test_disk1_0785b5d7ea814594aa9f173026092513",
+                                "name": "c7n-test-vm_OsDisk_1_ff7628b46249419c95e5151982c9cf41",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_DISK_TYPE_MODIFY/providers/Microsoft.Compute/disks/c7n-test-vm_OsDisk_1_ff7628b46249419c95e5151982c9cf41",
                                 "type": "Microsoft.Compute/disks",
                                 "location": "southcentralus",
-                                "managedBy": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_disk_type_modify/providers/Microsoft.Compute/virtualMachines/vm-disk-test",
+                                "managedBy": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_disk_type_modify/providers/Microsoft.Compute/virtualMachines/c7n-test-vm",
                                 "sku": {
-                                    "name": "Premium_LRS",
-                                    "tier": "Premium"
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
                                 },
                                 "properties": {
                                     "osType": "Windows",
                                     "hyperVGeneration": "V2",
+                                    "supportsHibernation": true,
+                                    "supportedCapabilities": {
+                                        "diskControllerTypes": "SCSI, NVMe",
+                                        "acceleratedNetwork": true,
+                                        "architecture": "x64"
+                                    },
                                     "creationData": {
                                         "createOption": "FromImage",
                                         "imageReference": {
-                                            "id": "/Subscriptions/ba3f11f2-e667-41a6-813f-d4915d729491/Providers/Microsoft.Compute/Locations/southcentralus/Publishers/microsoftwindowsdesktop/ArtifactTypes/VMImage/Offers/windows-10/Skus/win10-22h2-avd-g2/Versions/19045.5371.250112"
+                                            "id": "/Subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/Providers/Microsoft.Compute/Locations/southcentralus/Publishers/microsoftwindowsdesktop/ArtifactTypes/VMImage/Offers/windows-10/Skus/win10-22h2-avd-g2/Versions/19045.6093.250705"
                                         }
                                     },
                                     "diskSizeGB": 127,
                                     "diskIOPSReadWrite": 500,
-                                    "diskMBpsReadWrite": 100,
+                                    "diskMBpsReadWrite": 60,
                                     "encryption": {
                                         "type": "EncryptionAtRestWithPlatformKey"
                                     },
                                     "networkAccessPolicy": "AllowAll",
-                                    "timeCreated": "2025-02-10T16:29:42.3347928+00:00",
+                                    "publicNetworkAccess": "Enabled",
+                                    "timeCreated": "2025-07-23T18:35:46.4926407+00:00",
                                     "provisioningState": "Succeeded",
                                     "diskState": "Attached",
+                                    "LastOwnershipUpdateTime": "2025-07-23T18:44:26.0860766+00:00",
                                     "diskSizeBytes": 136367308800,
-                                    "uniqueId": "0785b5d7-ea81-4594-aa9f-173026092513",
-                                    "tier": "P10"
+                                    "uniqueId": "ff7628b4-6249-419c-95e5-151982c9cf41"
                                 }
                             }
                         ]
@@ -246,7 +224,7 @@
         {
             "request": {
                 "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_disk_type_modify/providers/Microsoft.Compute/virtualMachines/vm-disk-test?$expand=instanceView&api-version=2020-12-01",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_DISK_TYPE_MODIFY/providers/Microsoft.Compute/disks/c7n-test-disk2?api-version=2024-03-02",
                 "body": null,
                 "headers": {}
             },
@@ -256,1263 +234,38 @@
                     "message": ""
                 },
                 "headers": {
-                    "x-cache": [
-                        "CONFIG_NOCACHE"
-                    ],
-                    "x-ms-ratelimit-remaining-resource": [
-                        "Microsoft.Compute/LowCostGetSubscriptionMaximum;23997,Microsoft.Compute/LowCostGetResource;33"
-                    ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
-                    ],
-                    "x-msedge-ref": [
-                        "Ref A: 92CC6F5240BB4BF4B1162831C0178798 Ref B: MRS211050313039 Ref C: 2025-02-10T16:31:08Z"
-                    ],
-                    "date": [
-                        "Mon, 10 Feb 2025 16:31:09 GMT"
-                    ],
                     "cache-control": [
                         "no-cache"
-                    ],
-                    "content-length": [
-                        "3838"
                     ],
                     "x-ms-ratelimit-remaining-subscription-global-reads": [
                         "3749"
                     ],
-                    "x-ms-need-to-refresh-epl-cache": [
-                        "False"
-                    ]
-                },
-                "body": {
-                    "data": {
-                        "name": "vm-disk-test",
-                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_disk_type_modify/providers/Microsoft.Compute/virtualMachines/vm-disk-test",
-                        "type": "Microsoft.Compute/virtualMachines",
-                        "location": "southcentralus",
-                        "properties": {
-                            "hardwareProfile": {
-                                "vmSize": "Standard_B1s"
-                            },
-                            "provisioningState": "Succeeded",
-                            "vmId": "db723aeb-fefd-4c0d-9c44-05052c272504",
-                            "storageProfile": {
-                                "imageReference": {
-                                    "publisher": "microsoftwindowsdesktop",
-                                    "offer": "windows-10",
-                                    "sku": "win10-22h2-avd-g2",
-                                    "version": "latest",
-                                    "exactVersion": "19045.5371.250112"
-                                },
-                                "osDisk": {
-                                    "osType": "Windows",
-                                    "name": "vm-disk-test_disk1_0785b5d7ea814594aa9f173026092513",
-                                    "createOption": "FromImage",
-                                    "caching": "ReadWrite",
-                                    "managedDisk": {
-                                        "storageAccountType": "Premium_LRS",
-                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_disk_type_modify/providers/Microsoft.Compute/disks/vm-disk-test_disk1_0785b5d7ea814594aa9f173026092513"
-                                    },
-                                    "diskSizeGB": 127
-                                },
-                                "dataDisks": [
-                                    {
-                                        "lun": 0,
-                                        "name": "disk2",
-                                        "createOption": "Attach",
-                                        "caching": "None",
-                                        "managedDisk": {
-                                            "storageAccountType": "Standard_LRS",
-                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_disk_type_modify/providers/Microsoft.Compute/disks/disk2"
-                                        },
-                                        "diskSizeGB": 64,
-                                        "toBeDetached": false
-                                    }
-                                ]
-                            },
-                            "osProfile": {
-                                "computerName": "vm-disk-test",
-                                "adminUsername": "azureadmin",
-                                "windowsConfiguration": {
-                                    "provisionVMAgent": true,
-                                    "enableAutomaticUpdates": true,
-                                    "patchSettings": {
-                                        "patchMode": "AutomaticByOS"
-                                    }
-                                },
-                                "secrets": [],
-                                "allowExtensionOperations": true,
-                                "requireGuestProvisionSignal": true
-                            },
-                            "networkProfile": {
-                                "networkInterfaces": [
-                                    {
-                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_disk_type_modify/providers/Microsoft.Network/networkInterfaces/vmNIC"
-                                    }
-                                ]
-                            },
-                            "instanceView": {
-                                "vmAgent": {
-                                    "vmAgentVersion": "Unknown",
-                                    "statuses": [
-                                        {
-                                            "code": "ProvisioningState/Unavailable",
-                                            "level": "Warning",
-                                            "displayStatus": "Not Ready",
-                                            "message": "VM status blob is found but not yet populated.",
-                                            "time": "2025-02-10T16:31:09+00:00"
-                                        }
-                                    ]
-                                },
-                                "disks": [
-                                    {
-                                        "name": "vm-disk-test_disk1_0785b5d7ea814594aa9f173026092513",
-                                        "statuses": [
-                                            {
-                                                "code": "ProvisioningState/succeeded",
-                                                "level": "Info",
-                                                "displayStatus": "Provisioning succeeded",
-                                                "time": "2025-02-10T16:29:43.9373387+00:00"
-                                            }
-                                        ]
-                                    },
-                                    {
-                                        "name": "disk2",
-                                        "statuses": [
-                                            {
-                                                "code": "ProvisioningState/succeeded",
-                                                "level": "Info",
-                                                "displayStatus": "Provisioning succeeded",
-                                                "time": "2025-02-10T16:29:43.9373387+00:00"
-                                            }
-                                        ]
-                                    }
-                                ],
-                                "hyperVGeneration": "V2",
-                                "statuses": [
-                                    {
-                                        "code": "ProvisioningState/succeeded",
-                                        "level": "Info",
-                                        "displayStatus": "Provisioning succeeded",
-                                        "time": "2025-02-10T16:30:12.4530968+00:00"
-                                    },
-                                    {
-                                        "code": "PowerState/running",
-                                        "level": "Info",
-                                        "displayStatus": "VM running"
-                                    }
-                                ]
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        {
-            "request": {
-                "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_disk_type_modify/providers/Microsoft.Compute/virtualMachines/vm-disk-test?$expand=instanceView&api-version=2020-12-01",
-                "body": null,
-                "headers": {}
-            },
-            "response": {
-                "status": {
-                    "code": 200,
-                    "message": ""
-                },
-                "headers": {
-                    "x-cache": [
-                        "CONFIG_NOCACHE"
-                    ],
                     "x-ms-ratelimit-remaining-resource": [
-                        "Microsoft.Compute/LowCostGetSubscriptionMaximum;23996,Microsoft.Compute/LowCostGetResource;32"
+                        "Microsoft.Compute/LowCostGet3Min;14999,Microsoft.Compute/LowCostGet30Min;119988"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: FC285F9A568D41E4BA0FBF686B05D7DA Ref B: BL2AA2010204037 Ref C: 2025-07-23T19:33:08Z"
+                    ],
+                    "date": [
+                        "Wed, 23 Jul 2025 19:33:08 GMT"
                     ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
-                    "x-msedge-ref": [
-                        "Ref A: 93DF8F9F86EE4C259C966CB8EABD083A Ref B: MRS211050313039 Ref C: 2025-02-10T16:31:09Z"
-                    ],
-                    "date": [
-                        "Mon, 10 Feb 2025 16:31:09 GMT"
-                    ],
-                    "cache-control": [
-                        "no-cache"
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
                     ],
                     "content-length": [
-                        "3838"
-                    ],
-                    "x-ms-ratelimit-remaining-subscription-global-reads": [
-                        "3748"
-                    ],
-                    "x-ms-need-to-refresh-epl-cache": [
-                        "False"
+                        "1102"
                     ]
                 },
                 "body": {
                     "data": {
-                        "name": "vm-disk-test",
-                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_disk_type_modify/providers/Microsoft.Compute/virtualMachines/vm-disk-test",
-                        "type": "Microsoft.Compute/virtualMachines",
-                        "location": "southcentralus",
-                        "properties": {
-                            "hardwareProfile": {
-                                "vmSize": "Standard_B1s"
-                            },
-                            "provisioningState": "Succeeded",
-                            "vmId": "db723aeb-fefd-4c0d-9c44-05052c272504",
-                            "storageProfile": {
-                                "imageReference": {
-                                    "publisher": "microsoftwindowsdesktop",
-                                    "offer": "windows-10",
-                                    "sku": "win10-22h2-avd-g2",
-                                    "version": "latest",
-                                    "exactVersion": "19045.5371.250112"
-                                },
-                                "osDisk": {
-                                    "osType": "Windows",
-                                    "name": "vm-disk-test_disk1_0785b5d7ea814594aa9f173026092513",
-                                    "createOption": "FromImage",
-                                    "caching": "ReadWrite",
-                                    "managedDisk": {
-                                        "storageAccountType": "Premium_LRS",
-                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_disk_type_modify/providers/Microsoft.Compute/disks/vm-disk-test_disk1_0785b5d7ea814594aa9f173026092513"
-                                    },
-                                    "diskSizeGB": 127
-                                },
-                                "dataDisks": [
-                                    {
-                                        "lun": 0,
-                                        "name": "disk2",
-                                        "createOption": "Attach",
-                                        "caching": "None",
-                                        "managedDisk": {
-                                            "storageAccountType": "Standard_LRS",
-                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_disk_type_modify/providers/Microsoft.Compute/disks/disk2"
-                                        },
-                                        "diskSizeGB": 64,
-                                        "toBeDetached": false
-                                    }
-                                ]
-                            },
-                            "osProfile": {
-                                "computerName": "vm-disk-test",
-                                "adminUsername": "azureadmin",
-                                "windowsConfiguration": {
-                                    "provisionVMAgent": true,
-                                    "enableAutomaticUpdates": true,
-                                    "patchSettings": {
-                                        "patchMode": "AutomaticByOS"
-                                    }
-                                },
-                                "secrets": [],
-                                "allowExtensionOperations": true,
-                                "requireGuestProvisionSignal": true
-                            },
-                            "networkProfile": {
-                                "networkInterfaces": [
-                                    {
-                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_disk_type_modify/providers/Microsoft.Network/networkInterfaces/vmNIC"
-                                    }
-                                ]
-                            },
-                            "instanceView": {
-                                "vmAgent": {
-                                    "vmAgentVersion": "Unknown",
-                                    "statuses": [
-                                        {
-                                            "code": "ProvisioningState/Unavailable",
-                                            "level": "Warning",
-                                            "displayStatus": "Not Ready",
-                                            "message": "VM status blob is found but not yet populated.",
-                                            "time": "2025-02-10T16:31:09+00:00"
-                                        }
-                                    ]
-                                },
-                                "disks": [
-                                    {
-                                        "name": "vm-disk-test_disk1_0785b5d7ea814594aa9f173026092513",
-                                        "statuses": [
-                                            {
-                                                "code": "ProvisioningState/succeeded",
-                                                "level": "Info",
-                                                "displayStatus": "Provisioning succeeded",
-                                                "time": "2025-02-10T16:29:43.9373387+00:00"
-                                            }
-                                        ]
-                                    },
-                                    {
-                                        "name": "disk2",
-                                        "statuses": [
-                                            {
-                                                "code": "ProvisioningState/succeeded",
-                                                "level": "Info",
-                                                "displayStatus": "Provisioning succeeded",
-                                                "time": "2025-02-10T16:29:43.9373387+00:00"
-                                            }
-                                        ]
-                                    }
-                                ],
-                                "hyperVGeneration": "V2",
-                                "statuses": [
-                                    {
-                                        "code": "ProvisioningState/succeeded",
-                                        "level": "Info",
-                                        "displayStatus": "Provisioning succeeded",
-                                        "time": "2025-02-10T16:30:12.4530968+00:00"
-                                    },
-                                    {
-                                        "code": "PowerState/running",
-                                        "level": "Info",
-                                        "displayStatus": "VM running"
-                                    }
-                                ]
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        {
-            "request": {
-                "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_disk_type_modify/providers/Microsoft.Compute/virtualMachines/vm-disk-test?$expand=instanceView&api-version=2020-12-01",
-                "body": null,
-                "headers": {}
-            },
-            "response": {
-                "status": {
-                    "code": 200,
-                    "message": ""
-                },
-                "headers": {
-                    "x-cache": [
-                        "CONFIG_NOCACHE"
-                    ],
-                    "x-ms-ratelimit-remaining-resource": [
-                        "Microsoft.Compute/LowCostGetSubscriptionMaximum;23995,Microsoft.Compute/LowCostGetResource;31"
-                    ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
-                    ],
-                    "x-msedge-ref": [
-                        "Ref A: BC60B172EBCB4462A04A34E5B4B5F149 Ref B: MRS211050313039 Ref C: 2025-02-10T16:31:09Z"
-                    ],
-                    "date": [
-                        "Mon, 10 Feb 2025 16:31:10 GMT"
-                    ],
-                    "cache-control": [
-                        "no-cache"
-                    ],
-                    "content-length": [
-                        "3838"
-                    ],
-                    "x-ms-ratelimit-remaining-subscription-global-reads": [
-                        "3749"
-                    ],
-                    "x-ms-need-to-refresh-epl-cache": [
-                        "False"
-                    ]
-                },
-                "body": {
-                    "data": {
-                        "name": "vm-disk-test",
-                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_disk_type_modify/providers/Microsoft.Compute/virtualMachines/vm-disk-test",
-                        "type": "Microsoft.Compute/virtualMachines",
-                        "location": "southcentralus",
-                        "properties": {
-                            "hardwareProfile": {
-                                "vmSize": "Standard_B1s"
-                            },
-                            "provisioningState": "Succeeded",
-                            "vmId": "db723aeb-fefd-4c0d-9c44-05052c272504",
-                            "storageProfile": {
-                                "imageReference": {
-                                    "publisher": "microsoftwindowsdesktop",
-                                    "offer": "windows-10",
-                                    "sku": "win10-22h2-avd-g2",
-                                    "version": "latest",
-                                    "exactVersion": "19045.5371.250112"
-                                },
-                                "osDisk": {
-                                    "osType": "Windows",
-                                    "name": "vm-disk-test_disk1_0785b5d7ea814594aa9f173026092513",
-                                    "createOption": "FromImage",
-                                    "caching": "ReadWrite",
-                                    "managedDisk": {
-                                        "storageAccountType": "Premium_LRS",
-                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_disk_type_modify/providers/Microsoft.Compute/disks/vm-disk-test_disk1_0785b5d7ea814594aa9f173026092513"
-                                    },
-                                    "diskSizeGB": 127
-                                },
-                                "dataDisks": [
-                                    {
-                                        "lun": 0,
-                                        "name": "disk2",
-                                        "createOption": "Attach",
-                                        "caching": "None",
-                                        "managedDisk": {
-                                            "storageAccountType": "Standard_LRS",
-                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_disk_type_modify/providers/Microsoft.Compute/disks/disk2"
-                                        },
-                                        "diskSizeGB": 64,
-                                        "toBeDetached": false
-                                    }
-                                ]
-                            },
-                            "osProfile": {
-                                "computerName": "vm-disk-test",
-                                "adminUsername": "azureadmin",
-                                "windowsConfiguration": {
-                                    "provisionVMAgent": true,
-                                    "enableAutomaticUpdates": true,
-                                    "patchSettings": {
-                                        "patchMode": "AutomaticByOS"
-                                    }
-                                },
-                                "secrets": [],
-                                "allowExtensionOperations": true,
-                                "requireGuestProvisionSignal": true
-                            },
-                            "networkProfile": {
-                                "networkInterfaces": [
-                                    {
-                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_disk_type_modify/providers/Microsoft.Network/networkInterfaces/vmNIC"
-                                    }
-                                ]
-                            },
-                            "instanceView": {
-                                "vmAgent": {
-                                    "vmAgentVersion": "Unknown",
-                                    "statuses": [
-                                        {
-                                            "code": "ProvisioningState/Unavailable",
-                                            "level": "Warning",
-                                            "displayStatus": "Not Ready",
-                                            "message": "VM status blob is found but not yet populated.",
-                                            "time": "2025-02-10T16:31:10+00:00"
-                                        }
-                                    ]
-                                },
-                                "disks": [
-                                    {
-                                        "name": "vm-disk-test_disk1_0785b5d7ea814594aa9f173026092513",
-                                        "statuses": [
-                                            {
-                                                "code": "ProvisioningState/succeeded",
-                                                "level": "Info",
-                                                "displayStatus": "Provisioning succeeded",
-                                                "time": "2025-02-10T16:29:43.9373387+00:00"
-                                            }
-                                        ]
-                                    },
-                                    {
-                                        "name": "disk2",
-                                        "statuses": [
-                                            {
-                                                "code": "ProvisioningState/succeeded",
-                                                "level": "Info",
-                                                "displayStatus": "Provisioning succeeded",
-                                                "time": "2025-02-10T16:29:43.9373387+00:00"
-                                            }
-                                        ]
-                                    }
-                                ],
-                                "hyperVGeneration": "V2",
-                                "statuses": [
-                                    {
-                                        "code": "ProvisioningState/succeeded",
-                                        "level": "Info",
-                                        "displayStatus": "Provisioning succeeded",
-                                        "time": "2025-02-10T16:30:12.4530968+00:00"
-                                    },
-                                    {
-                                        "code": "PowerState/running",
-                                        "level": "Info",
-                                        "displayStatus": "VM running"
-                                    }
-                                ]
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        {
-            "request": {
-                "method": "POST",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_disk_type_modify/providers/Microsoft.Compute/virtualMachines/vm-disk-test/deallocate?api-version=2020-12-01",
-                "body": null,
-                "headers": {}
-            },
-            "response": {
-                "status": {
-                    "code": 202,
-                    "message": ""
-                },
-                "headers": {
-                    "x-cache": [
-                        "CONFIG_NOCACHE"
-                    ],
-                    "x-ms-ratelimit-remaining-subscription-writes": [
-                        "199"
-                    ],
-                    "x-ms-ratelimit-remaining-resource": [
-                        "Microsoft.Compute/DeleteVMSubscriptionMaximum;1499,Microsoft.Compute/DeleteVMResource;11"
-                    ],
-                    "date": [
-                        "Mon, 10 Feb 2025 16:31:11 GMT"
-                    ],
-                    "azure-asyncnotification": [
-                        "Enabled"
-                    ],
-                    "content-length": [
-                        "0"
-                    ],
-                    "x-msedge-ref": [
-                        "Ref A: A8793A16C826484397E4543DF875106C Ref B: MRS211050313039 Ref C: 2025-02-10T16:31:10Z"
-                    ],
-                    "x-ms-need-to-refresh-epl-cache": [
-                        "False"
-                    ],
-                    "location": [
-                        "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/locations/southcentralus/operations/dcb12299-b155-4940-a19b-d6fb1a486702?p=e0591a86-90ba-4cf1-98d9-5c1538cf7689&monitor=true&api-version=2020-12-01&t=638748018721628923&c=MIIH5zCCBs-gAwIBAgITOgTWw_CixDB5M0tRDAAEBNbD8DANBgkqhkiG9w0BAQsFADBEMRMwEQYKCZImiZPyLGQBGRYDR0JMMRMwEQYKCZImiZPyLGQBGRYDQU1FMRgwFgYDVQQDEw9BTUUgSU5GUkEgQ0EgMDEwHhcNMjUwMjA1MDYwMzM4WhcNMjYwMTMxMDYwMzM4WjBAMT4wPAYDVQQDEzVhc3luY29wZXJhdGlvbnNpZ25pbmdjZXJ0aWZpY2F0ZS5tYW5hZ2VtZW50LmF6dXJlLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAKUqQWGa1z42tcQF-DR_GfohPjSJLzzrOoB6iSg6rWTxRhvHfldQyBcC3xcWCHropJ7pZ5mNz6PNbaqnZxCRR46qsC7Yt-mvu7PbSg-Cek5HJd0TbsoM53vX2eQirD59YwFduhPaip67CygLRftuVpbiU8_IyRTu-u4U20YtdjpTuXH11KURCMJGA5XYqPlvwwSXCBgi_C1GTX47lDBsuEN0qTtRQHS_ek-MEiFKdWr3nzkPo8WHbJxpH9mspQ3IdcwTSbIqC9JMkYZukKyXNSPSwpZpYiEmg4VT_AjVwTKrFy6EDH9ZATtk10ip09iCjaiRzjdTMUPSUYWZklDFYhECAwEAAaOCBNQwggTQMCcGCSsGAQQBgjcVCgQaMBgwCgYIKwYBBQUHAwEwCgYIKwYBBQUHAwIwPQYJKwYBBAGCNxUHBDAwLgYmKwYBBAGCNxUIhpDjDYTVtHiE8Ys-hZvdFs6dEoFggvX2K4Py0SACAWQCAQowggHaBggrBgEFBQcBAQSCAcwwggHIMGYGCCsGAQUFBzAChlpodHRwOi8vY3JsLm1pY3Jvc29mdC5jb20vcGtpaW5mcmEvQ2VydHMvQlkyUEtJSU5UQ0EwMS5BTUUuR0JMX0FNRSUyMElORlJBJTIwQ0ElMjAwMSg0KS5jcnQwVgYIKwYBBQUHMAKGSmh0dHA6Ly9jcmwxLmFtZS5nYmwvYWlhL0JZMlBLSUlOVENBMDEuQU1FLkdCTF9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3J0MFYGCCsGAQUFBzAChkpodHRwOi8vY3JsMi5hbWUuZ2JsL2FpYS9CWTJQS0lJTlRDQTAxLkFNRS5HQkxfQU1FJTIwSU5GUkElMjBDQSUyMDAxKDQpLmNydDBWBggrBgEFBQcwAoZKaHR0cDovL2NybDMuYW1lLmdibC9haWEvQlkyUEtJSU5UQ0EwMS5BTUUuR0JMX0FNRSUyMElORlJBJTIwQ0ElMjAwMSg0KS5jcnQwVgYIKwYBBQUHMAKGSmh0dHA6Ly9jcmw0LmFtZS5nYmwvYWlhL0JZMlBLSUlOVENBMDEuQU1FLkdCTF9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3J0MB0GA1UdDgQWBBQisbRQvrAefMEPMKyvaT1PVI9GyTAOBgNVHQ8BAf8EBAMCBaAwQAYDVR0RBDkwN4I1YXN5bmNvcGVyYXRpb25zaWduaW5nY2VydGlmaWNhdGUubWFuYWdlbWVudC5henVyZS5jb20wggE1BgNVHR8EggEsMIIBKDCCASSgggEgoIIBHIZCaHR0cDovL2NybC5taWNyb3NvZnQuY29tL3BraWluZnJhL0NSTC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsMS5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsMi5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsMy5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsNC5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JsMIGdBgNVHSAEgZUwgZIwDAYKKwYBBAGCN3sBATBmBgorBgEEAYI3ewICMFgwVgYIKwYBBQUHAgIwSh5IADMAMwBlADAAMQA5ADIAMQAtADQAZAA2ADQALQA0AGYAOABjAC0AYQAwADUANQAtADUAYgBkAGEAZgBmAGQANQBlADMAMwBkMAwGCisGAQQBgjd7AwIwDAYKKwYBBAGCN3sEAjAfBgNVHSMEGDAWgBTl2Ztn_PjsurvwwKidileIud8-YzAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwDQYJKoZIhvcNAQELBQADggEBAGK8URvSRwObVbsCbUgrkRlQ-2UKTKNUvJlo6-EBMp-w1NI_xUhd6MomwZfvl23L3OEMSCwjgPSJB3lHE7gdpWurhGsPwRmrrYK-EWUDZyBmumk2zDGfZp-m6JqbxzGZnlFQj3ECr0kJIas4WkIjx2riHMfjn6HtgJZnsHJsl2onv4fsfeJ5grVLh1UcnnMOF4GvHmrMlqCIgW2NKOjkBQs3wByNyutZKqNb26SO9MCbxXTNvWJvZ3WCdBfikQRqyypFRP64GwGycQy9eLG_p2OLQ2myyospuUm3yDBHaXp_br7YlvKl1RzeA7HgcbdDaMLhmOgRlAoCq_muFttgeQY&s=aW8yN3hkpOaQeQ7jpIFTYYmLcLKM0oOMRK--UYaM3Ssw8zsxn56X24-Rgwi9ubjJw7eTAfIAoId7VbVi02P31vkFnpirJgsGIj750Gmyb4H9zulYCMpGMVKvv739IoJ0PKyTmm1V34uZcAvcVrj1FAv7_xzrI4sgfeYqklTwkGUfaFxKwvOCho7JPFSCU2A_Drqw5oXdbU7b1p_jUttcI2fhlcB62RAc1CP6rC9q3qbkOVfMcxqlOOE6BmLgYk9EsxdiZzbqu4WlVK3X0uxWAwkZ9dYgfmP3khhwqqmjUFeE7tmRG-aPFUzRtUHNNAqhaXD0T3diGOZnWrTN1Kcntw&h=YgYxkLMeT7oC-ZrR0rOV3i_siNwEPe0cFw812m0TOvQ"
-                    ],
-                    "x-ms-ratelimit-remaining-subscription-global-writes": [
-                        "2999"
-                    ],
-                    "azure-asyncoperation": [
-                        "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/locations/southcentralus/operations/dcb12299-b155-4940-a19b-d6fb1a486702?p=e0591a86-90ba-4cf1-98d9-5c1538cf7689&api-version=2020-12-01&t=638748018721628923&c=MIIH5zCCBs-gAwIBAgITOgTWw_CixDB5M0tRDAAEBNbD8DANBgkqhkiG9w0BAQsFADBEMRMwEQYKCZImiZPyLGQBGRYDR0JMMRMwEQYKCZImiZPyLGQBGRYDQU1FMRgwFgYDVQQDEw9BTUUgSU5GUkEgQ0EgMDEwHhcNMjUwMjA1MDYwMzM4WhcNMjYwMTMxMDYwMzM4WjBAMT4wPAYDVQQDEzVhc3luY29wZXJhdGlvbnNpZ25pbmdjZXJ0aWZpY2F0ZS5tYW5hZ2VtZW50LmF6dXJlLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAKUqQWGa1z42tcQF-DR_GfohPjSJLzzrOoB6iSg6rWTxRhvHfldQyBcC3xcWCHropJ7pZ5mNz6PNbaqnZxCRR46qsC7Yt-mvu7PbSg-Cek5HJd0TbsoM53vX2eQirD59YwFduhPaip67CygLRftuVpbiU8_IyRTu-u4U20YtdjpTuXH11KURCMJGA5XYqPlvwwSXCBgi_C1GTX47lDBsuEN0qTtRQHS_ek-MEiFKdWr3nzkPo8WHbJxpH9mspQ3IdcwTSbIqC9JMkYZukKyXNSPSwpZpYiEmg4VT_AjVwTKrFy6EDH9ZATtk10ip09iCjaiRzjdTMUPSUYWZklDFYhECAwEAAaOCBNQwggTQMCcGCSsGAQQBgjcVCgQaMBgwCgYIKwYBBQUHAwEwCgYIKwYBBQUHAwIwPQYJKwYBBAGCNxUHBDAwLgYmKwYBBAGCNxUIhpDjDYTVtHiE8Ys-hZvdFs6dEoFggvX2K4Py0SACAWQCAQowggHaBggrBgEFBQcBAQSCAcwwggHIMGYGCCsGAQUFBzAChlpodHRwOi8vY3JsLm1pY3Jvc29mdC5jb20vcGtpaW5mcmEvQ2VydHMvQlkyUEtJSU5UQ0EwMS5BTUUuR0JMX0FNRSUyMElORlJBJTIwQ0ElMjAwMSg0KS5jcnQwVgYIKwYBBQUHMAKGSmh0dHA6Ly9jcmwxLmFtZS5nYmwvYWlhL0JZMlBLSUlOVENBMDEuQU1FLkdCTF9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3J0MFYGCCsGAQUFBzAChkpodHRwOi8vY3JsMi5hbWUuZ2JsL2FpYS9CWTJQS0lJTlRDQTAxLkFNRS5HQkxfQU1FJTIwSU5GUkElMjBDQSUyMDAxKDQpLmNydDBWBggrBgEFBQcwAoZKaHR0cDovL2NybDMuYW1lLmdibC9haWEvQlkyUEtJSU5UQ0EwMS5BTUUuR0JMX0FNRSUyMElORlJBJTIwQ0ElMjAwMSg0KS5jcnQwVgYIKwYBBQUHMAKGSmh0dHA6Ly9jcmw0LmFtZS5nYmwvYWlhL0JZMlBLSUlOVENBMDEuQU1FLkdCTF9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3J0MB0GA1UdDgQWBBQisbRQvrAefMEPMKyvaT1PVI9GyTAOBgNVHQ8BAf8EBAMCBaAwQAYDVR0RBDkwN4I1YXN5bmNvcGVyYXRpb25zaWduaW5nY2VydGlmaWNhdGUubWFuYWdlbWVudC5henVyZS5jb20wggE1BgNVHR8EggEsMIIBKDCCASSgggEgoIIBHIZCaHR0cDovL2NybC5taWNyb3NvZnQuY29tL3BraWluZnJhL0NSTC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsMS5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsMi5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsMy5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsNC5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JsMIGdBgNVHSAEgZUwgZIwDAYKKwYBBAGCN3sBATBmBgorBgEEAYI3ewICMFgwVgYIKwYBBQUHAgIwSh5IADMAMwBlADAAMQA5ADIAMQAtADQAZAA2ADQALQA0AGYAOABjAC0AYQAwADUANQAtADUAYgBkAGEAZgBmAGQANQBlADMAMwBkMAwGCisGAQQBgjd7AwIwDAYKKwYBBAGCN3sEAjAfBgNVHSMEGDAWgBTl2Ztn_PjsurvwwKidileIud8-YzAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwDQYJKoZIhvcNAQELBQADggEBAGK8URvSRwObVbsCbUgrkRlQ-2UKTKNUvJlo6-EBMp-w1NI_xUhd6MomwZfvl23L3OEMSCwjgPSJB3lHE7gdpWurhGsPwRmrrYK-EWUDZyBmumk2zDGfZp-m6JqbxzGZnlFQj3ECr0kJIas4WkIjx2riHMfjn6HtgJZnsHJsl2onv4fsfeJ5grVLh1UcnnMOF4GvHmrMlqCIgW2NKOjkBQs3wByNyutZKqNb26SO9MCbxXTNvWJvZ3WCdBfikQRqyypFRP64GwGycQy9eLG_p2OLQ2myyospuUm3yDBHaXp_br7YlvKl1RzeA7HgcbdDaMLhmOgRlAoCq_muFttgeQY&s=aW8yN3hkpOaQeQ7jpIFTYYmLcLKM0oOMRK--UYaM3Ssw8zsxn56X24-Rgwi9ubjJw7eTAfIAoId7VbVi02P31vkFnpirJgsGIj750Gmyb4H9zulYCMpGMVKvv739IoJ0PKyTmm1V34uZcAvcVrj1FAv7_xzrI4sgfeYqklTwkGUfaFxKwvOCho7JPFSCU2A_Drqw5oXdbU7b1p_jUttcI2fhlcB62RAc1CP6rC9q3qbkOVfMcxqlOOE6BmLgYk9EsxdiZzbqu4WlVK3X0uxWAwkZ9dYgfmP3khhwqqmjUFeE7tmRG-aPFUzRtUHNNAqhaXD0T3diGOZnWrTN1Kcntw&h=YgYxkLMeT7oC-ZrR0rOV3i_siNwEPe0cFw812m0TOvQ"
-                    ],
-                    "cache-control": [
-                        "no-cache"
-                    ]
-                },
-                "body": {
-                    "string": ""
-                }
-            }
-        },
-        {
-            "request": {
-                "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/locations/southcentralus/operations/dcb12299-b155-4940-a19b-d6fb1a486702?p=e0591a86-90ba-4cf1-98d9-5c1538cf7689&api-version=2020-12-01&t=638748018721628923&c=MIIH5zCCBs-gAwIBAgITOgTWw_CixDB5M0tRDAAEBNbD8DANBgkqhkiG9w0BAQsFADBEMRMwEQYKCZImiZPyLGQBGRYDR0JMMRMwEQYKCZImiZPyLGQBGRYDQU1FMRgwFgYDVQQDEw9BTUUgSU5GUkEgQ0EgMDEwHhcNMjUwMjA1MDYwMzM4WhcNMjYwMTMxMDYwMzM4WjBAMT4wPAYDVQQDEzVhc3luY29wZXJhdGlvbnNpZ25pbmdjZXJ0aWZpY2F0ZS5tYW5hZ2VtZW50LmF6dXJlLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAKUqQWGa1z42tcQF-DR_GfohPjSJLzzrOoB6iSg6rWTxRhvHfldQyBcC3xcWCHropJ7pZ5mNz6PNbaqnZxCRR46qsC7Yt-mvu7PbSg-Cek5HJd0TbsoM53vX2eQirD59YwFduhPaip67CygLRftuVpbiU8_IyRTu-u4U20YtdjpTuXH11KURCMJGA5XYqPlvwwSXCBgi_C1GTX47lDBsuEN0qTtRQHS_ek-MEiFKdWr3nzkPo8WHbJxpH9mspQ3IdcwTSbIqC9JMkYZukKyXNSPSwpZpYiEmg4VT_AjVwTKrFy6EDH9ZATtk10ip09iCjaiRzjdTMUPSUYWZklDFYhECAwEAAaOCBNQwggTQMCcGCSsGAQQBgjcVCgQaMBgwCgYIKwYBBQUHAwEwCgYIKwYBBQUHAwIwPQYJKwYBBAGCNxUHBDAwLgYmKwYBBAGCNxUIhpDjDYTVtHiE8Ys-hZvdFs6dEoFggvX2K4Py0SACAWQCAQowggHaBggrBgEFBQcBAQSCAcwwggHIMGYGCCsGAQUFBzAChlpodHRwOi8vY3JsLm1pY3Jvc29mdC5jb20vcGtpaW5mcmEvQ2VydHMvQlkyUEtJSU5UQ0EwMS5BTUUuR0JMX0FNRSUyMElORlJBJTIwQ0ElMjAwMSg0KS5jcnQwVgYIKwYBBQUHMAKGSmh0dHA6Ly9jcmwxLmFtZS5nYmwvYWlhL0JZMlBLSUlOVENBMDEuQU1FLkdCTF9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3J0MFYGCCsGAQUFBzAChkpodHRwOi8vY3JsMi5hbWUuZ2JsL2FpYS9CWTJQS0lJTlRDQTAxLkFNRS5HQkxfQU1FJTIwSU5GUkElMjBDQSUyMDAxKDQpLmNydDBWBggrBgEFBQcwAoZKaHR0cDovL2NybDMuYW1lLmdibC9haWEvQlkyUEtJSU5UQ0EwMS5BTUUuR0JMX0FNRSUyMElORlJBJTIwQ0ElMjAwMSg0KS5jcnQwVgYIKwYBBQUHMAKGSmh0dHA6Ly9jcmw0LmFtZS5nYmwvYWlhL0JZMlBLSUlOVENBMDEuQU1FLkdCTF9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3J0MB0GA1UdDgQWBBQisbRQvrAefMEPMKyvaT1PVI9GyTAOBgNVHQ8BAf8EBAMCBaAwQAYDVR0RBDkwN4I1YXN5bmNvcGVyYXRpb25zaWduaW5nY2VydGlmaWNhdGUubWFuYWdlbWVudC5henVyZS5jb20wggE1BgNVHR8EggEsMIIBKDCCASSgggEgoIIBHIZCaHR0cDovL2NybC5taWNyb3NvZnQuY29tL3BraWluZnJhL0NSTC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsMS5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsMi5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsMy5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsNC5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JsMIGdBgNVHSAEgZUwgZIwDAYKKwYBBAGCN3sBATBmBgorBgEEAYI3ewICMFgwVgYIKwYBBQUHAgIwSh5IADMAMwBlADAAMQA5ADIAMQAtADQAZAA2ADQALQA0AGYAOABjAC0AYQAwADUANQAtADUAYgBkAGEAZgBmAGQANQBlADMAMwBkMAwGCisGAQQBgjd7AwIwDAYKKwYBBAGCN3sEAjAfBgNVHSMEGDAWgBTl2Ztn_PjsurvwwKidileIud8-YzAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwDQYJKoZIhvcNAQELBQADggEBAGK8URvSRwObVbsCbUgrkRlQ-2UKTKNUvJlo6-EBMp-w1NI_xUhd6MomwZfvl23L3OEMSCwjgPSJB3lHE7gdpWurhGsPwRmrrYK-EWUDZyBmumk2zDGfZp-m6JqbxzGZnlFQj3ECr0kJIas4WkIjx2riHMfjn6HtgJZnsHJsl2onv4fsfeJ5grVLh1UcnnMOF4GvHmrMlqCIgW2NKOjkBQs3wByNyutZKqNb26SO9MCbxXTNvWJvZ3WCdBfikQRqyypFRP64GwGycQy9eLG_p2OLQ2myyospuUm3yDBHaXp_br7YlvKl1RzeA7HgcbdDaMLhmOgRlAoCq_muFttgeQY&s=aW8yN3hkpOaQeQ7jpIFTYYmLcLKM0oOMRK--UYaM3Ssw8zsxn56X24-Rgwi9ubjJw7eTAfIAoId7VbVi02P31vkFnpirJgsGIj750Gmyb4H9zulYCMpGMVKvv739IoJ0PKyTmm1V34uZcAvcVrj1FAv7_xzrI4sgfeYqklTwkGUfaFxKwvOCho7JPFSCU2A_Drqw5oXdbU7b1p_jUttcI2fhlcB62RAc1CP6rC9q3qbkOVfMcxqlOOE6BmLgYk9EsxdiZzbqu4WlVK3X0uxWAwkZ9dYgfmP3khhwqqmjUFeE7tmRG-aPFUzRtUHNNAqhaXD0T3diGOZnWrTN1Kcntw&h=YgYxkLMeT7oC-ZrR0rOV3i_siNwEPe0cFw812m0TOvQ",
-                "body": null,
-                "headers": {}
-            },
-            "response": {
-                "status": {
-                    "code": 200,
-                    "message": ""
-                },
-                "headers": {
-                    "x-cache": [
-                        "CONFIG_NOCACHE"
-                    ],
-                    "x-ms-ratelimit-remaining-resource": [
-                        "Microsoft.Compute/GetOperationResource;44,Microsoft.Compute/GetOperationSubscriptionMaximum;14997"
-                    ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
-                    ],
-                    "x-msedge-ref": [
-                        "Ref A: E95C8C96810743459B3F9567AD5C8DAC Ref B: MRS211050313039 Ref C: 2025-02-10T16:31:12Z"
-                    ],
-                    "date": [
-                        "Mon, 10 Feb 2025 16:31:12 GMT"
-                    ],
-                    "cache-control": [
-                        "no-cache"
-                    ],
-                    "content-length": [
-                        "134"
-                    ],
-                    "x-ms-ratelimit-remaining-subscription-global-reads": [
-                        "3748"
-                    ],
-                    "x-ms-need-to-refresh-epl-cache": [
-                        "False"
-                    ]
-                },
-                "body": {
-                    "data": {
-                        "startTime": "2025-02-10T16:31:12.0472027+00:00",
-                        "status": "InProgress",
-                        "name": "dcb12299-b155-4940-a19b-d6fb1a486702"
-                    }
-                }
-            }
-        },
-        {
-            "request": {
-                "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/locations/southcentralus/operations/dcb12299-b155-4940-a19b-d6fb1a486702?p=e0591a86-90ba-4cf1-98d9-5c1538cf7689&api-version=2020-12-01&t=638748018721628923&c=MIIH5zCCBs-gAwIBAgITOgTWw_CixDB5M0tRDAAEBNbD8DANBgkqhkiG9w0BAQsFADBEMRMwEQYKCZImiZPyLGQBGRYDR0JMMRMwEQYKCZImiZPyLGQBGRYDQU1FMRgwFgYDVQQDEw9BTUUgSU5GUkEgQ0EgMDEwHhcNMjUwMjA1MDYwMzM4WhcNMjYwMTMxMDYwMzM4WjBAMT4wPAYDVQQDEzVhc3luY29wZXJhdGlvbnNpZ25pbmdjZXJ0aWZpY2F0ZS5tYW5hZ2VtZW50LmF6dXJlLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAKUqQWGa1z42tcQF-DR_GfohPjSJLzzrOoB6iSg6rWTxRhvHfldQyBcC3xcWCHropJ7pZ5mNz6PNbaqnZxCRR46qsC7Yt-mvu7PbSg-Cek5HJd0TbsoM53vX2eQirD59YwFduhPaip67CygLRftuVpbiU8_IyRTu-u4U20YtdjpTuXH11KURCMJGA5XYqPlvwwSXCBgi_C1GTX47lDBsuEN0qTtRQHS_ek-MEiFKdWr3nzkPo8WHbJxpH9mspQ3IdcwTSbIqC9JMkYZukKyXNSPSwpZpYiEmg4VT_AjVwTKrFy6EDH9ZATtk10ip09iCjaiRzjdTMUPSUYWZklDFYhECAwEAAaOCBNQwggTQMCcGCSsGAQQBgjcVCgQaMBgwCgYIKwYBBQUHAwEwCgYIKwYBBQUHAwIwPQYJKwYBBAGCNxUHBDAwLgYmKwYBBAGCNxUIhpDjDYTVtHiE8Ys-hZvdFs6dEoFggvX2K4Py0SACAWQCAQowggHaBggrBgEFBQcBAQSCAcwwggHIMGYGCCsGAQUFBzAChlpodHRwOi8vY3JsLm1pY3Jvc29mdC5jb20vcGtpaW5mcmEvQ2VydHMvQlkyUEtJSU5UQ0EwMS5BTUUuR0JMX0FNRSUyMElORlJBJTIwQ0ElMjAwMSg0KS5jcnQwVgYIKwYBBQUHMAKGSmh0dHA6Ly9jcmwxLmFtZS5nYmwvYWlhL0JZMlBLSUlOVENBMDEuQU1FLkdCTF9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3J0MFYGCCsGAQUFBzAChkpodHRwOi8vY3JsMi5hbWUuZ2JsL2FpYS9CWTJQS0lJTlRDQTAxLkFNRS5HQkxfQU1FJTIwSU5GUkElMjBDQSUyMDAxKDQpLmNydDBWBggrBgEFBQcwAoZKaHR0cDovL2NybDMuYW1lLmdibC9haWEvQlkyUEtJSU5UQ0EwMS5BTUUuR0JMX0FNRSUyMElORlJBJTIwQ0ElMjAwMSg0KS5jcnQwVgYIKwYBBQUHMAKGSmh0dHA6Ly9jcmw0LmFtZS5nYmwvYWlhL0JZMlBLSUlOVENBMDEuQU1FLkdCTF9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3J0MB0GA1UdDgQWBBQisbRQvrAefMEPMKyvaT1PVI9GyTAOBgNVHQ8BAf8EBAMCBaAwQAYDVR0RBDkwN4I1YXN5bmNvcGVyYXRpb25zaWduaW5nY2VydGlmaWNhdGUubWFuYWdlbWVudC5henVyZS5jb20wggE1BgNVHR8EggEsMIIBKDCCASSgggEgoIIBHIZCaHR0cDovL2NybC5taWNyb3NvZnQuY29tL3BraWluZnJhL0NSTC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsMS5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsMi5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsMy5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsNC5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JsMIGdBgNVHSAEgZUwgZIwDAYKKwYBBAGCN3sBATBmBgorBgEEAYI3ewICMFgwVgYIKwYBBQUHAgIwSh5IADMAMwBlADAAMQA5ADIAMQAtADQAZAA2ADQALQA0AGYAOABjAC0AYQAwADUANQAtADUAYgBkAGEAZgBmAGQANQBlADMAMwBkMAwGCisGAQQBgjd7AwIwDAYKKwYBBAGCN3sEAjAfBgNVHSMEGDAWgBTl2Ztn_PjsurvwwKidileIud8-YzAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwDQYJKoZIhvcNAQELBQADggEBAGK8URvSRwObVbsCbUgrkRlQ-2UKTKNUvJlo6-EBMp-w1NI_xUhd6MomwZfvl23L3OEMSCwjgPSJB3lHE7gdpWurhGsPwRmrrYK-EWUDZyBmumk2zDGfZp-m6JqbxzGZnlFQj3ECr0kJIas4WkIjx2riHMfjn6HtgJZnsHJsl2onv4fsfeJ5grVLh1UcnnMOF4GvHmrMlqCIgW2NKOjkBQs3wByNyutZKqNb26SO9MCbxXTNvWJvZ3WCdBfikQRqyypFRP64GwGycQy9eLG_p2OLQ2myyospuUm3yDBHaXp_br7YlvKl1RzeA7HgcbdDaMLhmOgRlAoCq_muFttgeQY&s=aW8yN3hkpOaQeQ7jpIFTYYmLcLKM0oOMRK--UYaM3Ssw8zsxn56X24-Rgwi9ubjJw7eTAfIAoId7VbVi02P31vkFnpirJgsGIj750Gmyb4H9zulYCMpGMVKvv739IoJ0PKyTmm1V34uZcAvcVrj1FAv7_xzrI4sgfeYqklTwkGUfaFxKwvOCho7JPFSCU2A_Drqw5oXdbU7b1p_jUttcI2fhlcB62RAc1CP6rC9q3qbkOVfMcxqlOOE6BmLgYk9EsxdiZzbqu4WlVK3X0uxWAwkZ9dYgfmP3khhwqqmjUFeE7tmRG-aPFUzRtUHNNAqhaXD0T3diGOZnWrTN1Kcntw&h=YgYxkLMeT7oC-ZrR0rOV3i_siNwEPe0cFw812m0TOvQ",
-                "body": null,
-                "headers": {}
-            },
-            "response": {
-                "status": {
-                    "code": 200,
-                    "message": ""
-                },
-                "headers": {
-                    "x-cache": [
-                        "CONFIG_NOCACHE"
-                    ],
-                    "x-ms-ratelimit-remaining-resource": [
-                        "Microsoft.Compute/GetOperationResource;43,Microsoft.Compute/GetOperationSubscriptionMaximum;14999"
-                    ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
-                    ],
-                    "x-msedge-ref": [
-                        "Ref A: 460DFE6529844E7CA0965E0A60B4A0F8 Ref B: MRS211050313039 Ref C: 2025-02-10T16:31:42Z"
-                    ],
-                    "date": [
-                        "Mon, 10 Feb 2025 16:31:42 GMT"
-                    ],
-                    "cache-control": [
-                        "no-cache"
-                    ],
-                    "content-length": [
-                        "134"
-                    ],
-                    "x-ms-ratelimit-remaining-subscription-global-reads": [
-                        "3749"
-                    ],
-                    "x-ms-need-to-refresh-epl-cache": [
-                        "False"
-                    ]
-                },
-                "body": {
-                    "data": {
-                        "startTime": "2025-02-10T16:31:12.0472027+00:00",
-                        "status": "InProgress",
-                        "name": "dcb12299-b155-4940-a19b-d6fb1a486702"
-                    }
-                }
-            }
-        },
-        {
-            "request": {
-                "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/locations/southcentralus/operations/dcb12299-b155-4940-a19b-d6fb1a486702?p=e0591a86-90ba-4cf1-98d9-5c1538cf7689&api-version=2020-12-01&t=638748018721628923&c=MIIH5zCCBs-gAwIBAgITOgTWw_CixDB5M0tRDAAEBNbD8DANBgkqhkiG9w0BAQsFADBEMRMwEQYKCZImiZPyLGQBGRYDR0JMMRMwEQYKCZImiZPyLGQBGRYDQU1FMRgwFgYDVQQDEw9BTUUgSU5GUkEgQ0EgMDEwHhcNMjUwMjA1MDYwMzM4WhcNMjYwMTMxMDYwMzM4WjBAMT4wPAYDVQQDEzVhc3luY29wZXJhdGlvbnNpZ25pbmdjZXJ0aWZpY2F0ZS5tYW5hZ2VtZW50LmF6dXJlLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAKUqQWGa1z42tcQF-DR_GfohPjSJLzzrOoB6iSg6rWTxRhvHfldQyBcC3xcWCHropJ7pZ5mNz6PNbaqnZxCRR46qsC7Yt-mvu7PbSg-Cek5HJd0TbsoM53vX2eQirD59YwFduhPaip67CygLRftuVpbiU8_IyRTu-u4U20YtdjpTuXH11KURCMJGA5XYqPlvwwSXCBgi_C1GTX47lDBsuEN0qTtRQHS_ek-MEiFKdWr3nzkPo8WHbJxpH9mspQ3IdcwTSbIqC9JMkYZukKyXNSPSwpZpYiEmg4VT_AjVwTKrFy6EDH9ZATtk10ip09iCjaiRzjdTMUPSUYWZklDFYhECAwEAAaOCBNQwggTQMCcGCSsGAQQBgjcVCgQaMBgwCgYIKwYBBQUHAwEwCgYIKwYBBQUHAwIwPQYJKwYBBAGCNxUHBDAwLgYmKwYBBAGCNxUIhpDjDYTVtHiE8Ys-hZvdFs6dEoFggvX2K4Py0SACAWQCAQowggHaBggrBgEFBQcBAQSCAcwwggHIMGYGCCsGAQUFBzAChlpodHRwOi8vY3JsLm1pY3Jvc29mdC5jb20vcGtpaW5mcmEvQ2VydHMvQlkyUEtJSU5UQ0EwMS5BTUUuR0JMX0FNRSUyMElORlJBJTIwQ0ElMjAwMSg0KS5jcnQwVgYIKwYBBQUHMAKGSmh0dHA6Ly9jcmwxLmFtZS5nYmwvYWlhL0JZMlBLSUlOVENBMDEuQU1FLkdCTF9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3J0MFYGCCsGAQUFBzAChkpodHRwOi8vY3JsMi5hbWUuZ2JsL2FpYS9CWTJQS0lJTlRDQTAxLkFNRS5HQkxfQU1FJTIwSU5GUkElMjBDQSUyMDAxKDQpLmNydDBWBggrBgEFBQcwAoZKaHR0cDovL2NybDMuYW1lLmdibC9haWEvQlkyUEtJSU5UQ0EwMS5BTUUuR0JMX0FNRSUyMElORlJBJTIwQ0ElMjAwMSg0KS5jcnQwVgYIKwYBBQUHMAKGSmh0dHA6Ly9jcmw0LmFtZS5nYmwvYWlhL0JZMlBLSUlOVENBMDEuQU1FLkdCTF9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3J0MB0GA1UdDgQWBBQisbRQvrAefMEPMKyvaT1PVI9GyTAOBgNVHQ8BAf8EBAMCBaAwQAYDVR0RBDkwN4I1YXN5bmNvcGVyYXRpb25zaWduaW5nY2VydGlmaWNhdGUubWFuYWdlbWVudC5henVyZS5jb20wggE1BgNVHR8EggEsMIIBKDCCASSgggEgoIIBHIZCaHR0cDovL2NybC5taWNyb3NvZnQuY29tL3BraWluZnJhL0NSTC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsMS5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsMi5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsMy5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsNC5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JsMIGdBgNVHSAEgZUwgZIwDAYKKwYBBAGCN3sBATBmBgorBgEEAYI3ewICMFgwVgYIKwYBBQUHAgIwSh5IADMAMwBlADAAMQA5ADIAMQAtADQAZAA2ADQALQA0AGYAOABjAC0AYQAwADUANQAtADUAYgBkAGEAZgBmAGQANQBlADMAMwBkMAwGCisGAQQBgjd7AwIwDAYKKwYBBAGCN3sEAjAfBgNVHSMEGDAWgBTl2Ztn_PjsurvwwKidileIud8-YzAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwDQYJKoZIhvcNAQELBQADggEBAGK8URvSRwObVbsCbUgrkRlQ-2UKTKNUvJlo6-EBMp-w1NI_xUhd6MomwZfvl23L3OEMSCwjgPSJB3lHE7gdpWurhGsPwRmrrYK-EWUDZyBmumk2zDGfZp-m6JqbxzGZnlFQj3ECr0kJIas4WkIjx2riHMfjn6HtgJZnsHJsl2onv4fsfeJ5grVLh1UcnnMOF4GvHmrMlqCIgW2NKOjkBQs3wByNyutZKqNb26SO9MCbxXTNvWJvZ3WCdBfikQRqyypFRP64GwGycQy9eLG_p2OLQ2myyospuUm3yDBHaXp_br7YlvKl1RzeA7HgcbdDaMLhmOgRlAoCq_muFttgeQY&s=aW8yN3hkpOaQeQ7jpIFTYYmLcLKM0oOMRK--UYaM3Ssw8zsxn56X24-Rgwi9ubjJw7eTAfIAoId7VbVi02P31vkFnpirJgsGIj750Gmyb4H9zulYCMpGMVKvv739IoJ0PKyTmm1V34uZcAvcVrj1FAv7_xzrI4sgfeYqklTwkGUfaFxKwvOCho7JPFSCU2A_Drqw5oXdbU7b1p_jUttcI2fhlcB62RAc1CP6rC9q3qbkOVfMcxqlOOE6BmLgYk9EsxdiZzbqu4WlVK3X0uxWAwkZ9dYgfmP3khhwqqmjUFeE7tmRG-aPFUzRtUHNNAqhaXD0T3diGOZnWrTN1Kcntw&h=YgYxkLMeT7oC-ZrR0rOV3i_siNwEPe0cFw812m0TOvQ",
-                "body": null,
-                "headers": {}
-            },
-            "response": {
-                "status": {
-                    "code": 200,
-                    "message": ""
-                },
-                "headers": {
-                    "x-cache": [
-                        "CONFIG_NOCACHE"
-                    ],
-                    "x-ms-ratelimit-remaining-resource": [
-                        "Microsoft.Compute/GetOperationResource;44,Microsoft.Compute/GetOperationSubscriptionMaximum;14997"
-                    ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
-                    ],
-                    "x-msedge-ref": [
-                        "Ref A: 4D73DBFF1ED4494E8F23AF50B049490A Ref B: MRS211050313039 Ref C: 2025-02-10T16:32:13Z"
-                    ],
-                    "date": [
-                        "Mon, 10 Feb 2025 16:32:13 GMT"
-                    ],
-                    "cache-control": [
-                        "no-cache"
-                    ],
-                    "content-length": [
-                        "183"
-                    ],
-                    "x-ms-ratelimit-remaining-subscription-global-reads": [
-                        "3749"
-                    ],
-                    "x-ms-need-to-refresh-epl-cache": [
-                        "False"
-                    ]
-                },
-                "body": {
-                    "data": {
-                        "startTime": "2025-02-10T16:31:12.0472027+00:00",
-                        "endTime": "2025-02-10T16:31:54.109941+00:00",
-                        "status": "Succeeded",
-                        "name": "dcb12299-b155-4940-a19b-d6fb1a486702"
-                    }
-                }
-            }
-        },
-        {
-            "request": {
-                "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/locations/southcentralus/operations/dcb12299-b155-4940-a19b-d6fb1a486702?p=e0591a86-90ba-4cf1-98d9-5c1538cf7689&monitor=true&api-version=2020-12-01&t=638748018721628923&c=MIIH5zCCBs-gAwIBAgITOgTWw_CixDB5M0tRDAAEBNbD8DANBgkqhkiG9w0BAQsFADBEMRMwEQYKCZImiZPyLGQBGRYDR0JMMRMwEQYKCZImiZPyLGQBGRYDQU1FMRgwFgYDVQQDEw9BTUUgSU5GUkEgQ0EgMDEwHhcNMjUwMjA1MDYwMzM4WhcNMjYwMTMxMDYwMzM4WjBAMT4wPAYDVQQDEzVhc3luY29wZXJhdGlvbnNpZ25pbmdjZXJ0aWZpY2F0ZS5tYW5hZ2VtZW50LmF6dXJlLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAKUqQWGa1z42tcQF-DR_GfohPjSJLzzrOoB6iSg6rWTxRhvHfldQyBcC3xcWCHropJ7pZ5mNz6PNbaqnZxCRR46qsC7Yt-mvu7PbSg-Cek5HJd0TbsoM53vX2eQirD59YwFduhPaip67CygLRftuVpbiU8_IyRTu-u4U20YtdjpTuXH11KURCMJGA5XYqPlvwwSXCBgi_C1GTX47lDBsuEN0qTtRQHS_ek-MEiFKdWr3nzkPo8WHbJxpH9mspQ3IdcwTSbIqC9JMkYZukKyXNSPSwpZpYiEmg4VT_AjVwTKrFy6EDH9ZATtk10ip09iCjaiRzjdTMUPSUYWZklDFYhECAwEAAaOCBNQwggTQMCcGCSsGAQQBgjcVCgQaMBgwCgYIKwYBBQUHAwEwCgYIKwYBBQUHAwIwPQYJKwYBBAGCNxUHBDAwLgYmKwYBBAGCNxUIhpDjDYTVtHiE8Ys-hZvdFs6dEoFggvX2K4Py0SACAWQCAQowggHaBggrBgEFBQcBAQSCAcwwggHIMGYGCCsGAQUFBzAChlpodHRwOi8vY3JsLm1pY3Jvc29mdC5jb20vcGtpaW5mcmEvQ2VydHMvQlkyUEtJSU5UQ0EwMS5BTUUuR0JMX0FNRSUyMElORlJBJTIwQ0ElMjAwMSg0KS5jcnQwVgYIKwYBBQUHMAKGSmh0dHA6Ly9jcmwxLmFtZS5nYmwvYWlhL0JZMlBLSUlOVENBMDEuQU1FLkdCTF9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3J0MFYGCCsGAQUFBzAChkpodHRwOi8vY3JsMi5hbWUuZ2JsL2FpYS9CWTJQS0lJTlRDQTAxLkFNRS5HQkxfQU1FJTIwSU5GUkElMjBDQSUyMDAxKDQpLmNydDBWBggrBgEFBQcwAoZKaHR0cDovL2NybDMuYW1lLmdibC9haWEvQlkyUEtJSU5UQ0EwMS5BTUUuR0JMX0FNRSUyMElORlJBJTIwQ0ElMjAwMSg0KS5jcnQwVgYIKwYBBQUHMAKGSmh0dHA6Ly9jcmw0LmFtZS5nYmwvYWlhL0JZMlBLSUlOVENBMDEuQU1FLkdCTF9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3J0MB0GA1UdDgQWBBQisbRQvrAefMEPMKyvaT1PVI9GyTAOBgNVHQ8BAf8EBAMCBaAwQAYDVR0RBDkwN4I1YXN5bmNvcGVyYXRpb25zaWduaW5nY2VydGlmaWNhdGUubWFuYWdlbWVudC5henVyZS5jb20wggE1BgNVHR8EggEsMIIBKDCCASSgggEgoIIBHIZCaHR0cDovL2NybC5taWNyb3NvZnQuY29tL3BraWluZnJhL0NSTC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsMS5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsMi5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsMy5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsNC5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JsMIGdBgNVHSAEgZUwgZIwDAYKKwYBBAGCN3sBATBmBgorBgEEAYI3ewICMFgwVgYIKwYBBQUHAgIwSh5IADMAMwBlADAAMQA5ADIAMQAtADQAZAA2ADQALQA0AGYAOABjAC0AYQAwADUANQAtADUAYgBkAGEAZgBmAGQANQBlADMAMwBkMAwGCisGAQQBgjd7AwIwDAYKKwYBBAGCN3sEAjAfBgNVHSMEGDAWgBTl2Ztn_PjsurvwwKidileIud8-YzAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwDQYJKoZIhvcNAQELBQADggEBAGK8URvSRwObVbsCbUgrkRlQ-2UKTKNUvJlo6-EBMp-w1NI_xUhd6MomwZfvl23L3OEMSCwjgPSJB3lHE7gdpWurhGsPwRmrrYK-EWUDZyBmumk2zDGfZp-m6JqbxzGZnlFQj3ECr0kJIas4WkIjx2riHMfjn6HtgJZnsHJsl2onv4fsfeJ5grVLh1UcnnMOF4GvHmrMlqCIgW2NKOjkBQs3wByNyutZKqNb26SO9MCbxXTNvWJvZ3WCdBfikQRqyypFRP64GwGycQy9eLG_p2OLQ2myyospuUm3yDBHaXp_br7YlvKl1RzeA7HgcbdDaMLhmOgRlAoCq_muFttgeQY&s=aW8yN3hkpOaQeQ7jpIFTYYmLcLKM0oOMRK--UYaM3Ssw8zsxn56X24-Rgwi9ubjJw7eTAfIAoId7VbVi02P31vkFnpirJgsGIj750Gmyb4H9zulYCMpGMVKvv739IoJ0PKyTmm1V34uZcAvcVrj1FAv7_xzrI4sgfeYqklTwkGUfaFxKwvOCho7JPFSCU2A_Drqw5oXdbU7b1p_jUttcI2fhlcB62RAc1CP6rC9q3qbkOVfMcxqlOOE6BmLgYk9EsxdiZzbqu4WlVK3X0uxWAwkZ9dYgfmP3khhwqqmjUFeE7tmRG-aPFUzRtUHNNAqhaXD0T3diGOZnWrTN1Kcntw&h=YgYxkLMeT7oC-ZrR0rOV3i_siNwEPe0cFw812m0TOvQ",
-                "body": null,
-                "headers": {}
-            },
-            "response": {
-                "status": {
-                    "code": 200,
-                    "message": ""
-                },
-                "headers": {
-                    "x-cache": [
-                        "CONFIG_NOCACHE"
-                    ],
-                    "x-ms-ratelimit-remaining-resource": [
-                        "Microsoft.Compute/GetOperationResource;43,Microsoft.Compute/GetOperationSubscriptionMaximum;14996"
-                    ],
-                    "x-msedge-ref": [
-                        "Ref A: 3032D946B7394A459CD72A35FAE830BC Ref B: MRS211050313039 Ref C: 2025-02-10T16:32:13Z"
-                    ],
-                    "date": [
-                        "Mon, 10 Feb 2025 16:32:14 GMT"
-                    ],
-                    "cache-control": [
-                        "no-cache"
-                    ],
-                    "content-length": [
-                        "0"
-                    ],
-                    "x-ms-ratelimit-remaining-subscription-global-reads": [
-                        "3749"
-                    ],
-                    "x-ms-need-to-refresh-epl-cache": [
-                        "False"
-                    ]
-                },
-                "body": {
-                    "string": ""
-                }
-            }
-        },
-        {
-            "request": {
-                "method": "PATCH",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_DISK_TYPE_MODIFY/providers/Microsoft.Compute/disks/vm-disk-test_disk1_0785b5d7ea814594aa9f173026092513?api-version=2020-09-30",
-                "body": "mock_body",
-                "headers": {}
-            },
-            "response": {
-                "status": {
-                    "code": 202,
-                    "message": ""
-                },
-                "headers": {
-                    "x-cache": [
-                        "CONFIG_NOCACHE"
-                    ],
-                    "x-ms-ratelimit-remaining-subscription-writes": [
-                        "199"
-                    ],
-                    "x-ms-ratelimit-remaining-resource": [
-                        "Microsoft.Compute/CreateUpdateDisks3Min;2997,Microsoft.Compute/CreateUpdateDisks30Min;24995"
-                    ],
-                    "date": [
-                        "Mon, 10 Feb 2025 16:32:18 GMT"
-                    ],
-                    "content-length": [
-                        "1051"
-                    ],
-                    "x-msedge-ref": [
-                        "Ref A: DCD5244E804E4B0B8438BFAD56F1FD27 Ref B: MRS211050313039 Ref C: 2025-02-10T16:32:14Z"
-                    ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
-                    ],
-                    "location": [
-                        "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/locations/southcentralus/DiskOperations/a85d70d0-cfda-45c0-9209-2b3db7385348?p=3baaf433-e12e-40ee-b196-624fe8ad87c1&monitor=true&api-version=2020-09-30&t=638748019391161730&c=MIIH5zCCBs-gAwIBAgITOgTWw_CixDB5M0tRDAAEBNbD8DANBgkqhkiG9w0BAQsFADBEMRMwEQYKCZImiZPyLGQBGRYDR0JMMRMwEQYKCZImiZPyLGQBGRYDQU1FMRgwFgYDVQQDEw9BTUUgSU5GUkEgQ0EgMDEwHhcNMjUwMjA1MDYwMzM4WhcNMjYwMTMxMDYwMzM4WjBAMT4wPAYDVQQDEzVhc3luY29wZXJhdGlvbnNpZ25pbmdjZXJ0aWZpY2F0ZS5tYW5hZ2VtZW50LmF6dXJlLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAKUqQWGa1z42tcQF-DR_GfohPjSJLzzrOoB6iSg6rWTxRhvHfldQyBcC3xcWCHropJ7pZ5mNz6PNbaqnZxCRR46qsC7Yt-mvu7PbSg-Cek5HJd0TbsoM53vX2eQirD59YwFduhPaip67CygLRftuVpbiU8_IyRTu-u4U20YtdjpTuXH11KURCMJGA5XYqPlvwwSXCBgi_C1GTX47lDBsuEN0qTtRQHS_ek-MEiFKdWr3nzkPo8WHbJxpH9mspQ3IdcwTSbIqC9JMkYZukKyXNSPSwpZpYiEmg4VT_AjVwTKrFy6EDH9ZATtk10ip09iCjaiRzjdTMUPSUYWZklDFYhECAwEAAaOCBNQwggTQMCcGCSsGAQQBgjcVCgQaMBgwCgYIKwYBBQUHAwEwCgYIKwYBBQUHAwIwPQYJKwYBBAGCNxUHBDAwLgYmKwYBBAGCNxUIhpDjDYTVtHiE8Ys-hZvdFs6dEoFggvX2K4Py0SACAWQCAQowggHaBggrBgEFBQcBAQSCAcwwggHIMGYGCCsGAQUFBzAChlpodHRwOi8vY3JsLm1pY3Jvc29mdC5jb20vcGtpaW5mcmEvQ2VydHMvQlkyUEtJSU5UQ0EwMS5BTUUuR0JMX0FNRSUyMElORlJBJTIwQ0ElMjAwMSg0KS5jcnQwVgYIKwYBBQUHMAKGSmh0dHA6Ly9jcmwxLmFtZS5nYmwvYWlhL0JZMlBLSUlOVENBMDEuQU1FLkdCTF9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3J0MFYGCCsGAQUFBzAChkpodHRwOi8vY3JsMi5hbWUuZ2JsL2FpYS9CWTJQS0lJTlRDQTAxLkFNRS5HQkxfQU1FJTIwSU5GUkElMjBDQSUyMDAxKDQpLmNydDBWBggrBgEFBQcwAoZKaHR0cDovL2NybDMuYW1lLmdibC9haWEvQlkyUEtJSU5UQ0EwMS5BTUUuR0JMX0FNRSUyMElORlJBJTIwQ0ElMjAwMSg0KS5jcnQwVgYIKwYBBQUHMAKGSmh0dHA6Ly9jcmw0LmFtZS5nYmwvYWlhL0JZMlBLSUlOVENBMDEuQU1FLkdCTF9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3J0MB0GA1UdDgQWBBQisbRQvrAefMEPMKyvaT1PVI9GyTAOBgNVHQ8BAf8EBAMCBaAwQAYDVR0RBDkwN4I1YXN5bmNvcGVyYXRpb25zaWduaW5nY2VydGlmaWNhdGUubWFuYWdlbWVudC5henVyZS5jb20wggE1BgNVHR8EggEsMIIBKDCCASSgggEgoIIBHIZCaHR0cDovL2NybC5taWNyb3NvZnQuY29tL3BraWluZnJhL0NSTC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsMS5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsMi5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsMy5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsNC5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JsMIGdBgNVHSAEgZUwgZIwDAYKKwYBBAGCN3sBATBmBgorBgEEAYI3ewICMFgwVgYIKwYBBQUHAgIwSh5IADMAMwBlADAAMQA5ADIAMQAtADQAZAA2ADQALQA0AGYAOABjAC0AYQAwADUANQAtADUAYgBkAGEAZgBmAGQANQBlADMAMwBkMAwGCisGAQQBgjd7AwIwDAYKKwYBBAGCN3sEAjAfBgNVHSMEGDAWgBTl2Ztn_PjsurvwwKidileIud8-YzAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwDQYJKoZIhvcNAQELBQADggEBAGK8URvSRwObVbsCbUgrkRlQ-2UKTKNUvJlo6-EBMp-w1NI_xUhd6MomwZfvl23L3OEMSCwjgPSJB3lHE7gdpWurhGsPwRmrrYK-EWUDZyBmumk2zDGfZp-m6JqbxzGZnlFQj3ECr0kJIas4WkIjx2riHMfjn6HtgJZnsHJsl2onv4fsfeJ5grVLh1UcnnMOF4GvHmrMlqCIgW2NKOjkBQs3wByNyutZKqNb26SO9MCbxXTNvWJvZ3WCdBfikQRqyypFRP64GwGycQy9eLG_p2OLQ2myyospuUm3yDBHaXp_br7YlvKl1RzeA7HgcbdDaMLhmOgRlAoCq_muFttgeQY&s=dWSmwfKY_HLz4o1f2jtu7Rn3e-Uv4jkEB_5u4m5dbtuas465hnDWu6bAX2Zq99atBQnbwz1rouoNCx3szyyol04uczyDfCjZ-euGSuRlQ5U5mcPoeqJT8nLTIMrUM4ct4jbG4-lEKKVUyXY730wq2tzHH7JuMk80-wLMHs2Bv_nvNkX2181EhfMkNJnHhE7h_60gI-Ln5BAdvPPDWDip510BEiGIl1T9rEYQyZgJ4IxMSomZ0b3caGQHKUunvHzb7M0yZcK1flhlu9CdDFDSziCutSZFQBydgSF2yhxZ-2B1qddFAzZDLPQN380HyI7psZfR9RJzPTXpOquPjM-kog&h=53hH7spjBcjPykW3HE-R9790kggfNKZFPcS4Yht0ONw"
-                    ],
-                    "x-ms-ratelimit-remaining-subscription-global-writes": [
-                        "2999"
-                    ],
-                    "azure-asyncoperation": [
-                        "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/locations/southcentralus/DiskOperations/a85d70d0-cfda-45c0-9209-2b3db7385348?p=3baaf433-e12e-40ee-b196-624fe8ad87c1&api-version=2020-09-30&t=638748019391005397&c=MIIH5zCCBs-gAwIBAgITOgTWw_CixDB5M0tRDAAEBNbD8DANBgkqhkiG9w0BAQsFADBEMRMwEQYKCZImiZPyLGQBGRYDR0JMMRMwEQYKCZImiZPyLGQBGRYDQU1FMRgwFgYDVQQDEw9BTUUgSU5GUkEgQ0EgMDEwHhcNMjUwMjA1MDYwMzM4WhcNMjYwMTMxMDYwMzM4WjBAMT4wPAYDVQQDEzVhc3luY29wZXJhdGlvbnNpZ25pbmdjZXJ0aWZpY2F0ZS5tYW5hZ2VtZW50LmF6dXJlLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAKUqQWGa1z42tcQF-DR_GfohPjSJLzzrOoB6iSg6rWTxRhvHfldQyBcC3xcWCHropJ7pZ5mNz6PNbaqnZxCRR46qsC7Yt-mvu7PbSg-Cek5HJd0TbsoM53vX2eQirD59YwFduhPaip67CygLRftuVpbiU8_IyRTu-u4U20YtdjpTuXH11KURCMJGA5XYqPlvwwSXCBgi_C1GTX47lDBsuEN0qTtRQHS_ek-MEiFKdWr3nzkPo8WHbJxpH9mspQ3IdcwTSbIqC9JMkYZukKyXNSPSwpZpYiEmg4VT_AjVwTKrFy6EDH9ZATtk10ip09iCjaiRzjdTMUPSUYWZklDFYhECAwEAAaOCBNQwggTQMCcGCSsGAQQBgjcVCgQaMBgwCgYIKwYBBQUHAwEwCgYIKwYBBQUHAwIwPQYJKwYBBAGCNxUHBDAwLgYmKwYBBAGCNxUIhpDjDYTVtHiE8Ys-hZvdFs6dEoFggvX2K4Py0SACAWQCAQowggHaBggrBgEFBQcBAQSCAcwwggHIMGYGCCsGAQUFBzAChlpodHRwOi8vY3JsLm1pY3Jvc29mdC5jb20vcGtpaW5mcmEvQ2VydHMvQlkyUEtJSU5UQ0EwMS5BTUUuR0JMX0FNRSUyMElORlJBJTIwQ0ElMjAwMSg0KS5jcnQwVgYIKwYBBQUHMAKGSmh0dHA6Ly9jcmwxLmFtZS5nYmwvYWlhL0JZMlBLSUlOVENBMDEuQU1FLkdCTF9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3J0MFYGCCsGAQUFBzAChkpodHRwOi8vY3JsMi5hbWUuZ2JsL2FpYS9CWTJQS0lJTlRDQTAxLkFNRS5HQkxfQU1FJTIwSU5GUkElMjBDQSUyMDAxKDQpLmNydDBWBggrBgEFBQcwAoZKaHR0cDovL2NybDMuYW1lLmdibC9haWEvQlkyUEtJSU5UQ0EwMS5BTUUuR0JMX0FNRSUyMElORlJBJTIwQ0ElMjAwMSg0KS5jcnQwVgYIKwYBBQUHMAKGSmh0dHA6Ly9jcmw0LmFtZS5nYmwvYWlhL0JZMlBLSUlOVENBMDEuQU1FLkdCTF9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3J0MB0GA1UdDgQWBBQisbRQvrAefMEPMKyvaT1PVI9GyTAOBgNVHQ8BAf8EBAMCBaAwQAYDVR0RBDkwN4I1YXN5bmNvcGVyYXRpb25zaWduaW5nY2VydGlmaWNhdGUubWFuYWdlbWVudC5henVyZS5jb20wggE1BgNVHR8EggEsMIIBKDCCASSgggEgoIIBHIZCaHR0cDovL2NybC5taWNyb3NvZnQuY29tL3BraWluZnJhL0NSTC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsMS5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsMi5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsMy5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsNC5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JsMIGdBgNVHSAEgZUwgZIwDAYKKwYBBAGCN3sBATBmBgorBgEEAYI3ewICMFgwVgYIKwYBBQUHAgIwSh5IADMAMwBlADAAMQA5ADIAMQAtADQAZAA2ADQALQA0AGYAOABjAC0AYQAwADUANQAtADUAYgBkAGEAZgBmAGQANQBlADMAMwBkMAwGCisGAQQBgjd7AwIwDAYKKwYBBAGCN3sEAjAfBgNVHSMEGDAWgBTl2Ztn_PjsurvwwKidileIud8-YzAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwDQYJKoZIhvcNAQELBQADggEBAGK8URvSRwObVbsCbUgrkRlQ-2UKTKNUvJlo6-EBMp-w1NI_xUhd6MomwZfvl23L3OEMSCwjgPSJB3lHE7gdpWurhGsPwRmrrYK-EWUDZyBmumk2zDGfZp-m6JqbxzGZnlFQj3ECr0kJIas4WkIjx2riHMfjn6HtgJZnsHJsl2onv4fsfeJ5grVLh1UcnnMOF4GvHmrMlqCIgW2NKOjkBQs3wByNyutZKqNb26SO9MCbxXTNvWJvZ3WCdBfikQRqyypFRP64GwGycQy9eLG_p2OLQ2myyospuUm3yDBHaXp_br7YlvKl1RzeA7HgcbdDaMLhmOgRlAoCq_muFttgeQY&s=HAk7IA3x99m5E_5d8_Oksp5HgJY0o-cPIghwwkU1JLtxmnX5g02F5oMJw_RW8p66yTstciqYa1fR88C7hrf0kW6-vtGVHbJYc448DyRVp7Vj-3IQ75Q0cAj2e0e6RZ-VWzC9-JuM-3VNZcViX5BKnoeiqx_K9YhRjhofbf7AtwXT3WQzNLWTo0jmuWO3wl2fAgN9qIMeU70BsAQAAhiEgrhd1iys3xXEVSqI6Arm9fzeryNPhy8zpSRpo21W945lnobUHen_JSZAum0aL6N98LzxSQzkbz7_ecp-H0_aUWlmjzyj7sSwt3Y7IZfGigKVi8Hf-8eogU1I77TR6hXMVw&h=G6AoO0TtCJHI6b5ga78utQlqj2GJwq2zM6z0r9gnoYk"
-                    ],
-                    "cache-control": [
-                        "no-cache"
-                    ]
-                },
-                "body": {
-                    "data": {
-                        "name": "vm-disk-test_disk1_0785b5d7ea814594aa9f173026092513",
-                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_DISK_TYPE_MODIFY/providers/Microsoft.Compute/disks/vm-disk-test_disk1_0785b5d7ea814594aa9f173026092513",
+                        "name": "c7n-test-disk2",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_DISK_TYPE_MODIFY/providers/Microsoft.Compute/disks/c7n-test-disk2",
                         "type": "Microsoft.Compute/disks",
                         "location": "southcentralus",
-                        "managedBy": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_disk_type_modify/providers/Microsoft.Compute/virtualMachines/vm-disk-test",
-                        "sku": {
-                            "name": "Standard_LRS"
-                        },
-                        "properties": {
-                            "osType": "Windows",
-                            "hyperVGeneration": "V2",
-                            "creationData": {
-                                "createOption": "FromImage",
-                                "imageReference": {
-                                    "id": "/Subscriptions/ba3f11f2-e667-41a6-813f-d4915d729491/Providers/Microsoft.Compute/Locations/southcentralus/Publishers/microsoftwindowsdesktop/ArtifactTypes/VMImage/Offers/windows-10/Skus/win10-22h2-avd-g2/Versions/19045.5371.250112"
-                                }
-                            },
-                            "diskSizeGB": 127,
-                            "provisioningState": "Updating",
-                            "tier": "P10"
-                        }
-                    }
-                }
-            }
-        },
-        {
-            "request": {
-                "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/locations/southcentralus/DiskOperations/a85d70d0-cfda-45c0-9209-2b3db7385348?p=3baaf433-e12e-40ee-b196-624fe8ad87c1&api-version=2020-09-30&t=638748019391005397&c=MIIH5zCCBs-gAwIBAgITOgTWw_CixDB5M0tRDAAEBNbD8DANBgkqhkiG9w0BAQsFADBEMRMwEQYKCZImiZPyLGQBGRYDR0JMMRMwEQYKCZImiZPyLGQBGRYDQU1FMRgwFgYDVQQDEw9BTUUgSU5GUkEgQ0EgMDEwHhcNMjUwMjA1MDYwMzM4WhcNMjYwMTMxMDYwMzM4WjBAMT4wPAYDVQQDEzVhc3luY29wZXJhdGlvbnNpZ25pbmdjZXJ0aWZpY2F0ZS5tYW5hZ2VtZW50LmF6dXJlLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAKUqQWGa1z42tcQF-DR_GfohPjSJLzzrOoB6iSg6rWTxRhvHfldQyBcC3xcWCHropJ7pZ5mNz6PNbaqnZxCRR46qsC7Yt-mvu7PbSg-Cek5HJd0TbsoM53vX2eQirD59YwFduhPaip67CygLRftuVpbiU8_IyRTu-u4U20YtdjpTuXH11KURCMJGA5XYqPlvwwSXCBgi_C1GTX47lDBsuEN0qTtRQHS_ek-MEiFKdWr3nzkPo8WHbJxpH9mspQ3IdcwTSbIqC9JMkYZukKyXNSPSwpZpYiEmg4VT_AjVwTKrFy6EDH9ZATtk10ip09iCjaiRzjdTMUPSUYWZklDFYhECAwEAAaOCBNQwggTQMCcGCSsGAQQBgjcVCgQaMBgwCgYIKwYBBQUHAwEwCgYIKwYBBQUHAwIwPQYJKwYBBAGCNxUHBDAwLgYmKwYBBAGCNxUIhpDjDYTVtHiE8Ys-hZvdFs6dEoFggvX2K4Py0SACAWQCAQowggHaBggrBgEFBQcBAQSCAcwwggHIMGYGCCsGAQUFBzAChlpodHRwOi8vY3JsLm1pY3Jvc29mdC5jb20vcGtpaW5mcmEvQ2VydHMvQlkyUEtJSU5UQ0EwMS5BTUUuR0JMX0FNRSUyMElORlJBJTIwQ0ElMjAwMSg0KS5jcnQwVgYIKwYBBQUHMAKGSmh0dHA6Ly9jcmwxLmFtZS5nYmwvYWlhL0JZMlBLSUlOVENBMDEuQU1FLkdCTF9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3J0MFYGCCsGAQUFBzAChkpodHRwOi8vY3JsMi5hbWUuZ2JsL2FpYS9CWTJQS0lJTlRDQTAxLkFNRS5HQkxfQU1FJTIwSU5GUkElMjBDQSUyMDAxKDQpLmNydDBWBggrBgEFBQcwAoZKaHR0cDovL2NybDMuYW1lLmdibC9haWEvQlkyUEtJSU5UQ0EwMS5BTUUuR0JMX0FNRSUyMElORlJBJTIwQ0ElMjAwMSg0KS5jcnQwVgYIKwYBBQUHMAKGSmh0dHA6Ly9jcmw0LmFtZS5nYmwvYWlhL0JZMlBLSUlOVENBMDEuQU1FLkdCTF9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3J0MB0GA1UdDgQWBBQisbRQvrAefMEPMKyvaT1PVI9GyTAOBgNVHQ8BAf8EBAMCBaAwQAYDVR0RBDkwN4I1YXN5bmNvcGVyYXRpb25zaWduaW5nY2VydGlmaWNhdGUubWFuYWdlbWVudC5henVyZS5jb20wggE1BgNVHR8EggEsMIIBKDCCASSgggEgoIIBHIZCaHR0cDovL2NybC5taWNyb3NvZnQuY29tL3BraWluZnJhL0NSTC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsMS5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsMi5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsMy5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsNC5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JsMIGdBgNVHSAEgZUwgZIwDAYKKwYBBAGCN3sBATBmBgorBgEEAYI3ewICMFgwVgYIKwYBBQUHAgIwSh5IADMAMwBlADAAMQA5ADIAMQAtADQAZAA2ADQALQA0AGYAOABjAC0AYQAwADUANQAtADUAYgBkAGEAZgBmAGQANQBlADMAMwBkMAwGCisGAQQBgjd7AwIwDAYKKwYBBAGCN3sEAjAfBgNVHSMEGDAWgBTl2Ztn_PjsurvwwKidileIud8-YzAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwDQYJKoZIhvcNAQELBQADggEBAGK8URvSRwObVbsCbUgrkRlQ-2UKTKNUvJlo6-EBMp-w1NI_xUhd6MomwZfvl23L3OEMSCwjgPSJB3lHE7gdpWurhGsPwRmrrYK-EWUDZyBmumk2zDGfZp-m6JqbxzGZnlFQj3ECr0kJIas4WkIjx2riHMfjn6HtgJZnsHJsl2onv4fsfeJ5grVLh1UcnnMOF4GvHmrMlqCIgW2NKOjkBQs3wByNyutZKqNb26SO9MCbxXTNvWJvZ3WCdBfikQRqyypFRP64GwGycQy9eLG_p2OLQ2myyospuUm3yDBHaXp_br7YlvKl1RzeA7HgcbdDaMLhmOgRlAoCq_muFttgeQY&s=HAk7IA3x99m5E_5d8_Oksp5HgJY0o-cPIghwwkU1JLtxmnX5g02F5oMJw_RW8p66yTstciqYa1fR88C7hrf0kW6-vtGVHbJYc448DyRVp7Vj-3IQ75Q0cAj2e0e6RZ-VWzC9-JuM-3VNZcViX5BKnoeiqx_K9YhRjhofbf7AtwXT3WQzNLWTo0jmuWO3wl2fAgN9qIMeU70BsAQAAhiEgrhd1iys3xXEVSqI6Arm9fzeryNPhy8zpSRpo21W945lnobUHen_JSZAum0aL6N98LzxSQzkbz7_ecp-H0_aUWlmjzyj7sSwt3Y7IZfGigKVi8Hf-8eogU1I77TR6hXMVw&h=G6AoO0TtCJHI6b5ga78utQlqj2GJwq2zM6z0r9gnoYk",
-                "body": null,
-                "headers": {}
-            },
-            "response": {
-                "status": {
-                    "code": 200,
-                    "message": ""
-                },
-                "headers": {
-                    "x-cache": [
-                        "CONFIG_NOCACHE"
-                    ],
-                    "x-ms-ratelimit-remaining-resource": [
-                        "Microsoft.Compute/GetOperation3Min;49990,Microsoft.Compute/GetOperation30Min;399990"
-                    ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
-                    ],
-                    "x-msedge-ref": [
-                        "Ref A: 08B0456C83E04DFC8973E0B3C4F68A24 Ref B: MRS211050313039 Ref C: 2025-02-10T16:32:19Z"
-                    ],
-                    "date": [
-                        "Mon, 10 Feb 2025 16:32:19 GMT"
-                    ],
-                    "cache-control": [
-                        "no-cache"
-                    ],
-                    "content-length": [
-                        "1641"
-                    ],
-                    "x-ms-ratelimit-remaining-subscription-global-reads": [
-                        "3749"
-                    ]
-                },
-                "body": {
-                    "data": {
-                        "startTime": "2025-02-10T16:32:18.9766516+00:00",
-                        "endTime": "2025-02-10T16:32:19.8672511+00:00",
-                        "status": "Succeeded",
-                        "properties": {
-                            "output": {
-                                "name": "vm-disk-test_disk1_0785b5d7ea814594aa9f173026092513",
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_DISK_TYPE_MODIFY/providers/Microsoft.Compute/disks/vm-disk-test_disk1_0785b5d7ea814594aa9f173026092513",
-                                "type": "Microsoft.Compute/disks",
-                                "location": "southcentralus",
-                                "managedBy": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_disk_type_modify/providers/Microsoft.Compute/virtualMachines/vm-disk-test",
-                                "sku": {
-                                    "name": "Standard_LRS",
-                                    "tier": "Standard"
-                                },
-                                "properties": {
-                                    "osType": "Windows",
-                                    "hyperVGeneration": "V2",
-                                    "creationData": {
-                                        "createOption": "FromImage",
-                                        "imageReference": {
-                                            "id": "/Subscriptions/ba3f11f2-e667-41a6-813f-d4915d729491/Providers/Microsoft.Compute/Locations/southcentralus/Publishers/microsoftwindowsdesktop/ArtifactTypes/VMImage/Offers/windows-10/Skus/win10-22h2-avd-g2/Versions/19045.5371.250112"
-                                        }
-                                    },
-                                    "diskSizeGB": 127,
-                                    "diskIOPSReadWrite": 500,
-                                    "diskMBpsReadWrite": 60,
-                                    "encryption": {
-                                        "type": "EncryptionAtRestWithPlatformKey"
-                                    },
-                                    "networkAccessPolicy": "AllowAll",
-                                    "timeCreated": "2025-02-10T16:29:42.3347928+00:00",
-                                    "provisioningState": "Succeeded",
-                                    "diskState": "Reserved",
-                                    "diskSizeBytes": 136367308800,
-                                    "uniqueId": "0785b5d7-ea81-4594-aa9f-173026092513"
-                                }
-                            }
-                        },
-                        "name": "a85d70d0-cfda-45c0-9209-2b3db7385348"
-                    }
-                }
-            }
-        },
-        {
-            "request": {
-                "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_DISK_TYPE_MODIFY/providers/Microsoft.Compute/disks/vm-disk-test_disk1_0785b5d7ea814594aa9f173026092513?api-version=2020-09-30",
-                "body": null,
-                "headers": {}
-            },
-            "response": {
-                "status": {
-                    "code": 200,
-                    "message": ""
-                },
-                "headers": {
-                    "x-cache": [
-                        "CONFIG_NOCACHE"
-                    ],
-                    "x-ms-ratelimit-remaining-resource": [
-                        "Microsoft.Compute/LowCostGet3Min;14992,Microsoft.Compute/LowCostGet30Min;119992"
-                    ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
-                    ],
-                    "x-msedge-ref": [
-                        "Ref A: 18318D7BACC7417FB51FE390D83C9030 Ref B: MRS211050313039 Ref C: 2025-02-10T16:32:20Z"
-                    ],
-                    "date": [
-                        "Mon, 10 Feb 2025 16:32:20 GMT"
-                    ],
-                    "cache-control": [
-                        "no-cache"
-                    ],
-                    "content-length": [
-                        "1416"
-                    ],
-                    "x-ms-ratelimit-remaining-subscription-global-reads": [
-                        "3747"
-                    ]
-                },
-                "body": {
-                    "data": {
-                        "name": "vm-disk-test_disk1_0785b5d7ea814594aa9f173026092513",
-                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_DISK_TYPE_MODIFY/providers/Microsoft.Compute/disks/vm-disk-test_disk1_0785b5d7ea814594aa9f173026092513",
-                        "type": "Microsoft.Compute/disks",
-                        "location": "southcentralus",
-                        "managedBy": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_disk_type_modify/providers/Microsoft.Compute/virtualMachines/vm-disk-test",
-                        "sku": {
-                            "name": "Standard_LRS",
-                            "tier": "Standard"
-                        },
-                        "properties": {
-                            "osType": "Windows",
-                            "hyperVGeneration": "V2",
-                            "creationData": {
-                                "createOption": "FromImage",
-                                "imageReference": {
-                                    "id": "/Subscriptions/ba3f11f2-e667-41a6-813f-d4915d729491/Providers/Microsoft.Compute/Locations/southcentralus/Publishers/microsoftwindowsdesktop/ArtifactTypes/VMImage/Offers/windows-10/Skus/win10-22h2-avd-g2/Versions/19045.5371.250112"
-                                }
-                            },
-                            "diskSizeGB": 127,
-                            "diskIOPSReadWrite": 500,
-                            "diskMBpsReadWrite": 60,
-                            "encryption": {
-                                "type": "EncryptionAtRestWithPlatformKey"
-                            },
-                            "networkAccessPolicy": "AllowAll",
-                            "timeCreated": "2025-02-10T16:29:42.3347928+00:00",
-                            "provisioningState": "Succeeded",
-                            "diskState": "Reserved",
-                            "diskSizeBytes": 136367308800,
-                            "uniqueId": "0785b5d7-ea81-4594-aa9f-173026092513"
-                        }
-                    }
-                }
-            }
-        },
-        {
-            "request": {
-                "method": "POST",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_disk_type_modify/providers/Microsoft.Compute/virtualMachines/vm-disk-test/start?api-version=2020-12-01",
-                "body": null,
-                "headers": {}
-            },
-            "response": {
-                "status": {
-                    "code": 202,
-                    "message": ""
-                },
-                "headers": {
-                    "x-cache": [
-                        "CONFIG_NOCACHE"
-                    ],
-                    "x-ms-ratelimit-remaining-subscription-writes": [
-                        "199"
-                    ],
-                    "x-ms-ratelimit-remaining-resource": [
-                        "Microsoft.Compute/UpdateVMSubscriptionMaximum;1499,Microsoft.Compute/UpdateVMResource;11"
-                    ],
-                    "date": [
-                        "Mon, 10 Feb 2025 16:32:22 GMT"
-                    ],
-                    "azure-asyncnotification": [
-                        "Enabled"
-                    ],
-                    "content-length": [
-                        "0"
-                    ],
-                    "x-msedge-ref": [
-                        "Ref A: 5B24B9B4620D49008B1BC18C7E052B63 Ref B: MRS211050313039 Ref C: 2025-02-10T16:32:20Z"
-                    ],
-                    "x-ms-need-to-refresh-epl-cache": [
-                        "False"
-                    ],
-                    "location": [
-                        "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/locations/southcentralus/operations/2862dbec-ef6c-49e5-b53d-7e1987deaa7e?p=e0591a86-90ba-4cf1-98d9-5c1538cf7689&monitor=true&api-version=2020-12-01&t=638748019429702926&c=MIIH5zCCBs-gAwIBAgITOgTWw_CixDB5M0tRDAAEBNbD8DANBgkqhkiG9w0BAQsFADBEMRMwEQYKCZImiZPyLGQBGRYDR0JMMRMwEQYKCZImiZPyLGQBGRYDQU1FMRgwFgYDVQQDEw9BTUUgSU5GUkEgQ0EgMDEwHhcNMjUwMjA1MDYwMzM4WhcNMjYwMTMxMDYwMzM4WjBAMT4wPAYDVQQDEzVhc3luY29wZXJhdGlvbnNpZ25pbmdjZXJ0aWZpY2F0ZS5tYW5hZ2VtZW50LmF6dXJlLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAKUqQWGa1z42tcQF-DR_GfohPjSJLzzrOoB6iSg6rWTxRhvHfldQyBcC3xcWCHropJ7pZ5mNz6PNbaqnZxCRR46qsC7Yt-mvu7PbSg-Cek5HJd0TbsoM53vX2eQirD59YwFduhPaip67CygLRftuVpbiU8_IyRTu-u4U20YtdjpTuXH11KURCMJGA5XYqPlvwwSXCBgi_C1GTX47lDBsuEN0qTtRQHS_ek-MEiFKdWr3nzkPo8WHbJxpH9mspQ3IdcwTSbIqC9JMkYZukKyXNSPSwpZpYiEmg4VT_AjVwTKrFy6EDH9ZATtk10ip09iCjaiRzjdTMUPSUYWZklDFYhECAwEAAaOCBNQwggTQMCcGCSsGAQQBgjcVCgQaMBgwCgYIKwYBBQUHAwEwCgYIKwYBBQUHAwIwPQYJKwYBBAGCNxUHBDAwLgYmKwYBBAGCNxUIhpDjDYTVtHiE8Ys-hZvdFs6dEoFggvX2K4Py0SACAWQCAQowggHaBggrBgEFBQcBAQSCAcwwggHIMGYGCCsGAQUFBzAChlpodHRwOi8vY3JsLm1pY3Jvc29mdC5jb20vcGtpaW5mcmEvQ2VydHMvQlkyUEtJSU5UQ0EwMS5BTUUuR0JMX0FNRSUyMElORlJBJTIwQ0ElMjAwMSg0KS5jcnQwVgYIKwYBBQUHMAKGSmh0dHA6Ly9jcmwxLmFtZS5nYmwvYWlhL0JZMlBLSUlOVENBMDEuQU1FLkdCTF9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3J0MFYGCCsGAQUFBzAChkpodHRwOi8vY3JsMi5hbWUuZ2JsL2FpYS9CWTJQS0lJTlRDQTAxLkFNRS5HQkxfQU1FJTIwSU5GUkElMjBDQSUyMDAxKDQpLmNydDBWBggrBgEFBQcwAoZKaHR0cDovL2NybDMuYW1lLmdibC9haWEvQlkyUEtJSU5UQ0EwMS5BTUUuR0JMX0FNRSUyMElORlJBJTIwQ0ElMjAwMSg0KS5jcnQwVgYIKwYBBQUHMAKGSmh0dHA6Ly9jcmw0LmFtZS5nYmwvYWlhL0JZMlBLSUlOVENBMDEuQU1FLkdCTF9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3J0MB0GA1UdDgQWBBQisbRQvrAefMEPMKyvaT1PVI9GyTAOBgNVHQ8BAf8EBAMCBaAwQAYDVR0RBDkwN4I1YXN5bmNvcGVyYXRpb25zaWduaW5nY2VydGlmaWNhdGUubWFuYWdlbWVudC5henVyZS5jb20wggE1BgNVHR8EggEsMIIBKDCCASSgggEgoIIBHIZCaHR0cDovL2NybC5taWNyb3NvZnQuY29tL3BraWluZnJhL0NSTC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsMS5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsMi5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsMy5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsNC5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JsMIGdBgNVHSAEgZUwgZIwDAYKKwYBBAGCN3sBATBmBgorBgEEAYI3ewICMFgwVgYIKwYBBQUHAgIwSh5IADMAMwBlADAAMQA5ADIAMQAtADQAZAA2ADQALQA0AGYAOABjAC0AYQAwADUANQAtADUAYgBkAGEAZgBmAGQANQBlADMAMwBkMAwGCisGAQQBgjd7AwIwDAYKKwYBBAGCN3sEAjAfBgNVHSMEGDAWgBTl2Ztn_PjsurvwwKidileIud8-YzAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwDQYJKoZIhvcNAQELBQADggEBAGK8URvSRwObVbsCbUgrkRlQ-2UKTKNUvJlo6-EBMp-w1NI_xUhd6MomwZfvl23L3OEMSCwjgPSJB3lHE7gdpWurhGsPwRmrrYK-EWUDZyBmumk2zDGfZp-m6JqbxzGZnlFQj3ECr0kJIas4WkIjx2riHMfjn6HtgJZnsHJsl2onv4fsfeJ5grVLh1UcnnMOF4GvHmrMlqCIgW2NKOjkBQs3wByNyutZKqNb26SO9MCbxXTNvWJvZ3WCdBfikQRqyypFRP64GwGycQy9eLG_p2OLQ2myyospuUm3yDBHaXp_br7YlvKl1RzeA7HgcbdDaMLhmOgRlAoCq_muFttgeQY&s=iAIWr3dTpE3nFlB0cGx4PTeE4VNvjkCNzXweeL5X6BKrscHZrA4T6proHB3-cjIYEc4xzM-MSY8AzqWhbKbyeENFBW0tn1fD7aq3rm6J4TTMEFUbtD0bHZxMmUw9qbRtDlJPBpwdL48UGHosjUlOMafEGy1DCJ_W1YofL6I2UdQdSTRCdMMYdBv7fXQSuboRAWhM4InKW098wNmuRSI69uDKxTVTwmjsSRhHvMtxQPc6ZOS9Y2UQG0O2kjmov6rrsx9VBNvZztRsTjGcgtMLAk31h_Zypd8_jZ0Hu-MVePiW4YB5z-L_8dgJwgHlc0dsJHXrOHtr42PZZSTMcyjaMw&h=1l92CiQ1NDygpbJfE3KhejWqx--yE-hkpgFFeybTfwc"
-                    ],
-                    "x-ms-ratelimit-remaining-subscription-global-writes": [
-                        "2999"
-                    ],
-                    "azure-asyncoperation": [
-                        "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/locations/southcentralus/operations/2862dbec-ef6c-49e5-b53d-7e1987deaa7e?p=e0591a86-90ba-4cf1-98d9-5c1538cf7689&api-version=2020-12-01&t=638748019429702926&c=MIIH5zCCBs-gAwIBAgITOgTWw_CixDB5M0tRDAAEBNbD8DANBgkqhkiG9w0BAQsFADBEMRMwEQYKCZImiZPyLGQBGRYDR0JMMRMwEQYKCZImiZPyLGQBGRYDQU1FMRgwFgYDVQQDEw9BTUUgSU5GUkEgQ0EgMDEwHhcNMjUwMjA1MDYwMzM4WhcNMjYwMTMxMDYwMzM4WjBAMT4wPAYDVQQDEzVhc3luY29wZXJhdGlvbnNpZ25pbmdjZXJ0aWZpY2F0ZS5tYW5hZ2VtZW50LmF6dXJlLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAKUqQWGa1z42tcQF-DR_GfohPjSJLzzrOoB6iSg6rWTxRhvHfldQyBcC3xcWCHropJ7pZ5mNz6PNbaqnZxCRR46qsC7Yt-mvu7PbSg-Cek5HJd0TbsoM53vX2eQirD59YwFduhPaip67CygLRftuVpbiU8_IyRTu-u4U20YtdjpTuXH11KURCMJGA5XYqPlvwwSXCBgi_C1GTX47lDBsuEN0qTtRQHS_ek-MEiFKdWr3nzkPo8WHbJxpH9mspQ3IdcwTSbIqC9JMkYZukKyXNSPSwpZpYiEmg4VT_AjVwTKrFy6EDH9ZATtk10ip09iCjaiRzjdTMUPSUYWZklDFYhECAwEAAaOCBNQwggTQMCcGCSsGAQQBgjcVCgQaMBgwCgYIKwYBBQUHAwEwCgYIKwYBBQUHAwIwPQYJKwYBBAGCNxUHBDAwLgYmKwYBBAGCNxUIhpDjDYTVtHiE8Ys-hZvdFs6dEoFggvX2K4Py0SACAWQCAQowggHaBggrBgEFBQcBAQSCAcwwggHIMGYGCCsGAQUFBzAChlpodHRwOi8vY3JsLm1pY3Jvc29mdC5jb20vcGtpaW5mcmEvQ2VydHMvQlkyUEtJSU5UQ0EwMS5BTUUuR0JMX0FNRSUyMElORlJBJTIwQ0ElMjAwMSg0KS5jcnQwVgYIKwYBBQUHMAKGSmh0dHA6Ly9jcmwxLmFtZS5nYmwvYWlhL0JZMlBLSUlOVENBMDEuQU1FLkdCTF9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3J0MFYGCCsGAQUFBzAChkpodHRwOi8vY3JsMi5hbWUuZ2JsL2FpYS9CWTJQS0lJTlRDQTAxLkFNRS5HQkxfQU1FJTIwSU5GUkElMjBDQSUyMDAxKDQpLmNydDBWBggrBgEFBQcwAoZKaHR0cDovL2NybDMuYW1lLmdibC9haWEvQlkyUEtJSU5UQ0EwMS5BTUUuR0JMX0FNRSUyMElORlJBJTIwQ0ElMjAwMSg0KS5jcnQwVgYIKwYBBQUHMAKGSmh0dHA6Ly9jcmw0LmFtZS5nYmwvYWlhL0JZMlBLSUlOVENBMDEuQU1FLkdCTF9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3J0MB0GA1UdDgQWBBQisbRQvrAefMEPMKyvaT1PVI9GyTAOBgNVHQ8BAf8EBAMCBaAwQAYDVR0RBDkwN4I1YXN5bmNvcGVyYXRpb25zaWduaW5nY2VydGlmaWNhdGUubWFuYWdlbWVudC5henVyZS5jb20wggE1BgNVHR8EggEsMIIBKDCCASSgggEgoIIBHIZCaHR0cDovL2NybC5taWNyb3NvZnQuY29tL3BraWluZnJhL0NSTC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsMS5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsMi5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsMy5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsNC5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JsMIGdBgNVHSAEgZUwgZIwDAYKKwYBBAGCN3sBATBmBgorBgEEAYI3ewICMFgwVgYIKwYBBQUHAgIwSh5IADMAMwBlADAAMQA5ADIAMQAtADQAZAA2ADQALQA0AGYAOABjAC0AYQAwADUANQAtADUAYgBkAGEAZgBmAGQANQBlADMAMwBkMAwGCisGAQQBgjd7AwIwDAYKKwYBBAGCN3sEAjAfBgNVHSMEGDAWgBTl2Ztn_PjsurvwwKidileIud8-YzAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwDQYJKoZIhvcNAQELBQADggEBAGK8URvSRwObVbsCbUgrkRlQ-2UKTKNUvJlo6-EBMp-w1NI_xUhd6MomwZfvl23L3OEMSCwjgPSJB3lHE7gdpWurhGsPwRmrrYK-EWUDZyBmumk2zDGfZp-m6JqbxzGZnlFQj3ECr0kJIas4WkIjx2riHMfjn6HtgJZnsHJsl2onv4fsfeJ5grVLh1UcnnMOF4GvHmrMlqCIgW2NKOjkBQs3wByNyutZKqNb26SO9MCbxXTNvWJvZ3WCdBfikQRqyypFRP64GwGycQy9eLG_p2OLQ2myyospuUm3yDBHaXp_br7YlvKl1RzeA7HgcbdDaMLhmOgRlAoCq_muFttgeQY&s=iAIWr3dTpE3nFlB0cGx4PTeE4VNvjkCNzXweeL5X6BKrscHZrA4T6proHB3-cjIYEc4xzM-MSY8AzqWhbKbyeENFBW0tn1fD7aq3rm6J4TTMEFUbtD0bHZxMmUw9qbRtDlJPBpwdL48UGHosjUlOMafEGy1DCJ_W1YofL6I2UdQdSTRCdMMYdBv7fXQSuboRAWhM4InKW098wNmuRSI69uDKxTVTwmjsSRhHvMtxQPc6ZOS9Y2UQG0O2kjmov6rrsx9VBNvZztRsTjGcgtMLAk31h_Zypd8_jZ0Hu-MVePiW4YB5z-L_8dgJwgHlc0dsJHXrOHtr42PZZSTMcyjaMw&h=1l92CiQ1NDygpbJfE3KhejWqx--yE-hkpgFFeybTfwc"
-                    ],
-                    "cache-control": [
-                        "no-cache"
-                    ]
-                },
-                "body": {
-                    "string": ""
-                }
-            }
-        },
-        {
-            "request": {
-                "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/locations/southcentralus/operations/2862dbec-ef6c-49e5-b53d-7e1987deaa7e?p=e0591a86-90ba-4cf1-98d9-5c1538cf7689&api-version=2020-12-01&t=638748019429702926&c=MIIH5zCCBs-gAwIBAgITOgTWw_CixDB5M0tRDAAEBNbD8DANBgkqhkiG9w0BAQsFADBEMRMwEQYKCZImiZPyLGQBGRYDR0JMMRMwEQYKCZImiZPyLGQBGRYDQU1FMRgwFgYDVQQDEw9BTUUgSU5GUkEgQ0EgMDEwHhcNMjUwMjA1MDYwMzM4WhcNMjYwMTMxMDYwMzM4WjBAMT4wPAYDVQQDEzVhc3luY29wZXJhdGlvbnNpZ25pbmdjZXJ0aWZpY2F0ZS5tYW5hZ2VtZW50LmF6dXJlLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAKUqQWGa1z42tcQF-DR_GfohPjSJLzzrOoB6iSg6rWTxRhvHfldQyBcC3xcWCHropJ7pZ5mNz6PNbaqnZxCRR46qsC7Yt-mvu7PbSg-Cek5HJd0TbsoM53vX2eQirD59YwFduhPaip67CygLRftuVpbiU8_IyRTu-u4U20YtdjpTuXH11KURCMJGA5XYqPlvwwSXCBgi_C1GTX47lDBsuEN0qTtRQHS_ek-MEiFKdWr3nzkPo8WHbJxpH9mspQ3IdcwTSbIqC9JMkYZukKyXNSPSwpZpYiEmg4VT_AjVwTKrFy6EDH9ZATtk10ip09iCjaiRzjdTMUPSUYWZklDFYhECAwEAAaOCBNQwggTQMCcGCSsGAQQBgjcVCgQaMBgwCgYIKwYBBQUHAwEwCgYIKwYBBQUHAwIwPQYJKwYBBAGCNxUHBDAwLgYmKwYBBAGCNxUIhpDjDYTVtHiE8Ys-hZvdFs6dEoFggvX2K4Py0SACAWQCAQowggHaBggrBgEFBQcBAQSCAcwwggHIMGYGCCsGAQUFBzAChlpodHRwOi8vY3JsLm1pY3Jvc29mdC5jb20vcGtpaW5mcmEvQ2VydHMvQlkyUEtJSU5UQ0EwMS5BTUUuR0JMX0FNRSUyMElORlJBJTIwQ0ElMjAwMSg0KS5jcnQwVgYIKwYBBQUHMAKGSmh0dHA6Ly9jcmwxLmFtZS5nYmwvYWlhL0JZMlBLSUlOVENBMDEuQU1FLkdCTF9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3J0MFYGCCsGAQUFBzAChkpodHRwOi8vY3JsMi5hbWUuZ2JsL2FpYS9CWTJQS0lJTlRDQTAxLkFNRS5HQkxfQU1FJTIwSU5GUkElMjBDQSUyMDAxKDQpLmNydDBWBggrBgEFBQcwAoZKaHR0cDovL2NybDMuYW1lLmdibC9haWEvQlkyUEtJSU5UQ0EwMS5BTUUuR0JMX0FNRSUyMElORlJBJTIwQ0ElMjAwMSg0KS5jcnQwVgYIKwYBBQUHMAKGSmh0dHA6Ly9jcmw0LmFtZS5nYmwvYWlhL0JZMlBLSUlOVENBMDEuQU1FLkdCTF9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3J0MB0GA1UdDgQWBBQisbRQvrAefMEPMKyvaT1PVI9GyTAOBgNVHQ8BAf8EBAMCBaAwQAYDVR0RBDkwN4I1YXN5bmNvcGVyYXRpb25zaWduaW5nY2VydGlmaWNhdGUubWFuYWdlbWVudC5henVyZS5jb20wggE1BgNVHR8EggEsMIIBKDCCASSgggEgoIIBHIZCaHR0cDovL2NybC5taWNyb3NvZnQuY29tL3BraWluZnJhL0NSTC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsMS5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsMi5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsMy5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsNC5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JsMIGdBgNVHSAEgZUwgZIwDAYKKwYBBAGCN3sBATBmBgorBgEEAYI3ewICMFgwVgYIKwYBBQUHAgIwSh5IADMAMwBlADAAMQA5ADIAMQAtADQAZAA2ADQALQA0AGYAOABjAC0AYQAwADUANQAtADUAYgBkAGEAZgBmAGQANQBlADMAMwBkMAwGCisGAQQBgjd7AwIwDAYKKwYBBAGCN3sEAjAfBgNVHSMEGDAWgBTl2Ztn_PjsurvwwKidileIud8-YzAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwDQYJKoZIhvcNAQELBQADggEBAGK8URvSRwObVbsCbUgrkRlQ-2UKTKNUvJlo6-EBMp-w1NI_xUhd6MomwZfvl23L3OEMSCwjgPSJB3lHE7gdpWurhGsPwRmrrYK-EWUDZyBmumk2zDGfZp-m6JqbxzGZnlFQj3ECr0kJIas4WkIjx2riHMfjn6HtgJZnsHJsl2onv4fsfeJ5grVLh1UcnnMOF4GvHmrMlqCIgW2NKOjkBQs3wByNyutZKqNb26SO9MCbxXTNvWJvZ3WCdBfikQRqyypFRP64GwGycQy9eLG_p2OLQ2myyospuUm3yDBHaXp_br7YlvKl1RzeA7HgcbdDaMLhmOgRlAoCq_muFttgeQY&s=iAIWr3dTpE3nFlB0cGx4PTeE4VNvjkCNzXweeL5X6BKrscHZrA4T6proHB3-cjIYEc4xzM-MSY8AzqWhbKbyeENFBW0tn1fD7aq3rm6J4TTMEFUbtD0bHZxMmUw9qbRtDlJPBpwdL48UGHosjUlOMafEGy1DCJ_W1YofL6I2UdQdSTRCdMMYdBv7fXQSuboRAWhM4InKW098wNmuRSI69uDKxTVTwmjsSRhHvMtxQPc6ZOS9Y2UQG0O2kjmov6rrsx9VBNvZztRsTjGcgtMLAk31h_Zypd8_jZ0Hu-MVePiW4YB5z-L_8dgJwgHlc0dsJHXrOHtr42PZZSTMcyjaMw&h=1l92CiQ1NDygpbJfE3KhejWqx--yE-hkpgFFeybTfwc",
-                "body": null,
-                "headers": {}
-            },
-            "response": {
-                "status": {
-                    "code": 200,
-                    "message": ""
-                },
-                "headers": {
-                    "x-cache": [
-                        "CONFIG_NOCACHE"
-                    ],
-                    "x-ms-ratelimit-remaining-resource": [
-                        "Microsoft.Compute/GetOperationResource;44,Microsoft.Compute/GetOperationSubscriptionMaximum;14999"
-                    ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
-                    ],
-                    "x-msedge-ref": [
-                        "Ref A: A0B66D9447304FB495231AB4D39CDE30 Ref B: MRS211050313039 Ref C: 2025-02-10T16:32:23Z"
-                    ],
-                    "date": [
-                        "Mon, 10 Feb 2025 16:32:22 GMT"
-                    ],
-                    "cache-control": [
-                        "no-cache"
-                    ],
-                    "content-length": [
-                        "133"
-                    ],
-                    "x-ms-ratelimit-remaining-subscription-global-reads": [
-                        "3746"
-                    ],
-                    "x-ms-need-to-refresh-epl-cache": [
-                        "False"
-                    ]
-                },
-                "body": {
-                    "data": {
-                        "startTime": "2025-02-10T16:32:22.578853+00:00",
-                        "status": "InProgress",
-                        "name": "2862dbec-ef6c-49e5-b53d-7e1987deaa7e"
-                    }
-                }
-            }
-        },
-        {
-            "request": {
-                "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/locations/southcentralus/operations/2862dbec-ef6c-49e5-b53d-7e1987deaa7e?p=e0591a86-90ba-4cf1-98d9-5c1538cf7689&api-version=2020-12-01&t=638748019429702926&c=MIIH5zCCBs-gAwIBAgITOgTWw_CixDB5M0tRDAAEBNbD8DANBgkqhkiG9w0BAQsFADBEMRMwEQYKCZImiZPyLGQBGRYDR0JMMRMwEQYKCZImiZPyLGQBGRYDQU1FMRgwFgYDVQQDEw9BTUUgSU5GUkEgQ0EgMDEwHhcNMjUwMjA1MDYwMzM4WhcNMjYwMTMxMDYwMzM4WjBAMT4wPAYDVQQDEzVhc3luY29wZXJhdGlvbnNpZ25pbmdjZXJ0aWZpY2F0ZS5tYW5hZ2VtZW50LmF6dXJlLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAKUqQWGa1z42tcQF-DR_GfohPjSJLzzrOoB6iSg6rWTxRhvHfldQyBcC3xcWCHropJ7pZ5mNz6PNbaqnZxCRR46qsC7Yt-mvu7PbSg-Cek5HJd0TbsoM53vX2eQirD59YwFduhPaip67CygLRftuVpbiU8_IyRTu-u4U20YtdjpTuXH11KURCMJGA5XYqPlvwwSXCBgi_C1GTX47lDBsuEN0qTtRQHS_ek-MEiFKdWr3nzkPo8WHbJxpH9mspQ3IdcwTSbIqC9JMkYZukKyXNSPSwpZpYiEmg4VT_AjVwTKrFy6EDH9ZATtk10ip09iCjaiRzjdTMUPSUYWZklDFYhECAwEAAaOCBNQwggTQMCcGCSsGAQQBgjcVCgQaMBgwCgYIKwYBBQUHAwEwCgYIKwYBBQUHAwIwPQYJKwYBBAGCNxUHBDAwLgYmKwYBBAGCNxUIhpDjDYTVtHiE8Ys-hZvdFs6dEoFggvX2K4Py0SACAWQCAQowggHaBggrBgEFBQcBAQSCAcwwggHIMGYGCCsGAQUFBzAChlpodHRwOi8vY3JsLm1pY3Jvc29mdC5jb20vcGtpaW5mcmEvQ2VydHMvQlkyUEtJSU5UQ0EwMS5BTUUuR0JMX0FNRSUyMElORlJBJTIwQ0ElMjAwMSg0KS5jcnQwVgYIKwYBBQUHMAKGSmh0dHA6Ly9jcmwxLmFtZS5nYmwvYWlhL0JZMlBLSUlOVENBMDEuQU1FLkdCTF9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3J0MFYGCCsGAQUFBzAChkpodHRwOi8vY3JsMi5hbWUuZ2JsL2FpYS9CWTJQS0lJTlRDQTAxLkFNRS5HQkxfQU1FJTIwSU5GUkElMjBDQSUyMDAxKDQpLmNydDBWBggrBgEFBQcwAoZKaHR0cDovL2NybDMuYW1lLmdibC9haWEvQlkyUEtJSU5UQ0EwMS5BTUUuR0JMX0FNRSUyMElORlJBJTIwQ0ElMjAwMSg0KS5jcnQwVgYIKwYBBQUHMAKGSmh0dHA6Ly9jcmw0LmFtZS5nYmwvYWlhL0JZMlBLSUlOVENBMDEuQU1FLkdCTF9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3J0MB0GA1UdDgQWBBQisbRQvrAefMEPMKyvaT1PVI9GyTAOBgNVHQ8BAf8EBAMCBaAwQAYDVR0RBDkwN4I1YXN5bmNvcGVyYXRpb25zaWduaW5nY2VydGlmaWNhdGUubWFuYWdlbWVudC5henVyZS5jb20wggE1BgNVHR8EggEsMIIBKDCCASSgggEgoIIBHIZCaHR0cDovL2NybC5taWNyb3NvZnQuY29tL3BraWluZnJhL0NSTC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsMS5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsMi5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsMy5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsNC5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JsMIGdBgNVHSAEgZUwgZIwDAYKKwYBBAGCN3sBATBmBgorBgEEAYI3ewICMFgwVgYIKwYBBQUHAgIwSh5IADMAMwBlADAAMQA5ADIAMQAtADQAZAA2ADQALQA0AGYAOABjAC0AYQAwADUANQAtADUAYgBkAGEAZgBmAGQANQBlADMAMwBkMAwGCisGAQQBgjd7AwIwDAYKKwYBBAGCN3sEAjAfBgNVHSMEGDAWgBTl2Ztn_PjsurvwwKidileIud8-YzAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwDQYJKoZIhvcNAQELBQADggEBAGK8URvSRwObVbsCbUgrkRlQ-2UKTKNUvJlo6-EBMp-w1NI_xUhd6MomwZfvl23L3OEMSCwjgPSJB3lHE7gdpWurhGsPwRmrrYK-EWUDZyBmumk2zDGfZp-m6JqbxzGZnlFQj3ECr0kJIas4WkIjx2riHMfjn6HtgJZnsHJsl2onv4fsfeJ5grVLh1UcnnMOF4GvHmrMlqCIgW2NKOjkBQs3wByNyutZKqNb26SO9MCbxXTNvWJvZ3WCdBfikQRqyypFRP64GwGycQy9eLG_p2OLQ2myyospuUm3yDBHaXp_br7YlvKl1RzeA7HgcbdDaMLhmOgRlAoCq_muFttgeQY&s=iAIWr3dTpE3nFlB0cGx4PTeE4VNvjkCNzXweeL5X6BKrscHZrA4T6proHB3-cjIYEc4xzM-MSY8AzqWhbKbyeENFBW0tn1fD7aq3rm6J4TTMEFUbtD0bHZxMmUw9qbRtDlJPBpwdL48UGHosjUlOMafEGy1DCJ_W1YofL6I2UdQdSTRCdMMYdBv7fXQSuboRAWhM4InKW098wNmuRSI69uDKxTVTwmjsSRhHvMtxQPc6ZOS9Y2UQG0O2kjmov6rrsx9VBNvZztRsTjGcgtMLAk31h_Zypd8_jZ0Hu-MVePiW4YB5z-L_8dgJwgHlc0dsJHXrOHtr42PZZSTMcyjaMw&h=1l92CiQ1NDygpbJfE3KhejWqx--yE-hkpgFFeybTfwc",
-                "body": null,
-                "headers": {}
-            },
-            "response": {
-                "status": {
-                    "code": 200,
-                    "message": ""
-                },
-                "headers": {
-                    "x-cache": [
-                        "CONFIG_NOCACHE"
-                    ],
-                    "x-ms-ratelimit-remaining-resource": [
-                        "Microsoft.Compute/GetOperationResource;43,Microsoft.Compute/GetOperationSubscriptionMaximum;14998"
-                    ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
-                    ],
-                    "x-msedge-ref": [
-                        "Ref A: 28134528A5824109B6800D2179CEDC45 Ref B: MRS211050313039 Ref C: 2025-02-10T16:32:33Z"
-                    ],
-                    "date": [
-                        "Mon, 10 Feb 2025 16:32:33 GMT"
-                    ],
-                    "cache-control": [
-                        "no-cache"
-                    ],
-                    "content-length": [
-                        "133"
-                    ],
-                    "x-ms-ratelimit-remaining-subscription-global-reads": [
-                        "3748"
-                    ],
-                    "x-ms-need-to-refresh-epl-cache": [
-                        "False"
-                    ]
-                },
-                "body": {
-                    "data": {
-                        "startTime": "2025-02-10T16:32:22.578853+00:00",
-                        "status": "InProgress",
-                        "name": "2862dbec-ef6c-49e5-b53d-7e1987deaa7e"
-                    }
-                }
-            }
-        },
-        {
-            "request": {
-                "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/locations/southcentralus/operations/2862dbec-ef6c-49e5-b53d-7e1987deaa7e?p=e0591a86-90ba-4cf1-98d9-5c1538cf7689&api-version=2020-12-01&t=638748019429702926&c=MIIH5zCCBs-gAwIBAgITOgTWw_CixDB5M0tRDAAEBNbD8DANBgkqhkiG9w0BAQsFADBEMRMwEQYKCZImiZPyLGQBGRYDR0JMMRMwEQYKCZImiZPyLGQBGRYDQU1FMRgwFgYDVQQDEw9BTUUgSU5GUkEgQ0EgMDEwHhcNMjUwMjA1MDYwMzM4WhcNMjYwMTMxMDYwMzM4WjBAMT4wPAYDVQQDEzVhc3luY29wZXJhdGlvbnNpZ25pbmdjZXJ0aWZpY2F0ZS5tYW5hZ2VtZW50LmF6dXJlLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAKUqQWGa1z42tcQF-DR_GfohPjSJLzzrOoB6iSg6rWTxRhvHfldQyBcC3xcWCHropJ7pZ5mNz6PNbaqnZxCRR46qsC7Yt-mvu7PbSg-Cek5HJd0TbsoM53vX2eQirD59YwFduhPaip67CygLRftuVpbiU8_IyRTu-u4U20YtdjpTuXH11KURCMJGA5XYqPlvwwSXCBgi_C1GTX47lDBsuEN0qTtRQHS_ek-MEiFKdWr3nzkPo8WHbJxpH9mspQ3IdcwTSbIqC9JMkYZukKyXNSPSwpZpYiEmg4VT_AjVwTKrFy6EDH9ZATtk10ip09iCjaiRzjdTMUPSUYWZklDFYhECAwEAAaOCBNQwggTQMCcGCSsGAQQBgjcVCgQaMBgwCgYIKwYBBQUHAwEwCgYIKwYBBQUHAwIwPQYJKwYBBAGCNxUHBDAwLgYmKwYBBAGCNxUIhpDjDYTVtHiE8Ys-hZvdFs6dEoFggvX2K4Py0SACAWQCAQowggHaBggrBgEFBQcBAQSCAcwwggHIMGYGCCsGAQUFBzAChlpodHRwOi8vY3JsLm1pY3Jvc29mdC5jb20vcGtpaW5mcmEvQ2VydHMvQlkyUEtJSU5UQ0EwMS5BTUUuR0JMX0FNRSUyMElORlJBJTIwQ0ElMjAwMSg0KS5jcnQwVgYIKwYBBQUHMAKGSmh0dHA6Ly9jcmwxLmFtZS5nYmwvYWlhL0JZMlBLSUlOVENBMDEuQU1FLkdCTF9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3J0MFYGCCsGAQUFBzAChkpodHRwOi8vY3JsMi5hbWUuZ2JsL2FpYS9CWTJQS0lJTlRDQTAxLkFNRS5HQkxfQU1FJTIwSU5GUkElMjBDQSUyMDAxKDQpLmNydDBWBggrBgEFBQcwAoZKaHR0cDovL2NybDMuYW1lLmdibC9haWEvQlkyUEtJSU5UQ0EwMS5BTUUuR0JMX0FNRSUyMElORlJBJTIwQ0ElMjAwMSg0KS5jcnQwVgYIKwYBBQUHMAKGSmh0dHA6Ly9jcmw0LmFtZS5nYmwvYWlhL0JZMlBLSUlOVENBMDEuQU1FLkdCTF9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3J0MB0GA1UdDgQWBBQisbRQvrAefMEPMKyvaT1PVI9GyTAOBgNVHQ8BAf8EBAMCBaAwQAYDVR0RBDkwN4I1YXN5bmNvcGVyYXRpb25zaWduaW5nY2VydGlmaWNhdGUubWFuYWdlbWVudC5henVyZS5jb20wggE1BgNVHR8EggEsMIIBKDCCASSgggEgoIIBHIZCaHR0cDovL2NybC5taWNyb3NvZnQuY29tL3BraWluZnJhL0NSTC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsMS5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsMi5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsMy5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsNC5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JsMIGdBgNVHSAEgZUwgZIwDAYKKwYBBAGCN3sBATBmBgorBgEEAYI3ewICMFgwVgYIKwYBBQUHAgIwSh5IADMAMwBlADAAMQA5ADIAMQAtADQAZAA2ADQALQA0AGYAOABjAC0AYQAwADUANQAtADUAYgBkAGEAZgBmAGQANQBlADMAMwBkMAwGCisGAQQBgjd7AwIwDAYKKwYBBAGCN3sEAjAfBgNVHSMEGDAWgBTl2Ztn_PjsurvwwKidileIud8-YzAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwDQYJKoZIhvcNAQELBQADggEBAGK8URvSRwObVbsCbUgrkRlQ-2UKTKNUvJlo6-EBMp-w1NI_xUhd6MomwZfvl23L3OEMSCwjgPSJB3lHE7gdpWurhGsPwRmrrYK-EWUDZyBmumk2zDGfZp-m6JqbxzGZnlFQj3ECr0kJIas4WkIjx2riHMfjn6HtgJZnsHJsl2onv4fsfeJ5grVLh1UcnnMOF4GvHmrMlqCIgW2NKOjkBQs3wByNyutZKqNb26SO9MCbxXTNvWJvZ3WCdBfikQRqyypFRP64GwGycQy9eLG_p2OLQ2myyospuUm3yDBHaXp_br7YlvKl1RzeA7HgcbdDaMLhmOgRlAoCq_muFttgeQY&s=iAIWr3dTpE3nFlB0cGx4PTeE4VNvjkCNzXweeL5X6BKrscHZrA4T6proHB3-cjIYEc4xzM-MSY8AzqWhbKbyeENFBW0tn1fD7aq3rm6J4TTMEFUbtD0bHZxMmUw9qbRtDlJPBpwdL48UGHosjUlOMafEGy1DCJ_W1YofL6I2UdQdSTRCdMMYdBv7fXQSuboRAWhM4InKW098wNmuRSI69uDKxTVTwmjsSRhHvMtxQPc6ZOS9Y2UQG0O2kjmov6rrsx9VBNvZztRsTjGcgtMLAk31h_Zypd8_jZ0Hu-MVePiW4YB5z-L_8dgJwgHlc0dsJHXrOHtr42PZZSTMcyjaMw&h=1l92CiQ1NDygpbJfE3KhejWqx--yE-hkpgFFeybTfwc",
-                "body": null,
-                "headers": {}
-            },
-            "response": {
-                "status": {
-                    "code": 200,
-                    "message": ""
-                },
-                "headers": {
-                    "x-cache": [
-                        "CONFIG_NOCACHE"
-                    ],
-                    "x-ms-ratelimit-remaining-resource": [
-                        "Microsoft.Compute/GetOperationResource;41,Microsoft.Compute/GetOperationSubscriptionMaximum;14996"
-                    ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
-                    ],
-                    "x-msedge-ref": [
-                        "Ref A: 612A20F410AF410C9C64572FCB8EE05A Ref B: MRS211050313039 Ref C: 2025-02-10T16:33:03Z"
-                    ],
-                    "date": [
-                        "Mon, 10 Feb 2025 16:33:03 GMT"
-                    ],
-                    "cache-control": [
-                        "no-cache"
-                    ],
-                    "content-length": [
-                        "183"
-                    ],
-                    "x-ms-ratelimit-remaining-subscription-global-reads": [
-                        "3749"
-                    ],
-                    "x-ms-need-to-refresh-epl-cache": [
-                        "False"
-                    ]
-                },
-                "body": {
-                    "data": {
-                        "startTime": "2025-02-10T16:32:22.578853+00:00",
-                        "endTime": "2025-02-10T16:32:38.9070507+00:00",
-                        "status": "Succeeded",
-                        "name": "2862dbec-ef6c-49e5-b53d-7e1987deaa7e"
-                    }
-                }
-            }
-        },
-        {
-            "request": {
-                "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/locations/southcentralus/operations/2862dbec-ef6c-49e5-b53d-7e1987deaa7e?p=e0591a86-90ba-4cf1-98d9-5c1538cf7689&monitor=true&api-version=2020-12-01&t=638748019429702926&c=MIIH5zCCBs-gAwIBAgITOgTWw_CixDB5M0tRDAAEBNbD8DANBgkqhkiG9w0BAQsFADBEMRMwEQYKCZImiZPyLGQBGRYDR0JMMRMwEQYKCZImiZPyLGQBGRYDQU1FMRgwFgYDVQQDEw9BTUUgSU5GUkEgQ0EgMDEwHhcNMjUwMjA1MDYwMzM4WhcNMjYwMTMxMDYwMzM4WjBAMT4wPAYDVQQDEzVhc3luY29wZXJhdGlvbnNpZ25pbmdjZXJ0aWZpY2F0ZS5tYW5hZ2VtZW50LmF6dXJlLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAKUqQWGa1z42tcQF-DR_GfohPjSJLzzrOoB6iSg6rWTxRhvHfldQyBcC3xcWCHropJ7pZ5mNz6PNbaqnZxCRR46qsC7Yt-mvu7PbSg-Cek5HJd0TbsoM53vX2eQirD59YwFduhPaip67CygLRftuVpbiU8_IyRTu-u4U20YtdjpTuXH11KURCMJGA5XYqPlvwwSXCBgi_C1GTX47lDBsuEN0qTtRQHS_ek-MEiFKdWr3nzkPo8WHbJxpH9mspQ3IdcwTSbIqC9JMkYZukKyXNSPSwpZpYiEmg4VT_AjVwTKrFy6EDH9ZATtk10ip09iCjaiRzjdTMUPSUYWZklDFYhECAwEAAaOCBNQwggTQMCcGCSsGAQQBgjcVCgQaMBgwCgYIKwYBBQUHAwEwCgYIKwYBBQUHAwIwPQYJKwYBBAGCNxUHBDAwLgYmKwYBBAGCNxUIhpDjDYTVtHiE8Ys-hZvdFs6dEoFggvX2K4Py0SACAWQCAQowggHaBggrBgEFBQcBAQSCAcwwggHIMGYGCCsGAQUFBzAChlpodHRwOi8vY3JsLm1pY3Jvc29mdC5jb20vcGtpaW5mcmEvQ2VydHMvQlkyUEtJSU5UQ0EwMS5BTUUuR0JMX0FNRSUyMElORlJBJTIwQ0ElMjAwMSg0KS5jcnQwVgYIKwYBBQUHMAKGSmh0dHA6Ly9jcmwxLmFtZS5nYmwvYWlhL0JZMlBLSUlOVENBMDEuQU1FLkdCTF9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3J0MFYGCCsGAQUFBzAChkpodHRwOi8vY3JsMi5hbWUuZ2JsL2FpYS9CWTJQS0lJTlRDQTAxLkFNRS5HQkxfQU1FJTIwSU5GUkElMjBDQSUyMDAxKDQpLmNydDBWBggrBgEFBQcwAoZKaHR0cDovL2NybDMuYW1lLmdibC9haWEvQlkyUEtJSU5UQ0EwMS5BTUUuR0JMX0FNRSUyMElORlJBJTIwQ0ElMjAwMSg0KS5jcnQwVgYIKwYBBQUHMAKGSmh0dHA6Ly9jcmw0LmFtZS5nYmwvYWlhL0JZMlBLSUlOVENBMDEuQU1FLkdCTF9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3J0MB0GA1UdDgQWBBQisbRQvrAefMEPMKyvaT1PVI9GyTAOBgNVHQ8BAf8EBAMCBaAwQAYDVR0RBDkwN4I1YXN5bmNvcGVyYXRpb25zaWduaW5nY2VydGlmaWNhdGUubWFuYWdlbWVudC5henVyZS5jb20wggE1BgNVHR8EggEsMIIBKDCCASSgggEgoIIBHIZCaHR0cDovL2NybC5taWNyb3NvZnQuY29tL3BraWluZnJhL0NSTC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsMS5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsMi5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsMy5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JshjRodHRwOi8vY3JsNC5hbWUuZ2JsL2NybC9BTUUlMjBJTkZSQSUyMENBJTIwMDEoNCkuY3JsMIGdBgNVHSAEgZUwgZIwDAYKKwYBBAGCN3sBATBmBgorBgEEAYI3ewICMFgwVgYIKwYBBQUHAgIwSh5IADMAMwBlADAAMQA5ADIAMQAtADQAZAA2ADQALQA0AGYAOABjAC0AYQAwADUANQAtADUAYgBkAGEAZgBmAGQANQBlADMAMwBkMAwGCisGAQQBgjd7AwIwDAYKKwYBBAGCN3sEAjAfBgNVHSMEGDAWgBTl2Ztn_PjsurvwwKidileIud8-YzAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwDQYJKoZIhvcNAQELBQADggEBAGK8URvSRwObVbsCbUgrkRlQ-2UKTKNUvJlo6-EBMp-w1NI_xUhd6MomwZfvl23L3OEMSCwjgPSJB3lHE7gdpWurhGsPwRmrrYK-EWUDZyBmumk2zDGfZp-m6JqbxzGZnlFQj3ECr0kJIas4WkIjx2riHMfjn6HtgJZnsHJsl2onv4fsfeJ5grVLh1UcnnMOF4GvHmrMlqCIgW2NKOjkBQs3wByNyutZKqNb26SO9MCbxXTNvWJvZ3WCdBfikQRqyypFRP64GwGycQy9eLG_p2OLQ2myyospuUm3yDBHaXp_br7YlvKl1RzeA7HgcbdDaMLhmOgRlAoCq_muFttgeQY&s=iAIWr3dTpE3nFlB0cGx4PTeE4VNvjkCNzXweeL5X6BKrscHZrA4T6proHB3-cjIYEc4xzM-MSY8AzqWhbKbyeENFBW0tn1fD7aq3rm6J4TTMEFUbtD0bHZxMmUw9qbRtDlJPBpwdL48UGHosjUlOMafEGy1DCJ_W1YofL6I2UdQdSTRCdMMYdBv7fXQSuboRAWhM4InKW098wNmuRSI69uDKxTVTwmjsSRhHvMtxQPc6ZOS9Y2UQG0O2kjmov6rrsx9VBNvZztRsTjGcgtMLAk31h_Zypd8_jZ0Hu-MVePiW4YB5z-L_8dgJwgHlc0dsJHXrOHtr42PZZSTMcyjaMw&h=1l92CiQ1NDygpbJfE3KhejWqx--yE-hkpgFFeybTfwc",
-                "body": null,
-                "headers": {}
-            },
-            "response": {
-                "status": {
-                    "code": 200,
-                    "message": ""
-                },
-                "headers": {
-                    "x-cache": [
-                        "CONFIG_NOCACHE"
-                    ],
-                    "x-ms-ratelimit-remaining-resource": [
-                        "Microsoft.Compute/GetOperationResource;40,Microsoft.Compute/GetOperationSubscriptionMaximum;14995"
-                    ],
-                    "x-msedge-ref": [
-                        "Ref A: DA279DB96183414A8B403AF6AE11808F Ref B: MRS211050313039 Ref C: 2025-02-10T16:33:04Z"
-                    ],
-                    "date": [
-                        "Mon, 10 Feb 2025 16:33:03 GMT"
-                    ],
-                    "cache-control": [
-                        "no-cache"
-                    ],
-                    "content-length": [
-                        "0"
-                    ],
-                    "x-ms-ratelimit-remaining-subscription-global-reads": [
-                        "3749"
-                    ],
-                    "x-ms-need-to-refresh-epl-cache": [
-                        "False"
-                    ]
-                },
-                "body": {
-                    "string": ""
-                }
-            }
-        },
-        {
-            "request": {
-                "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_DISK_TYPE_MODIFY/providers/Microsoft.Compute/disks/disk2?api-version=2020-09-30",
-                "body": null,
-                "headers": {}
-            },
-            "response": {
-                "status": {
-                    "code": 200,
-                    "message": ""
-                },
-                "headers": {
-                    "x-cache": [
-                        "CONFIG_NOCACHE"
-                    ],
-                    "x-ms-ratelimit-remaining-resource": [
-                        "Microsoft.Compute/LowCostGet3Min;14996,Microsoft.Compute/LowCostGet30Min;119989"
-                    ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
-                    ],
-                    "x-msedge-ref": [
-                        "Ref A: 7938A072ABC046EC87C10552CD650849 Ref B: MRS211050618017 Ref C: 2025-02-10T16:33:05Z"
-                    ],
-                    "date": [
-                        "Mon, 10 Feb 2025 16:33:04 GMT"
-                    ],
-                    "cache-control": [
-                        "no-cache"
-                    ],
-                    "content-length": [
-                        "977"
-                    ],
-                    "x-ms-ratelimit-remaining-subscription-global-reads": [
-                        "3749"
-                    ]
-                },
-                "body": {
-                    "data": {
-                        "name": "disk2",
-                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_DISK_TYPE_MODIFY/providers/Microsoft.Compute/disks/disk2",
-                        "type": "Microsoft.Compute/disks",
-                        "location": "southcentralus",
-                        "managedBy": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_disk_type_modify/providers/Microsoft.Compute/virtualMachines/vm-disk-test",
+                        "managedBy": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_disk_type_modify/providers/Microsoft.Compute/virtualMachines/c7n-test-vm",
                         "sku": {
                             "name": "Standard_LRS",
                             "tier": "Standard"
@@ -1528,11 +281,13 @@
                                 "type": "EncryptionAtRestWithPlatformKey"
                             },
                             "networkAccessPolicy": "AllowAll",
-                            "timeCreated": "2025-02-10T16:29:31.0847274+00:00",
+                            "publicNetworkAccess": "Enabled",
+                            "timeCreated": "2025-07-23T18:24:23.6648947+00:00",
                             "provisioningState": "Succeeded",
                             "diskState": "Attached",
+                            "LastOwnershipUpdateTime": "2025-07-23T18:44:26.0860766+00:00",
                             "diskSizeBytes": 68719476736,
-                            "uniqueId": "c94b2f6c-b6f2-4e01-b682-c1f3c12fb68e"
+                            "uniqueId": "508c62ff-b41c-4a65-912f-6e7c2a2d3d26"
                         }
                     }
                 }
@@ -1541,7 +296,7 @@
         {
             "request": {
                 "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_DISK_TYPE_MODIFY/providers/Microsoft.Compute/disks/vm-disk-test_disk1_0785b5d7ea814594aa9f173026092513?api-version=2020-09-30",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_DISK_TYPE_MODIFY/providers/Microsoft.Compute/disks/c7n-test-vm_OsDisk_1_ff7628b46249419c95e5151982c9cf41?api-version=2024-03-02",
                 "body": null,
                 "headers": {}
             },
@@ -1551,38 +306,38 @@
                     "message": ""
                 },
                 "headers": {
-                    "x-cache": [
-                        "CONFIG_NOCACHE"
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
                     ],
                     "x-ms-ratelimit-remaining-resource": [
-                        "Microsoft.Compute/LowCostGet3Min;14995,Microsoft.Compute/LowCostGet30Min;119988"
+                        "Microsoft.Compute/LowCostGet3Min;14998,Microsoft.Compute/LowCostGet30Min;119987"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: AED546CAE7814F34ABB3D00272C8F571 Ref B: BL2AA2010205017 Ref C: 2025-07-23T19:33:09Z"
+                    ],
+                    "date": [
+                        "Wed, 23 Jul 2025 19:33:08 GMT"
                     ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
-                    "x-msedge-ref": [
-                        "Ref A: 304308A392344184970CC0A6519BF41B Ref B: MRS211050618017 Ref C: 2025-02-10T16:33:05Z"
-                    ],
-                    "date": [
-                        "Mon, 10 Feb 2025 16:33:05 GMT"
-                    ],
-                    "cache-control": [
-                        "no-cache"
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
                     ],
                     "content-length": [
-                        "1416"
-                    ],
-                    "x-ms-ratelimit-remaining-subscription-global-reads": [
-                        "3748"
+                        "1709"
                     ]
                 },
                 "body": {
                     "data": {
-                        "name": "vm-disk-test_disk1_0785b5d7ea814594aa9f173026092513",
-                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_DISK_TYPE_MODIFY/providers/Microsoft.Compute/disks/vm-disk-test_disk1_0785b5d7ea814594aa9f173026092513",
+                        "name": "c7n-test-vm_OsDisk_1_ff7628b46249419c95e5151982c9cf41",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_DISK_TYPE_MODIFY/providers/Microsoft.Compute/disks/c7n-test-vm_OsDisk_1_ff7628b46249419c95e5151982c9cf41",
                         "type": "Microsoft.Compute/disks",
                         "location": "southcentralus",
-                        "managedBy": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_disk_type_modify/providers/Microsoft.Compute/virtualMachines/vm-disk-test",
+                        "managedBy": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_disk_type_modify/providers/Microsoft.Compute/virtualMachines/c7n-test-vm",
                         "sku": {
                             "name": "Standard_LRS",
                             "tier": "Standard"
@@ -1590,10 +345,16 @@
                         "properties": {
                             "osType": "Windows",
                             "hyperVGeneration": "V2",
+                            "supportsHibernation": true,
+                            "supportedCapabilities": {
+                                "diskControllerTypes": "SCSI, NVMe",
+                                "acceleratedNetwork": true,
+                                "architecture": "x64"
+                            },
                             "creationData": {
                                 "createOption": "FromImage",
                                 "imageReference": {
-                                    "id": "/Subscriptions/ba3f11f2-e667-41a6-813f-d4915d729491/Providers/Microsoft.Compute/Locations/southcentralus/Publishers/microsoftwindowsdesktop/ArtifactTypes/VMImage/Offers/windows-10/Skus/win10-22h2-avd-g2/Versions/19045.5371.250112"
+                                    "id": "/Subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/Providers/Microsoft.Compute/Locations/southcentralus/Publishers/microsoftwindowsdesktop/ArtifactTypes/VMImage/Offers/windows-10/Skus/win10-22h2-avd-g2/Versions/19045.6093.250705"
                                 }
                             },
                             "diskSizeGB": 127,
@@ -1603,11 +364,13 @@
                                 "type": "EncryptionAtRestWithPlatformKey"
                             },
                             "networkAccessPolicy": "AllowAll",
-                            "timeCreated": "2025-02-10T16:29:42.3347928+00:00",
+                            "publicNetworkAccess": "Enabled",
+                            "timeCreated": "2025-07-23T18:35:46.4926407+00:00",
                             "provisioningState": "Succeeded",
                             "diskState": "Attached",
+                            "LastOwnershipUpdateTime": "2025-07-23T18:44:26.0860766+00:00",
                             "diskSizeBytes": 136367308800,
-                            "uniqueId": "0785b5d7-ea81-4594-aa9f-173026092513"
+                            "uniqueId": "ff7628b4-6249-419c-95e5-151982c9cf41"
                         }
                     }
                 }
