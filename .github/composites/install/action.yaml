@@ -48,7 +48,7 @@ runs:
       id: cache_check
       shell: bash
       run: |
-        if uv run custodian version ; then
+        if uv run --no-sync custodian version ; then
            echo "venv=success" >> $GITHUB_OUTPUT
            echo "Cache Green"
         else
