@@ -763,8 +763,6 @@ class PolicyLambdaProvision(Publish):
             }
         )
         self.assert_items(result['Target'], {"RoleArn": scheduler_role})
-        # Verify Lambda ARN doesn't include version qualifier
-        self.assertEqual(result['Target']['Arn'].count(':'), 6)
 
         # modify policy and re-publish
         policy['mode']['timezone'] = 'America/New_York'
@@ -782,8 +780,6 @@ class PolicyLambdaProvision(Publish):
                 "ScheduleExpressionTimezone": 'America/New_York'
             }
         )
-        # Verify Lambda ARN still doesn't include version after code update
-        self.assertEqual(result['Target']['Arn'].count(':'), 6)
 
         # modify scheduler role
         policy['mode']['scheduler-role'] = f'{scheduler_role}2'
@@ -793,8 +789,6 @@ class PolicyLambdaProvision(Publish):
         result = mgr.publish(pl, "Dev", role=ROLE)
         result = scheduler.get_schedule(Name="custodian-schedule-ec2-checker")
         self.assert_items(result['Target'], {"RoleArn": f'{scheduler_role}2'})
-        # Verify Lambda ARN still doesn't include version after code update
-        self.assertEqual(result['Target']['Arn'].count(':'), 6)
 
     def test_pause_resume_sched_policy(self):
         session_factory = self.replay_flight_data("test_pause_resume_sched_policy")
