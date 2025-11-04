@@ -793,7 +793,7 @@ class PolicyLambdaProvision(Publish):
         result = mgr.publish(pl, "Dev", role=ROLE)
         result = scheduler.get_schedule(Name="custodian-schedule-ec2-checker")
         self.assert_items(result['Target'], {"RoleArn": f'{scheduler_role}2'})
-        # Verify Lambda ARN still unqualified after multiple updates
+        # Verify Lambda ARN still doesn't include version after code update
         self.assertEqual(result['Target']['Arn'].count(':'), 6)
 
     def test_pause_resume_sched_policy(self):
