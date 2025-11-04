@@ -281,6 +281,8 @@ def get_exec_options(options):
 def normalize_arn(func_arn):
     """Strip version or alias qualifiers from a Lambda function ARN.
     """
+    if not isinstance(func_arn, str):
+        return func_arn
     if func_arn.count(':') > 6:
         func_arn, _ = func_arn.rsplit(':', 1)
     return func_arn
