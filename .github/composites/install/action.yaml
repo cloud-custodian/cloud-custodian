@@ -82,7 +82,7 @@ runs:
 
 
     - name: Save cache
-      if: steps.cache.outputs.cache-hit == 'true' || steps.cache_check.outputs.venv == 'recreate'
+      if: steps.cache.outputs.cache-hit == 'true' && steps.cache_check.outputs.venv == 'recreate'
       uses: actions/cache/save@5a3ec84eff668545956fd18022155c47e93e2684 # ratchet:actions/cache@v4
       with:
         path: .venv
