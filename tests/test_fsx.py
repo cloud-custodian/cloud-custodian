@@ -392,10 +392,8 @@ class TestFSx(BaseTest):
         # skip-snapshot is set to False.
         session_factory = self.replay_flight_data(
             'test_fsx_delete_file_system_ontap', region="us-west-2")
-        if self.recording:
-            retry_delay = 30
-            retry_max_attempts = 10
-        else:
+        #  Adjust retry settings for recording playback speed.
+        if not self.recording:
             retry_delay = 1
             retry_max_attempts = 2
         p = self.load_policy(
@@ -876,12 +874,11 @@ class TestFSx(BaseTest):
         session_factory = self.replay_flight_data(
             'test_fsx_delete_file_system_openzfs_force',
             region="us-west-2")
-        if self.recording:
-            retry_delay = 10
-            retry_max_attempts = 10
-        else:
+
+        # Adjust retry settings for recording playback speed.
+        if not self.recording:
             retry_delay = 1
-            retry_max_attempts = 10
+            retry_max_attempts = 5
         p = self.load_policy(
             {
                 'name': 'fsx-delete-file-system',
@@ -923,10 +920,7 @@ class TestFSx(BaseTest):
         session_factory = self.replay_flight_data(
             'test_fsx_delete_file_system_lustre', region="us-west-2")
 
-        if self.recording:
-            retry_delay = 5
-            retry_max_attempts = 10
-        else:
+        if not self.recording:
             retry_delay = 1
             retry_max_attempts = 2
 
