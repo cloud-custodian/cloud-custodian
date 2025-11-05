@@ -1,0 +1,61 @@
+{
+    "status_code": 200,
+    "data": {
+        "WebACL": {
+            "Name": "compliant-rule-groups",
+            "Id": "6ac79b8d-35bf-41c3-835e-0c1d32a0ab97",
+            "ARN": "arn:aws:wafv2:us-east-1:111111111111:regional/webacl/compliant-rule-groups/6ac79b8d-35bf-41c3-835e-0c1d32a0ab97",
+            "DefaultAction": {
+                "Allow": {}
+            },
+            "Description": "1 custom rule group and 1 managed rule group",
+            "Rules": [
+                {
+                    "Name": "my-own-rg",
+                    "Priority": 0,
+                    "Statement": {
+                        "RuleGroupReferenceStatement": {
+                            "ARN": "arn:aws:wafv2:us-east-1:111111111111:regional/rulegroup/with-rules/60616042-d427-4c17-991c-ee3a39012c31"
+                        }
+                    },
+                    "OverrideAction": {
+                        "None": {}
+                    },
+                    "VisibilityConfig": {
+                        "SampledRequestsEnabled": true,
+                        "CloudWatchMetricsEnabled": true,
+                        "MetricName": "my-own-rg"
+                    }
+                },
+                {
+                    "Name": "AWS-AWSManagedRulesAdminProtectionRuleSet",
+                    "Priority": 1,
+                    "Statement": {
+                        "ManagedRuleGroupStatement": {
+                            "VendorName": "AWS",
+                            "Name": "AWSManagedRulesAdminProtectionRuleSet"
+                        }
+                    },
+                    "OverrideAction": {
+                        "None": {}
+                    },
+                    "VisibilityConfig": {
+                        "SampledRequestsEnabled": true,
+                        "CloudWatchMetricsEnabled": true,
+                        "MetricName": "AWS-AWSManagedRulesAdminProtectionRuleSet"
+                    }
+                }
+            ],
+            "VisibilityConfig": {
+                "SampledRequestsEnabled": true,
+                "CloudWatchMetricsEnabled": true,
+                "MetricName": "compliant-rule-groups"
+            },
+            "Capacity": 101,
+            "ManagedByFirewallManager": false,
+            "LabelNamespace": "awswaf:111111111111:webacl:compliant-rule-groups:"
+        },
+        "LockToken": "3d9f2121-8f00-4d59-bdf5-a5f7280223b4",
+        "ResponseMetadata": {}
+    }
+}

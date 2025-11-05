@@ -1,0 +1,62 @@
+{
+    "status_code": 200,
+    "data": {
+        "WebACL": {
+            "Name": "compliant-waf",
+            "Id": "d4595dae-518e-4ff7-98ac-609091678beb",
+            "ARN": "arn:aws:wafv2:us-east-1:111111111111:regional/webacl/compliant-waf/d4595dae-518e-4ff7-98ac-609091678beb",
+            "DefaultAction": {
+                "Allow": {}
+            },
+            "Description": "",
+            "Rules": [
+                {
+                    "Name": "AWS-AWSManagedRulesAmazonIpReputationList",
+                    "Priority": 0,
+                    "Statement": {
+                        "ManagedRuleGroupStatement": {
+                            "VendorName": "AWS",
+                            "Name": "AWSManagedRulesAmazonIpReputationList"
+                        }
+                    },
+                    "OverrideAction": {
+                        "None": {}
+                    },
+                    "VisibilityConfig": {
+                        "SampledRequestsEnabled": true,
+                        "CloudWatchMetricsEnabled": true,
+                        "MetricName": "AWS-AWSManagedRulesAmazonIpReputationList"
+                    }
+                },
+                {
+                    "Name": "AWS-AWSManagedRulesAnonymousIpList",
+                    "Priority": 1,
+                    "Statement": {
+                        "ManagedRuleGroupStatement": {
+                            "VendorName": "AWS",
+                            "Name": "AWSManagedRulesAnonymousIpList"
+                        }
+                    },
+                    "OverrideAction": {
+                        "None": {}
+                    },
+                    "VisibilityConfig": {
+                        "SampledRequestsEnabled": true,
+                        "CloudWatchMetricsEnabled": true,
+                        "MetricName": "AWS-AWSManagedRulesAnonymousIpList"
+                    }
+                }
+            ],
+            "VisibilityConfig": {
+                "SampledRequestsEnabled": true,
+                "CloudWatchMetricsEnabled": true,
+                "MetricName": "compliant-waf"
+            },
+            "Capacity": 75,
+            "ManagedByFirewallManager": false,
+            "LabelNamespace": "awswaf:111111111111:webacl:compliant-waf:"
+        },
+        "LockToken": "e081f73f-8e5c-4916-b485-1969096102d6",
+        "ResponseMetadata": {}
+    }
+}
