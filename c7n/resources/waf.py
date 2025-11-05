@@ -234,7 +234,7 @@ class WAFV2SetLogging(BaseAction):
         destination={'type': 'string'}
     )
 
-    permissions = ('wafv2:PutLoggingConfiguration')
+    permissions = ('wafv2:PutLoggingConfiguration',)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client(
