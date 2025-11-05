@@ -251,8 +251,8 @@ class WAFV2SetLogging(BaseAction):
             try:
                 client.put_logging_configuration(LoggingConfiguration=logging_config)
                 self.log.info(f"Logging enabled for {r['Name']} to {destination}.")
-            except Exception as e:
-                self.log.error(f"Error enabling logging for {r['Name']}: {e}")
+            except client.exceptions.WAFInvalidParameterException:
+                continue
 
 
 @WAFV2.filter_registry.register('web-acl-rules')
