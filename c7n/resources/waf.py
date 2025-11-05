@@ -251,7 +251,8 @@ class WAFV2SetLogging(BaseAction):
             try:
                 client.put_logging_configuration(LoggingConfiguration=logging_config)
                 self.log.info(f"Logging enabled for {r['Name']} to {destination}.")
-            except client.exceptions.WAFInvalidParameterException:
+            except client.exceptions.WAFInvalidParameterException as e:
+                self.log.error(f"Failed to enable logging for {r['Name']}: {e}")
                 continue
 
 
