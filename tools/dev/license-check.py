@@ -13,6 +13,7 @@ accept = (
     'Apache 2',
     'BSD License',
     'MPL 2.0',
+    'BSD-2-Clause',
     'BSD-3-Clause',
     'Apache-2.0',
     'Apache-2',
@@ -43,7 +44,9 @@ whitelist_packages = set(
         #
         # packages with bad metadata
         'protobuf',  # BSD-3-Clause
-        'uritemplate'  # Dual license BSD 3-Clause OR Apache-2.0
+        'uritemplate',  # Dual license BSD 3-Clause OR Apache-2.0
+        # https://github.com/GrahamDumpleton/wrapt/issues/298
+        'wrapt',  # BSD-2-Clause .. packaging update is missing license spdx header
     )
 )
 

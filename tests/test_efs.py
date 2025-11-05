@@ -13,7 +13,6 @@ from operator import itemgetter
 from c7n.testing import mock_datetime_now
 from dateutil import parser
 from pytest_terraform import terraform
-import c7n.resources.efs
 import c7n.filters.backup
 import json
 import pytest
