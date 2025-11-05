@@ -90,6 +90,27 @@ class WAFTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertTrue('c7n:WafV2LoggingConfiguration' not in resources[0])
 
+    def test_wafv2_set_logging_enabled(self):
+        session_factory = self.replay_flight_data("test_wafv2_set_logging_enabled")
+
+        policy = {
+                "name": "enable-wafv2-logging",
+                "resource": "aws.wafv2",
+                "filters": [{"Name": "noncompliant_waf"}],
+                "actions": [
+                    {
+                        "type": "set-logging",
+                        "destination": "arn:aws:s3:::aws-waf-logs-test-custodian-creation",
+                    }
+                ],
+            }
+        p = self.load_policy(policy,
+                             session_factory=session_factory,
+                             config={"region": "us-east-1"})
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1, f"Expected 1 resource, got {len(resources)}")
+
     def test_wafv2_rule_groups(self):
         session_factory = self.replay_flight_data("test_wafv2_rule_groups")
 
