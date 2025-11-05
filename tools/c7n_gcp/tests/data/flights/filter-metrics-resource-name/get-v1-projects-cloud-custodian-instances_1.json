@@ -1,0 +1,61 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 01 Apr 2021 18:36:09 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "777",
+    "-content-encoding": "gzip",
+    "content-location": "https://monitoring.googleapis.com/v3/projects/cloud-custodian/timeSeries?filter=metric.type+%3D+%22compute.googleapis.com%2Finstance%2Fcpu%2Futilization%22+AND+metric.labels.instance_name+%3D+%22iap-test-webapp%22+AND++resource.labels.zone+%3D+%22us-east4-c%22&interval.startTime=2021-03-18T18%3A36%3A07.478160%2B00%3A00&interval.endTime=2021-04-01T18%3A36%3A07.478160%2B00%3A00&aggregation.alignmentPeriod=1209600.0s&aggregation.perSeriesAligner=ALIGN_MEAN&aggregation.crossSeriesReducer=REDUCE_NONE&view=FULL&alt=json"
+  },
+  "body": {
+    "instances": [
+      {
+        "name": "projects/my-project-123456/instances/prod-spanner-instance",
+        "config": "projects/my-project-123456/instanceConfigs/regional-us-central1",
+        "displayName": "Production Spanner Instance",
+        "nodeCount": 3,
+        "processingUnits": 3000,
+        "replicaComputeCapacity": [
+          {
+            "replicaSelection": {
+              "location": "us-central1"
+            },
+            "nodeCount": 3
+          }
+        ],
+        "autoscalingConfig": {
+          "autoscalingLimits": {
+            "minNodes": 1,
+            "maxNodes": 10
+          },
+          "autoscalingTargets": {
+            "highPriorityCpuUtilizationPercent": 65,
+            "storageUtilizationPercent": 80
+          }
+        },
+        "state": "READY",
+        "labels": {
+          "environment": "production",
+          "team": "backend",
+          "cost-center": "engineering"
+        },
+        "instanceType": "PROVISIONED",
+        "endpointUris": [],
+        "createTime": "2024-01-15T10:30:00Z",
+        "updateTime": "2024-08-20T14:45:30Z",
+        "edition": "STANDARD",
+        "defaultBackupScheduleType": "AUTOMATIC"
+      }
+    ],
+    "nextPageToken": null,
+    "unreachable": []
+  }
+}
