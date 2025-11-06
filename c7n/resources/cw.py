@@ -832,3 +832,77 @@ class DeliveryDestinationDelete(BaseAction):
                 ignore_err_codes=('ResourceNotFoundException',),
                 name=r['name'],
             )
+
+
+@resources.register('cloudwatch-synthetics')
+class SyntheticsCanary(QueryResourceManager):
+    """AWS CloudWatch Synthetics Canary
+
+    Example:
+        .. code-block:: yaml
+
+            policies:
+              - name: stop-failed-canaries
+                resource: aws.cloudwatch-synthetics
+                filters:
+                  - State.CurrentStatus.State: FAILED
+                actions:
+                  - type: delete
+    """
+
+    class resource_type(TypeInfo):
+        service = 'synthetics'
+        id = 'Id'
+        name = 'Name'
+        date = 'LastModified'
+        arn_type = 'canary'
+        dimension = 'CanaryName'
+        cfn_type = 'AWS::Synthetics::Canary'
+        enum_spec = ('describe_canaries', 'Canaries', None)
+        universal_taggable = object()
+
+    def augment(self, resources):
+        for r in resources:
+            # AWS returns tags as a dict { "Key": "Value" }
+            # Custodian expects [{"Key": k, "Value": v}, ...]
+            r["Tags"] = [{"Key": k, "Value": v} for k, v in r["Tags"].items()]
+
+        return resources
+
+
+@SyntheticsCanary.action_registry.register('start')
+class StartCanary(BaseAction):
+    schema = type_schema('start')
+
+    permissions = ('synthetics:StartCanary',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('synthetics')
+        for r in resources:
+            client.start_canary(Name=r['Name'])
+
+
+@SyntheticsCanary.action_registry.register('stop')
+class StopCanary(BaseAction):
+    schema = type_schema('stop')
+
+    permissions = ('synthetics:StopCanary',)
+
+    def process(self, resources):
+        """Stop all running resources"""
+        client = local_session(self.manager.session_factory).client('synthetics')
+        for r in resources:
+            client.stop_canary(Name=r['Name'])
+
+
+@SyntheticsCanary.action_registry.register('delete')
+class DeleteCanary(BaseAction):
+    schema = type_schema('delete')
+
+    permissions = ('synthetics:DeleteCanary',)
+
+    def process(self, resources):
+        """Delete resources"""
+        client = local_session(self.manager.session_factory).client('synthetics')
+        for r in resources:
+            client.delete_canary(Name=r['Name'])

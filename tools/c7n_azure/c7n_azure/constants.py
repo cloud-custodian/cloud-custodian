@@ -77,7 +77,8 @@ STORAGE_AUTH_ENDPOINT = 'https://storage.azure.com/'
 VAULT_AUTH_ENDPOINT = 'vault'
 DEFAULT_RESOURCE_AUTH_ENDPOINT = 'resource_manager'
 DEFAULT_AUTH_ENDPOINT = 'active_directory_resource_id'
-GRAPH_AUTH_ENDPOINT = 'active_directory_graph_resource_id'
+GRAPH_AUTH_ENDPOINT = 'active_directory_graph_resource_id'  # Legacy Azure AD Graph
+MSGRAPH_RESOURCE_ID = 'https://graph.microsoft.com/'        # Microsoft Graph resource identifier
 RESOURCE_GLOBAL_MGMT = 'https://management.azure.com/'
 
 """

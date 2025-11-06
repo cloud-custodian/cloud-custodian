@@ -313,7 +313,7 @@ class ComprehendModelCrossAccountAccessFilter(CrossAccountAccessFilter):
             ),
         )
 
-        if result is not None:
+        if 'ResourcePolicy' in result:
             r[self.policy_annotation] = result['ResourcePolicy']
             return result['ResourcePolicy']
 

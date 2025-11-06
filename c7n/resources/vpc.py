@@ -722,6 +722,49 @@ class SubnetIpAddressUsageFilter(ValueFilter):
         return results
 
 
+@Subnet.action_registry.register('delete')
+class DeleteSubnet(BaseAction):
+    """Action to delete a Subnet.
+
+    :example:
+
+    Delete empty development subnets
+
+    .. code-block:: yaml
+
+        policies:
+          - name: delete-subnet
+            resource: aws.subnet
+            filters:
+              - tag:Environment: dev
+              - type: ip-address-usage
+                key: NumberUsed
+                value: 0
+            actions:
+              - type: delete
+    """
+
+    schema = type_schema('delete')
+    permissions = ("ec2:DeleteSubnet",)
+
+    def process(self, subnets):
+        client = local_session(self.manager.session_factory).client('ec2')
+        for subnet in subnets:
+            self.process_subnet(client, subnet)
+
+    def process_subnet(self, client, subnet):
+        try:
+            self.manager.retry(
+                client.delete_subnet,
+                SubnetId=subnet['SubnetId']
+            )
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'DependencyViolation':
+                self.log.warning(f"Cannot delete subnet {subnet['SubnetId']} due to dependencies")
+                return
+            raise
+
+
 class ConfigSG(query.ConfigSource):
 
     def load_resource(self, item):
