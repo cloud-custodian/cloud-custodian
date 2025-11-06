@@ -416,6 +416,7 @@ class DeleteFileSystem(BaseAction):
         }
     )
 
+    # ONTAP does not currently have its own configuration block in boto3.
     FSTYPE_CONFIG_KEY = {
         'WINDOWS': 'WindowsConfiguration',
         'LUSTRE': 'LustreConfiguration',
