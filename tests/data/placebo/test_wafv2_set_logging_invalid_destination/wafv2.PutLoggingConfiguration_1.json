@@ -1,0 +1,14 @@
+{
+    "status_code": 400,
+    "data": {
+        "Error": {
+            "Message": "Error reason: The ARN isn't valid. A valid ARN begins with arn: and includes other information separated by colons or slashes., field: LOG_DESTINATION, parameter: arn:aws:s3:::invalid-destination-for-logging",
+            "Code": "WAFInvalidParameterException"
+        },
+        "ResponseMetadata": {},
+        "message": "Error reason: The ARN isn't valid. A valid ARN begins with arn: and includes other information separated by colons or slashes., field: LOG_DESTINATION, parameter: arn:aws:s3:::invalid-destination-for-logging",
+        "Field": "LOG_DESTINATION",
+        "Parameter": "arn:aws:s3:::invalid-destination-for-logging",
+        "Reason": "The ARN isn't valid. A valid ARN begins with arn: and includes other information separated by colons or slashes."
+    }
+}

@@ -111,6 +111,27 @@ class WAFTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1, f"Expected 1 resource, got {len(resources)}")
 
+    def test_wafv2_set_logging_invalid_destination(self):
+        session_factory = self.replay_flight_data("test_wafv2_set_logging_invalid_destination")
+
+        policy = {
+                "name": "enable-wafv2-logging-invalid-destination",
+                "resource": "aws.wafv2",
+                "filters": [{"Name": "compliant-waf"}],
+                "actions": [
+                    {
+                        "type": "set-logging",
+                        "destination": "arn:aws:s3:::invalid-destination-for-logging",
+                    }
+                ],
+            }
+        p = self.load_policy(policy,
+                             session_factory=session_factory,
+                             config={"region": "us-east-1"})
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1, f"Expected 1 resource, got {len(resources)}")
+
     def test_wafv2_rule_groups(self):
         session_factory = self.replay_flight_data("test_wafv2_rule_groups")
 
