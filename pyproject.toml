@@ -117,4 +117,6 @@ filterwarnings = [
 
 
 [tool.coverage.report]
-omit = ["c7n/resources/opsworks.py"]
+# services removed upstream, we have some minimal fake implementations for
+# temporary compatiblity for existing policies.
+omit = ["c7n/resources/opsworks.py", "c7n/resources/qldb.py"]
