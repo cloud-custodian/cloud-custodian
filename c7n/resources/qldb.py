@@ -6,8 +6,7 @@
 from c7n.actions import BaseAction as Action
 from c7n.query import ConfigSource, DescribeSource, QueryResourceManager, TypeInfo
 from c7n.manager import resources
-from c7n.utils import local_session, type_schema
-
+from c7n.utils import type_schema
 
 
 class DescribeRemoved(DescribeSource):

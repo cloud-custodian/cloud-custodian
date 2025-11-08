@@ -1,8 +1,6 @@
 # Copyright 2020 Cloud Custodian Authors
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-import time
-from botocore.exceptions import ClientError
 from .common import BaseTest
 
 
