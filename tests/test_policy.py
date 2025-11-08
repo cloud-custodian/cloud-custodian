@@ -800,7 +800,7 @@ class PolicyMetaLint(BaseTest):
             'rrset',
             'redshift-reserved',
             'elasticsearch-reserved',
-            'ses-receipt-rule-set'
+            'ses-receipt-rule-set',
         ))
 
         for k, v in manager.resources.items():
@@ -940,6 +940,19 @@ class PolicyMetaLint(BaseTest):
                     len(explicit), ", ".join(explicit)))
 
     def test_resource_permissions(self):
+
+        ignore_elements = set((
+            # this service has been fully removed, we're keeping compatiblity
+            # support for the moment to avoid breaking policies targeting.
+            #
+            "opswork-cm",
+            "opswork-cm.actions.delete",
+            "opswork-stack",
+            "opswork-stack.actions.delete",
+            "opswork-stack.actions.stop",
+            "route-table.filters.route",
+        ))
+
         self.capture_logging("c7n.cache")
         missing = []
         cfg = Config.empty()
@@ -947,11 +960,11 @@ class PolicyMetaLint(BaseTest):
         for k, v in list(manager.resources.items()):
             p = Bag({"name": "permcheck", "resource": k, 'provider_name': 'aws'})
             ctx = self.get_context(config=cfg, policy=p)
-
             mgr = v(ctx, p)
             perms = mgr.get_permissions()
             if not perms:
-                missing.append(k)
+                if k not in ignore_elements:
+                    missing.append(k)
 
             for n, a in list(v.action_registry.items()):
                 p["actions"] = [n]
@@ -962,7 +975,9 @@ class PolicyMetaLint(BaseTest):
                 if "webhook" == n:
                     continue
                 if not found:
-                    missing.append("%s.actions.%s" % (k, n))
+                    qk = "%s.actions.%s" % (k, n)
+                    if qk not in ignore_elements:
+                        missing.append(qk)
 
             for n, f in list(v.filter_registry.items()):
                 if n in ("and", "or", "not", "missing", "reduce"):
@@ -1002,7 +1017,7 @@ class PolicyMetaLint(BaseTest):
                 ):
                     continue
                 qk = "%s.filters.%s" % (k, n)
-                if qk in ("route-table.filters.route",):
+                if qk in ignore_elements:
                     continue
                 if not perms:
                     missing.append(qk)
