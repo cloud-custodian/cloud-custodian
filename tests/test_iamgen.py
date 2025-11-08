@@ -44,12 +44,17 @@ class TestIamGen(BaseTest):
         perms = load_data('iam-actions.json')
         resources.load_available()
 
+        deprecated = set(('qldb', 'opswork-cm', 'opswork-stack',))
+
         for k, v in manager.resources.items():
             p = Bag({'name': 'permcheck', 'resource': k, 'provider_name': 'aws'})
             ctx = self.get_context(config=cfg, policy=p)
             mgr = v(ctx, p)
             # if getattr(mgr, 'permissions', None):
             #    print(mgr)
+
+            if mgr.type in deprecated:
+                continue
 
             found = False
             for s in (mgr.resource_type.service,
