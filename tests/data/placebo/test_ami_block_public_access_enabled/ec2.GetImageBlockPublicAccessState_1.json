@@ -1,0 +1,11 @@
+{
+    "status_code": 200,
+    "data": {
+        "ImageBlockPublicAccessState": "block-new-sharing",
+        "ManagedBy": "account",
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200,
+            "RequestId": "12345678-1234-4567-8901-123456789013"
+        }
+    }
+}

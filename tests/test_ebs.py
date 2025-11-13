@@ -16,7 +16,8 @@ from c7n.resources.ebs import (
     CopySnapshot,
     Delete,
     ErrorHandler,
-    SnapshotQueryParser as QueryParser
+    SnapshotQueryParser as QueryParser,
+    VolumeQueryParser
 )
 from .common import BaseTest
 from c7n.testing import mock_datetime_now
@@ -51,6 +52,53 @@ class SnapshotQueryParse(BaseTest):
         self.assertRaises(
             PolicyValidationError, QueryParser.parse, [
                 {'Name': 'snapshot-id', 'Values': [1]}])
+
+
+class VolumeQueryParse(BaseTest):
+
+    def test_query(self):
+        qfilters = [
+            {'Name': 'tag:Name', 'Values': ['Volume1']},
+            {'Name': 'status', 'Values': ['available']}]
+        self.assertEqual(qfilters, VolumeQueryParser.parse(qfilters))
+
+    def test_query_encrypted(self):
+        qfilters = [
+            {'Name': 'encrypted', 'Values': [True]},
+            {'Name': 'volume-type', 'Values': ['gp3']}]
+        self.assertEqual(qfilters, VolumeQueryParser.parse(qfilters))
+
+    def test_query_attachment(self):
+        qfilters = [
+            {'Name': 'attachment.status', 'Values': ['attached']},
+            {'Name': 'attachment.instance-id', 'Values': ['i-1234567890abcdef0']}]
+        self.assertEqual(qfilters, VolumeQueryParser.parse(qfilters))
+
+    def test_invalid_query(self):
+        self.assertRaises(
+            PolicyValidationError, VolumeQueryParser.parse, {})
+
+        self.assertRaises(
+            PolicyValidationError, VolumeQueryParser.parse, [None])
+
+        self.assertRaises(
+            PolicyValidationError, VolumeQueryParser.parse, [{'X': 1}])
+
+        self.assertRaises(
+            PolicyValidationError, VolumeQueryParser.parse, [
+                {'Name': 'status', 'Values': 'available'}])
+
+        self.assertRaises(
+            PolicyValidationError, VolumeQueryParser.parse, [
+                {'Name': 'status', 'Values': ['Available']}])
+
+        self.assertRaises(
+            PolicyValidationError, VolumeQueryParser.parse, [
+                {'Name': 'volume-id', 'Values': [1]}])
+
+        self.assertRaises(
+            PolicyValidationError, VolumeQueryParser.parse, [
+                {'Name': 'volume-type', 'Values': ['invalid-type']}])
 
 
 class SnapshotErrorHandler(BaseTest):
@@ -958,6 +1006,85 @@ class PiopsMetricsFilterTest(BaseTest):
         )
         resources = policy.run()
         self.assertEqual(len(resources), 0)
+
+
+class VolumeQueryFilterTest(BaseTest):
+
+    def test_volume_query_parser_integration(self):
+        policy = self.load_policy({
+            "name": "ebs-query-test",
+            "resource": "ebs",
+            "query": [
+                {"Name": "encrypted", "Values": [True]},
+                {"Name": "volume-type", "Values": ["gp3"]}
+            ]
+        })
+        self.assertIsNotNone(policy)
+        self.assertEqual(
+            policy.resource_manager.data.get('query'),
+            [
+                {"Name": "encrypted", "Values": [True]},
+                {"Name": "volume-type", "Values": ["gp3"]}
+            ]
+        )
+
+    def test_volume_query_api_call(self):
+        policy = self.load_policy({
+            "name": "ebs-query-test",
+            "resource": "ebs",
+            "query": [
+                {"Name": "encrypted", "Values": [True]},
+                {"Name": "volume-type", "Values": ["gp3"]},
+                {"Name": "status", "Values": ["available"]}
+            ]
+        })
+
+        with mock.patch.object(
+            policy.resource_manager.source,
+            'resources',
+            return_value=[]
+        ) as mock_resources:
+            policy.run()
+
+            mock_resources.assert_called_once()
+
+    def test_volume_query_filter(self):
+        factory = self.replay_flight_data("test_ebs_volume_query")
+        policy = self.load_policy(
+            {
+                "name": "ebs-encrypted-volumes",
+                "resource": "ebs",
+                "query": [
+                    {"Name": "encrypted", "Values": [True]},
+                    {"Name": "volume-type", "Values": ["gp3"]}
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = policy.run()
+        for r in resources:
+            self.assertTrue(r.get('Encrypted'))
+            self.assertEqual(r.get('VolumeType'), 'gp3')
+
+    def test_volume_query_combined_filters(self):
+        factory = self.replay_flight_data("test_ebs_volume_query_combined")
+        policy = self.load_policy(
+            {
+                "name": "ebs-unencrypted-gp3",
+                "resource": "ebs",
+                "query": [
+                    {"Name": "volume-type", "Values": ["gp3"]}
+                ],
+                "filters": [
+                    {"Encrypted": False}
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = policy.run()
+        for r in resources:
+            self.assertEqual(r.get('VolumeType'), 'gp3')
+            self.assertFalse(r.get('Encrypted'))
 
 
 class HealthEventsFilterTest(BaseTest):

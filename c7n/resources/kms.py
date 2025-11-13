@@ -440,6 +440,60 @@ class KmsPostFinding(PostFinding):
         return envelope
 
 
+@Key.filter_registry.register('last-rotation')
+class LastRotation(ValueFilter):
+    """Queries KMS keys by the last time they were rotated.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: kms-not-rotated-in-last-30
+                resource: kms-key
+                filters:
+                  - type: last-rotation
+                    key: RotationDate
+                    value: 30
+                    value_type: age
+                    op: gte
+
+    """
+
+    schema = type_schema('last-rotation', rinherit=ValueFilter.schema)
+    schema_alias = False
+    permissions = ('kms:ListKeyRotations',)
+    annotation_key = 'c7n:LastRotation'
+
+    def get_last_rotation(self, paginator, key_id):
+        last_rotation = None
+        page_iterator = paginator.paginate(KeyId=key_id)
+        try:
+            rotations = page_iterator.build_full_result().get('Rotations', [])
+            last_rotation = rotations and max(rotations, key=lambda x: x.get('RotationDate', 0))
+        except ClientError as err:
+            self.log.warning(err)
+        return last_rotation
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('kms')
+        results = []
+        paginator = client.get_paginator('list_key_rotations')
+
+        for r in resources:
+            if 'c7n:LastRotation' not in r:
+                # If the key is already there, it's cached & we'll skip the API..
+                # If not, we need the API call.
+                r[self.annotation_key] = self.get_last_rotation(paginator, r['KeyId'])
+
+            if self.match(r[self.annotation_key]):
+                # Either we found a rotation date or we're filtering for keys
+                # without a rotation (the match on `None`).
+                results.append(r)
+
+        return results
+
+
 @Key.action_registry.register("schedule-deletion")
 class KmsKeyScheduleDeletion(BaseAction):
     """Schedule KMS key deletion
