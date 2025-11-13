@@ -1,0 +1,74 @@
+{
+    "status_code": 200,
+    "data": {
+        "QueryExecution": {
+            "QueryExecutionId": "ecac796a-5960-4018-8f25-aca56bbe3748",
+            "Query": "SELECT * FROM \"c7n-athena-test\".\"c7n_frankcontrepois_aws_pricing\" limit 10",
+            "StatementType": "DML",
+            "ResultConfiguration": {
+                "OutputLocation": "s3://athenaqueryresults/Unsaved/2025/09/03/ecac796a-5960-4018-8f25-aca56bbe3748.csv",
+                "AclConfiguration": {
+                    "S3AclOption": "BUCKET_OWNER_FULL_CONTROL"
+                }
+            },
+            "ResultReuseConfiguration": {
+                "ResultReuseByAgeConfiguration": {
+                    "Enabled": false
+                }
+            },
+            "QueryExecutionContext": {
+                "Database": "c7n-athena-test",
+                "Catalog": "awsdatacatalog"
+            },
+            "Status": {
+                "State": "FAILED",
+                "StateChangeReason": "HIVE_PARTITION_SCHEMA_MISMATCH: There is a mismatch between the table and partition schemas. The types are incompatible and cannot be coerced. The column 'startingrange' in table 'c7n-athena-test.c7n_frankcontrepois_aws_pricing' is declared as type 'bigint', but partition 'partition_0=2025-08/partition_1=AmazonDataZone/partition_2=current' declared column 'startingrange' as type 'double'.",
+                "SubmissionDateTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 9,
+                    "day": 3,
+                    "hour": 14,
+                    "minute": 19,
+                    "second": 31,
+                    "microsecond": 335000
+                },
+                "CompletionDateTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 9,
+                    "day": 3,
+                    "hour": 14,
+                    "minute": 19,
+                    "second": 33,
+                    "microsecond": 95000
+                },
+                "AthenaError": {
+                    "ErrorCategory": 2,
+                    "ErrorType": 1004,
+                    "Retryable": false,
+                    "ErrorMessage": "HIVE_PARTITION_SCHEMA_MISMATCH: There is a mismatch between the table and partition schemas. The types are incompatible and cannot be coerced. The column 'startingrange' in table 'c7n-athena-test.c7n_frankcontrepois_aws_pricing' is declared as type 'bigint', but partition 'partition_0=2025-08/partition_1=AmazonDataZone/partition_2=current' declared column 'startingrange' as type 'double'."
+                }
+            },
+            "Statistics": {
+                "EngineExecutionTimeInMillis": 1501,
+                "DataScannedInBytes": 0,
+                "TotalExecutionTimeInMillis": 1760,
+                "QueryQueueTimeInMillis": 104,
+                "ServicePreProcessingTimeInMillis": 89,
+                "QueryPlanningTimeInMillis": 1164,
+                "ServiceProcessingTimeInMillis": 66,
+                "ResultReuseInformation": {
+                    "ReusedPreviousResult": false
+                }
+            },
+            "WorkGroup": "primary",
+            "EngineVersion": {
+                "SelectedEngineVersion": "AUTO",
+                "EffectiveEngineVersion": "Athena engine version 3"
+            },
+            "SubstatementType": "SELECT"
+        },
+        "ResponseMetadata": {}
+    }
+}
