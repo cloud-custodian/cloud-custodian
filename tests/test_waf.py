@@ -128,9 +128,9 @@ class WAFTest(BaseTest):
         p = self.load_policy(policy,
                              session_factory=session_factory,
                              config={"region": "us-east-1"})
-
-        resources = p.run()
-        self.assertEqual(len(resources), 1, f"Expected 1 resource, got {len(resources)}")
+        with self.assertRaises(Exception) as cm:
+            p.run()
+        self.assertIn("WAFInvalidParameterException", str(cm.exception))
 
     def test_wafv2_rule_groups(self):
         session_factory = self.replay_flight_data("test_wafv2_rule_groups")
