@@ -1,11 +1,13 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+from .common import BaseTest
 import copy
 import calendar
 from collections import namedtuple
 from datetime import datetime, timedelta
 from dateutil import tz
 from dateutil.parser import parse as parse_date
+import logging
 import random
 import unittest
 import os
@@ -21,7 +23,7 @@ from .common import instance, event_data, Bag, BaseTest
 from c7n.filters.core import AnnotationSweeper, ValueRegex, parse_date as core_parse_date
 
 
-class BaseFilterTest(unittest.TestCase):
+class BaseFilterTest(BaseTest):
 
     def assertFilter(self, f, i, v):
         """
@@ -940,6 +942,16 @@ class TestInstanceValue(BaseFilterTest):
         }
         self.assertFilter(fdata, i, True)
         self.assertEqual(annotation(i, base_filters.ANNOTATION_KEY), ["tag:foo"])
+
+        fdata_with_bad_transform = {
+            "type": "value",
+            "key": "tag:foo",
+            "tag_key_transforms": ["spam"],
+            "value": "abcd",
+        }
+        with self.capture_logging(level=logging.WARNING) as log_output:
+            self.assertFilter(fdata_with_bad_transform, i, False)
+            self.assertIn("Ignoring invalid tag key transform: spam", log_output.getvalue())
 
         i = instance(Tags=[{"Key": " foo_bar", "Value": "abcd"}])
         self.assertFilter({"tag:FooBar": "abcd"}, i, False)

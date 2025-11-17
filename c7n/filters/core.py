@@ -248,7 +248,7 @@ class BaseValueFilter(Filter):
     def get_resource_value(self, k, i, regex=None):
         r = None
         normalize_if_needed = NormalizeFilterTagKeys.transform_func_if_needed(
-            self.data.get("tag_key_transforms")
+            self.data.get("tag_key_transforms"), Filter.log
         )
         if k.startswith('tag:'):
             tk = k.split(':', 1)[1]
@@ -319,7 +319,7 @@ class NormalizeFilterTagKeys(enum.Enum):
     nodashes = _member(lambda v: v.replace("-", ""))
 
     @classmethod
-    def transform_func_if_needed(cls, transforms: list[str]):
+    def transform_func_if_needed(cls, transforms: list[str], logger=None):
         """Return a callable func to do the transformation of tag keys as specified in the tag
          strategy. For example: this example would normalize all the tag keys to do the following
          commands in order: strip(), title(), replace("_", "") and look for a normalized key of
@@ -336,9 +336,17 @@ class NormalizeFilterTagKeys(enum.Enum):
         ."""
         if not transforms:
             return None
-        return _combine(
-            cls[transform].value for transform in transforms if transform in cls.__members__
-        )
+        valid_transforms = []
+        for transform in transforms:
+            if transform in cls.__members__:
+                valid_transforms.append(transform)
+            else:
+                if logger:
+                    logger.warning("Ignoring invalid tag key transform: %s", transform)
+        if not valid_transforms:
+            return None
+
+        return _combine(cls[transform].value for transform in valid_transforms)
 
 
 def _combine(callables_list):
