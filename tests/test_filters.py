@@ -1,6 +1,5 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-from .common import BaseTest
 import copy
 import calendar
 from collections import namedtuple
