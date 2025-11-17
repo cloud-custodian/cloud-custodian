@@ -2,7 +2,7 @@
     "status_code": 200,
     "data": {
         "LoggingConfiguration": {
-            "ResourceArn": "arn:aws:wafv2:us-east-1:111111111111:regional/webacl/noncompliant_waf/a5cc092e-0be3-4dcf-9c83-891982d1f70f",
+            "ResourceArn": "arn:aws:wafv2:us-east-1:111111111111:regional/webacl/noncompliant_waf/cbbd1718-2b80-4da9-9a95-31d4fe8e7283",
             "LogDestinationConfigs": [
                 "arn:aws:s3:::aws-waf-logs-test-custodian-creation"
             ],

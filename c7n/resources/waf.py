@@ -6,6 +6,7 @@ from c7n.tags import universal_augment
 from c7n.filters import ValueFilter, ListItemFilter
 from c7n.utils import type_schema, local_session
 from c7n.actions import BaseAction
+from c7n.exceptions import PolicyValidationError
 
 
 class DescribeRegionalWaf(DescribeSource):
@@ -236,6 +237,22 @@ class WAFV2SetLogging(BaseAction):
 
     permissions = ('wafv2:PutLoggingConfiguration',)
 
+    def validate(self):
+        destination = self.data['destination']
+        if ':' in destination:
+            arn_parts = destination.split(':')
+            if len(arn_parts) >= 6:
+                resource_part = arn_parts[-1]
+                if '/' in resource_part:
+                    resource_name = resource_part.split('/')[-1]
+                else:
+                    resource_name = resource_part
+                if not resource_name.startswith('aws-waf-logs'):
+                    raise PolicyValidationError(
+                        f"Destination resource must start with aws-waf-logs, got {resource_name}"
+                    )
+        return self
+
     def process(self, resources):
         client = local_session(self.manager.session_factory).client(
             'wafv2', region_name=self.manager.region)
@@ -248,8 +265,13 @@ class WAFV2SetLogging(BaseAction):
                 'LogDestinationConfigs': [destination]
             }
 
-            client.put_logging_configuration(LoggingConfiguration=logging_config)
-            self.log.info(f"Logging enabled for {r['Name']} to {destination}.")
+            self.manager.retry(
+                client.put_logging_configuration,
+                LoggingConfiguration=logging_config,
+                ignore_err_codes=('WAFNonexistentItemException',)
+            )
+
+            self.log.info(f"Enabled logging for WAFv2 WebACL {r['Name']} to {destination}")
 
 
 @WAFV2.filter_registry.register('web-acl-rules')

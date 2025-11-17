@@ -4,25 +4,18 @@
         "NextMarker": "noncompliant_waf",
         "WebACLs": [
             {
-                "Name": "compliant-rule-groups",
-                "Id": "6ac79b8d-35bf-41c3-835e-0c1d32a0ab97",
-                "Description": "1 custom rule group and 1 managed rule group",
-                "LockToken": "3d9f2121-8f00-4d59-bdf5-a5f7280223b4",
-                "ARN": "arn:aws:wafv2:us-east-1:111111111111:regional/webacl/compliant-rule-groups/6ac79b8d-35bf-41c3-835e-0c1d32a0ab97"
-            },
-            {
-                "Name": "compliant-waf",
-                "Id": "d4595dae-518e-4ff7-98ac-609091678beb",
+                "Name": "compliant_waf",
+                "Id": "13c10003-88ca-44fa-8e45-21a6144a7a73",
                 "Description": "",
-                "LockToken": "e081f73f-8e5c-4916-b485-1969096102d6",
-                "ARN": "arn:aws:wafv2:us-east-1:111111111111:regional/webacl/compliant-waf/d4595dae-518e-4ff7-98ac-609091678beb"
+                "LockToken": "ef95341f-4c73-45c8-b8ba-b5eb4ad6b03f",
+                "ARN": "arn:aws:wafv2:us-east-1:111111111111:regional/webacl/compliant_waf/13c10003-88ca-44fa-8e45-21a6144a7a73"
             },
             {
                 "Name": "noncompliant_waf",
-                "Id": "a5cc092e-0be3-4dcf-9c83-891982d1f70f",
-                "Description": "No rules at all",
-                "LockToken": "b68c2aae-3479-4b4d-8f19-e02900d2b635",
-                "ARN": "arn:aws:wafv2:us-east-1:111111111111:regional/webacl/noncompliant_waf/a5cc092e-0be3-4dcf-9c83-891982d1f70f"
+                "Id": "cbbd1718-2b80-4da9-9a95-31d4fe8e7283",
+                "Description": "",
+                "LockToken": "79b34c29-f709-4d76-9996-80ca349a21aa",
+                "ARN": "arn:aws:wafv2:us-east-1:111111111111:regional/webacl/noncompliant_waf/cbbd1718-2b80-4da9-9a95-31d4fe8e7283"
             }
         ],
         "ResponseMetadata": {}

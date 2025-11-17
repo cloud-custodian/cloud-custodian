@@ -2,12 +2,7 @@
     "status_code": 200,
     "data": {
         "PaginationToken": "",
-        "ResourceTagMappingList": [
-            {
-                "ResourceARN": "arn:aws:wafv2:us-east-1:111111111111:regional/webacl/noncompliant_waf/a5cc092e-0be3-4dcf-9c83-891982d1f70f",
-                "Tags": []
-            }
-        ],
+        "ResourceTagMappingList": [],
         "ResponseMetadata": {}
     }
 }

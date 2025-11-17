@@ -2,21 +2,300 @@
     "status_code": 200,
     "data": {
         "WebACL": {
-            "Name": "compliant-waf",
-            "Id": "d4595dae-518e-4ff7-98ac-609091678beb",
-            "ARN": "arn:aws:wafv2:us-east-1:111111111111:regional/webacl/compliant-waf/d4595dae-518e-4ff7-98ac-609091678beb",
+            "Name": "noncompliant_waf",
+            "Id": "cbbd1718-2b80-4da9-9a95-31d4fe8e7283",
+            "ARN": "arn:aws:wafv2:us-east-1:111111111111:regional/webacl/noncompliant_waf/cbbd1718-2b80-4da9-9a95-31d4fe8e7283",
             "DefaultAction": {
                 "Allow": {}
             },
             "Description": "",
             "Rules": [
                 {
-                    "Name": "AWS-AWSManagedRulesAmazonIpReputationList",
+                    "Name": "AWS-AWSManagedRulesAntiDDoSRuleSet",
                     "Priority": 0,
                     "Statement": {
                         "ManagedRuleGroupStatement": {
                             "VendorName": "AWS",
-                            "Name": "AWSManagedRulesAmazonIpReputationList"
+                            "Name": "AWSManagedRulesAntiDDoSRuleSet",
+                            "ManagedRuleGroupConfigs": [
+                                {}
+                            ]
+                        }
+                    },
+                    "OverrideAction": {
+                        "Count": {}
+                    },
+                    "VisibilityConfig": {
+                        "SampledRequestsEnabled": true,
+                        "CloudWatchMetricsEnabled": true,
+                        "MetricName": "AWS-AWSManagedRulesAntiDDoSRuleSet"
+                    }
+                },
+                {
+                    "Name": "noncompliant_waf_IPV4_Allow",
+                    "Priority": 1,
+                    "Statement": {
+                        "IPSetReferenceStatement": {
+                            "ARN": "arn:aws:wafv2:us-east-1:111111111111:regional/ipset/noncompliant_waf_IPV4_Allow/70036a7d-2fb3-4f81-9f9b-ce4b804b033f"
+                        }
+                    },
+                    "Action": {
+                        "Allow": {}
+                    },
+                    "VisibilityConfig": {
+                        "SampledRequestsEnabled": true,
+                        "CloudWatchMetricsEnabled": true,
+                        "MetricName": "noncompliant_waf_IPV4_Allow"
+                    }
+                },
+                {
+                    "Name": "noncompliant_waf_IPV6_Allow",
+                    "Priority": 2,
+                    "Statement": {
+                        "IPSetReferenceStatement": {
+                            "ARN": "arn:aws:wafv2:us-east-1:111111111111:regional/ipset/noncompliant_waf_IPV6_Allow/19432af9-4b07-4104-b4b9-86521ef7d9fc"
+                        }
+                    },
+                    "Action": {
+                        "Allow": {}
+                    },
+                    "VisibilityConfig": {
+                        "SampledRequestsEnabled": true,
+                        "CloudWatchMetricsEnabled": true,
+                        "MetricName": "noncompliant_waf_IPV6_Allow"
+                    }
+                },
+                {
+                    "Name": "noncompliant_waf_IPV4_Block",
+                    "Priority": 3,
+                    "Statement": {
+                        "IPSetReferenceStatement": {
+                            "ARN": "arn:aws:wafv2:us-east-1:111111111111:regional/ipset/noncompliant_waf_IPV4_Block/78920140-a44e-44c7-8a5f-440e7ade96da"
+                        }
+                    },
+                    "Action": {
+                        "Block": {}
+                    },
+                    "VisibilityConfig": {
+                        "SampledRequestsEnabled": true,
+                        "CloudWatchMetricsEnabled": true,
+                        "MetricName": "noncompliant_waf_IPV4_Block"
+                    }
+                },
+                {
+                    "Name": "noncompliant_waf_IPV6_Block",
+                    "Priority": 4,
+                    "Statement": {
+                        "IPSetReferenceStatement": {
+                            "ARN": "arn:aws:wafv2:us-east-1:111111111111:regional/ipset/noncompliant_waf_IPV6_Block/c698dafa-eca2-4907-9d52-d6652d9b9491"
+                        }
+                    },
+                    "Action": {
+                        "Block": {}
+                    },
+                    "VisibilityConfig": {
+                        "SampledRequestsEnabled": true,
+                        "CloudWatchMetricsEnabled": true,
+                        "MetricName": "noncompliant_waf_IPV6_Block"
+                    }
+                },
+                {
+                    "Name": "GeoRule",
+                    "Priority": 5,
+                    "Statement": {
+                        "GeoMatchStatement": {
+                            "CountryCodes": [
+                                "CU",
+                                "IR",
+                                "KP",
+                                "RU",
+                                "SY",
+                                "VE"
+                            ]
+                        }
+                    },
+                    "Action": {
+                        "Block": {}
+                    },
+                    "VisibilityConfig": {
+                        "SampledRequestsEnabled": true,
+                        "CloudWatchMetricsEnabled": true,
+                        "MetricName": "GeoRule"
+                    }
+                },
+                {
+                    "Name": "GlobalRateBasedRule",
+                    "Priority": 6,
+                    "Statement": {
+                        "RateBasedStatement": {
+                            "Limit": 1000,
+                            "EvaluationWindowSec": 300,
+                            "AggregateKeyType": "IP"
+                        }
+                    },
+                    "Action": {
+                        "Count": {}
+                    },
+                    "VisibilityConfig": {
+                        "SampledRequestsEnabled": true,
+                        "CloudWatchMetricsEnabled": true,
+                        "MetricName": "GlobalRateBasedRule"
+                    }
+                },
+                {
+                    "Name": "RateBasedRuleGET",
+                    "Priority": 7,
+                    "Statement": {
+                        "RateBasedStatement": {
+                            "Limit": 500,
+                            "EvaluationWindowSec": 300,
+                            "AggregateKeyType": "IP",
+                            "ScopeDownStatement": {
+                                "ByteMatchStatement": {
+                                    "SearchString": "R0VU",
+                                    "FieldToMatch": {
+                                        "Method": {}
+                                    },
+                                    "TextTransformations": [
+                                        {
+                                            "Priority": 0,
+                                            "Type": "NONE"
+                                        }
+                                    ],
+                                    "PositionalConstraint": "EXACTLY"
+                                }
+                            }
+                        }
+                    },
+                    "Action": {
+                        "Count": {}
+                    },
+                    "VisibilityConfig": {
+                        "SampledRequestsEnabled": true,
+                        "CloudWatchMetricsEnabled": true,
+                        "MetricName": "RateBasedRuleGET"
+                    }
+                },
+                {
+                    "Name": "RateBasedRulePOST",
+                    "Priority": 8,
+                    "Statement": {
+                        "RateBasedStatement": {
+                            "Limit": 100,
+                            "EvaluationWindowSec": 300,
+                            "AggregateKeyType": "IP",
+                            "ScopeDownStatement": {
+                                "OrStatement": {
+                                    "Statements": [
+                                        {
+                                            "ByteMatchStatement": {
+                                                "SearchString": "UE9TVA==",
+                                                "FieldToMatch": {
+                                                    "Method": {}
+                                                },
+                                                "TextTransformations": [
+                                                    {
+                                                        "Priority": 0,
+                                                        "Type": "NONE"
+                                                    }
+                                                ],
+                                                "PositionalConstraint": "EXACTLY"
+                                            }
+                                        },
+                                        {
+                                            "ByteMatchStatement": {
+                                                "SearchString": "UFVU",
+                                                "FieldToMatch": {
+                                                    "Method": {}
+                                                },
+                                                "TextTransformations": [
+                                                    {
+                                                        "Priority": 0,
+                                                        "Type": "NONE"
+                                                    }
+                                                ],
+                                                "PositionalConstraint": "EXACTLY"
+                                            }
+                                        },
+                                        {
+                                            "ByteMatchStatement": {
+                                                "SearchString": "REVMRVRF",
+                                                "FieldToMatch": {
+                                                    "Method": {}
+                                                },
+                                                "TextTransformations": [
+                                                    {
+                                                        "Priority": 0,
+                                                        "Type": "NONE"
+                                                    }
+                                                ],
+                                                "PositionalConstraint": "EXACTLY"
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "Action": {
+                        "Count": {}
+                    },
+                    "VisibilityConfig": {
+                        "SampledRequestsEnabled": true,
+                        "CloudWatchMetricsEnabled": true,
+                        "MetricName": "RateBasedRulePOST"
+                    }
+                },
+                {
+                    "Name": "BodySizeRestrictionRule",
+                    "Priority": 9,
+                    "Statement": {
+                        "SizeConstraintStatement": {
+                            "FieldToMatch": {
+                                "Body": {
+                                    "OversizeHandling": "MATCH"
+                                }
+                            },
+                            "ComparisonOperator": "GT",
+                            "Size": 16384,
+                            "TextTransformations": [
+                                {
+                                    "Priority": 0,
+                                    "Type": "NONE"
+                                }
+                            ]
+                        }
+                    },
+                    "Action": {
+                        "Count": {}
+                    },
+                    "VisibilityConfig": {
+                        "SampledRequestsEnabled": true,
+                        "CloudWatchMetricsEnabled": true,
+                        "MetricName": "BodySizeRestrictionRule"
+                    }
+                },
+                {
+                    "Name": "AWS-AWSManagedRulesAmazonIpReputationList",
+                    "Priority": 10,
+                    "Statement": {
+                        "ManagedRuleGroupStatement": {
+                            "VendorName": "AWS",
+                            "Name": "AWSManagedRulesAmazonIpReputationList",
+                            "RuleActionOverrides": [
+                                {
+                                    "Name": "AWSManagedReconnaissanceList",
+                                    "ActionToUse": {
+                                        "Count": {}
+                                    }
+                                },
+                                {
+                                    "Name": "AWSManagedIPDDoSList",
+                                    "ActionToUse": {
+                                        "Block": {}
+                                    }
+                                }
+                            ]
                         }
                     },
                     "OverrideAction": {
@@ -29,8 +308,33 @@
                     }
                 },
                 {
+                    "Name": "ManagedIPDDoSRateLimit",
+                    "Priority": 11,
+                    "Statement": {
+                        "RateBasedStatement": {
+                            "Limit": 1000,
+                            "EvaluationWindowSec": 300,
+                            "AggregateKeyType": "IP",
+                            "ScopeDownStatement": {
+                                "LabelMatchStatement": {
+                                    "Scope": "LABEL",
+                                    "Key": "awswaf:managed:aws:amazon-ip-list:AWSManagedIPDDoSList"
+                                }
+                            }
+                        }
+                    },
+                    "Action": {
+                        "Count": {}
+                    },
+                    "VisibilityConfig": {
+                        "SampledRequestsEnabled": true,
+                        "CloudWatchMetricsEnabled": true,
+                        "MetricName": "ManagedIPDDoSRateLimit"
+                    }
+                },
+                {
                     "Name": "AWS-AWSManagedRulesAnonymousIpList",
-                    "Priority": 1,
+                    "Priority": 12,
                     "Statement": {
                         "ManagedRuleGroupStatement": {
                             "VendorName": "AWS",
@@ -45,18 +349,115 @@
                         "CloudWatchMetricsEnabled": true,
                         "MetricName": "AWS-AWSManagedRulesAnonymousIpList"
                     }
+                },
+                {
+                    "Name": "AWS-AWSManagedRulesCommonRuleSet",
+                    "Priority": 13,
+                    "Statement": {
+                        "ManagedRuleGroupStatement": {
+                            "VendorName": "AWS",
+                            "Name": "AWSManagedRulesCommonRuleSet"
+                        }
+                    },
+                    "OverrideAction": {
+                        "None": {}
+                    },
+                    "VisibilityConfig": {
+                        "SampledRequestsEnabled": true,
+                        "CloudWatchMetricsEnabled": true,
+                        "MetricName": "AWS-AWSManagedRulesCommonRuleSet"
+                    }
+                },
+                {
+                    "Name": "AWS-AWSManagedRulesKnownBadInputsRuleSet",
+                    "Priority": 14,
+                    "Statement": {
+                        "ManagedRuleGroupStatement": {
+                            "VendorName": "AWS",
+                            "Name": "AWSManagedRulesKnownBadInputsRuleSet"
+                        }
+                    },
+                    "OverrideAction": {
+                        "None": {}
+                    },
+                    "VisibilityConfig": {
+                        "SampledRequestsEnabled": true,
+                        "CloudWatchMetricsEnabled": true,
+                        "MetricName": "AWS-AWSManagedRulesKnownBadInputsRuleSet"
+                    }
+                },
+                {
+                    "Name": "AWS-AWSManagedRulesSQLiRuleSet",
+                    "Priority": 15,
+                    "Statement": {
+                        "ManagedRuleGroupStatement": {
+                            "VendorName": "AWS",
+                            "Name": "AWSManagedRulesSQLiRuleSet"
+                        }
+                    },
+                    "OverrideAction": {
+                        "None": {}
+                    },
+                    "VisibilityConfig": {
+                        "SampledRequestsEnabled": true,
+                        "CloudWatchMetricsEnabled": true,
+                        "MetricName": "AWS-AWSManagedRulesSQLiRuleSet"
+                    }
+                },
+                {
+                    "Name": "AWS-AWSManagedRulesLinuxRuleSet",
+                    "Priority": 16,
+                    "Statement": {
+                        "ManagedRuleGroupStatement": {
+                            "VendorName": "AWS",
+                            "Name": "AWSManagedRulesLinuxRuleSet"
+                        }
+                    },
+                    "OverrideAction": {
+                        "None": {}
+                    },
+                    "VisibilityConfig": {
+                        "SampledRequestsEnabled": true,
+                        "CloudWatchMetricsEnabled": true,
+                        "MetricName": "AWS-AWSManagedRulesLinuxRuleSet"
+                    }
+                },
+                {
+                    "Name": "AWS-AWSManagedRulesBotControlRuleSet",
+                    "Priority": 17,
+                    "Statement": {
+                        "ManagedRuleGroupStatement": {
+                            "VendorName": "AWS",
+                            "Name": "AWSManagedRulesBotControlRuleSet",
+                            "ManagedRuleGroupConfigs": [
+                                {
+                                    "AWSManagedRulesBotControlRuleSet": {
+                                        "InspectionLevel": "COMMON"
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "OverrideAction": {
+                        "Count": {}
+                    },
+                    "VisibilityConfig": {
+                        "SampledRequestsEnabled": true,
+                        "CloudWatchMetricsEnabled": true,
+                        "MetricName": "AWS-AWSManagedRulesBotControlRuleSet"
+                    }
                 }
             ],
             "VisibilityConfig": {
                 "SampledRequestsEnabled": true,
                 "CloudWatchMetricsEnabled": true,
-                "MetricName": "compliant-waf"
+                "MetricName": "noncompliant_waf"
             },
-            "Capacity": 75,
+            "Capacity": 1498,
             "ManagedByFirewallManager": false,
-            "LabelNamespace": "awswaf:111111111111:webacl:compliant-waf:"
+            "LabelNamespace": "awswaf:111111111111:webacl:noncompliant_waf:"
         },
-        "LockToken": "e081f73f-8e5c-4916-b485-1969096102d6",
+        "LockToken": "79b34c29-f709-4d76-9996-80ca349a21aa",
         "ResponseMetadata": {}
     }
 }
