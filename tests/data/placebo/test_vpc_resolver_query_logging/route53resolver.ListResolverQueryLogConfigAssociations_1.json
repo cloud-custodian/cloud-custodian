@@ -1,0 +1,16 @@
+{
+    "status_code": 200,
+    "data": {
+      "ResolverQueryLogConfigAssociations": [
+        {
+          "Id": "rqlca-2204474e25d248df",
+          "ResolverQueryLogConfigId": "rqlc-ceb57b1765044c85",
+          "ResourceId": "vpc-0503a8b9ddbb3a5c5",
+          "Status": "ACTIVE",
+          "Error": null,
+          "ErrorMessage": null,
+          "CreationTime": "2025-05-13T18:11:26.221000+00:00"
+        }
+      ]
+    }
+  }
