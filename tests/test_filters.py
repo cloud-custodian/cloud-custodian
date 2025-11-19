@@ -6,7 +6,6 @@ from collections import namedtuple
 from datetime import datetime, timedelta
 from dateutil import tz
 from dateutil.parser import parse as parse_date
-import logging
 import random
 import unittest
 import os
