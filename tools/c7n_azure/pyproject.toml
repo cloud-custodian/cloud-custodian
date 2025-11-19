@@ -28,7 +28,7 @@ dependencies = [
     "azure-mgmt-batch<16.0.0,>=15.0.0",
     "azure-mgmt-cdn<13.0.0,>=12.0.0",
     "azure-mgmt-cognitiveservices<12.0.0,>=11.0.0",
-    "azure-mgmt-compute<30.0.0,>=29.1.0",
+    "azure-mgmt-compute<35.0.0,>=34.1.0",
     "azure-mgmt-containerinstance<8.0.0,>=7.0.0",
     "azure-mgmt-containerregistry<15.0.0,>=14.0.0",
     "azure-mgmt-containerservice<16.0.0,>=15.0.0",
@@ -38,6 +38,7 @@ dependencies = [
     "azure-mgmt-datafactory<2.0.0,>=1.0.0",
     "azure-mgmt-datalake-analytics<1.0.0,>=0.5.0",
     "azure-mgmt-datalake-store<1.0.0,>=0.5.0",
+    "azure-mgmt-dataprotection<2.0.0,>=1.4.0",
     "azure-mgmt-desktopvirtualization<2.0.0,>=1.0.0",
     "azure-mgmt-dns==8.0.0b1",
     "azure-mgmt-eventgrid<11.0.0,>=10.3.0b4",
@@ -45,7 +46,7 @@ dependencies = [
     "azure-mgmt-frontdoor<2.0.0,>=1.0.0",
     "azure-mgmt-hdinsight<8.0.0,>=7.0.0",
     "azure-mgmt-iothub<2.0.0,>=1.0.0",
-    "azure-mgmt-keyvault<9.0.0,>=8.0.0",
+    "azure-mgmt-keyvault<13.0.0,>=12.1.0",
     "azure-mgmt-kusto<3.0.0,>=2.2.0",
     "azure-mgmt-logic<10.0.0,>=9.0.0",
     "azure-mgmt-machinelearningservices==2.0.0b2",
@@ -55,18 +56,18 @@ dependencies = [
     "azure-mgmt-network<29.0.0,>=28.0.0",
     "azure-mgmt-policyinsights<2.0.0,>=1.0.0",
     "azure-mgmt-rdbms==10.2.0b17",
-    "azure-mgmt-recoveryservices<3.0.0,>=2.4.0",
+    "azure-mgmt-recoveryservices<4.0.0,>=3.1.0",
     "azure-mgmt-recoveryservicesbackup<8.0.0,>=7.0.0",
     "azure-mgmt-redhatopenshift<2.0.0,>=1.2.0",
     "azure-mgmt-redis<15.0.0,>=14.5.0",
     "azure-mgmt-resource<24.0.0,>=23.0.0",
     "azure-mgmt-resourcegraph<8.0.0,>=7.0.0",
     "azure-mgmt-search<9.0.0,>=8.0.0",
-    "azure-mgmt-security<8.0.0,>=7.0.0",
+    "azure-mgmt-security==8.0.0b1",
     "azure-mgmt-servicebus<9.0.0,>=8.2.0",
     "azure-mgmt-servicefabric<2.0.0,>=1.0.0",
     "azure-mgmt-signalr==0.4.0",
-    "azure-mgmt-sql<2.0.0,>=1.0.0",
+    "azure-mgmt-sql<4.0.0,>=3.0.0",
     "azure-mgmt-storage<23.0.0,>=22.1.1",
     "azure-mgmt-streamanalytics<2.0.0,>=1.0.0rc1",
     "azure-mgmt-subscription<2.0.0,>=1.0.0",
@@ -86,7 +87,7 @@ dependencies = [
     "requests<3.0.0,>=2.22.0",
 ]
 name = "c7n_azure"
-version = "0.7.45"
+version = "0.7.47"
 description = "Cloud Custodian - Azure Support"
 readme = "readme.md"
 classifiers = [

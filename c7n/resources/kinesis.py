@@ -7,9 +7,9 @@ from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters import CrossAccountAccessFilter
 from c7n.query import (
     ConfigSource,
-    DescribeWithResourceTags, QueryResourceManager, TypeInfo)
+    DescribeWithResourceTags, QueryResourceManager, ResourceQuery, TypeInfo)
 from c7n.filters.vpc import SubnetFilter
-from c7n.utils import local_session, type_schema, get_retry, jmespath_search
+from c7n.utils import local_session, type_schema, get_retry, jmespath_search, jmespath_compile
 from c7n.tags import (
     TagDelayedAction, RemoveTag, TagActionFilter, Tag)
 
@@ -133,13 +133,47 @@ class KmsFilterDataStream(KmsRelatedFilter):
     RelatedIdsExpression = 'KeyId'
 
 
+class FirehoseQuery(ResourceQuery):
+    # this is a work around for api pagination semantics of kinesis
+    # firehose being different then other services, there isn't an
+    # explicit last/pagination token per se, so it doesn't fit into
+    # standard pagination semantics. it looks like for data streams
+    # they retro fitted standard pagination semantics, as it also has
+    # the exclusive start parameter.
+
+    # https://github.com/cloud-custodian/cloud-custodian/issues/10302
+    # https://docs.aws.amazon.com/firehose/latest/APIReference/API_ListDeliveryStreams.html
+    # https://docs.aws.amazon.com/kinesis/latest/APIReference/API_ListStreams.html
+    def _invoke_client_enum(self, client, enum_op, params, path, retry=None):
+
+        data = self._enumerate_firehoses(client, enum_op, params, path, retry)
+        return data
+
+    def _enumerate_firehoses(self, client, enum_op, params, path, retry):
+        path = jmespath_compile(path)
+        op = getattr(client, enum_op)
+        data = []
+        while True:
+            result = retry(op, **params)
+            data.extend(path.search(result))
+            if not result.get('HasMoreDeliveryStreams', False):
+                break
+            params['ExclusiveStartDeliveryStreamName'] = data[-1]
+        return data
+
+
+class DescribeFirehoseStream(DescribeWithResourceTags):
+
+    resource_query_factory = FirehoseQuery
+
+
 @resources.register('firehose')
 class DeliveryStream(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'firehose'
         arn_type = 'deliverystream'
-        enum_spec = ('list_delivery_streams', 'DeliveryStreamNames', None)
+        enum_spec = ('list_delivery_streams', 'DeliveryStreamNames', {'Limit': 100})
         detail_spec = (
             'describe_delivery_stream', 'DeliveryStreamName', None,
             'DeliveryStreamDescription')
@@ -150,7 +184,7 @@ class DeliveryStream(QueryResourceManager):
         config_type = cfn_type = 'AWS::KinesisFirehose::DeliveryStream'
 
     source_mapping = {
-        'describe': DescribeWithResourceTags,
+        'describe': DescribeFirehoseStream,
         'config': ConfigSource
     }
 
@@ -176,7 +210,7 @@ class FirehoseDelete(Action):
                 "These delivery streams can't be deleted (wrong state): %s" % (
                     ", ".join(creating)))
         for r in resources:
-            if not r['DeliveryStreamStatus'] == 'ACTIVE':
+            if r['DeliveryStreamStatus'] not in ('ACTIVE', 'SUSPENDED'):
                 continue
             client.delete_delivery_stream(
                 DeliveryStreamName=r['DeliveryStreamName'])

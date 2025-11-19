@@ -678,6 +678,7 @@ class SSMDocumentCrossAccount(CrossAccountAccessFilter):
 
     def process(self, resources, event=None):
         self.accounts = self.get_accounts()
+        self.everyone_only = self.data.get("everyone_only", False)
         results = []
         client = local_session(self.manager.session_factory).client('ssm')
         with self.executor_factory(max_workers=3) as w:
@@ -702,8 +703,9 @@ class SSMDocumentCrossAccount(CrossAccountAccessFilter):
                 Name=r['Name'],
                 PermissionType='Share',
                 ignore_err_codes=('InvalidDocument',))['AccountSharingInfoList']
-            shared_accounts = {
-                g.get('AccountId') for g in attrs}
+            shared_accounts = {g.get('AccountId') for g in attrs}
+            if self.everyone_only:
+                shared_accounts = {a for a in shared_accounts if a == 'all'}
             delta_accounts = shared_accounts.difference(self.accounts)
             if delta_accounts:
                 r['c7n:CrossAccountViolations'] = list(delta_accounts)

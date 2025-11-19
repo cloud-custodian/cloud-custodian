@@ -11,6 +11,7 @@ from c7n.filters.kms import KmsRelatedFilter
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction, Action
 from c7n.utils import local_session, type_schema, jmespath_search
 from c7n.filters.policystatement import HasStatementFilter
+from c7n.filters.core import ValueFilter
 
 
 class DescribeSecret(DescribeSource):
@@ -112,6 +113,77 @@ class HasStatementFilter(HasStatementFilter):
                 continue
 
         return list(filter(None, map(self.process_resource, resources)))
+
+
+@SecretsManager.filter_registry.register('replica-attribute')
+class ReplicaAttributeFilter(ValueFilter):
+    """Filter secrets based on an attribute in any replica (not primary).
+
+    This filter will fetch replica details on demand, annotate the resource,
+    and then use ValueFilter's match logic on replicas only.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: secretsmanager-replica-lastaccessed
+            resource: aws.secrets-manager
+            filters:
+              - type: replica-attribute
+                key: LastAccessedDate
+                op: ge
+                value: '2023-01-01'
+                value_type: date
+    """
+
+    schema = type_schema(
+        'replica-attribute',
+        rinherit=ValueFilter.schema
+    )
+    permissions = ('secretsmanager:DescribeSecret',)
+
+    def process(self, resources, event=None):
+        session_factory = self.manager.session_factory
+        service = self.manager.resource_type.service
+
+        # Cache clients by region to avoid creating multiple clients for the same region
+        client_cache = {}
+
+        for r in resources:
+            # Always fetch and annotate replica details when this filter is invoked
+            fetched_replicas = []
+            for replica in r.get('ReplicationStatus', []):
+                region = replica.get('Region')
+                # Use cached client if available
+                if region not in client_cache:
+                    client_cache[region] = local_session(session_factory).client(
+                        service, region_name=region
+                    )
+                replica_client = client_cache[region]
+                try:
+                    detail_op, param_name, param_key, _ = self.manager.resource_type.detail_spec
+                    op_func = getattr(replica_client, detail_op)
+                    kw = {param_name: r[param_key]}
+                    replica_detail = self.manager.retry(op_func, **kw)
+                    replica_detail['Region'] = region
+                    fetched_replicas.append(replica_detail)
+                except ClientError as e:
+                    self.manager.log.warning(
+                        "Replica Secret:%s in region:%s unable to invoke method:%s error:%s ",
+                        r[param_key], region, detail_op, e.response['Error']['Message']
+                    )
+            if fetched_replicas:
+                r['c7n:Replicas'] = fetched_replicas
+
+        matched = []
+        for r in resources:
+            # Only check already-fetched replicas, not the primary
+            for replica in r.get('c7n:Replicas', []):
+                if self.match(replica):
+                    matched.append(r)
+                    break
+        return matched
 
 
 @SecretsManager.action_registry.register('tag')

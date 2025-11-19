@@ -1,0 +1,36 @@
+{
+  "headers": {},
+  "body": {
+    "timeSeries": [
+      {
+        "metric": {
+          "labels": {
+            "instance_name": "iap-test-webapp"
+          },
+          "type": "spanner.googleapis.com/instance/cpu/utilization"
+        },
+        "resource": {
+          "type": "gcp_spanner_instance",
+          "labels": {
+            "zone": "us-central1",
+            "project_id": "cloud-custodian"
+          }
+        },
+        "metricKind": "GAUGE",
+        "valueType": "DOUBLE",
+        "points": [
+          {
+            "interval": {
+              "startTime": "2025-09-01T18:36:07.478160Z",
+              "endTime": "2025-10-10T18:36:07.478160Z"
+            },
+            "value": {
+              "doubleValue": 0.0349
+            }
+          }
+        ]
+      }
+    ],
+    "unit": "10^2.%"
+  }
+}

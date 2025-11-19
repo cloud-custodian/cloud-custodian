@@ -411,6 +411,10 @@ class TypeInfo(metaclass=TypeMeta):
     # If the type supports refreshing an individual resource
     refresh = None
 
+    # Some resources don't support monitoring (and hence, no filtering).
+    # Assume they generally can, and flip this to `False` for those that don't.
+    allow_metrics_filters = True
+
     @classmethod
     def get_metric_resource_name(cls, resource):
         return resource.get(cls.name)

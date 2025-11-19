@@ -114,6 +114,7 @@ class MetricsFilter(Filter):
         'es': 'AWS/ES',
         'events': 'AWS/Events',
         'firehose': 'AWS/Firehose',
+        'fsx': 'AWS/FSx',
         'kinesis': 'AWS/Kinesis',
         'lambda': 'AWS/Lambda',
         'logs': 'AWS/Logs',

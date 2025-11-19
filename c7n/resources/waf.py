@@ -5,6 +5,8 @@ from c7n.query import ConfigSource, QueryResourceManager, TypeInfo, DescribeSour
 from c7n.tags import universal_augment
 from c7n.filters import ValueFilter, ListItemFilter
 from c7n.utils import type_schema, local_session
+from c7n.actions import BaseAction
+from c7n.exceptions import PolicyValidationError
 
 
 class DescribeRegionalWaf(DescribeSource):
@@ -204,6 +206,72 @@ class WAFV2LoggingFilter(ValueFilter):
         return [
             r for r in resources if self.match(
                 r.get(self.annotation_key, {}))]
+
+
+@WAFV2.action_registry.register('set-logging')
+class WAFV2SetLogging(BaseAction):
+    """
+    Action to enable logging for a WAFv2 Web ACL.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: enable-wafv2-logging
+            resource: aws.wafv2
+            filters:
+              - type: value
+                key: Name
+                value: my-web-acl
+            actions:
+              - type: set-logging
+                destination: "arn:aws:s3:::aws-waf-logs-bucket"
+    """
+
+    schema = type_schema(
+        'set-logging',
+        required=['destination'],
+        destination={'type': 'string'}
+    )
+
+    permissions = ('wafv2:PutLoggingConfiguration',)
+
+    def validate(self):
+        destination = self.data['destination']
+        if ':' in destination:
+            arn_parts = destination.split(':')
+            if len(arn_parts) >= 6:
+                resource_part = arn_parts[-1]
+                if '/' in resource_part:
+                    resource_name = resource_part.split('/')[-1]
+                else:
+                    resource_name = resource_part
+                if not resource_name.startswith('aws-waf-logs'):
+                    raise PolicyValidationError(
+                        f"Destination resource must start with aws-waf-logs, got {resource_name}"
+                    )
+        return self
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client(
+            'wafv2', region_name=self.manager.region)
+        destination = self.data['destination']
+
+        for r in resources:
+            resource_arn = r['ARN']
+            logging_config = {
+                'ResourceArn': resource_arn,
+                'LogDestinationConfigs': [destination]
+            }
+
+            self.manager.retry(
+                client.put_logging_configuration,
+                LoggingConfiguration=logging_config,
+                ignore_err_codes=('WAFNonexistentItemException',)
+            )
+
+            self.log.info(f"Enabled logging for WAFv2 WebACL {r['Name']} to {destination}")
 
 
 @WAFV2.filter_registry.register('web-acl-rules')

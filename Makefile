@@ -1,6 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-oSHELL := /bin/bash
+SHELL := /bin/bash
 SELF_MAKE := $(lastword $(MAKEFILE_LIST))
 
 PKG_REPO = testpypi
@@ -50,6 +50,10 @@ test-coverage:
 test-functional:
 # note this will provision real resources in a cloud environment
 	C7N_FUNCTIONAL=yes AWS_DEFAULT_REGION=us-east-2 pytest tests -m functional $(ARGS)
+
+test-functional-azure:
+# note this will provision real resources in Azure's public cloud environment
+	C7N_FUNCTIONAL=yes uv run pytest tools/c7n_azure/tests_azure/tests_resources/test_entraid.py -k terraform -m functional $(ARGS)
 
 sphinx:
 	make -f docs/Makefile.sphinx html

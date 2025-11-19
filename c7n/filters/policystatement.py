@@ -204,8 +204,8 @@ class HasStatementFilter(Filter):
                 return partial_match_value.issubset(resource_stmt_value)
             elif isinstance(partial_match_value, dict):
                 merged_stmts = merge_dict(
-                    partial_match_value, resource_stmt_value
-                    )
+                    resource_stmt_value, partial_match_value
+                )
                 return compare_dicts_using_sets(
                     merged_stmts, resource_stmt_value
                 )

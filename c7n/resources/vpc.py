@@ -722,6 +722,49 @@ class SubnetIpAddressUsageFilter(ValueFilter):
         return results
 
 
+@Subnet.action_registry.register('delete')
+class DeleteSubnet(BaseAction):
+    """Action to delete a Subnet.
+
+    :example:
+
+    Delete empty development subnets
+
+    .. code-block:: yaml
+
+        policies:
+          - name: delete-subnet
+            resource: aws.subnet
+            filters:
+              - tag:Environment: dev
+              - type: ip-address-usage
+                key: NumberUsed
+                value: 0
+            actions:
+              - type: delete
+    """
+
+    schema = type_schema('delete')
+    permissions = ("ec2:DeleteSubnet",)
+
+    def process(self, subnets):
+        client = local_session(self.manager.session_factory).client('ec2')
+        for subnet in subnets:
+            self.process_subnet(client, subnet)
+
+    def process_subnet(self, client, subnet):
+        try:
+            self.manager.retry(
+                client.delete_subnet,
+                SubnetId=subnet['SubnetId']
+            )
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'DependencyViolation':
+                self.log.warning(f"Cannot delete subnet {subnet['SubnetId']} due to dependencies")
+                return
+            raise
+
+
 class ConfigSG(query.ConfigSource):
 
     def load_resource(self, item):
@@ -3381,4 +3424,76 @@ class UsedByNetworkAddress(Filter):
                     rtype = get_eni_resource_type(eni)
                     if rtype == self.data.get('resource-type'):
                         results.append(r)
+        return results
+
+
+@Vpc.filter_registry.register('resolver-query-logging')
+class ResolverQueryLoggingFilter(Filter):
+    """Filter VPCs based on Route 53 Resolver query logging configuration.
+
+    This filter checks if VPCs have Route 53 Resolver query logging
+    enabled by checking for an association to a query logging config.
+
+    It annotates the VPC with the full config details, allowing for
+    additional filtering with a `value` filter.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: vpc-missing-resolver-query-logs
+                resource: vpc
+                filters:
+                  - type: resolver-query-logging
+                    state: false
+    """
+    schema = type_schema(
+        'resolver-query-logging',
+        state={'type': 'boolean', 'default': True}
+    )
+
+    permissions = (
+        'route53resolver:ListResolverQueryLogConfigs',
+        'route53resolver:ListResolverQueryLogConfigAssociations'
+    )
+
+    annotation_key = 'c7n:resolver-logging'
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('route53resolver')
+        target_state = self.data.get('state', True)
+
+        vpc_ids = [r['VpcId'] for r in resources]
+        associations = {}
+        paginator = client.get_paginator('list_resolver_query_log_config_associations')
+        for page in paginator.paginate(
+            Filters=[
+                {'Name': 'ResourceId', 'Values': vpc_ids},
+                {'Name': 'Status', 'Values': ['ACTIVE', 'CREATING']}
+            ]
+        ):
+            for assoc in page.get('ResolverQueryLogConfigAssociations', []):
+                associations[assoc['ResourceId']] = assoc
+
+        log_configs = {}
+        if associations:
+            config_ids = list({a['ResolverQueryLogConfigId'] for a in associations.values()})
+            paginator = client.get_paginator('list_resolver_query_log_configs')
+            for page in paginator.paginate(
+                Filters=[{'Name': 'Id', 'Values': config_ids}]
+            ):
+                for config in page.get('ResolverQueryLogConfigs', []):
+                    log_configs[config['Id']] = config
+
+        results = []
+        for r in resources:
+            association = associations.get(r['VpcId'])
+            if association:
+                r[self.annotation_key] = log_configs.get(
+                    association['ResolverQueryLogConfigId'], {}
+                )
+            if (self.annotation_key in r) == target_state:
+                results.append(r)
+
         return results
