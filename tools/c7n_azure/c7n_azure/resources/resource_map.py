@@ -109,4 +109,8 @@ ResourceMap = {
     "azure.webapp": "c7n_azure.resources.web_app.WebApp",
     "azure.alert-logs": "c7n_azure.resources.alertlogs.AlertLogs",
     "azure.entraid-user": "c7n_azure.resources.entraid_user.EntraIDUser",
+    "azure.entraid-group": "c7n_azure.resources.entraid_group.EntraIDGroup",
+    "azure.entraid-organization": "c7n_azure.resources.entraid_organization.EntraIDOrganization",
+    "azure.entraid-conditional-access-policy": "c7n_azure.resources.entraid_conditional_access.EntraIDConditionalAccessPolicy", # noqa
+    "azure.entraid-security-defaults": "c7n_azure.resources.entraid_security_defaults.EntraIDSecurityDefaults", # noqa
 }
