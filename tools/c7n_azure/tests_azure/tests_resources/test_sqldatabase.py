@@ -448,7 +448,7 @@ class LongTermBackupRetentionPolicyActionTest(BaseTest):
     def setUpClass(cls, *args, **kwargs):
         super(LongTermBackupRetentionPolicyActionTest, cls).setUpClass(*args, **kwargs)
         cls.client = local_session(Session).client('azure.mgmt.sql.SqlManagementClient') \
-            .backup_long_term_retention_policies
+            .long_term_retention_policies
 
     def tearDown(self, *args, **kwargs):
         default_long_term_policy = {

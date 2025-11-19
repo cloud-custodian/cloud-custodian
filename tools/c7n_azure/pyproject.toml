@@ -67,7 +67,7 @@ dependencies = [
     "azure-mgmt-servicebus<9.0.0,>=8.2.0",
     "azure-mgmt-servicefabric<2.0.0,>=1.0.0",
     "azure-mgmt-signalr==0.4.0",
-    "azure-mgmt-sql<2.0.0,>=1.0.0",
+    "azure-mgmt-sql<4.0.0,>=3.0.0",
     "azure-mgmt-storage<23.0.0,>=22.1.1",
     "azure-mgmt-streamanalytics<2.0.0,>=1.0.0rc1",
     "azure-mgmt-subscription<2.0.0,>=1.0.0",

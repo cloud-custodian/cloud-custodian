@@ -1,0 +1,176 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "items": [
+            {
+                "id": "sn-04f175879bca86422",
+                "name": "non-compliant-network",
+                "arn": "arn:aws:vpc-lattice:us-east-1:644160558196:servicenetwork/sn-04f175879bca86422",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 9,
+                    "day": 16,
+                    "hour": 20,
+                    "minute": 17,
+                    "second": 34,
+                    "microsecond": 715000
+                },
+                "lastUpdatedAt": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 9,
+                    "day": 16,
+                    "hour": 20,
+                    "minute": 17,
+                    "second": 34,
+                    "microsecond": 715000
+                },
+                "numberOfAssociatedVPCs": 0,
+                "numberOfAssociatedServices": 0,
+                "numberOfAssociatedResourceConfigurations": 0
+            },
+            {
+                "id": "sn-0641bb2a478d9d77b",
+                "name": "network-partial-logs",
+                "arn": "arn:aws:vpc-lattice:us-east-1:644160558196:servicenetwork/sn-0641bb2a478d9d77b",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 9,
+                    "day": 16,
+                    "hour": 20,
+                    "minute": 17,
+                    "second": 9,
+                    "microsecond": 375000
+                },
+                "lastUpdatedAt": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 9,
+                    "day": 16,
+                    "hour": 20,
+                    "minute": 17,
+                    "second": 9,
+                    "microsecond": 375000
+                },
+                "numberOfAssociatedVPCs": 0,
+                "numberOfAssociatedServices": 0,
+                "numberOfAssociatedResourceConfigurations": 0
+            },
+            {
+                "id": "sn-070d9e8cc80e37098",
+                "name": "network-with-external-access",
+                "arn": "arn:aws:vpc-lattice:us-east-1:644160558196:servicenetwork/sn-070d9e8cc80e37098",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 9,
+                    "day": 16,
+                    "hour": 17,
+                    "minute": 44,
+                    "second": 20,
+                    "microsecond": 740000
+                },
+                "lastUpdatedAt": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 9,
+                    "day": 16,
+                    "hour": 18,
+                    "minute": 55,
+                    "second": 48,
+                    "microsecond": 888000
+                },
+                "numberOfAssociatedVPCs": 0,
+                "numberOfAssociatedServices": 0,
+                "numberOfAssociatedResourceConfigurations": 0
+            },
+            {
+                "id": "sn-08911a980b03fb795",
+                "name": "network-with-full-logging",
+                "arn": "arn:aws:vpc-lattice:us-east-1:644160558196:servicenetwork/sn-08911a980b03fb795",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 9,
+                    "day": 16,
+                    "hour": 20,
+                    "minute": 16,
+                    "second": 22,
+                    "microsecond": 455000
+                },
+                "lastUpdatedAt": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 9,
+                    "day": 16,
+                    "hour": 20,
+                    "minute": 16,
+                    "second": 22,
+                    "microsecond": 455000
+                },
+                "numberOfAssociatedVPCs": 0,
+                "numberOfAssociatedServices": 0,
+                "numberOfAssociatedResourceConfigurations": 0
+            },
+            {
+                "id": "sn-092f7a594a03e7eba",
+                "name": "compliant-iam-network",
+                "arn": "arn:aws:vpc-lattice:us-east-1:644160558196:servicenetwork/sn-092f7a594a03e7eba",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 9,
+                    "day": 16,
+                    "hour": 20,
+                    "minute": 17,
+                    "second": 49,
+                    "microsecond": 166000
+                },
+                "lastUpdatedAt": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 9,
+                    "day": 16,
+                    "hour": 20,
+                    "minute": 17,
+                    "second": 49,
+                    "microsecond": 166000
+                },
+                "numberOfAssociatedVPCs": 0,
+                "numberOfAssociatedServices": 0,
+                "numberOfAssociatedResourceConfigurations": 0
+            },
+            {
+                "id": "sn-0a92692360c7945f3",
+                "name": "network-no-logs",
+                "arn": "arn:aws:vpc-lattice:us-east-1:644160558196:servicenetwork/sn-0a92692360c7945f3",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 9,
+                    "day": 16,
+                    "hour": 20,
+                    "minute": 16,
+                    "second": 42,
+                    "microsecond": 466000
+                },
+                "lastUpdatedAt": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 9,
+                    "day": 16,
+                    "hour": 20,
+                    "minute": 16,
+                    "second": 42,
+                    "microsecond": 466000
+                },
+                "numberOfAssociatedVPCs": 0,
+                "numberOfAssociatedServices": 0,
+                "numberOfAssociatedResourceConfigurations": 0
+            }
+        ]
+    }
+}
