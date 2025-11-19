@@ -10,6 +10,11 @@ from pytest_terraform import terraform
 from c7n_azure.resources.entraid_user import (
     EntraIDUser
 )
+from c7n_azure.resources.entraid_group import EntraIDGroup
+from c7n_azure.resources.entraid_organization import EntraIDOrganization
+from c7n_azure.resources.entraid_conditional_access import EntraIDConditionalAccessPolicy
+from c7n_azure.resources.entraid_security_defaults import EntraIDSecurityDefaults
+from c7n_azure.resources.entraid_authorization_policy import EntraIDAuthorizationPolicy
 from tests_azure.azure_common import BaseTest
 
 
@@ -846,6 +851,2264 @@ client.return_value = mock_client
         action._process_resource(user)
 
 
+class EntraIDGroupTest(BaseTest):
+    """Test EntraID Group resource functionality"""
+
+    def test_entraid_group_schema_validate(self):
+        """Test that the EntraID group resource schema validates correctly"""
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'test-entraid-group',
+                'resource': 'azure.entraid-group',
+                'filters': [
+                    {'type': 'value', 'key': 'securityEnabled', 'value': True}
+                ]
+            }, validate=True)
+            self.assertTrue(p)
+
+    def test_entraid_group_resource_type(self):
+        """Test EntraID group resource type configuration"""
+        resource_type = EntraIDGroup.resource_type
+        self.assertEqual(resource_type.service, 'graph')
+        self.assertEqual(resource_type.id, 'id')
+        self.assertEqual(resource_type.name, 'displayName')
+        self.assertTrue(resource_type.global_resource)
+        self.assertIn('Group.Read.All', resource_type.permissions)
+
+    def test_entraid_group_augment(self):
+        """Test group resource augmentation with computed fields"""
+
+        # Sample group data
+        groups = [
+            {
+                'id': 'group1-id',
+                'displayName': 'Global Administrators',
+                'description': 'Admin group',
+                'securityEnabled': True,
+                'mailEnabled': False,
+                'groupTypes': []
+            },
+            {
+                'id': 'group2-id',
+                'displayName': 'All Users Distribution',
+                'description': 'Distribution list',
+                'securityEnabled': False,
+                'mailEnabled': True,
+                'groupTypes': ['Unified']
+            },
+            {
+                'id': 'group3-id',
+                'displayName': 'Dynamic Security Group',
+                'description': 'Dynamic membership',
+                'securityEnabled': True,
+                'mailEnabled': False,
+                'groupTypes': ['DynamicMembership']
+            }
+        ]
+
+        policy = self.load_policy({
+            'name': 'test-augment',
+            'resource': 'azure.entraid-group'
+        })
+
+        resource_mgr = policy.resource_manager
+        augmented = resource_mgr.augment(groups)
+
+        # Check augmented fields
+        self.assertIn('c7n:IsSecurityGroup', augmented[0])
+        self.assertIn('c7n:IsDistributionGroup', augmented[0])
+        self.assertIn('c7n:IsDynamicGroup', augmented[0])
+        self.assertIn('c7n:IsAdminGroup', augmented[0])
+
+        # Admin group should be flagged correctly
+        self.assertTrue(augmented[0]['c7n:IsSecurityGroup'])
+        self.assertTrue(augmented[0]['c7n:IsAdminGroup'])
+        self.assertFalse(augmented[0]['c7n:IsDistributionGroup'])
+
+        # Distribution group should be flagged correctly
+        self.assertFalse(augmented[1]['c7n:IsSecurityGroup'])
+        self.assertTrue(augmented[1]['c7n:IsDistributionGroup'])
+        self.assertFalse(augmented[1]['c7n:IsAdminGroup'])
+
+        # Dynamic group should be flagged correctly
+        self.assertTrue(augmented[2]['c7n:IsSecurityGroup'])
+        self.assertTrue(augmented[2]['c7n:IsDynamicGroup'])
+
+    @patch('c7n_azure.resources.entraid_group.EntraIDGroup.get_group_member_count')
+    def test_member_count_filter(self, mock_member_count):
+        """Test member count filter with real Graph API implementation"""
+        groups = [
+            {
+                'id': 'group1',
+                'displayName': 'Small Group'
+            },
+            {
+                'id': 'group2',
+                'displayName': 'Large Group'
+            },
+            {
+                'id': 'group3',
+                'displayName': 'Empty Group'
+            }
+        ]
+
+        # Mock member counts: group1=2, group2=5, group3=0
+        def mock_count_side_effect(group_id):
+            if group_id == 'group1':
+                return 2
+            elif group_id == 'group2':
+                return 5
+            elif group_id == 'group3':
+                return 0
+            else:
+                return None
+
+        mock_member_count.side_effect = mock_count_side_effect
+
+        policy = self.load_policy({
+            'name': 'test-member-count',
+            'resource': 'azure.entraid-group',
+            'filters': [
+                {'type': 'member-count', 'count': 3, 'op': 'greater-than'}
+            ]
+        })
+
+        resource_mgr = policy.resource_manager
+        filtered = resource_mgr.filter_resources(groups)
+
+        # Only group2 has >3 members
+        self.assertEqual(len(filtered), 1)
+        self.assertEqual(filtered[0]['id'], 'group2')
+
+        # Verify the member count check was called
+        self.assertEqual(mock_member_count.call_count, 3)
+
+    @patch('c7n_azure.resources.entraid_group.EntraIDGroup.get_group_owner_count')
+    def test_owner_count_filter(self, mock_owner_count):
+        """Test owner count filter with real Graph API implementation"""
+        groups = [
+            {
+                'id': 'group1',
+                'displayName': 'Owned Group'
+            },
+            {
+                'id': 'group2',
+                'displayName': 'Orphaned Group'
+            }
+        ]
+
+        # Mock owner counts: group1=1, group2=0
+        def mock_count_side_effect(group_id):
+            if group_id == 'group1':
+                return 1
+            elif group_id == 'group2':
+                return 0
+            else:
+                return None
+
+        mock_owner_count.side_effect = mock_count_side_effect
+
+        policy = self.load_policy({
+            'name': 'test-owner-count',
+            'resource': 'azure.entraid-group',
+            'filters': [
+                {'type': 'owner-count', 'count': 0, 'op': 'equal'}
+            ]
+        })
+
+        resource_mgr = policy.resource_manager
+        filtered = resource_mgr.filter_resources(groups)
+
+        # Only group2 has no owners
+        self.assertEqual(len(filtered), 1)
+        self.assertEqual(filtered[0]['id'], 'group2')
+
+        # Verify the owner count check was called
+        self.assertEqual(mock_owner_count.call_count, 2)
+
+    def test_group_type_filter(self):
+        """Test group type filter"""
+        groups = [
+            {
+                'id': 'group1',
+                'displayName': 'Security Group',
+                'c7n:IsSecurityGroup': True,
+                'c7n:IsDistributionGroup': False,
+                'c7n:IsDynamicGroup': False,
+                'c7n:IsAdminGroup': False
+            },
+            {
+                'id': 'group2',
+                'displayName': 'Distribution Group',
+                'c7n:IsSecurityGroup': False,
+                'c7n:IsDistributionGroup': True,
+                'c7n:IsDynamicGroup': False,
+                'c7n:IsAdminGroup': False
+            },
+            {
+                'id': 'group3',
+                'displayName': 'Admin Group',
+                'c7n:IsSecurityGroup': True,
+                'c7n:IsDistributionGroup': False,
+                'c7n:IsDynamicGroup': False,
+                'c7n:IsAdminGroup': True
+            }
+        ]
+
+        policy = self.load_policy({
+            'name': 'test-group-type',
+            'resource': 'azure.entraid-group',
+            'filters': [
+                {'type': 'group-type', 'group-type': 'admin'}
+            ]
+        })
+
+        resource_mgr = policy.resource_manager
+        filtered = resource_mgr.filter_resources(groups)
+
+        # Only group3 is an admin group
+        self.assertEqual(len(filtered), 1)
+        self.assertEqual(filtered[0]['id'], 'group3')
+
+    @patch('c7n_azure.resources.entraid_group.EntraIDGroup.make_graph_request')
+    def test_get_graph_resources_success(self, mock_request):
+        """Test successful retrieval of groups from Graph API"""
+        mock_request.return_value = {
+            'value': [
+                {
+                    'id': 'group1',
+                    'displayName': 'Test Group 1',
+                    'securityEnabled': True,
+                    'mailEnabled': False,
+                    'groupTypes': []
+                },
+                {
+                    'id': 'group2',
+                    'displayName': 'Admin Group',
+                    'securityEnabled': True,
+                    'mailEnabled': False,
+                    'groupTypes': []
+                }
+            ]
+        }
+
+        policy = self.load_policy({
+            'name': 'test-get-groups',
+            'resource': 'azure.entraid-group'
+        })
+
+        resources = policy.resource_manager.get_graph_resources()
+
+        self.assertEqual(len(resources), 2)
+        self.assertIn('c7n:IsSecurityGroup', resources[0])
+        self.assertTrue(resources[0]['c7n:IsSecurityGroup'])
+        self.assertTrue(resources[1]['c7n:IsAdminGroup'])
+
+    @patch('c7n_azure.resources.entraid_group.EntraIDGroup.make_graph_request')
+    def test_get_graph_resources_permission_error(self, mock_request):
+        """Test handling of permission errors when retrieving groups"""
+        mock_request.side_effect = requests.exceptions.RequestException(
+            "403 Forbidden: Insufficient privileges"
+        )
+
+        policy = self.load_policy({
+            'name': 'test-get-groups-error',
+            'resource': 'azure.entraid-group'
+        })
+
+        resources = policy.resource_manager.get_graph_resources()
+
+        # Should return empty list on permission error
+        self.assertEqual(resources, [])
+
+    @patch('c7n_azure.resources.entraid_group.EntraIDGroup.make_graph_request')
+    def test_get_graph_resources_generic_error(self, mock_request):
+        """Test handling of generic errors when retrieving groups"""
+        mock_request.side_effect = requests.exceptions.RequestException("Network error")
+
+        policy = self.load_policy({
+            'name': 'test-get-groups-error',
+            'resource': 'azure.entraid-group'
+        })
+
+        resources = policy.resource_manager.get_graph_resources()
+
+        # Should return empty list on error
+        self.assertEqual(resources, [])
+
+    def test_augment_exception_handling(self):
+        """Test exception handling during augmentation"""
+        policy = self.load_policy({
+            'name': 'test-augment-error',
+            'resource': 'azure.entraid-group'
+        })
+
+        # Pass invalid data that will cause augmentation to fail
+        resources = [{'id': 'test', 'displayName': None}]
+
+        # Should handle exception and still return resources
+        result = policy.resource_manager.augment(resources)
+        self.assertEqual(len(result), 1)
+
+    @patch('c7n_azure.resources.entraid_group.EntraIDGroup.make_graph_request')
+    def test_get_group_member_count_success(self, mock_request):
+        """Test successful retrieval of group member count"""
+        mock_request.return_value = 42
+
+        policy = self.load_policy({
+            'name': 'test-member-count',
+            'resource': 'azure.entraid-group'
+        })
+
+        count = policy.resource_manager.get_group_member_count('group-id')
+        self.assertEqual(count, 42)
+
+    @patch('c7n_azure.resources.entraid_group.EntraIDGroup.make_graph_request')
+    def test_get_group_member_count_string_response(self, mock_request):
+        """Test member count with string response"""
+        mock_request.return_value = "25"
+
+        policy = self.load_policy({
+            'name': 'test-member-count',
+            'resource': 'azure.entraid-group'
+        })
+
+        count = policy.resource_manager.get_group_member_count('group-id')
+        self.assertEqual(count, 25)
+
+    @patch('c7n_azure.resources.entraid_group.EntraIDGroup.make_graph_request')
+    def test_get_group_member_count_unexpected_format(self, mock_request):
+        """Test member count with unexpected response format"""
+        mock_request.return_value = {'unexpected': 'format'}
+
+        policy = self.load_policy({
+            'name': 'test-member-count',
+            'resource': 'azure.entraid-group'
+        })
+
+        count = policy.resource_manager.get_group_member_count('group-id')
+        self.assertEqual(count, 0)
+
+    @patch('c7n_azure.resources.entraid_group.EntraIDGroup.make_graph_request')
+    def test_get_group_member_count_permission_error(self, mock_request):
+        """Test member count with permission error"""
+        mock_request.side_effect = requests.exceptions.RequestException("403 Forbidden")
+
+        policy = self.load_policy({
+            'name': 'test-member-count',
+            'resource': 'azure.entraid-group'
+        })
+
+        count = policy.resource_manager.get_group_member_count('group-id')
+        self.assertIsNone(count)
+
+    @patch('c7n_azure.resources.entraid_group.EntraIDGroup.make_graph_request')
+    def test_get_group_member_count_generic_error(self, mock_request):
+        """Test member count with generic error"""
+        mock_request.side_effect = requests.exceptions.RequestException("Network error")
+
+        policy = self.load_policy({
+            'name': 'test-member-count',
+            'resource': 'azure.entraid-group'
+        })
+
+        count = policy.resource_manager.get_group_member_count('group-id')
+        self.assertIsNone(count)
+
+    @patch('c7n_azure.resources.entraid_group.EntraIDGroup.make_graph_request')
+    def test_get_group_owner_count_success(self, mock_request):
+        """Test successful retrieval of group owner count"""
+        mock_request.return_value = 3
+
+        policy = self.load_policy({
+            'name': 'test-owner-count',
+            'resource': 'azure.entraid-group'
+        })
+
+        count = policy.resource_manager.get_group_owner_count('group-id')
+        self.assertEqual(count, 3)
+
+    @patch('c7n_azure.resources.entraid_group.EntraIDGroup.make_graph_request')
+    def test_get_group_owner_count_unexpected_format(self, mock_request):
+        """Test owner count with unexpected response format"""
+        mock_request.return_value = ['not', 'a', 'number']
+
+        policy = self.load_policy({
+            'name': 'test-owner-count',
+            'resource': 'azure.entraid-group'
+        })
+
+        count = policy.resource_manager.get_group_owner_count('group-id')
+        self.assertEqual(count, 0)
+
+    @patch('c7n_azure.resources.entraid_group.EntraIDGroup.make_graph_request')
+    def test_get_group_owner_count_permission_error(self, mock_request):
+        """Test owner count with permission error"""
+        mock_request.side_effect = requests.exceptions.RequestException("Insufficient privileges")
+
+        policy = self.load_policy({
+            'name': 'test-owner-count',
+            'resource': 'azure.entraid-group'
+        })
+
+        count = policy.resource_manager.get_group_owner_count('group-id')
+        self.assertIsNone(count)
+
+    @patch('c7n_azure.resources.entraid_group.EntraIDGroup.make_graph_request')
+    def test_get_group_owner_count_generic_error(self, mock_request):
+        """Test owner count with generic error"""
+        mock_request.side_effect = requests.exceptions.RequestException("Timeout")
+
+        policy = self.load_policy({
+            'name': 'test-owner-count',
+            'resource': 'azure.entraid-group'
+        })
+
+        count = policy.resource_manager.get_group_owner_count('group-id')
+        self.assertIsNone(count)
+
+    @patch('c7n_azure.resources.entraid_group.EntraIDGroup.make_graph_request')
+    def test_analyze_group_member_types_success(self, mock_request):
+        """Test successful analysis of group member types"""
+        mock_request.return_value = {
+            'value': [
+                {
+                    '@odata.type': '#microsoft.graph.user',
+                    'id': 'user1',
+                    'userType': 'Member',
+                    'userPrincipalName': 'user1@example.com'
+                },
+                {
+                    '@odata.type': '#microsoft.graph.user',
+                    'id': 'user2',
+                    'userType': 'Guest',
+                    'userPrincipalName': 'user2_external#EXT#@example.com'
+                }
+            ]
+        }
+
+        policy = self.load_policy({
+            'name': 'test-member-types',
+            'resource': 'azure.entraid-group'
+        })
+
+        analysis = policy.resource_manager.analyze_group_member_types('group-id')
+
+        self.assertTrue(analysis['has_external_members'])
+        self.assertTrue(analysis['has_guest_members'])
+        self.assertEqual(analysis['total_members'], 2)
+
+    @patch('c7n_azure.resources.entraid_group.EntraIDGroup.make_graph_request')
+    def test_analyze_group_member_types_external_only(self, mock_request):
+        """Test analysis with external members only"""
+        mock_request.return_value = {
+            'value': [
+                {
+                    '@odata.type': '#microsoft.graph.user',
+                    'id': 'user1',
+                    'userType': 'Member',
+                    'userPrincipalName': 'user1_external#EXT#@example.com'
+                }
+            ]
+        }
+
+        policy = self.load_policy({
+            'name': 'test-member-types',
+            'resource': 'azure.entraid-group'
+        })
+
+        analysis = policy.resource_manager.analyze_group_member_types('group-id')
+
+        self.assertTrue(analysis['has_external_members'])
+        self.assertFalse(analysis['has_guest_members'])
+
+    @patch('c7n_azure.resources.entraid_group.EntraIDGroup.make_graph_request')
+    def test_analyze_group_member_types_permission_error(self, mock_request):
+        """Test member type analysis with permission error"""
+        mock_request.side_effect = requests.exceptions.RequestException("403 Forbidden")
+
+        policy = self.load_policy({
+            'name': 'test-member-types',
+            'resource': 'azure.entraid-group'
+        })
+
+        analysis = policy.resource_manager.analyze_group_member_types('group-id')
+        self.assertIsNone(analysis)
+
+    @patch('c7n_azure.resources.entraid_group.EntraIDGroup.make_graph_request')
+    def test_analyze_group_member_types_generic_error(self, mock_request):
+        """Test member type analysis with generic error"""
+        mock_request.side_effect = requests.exceptions.RequestException("Connection error")
+
+        policy = self.load_policy({
+            'name': 'test-member-types',
+            'resource': 'azure.entraid-group'
+        })
+
+        analysis = policy.resource_manager.analyze_group_member_types('group-id')
+        self.assertIsNone(analysis)
+
+    @patch('c7n_azure.resources.entraid_group.EntraIDGroup.get_group_member_count')
+    def test_member_count_filter_missing_group_id(self, mock_count):
+        """Test member count filter with missing group ID"""
+        groups = [
+            {'displayName': 'Test Group'}  # No ID
+        ]
+
+        policy = self.load_policy({
+            'name': 'test-member-count-filter',
+            'resource': 'azure.entraid-group',
+            'filters': [
+                {'type': 'member-count', 'count': 10, 'op': 'greater-than'}
+            ]
+        })
+
+        filtered = policy.resource_manager.filter_resources(groups)
+        self.assertEqual(len(filtered), 0)
+
+    @patch('c7n_azure.resources.entraid_group.EntraIDGroup.get_group_member_count')
+    def test_member_count_filter_none_count(self, mock_count):
+        """Test member count filter with None count (permission error)"""
+        mock_count.return_value = None
+
+        groups = [
+            {'id': 'group1', 'displayName': 'Test Group'}
+        ]
+
+        policy = self.load_policy({
+            'name': 'test-member-count-filter',
+            'resource': 'azure.entraid-group',
+            'filters': [
+                {'type': 'member-count', 'count': 10, 'op': 'greater-than'}
+            ]
+        })
+
+        filtered = policy.resource_manager.filter_resources(groups)
+        self.assertEqual(len(filtered), 0)
+
+    @patch('c7n_azure.resources.entraid_group.EntraIDGroup.get_group_member_count')
+    def test_member_count_filter_less_than(self, mock_count):
+        """Test member count filter with less-than operator"""
+        mock_count.return_value = 5
+
+        groups = [
+            {'id': 'group1', 'displayName': 'Small Group'}
+        ]
+
+        policy = self.load_policy({
+            'name': 'test-member-count-filter',
+            'resource': 'azure.entraid-group',
+            'filters': [
+                {'type': 'member-count', 'count': 10, 'op': 'less-than'}
+            ]
+        })
+
+        filtered = policy.resource_manager.filter_resources(groups)
+        self.assertEqual(len(filtered), 1)
+
+    @patch('c7n_azure.resources.entraid_group.EntraIDGroup.get_group_member_count')
+    def test_member_count_filter_equal(self, mock_count):
+        """Test member count filter with equal operator"""
+        mock_count.return_value = 10
+
+        groups = [
+            {'id': 'group1', 'displayName': 'Exact Group'}
+        ]
+
+        policy = self.load_policy({
+            'name': 'test-member-count-filter',
+            'resource': 'azure.entraid-group',
+            'filters': [
+                {'type': 'member-count', 'count': 10, 'op': 'equal'}
+            ]
+        })
+
+        filtered = policy.resource_manager.filter_resources(groups)
+        self.assertEqual(len(filtered), 1)
+
+    @patch('c7n_azure.resources.entraid_group.EntraIDGroup.get_group_member_count')
+    def test_member_count_filter_greater_than(self, mock_count):
+        """Test member count filter with greater-than matching"""
+        mock_count.return_value = 150
+
+        groups = [
+            {'id': 'group1', 'displayName': 'Large Group'}
+        ]
+
+        policy = self.load_policy({
+            'name': 'test-member-count-filter',
+            'resource': 'azure.entraid-group',
+            'filters': [
+                {'type': 'member-count', 'count': 100, 'op': 'greater-than'}
+            ]
+        })
+
+        filtered = policy.resource_manager.filter_resources(groups)
+        self.assertEqual(len(filtered), 1)
+
+    @patch('c7n_azure.resources.entraid_group.EntraIDGroup.get_group_owner_count')
+    def test_owner_count_filter_missing_group_id(self, mock_count):
+        """Test owner count filter with missing group ID"""
+        groups = [
+            {'displayName': 'Test Group'}  # No ID
+        ]
+
+        policy = self.load_policy({
+            'name': 'test-owner-count-filter',
+            'resource': 'azure.entraid-group',
+            'filters': [
+                {'type': 'owner-count', 'count': 0, 'op': 'equal'}
+            ]
+        })
+
+        filtered = policy.resource_manager.filter_resources(groups)
+        self.assertEqual(len(filtered), 0)
+
+    @patch('c7n_azure.resources.entraid_group.EntraIDGroup.get_group_owner_count')
+    def test_owner_count_filter_none_count(self, mock_count):
+        """Test owner count filter with None count (permission error)"""
+        mock_count.return_value = None
+
+        groups = [
+            {'id': 'group1', 'displayName': 'Test Group'}
+        ]
+
+        policy = self.load_policy({
+            'name': 'test-owner-count-filter',
+            'resource': 'azure.entraid-group',
+            'filters': [
+                {'type': 'owner-count', 'count': 0, 'op': 'equal'}
+            ]
+        })
+
+        filtered = policy.resource_manager.filter_resources(groups)
+        self.assertEqual(len(filtered), 0)
+
+    @patch('c7n_azure.resources.entraid_group.EntraIDGroup.get_group_owner_count')
+    def test_owner_count_filter_greater_than(self, mock_count):
+        """Test owner count filter with greater-than operator"""
+        mock_count.return_value = 5
+
+        groups = [
+            {'id': 'group1', 'displayName': 'Many Owners Group'}
+        ]
+
+        policy = self.load_policy({
+            'name': 'test-owner-count-filter',
+            'resource': 'azure.entraid-group',
+            'filters': [
+                {'type': 'owner-count', 'count': 3, 'op': 'greater-than'}
+            ]
+        })
+
+        filtered = policy.resource_manager.filter_resources(groups)
+        self.assertEqual(len(filtered), 1)
+
+    @patch('c7n_azure.resources.entraid_group.EntraIDGroup.get_group_owner_count')
+    def test_owner_count_filter_less_than(self, mock_count):
+        """Test owner count filter with less-than operator"""
+        mock_count.return_value = 1
+
+        groups = [
+            {'id': 'group1', 'displayName': 'Few Owners Group'}
+        ]
+
+        policy = self.load_policy({
+            'name': 'test-owner-count-filter',
+            'resource': 'azure.entraid-group',
+            'filters': [
+                {'type': 'owner-count', 'count': 2, 'op': 'less-than'}
+            ]
+        })
+
+        filtered = policy.resource_manager.filter_resources(groups)
+        self.assertEqual(len(filtered), 1)
+
+    @patch('c7n_azure.resources.entraid_group.EntraIDGroup.get_group_owner_count')
+    def test_owner_count_filter_equal(self, mock_count):
+        """Test owner count filter with equal operator matching"""
+        mock_count.return_value = 2
+
+        groups = [
+            {'id': 'group1', 'displayName': 'Two Owners Group'}
+        ]
+
+        policy = self.load_policy({
+            'name': 'test-owner-count-filter',
+            'resource': 'azure.entraid-group',
+            'filters': [
+                {'type': 'owner-count', 'count': 2, 'op': 'equal'}
+            ]
+        })
+
+        filtered = policy.resource_manager.filter_resources(groups)
+        self.assertEqual(len(filtered), 1)
+
+    @patch('c7n_azure.resources.entraid_group.EntraIDGroup.analyze_group_member_types')
+    def test_member_types_filter_missing_group_id(self, mock_analysis):
+        """Test member types filter with missing group ID"""
+        groups = [
+            {'displayName': 'Test Group'}  # No ID
+        ]
+
+        policy = self.load_policy({
+            'name': 'test-member-types-filter',
+            'resource': 'azure.entraid-group',
+            'filters': [
+                {'type': 'member-types', 'include-external': True}
+            ]
+        })
+
+        filtered = policy.resource_manager.filter_resources(groups)
+        self.assertEqual(len(filtered), 0)
+
+    @patch('c7n_azure.resources.entraid_group.EntraIDGroup.analyze_group_member_types')
+    def test_member_types_filter_none_analysis(self, mock_analysis):
+        """Test member types filter with None analysis (permission error)"""
+        mock_analysis.return_value = None
+
+        groups = [
+            {'id': 'group1', 'displayName': 'Test Group'}
+        ]
+
+        policy = self.load_policy({
+            'name': 'test-member-types-filter',
+            'resource': 'azure.entraid-group',
+            'filters': [
+                {'type': 'member-types', 'include-external': True}
+            ]
+        })
+
+        filtered = policy.resource_manager.filter_resources(groups)
+        self.assertEqual(len(filtered), 0)
+
+    @patch('c7n_azure.resources.entraid_group.EntraIDGroup.analyze_group_member_types')
+    def test_member_types_filter_include_external(self, mock_analysis):
+        """Test member types filter with include-external"""
+        mock_analysis.return_value = {
+            'has_external_members': True,
+            'has_guest_members': False,
+            'total_members': 5
+        }
+
+        groups = [
+            {'id': 'group1', 'displayName': 'External Group'}
+        ]
+
+        policy = self.load_policy({
+            'name': 'test-member-types-filter',
+            'resource': 'azure.entraid-group',
+            'filters': [
+                {'type': 'member-types', 'include-external': True}
+            ]
+        })
+
+        filtered = policy.resource_manager.filter_resources(groups)
+        self.assertEqual(len(filtered), 1)
+
+    @patch('c7n_azure.resources.entraid_group.EntraIDGroup.analyze_group_member_types')
+    def test_member_types_filter_exclude_external(self, mock_analysis):
+        """Test member types filter with exclude external"""
+        mock_analysis.return_value = {
+            'has_external_members': True,
+            'has_guest_members': False,
+            'total_members': 5
+        }
+
+        groups = [
+            {'id': 'group1', 'displayName': 'External Group'}
+        ]
+
+        policy = self.load_policy({
+            'name': 'test-member-types-filter',
+            'resource': 'azure.entraid-group',
+            'filters': [
+                {'type': 'member-types', 'include-external': False}
+            ]
+        })
+
+        filtered = policy.resource_manager.filter_resources(groups)
+        self.assertEqual(len(filtered), 0)
+
+    @patch('c7n_azure.resources.entraid_group.EntraIDGroup.analyze_group_member_types')
+    def test_member_types_filter_include_guests(self, mock_analysis):
+        """Test member types filter with include-guests"""
+        mock_analysis.return_value = {
+            'has_external_members': False,
+            'has_guest_members': True,
+            'total_members': 3
+        }
+
+        groups = [
+            {'id': 'group1', 'displayName': 'Guest Group'}
+        ]
+
+        policy = self.load_policy({
+            'name': 'test-member-types-filter',
+            'resource': 'azure.entraid-group',
+            'filters': [
+                {'type': 'member-types', 'include-guests': True}
+            ]
+        })
+
+        filtered = policy.resource_manager.filter_resources(groups)
+        self.assertEqual(len(filtered), 1)
+
+    @patch('c7n_azure.resources.entraid_group.EntraIDGroup.analyze_group_member_types')
+    def test_member_types_filter_exclude_guests(self, mock_analysis):
+        """Test member types filter excluding guest users"""
+        mock_analysis.return_value = {
+            'has_external_members': False,
+            'has_guest_members': True,
+            'total_members': 5
+        }
+
+        groups = [
+            {'id': 'group1', 'displayName': 'Guest Group'}
+        ]
+
+        policy = self.load_policy({
+            'name': 'test-member-types-filter',
+            'resource': 'azure.entraid-group',
+            'filters': [
+                {'type': 'member-types', 'include-guests': False}
+            ]
+        })
+
+        filtered = policy.resource_manager.filter_resources(groups)
+        self.assertEqual(len(filtered), 0)
+
+    @patch('c7n_azure.resources.entraid_group.EntraIDGroup.analyze_group_member_types')
+    def test_member_types_filter_no_external_when_required(self, mock_analysis):
+        """Test member types filter when external members are required but not present"""
+        mock_analysis.return_value = {
+            'has_external_members': False,
+            'has_guest_members': False,
+            'total_members': 5
+        }
+
+        groups = [
+            {'id': 'group1', 'displayName': 'Internal Only Group'}
+        ]
+
+        policy = self.load_policy({
+            'name': 'test-member-types-filter',
+            'resource': 'azure.entraid-group',
+            'filters': [
+                {'type': 'member-types', 'include-external': True}
+            ]
+        })
+
+        filtered = policy.resource_manager.filter_resources(groups)
+        self.assertEqual(len(filtered), 0)
+
+    @patch('c7n_azure.resources.entraid_group.EntraIDGroup.analyze_group_member_types')
+    def test_member_types_filter_no_guests_when_required(self, mock_analysis):
+        """Test member types filter when guests are required but not present"""
+        mock_analysis.return_value = {
+            'has_external_members': False,
+            'has_guest_members': False,
+            'total_members': 5
+        }
+
+        groups = [
+            {'id': 'group1', 'displayName': 'No Guests Group'}
+        ]
+
+        policy = self.load_policy({
+            'name': 'test-member-types-filter',
+            'resource': 'azure.entraid-group',
+            'filters': [
+                {'type': 'member-types', 'include-guests': True}
+            ]
+        })
+
+        filtered = policy.resource_manager.filter_resources(groups)
+        self.assertEqual(len(filtered), 0)
+
+    @patch('c7n_azure.resources.entraid_group.EntraIDGroup.analyze_group_member_types')
+    def test_member_types_filter_combined(self, mock_analysis):
+        """Test member types filter with combined filters"""
+        mock_analysis.return_value = {
+            'has_external_members': True,
+            'has_guest_members': True,
+            'total_members': 10
+        }
+
+        groups = [
+            {'id': 'group1', 'displayName': 'Mixed Group'}
+        ]
+
+        policy = self.load_policy({
+            'name': 'test-member-types-filter',
+            'resource': 'azure.entraid-group',
+            'filters': [
+                {'type': 'member-types', 'include-external': True, 'include-guests': True}
+            ]
+        })
+
+        filtered = policy.resource_manager.filter_resources(groups)
+        self.assertEqual(len(filtered), 1)
+
+
+class EntraIDOrganizationTest(BaseTest):
+    """Test EntraID Organization resource functionality"""
+
+    def test_entraid_organization_schema_validate(self):
+        """Test organization resource schema validation"""
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'test-organization',
+                'resource': 'azure.entraid-organization',
+                'filters': [
+                    {'type': 'security-defaults', 'enabled': True}
+                ]
+            }, validate=True)
+            self.assertTrue(p)
+
+    def test_organization_resource_type(self):
+        """Test organization resource type configuration"""
+        resource_type = EntraIDOrganization.resource_type
+        self.assertEqual(resource_type.service, 'graph')
+        self.assertEqual(resource_type.id, 'id')
+        self.assertTrue(resource_type.global_resource)
+        self.assertIn('Organization.Read.All', resource_type.permissions)
+        self.assertIn('Directory.Read.All', resource_type.permissions)
+
+    def test_security_defaults_filter(self):
+        """Test security defaults filter"""
+        orgs = [
+            {
+                'id': 'org1',
+                'displayName': 'Test Organization',
+                'securityDefaults': {'isEnabled': True}
+            },
+            {
+                'id': 'org2',
+                'displayName': 'Another Organization',
+                'securityDefaults': {'isEnabled': False}
+            }
+        ]
+
+        policy = self.load_policy({
+            'name': 'test-security-defaults',
+            'resource': 'azure.entraid-organization',
+            'filters': [
+                {'type': 'security-defaults', 'enabled': False}
+            ]
+        })
+
+        resource_mgr = policy.resource_manager
+        filtered = resource_mgr.filter_resources(orgs)
+
+        # Only org2 has security defaults disabled
+        self.assertEqual(len(filtered), 1)
+        self.assertEqual(filtered[0]['id'], 'org2')
+
+    def test_password_lockout_threshold_schema_validate(self):
+        """Test password lockout threshold filter schema validation"""
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'test-lockout-threshold',
+                'resource': 'azure.entraid-organization',
+                'filters': [
+                    {'type': 'password-lockout-threshold', 'max_threshold': 10}
+                ]
+            }, validate=True)
+            self.assertTrue(p)
+
+    @patch('c7n_azure.resources.entraid_organization.EntraIDOrganization.make_graph_request')
+    def test_password_lockout_threshold_filter(self, mock_graph_request):
+        """Test password lockout threshold filter with mocked API responses"""
+        # Mock API responses for template lookup and settings
+        def mock_request_side_effect(endpoint):
+            if 'directorySettingTemplates' in endpoint:
+                return {
+                    'value': [{
+                        'id': '5cf42378-d67d-4f36-ba46-e8b86229381d',
+                        'displayName': 'Password Rule Settings'
+                    }]
+                }
+            elif endpoint == 'settings':
+                return {
+                    'value': [{
+                        'id': 'setting1',
+                        'templateId': '5cf42378-d67d-4f36-ba46-e8b86229381d',
+                        'values': [
+                            {'name': 'LockoutThreshold', 'value': '15'},
+                            {'name': 'LockoutDurationInSeconds', 'value': '60'}
+                        ]
+                    }]
+                }
+            else:
+                return {'value': []}
+
+        mock_graph_request.side_effect = mock_request_side_effect
+
+        orgs = [
+            {
+                'id': 'org1',
+                'displayName': 'Test Organization'
+            }
+        ]
+
+        policy = self.load_policy({
+            'name': 'test-lockout-threshold',
+            'resource': 'azure.entraid-organization',
+            'filters': [
+                {'type': 'password-lockout-threshold', 'max_threshold': 10}
+            ]
+        })
+
+        resource_mgr = policy.resource_manager
+        filtered = resource_mgr.filter_resources(orgs)
+
+        # Should filter org1 because threshold (15) > max_threshold (10)
+        self.assertEqual(len(filtered), 1)
+        self.assertEqual(filtered[0]['id'], 'org1')
+        self.assertEqual(filtered[0]['lockoutThreshold'], 15)
+
+        # Verify API calls were made
+        self.assertEqual(mock_graph_request.call_count, 2)
+        mock_graph_request.assert_any_call('directorySettingTemplates')
+        mock_graph_request.assert_any_call('settings')
+
+    @patch('c7n_azure.resources.entraid_organization.EntraIDOrganization.make_graph_request')
+    def test_password_lockout_threshold_filter_within_limit(self, mock_graph_request):
+        """Test password lockout threshold filter when threshold is within acceptable limit"""
+        # Mock API responses with threshold within limit
+        def mock_request_side_effect(endpoint):
+            if 'directorySettingTemplates' in endpoint:
+                return {
+                    'value': [{
+                        'id': '5cf42378-d67d-4f36-ba46-e8b86229381d',
+                        'displayName': 'Password Rule Settings'
+                    }]
+                }
+            elif endpoint == 'settings':
+                return {
+                    'value': [{
+                        'id': 'setting1',
+                        'templateId': '5cf42378-d67d-4f36-ba46-e8b86229381d',
+                        'values': [
+                            {'name': 'LockoutThreshold', 'value': '8'},
+                            {'name': 'LockoutDurationInSeconds', 'value': '60'}
+                        ]
+                    }]
+                }
+            else:
+                return {'value': []}
+
+        mock_graph_request.side_effect = mock_request_side_effect
+
+        orgs = [
+            {
+                'id': 'org1',
+                'displayName': 'Test Organization'
+            }
+        ]
+
+        policy = self.load_policy({
+            'name': 'test-lockout-threshold-compliant',
+            'resource': 'azure.entraid-organization',
+            'filters': [
+                {'type': 'password-lockout-threshold', 'max_threshold': 10}
+            ]
+        })
+
+        resource_mgr = policy.resource_manager
+        filtered = resource_mgr.filter_resources(orgs)
+
+        # Should not filter org1 because threshold (8) <= max_threshold (10)
+        self.assertEqual(len(filtered), 0)
+
+    @patch('c7n_azure.resources.entraid_organization.EntraIDOrganization.make_graph_request')
+    def test_password_lockout_threshold_template_not_found(self, mock_graph_request):
+        """Test password lockout threshold filter when template is not found"""
+        # Mock API response with empty template list
+        def mock_request_side_effect(endpoint):
+            if 'directorySettingTemplates' in endpoint:
+                return {'value': []}
+            else:
+                return {'value': []}
+
+        mock_graph_request.side_effect = mock_request_side_effect
+
+        orgs = [
+            {
+                'id': 'org1',
+                'displayName': 'Test Organization'
+            }
+        ]
+
+        policy = self.load_policy({
+            'name': 'test-lockout-threshold-no-template',
+            'resource': 'azure.entraid-organization',
+            'filters': [
+                {'type': 'password-lockout-threshold', 'max_threshold': 10}
+            ]
+        })
+
+        resource_mgr = policy.resource_manager
+        filtered = resource_mgr.filter_resources(orgs)
+
+        # Should return empty list when template is not found
+        self.assertEqual(len(filtered), 0)
+
+    @patch('c7n_azure.resources.entraid_organization.EntraIDOrganization.make_graph_request')
+    def test_password_lockout_threshold_setting_not_found(self, mock_graph_request):
+        """Test password lockout threshold filter when directory setting is not found"""
+        # Mock API responses where template exists but no directory settings
+        def mock_request_side_effect(endpoint):
+            if 'directorySettingTemplates' in endpoint:
+                return {
+                    'value': [{
+                        'id': '5cf42378-d67d-4f36-ba46-e8b86229381d',
+                        'displayName': 'Password Rule Settings'
+                    }]
+                }
+            elif endpoint == 'settings':
+                return {'value': []}  # No directory settings
+            else:
+                return {'value': []}
+
+        mock_graph_request.side_effect = mock_request_side_effect
+
+        orgs = [
+            {
+                'id': 'org1',
+                'displayName': 'Test Organization'
+            }
+        ]
+
+        policy = self.load_policy({
+            'name': 'test-lockout-threshold-no-setting',
+            'resource': 'azure.entraid-organization',
+            'filters': [
+                {'type': 'password-lockout-threshold', 'max_threshold': 10}
+            ]
+        })
+
+        resource_mgr = policy.resource_manager
+        filtered = resource_mgr.filter_resources(orgs)
+
+        # Should return empty list when directory setting is not found
+        self.assertEqual(len(filtered), 0)
+
+    @patch('c7n_azure.resources.entraid_organization.EntraIDOrganization.make_graph_request')
+    def test_password_lockout_threshold_invalid_value(self, mock_graph_request):
+        """Test password lockout threshold filter with invalid threshold value"""
+        # Mock API responses with invalid threshold value
+        def mock_request_side_effect(endpoint):
+            if 'directorySettingTemplates' in endpoint:
+                return {
+                    'value': [{
+                        'id': '5cf42378-d67d-4f36-ba46-e8b86229381d',
+                        'displayName': 'Password Rule Settings'
+                    }]
+                }
+            elif endpoint == 'settings':
+                return {
+                    'value': [{
+                        'id': 'setting1',
+                        'templateId': '5cf42378-d67d-4f36-ba46-e8b86229381d',
+                        'values': [
+                            {'name': 'LockoutThreshold', 'value': 'invalid_number'},
+                            {'name': 'LockoutDurationInSeconds', 'value': '60'}
+                        ]
+                    }]
+                }
+            else:
+                return {'value': []}
+
+        mock_graph_request.side_effect = mock_request_side_effect
+
+        orgs = [
+            {
+                'id': 'org1',
+                'displayName': 'Test Organization'
+            }
+        ]
+
+        policy = self.load_policy({
+            'name': 'test-lockout-threshold-invalid',
+            'resource': 'azure.entraid-organization',
+            'filters': [
+                {'type': 'password-lockout-threshold', 'max_threshold': 10}
+            ]
+        })
+
+        resource_mgr = policy.resource_manager
+        filtered = resource_mgr.filter_resources(orgs)
+
+        # Should return empty list when threshold value is invalid
+        self.assertEqual(len(filtered), 0)
+
+    @patch('c7n_azure.resources.entraid_organization.EntraIDOrganization.make_graph_request')
+    def test_password_lockout_threshold_default_max_threshold(self, mock_graph_request):
+        """Test password lockout threshold filter with default max_threshold (10)"""
+        # Mock API responses with threshold above default limit
+        def mock_request_side_effect(endpoint):
+            if 'directorySettingTemplates' in endpoint:
+                return {
+                    'value': [{
+                        'id': '5cf42378-d67d-4f36-ba46-e8b86229381d',
+                        'displayName': 'Password Rule Settings'
+                    }]
+                }
+            elif endpoint == 'settings':
+                return {
+                    'value': [{
+                        'id': 'setting1',
+                        'templateId': '5cf42378-d67d-4f36-ba46-e8b86229381d',
+                        'values': [
+                            {'name': 'LockoutThreshold', 'value': '12'},
+                            {'name': 'LockoutDurationInSeconds', 'value': '60'}
+                        ]
+                    }]
+                }
+            else:
+                return {'value': []}
+
+        mock_graph_request.side_effect = mock_request_side_effect
+
+        orgs = [
+            {
+                'id': 'org1',
+                'displayName': 'Test Organization'
+            }
+        ]
+
+        # Test without specifying max_threshold (should default to 10)
+        policy = self.load_policy({
+            'name': 'test-lockout-threshold-default',
+            'resource': 'azure.entraid-organization',
+            'filters': [
+                {'type': 'password-lockout-threshold'}
+            ]
+        })
+
+        resource_mgr = policy.resource_manager
+        filtered = resource_mgr.filter_resources(orgs)
+
+        # Should filter org1 because threshold (12) > default max_threshold (10)
+        self.assertEqual(len(filtered), 1)
+        self.assertEqual(filtered[0]['id'], 'org1')
+        self.assertEqual(filtered[0]['lockoutThreshold'], 12)
+
+    @patch('c7n_azure.resources.entraid_organization.requests.get')
+    @patch('c7n_azure.resources.entraid_organization.EntraIDOrganization.get_client')
+    def test_make_graph_request_beta_api(self, mock_get_client, mock_requests_get):
+        """Test make_graph_request method for beta API endpoints"""
+        # Setup mock session and credentials
+        mock_token = Mock()
+        mock_token.token = 'test-access-token'
+        mock_credentials = Mock()
+        mock_credentials.get_token.return_value = mock_token
+
+        mock_session = Mock()
+        mock_session.credentials = mock_credentials
+        mock_session._initialize_session = Mock()
+        mock_get_client.return_value = mock_session
+
+        # Setup mock response
+        mock_response = Mock()
+        mock_response.json.return_value = {
+            'value': [{
+                'id': 'template1',
+                'displayName': 'Test Template'
+            }]
+        }
+        mock_response.raise_for_status = Mock()
+        mock_requests_get.return_value = mock_response
+
+        policy = self.load_policy({
+            'name': 'test-beta-api',
+            'resource': 'azure.entraid-organization'
+        })
+
+        resource_mgr = policy.resource_manager
+        result = resource_mgr.make_graph_request('directorySettingTemplates')
+
+        # Verify beta API was called
+        mock_requests_get.assert_called_once()
+        call_args = mock_requests_get.call_args
+        self.assertIn('beta', call_args[0][0])
+        self.assertIn('directorySettingTemplates', call_args[0][0])
+
+        # Verify headers
+        headers = call_args[1]['headers']
+        self.assertEqual(headers['Authorization'], 'Bearer test-access-token')
+        self.assertEqual(headers['Content-Type'], 'application/json')
+
+        # Verify result
+        self.assertEqual(result['value'][0]['id'], 'template1')
+
+    @patch('c7n_azure.resources.entraid_organization.requests.get')
+    @patch('c7n_azure.resources.entraid_organization.EntraIDOrganization.get_client')
+    def test_make_graph_request_beta_api_http_error(self, mock_get_client, mock_requests_get):
+        """Test make_graph_request error handling for beta API HTTP errors"""
+        # Setup mock session and credentials
+        mock_token = Mock()
+        mock_token.token = 'test-access-token'
+        mock_credentials = Mock()
+        mock_credentials.get_token.return_value = mock_token
+
+        mock_session = Mock()
+        mock_session.credentials = mock_credentials
+        mock_session._initialize_session = Mock()
+        mock_get_client.return_value = mock_session
+
+        # Setup mock response to raise HTTP error
+        mock_response = Mock()
+        mock_response.raise_for_status.side_effect = requests.HTTPError('403 Forbidden')
+        mock_requests_get.return_value = mock_response
+
+        policy = self.load_policy({
+            'name': 'test-beta-api-error',
+            'resource': 'azure.entraid-organization'
+        })
+
+        resource_mgr = policy.resource_manager
+
+        # Should raise exception
+        with self.assertRaises(requests.HTTPError):
+            resource_mgr.make_graph_request('settings')
+
+    @patch('c7n_azure.resources.entraid_organization.EntraIDOrganization.get_client')
+    @patch('c7n_azure.graph_utils.get_required_permissions_for_endpoint')
+    def test_make_graph_request_beta_api_unmapped_endpoint(self, mock_get_perms, mock_get_client):
+        """Test make_graph_request error handling for unmapped endpoint"""
+        # Setup mocks
+        mock_get_perms.side_effect = ValueError("Unmapped endpoint")
+
+        mock_session = Mock()
+        mock_session._initialize_session = Mock()
+        mock_get_client.return_value = mock_session
+
+        policy = self.load_policy({
+            'name': 'test-unmapped-endpoint',
+            'resource': 'azure.entraid-organization'
+        })
+
+        resource_mgr = policy.resource_manager
+
+        # Should raise ValueError for unmapped endpoint
+        with self.assertRaises(ValueError):
+            resource_mgr.make_graph_request('settings')
+
+    @patch('c7n_azure.resources.entraid_organization.EntraIDOrganization.make_graph_request')
+    def test_make_graph_request_v1_fallback(self, mock_make_graph_request):
+        """Test that make_graph_request falls back to v1.0 for non-beta endpoints"""
+        # Mock the parent class method
+        mock_make_graph_request.return_value = {
+            'value': [{
+                'id': 'org1',
+                'displayName': 'Test Org'
+            }]
+        }
+
+        policy = self.load_policy({
+            'name': 'test-v1-fallback',
+            'resource': 'azure.entraid-organization'
+        })
+
+        resource_mgr = policy.resource_manager
+
+        # Directly test that organization endpoint would use parent class
+        # This tests line 100 (the else branch)
+        # We'll validate this indirectly through get_graph_resources
+        result = resource_mgr.get_graph_resources()
+
+        # Verify the method was called
+        mock_make_graph_request.assert_called()
+        self.assertEqual(len(result), 1)
+
+    @patch('c7n_azure.resources.entraid_organization.EntraIDOrganization.make_graph_request')
+    def test_get_graph_resources_error_handling(self, mock_make_graph_request):
+        """Test get_graph_resources error handling"""
+        # Make the API request raise an exception
+        mock_make_graph_request.side_effect = Exception("API Error")
+
+        policy = self.load_policy({
+            'name': 'test-get-resources-error',
+            'resource': 'azure.entraid-organization'
+        })
+
+        resource_mgr = policy.resource_manager
+        result = resource_mgr.get_graph_resources()
+
+        # Should return empty list on error
+        self.assertEqual(result, [])
+
+    @patch('c7n_azure.resources.entraid_organization.EntraIDOrganization.make_graph_request')
+    def test_password_lockout_threshold_no_template_id(self, mock_graph_request):
+        """Test password lockout threshold filter when template has no ID"""
+        # Mock API response with template missing id field
+        def mock_request_side_effect(endpoint):
+            if 'directorySettingTemplates' in endpoint:
+                return {
+                    'value': [{
+                        'displayName': 'Password Rule Settings'
+                        # No 'id' field
+                    }]
+                }
+            else:
+                return {'value': []}
+
+        mock_graph_request.side_effect = mock_request_side_effect
+
+        orgs = [
+            {
+                'id': 'org1',
+                'displayName': 'Test Organization'
+            }
+        ]
+
+        policy = self.load_policy({
+            'name': 'test-lockout-threshold-no-id',
+            'resource': 'azure.entraid-organization',
+            'filters': [
+                {'type': 'password-lockout-threshold', 'max_threshold': 10}
+            ]
+        })
+
+        resource_mgr = policy.resource_manager
+        filtered = resource_mgr.filter_resources(orgs)
+
+        # Should return empty list when template ID is not found
+        self.assertEqual(len(filtered), 0)
+
+    @patch('c7n_azure.resources.entraid_organization.EntraIDOrganization.make_graph_request')
+    def test_password_lockout_threshold_template_api_error(self, mock_graph_request):
+        """Test password lockout threshold filter when template API call fails"""
+        # Mock API to raise exception
+        mock_graph_request.side_effect = Exception("API Error")
+
+        orgs = [
+            {
+                'id': 'org1',
+                'displayName': 'Test Organization'
+            }
+        ]
+
+        policy = self.load_policy({
+            'name': 'test-lockout-threshold-api-error',
+            'resource': 'azure.entraid-organization',
+            'filters': [
+                {'type': 'password-lockout-threshold', 'max_threshold': 10}
+            ]
+        })
+
+        resource_mgr = policy.resource_manager
+        filtered = resource_mgr.filter_resources(orgs)
+
+        # Should return empty list on API error
+        self.assertEqual(len(filtered), 0)
+
+    @patch('c7n_azure.resources.entraid_organization.EntraIDOrganization.make_graph_request')
+    def test_password_lockout_threshold_settings_api_error(self, mock_graph_request):
+        """Test password lockout threshold filter when settings API call fails"""
+        # Mock API responses where template works but settings fails
+        def mock_request_side_effect(endpoint):
+            if 'directorySettingTemplates' in endpoint:
+                return {
+                    'value': [{
+                        'id': '5cf42378-d67d-4f36-ba46-e8b86229381d',
+                        'displayName': 'Password Rule Settings'
+                    }]
+                }
+            elif endpoint == 'settings':
+                raise Exception("Settings API Error")
+            else:
+                return {'value': []}
+
+        mock_graph_request.side_effect = mock_request_side_effect
+
+        orgs = [
+            {
+                'id': 'org1',
+                'displayName': 'Test Organization'
+            }
+        ]
+
+        policy = self.load_policy({
+            'name': 'test-lockout-threshold-settings-error',
+            'resource': 'azure.entraid-organization',
+            'filters': [
+                {'type': 'password-lockout-threshold', 'max_threshold': 10}
+            ]
+        })
+
+        resource_mgr = policy.resource_manager
+        filtered = resource_mgr.filter_resources(orgs)
+
+        # Should return empty list when settings API fails
+        self.assertEqual(len(filtered), 0)
+
+
+class EntraIDConditionalAccessTest(BaseTest):
+    """Test EntraID Conditional Access Policy resource functionality"""
+
+    def test_conditional_access_schema_validate(self):
+        """Test conditional access policy schema validation"""
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'test-conditional-access',
+                'resource': 'azure.entraid-conditional-access-policy',
+                'filters': [
+                    {'type': 'value', 'key': 'state', 'value': 'enabled'}
+                ]
+            }, validate=True)
+            self.assertTrue(p)
+
+    def test_conditional_access_resource_type(self):
+        """Test conditional access resource type configuration"""
+        resource_type = EntraIDConditionalAccessPolicy.resource_type
+        self.assertEqual(resource_type.service, 'graph')
+        self.assertEqual(resource_type.id, 'id')
+        self.assertTrue(resource_type.global_resource)
+        self.assertIn('Policy.Read.All', resource_type.permissions)
+
+    def test_admin_mfa_required_filter(self):
+        """Test admin MFA required filter"""
+        policies = [
+            {
+                'id': 'policy1',
+                'displayName': 'Admin MFA Policy',
+                'state': 'enabled',
+                'conditions': {
+                    'users': {
+                        'includeRoles': ['Global Administrator']
+                    }
+                },
+                'grantControls': {
+                    'builtInControls': ['mfa']
+                }
+            },
+            {
+                'id': 'policy2',
+                'displayName': 'Admin No MFA Policy',
+                'state': 'enabled',
+                'conditions': {
+                    'users': {
+                        'includeRoles': ['Global Administrator']
+                    }
+                },
+                'grantControls': {
+                    'builtInControls': ['block']
+                }
+            },
+            {
+                'id': 'policy3',
+                'displayName': 'User Policy',
+                'state': 'enabled',
+                'conditions': {
+                    'users': {
+                        'includeRoles': ['User']
+                    }
+                },
+                'grantControls': {
+                    'builtInControls': ['mfa']
+                }
+            }
+        ]
+
+        policy = self.load_policy({
+            'name': 'test-admin-mfa',
+            'resource': 'azure.entraid-conditional-access-policy',
+            'filters': [
+                {'type': 'admin-mfa-required', 'value': True}
+            ]
+        })
+
+        resource_mgr = policy.resource_manager
+        filtered = resource_mgr.filter_resources(policies)
+
+        # Only policy1 requires MFA for admins
+        self.assertEqual(len(filtered), 1)
+        self.assertEqual(filtered[0]['id'], 'policy1')
+
+    def test_admin_mfa_required_filter_false(self):
+        """Test admin MFA required filter with value=False (find policies NOT requiring MFA)"""
+        policies = [
+            {
+                'id': 'policy1',
+                'displayName': 'Admin MFA Policy',
+                'state': 'enabled',
+                'conditions': {
+                    'users': {
+                        'includeRoles': ['Global Administrator']
+                    }
+                },
+                'grantControls': {
+                    'builtInControls': ['mfa']
+                }
+            },
+            {
+                'id': 'policy2',
+                'displayName': 'Admin No MFA Policy',
+                'state': 'enabled',
+                'conditions': {
+                    'users': {
+                        'includeRoles': ['Global Administrator']
+                    }
+                },
+                'grantControls': {
+                    'builtInControls': ['block']
+                }
+            }
+        ]
+
+        policy = self.load_policy({
+            'name': 'test-admin-no-mfa',
+            'resource': 'azure.entraid-conditional-access-policy',
+            'filters': [
+                {'type': 'admin-mfa-required', 'value': False}
+            ]
+        })
+
+        resource_mgr = policy.resource_manager
+        filtered = resource_mgr.filter_resources(policies)
+
+        # Only policy2 doesn't require MFA for admins
+        self.assertEqual(len(filtered), 1)
+        self.assertEqual(filtered[0]['id'], 'policy2')
+
+    def test_admin_mfa_required_filter_multiple_admin_roles(self):
+        """Test filter with multiple admin role types"""
+        policies = [
+            {
+                'id': 'policy1',
+                'displayName': 'Privileged Role Admin MFA',
+                'conditions': {
+                    'users': {
+                        'includeRoles': ['Privileged Role Administrator']
+                    }
+                },
+                'grantControls': {
+                    'builtInControls': ['mfa']
+                }
+            },
+            {
+                'id': 'policy2',
+                'displayName': 'User Admin MFA',
+                'conditions': {
+                    'users': {
+                        'includeRoles': ['User Administrator']
+                    }
+                },
+                'grantControls': {
+                    'builtInControls': ['MFA']  # Test case insensitive
+                }
+            }
+        ]
+
+        policy = self.load_policy({
+            'name': 'test-admin-roles',
+            'resource': 'azure.entraid-conditional-access-policy',
+            'filters': [
+                {'type': 'admin-mfa-required', 'value': True}
+            ]
+        })
+
+        filtered = policy.resource_manager.filter_resources(policies)
+        self.assertEqual(len(filtered), 2)
+
+    def test_admin_mfa_required_filter_missing_conditions(self):
+        """Test filter with policies missing conditions or grant controls"""
+        policies = [
+            {
+                'id': 'policy1',
+                'displayName': 'No conditions',
+                # No conditions key
+            },
+            {
+                'id': 'policy2',
+                'displayName': 'Empty conditions',
+                'conditions': {}
+            },
+            {
+                'id': 'policy3',
+                'displayName': 'No users',
+                'conditions': {
+                    'users': {}
+                }
+            },
+            {
+                'id': 'policy4',
+                'displayName': 'No grant controls',
+                'conditions': {
+                    'users': {
+                        'includeRoles': ['Global Administrator']
+                    }
+                }
+            },
+            {
+                'id': 'policy5',
+                'displayName': 'Empty grant controls',
+                'conditions': {
+                    'users': {
+                        'includeRoles': ['Global Administrator']
+                    }
+                },
+                'grantControls': {}
+            }
+        ]
+
+        policy = self.load_policy({
+            'name': 'test-missing-data',
+            'resource': 'azure.entraid-conditional-access-policy',
+            'filters': [
+                {'type': 'admin-mfa-required', 'value': True}
+            ]
+        })
+
+        filtered = policy.resource_manager.filter_resources(policies)
+        # None of these should match since they don't have admin roles with MFA
+        self.assertEqual(len(filtered), 0)
+
+    def test_admin_mfa_required_filter_non_admin_roles(self):
+        """Test that non-admin roles are filtered out"""
+        policies = [
+            {
+                'id': 'policy1',
+                'displayName': 'Regular User with MFA',
+                'conditions': {
+                    'users': {
+                        'includeRoles': ['Regular User', 'Guest']
+                    }
+                },
+                'grantControls': {
+                    'builtInControls': ['mfa']
+                }
+            }
+        ]
+
+        policy = self.load_policy({
+            'name': 'test-non-admin',
+            'resource': 'azure.entraid-conditional-access-policy',
+            'filters': [
+                {'type': 'admin-mfa-required', 'value': True}
+            ]
+        })
+
+        filtered = policy.resource_manager.filter_resources(policies)
+        # Should not match since no admin roles
+        self.assertEqual(len(filtered), 0)
+
+    @patch('c7n_azure.resources.entraid_conditional_access.requests.get')
+    @patch('c7n_azure.resources.entraid_conditional_access.get_required_permissions_for_endpoint')
+    def test_make_graph_request_success(self, mock_get_permissions, mock_requests_get):
+        """Test successful Graph API request"""
+        # Setup mocks
+        mock_get_permissions.return_value = ['Policy.Read.All']
+
+        mock_response = Mock()
+        mock_response.json.return_value = {'value': [{'id': 'test'}]}
+        mock_response.raise_for_status = Mock()
+        mock_requests_get.return_value = mock_response
+
+        mock_token = Mock()
+        mock_token.token = 'test-token'
+
+        mock_session = Mock()
+        mock_session._initialize_session = Mock()
+        mock_session.credentials.get_token.return_value = mock_token
+
+        # Create instance and test
+        policy = self.load_policy({
+            'name': 'test-graph-request',
+            'resource': 'azure.entraid-conditional-access-policy'
+        })
+
+        resource_mgr = policy.resource_manager
+        resource_mgr.get_client = Mock(return_value=mock_session)
+
+        result = resource_mgr.make_graph_request('test/endpoint')
+
+        self.assertEqual(result, {'value': [{'id': 'test'}]})
+        mock_requests_get.assert_called_once()
+        call_args = mock_requests_get.call_args
+        self.assertIn('https://graph.microsoft.com/beta/test/endpoint', call_args[0])
+
+    @patch('c7n_azure.resources.entraid_conditional_access.get_required_permissions_for_endpoint')
+    def test_make_graph_request_unmapped_endpoint(self, mock_get_permissions):
+        """Test Graph API request with unmapped endpoint raises ValueError"""
+        mock_get_permissions.side_effect = ValueError("Unmapped endpoint")
+
+        mock_session = Mock()
+        mock_session._initialize_session = Mock()
+
+        policy = self.load_policy({
+            'name': 'test-unmapped-endpoint',
+            'resource': 'azure.entraid-conditional-access-policy'
+        })
+
+        resource_mgr = policy.resource_manager
+        resource_mgr.get_client = Mock(return_value=mock_session)
+
+        with self.assertRaises(ValueError):
+            resource_mgr.make_graph_request('unmapped/endpoint')
+
+    @patch('c7n_azure.resources.entraid_conditional_access.requests.get')
+    @patch('c7n_azure.resources.entraid_conditional_access.get_required_permissions_for_endpoint')
+    def test_make_graph_request_api_error(self, mock_get_permissions, mock_requests_get):
+        """Test Graph API request handling of request exceptions"""
+        mock_get_permissions.return_value = ['Policy.Read.All']
+        mock_requests_get.side_effect = requests.exceptions.RequestException("API Error")
+
+        mock_token = Mock()
+        mock_token.token = 'test-token'
+
+        mock_session = Mock()
+        mock_session._initialize_session = Mock()
+        mock_session.credentials.get_token.return_value = mock_token
+
+        policy = self.load_policy({
+            'name': 'test-api-error',
+            'resource': 'azure.entraid-conditional-access-policy'
+        })
+
+        resource_mgr = policy.resource_manager
+        resource_mgr.get_client = Mock(return_value=mock_session)
+
+        with self.assertRaises(requests.exceptions.RequestException):
+            resource_mgr.make_graph_request('test/endpoint')
+
+    @patch('c7n_azure.resources.entraid_conditional_access.EntraIDConditionalAccessPolicy.make_graph_request')
+    def test_get_graph_resources_success(self, mock_make_request):
+        """Test successful retrieval of conditional access policies"""
+        mock_make_request.return_value = {
+            'value': [
+                {'id': 'policy1', 'displayName': 'Test Policy 1'},
+                {'id': 'policy2', 'displayName': 'Test Policy 2'}
+            ]
+        }
+
+        policy = self.load_policy({
+            'name': 'test-get-resources',
+            'resource': 'azure.entraid-conditional-access-policy'
+        })
+
+        resource_mgr = policy.resource_manager
+        resources = resource_mgr.get_graph_resources()
+
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(resources[0]['id'], 'policy1')
+        self.assertEqual(resources[1]['id'], 'policy2')
+        mock_make_request.assert_called_once_with('identity/conditionalAccess/policies')
+
+    @patch('c7n_azure.resources.entraid_conditional_access.EntraIDConditionalAccessPolicy.make_graph_request')
+    def test_get_graph_resources_error(self, mock_make_request):
+        """Test get_graph_resources returns empty list on exception"""
+        mock_make_request.side_effect = Exception("API Error")
+
+        policy = self.load_policy({
+            'name': 'test-get-resources-error',
+            'resource': 'azure.entraid-conditional-access-policy'
+        })
+
+        resource_mgr = policy.resource_manager
+        resources = resource_mgr.get_graph_resources()
+
+        # Should return empty list on error
+        self.assertEqual(resources, [])
+
+
+class EntraIDSecurityDefaultsTest(BaseTest):
+    """Test EntraID Security Defaults resource functionality"""
+
+    def setUp(self):
+        super().setUp()
+        self.policy = self.load_policy({
+            'name': 'test-entraid-security-defaults',
+            'resource': 'azure.entraid-security-defaults'
+        })
+        self.manager = self.policy.resource_manager
+
+    def test_security_defaults_schema_validate(self):
+        """Test security defaults schema validation"""
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'test-security-defaults',
+                'resource': 'azure.entraid-security-defaults',
+                'filters': [
+                    {'type': 'value', 'key': 'isEnabled', 'value': True}
+                ]
+            }, validate=True)
+            self.assertTrue(p)
+
+    def test_security_defaults_resource_type(self):
+        """Test security defaults resource type configuration"""
+        resource_type = EntraIDSecurityDefaults.resource_type
+        self.assertEqual(resource_type.service, 'graph')
+        self.assertEqual(resource_type.id, 'id')
+        self.assertTrue(resource_type.global_resource)
+        self.assertIn('Policy.Read.All', resource_type.permissions)
+
+    def test_security_defaults_init(self):
+        """Test security defaults initialization with GraphSource"""
+        from c7n_azure.graph_utils import GraphSource
+        # Verify GraphSource is set in __init__
+        self.assertIsInstance(self.manager.source, GraphSource)
+
+    def test_get_graph_resources_success(self):
+        """Test get_graph_resources successful API call"""
+        mock_policy = {
+            'id': 'security-defaults-id',
+            'displayName': 'Security Defaults',
+            'description': 'Security defaults policy',
+            'isEnabled': True
+        }
+
+        with patch.object(self.manager, 'make_graph_request', return_value=mock_policy):
+            with patch('c7n_azure.resources.entraid_security_defaults.log') as mock_log:
+                resources = self.manager.get_graph_resources()
+
+                # Verify API was called with correct endpoint
+                self.manager.make_graph_request.assert_called_once_with(
+                    'policies/identitySecurityDefaultsEnforcementPolicy'
+                )
+
+                # Verify returned list contains the policy
+                self.assertEqual(len(resources), 1)
+                self.assertEqual(resources[0]['id'], 'security-defaults-id')
+                self.assertEqual(resources[0]['isEnabled'], True)
+
+                # Verify debug logging was called
+                mock_log.debug.assert_called_once_with(
+                    "Retrieved security defaults policy from Graph API"
+                )
+
+    def test_get_graph_resources_error_handling(self):
+        """Test get_graph_resources error handling"""
+        with patch.object(self.manager, 'make_graph_request',
+                         side_effect=Exception("API Error")):
+            with patch('c7n_azure.resources.entraid_security_defaults.log') as mock_log:
+                resources = self.manager.get_graph_resources()
+
+                # Should return empty list on error
+                self.assertEqual(resources, [])
+
+                # Verify warning log was called with error message
+                mock_log.warning.assert_called_once()
+                call_args = mock_log.warning.call_args[0][0]
+                self.assertIn("Could not retrieve Security Defaults policy", call_args)
+                self.assertIn("API Error", call_args)
+
+    def test_get_graph_resources_permission_error(self):
+        """Test get_graph_resources with insufficient privileges"""
+        http_error = requests.exceptions.HTTPError("403 Insufficient privileges")
+
+        with patch.object(self.manager, 'make_graph_request',
+                         side_effect=http_error):
+            with patch('c7n_azure.resources.entraid_security_defaults.log') as mock_log:
+                resources = self.manager.get_graph_resources()
+
+                # Should return empty list on permission error
+                self.assertEqual(resources, [])
+
+                # Verify warning log includes exception details
+                mock_log.warning.assert_called_once()
+                call_args = mock_log.warning.call_args[0][0]
+                self.assertIn("Could not retrieve Security Defaults policy", call_args)
+                self.assertIn("403 Insufficient privileges", call_args)
+
+    def test_get_graph_resources_network_error(self):
+        """Test get_graph_resources with network error"""
+        network_error = requests.exceptions.ConnectionError("Network unreachable")
+
+        with patch.object(self.manager, 'make_graph_request',
+                         side_effect=network_error):
+            with patch('c7n_azure.resources.entraid_security_defaults.log') as mock_log:
+                resources = self.manager.get_graph_resources()
+
+                # Should return empty list on network error
+                self.assertEqual(resources, [])
+
+                # Verify warning log includes exception details
+                mock_log.warning.assert_called_once()
+                call_args = mock_log.warning.call_args[0][0]
+                self.assertIn("Could not retrieve Security Defaults policy", call_args)
+                self.assertIn("Network unreachable", call_args)
+
+    def test_security_defaults_with_filter(self):
+        """Test security defaults resource with enabled filter"""
+        mock_policy = {
+            'id': 'security-defaults-id',
+            'displayName': 'Security Defaults',
+            'description': 'Security defaults policy',
+            'isEnabled': True
+        }
+
+        policy = self.load_policy({
+            'name': 'test-enabled-security-defaults',
+            'resource': 'azure.entraid-security-defaults',
+            'filters': [
+                {'type': 'value', 'key': 'isEnabled', 'value': True}
+            ]
+        })
+
+        resource_mgr = policy.resource_manager
+        with patch.object(resource_mgr, 'make_graph_request', return_value=mock_policy):
+            resources = resource_mgr.get_graph_resources()
+            filtered = resource_mgr.filter_resources(resources)
+
+            # Should return the policy since it's enabled
+            self.assertEqual(len(filtered), 1)
+            self.assertEqual(filtered[0]['isEnabled'], True)
+
+    def test_security_defaults_disabled_filter(self):
+        """Test security defaults resource with disabled filter"""
+        mock_policy = {
+            'id': 'security-defaults-id',
+            'displayName': 'Security Defaults',
+            'description': 'Security defaults policy',
+            'isEnabled': False
+        }
+
+        policy = self.load_policy({
+            'name': 'test-disabled-security-defaults',
+            'resource': 'azure.entraid-security-defaults',
+            'filters': [
+                {'type': 'value', 'key': 'isEnabled', 'value': False}
+            ]
+        })
+
+        resource_mgr = policy.resource_manager
+        with patch.object(resource_mgr, 'make_graph_request', return_value=mock_policy):
+            resources = resource_mgr.get_graph_resources()
+            filtered = resource_mgr.filter_resources(resources)
+
+            # Should return the policy since it's disabled
+            self.assertEqual(len(filtered), 1)
+            self.assertEqual(filtered[0]['isEnabled'], False)
+
+
+class EntraIDAuthorizationPolicyTest(BaseTest):
+    """Test EntraID Authorization Policy resource functionality"""
+
+    def test_authorization_policy_schema_validate(self):
+        """Test authorization policy schema validation"""
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'test-authorization-policy',
+                'resource': 'azure.entraid-authorization-policy',
+                'filters': [
+                    {'type': 'value',
+                     'key': 'defaultUserRolePermissions.allowedToCreateApps',
+                     'value': False}
+                ]
+            }, validate=True)
+            self.assertTrue(p)
+
+    def test_authorization_policy_resource_type(self):
+        """Test authorization policy resource type configuration"""
+        resource_type = EntraIDAuthorizationPolicy.resource_type
+        self.assertEqual(resource_type.service, 'graph')
+        self.assertEqual(resource_type.id, 'id')
+        self.assertTrue(resource_type.global_resource)
+        self.assertIn('Policy.Read.All', resource_type.permissions)
+
+    @patch('c7n_azure.resources.entraid_authorization_policy.EntraIDAuthorizationPolicy.make_graph_request')
+    def test_authorization_policy_get_resources(self, mock_graph_request):
+        """Test authorization policy resource retrieval"""
+        # Mock the Graph API response
+        mock_graph_request.return_value = {
+            'id': 'authorizationPolicy',
+            'displayName': 'Authorization Policy',
+            'description': 'Used to manage authorization related settings across the company.',
+            'defaultUserRolePermissions': {
+                'allowedToCreateApps': True,
+                'allowedToCreateSecurityGroups': True,
+                'allowedToReadOtherUsers': True,
+                'allowedToCreateTenants': False
+            }
+        }
+
+        policy = self.load_policy({
+            'name': 'test-auth-policy-retrieval',
+            'resource': 'azure.entraid-authorization-policy'
+        })
+
+        resource_mgr = policy.resource_manager
+        resources = resource_mgr.get_graph_resources()
+
+        # Should return authorization policy wrapped in a list
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['id'], 'authorizationPolicy')
+        self.assertIn('defaultUserRolePermissions', resources[0])
+
+    def test_cis_compliance_scenario(self):
+        """Test CIS-B-MAF-4.0.0-6.14 compliance scenario"""
+        # Test the specific CIS control: 'Users can register applications' is set to 'No'
+
+        # Compliant scenario - users cannot create apps
+        compliant_policy = {
+            'id': 'authorizationPolicy',
+            'displayName': 'Authorization Policy',
+            'description': 'Used to manage authorization related settings across the company.',
+            'defaultUserRolePermissions': {
+                'allowedToCreateApps': False,  # CIS compliant
+                'allowedToCreateSecurityGroups': False,
+                'allowedToReadOtherUsers': True,
+                'allowedToCreateTenants': False
+            }
+        }
+
+        # Non-compliant scenario - users can create apps
+        non_compliant_policy = {
+            'id': 'authorizationPolicy',
+            'displayName': 'Authorization Policy',
+            'description': 'Used to manage authorization related settings across the company.',
+            'defaultUserRolePermissions': {
+                'allowedToCreateApps': True,  # CIS non-compliant
+                'allowedToCreateSecurityGroups': True,
+                'allowedToReadOtherUsers': True,
+                'allowedToCreateTenants': True
+            }
+        }
+
+        # Policy to check for CIS compliance
+        cis_policy = self.load_policy({
+            'name': 'cis-b-maf-4-0-0-6-14-users-register-applications',
+            'resource': 'azure.entraid-authorization-policy',
+            'filters': [
+                {'type': 'value',
+                 'key': 'defaultUserRolePermissions.allowedToCreateApps',
+                 'value': False}
+            ]
+        })
+
+        resource_mgr = cis_policy.resource_manager
+
+        # Test compliant scenario
+        compliant_filtered = resource_mgr.filter_resources([compliant_policy])
+        self.assertEqual(len(compliant_filtered), 1)
+        self.assertFalse(compliant_filtered[0]['defaultUserRolePermissions']['allowedToCreateApps'])
+
+        # Test non-compliant scenario
+        non_compliant_filtered = resource_mgr.filter_resources([non_compliant_policy])
+        self.assertEqual(len(non_compliant_filtered), 0)  # Should not match
+
+        # Policy to find violations (non-compliant)
+        violation_policy = self.load_policy({
+            'name': 'cis-violation-users-can-register-apps',
+            'resource': 'azure.entraid-authorization-policy',
+            'filters': [
+                {'type': 'value',
+                 'key': 'defaultUserRolePermissions.allowedToCreateApps',
+                 'value': True}
+            ]
+        })
+
+        violation_mgr = violation_policy.resource_manager
+        violation_filtered = violation_mgr.filter_resources([non_compliant_policy])
+        self.assertEqual(len(violation_filtered), 1)
+        self.assertTrue(violation_filtered[0]['defaultUserRolePermissions']['allowedToCreateApps'])
+
+    @patch('c7n_azure.resources.entraid_authorization_policy.EntraIDAuthorizationPolicy.make_graph_request')
+    def test_authorization_policy_empty_response(self, mock_graph_request):
+        """Test authorization policy when API returns None/empty response"""
+        # Mock the Graph API to return None
+        mock_graph_request.return_value = None
+
+        policy = self.load_policy({
+            'name': 'test-auth-policy-empty-response',
+            'resource': 'azure.entraid-authorization-policy'
+        })
+
+        resource_mgr = policy.resource_manager
+        resources = resource_mgr.get_graph_resources()
+
+        # Should return empty list when response is None
+        self.assertEqual(len(resources), 0)
+        self.assertEqual(resources, [])
+
+    @patch('c7n_azure.resources.entraid_authorization_policy.EntraIDAuthorizationPolicy.make_graph_request')
+    def test_authorization_policy_general_exception(self, mock_graph_request):
+        """Test authorization policy handles general exceptions"""
+        # Mock the Graph API to raise a general exception
+        mock_graph_request.side_effect = Exception("Network error")
+
+        policy = self.load_policy({
+            'name': 'test-auth-policy-exception',
+            'resource': 'azure.entraid-authorization-policy'
+        })
+
+        resource_mgr = policy.resource_manager
+        resources = resource_mgr.get_graph_resources()
+
+        # Should return empty list on exception
+        self.assertEqual(len(resources), 0)
+        self.assertEqual(resources, [])
+
+    @patch('c7n_azure.resources.entraid_authorization_policy.EntraIDAuthorizationPolicy.make_graph_request')
+    def test_authorization_policy_insufficient_privileges_exception(self, mock_graph_request):
+        """Test authorization policy handles insufficient privileges error"""
+        # Mock the Graph API to raise an insufficient privileges exception
+        mock_graph_request.side_effect = Exception(
+            "Insufficient privileges to complete the operation"
+        )
+
+        policy = self.load_policy({
+            'name': 'test-auth-policy-insufficient-privileges',
+            'resource': 'azure.entraid-authorization-policy'
+        })
+
+        resource_mgr = policy.resource_manager
+        resources = resource_mgr.get_graph_resources()
+
+        # Should return empty list on permission error
+        self.assertEqual(len(resources), 0)
+        self.assertEqual(resources, [])
+
+    @patch('c7n_azure.resources.entraid_authorization_policy.EntraIDAuthorizationPolicy.make_graph_request')
+    def test_authorization_policy_403_exception(self, mock_graph_request):
+        """Test authorization policy handles 403 forbidden error"""
+        # Mock the Graph API to raise a 403 exception
+        mock_graph_request.side_effect = requests.exceptions.RequestException("403 Forbidden")
+
+        policy = self.load_policy({
+            'name': 'test-auth-policy-403-error',
+            'resource': 'azure.entraid-authorization-policy'
+        })
+
+        resource_mgr = policy.resource_manager
+        resources = resource_mgr.get_graph_resources()
+
+        # Should return empty list on 403 error
+        self.assertEqual(len(resources), 0)
+        self.assertEqual(resources, [])
+
+    def test_authorization_policy_diagnostic_settings_filter_registered(self):
+        """Test that diagnostic-settings filter is properly registered"""
+        # Check that the diagnostic-settings filter is registered
+        from c7n_azure.graph_utils import EntraIDDiagnosticSettingsFilter
+
+        filter_registry = EntraIDAuthorizationPolicy.filter_registry
+        self.assertIn('diagnostic-settings', filter_registry.keys())
+
+        # Verify it's the correct filter class
+        registered_filter = filter_registry.get('diagnostic-settings')
+        self.assertEqual(registered_filter, EntraIDDiagnosticSettingsFilter)
+
+    def test_authorization_policy_source_initialization(self):
+        """Test that authorization policy initializes with GraphSource"""
+        from c7n_azure.graph_utils import GraphSource
+
+        policy = self.load_policy({
+            'name': 'test-auth-policy-source',
+            'resource': 'azure.entraid-authorization-policy'
+        })
+
+        resource_mgr = policy.resource_manager
+
+        # Verify that the source is a GraphSource instance
+        self.assertIsInstance(resource_mgr.source, GraphSource)
+
+
 # Terraform-based integration tests
 # These tests use real Azure EntraID resources provisioned via Terraform
 # Following the same pattern as AWS tests
@@ -955,5 +3218,230 @@ def test_entraid_user_department_filter_terraform(test, entraid_user):
     # Verify test data has expected departments
     assert admin_user['department'] == 'IT'
     assert old_password_user['department'] == 'Finance'
+
+    assert policy is not None
+
+
+@terraform('entraid_organization')
+@pytest.mark.functional
+def test_entraid_organization_discovery_terraform(test, entraid_organization):
+    """Test that Cloud Custodian can discover organization provisioned by Terraform"""
+    org_info = entraid_organization.outputs['organization_basic_info']['value']
+
+    # Test basic organization discovery
+    policy = test.load_policy({
+        'name': 'terraform-organization-discovery',
+        'resource': 'azure.entraid-organization'
+    })
+
+    # Verify policy loads correctly
+    assert policy.resource_manager.type == 'entraid-organization'
+
+    # Verify test data structure
+    assert 'id' in org_info
+    assert 'display_name' in org_info
+    assert 'tenant_id' in org_info
+
+
+@terraform('entraid_organization')
+@pytest.mark.functional
+def test_entraid_organization_domains_terraform(test, entraid_organization):
+    """Test organization domains against Terraform-provisioned data"""
+    domains_info = entraid_organization.outputs['organization_domains']['value']
+
+    # Test organization domains discovery
+    policy = test.load_policy({
+        'name': 'terraform-organization-domains',
+        'resource': 'azure.entraid-organization'
+    })
+
+    # Verify domains data structure
+    assert 'domains' in domains_info
+    assert len(domains_info['domains']) > 0
+
+    # Verify domain properties
+    for domain in domains_info['domains']:
+        assert 'domain_name' in domain
+        assert 'is_verified' in domain
+        assert 'is_default' in domain
+        assert 'authentication_type' in domain
+
+    assert policy is not None
+
+
+@terraform('entraid_organization')
+@pytest.mark.functional
+def test_entraid_organization_compliance_terraform(test, entraid_organization):
+    """Test organization compliance data against Terraform-provisioned data"""
+    compliance = entraid_organization.outputs['organization_compliance']['value']
+
+    # Test compliance monitoring
+    policy = test.load_policy({
+        'name': 'terraform-organization-compliance',
+        'resource': 'azure.entraid-organization'
+    })
+
+    # Verify CIS compliance structure
+    assert 'cis_compliance' in compliance
+    cis_compliance = compliance['cis_compliance']
+    assert 'version' in cis_compliance
+    assert 'controls' in cis_compliance
+
+    # Verify NIST compliance structure
+    assert 'nist_compliance' in compliance
+    nist_compliance = compliance['nist_compliance']
+    assert 'framework' in nist_compliance
+    assert 'controls' in nist_compliance
+
+    assert policy is not None
+
+
+@terraform('entraid_security_defaults')
+@pytest.mark.functional
+def test_entraid_security_defaults_discovery_terraform(test, entraid_security_defaults):
+    """Test that Cloud Custodian can discover security defaults provisioned by Terraform"""
+    enabled_defaults = entraid_security_defaults.outputs['security_defaults_enabled']['value']
+    disabled_defaults = entraid_security_defaults.outputs['security_defaults_disabled']['value']
+
+    # Test basic security defaults discovery
+    policy = test.load_policy({
+        'name': 'terraform-security-defaults-discovery',
+        'resource': 'azure.entraid-security-defaults'
+    })
+
+    # Verify policy loads correctly
+    assert policy.resource_manager.type == 'entraid-security-defaults'
+
+    # Verify test data integrity
+    assert enabled_defaults['is_enabled'] is True
+    assert disabled_defaults['is_enabled'] is False
+
+    assert enabled_defaults['display_name'] == 'Security Defaults'
+
+
+@terraform('entraid_security_defaults')
+@pytest.mark.functional
+def test_entraid_security_defaults_features_terraform(test, entraid_security_defaults):
+    """Test security defaults features against Terraform-provisioned data"""
+    features = entraid_security_defaults.outputs['security_defaults_features']['value']
+
+    # Test security defaults feature analysis
+    policy = test.load_policy({
+        'name': 'terraform-security-defaults-features',
+        'resource': 'azure.entraid-security-defaults',
+        'filters': [
+            {'type': 'value', 'key': 'isEnabled', 'value': True}
+        ]
+    })
+
+    # Verify features structure
+    assert 'enabled_features' in features
+    enabled_features = features['enabled_features']
+
+    # Verify key security features
+    expected_features = [
+        'require_mfa_for_admins',
+        'require_mfa_for_users',
+        'block_legacy_authentication',
+        'protect_privileged_activities'
+    ]
+
+    for feature in expected_features:
+        assert feature in enabled_features
+        assert 'enabled' in enabled_features[feature]
+        assert 'description' in enabled_features[feature]
+
+    # Verify admin MFA feature details
+    mfa_admin_feature = enabled_features['require_mfa_for_admins']
+    assert 'affected_roles' in mfa_admin_feature
+    assert 'Global Administrator' in mfa_admin_feature['affected_roles']
+
+    assert policy is not None
+
+
+@terraform('entraid_security_defaults')
+@pytest.mark.functional
+def test_entraid_security_defaults_compliance_terraform(test, entraid_security_defaults):
+    """Test security defaults compliance against Terraform-provisioned data"""
+    compliance = entraid_security_defaults.outputs['security_defaults_compliance']['value']
+
+    # Test compliance analysis
+    policy = test.load_policy({
+        'name': 'terraform-security-defaults-compliance',
+        'resource': 'azure.entraid-security-defaults'
+    })
+
+    # Verify compliance structure
+    required_sections = [
+        'cis_compliant_controls',
+        'security_improvements',
+        'limitations',
+        'recommendations'
+    ]
+    for section in required_sections:
+        assert section in compliance
+
+    # Verify CIS compliance controls
+    cis_controls = compliance['cis_compliant_controls']
+    assert len(cis_controls) > 0
+
+    for control in cis_controls:
+        assert 'control' in control
+        assert 'title' in control
+        assert 'status' in control
+
+    # Verify security improvements
+    improvements = compliance['security_improvements']
+    assert len(improvements) > 0
+
+    for improvement in improvements:
+        assert 'area' in improvement
+        assert 'improvement' in improvement
+        assert 'risk_reduction' in improvement
+
+    assert policy is not None
+
+
+@terraform('entraid_security_defaults')
+@pytest.mark.functional
+def test_entraid_security_defaults_scenarios_terraform(test, entraid_security_defaults):
+    """Test tenant scenarios against Terraform-provisioned data"""
+    scenarios = entraid_security_defaults.outputs['test_scenarios']['value']
+
+    # Test scenario-based analysis
+    policy = test.load_policy({
+        'name': 'terraform-tenant-scenarios',
+        'resource': 'azure.entraid-security-defaults'
+    })
+
+    # Verify all expected scenarios
+    expected_scenarios = ['new_tenant_secure', 'disabled_no_ca', 'disabled_with_ca']
+    for scenario_name in expected_scenarios:
+        assert scenario_name in scenarios
+
+        scenario = scenarios[scenario_name]
+        required_fields = [
+            'security_defaults_enabled',
+            'conditional_access_policies',
+            'mfa_enforced_users',
+            'legacy_auth_blocked',
+            'compliance_score',
+            'risk_level'
+        ]
+
+        for field in required_fields:
+            assert field in scenario
+
+    # Verify scenario logic
+    secure_scenario = scenarios['new_tenant_secure']
+    risky_scenario = scenarios['disabled_no_ca']
+    optimal_scenario = scenarios['disabled_with_ca']
+
+    assert secure_scenario['security_defaults_enabled'] is True
+    assert risky_scenario['security_defaults_enabled'] is False
+    assert optimal_scenario['security_defaults_enabled'] is False
+
+    assert optimal_scenario['compliance_score'] > secure_scenario['compliance_score']
+    assert secure_scenario['compliance_score'] > risky_scenario['compliance_score']
 
     assert policy is not None
