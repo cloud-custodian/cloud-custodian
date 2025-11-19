@@ -18,9 +18,12 @@ import enum
 import logging
 
 from azure.core.exceptions import AzureError, ResourceNotFoundError
-from azure.mgmt.sql.models import (BackupLongTermRetentionPolicy,
-                                   BackupShortTermRetentionPolicy,
-                                   DatabaseUpdate, Sku)
+from azure.mgmt.sql.models import (
+    LongTermRetentionPolicy,
+    BackupShortTermRetentionPolicy,
+    DatabaseUpdate,
+    Sku,
+)
 from c7n.filters import Filter
 from c7n.filters.core import PolicyValidationError
 from c7n.utils import get_annotation_prefix, type_schema
@@ -233,7 +236,7 @@ class DataMaskingPolicyFilter(Filter):
 class BackupRetentionPolicyHelper:
 
     SHORT_TERM_SQL_OPERATIONS = 'backup_short_term_retention_policies'
-    LONG_TERM_SQL_OPERATIONS = 'backup_long_term_retention_policies'
+    LONG_TERM_SQL_OPERATIONS = 'long_term_retention_policies'
 
     WEEK_OF_YEAR = 'week_of_year'
 
@@ -619,15 +622,15 @@ class LongTermBackupRetentionPolicyAction(BackupRetentionPolicyBaseAction):
             # If there is a yearly retention, and the week is not specified, default to week 1
             new_retention_policy[BackupRetentionPolicyHelper.WEEK_OF_YEAR] = 1
 
-        return BackupLongTermRetentionPolicy(**new_retention_policy)
+        return LongTermRetentionPolicy(**new_retention_policy)
 
     def _copy_retention_policy(self, retention_policy):
         """
         Create a copy of a retention policy object with only the required parameters for the
-        BackupLongTermRetentionPolicy class.
+        LongTermRetentionPolicy class.
 
         more info:
-          https://docs.microsoft.com/en-us/python/api/azure-mgmt-sql/azure.mgmt.sql.models.backuplongtermretentionpolicy?view=azure-python
+          https://docs.microsoft.com/en-us/python/api/azure-mgmt-sql/azure.mgmt.sql.models.longtermretentionpolicy?view=azure-python
         """
 
         keys = [backup_type.retention_property for backup_type in

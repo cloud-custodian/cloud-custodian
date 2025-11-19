@@ -1,0 +1,28 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Action\":\"vpc-lattice-svcs:Invoke\",\"Resource\":\"*\"}]}",
+        "state": "Active",
+        "createdAt": {
+            "__class__": "datetime",
+            "year": 2025,
+            "month": 9,
+            "day": 16,
+            "hour": 20,
+            "minute": 54,
+            "second": 54,
+            "microsecond": 86000
+        },
+        "lastUpdatedAt": {
+            "__class__": "datetime",
+            "year": 2025,
+            "month": 9,
+            "day": 16,
+            "hour": 20,
+            "minute": 54,
+            "second": 54,
+            "microsecond": 399000
+        }
+    }
+}
