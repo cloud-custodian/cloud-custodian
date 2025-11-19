@@ -942,16 +942,6 @@ class TestInstanceValue(BaseFilterTest):
         self.assertFilter(fdata, i, True)
         self.assertEqual(annotation(i, base_filters.ANNOTATION_KEY), ["tag:foo"])
 
-        fdata_with_bad_transform = {
-            "type": "value",
-            "key": "tag:foo",
-            "tag_key_transforms": ["spam"],
-            "value": "abcd",
-        }
-        with self.capture_logging(level=logging.WARNING) as log_output:
-            self.assertFilter(fdata_with_bad_transform, i, False)
-            self.assertIn("Ignoring invalid tag key transform: spam", log_output.getvalue())
-
         i = instance(Tags=[{"Key": " foo_bar", "Value": "abcd"}])
         self.assertFilter({"tag:FooBar": "abcd"}, i, False)
         fdata_big = {
@@ -964,6 +954,13 @@ class TestInstanceValue(BaseFilterTest):
         self.assertEqual(
             annotation(i, base_filters.ANNOTATION_KEY),
             ["tag:FooBar"],
+        )
+
+        self.assertRaises(
+            PolicyValidationError,
+            filters.factory(
+                {"type": "value", "key": "foo", "tag_key_transforms": ["spam"], "value": "abcd"}
+            ).validate,
         )
 
         # make instance tags GCP-like by removing "Tags" and adding "labels"

@@ -248,7 +248,7 @@ class BaseValueFilter(Filter):
     def get_resource_value(self, k, i, regex=None):
         r = None
         normalize_if_needed = NormalizeFilterTagKeys.transform_func_if_needed(
-            self.data.get("tag_key_transforms"), Filter.log
+            self.data.get("tag_key_transforms")
         )
         if k.startswith('tag:'):
             tk = k.split(':', 1)[1]
@@ -299,6 +299,19 @@ class BaseValueFilter(Filter):
                 "Invalid value_regex: %s %s" % (e, self.data))
         return self
 
+    def _validate_tag_key_transforms(self, transforms_list):
+        if not transforms_list:
+            return self
+        invalid_transforms = []
+        for transform in transforms_list:
+            if transform not in NormalizeFilterTagKeys.__members__:
+                invalid_transforms.append(transform)
+        if invalid_transforms:
+            raise PolicyValidationError(
+                "Invalid tag_transforms: %s %s" % (", ".join(invalid_transforms), self.data)
+            )
+        return self
+
 
 # Setting a callable Enum value overrides Enum methods so we need to wrap in either:
 # functools.partial (3.10) or enum.member (3.11+).
@@ -319,7 +332,7 @@ class NormalizeFilterTagKeys(enum.Enum):
     nodashes = _member(lambda v: v.replace("-", ""))
 
     @classmethod
-    def transform_func_if_needed(cls, transforms: list[str], logger=None):
+    def transform_func_if_needed(cls, transforms: list[str]):
         """Return a callable func to do the transformation of tag keys as specified in the tag
          strategy. For example: this example would normalize all the tag keys to do the following
          commands in order: strip(), title(), replace("_", "") and look for a normalized key of
@@ -336,17 +349,10 @@ class NormalizeFilterTagKeys(enum.Enum):
         ."""
         if not transforms:
             return None
-        valid_transforms = []
-        for transform in transforms:
-            if transform in cls.__members__:
-                valid_transforms.append(transform)
-            else:
-                if logger:
-                    logger.warning("Ignoring invalid tag key transform: %s", transform)
-        if not valid_transforms:
-            return None
 
-        return _combine(cls[transform].value for transform in valid_transforms)
+        return _combine(
+            cls[transform].value for transform in transforms if transform in cls.__members__
+        )
 
 
 def _combine(callables_list):
@@ -667,6 +673,8 @@ class ValueFilter(BaseValueFilter):
                         "Invalid regex: %s %s" % (e, self.data))
         if 'value_regex' in self.data:
             return self._validate_value_regex(self.data['value_regex'])
+        if 'tag_key_transforms' in self.data:
+            return self._validate_tag_key_transforms(self.data['tag_key_transforms'])
 
         return self
 
