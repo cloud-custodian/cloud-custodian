@@ -186,7 +186,7 @@ class ReplicaAttributeFilter(ValueFilter):
         return matched
 
 
-@SecretsManager.filter_registry.register('secret-current-version')
+@SecretsManager.filter_registry.register('current-version')
 class SecretVersionFilter(ValueFilter):
     """Filter secrets based on attributes of their current (AWSCURRENT) version.
 
@@ -201,14 +201,14 @@ class SecretVersionFilter(ValueFilter):
             - name: current-secret-version-age
               resource: aws.secrets-manager
               filters:
-                - type: secret-current-version
+                - type: current-version
                   key: CreatedDate
                   op: gt
                   value: 90
                   value_type: age
     """
     schema = type_schema(
-        'secret-current-version',
+        'current-version',
         rinherit=ValueFilter.schema
     )
     permissions = ('secretsmanager:ListSecretVersionIds',)

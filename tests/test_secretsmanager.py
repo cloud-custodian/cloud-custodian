@@ -370,7 +370,7 @@ class TestSecretsManager(BaseTest):
                 'resource': 'secrets-manager',
                 'filters': [
                     {
-                        'type': 'secret-current-version',
+                        'type': 'current-version',
                         'key': 'CreatedDate',
                         'op': 'lt',
                         'value': 90,
