@@ -196,6 +196,7 @@ class SecretVersionFilter(ValueFilter):
     :example:
 
     .. code-block:: yaml
+
         policies:
             - name: current-secret-version-age
               resource: aws.secrets-manager
