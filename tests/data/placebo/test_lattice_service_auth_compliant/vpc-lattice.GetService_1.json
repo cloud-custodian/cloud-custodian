@@ -1,0 +1,35 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "arn": "arn:aws:vpc-lattice:us-east-1:644160558196:service/svc-03df66cf575b63796",
+        "authType": "AWS_IAM",
+        "createdAt": {
+            "__class__": "datetime",
+            "year": 2025,
+            "month": 9,
+            "day": 16,
+            "hour": 20,
+            "minute": 56,
+            "second": 19,
+            "microsecond": 716000
+        },
+        "dnsEntry": {
+            "domainName": "compliant-service-03df66cf575b63796.7d67968.vpc-lattice-svcs.us-east-1.on.aws",
+            "hostedZoneId": "Z0681547Z82L3THDFSCZ"
+        },
+        "id": "svc-03df66cf575b63796",
+        "lastUpdatedAt": {
+            "__class__": "datetime",
+            "year": 2025,
+            "month": 9,
+            "day": 16,
+            "hour": 20,
+            "minute": 56,
+            "second": 19,
+            "microsecond": 716000
+        },
+        "name": "compliant-service",
+        "status": "ACTIVE"
+    }
+}

@@ -1022,16 +1022,16 @@ wheels = [
 
 [[package]]
 name = "azure-mgmt-sql"
-version = "1.0.0"
+version = "3.0.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "azure-common" },
     { name = "azure-mgmt-core" },
     { name = "msrest" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/c4/1f/40af724de7a0b00f9a8986ec3554adf1c1cbc5f65c6401d3b0d7b86fc169/azure-mgmt-sql-1.0.0.zip", hash = "sha256:c7904f8798fbb285a2160c41c8bd7a416c6bd987f5d36a9b98c16f41e24e9f47", size = 938942, upload-time = "2020-11-25T04:37:31.156Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/3f/af/398c57d15064ea23475076cd087b1a143b66d33a029e6e47c4688ca32310/azure-mgmt-sql-3.0.1.zip", hash = "sha256:129042cc011225e27aee6ef2697d585fa5722e5d1aeb0038af6ad2451a285457", size = 996625, upload-time = "2021-07-16T02:07:56.492Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/40/e9/6dd75c0e54b19fd1dca986aae06b853551c9631c3e2e50c94e7d3391e0be/azure_mgmt_sql-1.0.0-py2.py3-none-any.whl", hash = "sha256:8fae38fc88ba3388b15854f3a8a2c3f8aaeb9cb609ad37b6545abb8d3ae540e6", size = 711094, upload-time = "2020-11-25T04:37:29.419Z" },
+    { url = "https://files.pythonhosted.org/packages/0e/46/db6dd21a237c32eb747c4a1790a6b0aafe1f52c55e07b90f732231027d47/azure_mgmt_sql-3.0.1-py2.py3-none-any.whl", hash = "sha256:1d1dd940d4d41be4ee319aad626341251572a5bf4a2addec71779432d9a1381f", size = 912881, upload-time = "2021-07-16T02:07:53.079Z" },
 ]
 
 [[package]]
@@ -1548,7 +1548,7 @@ requires-dist = [
     { name = "azure-mgmt-servicebus", specifier = ">=8.2.0,<9.0.0" },
     { name = "azure-mgmt-servicefabric", specifier = ">=1.0.0,<2.0.0" },
     { name = "azure-mgmt-signalr", specifier = "==0.4.0" },
-    { name = "azure-mgmt-sql", specifier = ">=1.0.0,<2.0.0" },
+    { name = "azure-mgmt-sql", specifier = ">=3.0.0,<4.0.0" },
     { name = "azure-mgmt-storage", specifier = ">=22.1.1,<23.0.0" },
     { name = "azure-mgmt-streamanalytics", specifier = ">=1.0.0rc1,<2.0.0" },
     { name = "azure-mgmt-subscription", specifier = ">=1.0.0,<2.0.0" },
@@ -2415,7 +2415,7 @@ name = "exceptiongroup"
 version = "1.3.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
+    { name = "typing-extensions", marker = "python_full_version < '3.11'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/0b/9f/a65090624ecf468cdca03533906e7c69ed7588582240cfe7cc9e770b50eb/exceptiongroup-1.3.0.tar.gz", hash = "sha256:b241f5885f560bc56a59ee63ca4c6a8bfa46ae4ad651af316d4e81817bb9fd88", size = 29749, upload-time = "2025-05-10T17:42:51.123Z" }
 wheels = [

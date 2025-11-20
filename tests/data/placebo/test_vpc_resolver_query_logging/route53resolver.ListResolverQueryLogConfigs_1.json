@@ -1,0 +1,19 @@
+{
+    "status_code": 200,
+    "data": {
+      "ResolverQueryLogConfigs": [
+        {
+          "Id": "rqlc-ceb57b1765044c85",
+          "OwnerId": "644160558196",
+          "Status": "ACTIVE",
+          "ShareStatus": "NOT_SHARED",
+          "AssociationCount": 1,
+          "Arn": "arn:aws:route53resolver:us-east-1:644160558196:resolver-query-log-config/rqlc-ceb57b1765044c85",
+          "Name": "test-resolver-query-log-config",
+          "DestinationArn": "arn:aws:s3:::resolver-query-logs-20250513181124788700000003",
+          "CreationTime": "2025-05-13T18:11:25.497000+00:00",
+          "CreatorRequestId": "1234567890"
+        }
+      ]
+    }
+  }
