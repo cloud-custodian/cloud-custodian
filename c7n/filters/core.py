@@ -247,10 +247,10 @@ class BaseValueFilter(Filter):
 
     def get_resource_value(self, k, i, regex=None):
         r = None
-        normalize_if_needed = NormalizeFilterTagKeys.transform_func_if_needed(
-            self.data.get("tag_key_transforms")
-        )
         if k.startswith('tag:'):
+            normalize_if_needed = NormalizeFilterTagKeys.transform_func_if_needed(
+                self.data.get("tag_key_transforms")
+            )
             tk = k.split(':', 1)[1]
             if 'Tags' in i:
                 for t in _normalize_aws_tag_keys(i.get("Tags", []), normalize_if_needed):
