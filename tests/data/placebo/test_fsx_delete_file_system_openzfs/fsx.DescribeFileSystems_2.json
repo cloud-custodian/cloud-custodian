@@ -1,0 +1,59 @@
+{
+    "status_code": 200,
+    "data": {
+        "FileSystems": [
+            {
+                "OwnerId": "644160558196",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 10,
+                    "day": 21,
+                    "hour": 13,
+                    "minute": 35,
+                    "second": 20,
+                    "microsecond": 322000
+                },
+                "FileSystemId": "fs-0ba7088f9b54df497",
+                "FileSystemType": "OPENZFS",
+                "Lifecycle": "DELETING",
+                "StorageCapacity": 1024,
+                "StorageType": "SSD",
+                "VpcId": "vpc-4a9ff72e",
+                "SubnetIds": [
+                    "subnet-5fb47507"
+                ],
+                "NetworkInterfaceIds": [
+                    "eni-09021c5644b6c7b58"
+                ],
+                "DNSName": "fs-0ba7088f9b54df497.fsx.us-west-2.amazonaws.com",
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/5b42e50f-8d8a-4be2-8938-59ccd7a44d0c",
+                "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:file-system/fs-0ba7088f9b54df497",
+                "Tags": [
+                    {
+                        "Key": "Environment",
+                        "Value": "dev"
+                    },
+                    {
+                        "Key": "Name",
+                        "Value": "example-openzfs"
+                    }
+                ],
+                "OpenZFSConfiguration": {
+                    "CopyTagsToBackups": false,
+                    "CopyTagsToVolumes": false,
+                    "DeploymentType": "SINGLE_AZ_1",
+                    "ThroughputCapacity": 64,
+                    "WeeklyMaintenanceStartTime": "5:10:30",
+                    "DiskIopsConfiguration": {
+                        "Mode": "AUTOMATIC",
+                        "Iops": 3072
+                    },
+                    "RootVolumeId": "fsvol-0fcd3847da5309e45"
+                },
+                "NetworkType": "IPV4"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

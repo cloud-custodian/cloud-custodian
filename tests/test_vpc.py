@@ -4476,6 +4476,43 @@ def test_eip_shield_sync_deleted(test, eip_shield_sync):
     test.assertEqual(len(protections["Protections"]), 1)
 
 
+class VpcResolverQueryLoggingTest(BaseTest):
+
+    def test_resolver_query_logging_filter(self):
+        factory = self.replay_flight_data("test_vpc_resolver_query_logging")
+
+        vpc_with_logging_id = "vpc-0503a8b9ddbb3a5c5"
+        vpc_without_logging_id = "vpc-029d7b65096a4717d"
+
+        p_enabled = self.load_policy({
+            "name": "find-vpcs-with-logging-enabled",
+            "resource": "vpc",
+            "filters": [
+                {"type": "resolver-query-logging", "state": True}
+            ]
+        }, session_factory=factory)
+
+        enabled_resources = p_enabled.run()
+
+        self.assertEqual(len(enabled_resources), 1)
+        self.assertEqual(enabled_resources[0]['VpcId'], vpc_with_logging_id)
+        self.assertIn('c7n:resolver-logging', enabled_resources[0])
+
+        p_without_logging = self.load_policy({
+            "name": "find-vpcs-without-logging",
+            "resource": "vpc",
+            "filters": [
+                {"type": "resolver-query-logging", "state": False}
+            ]
+        }, session_factory=factory)
+
+        resources_without_logging = p_without_logging.run()
+
+        self.assertEqual(len(resources_without_logging), 1)
+        self.assertEqual(resources_without_logging[0]['VpcId'], vpc_without_logging_id)
+        self.assertNotIn('c7n:resolver-logging', resources_without_logging[0])
+
+
 class TestVPCEndpointServiceConfiguration(BaseTest):
     def test_query(self):
         session_factory = self.replay_flight_data("test_vpc_endpoint_service_configuration_query")
