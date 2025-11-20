@@ -945,6 +945,7 @@ class PolicyMetaLint(BaseTest):
             # this service has been fully removed, we're keeping compatiblity
             # support for the moment to avoid breaking policies targeting.
             #
+            "qldb",
             "opswork-cm",
             "opswork-cm.actions.delete",
             "opswork-stack",
