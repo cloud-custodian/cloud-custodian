@@ -609,14 +609,13 @@ class DescribeSubnets(query.DescribeSource):
                     for sid in missing_subnet_ids:
                         self.manager.log.warning(
                             "Subnet ID '%s' not found, skipping", sid)
-                    for sid in missing_subnet_ids:
                         if sid in resource_ids:
                             resource_ids.remove(sid)
                     if not resource_ids:
                         return []
                 else:
                     self.manager.log.warning(
-                        "InvalidSubnetID.NotFound error encountered but could not extract subnet IDs from error message: %s",
+                        "InvalidSubnetID.NotFound error but couldn't extract subnet IDs from the error: %s",
                         str(e))
                     return []
 
