@@ -186,6 +186,58 @@ class ReplicaAttributeFilter(ValueFilter):
         return matched
 
 
+@SecretsManager.filter_registry.register('secret-current-version')
+class SecretVersionFilter(ValueFilter):
+    """Filter secrets based on attributes of their current (AWSCURRENT) version.
+    
+    The filter retrieves the version metadata for the AWSCURRENT labeled version and
+    makes all its attributes available for filtering,  
+    
+    :example:
+    
+    .. code-block:: yaml
+        policies:
+            - name: find-o
+              resource: aws.secrets-manager
+              filters:
+                - type: secret-current-version
+                  key: CreatedDate
+                  op: gt
+                  value: 90
+                  value_type: age
+    """
+    schema = type_schema(
+        'secret-current-version',
+        rinherit=ValueFilter.schema
+    )
+    permissions = ('secretsmanager:ListSecretVersionIds',)
+    annotation_key = 'c7n:CurrentSecretVersion'
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('secretsmanager')
+
+        for r in resources:
+            if self.annotation_key not in r:
+                versions = self.manager.retry(
+                    client.list_secret_version_ids,
+                    SecretId=r['ARN'],
+                    ignore_err_codes=('ResourceNotFoundException',)
+                )
+                if versions:
+                    current_versions = [
+                        v for v in versions.get('Versions', [])
+                        if 'AWSCURRENT' in v.get('VersionStages', [])
+                    ]
+                    r[self.annotation_key] = current_versions
+        return list(filter(None, map(self.process_resource, resources)))
+
+    def process_resource(self, resource):
+        cv = resource.get(self.annotation_key, [])
+        if cv and self.match(cv[0]):
+            return resource
+        return None
+
+
 @SecretsManager.action_registry.register('tag')
 class TagSecretsManagerResource(Tag):
     """Action to create tag(s) on a Secret resource
