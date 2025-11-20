@@ -4330,7 +4330,8 @@ class TestModifySubnet(BaseTest):
         valid_subnet_id = 'subnet-023db907202d61c00'
         all_subnet_ids = missing_subnet_ids + [valid_subnet_id]
 
-        with self.capture_logging('custodian.resources.subnet', level=logging.WARNING) as log_output:
+        with self.capture_logging('custodian.resources.subnet',
+         level=logging.WARNING) as log_output:
             resources = p.resource_manager.get_resources(all_subnet_ids)
             # Graceful error handling
             self.assertIsInstance(resources, list)
@@ -4349,7 +4350,8 @@ class TestModifySubnet(BaseTest):
 
         missing_subnet_ids = ['subnet-123456', 'subnet-00000000']
 
-        with self.capture_logging('custodian.resources.subnet', level=logging.WARNING) as log_output:
+        with self.capture_logging('custodian.resources.subnet',
+         level=logging.WARNING) as log_output:
             resources = p.resource_manager.get_resources(missing_subnet_ids)
             self.assertEqual(resources, [])
 

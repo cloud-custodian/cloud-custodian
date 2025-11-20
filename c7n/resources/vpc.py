@@ -615,7 +615,8 @@ class DescribeSubnets(query.DescribeSource):
                         return []
                 else:
                     self.manager.log.warning(
-                        "InvalidSubnetID.NotFound error but couldn't extract subnet IDs from the error: %s",
+                        "InvalidSubnetID.NotFound error but \
+                         couldn't extract subnet IDs from the error: %s",
                         str(e))
                     return []
 
