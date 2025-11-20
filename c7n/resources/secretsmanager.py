@@ -189,15 +189,15 @@ class ReplicaAttributeFilter(ValueFilter):
 @SecretsManager.filter_registry.register('secret-current-version')
 class SecretVersionFilter(ValueFilter):
     """Filter secrets based on attributes of their current (AWSCURRENT) version.
-    
+
     The filter retrieves the version metadata for the AWSCURRENT labeled version and
-    makes all its attributes available for filtering,  
-    
+    makes all its attributes available for filtering.
+
     :example:
-    
+
     .. code-block:: yaml
         policies:
-            - name: find-o
+            - name: current-secret-version-age
               resource: aws.secrets-manager
               filters:
                 - type: secret-current-version
