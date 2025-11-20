@@ -675,10 +675,10 @@ class ValueFilter(BaseValueFilter):
                 except re.error as e:
                     raise PolicyValidationError(
                         "Invalid regex: %s %s" % (e, self.data))
+        if 'tag_key_transforms' in self.data:
+            self._validate_tag_key_transforms(self.data['tag_key_transforms'])
         if 'value_regex' in self.data:
             return self._validate_value_regex(self.data['value_regex'])
-        if 'tag_key_transforms' in self.data:
-            return self._validate_tag_key_transforms(self.data['tag_key_transforms'])
 
         return self
 
