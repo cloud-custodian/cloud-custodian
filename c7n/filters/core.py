@@ -302,10 +302,9 @@ class BaseValueFilter(Filter):
     def _validate_tag_key_transforms(self, transforms_list):
         if not transforms_list:
             return self
-        invalid_transforms = []
-        for transform in transforms_list:
-            if transform not in NormalizeFilterTagKeys.__members__:
-                invalid_transforms.append(transform)
+        invalid_transforms = [
+            t for t in transforms_list if NormalizeFilterTagKeys.is_not_valid_transform(t)
+        ]
         if invalid_transforms:
             raise PolicyValidationError(
                 "Invalid tag_transforms: %s %s" % (", ".join(invalid_transforms), self.data)
@@ -330,6 +329,10 @@ class NormalizeFilterTagKeys(enum.Enum):
     nospaces = _member(lambda v: v.replace(" ", ""))
     nounderscores = _member(lambda v: v.replace("_", ""))
     nodashes = _member(lambda v: v.replace("-", ""))
+
+    @classmethod
+    def is_not_valid_transform(cls, transform):
+        return transform not in cls.__members__
 
     @classmethod
     def transform_func_if_needed(cls, transforms: list[str]):
@@ -603,7 +606,8 @@ class ValueFilter(BaseValueFilter):
             'value_from': {'$ref': '#/definitions/filters_common/value_from'},
             'value': {'$ref': '#/definitions/filters_common/value'},
             'op': {'$ref': '#/definitions/filters_common/comparison_operators'},
-            'value_path': {'type': 'string'}
+            'value_path': {'type': 'string'},
+            'tag_key_transforms': {'type': 'array', 'items': {'type': 'string'}}
         }
     }
     schema_alias = True
