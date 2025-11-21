@@ -76,7 +76,7 @@
                         "properties": {
                             "image": "[concat(parameters('image_repository'), ':', parameters('image_tag'))]",
                             "command": [
-                                "/usr/local/bin/python3",
+                                "/src/.venv/bin/python3",
                                 "-m",
                                 "c7n_azure.container_host.host"
                             ],

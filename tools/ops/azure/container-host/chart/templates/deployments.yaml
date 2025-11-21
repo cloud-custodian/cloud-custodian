@@ -39,7 +39,7 @@ spec:
               name: "{{ $host.name }}-secret-environment"
           {{- end }}
         command: 
-          - "/usr/local/bin/python3"
+          - "/src/.venv/bin/python3"
         args:
           - "-m"
           - "c7n_azure.container_host.host"

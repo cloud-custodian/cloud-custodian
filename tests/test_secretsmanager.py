@@ -361,3 +361,26 @@ class TestSecretsManager(BaseTest):
         self.assertTrue(isinstance(resources[0]['c7n:Replicas'], list))
         self.assertEqual(len(resources[0]['c7n:Replicas']), 1)
         self.assertEqual(resources[0]['c7n:Replicas'][0]['Name'], 'c7n')
+
+    def test_secrets_manager_version_age(self):
+        session_factory = self.replay_flight_data('test_secrets_manager_version_age')
+        p = self.load_policy(
+            {
+                'name': 'secrets-version-and-age-filter',
+                'resource': 'secrets-manager',
+                'filters': [
+                    {
+                        'type': 'current-version',
+                        'key': 'CreatedDate',
+                        'op': 'lt',
+                        'value': 90,
+                        'value_type': 'age'
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['Name'], 'test_lambda_secret')
+        self.assertIn('c7n:CurrentSecretVersion', resources[0])
