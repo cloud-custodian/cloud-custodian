@@ -1429,3 +1429,81 @@ class TestTargetGroupAttributesFilter(BaseTest):
         self.assertEqual(
             resources[0]['c7n:TargetGroupAttributes']['deregistration_delay.timeout_seconds'], 300
         )
+
+    def test_appelb_listener_rules_fetched(self):
+        """Test that listener rules are fetched and available for filtering"""
+        self.patch(AppELB, "executor_factory", MainThreadExecutor)
+        session_factory = self.replay_flight_data("test_appelb_listener_rules")
+        p = self.load_policy(
+            {
+                "name": "appelb-with-rules",
+                "resource": "app-elb",
+                "filters": [
+                    {
+                        "type": "listener-rule",
+                        "count": 0,
+                        "count_op": "gt"
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertGreater(len(resources), 0)
+
+        # Verify that Rules are attached to ALBs
+        listener_rules = resources[0].get('c7n:ListenerRules', [])
+        self.assertGreater(len(listener_rules), 0)
+
+        # Verify rule structure
+        rule = listener_rules[0]
+        self.assertIn('Actions', rule)
+        self.assertIsInstance(rule['Actions'], list)
+
+    def test_appelb_filter_by_listener_rules(self):
+        """Test filtering ALBs based on listener rule actions"""
+        self.patch(AppELB, "executor_factory", MainThreadExecutor)
+        session_factory = self.replay_flight_data("test_appelb_listener_rules_filter")
+        p = self.load_policy(
+            {
+                "name": "appelb-insecure-rules",
+                "resource": "app-elb",
+                "filters": [
+                    {
+                        "type": "listener-rule",
+                        "attrs": [
+                            {
+                                "type": "value",
+                                "key": "Actions[0].Type",
+                                "value": "redirect"
+                            },
+                            {
+                                "type": "value",
+                                "key": "Actions[0].RedirectConfig.Protocol",
+                                "value": "HTTP"
+                            }
+                        ]
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+
+        # Should catch ALBs with listener rules redirecting to HTTP
+        self.assertGreater(len(resources), 0)
+
+        # Verify the ALB has listener rules attached
+        listener_rules = resources[0].get('c7n:ListenerRules', [])
+        self.assertGreater(len(listener_rules), 0)
+
+        # Check that at least one rule has redirect to HTTP
+        has_insecure_redirect = False
+        for rule in listener_rules:
+            for action in rule.get('Actions', []):
+                if (action.get('Type') == 'redirect' and
+                    action.get('RedirectConfig', {}).get('Protocol') == 'HTTP'):
+                    has_insecure_redirect = True
+                    break
+
+        self.assertTrue(has_insecure_redirect)
