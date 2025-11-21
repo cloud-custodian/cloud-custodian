@@ -21,7 +21,6 @@ class OpsworkStack(QueryResourceManager):
     """
 
     class resource_type(TypeInfo):
-        service = 'account'
         id = 'StackId'
         name = 'Name'
         arn = "Arn"
@@ -41,7 +40,7 @@ class DeleteStack(BaseAction):
     permissions = ()
 
     def process(self, stacks):
-        return []
+        return
 
 
 @OpsworkStack.action_registry.register('stop')
@@ -52,7 +51,7 @@ class StopStack(BaseAction):
     permissions = ()
 
     def process(self, stacks):
-        return []
+        return
 
 
 @resources.register('opswork-cm')
@@ -62,7 +61,6 @@ class OpsworksCM(QueryResourceManager):
     """
 
     class resource_type(TypeInfo):
-        service = "account"
         name = id = 'ServerName'
         arn = "ServerArn"
         cfn_type = 'AWS::OpsWorksCM::Server'
@@ -81,4 +79,4 @@ class CMDelete(BaseAction):
     permissions = ()
 
     def process(self, servers):
-        return []
+        return

@@ -317,6 +317,10 @@ def _main(provider, output_dir, group_by):
 
     for r in provider_class.resources.values():
         group = group_by(r)
+
+        # deprecated / removed resources don't have a group by
+        if group is None:
+            continue
         if not isinstance(group, list):
             group = [group]
         for g in group:
@@ -333,6 +337,12 @@ def _main(provider, output_dir, group_by):
                 'amplifyuibuilder_component',
                 'amplifybuilder_component'):
             continue
+
+        # deprecated / removed resources don't have a group by
+        group = group_by(r)
+        if group is None:
+            continue
+
         rpath = resource_file_name(output_dir, r)
         t = env.get_template('provider-resource.rst')
         written += write_modified_file(
