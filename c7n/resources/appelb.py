@@ -960,7 +960,7 @@ class AppELBListenerRuleFilter(ListItemFilter):
 
     :example:
 
-    Find ALBs with HTTP listeners that have rules redirecting to HTTP (insecure):
+    Find ALBs with rules redirecting to HTTP (insecure):
 
     .. code-block:: yaml
 
@@ -971,15 +971,10 @@ class AppELBListenerRuleFilter(ListItemFilter):
                   - type: listener-rule
                     attrs:
                       - type: value
-                        key: Conditions[?Field=='host-header']
-                        value: present
-                      - type: value
-                        key: Actions[].Type
+                        key: Actions[0].Type
                         value: redirect
-                        op: in
-                        value_type: swap
                       - type: value
-                        key: Actions[].RedirectConfig.Protocol
+                        key: Actions[0].RedirectConfig.Protocol
                         value: HTTP
 
     Find ALBs with rules forwarding to specific target groups:
