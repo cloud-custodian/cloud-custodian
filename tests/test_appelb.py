@@ -1507,3 +1507,67 @@ class TestTargetGroupAttributesFilter(BaseTest):
                     break
 
         self.assertTrue(has_insecure_redirect)
+
+    def test_appelb_listener_rules_fetch_error_listeners(self):
+        # Test exception handling when DescribeListeners fails
+        from unittest import mock
+        session_factory = self.replay_flight_data('test_appelb_listener_rules')
+
+        p = self.load_policy(
+            {
+                'name': 'appelb-listener-rules-error',
+                'resource': 'app-elb',
+                'filters': [
+                    {'type': 'listener-rule', 'count': 0, 'count_op': 'gte'}
+                ]
+            },
+            session_factory=session_factory,
+        )
+
+        # Get the filter and mock its manager's retry method for describe_listeners
+        filter_instance = p.resource_manager.filters[0]
+        original_retry = filter_instance.manager.retry
+
+        def mock_retry(func, *args, **kwargs):
+            if func.__name__ == 'describe_listeners':
+                raise Exception("Simulated DescribeListeners failure")
+            return original_retry(func, *args, **kwargs)
+
+        with mock.patch.object(filter_instance.manager, 'retry', side_effect=mock_retry):
+            # Should not raise exception, just log warning and return resources with empty rules
+            resources = p.run()
+            self.assertGreater(len(resources), 0)
+            for alb in resources:
+                self.assertEqual(len(alb.get('c7n:ListenerRules', [])), 0)
+
+    def test_appelb_listener_rules_fetch_error_rules(self):
+        # Test exception handling when DescribeRules fails
+        from unittest import mock
+        session_factory = self.replay_flight_data('test_appelb_listener_rules')
+
+        p = self.load_policy(
+            {
+                'name': 'appelb-listener-rules-error',
+                'resource': 'app-elb',
+                'filters': [
+                    {'type': 'listener-rule', 'count': 0, 'count_op': 'gte'}
+                ]
+            },
+            session_factory=session_factory,
+        )
+
+        # Get the filter and mock its manager's retry method for describe_rules
+        filter_instance = p.resource_manager.filters[0]
+        original_retry = filter_instance.manager.retry
+
+        def mock_retry(func, *args, **kwargs):
+            if func.__name__ == 'describe_rules':
+                raise Exception("Simulated DescribeRules failure")
+            return original_retry(func, *args, **kwargs)
+
+        with mock.patch.object(filter_instance.manager, 'retry', side_effect=mock_retry):
+            # Should not raise exception, just log warning and return resources with empty rules
+            resources = p.run()
+            self.assertGreater(len(resources), 0)
+            for alb in resources:
+                self.assertEqual(len(alb.get('c7n:ListenerRules', [])), 0)
