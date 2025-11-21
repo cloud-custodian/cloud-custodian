@@ -993,8 +993,8 @@ class AppELBListenerRuleFilter(ListItemFilter):
                   - type: listener-rule
                     attrs:
                       - type: value
-                        key: Actions[].TargetGroupArn
-                        value: "arn:aws:elasticloadbalancing:us-east-1:123456789012:targetgroup/old-*"
+                        key: Actions[0].TargetGroupArn
+                        value: "arn:aws:elasticloadbalancing:*:*:targetgroup/old-*"
                         op: glob
 
     Count ALBs with more than 5 custom rules:
