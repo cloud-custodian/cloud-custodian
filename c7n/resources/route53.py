@@ -571,6 +571,98 @@ class IsQueryLoggingEnabled(Filter):
         return results
 
 
+@resources.register('resolver-rule')
+class ResolverRule(QueryResourceManager):
+    # Resource for managing Route53 Resolver Rules
+    class resource_type(TypeInfo):
+        service = 'route53resolver'
+        arn_type = 'resolver-rule'
+        enum_spec = ('list_resolver_rules', 'ResolverRules', None)
+        id = 'Id'
+        name = 'Name'
+        config_id = 'c7n:ResolverRuleId'
+        universal_taggable = True
+        # Route53 Resolver is regional
+        global_resource = False
+        cfn_type = 'AWS::Route53Resolver::ResolverRule'
+        permissions_augment = ("route53resolver:ListTagsForResource",)
+
+    def augment(self, resources):
+        client = local_session(self.session_factory).client('route53resolver')
+        for r in resources:
+            if r.get('OwnerId') != self.account_id:
+                continue  # don't try to fetch tags for shared resources
+            r['Tags'] = self.retry(
+                client.list_tags_for_resource,
+                ResourceArn=r['Arn'])['Tags']
+        return resources
+
+
+@ResolverRule.filter_registry.register('resolver-rule-associations')
+class ResolverRuleAssociationsFilter(Filter):
+    """ Checks Resolver Rule Associations for VPCs.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+                - name: resolver-rule-with-vpc-associations
+                  resource: resolver-rule
+                  filters:
+                   - type: resolver-rule-associations
+                     vpcid: "vpc-12345678"
+
+    """
+    permissions = ('route53resolver:ListResolverRuleAssociations',)
+    schema = type_schema('resolver-rule-associations',
+        vpcid={'type': 'string', 'pattern': '^(?:vpc-[0-9a-f]{8,17}|all)$'},)
+
+    def process(self, resources, event=None):
+        results = []
+        client = local_session(self.manager.session_factory).client('route53resolver')
+
+        # Get all resolver rule associations
+        paginator = client.get_paginator('list_resolver_rule_associations')
+        all_associations = paginator.paginate().build_full_result().get(
+            'ResolverRuleAssociations', []
+        )
+
+        # Group associations by resolver rule ID
+        rule_associations = {}
+        for assoc in all_associations:
+            rule_id = assoc.get('ResolverRuleId')
+            if rule_id not in rule_associations:
+                rule_associations[rule_id] = []
+            rule_associations[rule_id].append(assoc)
+
+        # Filter resources based on VPC associations
+        for resource in resources:
+            rule_id = resource['Id']
+            resource_associations = rule_associations.get(rule_id, [])
+
+            if self.data.get('vpcid'):
+                target_vpc = self.data['vpcid']
+                if target_vpc == 'all':
+                    # If 'all', include rules that have any associations
+                    if resource_associations:
+                        resource['c7n:ResolverRuleAssociations'] = resource_associations
+                        results.append(resource)
+                else:
+                    # Check for specific VPC ID
+                    matching_assocs = [assoc for assoc in resource_associations
+                                     if assoc.get('VPCId') == target_vpc]
+                    if matching_assocs:
+                        resource['c7n:ResolverRuleAssociations'] = matching_assocs
+                        results.append(resource)
+            else:
+                # No vpcid specified, just annotate with associations
+                resource['c7n:ResolverRuleAssociations'] = resource_associations
+                results.append(resource)
+
+        return results
+
+
 @resources.register('resolver-logs')
 class ResolverQueryLogConfig(QueryResourceManager):
 

@@ -674,3 +674,71 @@ class TestControlPanel(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['ControlPanelArn'],
             'arn:aws:route53-recovery-control::644160558196:controlpanel/fd5a6bfc73364a0dbd48d3915867a306')
+
+
+class ResolverRuleTest(BaseTest):
+
+    def test_resolver_rule_query(self):
+        session_factory = self.replay_flight_data("test_resolver_rule_query")
+        p = self.load_policy(
+            {
+                "name": "resolver-rule-list",
+                "resource": "resolver-rule",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "Status",
+                        "op": "eq",
+                        "value": "COMPLETE",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["RuleType"], "FORWARD")
+
+    def test_resolver_rule_associations_filter(self):
+        session_factory = self.replay_flight_data("test_resolver_rule_associations_filter")
+        p = self.load_policy(
+            {
+                "name": "resolver-rule-associations",
+                "resource": "resolver-rule",
+                "filters": [
+                    {
+                        "type": "resolver-rule-associations",
+                        "vpcid": "vpc-12345678",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertIn("c7n:ResolverRuleAssociations", resources[0])
+        associations = resources[0]["c7n:ResolverRuleAssociations"]
+        self.assertTrue(
+            any(assoc["VPCId"] == "vpc-12345678" for assoc in associations)
+        )
+
+    def test_resolver_rule_all_associations_filter(self):
+        session_factory = self.replay_flight_data("test_resolver_rule_all_associations_filter")
+        p = self.load_policy(
+            {
+                "name": "resolver-rule-all-associations",
+                "resource": "resolver-rule",
+                "filters": [
+                    {
+                        "type": "resolver-rule-associations",
+                        "vpcid": "all",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertIn("c7n:ResolverRuleAssociations", resources[0])
+        associations = resources[0]["c7n:ResolverRuleAssociations"]
+        self.assertTrue(len(associations) > 0)

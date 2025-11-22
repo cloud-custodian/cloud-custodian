@@ -1,0 +1,17 @@
+{
+  "status_code": 200,
+  "data": {
+    "ResponseMetadata": {},
+    "MaxResults": 30,
+    "ResolverRuleAssociations": [
+      {
+        "Id": "rslvr-rrassoc-97242eaf88example",
+        "Name": "forward example.com for gamma VPC",
+        "ResolverRuleId": "rslvr-rr-5328a0899aexample",
+        "Status": "COMPLETE",
+        "StatusMessage": "[Trace id: 1-5bdb53db-75f3852c8384ad30fexample] Creating the association.",
+        "VPCId": "vpc-03cf94c75eexample"
+      }
+    ]
+  }
+}
