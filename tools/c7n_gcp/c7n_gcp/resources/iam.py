@@ -66,7 +66,7 @@ class ServiceAccount(QueryResourceManager):
                         resource_info['email_id'])})
 
         @staticmethod
-        def get_metric_resource_name(resource):
+        def get_metric_resource_name(resource, metric_key=None):
             return resource["uniqueId"]
 
 
@@ -160,7 +160,7 @@ class ServiceAccountKey(ChildResourceManager):
                         project, sa, key)})
 
         @staticmethod
-        def get_metric_resource_name(resource):
+        def get_metric_resource_name(resource, metric_key=None):
             return resource["name"].split('/')[-1]
 
 
