@@ -4,7 +4,7 @@ from azure.mgmt.eventgrid.models import StorageQueueEventSubscriptionDestination
 from .azure_common import BaseTest
 from c7n_azure.azure_events import AzureEvents, AzureEventSubscription
 from c7n_azure.session import Session
-from mock import patch
+from unittest.mock import patch
 
 
 class AzureEventsTest(BaseTest):

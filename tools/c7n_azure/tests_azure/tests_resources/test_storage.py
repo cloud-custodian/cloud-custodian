@@ -7,7 +7,7 @@ from c7n_azure.resources.storage import StorageSettingsUtilities, StorageFirewal
     StorageFirewallBypassFilter
 from c7n_azure.session import Session
 from c7n_azure.storage_utils import StorageUtilities
-from mock import patch, MagicMock, Mock
+from unittest.mock import patch, MagicMock, Mock
 from netaddr import IPSet
 from parameterized import parameterized
 
