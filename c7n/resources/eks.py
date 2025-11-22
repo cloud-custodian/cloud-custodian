@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 import c7n.filters.vpc as net_filters
 from c7n.actions import Action
+from c7n.filters.core import ComparableVersion
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter
 from c7n.manager import resources
 from c7n.resources.aws import shape_schema
@@ -13,6 +14,7 @@ from botocore.waiter import WaiterModel, create_waiter_with_client
 from .aws import shape_validate
 from .ecs import ContainerConfigSource
 from c7n.filters.kms import KmsRelatedFilter
+from c7n.filters import Filter
 
 
 @query.sources.register('describe-eks-nodegroup')
@@ -132,6 +134,87 @@ class EKSVpcFilter(VpcFilter):
 @EKS.filter_registry.register('kms-key')
 class KmsFilter(KmsRelatedFilter):
     RelatedIdsExpression = 'encryptionConfig[].provider.keyArn'
+
+
+@EKS.filter_registry.register('upgrade-available')
+class UpgradeAvailable(Filter):
+    """Scans for available upgrade-compatible EKS versions
+
+    This will check all the EKS clusters on the resources, and return
+    a list of viable upgrade options.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: eks-upgrade-available
+                resource: aws.eks
+                filters:
+                  - type: upgrade-available
+                    major: False
+
+    """
+
+    schema = type_schema(
+        'upgrade-available',
+        major={'type': 'boolean'},
+        value={'type': 'boolean'},
+    )
+    permissions = ('eks:DescribeClusterVersions',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('eks')
+        check_major = self.data.get('major', False)
+        check_upgrade_extant = self.data.get('value', True)
+        results = []
+
+        for r in resources:
+            raw_version = r.get('version')
+
+            if not raw_version:
+                continue
+
+            current_version = ComparableVersion(raw_version)
+
+            # Get paginator for DescribeClusterVersions
+            paginator = client.get_paginator('describe_cluster_versions')
+
+            # Request all available versions with STANDARD_SUPPORT
+            page_iterator = paginator.paginate(
+                versionStatus='STANDARD_SUPPORT'
+            )
+
+            available_versions = []
+            upgrade_versions = []
+            has_upgrades = False
+
+            for page in page_iterator:
+                for version_info in page.get('clusterVersions', []):
+                    cluster_version = version_info['clusterVersion']
+                    available_versions.append(cluster_version)
+                    available_version = ComparableVersion(cluster_version)
+
+                    if available_version == current_version and check_upgrade_extant:
+                        upgrade_versions.append(cluster_version)
+                        has_upgrades = True
+                    elif available_version > current_version:
+                        if (
+                            available_version.version[0] == current_version.version[0]
+                            or check_major
+                        ):
+                            upgrade_versions.append(cluster_version)
+                            has_upgrades = True
+
+            if has_upgrades:
+                # These modify the resource results **in-place**!
+                # Unexpected to me, but consistent w/ lots of other places in the code.
+                r['c7n:AvailableVersions'] = available_versions
+                r['c7n:UpgradeVersions'] = upgrade_versions
+                r['c7n:HasUpgrades'] = has_upgrades
+                results.append(r)
+
+        return results
 
 
 @EKS.action_registry.register('tag')
