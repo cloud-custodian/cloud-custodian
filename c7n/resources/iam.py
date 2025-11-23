@@ -26,7 +26,13 @@ from c7n.filters import ValueFilter, Filter
 from c7n.filters.multiattr import MultiAttrFilter
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.manager import resources
-from c7n.query import ConfigSource, QueryResourceManager, DescribeSource, TypeInfo
+from c7n.query import (
+    ChildResourceManager,
+    ConfigSource,
+    DescribeSource,
+    QueryResourceManager,
+    TypeInfo,
+)
 from c7n.resolver import ValuesFrom
 from c7n.tags import TagActionFilter, TagDelayedAction, Tag, RemoveTag, universal_augment
 from c7n.utils import (
@@ -3219,3 +3225,31 @@ class SpecificIamProfileManagedPolicy(ValueFilter):
             if matched_keys:
                 matched.append(r)
         return matched
+
+
+#########################
+#    IAM Access Keys    #
+#########################
+
+
+@resources.register('iam-access-key')
+class AccessKey(ChildResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'iam'
+        # Access keys don't have ARNs - they use AccessKeyId as identifier
+        # Using 'access-key' as arn_type for consistency but ARN construction will not be used
+        arn_type = 'access-key'
+        id = name = 'AccessKeyId'
+        date = 'CreateDate'
+        # Denotes this resource type exists across regions
+        global_resource = True
+        enum_spec = ('list_access_keys', 'AccessKeys', None)
+        parent_spec = ('iam-user', 'UserName', None)
+        # No detail spec needed as list_access_keys returns full metadata
+        cfn_type = config_type = "AWS::IAM::AccessKey"
+        # config_id = 'AccessKeyId'
+
+    source_mapping = {
+        'config': ConfigSource
+    }

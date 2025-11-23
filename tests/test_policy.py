@@ -735,6 +735,7 @@ class PolicyMetaLint(BaseTest):
                 "Missing config types \n %s" % ('\n'.join(sorted(missing))))
 
         # config service can't be bothered to update their sdk correctly
+        # See: https://docs.aws.amazon.com/config/latest/APIReference/API_ListDiscoveredResources.html
         invalid_ignore = {
             'AWS::Config::ConfigurationRecorder',
             'AWS::SageMaker::NotebookInstance',
@@ -742,6 +743,7 @@ class PolicyMetaLint(BaseTest):
             'AWS::DMS::ReplicationInstance',
             'AWS::DMS::ReplicationTask',
             'AWS::SES::MailManagerIngressPoint',
+            'AWS::IAM::AccessKey',
         }
         bad_types = resource_config_types.difference(config_types)
         bad_types = bad_types.difference(invalid_ignore)
@@ -801,6 +803,7 @@ class PolicyMetaLint(BaseTest):
             'redshift-reserved',
             'elasticsearch-reserved',
             'ses-receipt-rule-set',
+            'iam-access-key',
         ))
 
         for k, v in manager.resources.items():

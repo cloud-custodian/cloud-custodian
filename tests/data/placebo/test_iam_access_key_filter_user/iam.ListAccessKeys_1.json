@@ -1,0 +1,49 @@
+{
+  "status_code": 200,
+  "data": {
+    "AccessKeyMetadata": [
+      {
+        "UserName": "faizan.ahmed",
+        "AccessKeyId": "AKIAI5PSD5WUP3AO2OPA",
+        "Status": "Active",
+        "CreateDate": {
+          "__class__": "datetime",
+          "year": 1990,
+          "month": 8,
+          "day": 21,
+          "hour": 19,
+          "minute": 35,
+          "second": 9,
+          "microsecond": 0
+        }
+      },
+      {
+        "UserName": "faizan.ahmed",
+        "AccessKeyId": "AKIAZL6XWCR2EAE3M5WG",
+        "Status": "Active",
+        "CreateDate": {
+          "__class__": "datetime",
+          "year": 2020,
+          "month": 1,
+          "day": 21,
+          "hour": 20,
+          "minute": 5,
+          "second": 55,
+          "microsecond": 0
+        }
+      }
+    ],
+    "IsTruncated": false,
+    "ResponseMetadata": {
+      "RequestId": "411189d8-a31c-4406-a4e2-35f799166ea2",
+      "HTTPStatusCode": 200,
+      "HTTPHeaders": {
+        "x-amzn-requestid": "411189d8-a31c-4406-a4e2-35f799166ea2",
+        "content-type": "text/xml",
+        "content-length": "805",
+        "date": "Tue, 21 Jan 2020 20:33:46 GMT"
+      },
+      "RetryAttempts": 0
+    }
+  }
+}
